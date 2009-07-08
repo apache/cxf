@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +30,7 @@ import javax.ws.rs.core.Response;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -71,7 +74,8 @@ public class WadlGeneratorTest extends Assert {
         
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
-        List<Element> els = getWadlResourcesInfo("http://localhost:8080/baz", 1, r.getEntity().toString());
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
         checkBookStoreInfo(els.get(0));
         
     }
@@ -80,14 +84,14 @@ public class WadlGeneratorTest extends Assert {
         assertNotNull(r);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-//        File f = new File("test.xml");
-//        f.delete();
-//        f.createNewFile();
-//        System.out.println(f.getAbsolutePath());
-//        FileOutputStream fos = new FileOutputStream(f);
-//        fos.write(r.getEntity().toString().getBytes());
-//        fos.flush();
-//        fos.close();
+        File f = new File("test.xml");
+        f.delete();
+        f.createNewFile();
+        System.out.println(f.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(r.getEntity().toString().getBytes());
+        fos.flush();
+        fos.close();
     }
     
     @Test
@@ -103,34 +107,69 @@ public class WadlGeneratorTest extends Assert {
         Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, cris);
         Response r = wg.handleRequest(m, null);
         checkResponse(r);
-        List<Element> els = getWadlResourcesInfo("http://localhost:8080/baz", 2, r.getEntity().toString());
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammars(doc.getDocumentElement());
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
         checkBookStoreInfo(els.get(0));
         Element orderResource = els.get(1);
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
+    private void checkGrammars(Element appElement) {
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
+                                                                "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+                                                          XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+        assertEquals(1, schemasEls.size());
+        assertEquals("http://superbooks", schemasEls.get(0).getAttribute("targetNamespace"));
+        assertEquals(2, DOMUtils.getChildrenWithName(schemasEls.get(0), 
+                       XmlSchemaConstants.XSD_NAMESPACE_URI, "element").size());
+        assertEquals(2, DOMUtils.getChildrenWithName(schemasEls.get(0), 
+                       XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType").size());
+    }
+    
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
-                  "http://research.sun.com/wadl/2006/10", "resource");
-        assertEquals(3, resourceEls.size());        
+                                         WadlGenerator.WADL_NS, "resource");
+        assertEquals(4, resourceEls.size());        
         assertEquals("/", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(2).getAttribute("path"));
+        assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(3).getAttribute("path"));
+        
         
         List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
-            "http://research.sun.com/wadl/2006/10", "method");
+                                                               WadlGenerator.WADL_NS, "method");
         assertEquals(1, methodEls.size());
         assertEquals("GET", methodEls.get(0).getAttribute("name"));
                                                            
         
         List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
-                                  "http://research.sun.com/wadl/2006/10", "param");
+                                                               WadlGenerator.WADL_NS, "param");
         assertEquals(3, paramsEls.size());
         checkParameter(paramsEls.get(0), "id", "template");
         checkParameter(paramsEls.get(1), "bookid", "template");
         checkParameter(paramsEls.get(2), "mid", "matrix");
+        
+        methodEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
+                                                 WadlGenerator.WADL_NS, "method");
+        assertEquals(1, methodEls.size());
+        assertEquals("POST", methodEls.get(0).getAttribute("name"));
+        
+        List<Element> requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
+                                                                WadlGenerator.WADL_NS, "request");
+        assertEquals(1, requestEls.size());
+        List<Element> repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
+                                                            WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, repEls.size());
+        assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));
+        assertEquals("prefix1:thebook", repEls.get(0).getAttribute("element"));
+        assertEquals("application/json", repEls.get(1).getAttribute("mediaType"));
+        assertEquals("", repEls.get(1).getAttribute("element"));
+        
     }
     
     private void checkParameter(Element paramEl, String name, String type) {
@@ -138,19 +177,18 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(type, paramEl.getAttribute("style"));    
     }
     
-    private List<Element> getWadlResourcesInfo(String baseURI, int size, String value) throws Exception {
-        Document doc = DOMUtils.readXml(new StringReader(value));
+    private List<Element> getWadlResourcesInfo(Document doc, String baseURI, int size) throws Exception {
         Element root = doc.getDocumentElement();
-        assertEquals("http://research.sun.com/wadl/2006/10", root.getNamespaceURI());
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
-                                            "http://research.sun.com/wadl/2006/10", "resources");
+                                                                  WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
         Element resourcesEl =  resourcesEls.get(0);
         assertEquals(baseURI, resourcesEl.getAttribute("base"));
         List<Element> resourceEls = 
             DOMUtils.getChildrenWithName(resourcesEl, 
-                                                "http://research.sun.com/wadl/2006/10", "resource");
+                                         WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
         return resourceEls;
     }

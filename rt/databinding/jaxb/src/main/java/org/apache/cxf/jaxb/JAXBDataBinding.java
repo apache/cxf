@@ -19,12 +19,9 @@
 
 package org.apache.cxf.jaxb;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -32,7 +29,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,7 +41,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
-import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
@@ -55,7 +50,6 @@ import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
@@ -67,6 +61,7 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
+import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -125,27 +120,11 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
 
     }
     
-    static final class CachedClassOrNull {
-        private WeakReference<Class<?>> cachedClass;
-
-        public CachedClassOrNull(Class<?> cachedClass) {
-            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
-        }
-
-        public Class<?> getCachedClass() {
-            return cachedClass == null ? null : cachedClass.get();
-        }
-
-        public void setCachedClass(Class<?> cachedClass) {
-            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
-        }
-    }
-
     private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE 
         = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
     
-    private static final Map<Package, CachedClassOrNull> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClassOrNull>();
+    private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
+        = new CacheMap<Package, CachedClass>();
     
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
     static {
@@ -452,27 +431,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
 
     // default access for tests.
     List<DOMResult> generateJaxbSchemas() throws IOException {
-        final List<DOMResult> results = new ArrayList<DOMResult>();
-
-        context.generateSchema(new SchemaOutputResolver() {
-
-            @Override
-            public Result createOutput(String ns, String file) throws IOException {
-                DOMResult result = new DOMResult();
-
-                if (BUILT_IN_SCHEMAS.containsKey(ns)) {
-                    DOMResult dr = BUILT_IN_SCHEMAS.get(ns);
-                    result.setSystemId(dr.getSystemId());
-                    results.add(dr);
-                    return result;
-                }
-                result.setSystemId(file);
-                results.add(result);
-                return result;
-            }
-        });
-
-        return results;
+        return JAXBUtils.generateJaxbSchemas(context, BUILT_IN_SCHEMAS);
     }
 
     public JAXBContext createJAXBContext(Set<Class<?>> classes) throws JAXBException {
@@ -494,7 +453,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
             }
         }
 
-        scanPackages(classes);
+        JAXBUtils.scanPackages(classes, OBJECT_FACTORY_CACHE);
         addWsAddressingTypes(classes);
 
         for (Class<?> clz : classes) {
@@ -542,88 +501,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
 
         return cachedContextAndSchemas;
     }
-    private void scanPackages(Set<Class<?>> classes) {
-     // try and read any jaxb.index files that are with the other classes.
-        // This should
-        // allow loading of extra classes (such as subclasses for inheritance
-        // reasons)
-        // that are in the same package. Also check for ObjectFactory classes
-        Map<String, InputStream> packages = new HashMap<String, InputStream>();
-        Map<String, ClassLoader> packageLoaders = new HashMap<String, ClassLoader>();
-        Set<Class<?>> objectFactories = new HashSet<Class<?>>();
-        for (Class<?> jcls : classes) {
-            String pkgName = PackageUtils.getPackageName(jcls);
-            if (!packages.containsKey(pkgName)) {
-                Package pkg = jcls.getPackage();
-                
-                packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
-                packageLoaders.put(pkgName, jcls.getClassLoader());
-                String objectFactoryClassName = pkgName + "." + "ObjectFactory";
-                Class<?> ofactory = null;
-                CachedClassOrNull cachedFactory = null;
-                if (pkg != null) {
-                    synchronized (OBJECT_FACTORY_CACHE) {
-                        cachedFactory = OBJECT_FACTORY_CACHE.get(pkg);
-                    }
-                }
-                if (cachedFactory != null) {
-                    ofactory = cachedFactory.getCachedClass();
-                }
-                if (ofactory == null) {
-                    try {
-                        ofactory = Class.forName(objectFactoryClassName, false, jcls
-                                                 .getClassLoader());
-                        objectFactories.add(ofactory);
-                        addToObjectFactoryCache(pkg, ofactory);
-                    } catch (ClassNotFoundException e) {
-                        addToObjectFactoryCache(pkg, null);
-                    }
-                } else {
-                    objectFactories.add(ofactory);                    
-                }
-            }
-        }
-        for (Map.Entry<String, InputStream> entry : packages.entrySet()) {
-            if (entry.getValue() != null) {
-                try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(entry.getValue(),
-                                                                                     "UTF-8"));
-                    String pkg = entry.getKey();
-                    ClassLoader loader = packageLoaders.get(pkg);
-                    if (!StringUtils.isEmpty(pkg)) {
-                        pkg += ".";
-                    }
-
-                    String line = reader.readLine();
-                    while (line != null) {
-                        line = line.trim();
-                        if (line.indexOf("#") != -1) {
-                            line = line.substring(0, line.indexOf("#"));
-                        }
-                        if (!StringUtils.isEmpty(line)) {
-                            try {
-                                Class<?> ncls = Class.forName(pkg + line, false, loader);
-                                classes.add(ncls);
-                            } catch (Exception e) {
-                                // ignore
-                            }
-                        }
-                        line = reader.readLine();
-                    }
-                } catch (Exception e) {
-                    // ignore
-                } finally {
-                    try {
-                        entry.getValue().close();
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-            }
-        }
-        classes.addAll(objectFactories);
-    }
-
+    
     private boolean checkObjectFactoryNamespaces(Class<?> clz) {
         for (Method meth : clz.getMethods()) {
             XmlElementDecl decl = meth.getAnnotation(XmlElementDecl.class);
@@ -635,16 +513,6 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
         }
 
         return false;
-    }
-
-    private void addToObjectFactoryCache(Package objectFactoryPkg, Class<?> ofactory) {
-        if (objectFactoryPkg == null) {
-            return;
-        }
-        synchronized (OBJECT_FACTORY_CACHE) {
-            OBJECT_FACTORY_CACHE.put(objectFactoryPkg, 
-                                     new CachedClassOrNull(ofactory));
-        }
     }
 
     private void addWsAddressingTypes(Set<Class<?>> classes) {

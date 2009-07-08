@@ -18,14 +18,23 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-
+@XmlRootElement(name = "thebook", namespace = "http://superbooks")
+@XmlType(name = "book", namespace = "http://superbooks")
 public class Book {
 
     private int id;
+    @XmlElement(name = "thechapter", namespace = "http://superbooks")
+    private Chapter chapter;
     
     public Book() {
     }
@@ -46,7 +55,17 @@ public class Book {
     
     @Path("/chapter/{cid}")
     public Chapter getChapter(@PathParam("cid") int cid) {
-        return new Chapter(cid);
+        return chapter;
     }
-
+    
+    @Path("/form1")
+    @POST
+    public void form1(MultivaluedMap map) {
+    }
+    
+    @Path("/form2")
+    @POST
+    public void form2(@FormParam("field1") String f1, @FormParam("field2") String f2) {
+    }
+    
 }

@@ -94,6 +94,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
         return null;
     }
+    
     public JAXBBeanInfo getBeanInfo(Type cls) {
         if (cls instanceof Class) {
             if (((Class)cls).isArray()) {
@@ -115,16 +116,15 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         
         return null;
     }
+    
     public JAXBBeanInfo getBeanInfo(Class<?> cls) {
         return getBeanInfo(context, cls);
     }
+    
     public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
-        Object o = context.getBeanInfo(cls);
-        if (o == null) {
-            return null;
-        }
-        return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
+        return JAXBUtils.getBeanInfo(context, cls);
     }
+    
     @Override
     public void begin(MessagePartInfo part) {
         // Check to see if the WSDL information has been filled in for us.

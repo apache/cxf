@@ -58,5 +58,10 @@ public class BookStore {
         return new Book(1);
     }
     
+    @GET
+    @Path("chapter")
+    public Chapter getChaper() {
+        return new Chapter(1);
+    }
     
 }

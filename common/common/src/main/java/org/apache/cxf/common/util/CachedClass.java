@@ -16,32 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.model.wadl;
+package org.apache.cxf.common.util;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
+import java.lang.ref.WeakReference;
 
-@XmlRootElement(name = "thechapter", namespace = "http://superbooks")
-@XmlType(name = "chapter", namespace = "http://superbooks")
-public class Chapter {
+public class CachedClass {
+    private WeakReference<Class<?>> cachedClass;
 
-    private int id;
-    public Chapter() {
-    }
-    public Chapter(int id) {
-        this.id = id;
-    }
-    
-    @GET
-    @Path("/id")
-    public int getId() {
-        return id;
-    }
-    
-    public void setId(int ident) {
-        id = ident;
+    public CachedClass(Class<?> cachedClass) {
+        this.cachedClass = new WeakReference<Class<?>>(cachedClass);
     }
 
+    public Class<?> getCachedClass() {
+        return cachedClass == null ? null : cachedClass.get();
+    }
+
+    public void setCachedClass(Class<?> cachedClass) {
+        this.cachedClass = new WeakReference<Class<?>>(cachedClass);
+    }
 }

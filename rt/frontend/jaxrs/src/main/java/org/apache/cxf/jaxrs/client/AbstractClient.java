@@ -52,7 +52,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
@@ -321,9 +320,7 @@ public class AbstractClient implements Client {
         if (status >= 400) {
             try {
                 InputStream errorStream = mStream == null ? conn.getErrorStream() : mStream;
-                if (errorStream != null) {
-                    responseBuilder.entity(IOUtils.readStringFromStream(errorStream));
-                }
+                responseBuilder.entity(errorStream);
             } catch (Exception ex) {
                 // nothing we can do really
             }
