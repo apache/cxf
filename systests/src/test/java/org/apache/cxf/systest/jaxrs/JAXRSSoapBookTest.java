@@ -58,6 +58,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -104,9 +105,14 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:9092/test/services/rest";
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
+        HTTPConduit conduit = (HTTPConduit)WebClient.getConfig(proxy).getConduit();
+        
         Book b = proxy.getBook(new Long("123"));
         assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
+        
+        HTTPConduit conduit2 = (HTTPConduit)WebClient.getConfig(proxy).getConduit();
+        assertSame(conduit, conduit2);
     }
     
     @Test
