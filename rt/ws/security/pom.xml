@@ -31,6 +31,22 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+
+    <repositories>
+        <!--  temporary add the apache snapshot repo to get the wss4j snapshot -->
+        <repository>
+            <id>apache.snapshot</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <dependencies>
 
         <dependency>
@@ -60,7 +76,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.5.7</version>
+            <version>1.5.8-SNAPSHOT</version>
             <exclusions>
                 <exclusion>
                     <groupId>axis</groupId>
