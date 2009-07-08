@@ -21,6 +21,7 @@ package org.apache.cxf.javascript.fortest;
 
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import uri.cxf_apache_org.jstest.any.AcceptAny;
 import uri.cxf_apache_org.jstest.types.any.AcceptAny1;
@@ -189,10 +190,13 @@ public class AnyImpl implements AcceptAny {
             return;
         }
         try {
-            onewayNotify.await();
-            onewayNotify = null;
+            if (!onewayNotify.await(5000, TimeUnit.MILLISECONDS)) {
+                throw new RuntimeException("Did not get the oneway!");
+            }
         } catch (InterruptedException e) {
             //
+        } finally {
+            onewayNotify = null;            
         }
     }
 }
