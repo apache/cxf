@@ -44,12 +44,11 @@
         <compiler.fork>false</compiler.fork>
     </properties>
 
-
     <distributionManagement>
         <repository>
-            <id>apache.releases</id>
+            <id>apache.releases.https</id>
             <name>Apache Release Distribution Repository</name>
-            <url>file://tmp/stage</url>
+            <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
         </repository>
         <snapshotRepository>
             <id>apache.snapshots.https</id>
