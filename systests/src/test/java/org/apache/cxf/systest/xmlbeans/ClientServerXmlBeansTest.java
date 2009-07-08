@@ -61,7 +61,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest/xmlbeans/hello_world.wsdl");
-        assertNotNull("We should found the WSDL her. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. " , wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
@@ -92,7 +92,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
             FaultDetailDocument detailDocument = ex.getFaultInfo();
             FaultDetail detail = detailDocument.getFaultDetail();
             assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
-            assertEquals("Wrong faultDetail minor:", detail.getMinor(), 1);             
+            assertEquals("Wrong faultDetail minor", detail.getMinor(), 1);             
         }          
     }
     
@@ -102,7 +102,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
         BusFactory.setDefaultBus(bus);
         URL wsdl = this.getClass().getResource("/wsdl_systest/xmlbeans/hello_world.wsdl");
-        assertNotNull("We should found the WSDL her. " , wsdl);      
+        assertNotNull("We should have found the WSDL here. " , wsdl);      
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
@@ -135,7 +135,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
             FaultDetailDocument detailDocument = ex.getFaultInfo();
             FaultDetail detail = detailDocument.getFaultDetail();
             assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
-            assertEquals("Wrong faultDetail minor:", detail.getMinor(), 1);             
+            assertEquals("Wrong faultDetail minor", detail.getMinor(), 1);             
         }          
     }
 
