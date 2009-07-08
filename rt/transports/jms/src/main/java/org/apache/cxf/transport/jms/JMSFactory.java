@@ -196,7 +196,7 @@ public final class JMSFactory {
      * @param pubSubDomain true=pubSub, false=Queues
      * @return resolved destination
      */
-    private static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
+    protected static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
                                                           final String replyToDestinationName,
                                                           final boolean pubSubDomain) {
         return (Destination)jmsTemplate.execute(new SessionCallback() {

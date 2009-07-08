@@ -33,10 +33,13 @@ import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
 import org.apache.cxf.hello_world_jms.HWByteMsgService;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
@@ -44,6 +47,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldOneWayQueueService;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 import org.apache.cxf.hello_world_jms.HelloWorldPubSubService;
+import org.apache.cxf.hello_world_jms.HelloWorldQueueDecoupledOneWaysService;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDNoPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDStaticPrefix;
@@ -56,29 +60,28 @@ import org.apache.cxf.jms_greeter.JMSGreeterService;
 import org.apache.cxf.jms_greeter.JMSGreeterService2;
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.systest.jaxws.Hello;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.jms.AddressType;
+import org.apache.cxf.transport.jms.JMSConduit;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
+import org.apache.cxf.transport.jms.JMSNamingPropertyType;
 import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
-import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
-    protected static boolean serversStarted;
-
-    @Before
-    public void startServers() throws Exception {
-        if (serversStarted) {
-            return;
-        }
+    @BeforeClass
+    public static void startServers() throws Exception {
         Map<String, String> props = new HashMap<String, String>();                
         if (System.getProperty("activemq.store.dir") != null) {
             props.put("activemq.store.dir", System.getProperty("activemq.store.dir"));
@@ -91,7 +94,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, false));
-        serversStarted = true;
     }
     
     public URL getWSDLURL(String s) throws Exception {
@@ -119,6 +121,17 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            Client client = ClientProxy.getClient(greeter);
+            EndpointInfo ei = client.getEndpoint().getEndpointInfo();
+            AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
+            JMSNamingPropertyType name = new JMSNamingPropertyType();
+            JMSNamingPropertyType password = new JMSNamingPropertyType();
+            name.setName("java.naming.security.principal");
+            name.setValue("ivan");
+            password.setName("java.naming.security.credentials");
+            password.setValue("the-terrible");
+            address.getJMSNamingProperty().add(name);
+            address.getJMSNamingProperty().add(password);
             for (int idx = 0; idx < 5; idx++) {
 
                 greeter.greetMeOneWay("test String");
@@ -232,6 +245,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
+        } catch (Exception t) {
+            throw t;
         }
     }
     
@@ -282,7 +297,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
             }
             //Give some time to complete one-way calls.
-            Thread.sleep(100L);
+            Thread.sleep(50L);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -306,7 +321,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 greeter.greetMeOneWay("JMS:PubSub:Milestone-" + idx);
             }
             //Give some time to complete one-way calls.
-            Thread.sleep(100L);
+            Thread.sleep(50L);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -386,6 +401,131 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+    }
+
+    @Test
+    public void testQueueDecoupledOneWaysConnection() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                                     "HelloWorldQueueDecoupledOneWaysService"));
+        QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                               "HelloWorldQueueDecoupledOneWaysPort"));
+        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        assertNotNull(wsdl);
+
+        HelloWorldQueueDecoupledOneWaysService service = 
+            new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
+        assertNotNull(service);
+        Endpoint requestEndpoint = null;
+        Endpoint replyEndpoint = null;
+        try {
+            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
+            GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays();
+            requestEndpoint = Endpoint.publish("", requestServant);
+            GreeterImplQueueDecoupledOneWaysDeferredReply replyServant = 
+                new GreeterImplQueueDecoupledOneWaysDeferredReply();
+            replyEndpoint = Endpoint.publish("", replyServant);
+            
+            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
+            BindingProvider  bp = (BindingProvider)handler;
+            Map<String, Object> requestContext = bp.getRequestContext();
+            JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+            requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
+            requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
+            String expectedRequest = "JMS:Queue:Request"; 
+            greeter.greetMeOneWay(expectedRequest);
+            String request = requestServant.ackRequestReceived(5000);
+            if (request == null) {
+                if (requestServant.getException() != null) {
+                    fail(requestServant.getException().getMessage());
+                } else {
+                    fail("The oneway call didn't reach its intended endpoint");
+                }
+            }
+            assertEquals(expectedRequest, request);
+            requestServant.proceedWithReply();
+            String expectedReply = requestServant.ackReplySent(5000);
+            if (expectedReply == null) {
+                if (requestServant.getException() != null) {
+                    fail(requestServant.getException().getMessage());
+                } else {
+                    fail("The decoupled one-way reply was not sent");
+                }
+            }
+            String reply = replyServant.ackRequest(5000);
+            if (reply == null) {
+                if (replyServant.getException() != null) {
+                    fail(replyServant.getException().getMessage());
+                } else {
+                    fail("The decoupled one-way reply didn't reach its intended endpoint");
+                }
+            }
+            assertEquals(expectedReply, reply);
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            if (requestEndpoint != null) {
+                requestEndpoint.stop();
+            }
+            if (replyEndpoint != null) {
+                replyEndpoint.stop();
+            }
+        }
+    }
+    
+    @Test
+    public void testQueueOneWaySpecCompliantConnection() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                                     "HelloWorldQueueDecoupledOneWaysService"));
+        QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                               "HelloWorldQueueDecoupledOneWaysPort"));
+        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        assertNotNull(wsdl);
+
+        HelloWorldQueueDecoupledOneWaysService service = 
+            new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
+        assertNotNull(service);
+        Endpoint requestEndpoint = null;
+        try {
+            HelloWorldOneWayPort greeter = service.getPort(portName, HelloWorldOneWayPort.class);
+            GreeterImplQueueDecoupledOneWays requestServant = new GreeterImplQueueDecoupledOneWays(true);
+            requestEndpoint = Endpoint.publish("", requestServant);
+            
+            Client client = ClientProxy.getClient(greeter);
+            ((JMSConduit)client.getConduit()).getJmsConfig().setEnforceSpec(true);
+            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
+            BindingProvider  bp = (BindingProvider)handler;
+            Map<String, Object> requestContext = bp.getRequestContext();
+            JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+            requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
+            requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
+            String expectedRequest = "JMS:Queue:Request"; 
+            greeter.greetMeOneWay(expectedRequest);
+            String request = requestServant.ackRequestReceived(5000);
+            if (request == null) {
+                if (requestServant.getException() != null) {
+                    fail(requestServant.getException().getMessage());
+                } else {
+                    fail("The oneway call didn't reach its intended endpoint");
+                }
+            }
+            assertEquals(expectedRequest, request);
+            requestServant.proceedWithReply();
+            boolean ack = requestServant.ackNoReplySent(5000);
+            if (!ack) {
+                if (requestServant.getException() != null) {
+                    fail(requestServant.getException().getMessage());
+                } else {
+                    fail("The decoupled one-way reply was sent");
+                }
+            }
+        } catch (Exception ex) {
+            throw ex;
+        } finally {
+            if (requestEndpoint != null) {
+                requestEndpoint.stop();
+            }
+        }
+
     }
 
     private static interface CorrelationIDFactory {
@@ -534,7 +674,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         
         HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
         
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 10; ++i) {
             ClientRunnable client =  
                 new ClientRunnable(port,
                     new CorrelationIDFactory() {
@@ -616,7 +756,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
         HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
         
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 10; ++i) {
             ClientRunnable client =  new ClientRunnable(portEng, "com.mycompany.eng:");
             Thread thread = new Thread(client);
             threads.add(thread);
@@ -661,7 +801,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         
         HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
         
-        for (int i = 0; i < 100; ++i) {
+        for (int i = 0; i < 10; ++i) {
             ClientRunnable client =  
                 new ClientRunnable(port);
             

@@ -80,6 +80,7 @@ public class JMSConfiguration implements InitializingBean {
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
+    private boolean enforceSpec = true;
     
     //For jms spec.
     private String targetService;
@@ -457,5 +458,12 @@ public class JMSConfiguration implements InitializingBean {
     public String getRequestURI() {
         return requestURI;
     }
+    
+    public boolean isEnforceSpec() {
+        return enforceSpec;
+    }
 
+    public void setEnforceSpec(boolean enforceSpec) {
+        this.enforceSpec = enforceSpec;
+    }
 }

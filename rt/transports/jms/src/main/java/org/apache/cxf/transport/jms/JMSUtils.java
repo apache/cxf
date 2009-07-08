@@ -35,7 +35,9 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.ObjectMessage;
+import javax.jms.Queue;
 import javax.jms.Session;
+import javax.jms.Topic;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
@@ -151,6 +153,15 @@ public final class JMSUtils {
             messageProperties.setJMSRedelivered(Boolean.valueOf(message.getJMSRedelivered()));
             messageProperties.setJMSTimeStamp(new Long(message.getJMSTimestamp()));
             messageProperties.setJMSType(message.getJMSType());
+
+            if (message.getJMSReplyTo() != null) {
+                Destination replyTo = message.getJMSReplyTo();
+                if (replyTo instanceof Queue) {
+                    messageProperties.setJMSReplyTo(((Queue)replyTo).getQueueName());
+                } else if (replyTo instanceof Topic) {
+                    messageProperties.setJMSReplyTo(((Topic)replyTo).getTopicName());
+                }
+            }
 
             Map<String, List<String>> protHeaders = new HashMap<String, List<String>>();
             List<JMSPropertyType> props = messageProperties.getProperty();

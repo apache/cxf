@@ -56,6 +56,7 @@
     				default="0" />
                 <xs:attribute name="conduitSelectorPrefix" type="xs:string" use="optional" default=""/>    				
                 <xs:attribute name="useConduitIdSelector" type="xs:boolean" use="optional"/>
+                <xs:attribute name="enforceSpec" type="xs:boolean" use="optional" default="true"/>
     		</xs:extension>
     	</xs:complexContent>
     </xs:complexType>
@@ -91,6 +92,7 @@
         <xs:attribute name="JMSMessageID" type="xs:string"/>
         <xs:attribute name="JMSPriority" type="xs:int"/>
         <xs:attribute name="JMSRedelivered" type="xs:boolean"/>
+        <xs:attribute name="JMSReplyTo" type="xs:string"/>
         <xs:attribute name="JMSTimeStamp" type="xs:long"/>
         <xs:attribute name="JMSType" type="xs:string"/>
         <xs:attribute name="TimeToLive" type="xs:long"/>
