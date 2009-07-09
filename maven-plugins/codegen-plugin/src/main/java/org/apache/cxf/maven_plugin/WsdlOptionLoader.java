@@ -113,11 +113,17 @@ public final class WsdlOptionLoader {
             }
 
             String wsdlName = wsdl.getName();
-            wsdlName = wsdlName.substring(0, wsdlName.indexOf(".wsdl"));
-            File options = getOptions(dir, wsdlName + WSDL_OPTIONS);
-            List<File> bindings = getBindingFiles(dir, wsdlName + WSDL_BINDINGS);
-
-            jobs.add(generateWsdlOption(wsdl, bindings, options, defaultOptions));
+            int idx = wsdlName.toLowerCase().lastIndexOf(".wsdl");
+            if (idx == -1) {
+                idx = wsdlName.lastIndexOf('.');
+            }
+            if (idx != -1) {
+                wsdlName = wsdlName.substring(0, idx);
+                File options = getOptions(dir, wsdlName + WSDL_OPTIONS);
+                List<File> bindings = getBindingFiles(dir, wsdlName + WSDL_BINDINGS);
+    
+                jobs.add(generateWsdlOption(wsdl, bindings, options, defaultOptions));
+            }
         }
         return jobs;
     }
