@@ -19,20 +19,162 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ext.MessageBodyReader;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.ManyTags;
 import org.apache.cxf.jaxrs.resources.TagVO;
+import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
 
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadFromTags() throws Exception {
+        MessageBodyReader<Object> p = new JSONProvider();
+        byte[] bytes = 
+            "{\"Tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"},{\"group\":\"d\",\"name\":\"c\"}]}}"
+            .getBytes();
+        Object tagsObject = p.readFrom((Class)Tags.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        Tags tags = (Tags)tagsObject;
+        List<TagVO> list = tags.getTags();
+        assertEquals(2, list.size());
+        assertEquals("a", list.get(0).getName());
+        assertEquals("b", list.get(0).getGroup());
+        assertEquals("c", list.get(1).getName());
+        assertEquals("d", list.get(1).getGroup());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadFromTag() throws Exception {
+        MessageBodyReader<Object> p = new JSONProvider();
+        byte[] bytes = "{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}"
+            .getBytes();
+        Object tagsObject = p.readFrom((Class)TagVO.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        TagVO tag = (TagVO)tagsObject;
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @Test
+    public void testReadFromUnwrappedTagWrapperName() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setSupportUnwrapped(true);
+        p.setWrapperName("tagVO");
+        readUnwrapped(p);
+    }
+    
+    @Test
+    public void testReadFromUnwrappedTagMap() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setSupportUnwrapped(true);
+        
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(TagVO.class.getName(), "tagVO");
+        p.setWrapperMap(map);
+        readUnwrapped(p);
+    }
+    
+    @Test
+    public void testReadFromUnwrappedTagRoot() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setSupportUnwrapped(true);
+        readUnwrapped(p);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testReadFromUnwrappedQualifiedTagRoot() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setSupportUnwrapped(true);
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns1");
+        p.setNamespaceMap(namespaceMap);
+        
+        byte[] bytes = "{\"group\":\"b\",\"name\":\"a\"}"
+            .getBytes();
+        Object tagsObject = p.readFrom((Class)TagVO2.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        TagVO2 tag = (TagVO2)tagsObject;
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readUnwrapped(JSONProvider p) throws Exception {
+        byte[] bytes = "{\"group\":\"b\",\"name\":\"a\"}"
+            .getBytes();
+        Object tagsObject = p.readFrom((Class)TagVO.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        TagVO tag = (TagVO)tagsObject;
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @Test
+    public void testWriteToSingleTag() throws Exception {
+        JSONProvider p = new JSONProvider();
+        TagVO tag = createTag("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"tagVO\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
+    @Test
+    public void testWriteToSingleQualifiedTag() throws Exception {
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns1");
+        p.setNamespaceMap(namespaceMap);
+        TagVO2 tag = createTag2("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
+    @Test
+    public void testWriteToSingleQualifiedTag2() throws Exception {
+        JSONProvider p = new JSONProvider();
+        TagVO2 tag = createTag2("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+        
+    }
+    
     @Test
     public void testWriteToListWithManyValues() throws Exception {
         JSONProvider p = new JSONProvider();
@@ -94,5 +236,9 @@ public class JSONProviderTest extends Assert {
     
     private TagVO createTag(String name, String group) {
         return new TagVO(name, group);
+    }
+    
+    private TagVO2 createTag2(String name, String group) {
+        return new TagVO2(name, group);
     }
 }

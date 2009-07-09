@@ -41,6 +41,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
@@ -85,6 +86,8 @@ public class WadlGenerator implements RequestHandler {
     public static final String WADL_NS = "http://research.sun.com/wadl/2006/10";    
     
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
+    private static final String JAXB_DEFAULT_NAMESPACE = "##default";
+    private static final String JAXB_DEFAULT_NAME = "##default";
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -373,13 +376,10 @@ public class WadlGenerator implements RequestHandler {
             writeQName(sb, typeQName);
             return;
         }
-        JAXBBeanInfo info = JAXBUtils.getBeanInfo(jaxbProxy, type);
-        if (info == null) {
-            return;
-        }
-        QName qname = getQName(info, type, clsMap);
         
-        if (qname != null && qname.getNamespaceURI().length() > 0) {
+        QName qname = getQName(jaxbProxy, type, clsMap);
+        
+        if (qname != null) {
             writeQName(sb, qname);
             clsMap.put(type, qname);
         }
@@ -417,33 +417,41 @@ public class WadlGenerator implements RequestHandler {
         return xmlSchemaCollection;
     }
     
-    private QName getQName(JAXBBeanInfo jaxbInfo, Class<?> type, Map<Class<?>, QName> clsMap) {
+    private QName getQName(JAXBContextProxy jaxbProxy, Class<?> type, Map<Class<?>, QName> clsMap) {
+        
+        XmlRootElement root = type.getAnnotation(XmlRootElement.class);
+        if (root != null) {
+            return getQNameFromParts(root.name(), root.namespace(), clsMap);
+        }
+        
         try {
-            Object instance = type.newInstance();
-            String localName = jaxbInfo.getElementLocalName(instance);
-            String ns = jaxbInfo.getElementNamespaceURI(instance);
-            if (localName != null) {
-                if (ns != null && ns.length() > 0) {
-                    String prefix = null;
-                    for (QName name : clsMap.values()) {
-                        if (name.getNamespaceURI().equals(ns)) {
-                            prefix = name.getPrefix();
-                            break;
-                        }
-                    }    
-                    if (prefix == null) {
-                        int size = new HashSet<QName>(clsMap.values()).size();
-                        prefix = "prefix" + (size + 1);
-                    }
-                    return new QName(ns, localName, prefix);
-                } else {
-                    return new QName("", localName);
-                }
+            JAXBBeanInfo jaxbInfo = JAXBUtils.getBeanInfo(jaxbProxy, type);
+            if (jaxbInfo == null) {
+                return null;
             }
+            Object instance = type.newInstance();
+            return getQNameFromParts(jaxbInfo.getElementLocalName(instance), 
+                                     jaxbInfo.getElementNamespaceURI(instance),
+                                     clsMap);
         } catch (Exception ex) {
             // ignore    
         }
         return null;
+    }
+    
+    private String getPrefix(String ns, Map<Class<?>, QName> clsMap) {
+        String prefix = null;
+        for (QName name : clsMap.values()) {
+            if (name.getNamespaceURI().equals(ns)) {
+                prefix = name.getPrefix();
+                break;
+            }
+        }    
+        if (prefix == null) {
+            int size = new HashSet<QName>(clsMap.values()).size();
+            prefix = "prefix" + (size + 1);
+        }
+        return prefix;
     }
     
     private Set<Class<?>> getAllJaxbTypes(List<ClassResourceInfo> cris) {
@@ -575,4 +583,19 @@ public class WadlGenerator implements RequestHandler {
         }
         return doc;
     }
+    
+    
+    private QName getQNameFromParts(String name, String namespace, Map<Class<?>, QName> clsMap) {
+        if (name == null || JAXB_DEFAULT_NAME.equals(name) || name.length() == 0) {
+            return null; 
+        }
+        if (namespace == null || JAXB_DEFAULT_NAMESPACE.equals(namespace) || namespace.length() == 0) {
+            return null;
+        }
+        
+        String prefix = getPrefix(namespace, clsMap);
+        return new QName(namespace, name, prefix);
+    }
+    
+    
 }
