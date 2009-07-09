@@ -20,12 +20,15 @@
 package org.apache.cxf.jaxrs.provider;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,14 +40,20 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.jaxb.JAXBBeanInfo;
+import org.apache.cxf.jaxb.JAXBContextProxy;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
@@ -64,10 +73,25 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private Map<String, String> namespaceMap = new HashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
+    private boolean unwrapped;
+    private String wrapperName;
+    private Map<String, String> wrapperMap;
     
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
+    }
+    
+    public void setSupportUnwrapped(boolean unwrap) {
+        this.unwrapped = unwrap;
+    }
+    
+    public void setWrapperName(String wName) {
+        wrapperName = wName;
+    }
+    
+    public void setWrapperMap(Map<String, String> map) {
+        wrapperMap = map;
     }
     
     public void setEnableBuffering(boolean enableBuf) {
@@ -111,8 +135,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
             
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
+            InputStream realStream = getInputStream(type, genericType, is);
             MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
-            XMLStreamReader xsw = factory.createXMLStreamReader(is);
+            XMLStreamReader xsw = factory.createXMLStreamReader(realStream);
+            
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type)) {
                 response = unmarshaller.unmarshal(xsw, theType);
@@ -135,6 +161,56 @@ public class JSONProvider extends AbstractJAXBProvider  {
         return null;
     }
 
+    protected InputStream getInputStream(Class<Object> cls, Type type, InputStream is) throws Exception {
+        if (unwrapped) {
+            String rootName = getRootName(cls, type);
+            InputStream isBefore = new ByteArrayInputStream(rootName.getBytes());
+            InputStream isAfter = new ByteArrayInputStream("}".getBytes());
+            final InputStream[] streams = new InputStream[]{isBefore, is, isAfter};
+            
+            Enumeration<InputStream> list = new Enumeration<InputStream>() {
+                private int index; 
+                public boolean hasMoreElements() {
+                    return index < streams.length;
+                }
+
+                public InputStream nextElement() {
+                    return streams[index++];
+                }  
+                
+            };
+            return new SequenceInputStream(list);
+        } else {
+            return is;
+        }
+                 
+    }
+    
+    protected String getRootName(Class<Object> cls, Type type) throws Exception {
+        String name = null;
+        if (wrapperName != null) {
+            name = wrapperName;
+        } else if (wrapperMap != null) {
+            name = wrapperMap.get(cls.getName());
+        }
+        if (name == null) {
+            QName qname = getQName(cls, type, null, false);
+            if (qname != null) {
+                name = qname.getLocalPart();
+                String prefix = qname.getPrefix();
+                if (prefix.length() > 0) {
+                    name = prefix + "." + name;
+                }
+            }
+        }
+        
+        if (name == null) {
+            throw new WebApplicationException(500);
+        }
+        
+        return "{\"" + name + "\":";
+    }
+    
     public void writeTo(Object obj, Class<?> cls, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
@@ -151,6 +227,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
             Marshaller ms = createMarshaller(actualObject, actualClass, genericType, encoding);
 
+            QName qname = getQName(actualClass, genericType, actualObject, true);
             Configuration c = new Configuration(namespaceMap);
             MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
             AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
@@ -162,7 +239,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
                         xsw.seriliazeAsArray(key);
                     }
                 } else {
-                    String key = getKey(convention, cls);
+                    String key = getKey(convention, qname);
                     xsw.seriliazeAsArray(key);
                 }
             }
@@ -179,33 +256,73 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
     }
 
-    private String getKey(MappedNamespaceConvention convention, Class<?> cls) {
-        String key = null;
+    private String getKey(MappedNamespaceConvention convention, QName qname) throws Exception {
+        return convention.createKey(qname.getPrefix(), 
+                                    qname.getNamespaceURI(),
+                                    qname.getLocalPart());
+            
         
-        XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
-        if (root != null) {
-            
-            String namespace = root.namespace();
-            if (JAXB_DEFAULT_NAMESPACE.equals(namespace)) {
-                namespace = "";
-            }
-            
-            String prefix = namespaceMap.get(namespace);
-            if (prefix == null) {
-                prefix = "";
-            }
-            
-            String name = root.name();
-            if (JAXB_DEFAULT_NAME.equals(name)) {
-                name = cls.getSimpleName();
-            }
-            key = convention.createKey(prefix, namespace, name);
-            
-        } else {
-            key = convention.createKey("", "", cls.getSimpleName());
-        }
-        return key;
     }
     
+    private QName getQName(Class<?> cls, Type type, Object object, boolean allocatePrefix) 
+        throws Exception {
+        //try the easy way first
+        XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
+        QName qname = null;
+        if (root != null) {
+            String namespace = getNamespace(root.namespace());
+            String name = getLocalName(root.name(), cls.getSimpleName());
+            String prefix = getPrefix(namespace, allocatePrefix);
+            qname = new QName(namespace, name, prefix);
+        } else {
+            JAXBContext context = getJAXBContext(cls, type);
+            JAXBContextProxy proxy = ReflectionInvokationHandler.createProxyWrapper(context,
+                                                                                    JAXBContextProxy.class);
+            JAXBBeanInfo info = JAXBUtils.getBeanInfo(proxy, cls);
+            if (info != null) {
+                try {
+                    Object instance = object == null ? cls.newInstance() : object;
+                    String name = getLocalName(info.getElementLocalName(instance), cls.getSimpleName());
+                    String namespace = getNamespace(info.getElementNamespaceURI(instance));
+                    String prefix = getPrefix(namespace, allocatePrefix);
+                    qname = new QName(namespace, name, prefix);
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+        }
+        return qname;
+    }
     
+    private String getLocalName(String name, String clsName) {
+        if (JAXB_DEFAULT_NAME.equals(name)) {
+            name = clsName;
+            if (name.length() > 1) {
+                name = name.substring(0, 1).toLowerCase() + name.substring(1); 
+            } else {
+                name = name.toLowerCase();
+            }
+        }
+        return name;
+    }
+    
+    private String getNamespace(String namespace) {
+        if (JAXB_DEFAULT_NAMESPACE.equals(namespace)) {
+            return "";
+        }
+        return namespace;
+    }
+    
+    private String getPrefix(String namespace, boolean allocatePrefix) {
+        String prefix = namespaceMap.get(namespace);
+        if (prefix == null) {
+            if (allocatePrefix && namespace.length() > 0) {
+                prefix = "ns" + (namespaceMap.size() + 1);
+                namespaceMap.put(namespace, prefix);
+            } else {
+                prefix = "";
+            }
+        }
+        return prefix;
+    }
 }
