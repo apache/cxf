@@ -35,7 +35,7 @@
     <repositories>
         <!--  temporary add the apache snapshot repo to get the wss4j snapshot -->
         <repository>
-            <id>apache.snapshot</id>
+            <id>apache-snapshots</id>
             <name>Apache Snapshot Repository</name>
             <url>http://people.apache.org/repo/m2-snapshot-repository</url>
             <snapshots>
