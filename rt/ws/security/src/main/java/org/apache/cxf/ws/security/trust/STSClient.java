@@ -101,7 +101,6 @@ import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.conversation.ConversationException;
 import org.apache.ws.security.conversation.dkalgo.P_SHA1;
 import org.apache.ws.security.message.token.Reference;
-import org.apache.ws.security.processor.EncryptedDataProcessor;
 import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -670,11 +669,6 @@ public class STSClient implements Configurable {
             el = DOMUtils.getNextElement(el);
         }
         Element rstDec = rst;
-        try {
-            rstDec = decrypt(rst);
-        } catch (IOException e1) {
-            throw new TrustException(e1);
-        }
         String id = findID(rar, rur, rstDec);
         if (StringUtils.isEmpty(id)) {
             throw new TrustException(new Message("NO_ID", LOG));
@@ -734,27 +728,6 @@ public class STSClient implements Configurable {
         token.setSecret(secret);
 
         return token;
-    }
-
-    protected Element decrypt(Element firstElement) throws IOException {
-        if ("EncryptedData".equals(firstElement.getLocalName())
-            && "http://www.w3.org/2001/04/xmlenc#".equals(firstElement.getNamespaceURI())) {
-            Node parent = firstElement.getParentNode();
-            Node prev = firstElement.getPreviousSibling();
-
-            // encrypted even more. WCF seems to do this periodically
-            EncryptedDataProcessor processor = new EncryptedDataProcessor();
-
-            processor.handleToken(firstElement, null, createCrypto(true), createHandler(), null,
-                                  new Vector(), null);
-
-            if (prev == null) {
-                firstElement = (Element)parent.getFirstChild();
-            } else {
-                firstElement = (Element)prev.getNextSibling();
-            }
-        }
-        return firstElement;
     }
 
     private CallbackHandler createHandler() {

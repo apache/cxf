@@ -128,7 +128,6 @@
     			<entry key="ws-security.password" value="abcd!1234"/>
             	<entry key="ws-security.signature.properties" value="etc/wssip.properties"/> 
             	<entry key="ws-security.sts.token.properties" value="etc/wssip.properties"/> 
-            	<entry key="ws-security.sts.token.properties.decrypt" value="etc/bob.properties"/> 
             	<entry key="ws-security.callback-handler" value="interop.client.KeystorePasswordCallback"/>
     		</map>
     	</property>
