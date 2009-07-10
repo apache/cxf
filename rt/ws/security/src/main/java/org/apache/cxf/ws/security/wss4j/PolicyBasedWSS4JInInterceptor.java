@@ -40,6 +40,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
@@ -55,6 +56,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -336,9 +338,20 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                             if (!found && "signed".equals(type)) {
                                 for (int x = 0; x < list.getLength(); x++) {
                                     Element el = (Element)list.item(x);
+                                    
+                                    Attr idAttr = el.getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                                                   "Id");
+                                    if (idAttr == null) {
+                                        idAttr = el.getAttributeNode("Id");
+                                    }
+                                    String id = idAttr == null ? null : idAttr.getValue();
+
                                     for (WSDataRef r : refs) {
                                         if (r.getName().equals(new QName(el.getNamespaceURI(),
-                                                                     el.getLocalName()))) {
+                                                                     el.getLocalName()))
+                                            && r.getWsuId() != null
+                                            && (r.getWsuId().equals(id)
+                                             || r.getWsuId().equals("#" + id))) {
                                             found = true;
                                         }
                                     }
