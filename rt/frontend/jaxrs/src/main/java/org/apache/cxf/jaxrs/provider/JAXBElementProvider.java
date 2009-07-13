@@ -141,14 +141,16 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
 
     protected Object doUnmarshal(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
-        MessageContext mc = getContext();
-        if (mc != null) {
-            XMLStreamReader reader = getContext().getContent(XMLStreamReader.class);
-            if (reader != null) {
-                return unmarshalFromReader(unmarshaller, reader, mt);
-            }
+        XMLStreamReader reader = getStreamReader(is, mt);
+        if (reader != null) {
+            return unmarshalFromReader(unmarshaller, reader, mt);
         }
         return unmarshalFromInputStream(unmarshaller, is, mt);
+    }
+    
+    protected XMLStreamReader getStreamReader(InputStream is, MediaType mt) {
+        MessageContext mc = getContext();
+        return mc != null ? mc.getContent(XMLStreamReader.class) : null;
     }
     
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
@@ -190,14 +192,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             ms.setProperty(entry.getKey(), entry.getValue());
         }
         
-        XMLStreamWriter writer = null;
         MessageContext mc = getContext();
         if (mc != null) {
-            writer = mc.getContent(XMLStreamWriter.class);
-            if (writer == null && enableStreaming) {
-                writer = StaxUtils.createXMLStreamWriter(os);
-            }
-            // check Marshaller properties here as well which might've been set earlier on,
+            // check Marshaller properties which might've been set earlier on,
             // they'll overwrite statically configured ones
             for (String key : MARSHALLER_PROPERTIES) {
                 Object value = mc.get(key);
@@ -207,11 +204,27 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
             
         }
+        XMLStreamWriter writer = getStreamWriter(obj, os, mt);
         if (writer != null) {
+            if (mc != null) {
+                mc.put(XMLStreamWriter.class.getName(), writer);
+            }
             marshalToWriter(ms, obj, writer, mt);
         } else {
             marshalToOutputStream(ms, obj, os, mt);
         }
+    }
+    
+    protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
+        XMLStreamWriter writer = null;
+        MessageContext mc = getContext();
+        if (mc != null) {
+            writer = mc.getContent(XMLStreamWriter.class);
+            if (writer == null && enableStreaming) {
+                writer = StaxUtils.createXMLStreamWriter(os);
+            }
+        }
+        return writer;
     }
     
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 

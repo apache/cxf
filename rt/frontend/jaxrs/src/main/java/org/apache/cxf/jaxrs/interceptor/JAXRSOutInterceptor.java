@@ -257,10 +257,12 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private void checkCachedStream(Message m, OutputStream osOriginal, boolean enabled) throws Exception {
-        if (!enabled) {
-            return;
+        XMLStreamWriter writer = null;
+        if (enabled) {
+            writer = m.getContent(XMLStreamWriter.class);
+        } else {
+            writer = (XMLStreamWriter)m.get(XMLStreamWriter.class.getName());
         }
-        XMLStreamWriter writer = m.getContent(XMLStreamWriter.class);
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
             if (cache.getEvents().size() != 0) {
@@ -272,11 +274,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             m.setContent(XMLStreamWriter.class, null);
             return;
         }
-        OutputStream os = m.getContent(OutputStream.class);
-        if (os != osOriginal && os instanceof CachedOutputStream) {
-            CachedOutputStream cos = (CachedOutputStream)os;
-            if (cos.size() != 0) {
-                cos.writeCacheTo(osOriginal);
+        if (enabled) {
+            OutputStream os = m.getContent(OutputStream.class);
+            if (os != osOriginal && os instanceof CachedOutputStream) {
+                CachedOutputStream cos = (CachedOutputStream)os;
+                if (cos.size() != 0) {
+                    cos.writeCacheTo(osOriginal);
+                }
             }
         }
     }

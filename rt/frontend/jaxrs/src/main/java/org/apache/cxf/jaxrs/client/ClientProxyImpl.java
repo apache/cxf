@@ -205,6 +205,10 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         
         if (status >= 400) {
             
+            if (m.getReturnType() == Response.class && m.getExceptionTypes().length == 0) {
+                return;
+            }
+            
             ResponseExceptionMapper<?> mapper = findExceptionMapper(m, message);
             if (mapper != null) {
                 Throwable t = mapper.fromResponse(r);
