@@ -79,6 +79,29 @@ public class URITemplateTest extends Assert {
         assertEquals("123", values.getFirst("id"));
         assertEquals("3", values.getFirst("order"));
     }
+    
+    @Test
+    public void testMatchWithMultipleMatrixParams() throws Exception {
+        URITemplate uriTemplate = 
+            new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("renderwidget/id/1007/type/1/size/1/locale/en_US/properties;a=b", 
+                                     values));
+        assertEquals("1007", values.getFirst("id"));
+    }
+    
+    @Test
+    public void testMatchWithMultipleMatrixParams2() throws Exception {
+        URITemplate uriTemplate = 
+            new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match(
+                   "renderwidget/id/1007/type/1/size/1/locale/en_US/properties;numResults=1;foo=bar", 
+                    values));
+        assertEquals("1007", values.getFirst("id"));
+    }
 
     @Test
     public void testMatchWithMatrixOnClearPath3() throws Exception {

@@ -244,6 +244,13 @@ public class BookStore {
     }
     
     @GET
+    @Path("/books/{bookId}/")
+    @Produces("text/xml")
+    public Book getBookTextXml(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return doGetBook(id);
+    }
+    
+    @GET
     @Path("/books/wrapper/{bookId}/")
     @Produces("application/xml")
     public BookWrapper getWrappedBook(@PathParam("bookId") Long id) throws BookNotFoundFault {
