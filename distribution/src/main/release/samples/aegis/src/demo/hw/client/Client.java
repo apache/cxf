@@ -21,6 +21,8 @@ package demo.hw.client;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import demo.hw.server.HelloWorld;
 
@@ -41,7 +43,10 @@ public final class Client {
         HelloWorld client = (HelloWorld)factory.create();
         System.out.println("Invoke sayHi()....");
         System.out.println(client.sayHi(System.getProperty("user.name")));
-        System.exit(0);
+        Document doc = client.getADocument();
+        Element e = (Element) doc.getFirstChild();
+        System.out.println(e.getTagName());
+        e = (Element) e.getFirstChild();
+        System.out.println(e.getTagName());
     }
-
 }
