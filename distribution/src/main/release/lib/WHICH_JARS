@@ -16,12 +16,14 @@ The following jars are required for all CXF usage:
 - geronimo-activation.jar (Or the Sun equivalent) [6]
 - geronimo-annotation.jar (Or the Sun equivalent) [6]
 - geronimo-javamail.jar (Or the Sun equivalent) [6]
+  (MAY be able to remove javamail if you don't use any MTOM/SAAJ type things)
 - geronimo-stax-api.jar (Or the Sun equivalent) [6]
 - neethi.jar
 - jaxb-api.jar  [6]
-- jaxb-impl.jar
+- jaxb-impl.jar (this is a [6] for normal runtime, but is required for 
+                 tooling and the dynamic clients)
 - XmlSchema.jar
-- wstx-asl.jar  [6]
+- wstx-asl.jar  [6] or another StAX implementation
 - wsdl4j.jar
 - xml-resolver.jar 
 
