@@ -79,8 +79,12 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         XMLStreamReader reader;
         try {
             XMLInputFactory factory = getXMLInputFactory(message);
-            synchronized (factory) {
-                reader = factory.createXMLStreamReader(is, encoding);
+            if (factory == null) {
+                reader = StaxUtils.createXMLStreamReader(is, encoding);
+            } else {
+                synchronized (factory) {
+                    reader = factory.createXMLStreamReader(is, encoding);
+                }                
             }
         } catch (XMLStreamException e) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("STREAM_CREATE_EXC",
@@ -123,8 +127,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
             }
             return xif;
-        } else {
-            return StaxUtils.getXMLInputFactory();
-        }
+        } 
+        return null;
     }
 }

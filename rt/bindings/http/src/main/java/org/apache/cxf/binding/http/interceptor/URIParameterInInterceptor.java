@@ -114,8 +114,12 @@ public class URIParameterInInterceptor extends AbstractPhaseInterceptor<Message>
             XMLInputFactory inputFactory = StaxInInterceptor.getXMLInputFactory(message);
             try {
                 XMLStreamReader reader;
-                synchronized (inputFactory) {
-                    reader = inputFactory.createXMLStreamReader(message.getContent(InputStream.class));
+                if (inputFactory == null) {
+                    reader = StaxUtils.createXMLStreamReader(message.getContent(InputStream.class));
+                } else {
+                    synchronized (inputFactory) {
+                        reader = inputFactory.createXMLStreamReader(message.getContent(InputStream.class));
+                    }
                 }
                 doc = StaxUtils.read(reader);
             } catch (XMLStreamException e) {

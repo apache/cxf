@@ -19,7 +19,6 @@
 
 package org.apache.cxf.staxutils;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.junit.Assert;
@@ -29,9 +28,8 @@ public class FragmentStreamReaderTest extends Assert {
 
     @Test
     public void testReader() throws Exception {
-        XMLInputFactory ifactory = StaxUtils.getXMLInputFactory();
         XMLStreamReader reader = 
-            ifactory.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
+            StaxUtils.createXMLStreamReader(getClass().getResourceAsStream("./resources/amazon.xml"));
         
         DepthXMLStreamReader dr = new DepthXMLStreamReader(reader);
         
