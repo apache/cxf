@@ -36,6 +36,7 @@ import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.staxutils.StaxUtils;
 
 
 public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor {
@@ -64,8 +65,12 @@ public class MediatorInInterceptor extends AbstractEndpointSelectionInterceptor 
 
             XMLStreamReader xsr;
             XMLInputFactory factory = StaxInInterceptor.getXMLInputFactory(message);
-            synchronized (factory) {
-                xsr = factory.createXMLStreamReader(bos.getInputStream(), encoding);
+            if (factory == null) {
+                xsr = StaxUtils.createXMLStreamReader(bos.getInputStream(), encoding);
+            } else {
+                synchronized (factory) {
+                    xsr = factory.createXMLStreamReader(bos.getInputStream(), encoding);
+                }
             }
             
             // move to the soap body            
