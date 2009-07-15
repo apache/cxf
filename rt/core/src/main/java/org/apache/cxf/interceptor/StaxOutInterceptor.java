@@ -65,8 +65,12 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         
         try {
             XMLOutputFactory factory = getXMLOutputFactory(message);
-            synchronized (factory) {
-                writer = factory.createXMLStreamWriter(os, encoding);
+            if (factory == null) {
+                writer = StaxUtils.createXMLStreamWriter(os, encoding);
+            } else {
+                synchronized (factory) {
+                    writer = factory.createXMLStreamWriter(os, encoding);
+                }
             }
             if (Boolean.TRUE.equals(message.getContextualProperty(FORCE_START_DOCUMENT))) {
                 writer.writeStartDocument(encoding, "1.0");
@@ -142,9 +146,8 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                   Boolean.TRUE);
             m.put(FORCE_START_DOCUMENT, Boolean.TRUE);
             return xif;
-        } else {
-            return StaxUtils.getXMLOutputFactory();
         }
+        return null;
     }
     
     public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {

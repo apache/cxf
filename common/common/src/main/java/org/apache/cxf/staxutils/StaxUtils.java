@@ -23,9 +23,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
-//import java.util.HashMap;
-//import java.util.Map;
 import java.util.Iterator;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.NamespaceContext;
@@ -75,23 +75,27 @@ public final class StaxUtils {
 
     private static final Logger LOG = LogUtils.getL7dLogger(StaxUtils.class);
     
-    private static final XMLInputFactory XML_NS_AWARE_INPUT_FACTORY = XMLInputFactory.newInstance();
-    private static final XMLInputFactory XML_INPUT_FACTORY = XMLInputFactory.newInstance();
-    private static final XMLOutputFactory XML_OUTPUT_FACTORY = XMLOutputFactory.newInstance();
+    private static final BlockingQueue<XMLInputFactory> NS_AWARE_INPUT_FACTORY_POOL;
+    private static final BlockingQueue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
     
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
     
     static {
+        int i = 20;
+    
         try {
-            XML_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, false);
-        } catch (Exception e) {
-            //ignore
+            String s = System.getProperty("org.apache.cxf.staxutils.pool-size",
+                                          "-1");
+            i = Integer.parseInt(s);
+        } catch (Throwable t) {
+            //ignore 
+            i = 20;
         }
-        try {
-            XML_NS_AWARE_INPUT_FACTORY.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
-        } catch (Exception ex) {
-            //ignore
+        if (i <= 0) {
+            i = 20;
         }
+        NS_AWARE_INPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLInputFactory>(i);
+        OUTPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLOutputFactory>(i);
     }
     
     private StaxUtils() {
@@ -117,17 +121,29 @@ public final class StaxUtils {
      * Return a cached, namespace-aware, factory.
      * @return
      */
-    public static XMLInputFactory getXMLInputFactory() {
-        return getXMLInputFactory(true);
+    private static XMLInputFactory getXMLInputFactory() {
+        XMLInputFactory f = NS_AWARE_INPUT_FACTORY_POOL.poll();
+        if (f == null) {
+            f = XMLInputFactory.newInstance();
+            f.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+        }
+        return f;
     }
     
-    /**
-     * Return a cached factory.
-     * @param nsAware
-     * @return
-     */
-    public static XMLInputFactory getXMLInputFactory(boolean nsAware) {
-        return nsAware ? XML_NS_AWARE_INPUT_FACTORY : XML_INPUT_FACTORY;
+    private static void returnXMLInputFactory(XMLInputFactory factory) {
+        NS_AWARE_INPUT_FACTORY_POOL.offer(factory);
+    }
+    
+    private static XMLOutputFactory getXMLOutputFactory() {
+        XMLOutputFactory f = OUTPUT_FACTORY_POOL.poll();
+        if (f == null) {
+            f = XMLOutputFactory.newInstance();
+        }
+        return f;
+    }
+    
+    private static void returnXMLOutputFactory(XMLOutputFactory factory) {
+        OUTPUT_FACTORY_POOL.offer(factory);
     }
     
     /**
@@ -141,18 +157,16 @@ public final class StaxUtils {
         return factory;
     }
 
-    public static XMLOutputFactory getXMLOutputFactory() {
-        return XML_OUTPUT_FACTORY;
-    }
+    
 
     public static XMLStreamWriter createXMLStreamWriter(Writer out) {
+        XMLOutputFactory factory = getXMLOutputFactory();
         try {
-            XMLOutputFactory factory = getXMLOutputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamWriter(out);
-            }
+            return factory.createXMLStreamWriter(out);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
+        } finally {
+            returnXMLOutputFactory(factory);
         }
     } 
     
@@ -164,36 +178,35 @@ public final class StaxUtils {
         if (encoding == null) {
             encoding = "UTF-8";
         }
-
+        XMLOutputFactory factory = getXMLOutputFactory();
         try {
-            XMLOutputFactory factory = getXMLOutputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamWriter(out, encoding);
-            }
+            return factory.createXMLStreamWriter(out, encoding);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
+        } finally {
+            returnXMLOutputFactory(factory);
         }
     }
     
     public static XMLStreamWriter createXMLStreamWriter(Result r) {
+        XMLOutputFactory factory = getXMLOutputFactory();
         try {
-            XMLOutputFactory factory = getXMLOutputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamWriter(r);
-            }
+            return factory.createXMLStreamWriter(r);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamWriter", e);
+        } finally {
+            returnXMLOutputFactory(factory);
         }
     }
 
     public static XMLStreamReader createFilteredReader(XMLStreamReader reader, StreamFilter filter) {
+        XMLInputFactory factory = getXMLInputFactory();
         try {
-            XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
-                return factory.createFilteredReader(reader, filter);
-            }
+            return factory.createFilteredReader(reader, filter);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Cant' create XMLStreamReader", e);
+        } finally {
+            returnXMLInputFactory(factory);
         }
     }
 
@@ -857,13 +870,13 @@ public final class StaxUtils {
             encoding = "UTF-8";
         }
 
+        XMLInputFactory factory = getXMLInputFactory();
         try {
-            XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamReader(in, encoding);
-            }
+            return factory.createXMLStreamReader(in, encoding);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
+        } finally {
+            returnXMLInputFactory(factory);
         }
     }
 
@@ -872,23 +885,23 @@ public final class StaxUtils {
      * @return
      */
     public static XMLStreamReader createXMLStreamReader(InputStream in) {
+        XMLInputFactory factory = getXMLInputFactory();
         try {
-            XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamReader(in);
-            }
+            return factory.createXMLStreamReader(in);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
+        } finally {
+            returnXMLInputFactory(factory);
         }
     }
     public static XMLStreamReader createXMLStreamReader(String systemId, InputStream in) {
+        XMLInputFactory factory = getXMLInputFactory();
         try {
-            XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamReader(systemId, in);
-            }
+            return factory.createXMLStreamReader(systemId, in);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
+        } finally {
+            returnXMLInputFactory(factory);
         }
     }
     
@@ -914,9 +927,12 @@ public final class StaxUtils {
                     return new W3CDOMStreamReader(el);
                 }
             }
+            
             XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
+            try {
                 return factory.createXMLStreamReader(source);
+            } finally {
+                returnXMLInputFactory(factory);
             }
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
@@ -928,14 +944,13 @@ public final class StaxUtils {
      * @return
      */
     public static XMLStreamReader createXMLStreamReader(Reader reader) {
-
+        XMLInputFactory factory = getXMLInputFactory();
         try {
-            XMLInputFactory factory = getXMLInputFactory();
-            synchronized (factory) {
-                return factory.createXMLStreamReader(reader);
-            }
+            return factory.createXMLStreamReader(reader);
         } catch (XMLStreamException e) {
             throw new RuntimeException("Couldn't parse stream.", e);
+        } finally {
+            returnXMLInputFactory(factory);
         }
     }
 
