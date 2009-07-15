@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.frontend.soap;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.endpoint.ServerImpl;
@@ -78,17 +81,26 @@ public class SoapBindingSelectionTest extends AbstractSimpleFrontendTest {
         MultipleEndpointObserver meo = (MultipleEndpointObserver) mo;
         assertEquals(2, meo.getEndpoints().size());
         
-        invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap11.xml");
+        Node nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap11.xml");
+        assertEquals("http://schemas.xmlsoap.org/soap/envelope/", getNs(nd));
         
         assertTrue(service1Invoked);
         assertFalse(service2Invoked);
         
         service1Invoked = false;
         
-        invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap12.xml");
+        nd = invoke("http://localhost/Hello", LocalTransportFactory.TRANSPORT_ID, "soap12.xml");
+        assertEquals("http://www.w3.org/2003/05/soap-envelope", getNs(nd));
         
         assertFalse(service1Invoked);
         assertTrue(service2Invoked);
+    }
+    
+    private String getNs(Node nd) {
+        if (nd instanceof Document) {
+            return getNs(((Document)nd).getDocumentElement());
+        }
+        return nd.getNamespaceURI();
     }
 
 }
