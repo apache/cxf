@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -83,6 +84,46 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         source.setBuffering(true);
         assertEquals(124L, Long.parseLong(source.getValue("Book/id")));
         assertEquals("CXF rocks", source.getValue("Book/name"));
+    }
+    
+    @Test 
+    public void testGetBookCollection() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b1);
+        books.add(b2);
+        List<Book> books2 = store.getBookCollection(books);
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        Book b11 = books.get(0);
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books.get(1);
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
+    }
+    
+    @Test 
+    public void testGetBookArray() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        Book b1 = new Book("CXF in Action", 123L);
+        Book b2 = new Book("CXF Rocks", 124L);
+        Book[] books = new Book[2];
+        books[0] = b1;
+        books[1] = b2;
+        Book[] books2 = store.getBookArray(books);
+        assertNotNull(books2);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.length);
+        Book b11 = books2[0];
+        assertEquals(123L, b11.getId());
+        assertEquals("CXF in Action", b11.getName());
+        Book b22 = books2[1];
+        assertEquals(124L, b22.getId());
+        assertEquals("CXF Rocks", b22.getName());
     }
     
     @Test
