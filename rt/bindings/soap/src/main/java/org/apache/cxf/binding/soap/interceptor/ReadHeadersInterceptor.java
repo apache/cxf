@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -58,8 +59,14 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(ReadHeadersInterceptor.class);
 
     private Bus bus;
+    private SoapVersion version;
     public ReadHeadersInterceptor(Bus b) {
         super(Phase.READ);
+        bus = b;
+    }
+    public ReadHeadersInterceptor(Bus b, SoapVersion v) {
+        super(Phase.READ);
+        version = v;
         bus = b;
     }
     public ReadHeadersInterceptor(Bus b, String phase) {
@@ -94,6 +101,11 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 if (soapVersion == null) {
                     throw new SoapFault(new Message("INVALID_VERSION", LOG, ns, xmlReader.getLocalName()),
                                             Soap11.getInstance().getVersionMismatch());
+                }
+                if (soapVersion == Soap12.getInstance()
+                    && version == Soap11.getInstance()) {
+                    throw new SoapFault(new Message("INVALID_11_VERSION", LOG, ns, xmlReader.getLocalName()),
+                                        Soap11.getInstance().getVersionMismatch());                    
                 }
                 message.setVersion(soapVersion);
 

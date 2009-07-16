@@ -45,6 +45,7 @@ import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.OutgoingChainInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.Extensible;
@@ -380,16 +381,17 @@ public final class ContextUtils {
                                  new PreexistingConduitSelector(backChannel,
                                                                 exchange.get(Endpoint.class)));
 
-                    if (!partialResponse.getInterceptorChain().doIntercept(partialResponse) 
-                            && partialResponse.getContent(Exception.class) != null) {
+                    if (chain != null && !chain.doIntercept(partialResponse) 
+                        && partialResponse.getContent(Exception.class) != null) {
                         if (partialResponse.getContent(Exception.class) instanceof Fault) {
                             throw (Fault)partialResponse.getContent(Exception.class);
                         } else {
                             throw new Fault(partialResponse.getContent(Exception.class));
                         }
                     }
-                    
-                    partialResponse.getInterceptorChain().reset();
+                    if (chain != null) {
+                        chain.reset();                        
+                    }
                     exchange.put(ConduitSelector.class, new NullConduitSelector());
                     if (fullResponse != null) {
                         exchange.setOutMessage(fullResponse);
@@ -825,7 +827,11 @@ public final class ContextUtils {
         Endpoint ep = exchange.get(Endpoint.class);
         Message msg = null;
         if (ep != null) {
-            msg = ep.getBinding().createMessage();
+            msg = new MessageImpl();
+            msg.setExchange(exchange);
+            if (ep.getBinding() != null) {
+                msg = ep.getBinding().createMessage(msg);
+            }
         }
         return msg;
     }

@@ -276,7 +276,9 @@ public class WrappedMessageContext implements MessageContext {
             }
             if (m == null) {
                 Endpoint ep = exchange.get(Endpoint.class);
-                m = ep.getBinding().createMessage();
+                m = new org.apache.cxf.message.MessageImpl();
+                m.setExchange(exchange);
+                m = ep.getBinding().createMessage(m);
                 exchange.setInMessage(m);
             }
         } else {
