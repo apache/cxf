@@ -21,10 +21,14 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
@@ -41,14 +45,20 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.QName;
 import javax.xml.validation.Schema;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
+import org.apache.cxf.jaxb.JAXBBeanInfo;
+import org.apache.cxf.jaxb.JAXBContextProxy;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -60,20 +70,138 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
+   
+    private static final String JAXB_DEFAULT_NAMESPACE = "##default";
+    private static final String JAXB_DEFAULT_NAME = "##default";
     
     private static final String CHARSET_PARAMETER = "charset";
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
    
+    private static Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
+    private static JAXBContext collectionContext; 
+    
     private MessageContext mc;
     private Schema schema;
+    private String collectionWrapperName;
+    private Map<String, String> collectionWrapperMap;
+    
+    public void setCollectionWrapperName(String wName) {
+        collectionWrapperName = wName;
+    }
+    
+    public void setCollectionWrapperMap(Map<String, String> map) {
+        collectionWrapperMap = map;
+    }
     
     protected void setContext(MessageContext context) {
         mc = context;
     }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            if (type == null) {
+                return false;
+            }
+        }
+        
         return isSupported(type, genericType, anns);
+    }
+    
+    protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
+        synchronized (collectionContextClasses) {
+            if (!collectionContextClasses.contains(type)) {
+                collectionContextClasses.add(CollectionWrapper.class);
+                collectionContextClasses.add(type);
+            }
+            collectionContext = JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}));
+            return collectionContext;
+        }
+    }
+    
+    protected QName getCollectionWrapperQName(Class<?> cls, Type type, Object object, boolean pluralName)
+        throws Exception {
+        String name = getCollectionWrapperName(cls);
+        if (name == null) {
+            return getJaxbQName(cls, type, object, pluralName);
+        }
+            
+        int ind1 = name.indexOf('{');
+        if (ind1 != 0) {
+            return new QName(name);
+        }
+        
+        int ind2 = name.indexOf('}');
+        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
+            return null;
+        }
+        String ns = name.substring(ind1 + 1, ind2);
+        String localName = name.substring(ind2 + 1);
+        return new QName(ns, localName);
+    }
+    
+    private String getCollectionWrapperName(Class<?> cls) {
+        if (collectionWrapperName != null) { 
+            return collectionWrapperName;
+        }
+        if (collectionWrapperMap != null) {
+            return collectionWrapperMap.get(cls.getName());
+        }
+        
+        return null;
+    }
+    
+    protected QName getJaxbQName(Class<?> cls, Type type, Object object, boolean pluralName) 
+        throws Exception {
+        //try the easy way first
+        XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
+        QName qname = null;
+        if (root != null) {
+            String namespace = getNamespace(root.namespace());
+            String name = getLocalName(root.name(), cls.getSimpleName(), pluralName);
+            return new QName(namespace, name);
+        } else {
+            JAXBContext context = getJAXBContext(cls, type);
+            JAXBContextProxy proxy = ReflectionInvokationHandler.createProxyWrapper(context,
+                                                                                    JAXBContextProxy.class);
+            JAXBBeanInfo info = JAXBUtils.getBeanInfo(proxy, cls);
+            if (info != null) {
+                try {
+                    Object instance = object == null ? cls.newInstance() : object;
+                    String name = getLocalName(info.getElementLocalName(instance), cls.getSimpleName(), 
+                                               pluralName);
+                    String namespace = getNamespace(info.getElementNamespaceURI(instance));
+                    return new QName(namespace, name);
+                } catch (Exception ex) {
+                    // ignore
+                }
+            }
+        }
+        return qname;
+    }
+    
+    private String getLocalName(String name, String clsName, boolean pluralName) {
+        if (JAXB_DEFAULT_NAME.equals(name)) {
+            name = clsName;
+            if (name.length() > 1) {
+                name = name.substring(0, 1).toLowerCase() + name.substring(1); 
+            } else {
+                name = name.toLowerCase();
+            }
+        }
+        if (pluralName) {
+            name += 's';
+        }
+        return name;
+    }
+    
+    private String getNamespace(String namespace) {
+        if (JAXB_DEFAULT_NAMESPACE.equals(namespace)) {
+            return "";
+        }
+        return namespace;
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
@@ -124,7 +252,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return context != null ? context : getClassContext(type);
     }
     
-    // TODO : move this method to a dedicated JAXBContextRegistry class
     public JAXBContext getClassContext(Class<?> type) throws JAXBException {
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
@@ -136,7 +263,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
-    //  TODO : move this method to a dedicated JAXBContextRegistry class
     public JAXBContext getPackageContext(Class<?> type) {
         if (type == null) {
             return null;
@@ -159,12 +285,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected boolean isSupported(Class<?> type, Type genericType, Annotation[] anns) {
-        // TODO : Shall we just return true and let readFrom/writeTo 
-        // fail if JAXB can't handle a given type ?
-        
-        // TODO: still not checked : 
-        // - XmlJavaTypeAdapter at package level
-        // - anything else ?
         return type.getAnnotation(XmlRootElement.class) != null
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)
@@ -193,7 +313,13 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected Unmarshaller createUnmarshaller(Class<?> cls, Type genericType) 
         throws JAXBException {
-        JAXBContext context = getJAXBContext(cls, genericType);
+        return createUnmarshaller(cls, genericType, false);        
+    }
+    
+    protected Unmarshaller createUnmarshaller(Class<?> cls, Type genericType, boolean isCollection) 
+        throws JAXBException {
+        JAXBContext context = isCollection ? getCollectionContext(cls) 
+                                           : getJAXBContext(cls, genericType);
         Unmarshaller unmarshaller = context.createUnmarshaller();
         if (schema != null) {
             unmarshaller.setSchema(schema);
@@ -201,17 +327,26 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return unmarshaller;        
     }
     
-    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
+    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc, 
+                                          boolean isCollection)
         throws JAXBException {
         
         Class<?> objClazz = JAXBElement.class.isAssignableFrom(cls) 
                             ? ((JAXBElement)obj).getDeclaredType() : cls;
-        JAXBContext context = getJAXBContext(objClazz, genericType);
+                            
+        JAXBContext context = isCollection ? getCollectionContext(objClazz) 
+            : getJAXBContext(objClazz, genericType);
         Marshaller marshaller = context.createMarshaller();
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
         }
         return marshaller;
+    }
+    
+    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
+        throws JAXBException {
+        
+        return createMarshaller(obj, cls, genericType, enc, false);
     }
     
     protected String getEncoding(MediaType mt, MultivaluedMap<String, Object> headers) {
@@ -296,13 +431,56 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected static void handleJAXBException(JAXBException e) {
+        StringBuilder sb = new StringBuilder();
+        if (e.getMessage() != null) {
+            sb.append(e.getMessage()).append(". ");
+        }
+        if (e.getCause() != null && e.getCause().getMessage() != null) {
+            sb.append(e.getCause().getMessage()).append(". ");
+        }
+        if (e.getLinkedException() != null && e.getLinkedException().getMessage() != null) {
+            sb.append(e.getLinkedException().getMessage()).append(". ");
+        }
         Throwable t = e.getLinkedException() != null 
             ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
-                             BUNDLE, t.getMessage()).toString();
+                             BUNDLE, sb.toString()).toString();
         LOG.warning(message);
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
         throw new WebApplicationException(t, r);
+    }
+    
+    @XmlRootElement
+    protected static class CollectionWrapper {
+        
+        @XmlAnyElement(lax = true)
+        private List<?> l;
+        
+        public void setList(List<?> list) {
+            l = list;
+        }
+        
+        public List<?> getList() {
+            if (l == null) {
+                l = new ArrayList<Object>();
+            }
+            return l;
+        }
+        
+        @SuppressWarnings("unchecked")
+        public <T> Object getCollectionOrArray(Class<T> type, boolean isArray) {
+            List<?> theList = getList();
+            if (isArray) {
+                T[] values = (T[])Array.newInstance(type, theList.size());
+                for (int i = 0; i < theList.size(); i++) {
+                    values[i] = (T)theList.get(i);
+                }
+                return values;
+            } else {
+                return theList;
+            }
+        }
+        
     }
 }

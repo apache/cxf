@@ -137,6 +137,28 @@ public class BookStore {
         return doGetBook(url2.substring(index + 1));
     }
     
+    @POST
+    @Path("/collections")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public List<Book> getBookCollection(List<Book> bs) throws Exception {
+        if (bs == null || bs.size() != 2) {
+            throw new RuntimeException();
+        }
+        return bs;
+    }
+    
+    @POST
+    @Path("/array")
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    public Book[] getBookArray(Book[] bs) throws Exception {
+        if (bs == null || bs.length != 2) {
+            throw new RuntimeException();
+        }
+        return bs;
+    }
+    
     @GET
     @Path("/segment/{pathsegment}/")
     public Book getBookBySegment(@PathParam("pathsegment") PathSegment segment) throws Exception {

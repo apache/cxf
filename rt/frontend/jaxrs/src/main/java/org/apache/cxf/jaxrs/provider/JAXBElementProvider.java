@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,18 +37,24 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Produces({"application/xml", "application/*+xml", "text/xml" })
@@ -64,6 +72,19 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
+    
+    @Override
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+        
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            type = InjectionUtils.getActualType(genericType);
+            if (type == null) {
+                return false;
+            }
+        }
+        
+        return isSupported(type, genericType, anns);
+    }
     
     @Context
     public void setMessageContext(MessageContext mc) {
@@ -114,8 +135,11 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
-            Class<?> theType = getActualType(type, genericType, anns);
-            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
+            boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
+            Class<?> theType = isCollection ? InjectionUtils.getActualType(genericType) : type;
+            theType = getActualType(theType, genericType, anns);
+
+            Unmarshaller unmarshaller = createUnmarshaller(theType, genericType, isCollection);
             if (eventHandler != null) {
                 unmarshaller.setEventHandler(eventHandler);
             }
@@ -123,8 +147,12 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (JAXBElement.class.isAssignableFrom(type)) {
                 response = unmarshaller.unmarshal(new StreamSource(is), theType);
             } else {
-                response = doUnmarshal(unmarshaller, is, mt);
+                response = doUnmarshal(unmarshaller, type, is, mt);
             }
+            if (isCollection) {
+                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type.isArray()); 
+            }
+            
             response = checkAdapter(response, anns, false);
             return response;
             
@@ -139,18 +167,25 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         return null;
     }
 
-    protected Object doUnmarshal(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
+    protected Object doUnmarshal(Unmarshaller unmarshaller, Class<?> type, InputStream is, MediaType mt) 
         throws JAXBException {
-        XMLStreamReader reader = getStreamReader(is, mt);
+        XMLStreamReader reader = getStreamReader(is, type, mt);
         if (reader != null) {
             return unmarshalFromReader(unmarshaller, reader, mt);
         }
         return unmarshalFromInputStream(unmarshaller, is, mt);
     }
     
-    protected XMLStreamReader getStreamReader(InputStream is, MediaType mt) {
+    protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
         MessageContext mc = getContext();
-        return mc != null ? mc.getContent(XMLStreamReader.class) : null;
+        XMLStreamReader reader = mc != null ? mc.getContent(XMLStreamReader.class) : null;
+        if (InjectionUtils.isSupportedCollectionOrArray(type)) {
+            reader = reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
+            return new JAXBCollectionWrapperReader(reader);
+        } else {
+            return reader;
+        }
+        
     }
     
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
@@ -169,11 +204,13 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         try {
             Object actualObject = checkAdapter(obj, anns, true);
             Class<?> actualClass = actualObject.getClass();
-            if (cls == genericType) {
-                genericType = actualClass;
-            }
             String encoding = getEncoding(m, headers);
-            marshal(actualObject, actualClass, genericType, encoding, os, m);
+            if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
+                actualClass = InjectionUtils.getActualType(genericType);
+                marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);
+            } else {
+                marshal(actualObject, actualClass, genericType, encoding, os, m);
+            }
         } catch (JAXBException e) {
             handleJAXBException(e);
         }  catch (WebApplicationException e) {
@@ -183,15 +220,66 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
     }
 
-    protected void marshal(Object obj, Class<?> cls, Type genericType, 
-                           String enc, OutputStream os, MediaType mt)
+    protected void marshalCollection(Class<?> originalCls, Object actualObject, Class<?> actualClass,
+                                     Type genericType, String encoding, OutputStream os, MediaType m) 
         throws Exception {
         
+        QName qname = getCollectionWrapperQName(actualClass, genericType, actualObject, true);
+        if (qname == null) {
+            String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
+                                                                    BUNDLE).toString();
+            throw new WebApplicationException(Response.serverError()
+                                              .entity(message).build());
+        }
+        
+        String startTag = null;
+        String endTag = null;
+        if (qname.getNamespaceURI().length() > 0) {
+            startTag = "<ns1:" + qname.getLocalPart() + " xmlns:ns1=\"" + qname.getNamespaceURI()
+                       + "\">";
+            endTag = "</ns1:" + qname.getLocalPart() + ">"; 
+        } else {
+            startTag = "<" + qname.getLocalPart() + ">";
+            endTag = "</" + qname.getLocalPart() + ">";
+        }
+        os.write(startTag.getBytes());
+        Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
+        for (Object o : arr) {
+            marshalCollectionMember(o, actualClass, genericType, encoding, os, m, 
+                                    qname.getNamespaceURI());    
+        }
+        os.write(endTag.getBytes());
+    }
+    
+    protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType, 
+                           String enc, OutputStream os, MediaType mt, String ns) throws Exception {
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
+        if (ns.length() > 0) {
+            Map<String, String> map = Collections.singletonMap(ns, "ns1");
+            NamespaceMapper nsMapper = new NamespaceMapper(map);
+            try {
+                ms.setProperty("com.sun.xml.bind.namespacePrefixMapper", nsMapper);
+            } catch (PropertyException ex) {
+                ms.setProperty("com.sun.xml.internal.bind.namespacePrefixMapper", nsMapper);
+            }
+        }
+        marshal(obj, cls, genericType, enc, os, mt, ms);
+    }
+    
+    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+                           String enc, OutputStream os, MediaType mt) throws Exception {
+        Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        marshal(obj, cls, genericType, enc, os, mt, ms);
+    }
+    
+    protected void marshal(Object obj, Class<?> cls, Type genericType, 
+                           String enc, OutputStream os, MediaType mt, Marshaller ms)
+        throws Exception {
+        
         for (Map.Entry<String, Object> entry : mProperties.entrySet()) {
             ms.setProperty(entry.getKey(), entry.getValue());
         }
-        
         MessageContext mc = getContext();
         if (mc != null) {
             // check Marshaller properties which might've been set earlier on,
@@ -235,5 +323,36 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected void marshalToWriter(Marshaller ms, Object obj, XMLStreamWriter writer, MediaType mt) 
         throws Exception {
         ms.marshal(obj, writer);
+    }
+    
+    
+    protected static class JAXBCollectionWrapperReader extends DepthXMLStreamReader {
+        
+        private boolean firstName;
+        private boolean firstNs;
+        
+        public JAXBCollectionWrapperReader(XMLStreamReader reader) {
+            super(reader);
+        }
+        
+        @Override
+        public String getNamespaceURI() {
+            if (!firstNs) {
+                firstNs = true;
+                return "";
+            }
+            return super.getNamespaceURI();
+        }
+        
+        @Override
+        public String getLocalName() {
+            if (!firstName) {
+                firstName = true;
+                return "collectionWrapper";
+            }
+            
+            return super.getLocalName();
+        }
+        
     }
 }

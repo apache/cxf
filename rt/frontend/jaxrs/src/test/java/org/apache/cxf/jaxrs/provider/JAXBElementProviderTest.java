@@ -19,11 +19,13 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -48,12 +50,144 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.CollectionsResource;
+import org.apache.cxf.jaxrs.resources.TagVO2;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JAXBElementProviderTest extends Assert {
 
+    @Test
+    public void testIsWriteableCollection() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setCollectionWrapperName("foo");
+        Method m = CollectionsResource.class.getMethod("getBooks", new Class[0]);
+        assertTrue(provider.isWriteable(m.getReturnType(), m.getGenericReturnType(),
+                             new Annotation[0], MediaType.TEXT_XML_TYPE));
+    }
+    
+    @Test
+    public void testWriteCollection() throws Exception {
+        doWriteUnqualifiedCollection(true, false);
+    }
+    
+    @Test
+    public void testWriteCollectionJaxbName() throws Exception {
+        doWriteUnqualifiedCollection(false, false);
+    }
+    
+    @Test
+    public void testWriteArray() throws Exception {
+        doWriteUnqualifiedCollection(true, true);
+    }
+    
+    public void doWriteUnqualifiedCollection(boolean setName, boolean isArray) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        if (setName) {
+            provider.setCollectionWrapperName("Books");
+        }
+        List<Book> books = new ArrayList<Book>();
+        books.add(new Book("CXF in Action", 123L));
+        books.add(new Book("CXF Rocks", 124L));
+        String mName = isArray ? "getBooksArray" : "getBooks";
+        Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(isArray ? books.toArray() : books, m.getReturnType(), m.getGenericReturnType(),
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        doReadUnqualifiedCollection(bos.toString());
+    }
+    
+    @Test
+    public void testWriteQualifiedCollection() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setCollectionWrapperName("{http://tags}tags");
+        List<TagVO2> tags = new ArrayList<TagVO2>();
+        tags.add(new TagVO2("A", "B"));
+        tags.add(new TagVO2("C", "D"));
+        Method m = CollectionsResource.class.getMethod("getTags", new Class[0]);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tags, m.getReturnType(), m.getGenericReturnType(),
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        doReadQualifiedCollection(bos.toString(), false);
+    }
+    
+    @Test
+    public void testReadUnqualifiedCollection() throws Exception {
+        String data = "<Books><Book><id>123</id><name>CXF in Action</name>"
+            + "</Book><Book><id>124</id><name>CXF Rocks</name></Book></Books>";
+        doReadUnqualifiedCollection(data);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void doReadUnqualifiedCollection(String data) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Method m = CollectionsResource.class.getMethod("setBooks", 
+                                                       new Class[]{List.class});
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        List<Book> books = (List<Book>)provider.readFrom(
+                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertNotNull(books);
+        assertEquals(2, books.size());
+        Book b1 = books.get(0);
+        assertEquals(123, b1.getId());
+        assertEquals("CXF in Action", b1.getName());
+        
+        Book b2 = books.get(1);
+        assertEquals(124, b2.getId());
+        assertEquals("CXF Rocks", b2.getName());    
+    }
+    
+    
+    @Test
+    public void testReadQualifiedCollection() throws Exception {
+        String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"
+            + "</ns1:thetag><ns1:thetag><group>D</group><name>C</name></ns1:thetag></ns1:tags>";
+        doReadQualifiedCollection(data, false);
+    }
+    
+    @Test
+    public void testReadQualifiedArray() throws Exception {
+        String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"
+            + "</ns1:thetag><ns1:thetag><group>D</group><name>C</name></ns1:thetag></ns1:tags>";
+        doReadQualifiedCollection(data, true);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Method m = null;
+        if (!isArray) {
+            m = CollectionsResource.class.getMethod("setTags", new Class[]{List.class});
+        } else {
+            m = CollectionsResource.class.getMethod("setTagsArray", new Class[]{TagVO2[].class});
+        }
+        
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom(
+                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertNotNull(o);
+        TagVO2 t1 = null;
+        TagVO2 t2 = null;
+        if (!isArray) {
+            assertEquals(2, ((List)o).size());
+            t1 = (TagVO2)((List)o).get(0);
+            t2 = (TagVO2)((List)o).get(1);
+        } else {
+            assertEquals(2, ((Object[])o).length);
+            t1 = (TagVO2)((Object[])o)[0];
+            t2 = (TagVO2)((Object[])o)[1];
+        }
+        assertEquals("A", t1.getName());
+        assertEquals("B", t1.getGroup());
+        
+        assertEquals("C", t2.getName());
+        assertEquals("D", t2.getGroup());
+    }
+    
     @Test
     public void testSetSchemasFromClasspath() {
         JAXBElementProvider provider = new JAXBElementProvider();
