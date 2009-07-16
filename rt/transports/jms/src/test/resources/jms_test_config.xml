@@ -109,6 +109,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   	p:concurrentConsumers="3"
   	p:maxConcurrentConsumers="5"
   	p:maxSuspendedContinuations="2"
+  	p:acceptMessagesWhileStopping="true"
   />    
  
 <!--
