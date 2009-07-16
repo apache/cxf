@@ -33,8 +33,6 @@ import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
-
-    static final String BOGUS_MESSAGE_SELECTOR = "orgApacheCxfTransportsJmsContinuations='too-many'";
     
     private Bus bus;
     private Message inMessage;
@@ -42,8 +40,6 @@ public class JMSContinuation implements Continuation {
     private Collection<JMSContinuation> continuations;
     private DefaultMessageListenerContainer jmsListener;
     private JMSConfiguration jmsConfig;
-    
-    private String currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
     
     private Object userObject;
     
@@ -163,14 +159,11 @@ public class JMSContinuation implements Continuation {
         // throttle the flow if there're too many continuation instances in memory
         synchronized (continuations) {
             modifyList(remove);
-            if (remove && !BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
-                jmsListener.setMessageSelector(currentMessageSelector);
-                currentMessageSelector = BOGUS_MESSAGE_SELECTOR;
-            } else if (!remove && continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
-                currentMessageSelector = jmsListener.getMessageSelector();
-                if (!BOGUS_MESSAGE_SELECTOR.equals(currentMessageSelector)) {
-                    jmsListener.setMessageSelector(BOGUS_MESSAGE_SELECTOR);
-                    
+            if (continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
+                jmsListener.stop();
+            } else {
+                if (!jmsListener.isRunning()) {
+                    jmsListener.start();
                 }
             }
         }
@@ -185,9 +178,6 @@ public class JMSContinuation implements Continuation {
         }
     }
     
-    String getCurrentMessageSelector() {
-        return currentMessageSelector;
-    }
     
     
 }

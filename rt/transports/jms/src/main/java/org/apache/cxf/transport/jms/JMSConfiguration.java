@@ -81,7 +81,8 @@ public class JMSConfiguration implements InitializingBean {
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
     private boolean enforceSpec = true;
-    
+    private boolean acceptMessagesWhileStopping;
+
     //For jms spec.
     private String targetService;
     private String requestURI;
@@ -386,7 +387,15 @@ public class JMSConfiguration implements InitializingBean {
     public void setReconnectOnException(boolean reconnectOnException) {
         this.reconnectOnException = reconnectOnException;
     }
-         
+
+    public boolean isAcceptMessagesWhileStopping() {
+        return acceptMessagesWhileStopping;
+    }
+    
+    public void setAcceptMessagesWhileStopping(boolean acceptMessagesWhileStopping) {
+        this.acceptMessagesWhileStopping = acceptMessagesWhileStopping;
+    }
+    
     /**
      * Tries to creates a ConnectionFactory from jndi if none was set as a property
      * by using the jndConfig. Then it determiens if the connectionFactory should be wrapped

@@ -159,6 +159,9 @@ public final class JMSFactory {
                      + ", please set cacheLevel to the value less than "
                      + " org.springframework.jms.listener.DefaultMessageListenerContainer.CACHE_CONSUMER");
         }
+        if (jmsConfig.isAcceptMessagesWhileStopping()) {
+            jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
+        }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
         if (!userCID && messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
             jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 

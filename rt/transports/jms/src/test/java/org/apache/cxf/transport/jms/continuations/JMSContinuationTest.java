@@ -33,6 +33,7 @@ import org.easymock.classextension.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.springframework.jms.JmsException;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 
@@ -99,9 +100,9 @@ public class JMSContinuationTest extends Assert {
     }
     
     @Test
-    public void testThrottleWithMessageSelector() {
+    public void testThrottleWithJmsStartAndStop() {
         
-        DefaultMessageListenerContainer springContainer = new DefaultMessageListenerContainer();
+        DefaultMessageListenerContainerStub springContainer = new DefaultMessageListenerContainerStub();
         springContainer.setCacheLevel(2);
         JMSConfiguration config = new JMSConfiguration();
         config.setMaxSuspendedContinuations(1);
@@ -110,17 +111,17 @@ public class JMSContinuationTest extends Assert {
             new TestJMSContinuationWrapper(b, m, observer, continuations,
                                            springContainer, config);
         
-        assertNull(springContainer.getMessageSelector());
-        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, cw.getCurrentMessageSelector());
+        assertFalse(springContainer.isStart());
+        assertFalse(springContainer.isStop());
         
-        suspendResumeCheckSelector(cw, springContainer);
+        suspendResumeCheckStartAndStop(cw, config, springContainer);
         EasyMock.reset(observer);
-        suspendResumeCheckSelector(cw, springContainer);
+        suspendResumeCheckStartAndStop(cw, config, springContainer);
         
     }
     
-    private void suspendResumeCheckSelector(JMSContinuation cw, 
-                                            DefaultMessageListenerContainer springContainer) {
+    private void suspendResumeCheckStartAndStop(JMSContinuation cw, JMSConfiguration config,
+                                            DefaultMessageListenerContainerStub springContainer) {
         try {
             cw.suspend(5000);
             fail("SuspendInvocation exception expected");
@@ -129,11 +130,9 @@ public class JMSContinuationTest extends Assert {
         }
         assertEquals(continuations.size(), 1);
         assertSame(continuations.get(0), cw);
+        assertTrue(springContainer.isStop());
         
         assertFalse(cw.suspend(1000));
-        
-        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, springContainer.getMessageSelector());
-        assertNull(cw.getCurrentMessageSelector());        
         
         observer.onMessage(m);
         EasyMock.expectLastCall();
@@ -142,10 +141,8 @@ public class JMSContinuationTest extends Assert {
         cw.resume();
         
         assertEquals(continuations.size(), 0);
+        assertTrue(springContainer.isStart());
         EasyMock.verify(observer);
-        
-        assertNull(springContainer.getMessageSelector());
-        assertEquals(JMSContinuation.BOGUS_MESSAGE_SELECTOR, cw.getCurrentMessageSelector());
     }
     
     @Test
@@ -189,6 +186,29 @@ public class JMSContinuationTest extends Assert {
             boolean result = taskCancelled;
             taskCancelled = false;
             return result;
+        }
+    }
+    
+    private class DefaultMessageListenerContainerStub extends DefaultMessageListenerContainer {
+        private boolean start;
+        private boolean stop;
+
+        public void start() throws JmsException {
+            this.start = true;
+            this.stop = false;
+        }
+
+        public void stop() throws JmsException {
+            this.stop = true;
+            this.start = false;
+        }
+
+        public boolean isStart() {
+            return this.start;
+        }
+
+        public boolean isStop() {
+            return this.stop;
         }
     }
 }
