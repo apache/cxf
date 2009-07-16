@@ -41,4 +41,24 @@ public class ProviderTest extends AbstractJaxWsTest {
         addNamespace("j", "http://service.jaxws.cxf.apache.org/");
         assertValid("//s:Body/j:sayHi", response);
     }
+    
+    @Test
+    public void testCXF1852() throws Exception {
+        EndpointImpl ep = new EndpointImpl(getBus(), new PayloadProvider2(), (String) null);
+        ep.publish("http://localhost:9001/Provider2");
+        
+        Node response = invoke("http://localhost:9001/Provider2",
+                               LocalTransportFactory.TRANSPORT_ID, 
+                               "/org/apache/cxf/jaxws/sayHi.xml");
+
+        assertNotNull(response);
+        assertNoFault(response);
+
+        addNamespace("j", "http://service.jaxws.cxf.apache.org/");
+        assertValid("//s:Body/j:sayHi", response);        
+    }
+    
+    public static class PayloadProvider2 extends PayloadProvider {
+        
+    }
 }
