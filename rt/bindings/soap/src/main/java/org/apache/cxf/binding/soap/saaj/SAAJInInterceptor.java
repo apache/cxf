@@ -21,6 +21,7 @@ package org.apache.cxf.binding.soap.saaj;
 
 
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.ResourceBundle;
 
 import javax.xml.namespace.QName;
@@ -102,13 +103,17 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             Document node = (Document) message.getContent(Node.class);
             DOMSource source = new DOMSource(node);
             part.setContent(source);
-            
-            // TODO: setup mime headers
             Collection<Attachment> atts = message.getAttachments();
             if (atts != null) {
                 for (Attachment a : atts) {
                     AttachmentPart ap = soapMessage.createAttachmentPart(a.getDataHandler());
-                    
+                    ap.setContentId(a.getId());
+                    Iterator<String> i = a.getHeaderNames();
+                    while (i != null && i.hasNext()) {
+                        String h = i.next();
+                        String val = a.getHeader(h);
+                        ap.addMimeHeader(h, val);
+                    }
                     soapMessage.addAttachmentPart(ap);
                 }
             }
