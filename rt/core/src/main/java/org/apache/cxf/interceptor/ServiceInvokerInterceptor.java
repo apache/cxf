@@ -28,6 +28,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
@@ -60,7 +61,9 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
                     
                     Message outMessage = runableEx.getOutMessage();
                     if (outMessage == null) {
-                        outMessage = ep.getBinding().createMessage();
+                        outMessage = new MessageImpl();
+                        outMessage.setExchange(exchange);
+                        outMessage = ep.getBinding().createMessage(outMessage);
                         exchange.setOutMessage(outMessage);
                     }
                     copyJaxwsProperties(message, outMessage);

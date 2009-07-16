@@ -70,8 +70,8 @@ public class ChainInitiationObserver implements MessageObserver {
             Exchange exchange = message.getExchange();
             if (exchange == null) {
                 exchange = new ExchangeImpl();
-                exchange.setInMessage(message);
             }
+            exchange.setInMessage(message);
             setExchangeProperties(exchange, message);
     
             // setup chain
