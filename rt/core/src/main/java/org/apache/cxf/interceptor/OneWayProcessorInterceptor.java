@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -98,7 +99,9 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
         Endpoint ep = exchange.get(Endpoint.class);
         Message msg = null;
         if (ep != null) {
-            msg = ep.getBinding().createMessage();
+            msg = new MessageImpl();
+            msg.setExchange(exchange);
+            msg = ep.getBinding().createMessage(msg);
         }
         return msg;
     }

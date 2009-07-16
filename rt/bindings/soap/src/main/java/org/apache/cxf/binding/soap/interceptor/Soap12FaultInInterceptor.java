@@ -31,6 +31,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
@@ -50,6 +51,10 @@ public class Soap12FaultInInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
+        if (message.getVersion() == Soap11.getInstance()) {
+            new Soap11FaultInInterceptor().handleMessage(message);
+            return;
+        }
         XMLStreamReader reader = message.getContent(XMLStreamReader.class);
         message.setContent(Exception.class, unmarshalFault(message, reader));
     }

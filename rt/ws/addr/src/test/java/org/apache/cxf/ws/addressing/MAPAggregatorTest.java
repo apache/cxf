@@ -29,16 +29,21 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
+
 //import javax.xml.ws.RequestWrapper;
 //import javax.xml.ws.ResponseWrapper;
 
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.phase.PhaseManager;
+import org.apache.cxf.phase.PhaseManagerImpl;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -425,6 +430,17 @@ public class MAPAggregatorTest extends Assert {
                            decoupled,
                            zeroLengthAction,
                            fault);
+            
+            Endpoint endpoint = control.createMock(Endpoint.class);
+            endpoint.getOutInterceptors();
+            EasyMock.expectLastCall().andReturn(new ArrayList()).anyTimes();
+            Service serv = control.createMock(Service.class);
+            endpoint.getService();
+            EasyMock.expectLastCall().andReturn(serv).anyTimes();
+            serv.getOutInterceptors();
+            EasyMock.expectLastCall().andReturn(new ArrayList()).anyTimes();
+            exchange.get(Endpoint.class);
+            EasyMock.expectLastCall().andReturn(endpoint).anyTimes();
         }
         control.replay();
         return message;
@@ -435,6 +451,9 @@ public class MAPAggregatorTest extends Assert {
                                       boolean usingAddressing) {
         setUpMessageExchange(message, exchange);
         Endpoint endpoint = control.createMock(Endpoint.class);
+        endpoint.getOutInterceptors();
+        EasyMock.expectLastCall().andReturn(new ArrayList()).anyTimes();
+        
         setUpExchangeGet(exchange, Endpoint.class, endpoint);
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         endpoint.getEndpointInfo();
@@ -445,7 +464,7 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expectLastCall().andReturn(endpointExts);
         BindingInfo bindingInfo = control.createMock(BindingInfo.class);
         endpointInfo.getBinding();
-        EasyMock.expectLastCall().andReturn(bindingInfo).times(2);
+        EasyMock.expectLastCall().andReturn(bindingInfo).anyTimes();
         bindingInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));
         EasyMock.expectLastCall().andReturn(Collections.EMPTY_LIST);
         ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
@@ -592,9 +611,9 @@ public class MAPAggregatorTest extends Assert {
         EasyMock.expectLastCall().andReturn(endpoint);
         Binding binding = control.createMock(Binding.class);
         endpoint.getBinding();        
-        EasyMock.expectLastCall().andReturn(binding);
+        EasyMock.expectLastCall().andReturn(binding).anyTimes();
         Message partialResponse = getMessage();
-        binding.createMessage();
+        binding.createMessage(EasyMock.isA(Message.class));
         EasyMock.expectLastCall().andReturn(partialResponse);
 
         Destination target = control.createMock(Destination.class);
@@ -656,7 +675,13 @@ public class MAPAggregatorTest extends Assert {
     }
 
     private Exchange getExchange() {
+        Bus bus = control.createMock(Bus.class);
+        bus.getExtension(PhaseManager.class);
+        EasyMock.expectLastCall().andReturn(new PhaseManagerImpl()).anyTimes();
+        
         Exchange exchange = control.createMock(Exchange.class);
+        exchange.get(Bus.class);
+        EasyMock.expectLastCall().andReturn(bus).anyTimes();
         //Exchange exchange = new ExchangeImpl();
         return exchange;
     }

@@ -57,10 +57,18 @@ public class SoapBinding extends AbstractBasicInterceptorProvider implements Bin
 
     public Message createMessage(Message m) {
         SoapMessage soapMessage = new SoapMessage(m);
-        soapMessage.setVersion(version);
+        if (m.getExchange() != null) { 
+            if (m.getExchange().getInMessage() instanceof SoapMessage) {
+                soapMessage.setVersion(((SoapMessage)m.getExchange().getInMessage()).getVersion());
+            } else {
+                soapMessage.setVersion(version);                
+            }
+        } else {
+            soapMessage.setVersion(version);
+        }
 
         if (!soapMessage.containsKey(Message.CONTENT_TYPE)) {
-            soapMessage.put(Message.CONTENT_TYPE, version.getContentType());
+            soapMessage.put(Message.CONTENT_TYPE, soapMessage.getVersion().getContentType());
         }
         
         return soapMessage;

@@ -31,7 +31,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
+import javax.xml.soap.SOAPConstants;
 import javax.xml.soap.SOAPException;
+import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
@@ -193,6 +195,16 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
         
         if (ex instanceof SoapFault) {
+            if (!soapFault.getNamespaceURI().equals(((SoapFault)ex).getFaultCode().getNamespaceURI())
+                && SOAPConstants.URI_NS_SOAP_1_1_ENVELOPE
+                    .equals(((SoapFault)ex).getFaultCode().getNamespaceURI())) {
+                //change to 1.1
+                try {
+                    soapFault = SOAPFactory.newInstance().createFault();
+                } catch (Throwable t) {
+                    //ignore
+                }
+            }
             soapFault.setFaultString(((SoapFault)ex).getReason());
             soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
             soapFault.setFaultActor(((SoapFault)ex).getRole());

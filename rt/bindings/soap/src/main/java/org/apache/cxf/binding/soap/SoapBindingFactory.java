@@ -377,7 +377,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             }
             sb.getInInterceptors().add(new SoapHeaderInterceptor());
 
-            sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus()));
+            sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus(), version));
             sb.getInInterceptors().add(new CheckFaultInterceptor());
             sb.getInInterceptors().add(new MustUnderstandInterceptor());
             sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
@@ -805,7 +805,8 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             // This will not work if we one of the endpoints disables message
             // processing. But, if you've disabled message processing, you
             // probably aren't going to use this feature.
-            newMO.getBindingInterceptors().add(new ReadHeadersInterceptor(getBus()));
+            
+            newMO.getBindingInterceptors().add(new ReadHeadersInterceptor(getBus(), (SoapVersion)null));
             newMO.getBindingInterceptors().add(new CheckFaultInterceptor());
 
             // Add in a default selection interceptor
