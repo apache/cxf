@@ -158,7 +158,7 @@ public class WrappedTest extends AbstractAegisTest {
         assertEquals("before items", arrayService.getBeforeValue());
         assertEquals(3, arrayService.getW3cArray().length);
         org.w3c.dom.Document e = arrayService.getW3cArray()[0];
-        assertValid("/a:anyType/iam:walrus", e);
+        assertValid("/iam:walrus", e);
         assertEquals("after items", arrayService.getAfterValue());
     }
 
