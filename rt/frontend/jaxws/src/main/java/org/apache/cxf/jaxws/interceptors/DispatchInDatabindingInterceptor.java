@@ -394,8 +394,7 @@ public class DispatchInDatabindingInterceptor extends AbstractInDatabindingInter
 
         XMLStreamReader reader = null;
 
-        reader = StaxUtils.getXMLInputFactory().createXMLStreamReader(cos.getInputStream(),
-                                                                      encoding);
+        reader = StaxUtils.createXMLStreamReader(cos.getInputStream(), encoding);
 
         DataReader<XMLStreamReader> dataReader = getDataReader(message);
         dataReader.setProperty(JAXBDataBinding.UNWRAP_JAXB_ELEMENT, Boolean.FALSE);
