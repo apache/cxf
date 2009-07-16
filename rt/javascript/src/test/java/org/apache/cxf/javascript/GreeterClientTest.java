@@ -58,7 +58,7 @@ public class GreeterClientTest extends JavascriptRhinoTest {
             testUtilities.rhinoCallConvert("sayHiTest", Notifier.class, 
                                            testUtilities.javaToJS(getAddress()));
         
-        boolean notified = notifier.waitForJavascript(1000 * 10);
+        boolean notified = notifier.waitForJavascript(1000 * 15);
         assertTrue(notified);
         Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
         assertNull(errorStatus);
@@ -86,7 +86,7 @@ public class GreeterClientTest extends JavascriptRhinoTest {
             testUtilities.rhinoCallConvert("requestClosureTest", CountDownNotifier.class, 
                                            testUtilities.javaToJS(getAddress()));
         
-        boolean notified = notifier.waitForJavascript(1000 * 10);
+        boolean notified = notifier.waitForJavascript(1000 * 15);
         assertTrue(notified);
         Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
         assertNull(errorStatus);

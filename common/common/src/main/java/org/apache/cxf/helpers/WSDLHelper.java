@@ -97,7 +97,7 @@ public class WSDLHelper {
     public List<Part> getInMessageParts(Operation operation) {
         Input input = operation.getInput();
         List<Part> partsList = new ArrayList<Part>();
-        if (input != null) {
+        if (input != null && input.getMessage() != null) {
             Iterator ite = input.getMessage().getParts().values().iterator();
             while (ite.hasNext()) {
                 partsList.add((Part)ite.next());
@@ -109,7 +109,7 @@ public class WSDLHelper {
     public List<Part> getOutMessageParts(Operation operation) {
         Output output = operation.getOutput();
         List<Part> partsList = new ArrayList<Part>();
-        if (output != null) {
+        if (output != null && output.getMessage() != null) {
             Iterator ite = output.getMessage().getParts().values().iterator();
             while (ite.hasNext()) {
                 partsList.add((Part)ite.next());
