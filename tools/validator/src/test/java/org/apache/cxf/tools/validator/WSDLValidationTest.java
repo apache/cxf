@@ -87,7 +87,8 @@ public class WSDLValidationTest extends ToolTestBase {
         String error = getStdErr();
         if (StaxUtils.isWoodstox()) {
             // sjsxp doesn't report locations.
-            assertTrue(error.indexOf("[147,3]") != -1);
+            assertTrue("error message does not contain [147,3]. error message: "
+                + error, error.indexOf("[147,3]") != -1);
         }
         assertTrue(error.indexOf("Caused by {http://apache.org/hello_world_soap_http}"
                                        + "[binding:Greeter_SOAPBinding1] not exist.") != -1);
