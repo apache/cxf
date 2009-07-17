@@ -59,7 +59,10 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore">
      <property name="bookStore" ref="bookstore2"/>
+     <lookup-method name="getSecureBook" bean="subResource" />
   </bean>
+  
+  <bean id="subResource" class="org.apache.cxf.systest.jaxrs.security.SecureBook"/>  
   
   <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
 

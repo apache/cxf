@@ -46,7 +46,9 @@ class SpringAopClassHelper extends ClassHelper {
                 // ignore
             }
             
-        } 
+        } else if (AopUtils.isCglibProxyClass(o.getClass())) {
+            return AopUtils.getTargetClass(o);
+        }
         return o.getClass();
     }
     

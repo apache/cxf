@@ -68,4 +68,9 @@ public class SecureBookStoreNoInterface {
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
     }
+    
+    @Path("/securebook")
+    public SecureBook getSecureBook() throws BookNotFoundFault {
+        return new SecureBook("CXF in Action", 123L);
+    }
 }
