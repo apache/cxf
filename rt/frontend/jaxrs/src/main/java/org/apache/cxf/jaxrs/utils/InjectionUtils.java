@@ -37,6 +37,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -82,6 +83,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
@@ -808,6 +810,23 @@ public final class InjectionUtils {
             }
         }
     }
+    
+    public static Map<Parameter, Class<?>> getParametersFromBeanClass(Class<?> beanClass, 
+                                                                      ParameterType type) {
+        Map<Parameter, Class<?>> params = new LinkedHashMap<Parameter, Class<?>>();
+        for (Method m : beanClass.getMethods()) {
+            if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
+                && m.getName().length() > 3) {
+                String propertyName = m.getName().substring(3).toLowerCase();
+                if ("class".equals(propertyName)) {
+                    continue;
+                }
+                params.put(new Parameter(type, propertyName), m.getReturnType());
+            }
+        }
+        return params;
+    }
+    
     
     public static boolean isPrimitive(Class<?> type) {
         return type.isPrimitive() 
