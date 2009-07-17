@@ -66,6 +66,7 @@ import org.apache.xmlbeans.impl.schema.SchemaTypeSystemCompiler;
 import org.apache.xmlbeans.impl.schema.StscState;
 import org.apache.xmlbeans.impl.tool.CodeGenUtil;
 import org.apache.xmlbeans.impl.util.FilerImpl;
+import org.apache.xmlbeans.impl.xb.substwsdl.TImport;
 import org.apache.xmlbeans.impl.xb.xmlconfig.ConfigDocument;
 import org.apache.xmlbeans.impl.xb.xmlconfig.Extensionconfig;
 import org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument;
@@ -267,9 +268,22 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             XmlObject urldoc = loader.parse(url, null, options);
 
             if (urldoc instanceof org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument) {
+                org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument wsdldoc = 
+                    (org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument)urldoc;
+                
                 addWsdlSchemas(url.toString(),
-                               (org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument)urldoc,
+                               wsdldoc,
                                errorListener, scontentlist);
+                
+                for (TImport imp : wsdldoc.getDefinitions().getImportArray()) {
+                    if (imp.getLocation().toLowerCase().endsWith(".xsd")) {
+                        URL url1 = new URL(url, imp.getLocation());
+                        XmlObject urldoc2 = loader.parse(url1, null, options);
+                        addSchema(url1.toString(), (SchemaDocument)urldoc2, errorListener, false,
+                                  scontentlist);
+                    }
+                }
+
             } else if (urldoc instanceof SchemaDocument) {
                 addSchema(url.toString(), (SchemaDocument)urldoc, errorListener, false,
                           scontentlist);
@@ -411,6 +425,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         StscState.addInfo(errorListener, "Loading wsdl file " + name);
         XmlOptions opts = new XmlOptions().setErrorListener(errorListener);
         XmlObject[] types = wsdldoc.getDefinitions().getTypesArray();
+        
         int count = 0;
         for (int j = 0; j < types.length; j++) {
             XmlObject[] schemas = types[j]
