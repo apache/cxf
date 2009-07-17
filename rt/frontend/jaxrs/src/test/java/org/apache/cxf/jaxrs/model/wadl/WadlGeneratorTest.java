@@ -132,20 +132,36 @@ public class WadlGeneratorTest extends Assert {
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(4, resourceEls.size());        
+        assertEquals(5, resourceEls.size());        
         assertEquals("/", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
         assertEquals("/booksubresource", resourceEls.get(3).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(4).getAttribute("path"));
         
         
         List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
                                                                WadlGenerator.WADL_NS, "method");
+        
         assertEquals(1, methodEls.size());
         assertEquals("GET", methodEls.get(0).getAttribute("name"));
-                                                           
         
-        List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
+        List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
+                                                               WadlGenerator.WADL_NS, "param");
+        assertEquals(1, paramsEls.size());
+        checkParameter(paramsEls.get(0), "id", "template");
+        
+        List<Element> requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
+                                                               WadlGenerator.WADL_NS, "request");
+        assertEquals(1, requestEls.size());
+        
+        paramsEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
+                                                 WadlGenerator.WADL_NS, "param");
+        assertEquals(2, paramsEls.size());
+        checkParameter(paramsEls.get(0), "a", "query");
+        checkParameter(paramsEls.get(1), "b", "query");
+        
+        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
                                                                WadlGenerator.WADL_NS, "param");
         assertEquals(3, paramsEls.size());
         checkParameter(paramsEls.get(0), "id", "template");
@@ -157,7 +173,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(1, methodEls.size());
         assertEquals("POST", methodEls.get(0).getAttribute("name"));
         
-        List<Element> requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
+        requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
                                                                 WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
         List<Element> repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 

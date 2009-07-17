@@ -27,6 +27,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
@@ -37,7 +38,7 @@ public class BookStore {
 
     @GET 
     @Produces("text/plain")
-    public String getName(@PathParam("id") Long id) {
+    public String getName(@PathParam("id") Long id, @QueryParam("") QueryBean query) {
         return "store";
     }
     
@@ -64,4 +65,21 @@ public class BookStore {
         return new Chapter(1);
     }
     
+    @Path("itself")
+    public BookStore getItself() {
+        return this;
+    }
+    
+    public static class QueryBean {
+        private int a;
+        private int b;
+        
+        public int getA() {
+            return a;
+        }
+        
+        public int getB() {
+            return b;
+        }
+    }
 }

@@ -119,10 +119,10 @@ public class WadlGenerator implements RequestHandler {
             proxy = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
         }
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
-        
+        Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             handleResource(sbResources, jaxbTypes, proxy, clsMap,
-                           cri, cri.getURITemplate().getValue());
+                           cri, cri.getURITemplate().getValue(), visitedResources);
         }
         sbResources.append("</resources>");
         
@@ -170,7 +170,9 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy,
-                                Map<Class<?>, QName> clsMap, ClassResourceInfo cri, String path) {
+                                Map<Class<?>, QName> clsMap, ClassResourceInfo cri, String path,
+                                Set<ClassResourceInfo> visitedResources) {
+        visitedResources.add(cri);
         sb.append("<resource path=\"").append(path).append("\">");
         
         List<OperationResourceInfo> sortedOps = sortOperationsByPath(
@@ -181,11 +183,11 @@ public class WadlGenerator implements RequestHandler {
             if (ori.getHttpMethod() == null) {
                 Class<?> cls = ori.getMethodToInvoke().getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
-                if (subcri != null) {
+                if (subcri != null && !visitedResources.contains(subcri)) {
                     handleResource(sb, jaxbTypes, jaxbProxy, clsMap, subcri, 
-                                   ori.getURITemplate().getValue());
+                                   ori.getURITemplate().getValue(), visitedResources);
                 } else {
-                    handleDynamicSubresource(sb, jaxbTypes, jaxbProxy, clsMap, ori);
+                    handleDynamicSubresource(sb, jaxbTypes, jaxbProxy, clsMap, ori, subcri);
                 }
                 continue;
             }
@@ -249,9 +251,14 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes, 
-                 JAXBContextProxy jaxbProxy, Map<Class<?>, QName> clsMap, OperationResourceInfo ori) {
+                 JAXBContextProxy jaxbProxy, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
+                 ClassResourceInfo subcri) {
         
-        sb.append("<!-- Dynamic subresource -->");
+        if (subcri != null) {
+            sb.append("<!-- Recursive subresource -->");
+        } else {
+            sb.append("<!-- Dynamic subresource -->");    
+        }
         sb.append("<resource path=\"").append(ori.getURITemplate().getValue()).append("\">");
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
             sb.append("<request>");
@@ -289,6 +296,19 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori) {
+        Class<?> type = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+        if (!"".equals(pm.getName())) {
+            doWriteParam(sb, pm, type);
+        } else {
+            Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType());
+            for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {   
+                doWriteParam(sb, entry.getKey(), entry.getValue());
+            }
+        }
+    }
+    
+    private void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type) {
+        
         sb.append("<param name=\"").append(pm.getName()).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template" 
                        : ParameterType.FORM == pm.getType() ? "query"
@@ -297,7 +317,6 @@ public class WadlGenerator implements RequestHandler {
         if (pm.getDefaultValue() != null) {
             sb.append(" default=\"").append(pm.getDefaultValue()).append("\"");
         }
-        Class<?> type = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
         String value = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
         if (value != null) {
             sb.append(" type=\"").append(value).append("\"");
