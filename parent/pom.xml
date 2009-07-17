@@ -471,12 +471,6 @@
                 <groupId>com.sun.xml.parsers</groupId>
                 <artifactId>jaxp-ri</artifactId>
                 <version>1.4.2</version>
-                <exclusions>
-                    <exclusion>
-                        <groupId>javax.xml.parsers</groupId>
-                        <artifactId>jaxp-api</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix</groupId>
