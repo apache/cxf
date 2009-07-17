@@ -21,42 +21,46 @@ package org.apache.cxf.systest.jaxrs.security;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
 import org.apache.cxf.systest.jaxrs.Book;
-import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 import org.springframework.security.annotation.Secured;
 
-public interface SecureBookInterface {
+public class SecureBook {
+    private String name;
+    private long id;
+    
+    public SecureBook() {
+        name = "CXF in Action";
+        id = 123L;
+    }
+    
+    public SecureBook(String name, long id) {
+        this.name = name;
+        this.id = id;
+    }
+    
+    public void setName(String n) {
+        name = n;
+    }
 
-    @GET
-    @Path("/thosebooks/{bookId}/")
-    @Produces("application/xml")
-    @Secured({"ROLE_USER", "ROLE_ADMIN" })
-    Book getThatBook(@PathParam("bookId") Long id) throws BookNotFoundFault;
+    public String getName() {
+        return name;
+    }
     
-    
-    @GET
-    @Path("/thosebooks/{bookId}/{id}")
-    @Produces("application/xml")
-    @Secured("ROLE_USER")
-    Book getThatBook(@PathParam("bookId") Long id, @PathParam("id") String s) throws BookNotFoundFault;
+    public void setId(long i) {
+        id = i;
+    }
+    public long getId() {
+        return id;
+    }
     
     @GET
-    @Path("/thosebooks")
+    @Path("self")    
     @Produces("application/xml")
     @Secured("ROLE_ADMIN")
-    Book getThatBook() throws BookNotFoundFault;
+    public Book getBook() {
+        return new Book(name, id);
+    } 
     
-    @Path("/subresource")
-    SecureBookInterface getBookSubResource() throws BookNotFoundFault;
-    
-    @GET
-    @Produces("application/xml")
-    @Secured("ROLE_ADMIN")
-    Book getDefaultBook() throws BookNotFoundFault;
-    
-    @Path("/securebook")
-    SecureBook getSecureBook() throws BookNotFoundFault;
 }
