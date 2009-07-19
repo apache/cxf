@@ -120,7 +120,10 @@ public class FormEncodingProvider implements
                 AttachmentUtils.getMultipartBody(mc, attachmentDir, attachmentThreshold);
             FormUtils.populateMapFromMultipart(params, body, decode);
         } else {
-            FormUtils.populateMapFromString(params, FormUtils.readBody(is), decode);
+            FormUtils.populateMapFromString(params, 
+                                            FormUtils.readBody(is), 
+                                            decode,
+                                            mc != null ? mc.getHttpServletRequest() : null);
         }
     }
     

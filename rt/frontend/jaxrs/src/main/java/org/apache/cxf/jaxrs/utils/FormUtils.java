@@ -23,9 +23,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -68,7 +70,8 @@ public final class FormUtils {
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params, 
-                                             String postBody, boolean decode) {
+                                             String postBody, boolean decode,
+                                             HttpServletRequest request) {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
             for (String part : parts) {
@@ -84,6 +87,12 @@ public final class FormUtils {
                 } else {
                     params.add(keyValue[0], "");
                 }
+            }
+        } else if (request != null) {
+            for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
+                String paramName = en.nextElement().toString();
+                String[] values = request.getParameterValues(paramName);
+                params.put(paramName, Arrays.asList(values));
             }
         }
     }

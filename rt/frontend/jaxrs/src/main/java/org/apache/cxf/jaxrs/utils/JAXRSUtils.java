@@ -597,7 +597,8 @@ public final class JAXRSUtils {
                 body = FormUtils.readBody(m.getContent(InputStream.class));
                 m.put("org.apache.cxf.jaxrs.provider.form.body", body);
             }
-            FormUtils.populateMapFromString(params, (String)body, decode);
+            HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+            FormUtils.populateMapFromString(params, (String)body, decode, request);
         } else {
             MultipartBody body = AttachmentUtils.getMultipartBody(mc);
             FormUtils.populateMapFromMultipart(params, body, decode);
