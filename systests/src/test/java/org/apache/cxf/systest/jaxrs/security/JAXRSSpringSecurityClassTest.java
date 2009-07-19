@@ -19,6 +19,16 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
+import java.io.InputStream;
+
+import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Unmarshaller;
+
+import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.form.Form;
+import org.apache.cxf.systest.jaxrs.Book;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -35,6 +45,19 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
         String endpointAddress =
             "http://localhost:9080/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "ba", 401);
+    }
+    
+    @Test
+    public void testBookFromForm() throws Exception {
+        
+        WebClient wc = WebClient.create("http://localhost:9080/bookstorestorage/bookforms", 
+                                        "foo", "bar", null);
+        
+        Response r = wc.form(new Form().set("name", "CXF Rocks").set("id", "123"));
+        
+        Book b = readBook((InputStream)r.getEntity());
+        assertEquals("CXF Rocks", b.getName());
+        assertEquals(123L, b.getId());
     }
     
     @Test
@@ -62,6 +85,12 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
     
+    private Book readBook(InputStream is) throws Exception {
+        JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
+        Unmarshaller u = c.createUnmarshaller();
+        return (Book)u.unmarshal(is);
+    }
+
     @Test
     public void testGetBookSubresourceAdmin() throws Exception {
         String endpointAddress =
@@ -70,5 +99,5 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
     
-      
+     
 }

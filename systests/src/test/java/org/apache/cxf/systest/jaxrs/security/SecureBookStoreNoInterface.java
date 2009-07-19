@@ -22,7 +22,9 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -40,6 +42,16 @@ public class SecureBookStoreNoInterface {
         book.setId(123L);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
+    }
+    
+    @POST
+    @Path("/bookforms")
+    @Secured({"ROLE_USER", "ROLE_ADMIN" })
+    public Book getBookFromFormParams(@FormParam("name") String name, @FormParam("id") long id) {
+        if (name == null || id == 0) {
+            throw new RuntimeException("FormParams are not set");
+        }
+        return new Book(name, id);
     }
     
     @GET
