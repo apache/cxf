@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.utils;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class InjectionUtilsTest extends Assert {
     
     @Test
     public void testCollectionType() {
+        assertEquals(ArrayList.class, InjectionUtils.getCollectionType(Collection.class));
         assertEquals(ArrayList.class, InjectionUtils.getCollectionType(List.class));
         assertEquals(HashSet.class, InjectionUtils.getCollectionType(Set.class));
         assertEquals(TreeSet.class, InjectionUtils.getCollectionType(SortedSet.class));
@@ -49,6 +51,7 @@ public class InjectionUtilsTest extends Assert {
         assertFalse(InjectionUtils.isSupportedCollectionOrArray(Map.class));
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(String[].class));
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(List.class));
+        assertTrue(InjectionUtils.isSupportedCollectionOrArray(Collection.class));
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(Set.class));
         assertTrue(InjectionUtils.isSupportedCollectionOrArray(SortedSet.class));
     }

@@ -150,7 +150,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 response = doUnmarshal(unmarshaller, type, is, mt);
             }
             if (isCollection) {
-                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type.isArray()); 
+                response = ((CollectionWrapper)response).getCollectionOrArray(theType, type); 
             }
             
             response = checkAdapter(response, anns, false);
@@ -203,7 +203,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         throws IOException {
         try {
             Object actualObject = checkAdapter(obj, anns, true);
-            Class<?> actualClass = actualObject.getClass();
+            Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
             String encoding = getEncoding(m, headers);
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
                 actualClass = InjectionUtils.getActualType(genericType);
