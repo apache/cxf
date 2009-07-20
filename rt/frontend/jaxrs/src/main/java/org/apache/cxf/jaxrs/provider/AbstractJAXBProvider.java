@@ -469,14 +469,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         
         @SuppressWarnings("unchecked")
-        public <T> Object getCollectionOrArray(Class<T> type, boolean isArray) {
+        public <T> Object getCollectionOrArray(Class<T> type, Class<?> origType) {
             List<?> theList = getList();
-            if (isArray) {
+            if (origType.isArray()) {
                 T[] values = (T[])Array.newInstance(type, theList.size());
                 for (int i = 0; i < theList.size(); i++) {
                     values[i] = (T)theList.get(i);
                 }
                 return values;
+            } else if (origType == Set.class) {
+                return new HashSet(theList);
             } else {
                 return theList;
             }

@@ -218,7 +218,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
         try {
             
             Object actualObject = checkAdapter(obj, anns, true);
-            Class<?> actualClass = actualObject.getClass();
+            Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
             if (cls == genericType) {
                 genericType = actualClass;
             }

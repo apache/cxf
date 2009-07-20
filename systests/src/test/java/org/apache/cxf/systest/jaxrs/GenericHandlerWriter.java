@@ -47,7 +47,8 @@ public class GenericHandlerWriter implements MessageBodyWriter<GenericHandler<Bo
                         MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
         JAXBElementProvider jaxb = new JAXBElementProvider();
-        jaxb.writeTo(o.getEntity(), c, InjectionUtils.getActualType(t), anns, m, headers, os);
+        jaxb.writeTo(o.getEntity(), o.getEntity().getClass(), InjectionUtils.getActualType(t), 
+                     anns, m, headers, os);
     }
 
 
