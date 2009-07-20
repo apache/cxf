@@ -64,7 +64,12 @@ public class ClassUtils {
             argList.add(getClass().getClassLoader().getResource(".").getFile() + "../lib/");
         } else {
             argList.add("-classpath");
-            argList.add(javaClasspath);
+            if (context.get(ToolConstants.CFG_OUTPUTDIR) != null) { 
+                argList.add(javaClasspath + File.pathSeparatorChar 
+                            + context.get(ToolConstants.CFG_OUTPUTDIR));
+            } else {
+                argList.add(javaClasspath);
+            }
         }
 
         String outPutDir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
