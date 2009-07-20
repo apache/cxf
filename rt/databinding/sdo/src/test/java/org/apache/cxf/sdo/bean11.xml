@@ -1,0 +1,8 @@
+<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
+ <env:Header/>
+ <env:Body>
+  <ns1:greetMe xmlns:ns1="http://apache.org/hello_world_soap_http/types">
+  	<ns1:requestType>World</ns1:requestType>
+  </ns1:greetMe>
+ </env:Body>
+</env:Envelope>
