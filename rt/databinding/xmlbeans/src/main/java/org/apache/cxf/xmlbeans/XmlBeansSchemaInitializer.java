@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.net.URI;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,9 +131,12 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             Element elem = DOMUtils.getFirstElement(doc.getDocumentElement());
             while (elem != null) {
                 if (elem.getLocalName().equals("import")) {
+                    URI uri = new URI(file);
                     String loc = elem.getAttribute("schemaLocation");
                     if (!StringUtils.isEmpty(loc)) {
-                        getSchema(sts, loc);
+                        URI locUri = uri.resolve(loc);
+                        String newLoc = locUri.toString();
+                        getSchema(sts, newLoc);
                     }
                 }                 
                 elem = DOMUtils.getNextElement(elem);
