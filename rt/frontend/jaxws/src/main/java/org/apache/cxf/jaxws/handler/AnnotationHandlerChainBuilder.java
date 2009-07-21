@@ -41,6 +41,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -303,7 +304,7 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                     String seiClassName = ws.endpointInterface().trim();
                     Class seiClass = null;
                     try {
-                        seiClass = clz.getClassLoader().loadClass(seiClassName);
+                        seiClass = ClassLoaderUtils.loadClass(seiClassName, clz);
                     } catch (ClassNotFoundException e) {
                         throw new WebServiceException(BUNDLE.getString("SEI_LOAD_FAILURE_EXC"), e);
                     }
