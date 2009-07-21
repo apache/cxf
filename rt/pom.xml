@@ -38,6 +38,7 @@
         <module>databinding/jaxb</module>
         <module>databinding/xmlbeans</module>
         <module>databinding/aegis</module>
+        <module>databinding/sdo</module>
         <module>bindings</module>
         <module>frontend/simple</module>
         <module>frontend/jaxws</module>

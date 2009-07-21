@@ -23,6 +23,8 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
@@ -147,7 +149,13 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
         List<String> partNames = new ArrayList<String>();
         List<String> elTypeNames = new ArrayList<String>();
         List<Class<?>> partClasses = new ArrayList<Class<?>>();
-        
+        QName wrapperName = null;
+        for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {
+            if (p.getTypeClass() == wrapperClass) {
+                wrapperName = p.getElementQName();
+            }
+        }
+
         for (MessagePartInfo p : messageInfo.getMessageParts()) {
             ensureSize(partNames, p.getIndex());
             ensureSize(elTypeNames, p.getIndex());
@@ -167,8 +175,9 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
             partClasses.set(p.getIndex(), p.getTypeClass());
         }
         return dataBinding.createWrapperHelper(wrapperClass,
-                                                 partNames,
-                                                 elTypeNames,
-                                                 partClasses);
+                                               wrapperName,
+                                               partNames,
+                                               elTypeNames,
+                                               partClasses);
     }
 }

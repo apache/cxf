@@ -45,6 +45,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementDecl;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
@@ -689,7 +690,7 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
         }
     }
 
-    public WrapperHelper createWrapperHelper(Class<?> wrapperType, List<String> partNames,
+    public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,
                                              List<String> elTypeNames, List<Class<?>> partClasses) {
         List<Method> getMethods = new ArrayList<Method>(partNames.size());
         List<Method> setMethods = new ArrayList<Method>(partNames.size());

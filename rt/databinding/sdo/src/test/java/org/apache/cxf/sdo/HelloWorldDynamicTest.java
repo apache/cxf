@@ -33,7 +33,7 @@ import org.junit.Test;
 /**
  * 
  */
-public class HelloWorldStaticTest extends AbstractSDOTest {
+public class HelloWorldDynamicTest extends AbstractSDOTest {
 
 
     @Before 
@@ -46,7 +46,7 @@ public class HelloWorldStaticTest extends AbstractSDOTest {
     @WebService(targetNamespace = "http://apache.org/hello_world_soap_http",
                 name = "Greeter",
                 serviceName = "TestService",
-                endpointInterface = "helloworld.static_types.ws.Greeter")
+                endpointInterface = "helloworld.dynamic_types.ws.Greeter")
     public static class Server {
         public java.lang.String sayHi() {
             return "Hi!";
@@ -71,7 +71,7 @@ public class HelloWorldStaticTest extends AbstractSDOTest {
                                                      SDODataBinding binding) {
         ServerFactoryBean sf = super.createServiceFactory(serviceClass, serviceBean, address, name, binding);
         sf.setWsdlLocation(HelloWorldStaticTest.class
-                               .getResource("/wsdl_sdo/HelloService_static.wsdl").toString());
+                               .getResource("/wsdl_sdo/HelloService_dynamic.wsdl").toString());
         sf.setServiceName(new QName("http://apache.org/hello_world_soap_http", "SOAPService"));
         sf.setEndpointName(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
         return sf;

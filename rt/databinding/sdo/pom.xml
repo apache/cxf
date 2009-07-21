@@ -30,6 +30,9 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</pmd.eclipse.ruleset>
+    </properties>
 
     <dependencies>
         <dependency>
@@ -135,7 +138,83 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
 
+
+
+    <build>
+        <plugins>
+            <plugin>
+                 <groupId>org.apache.cxf</groupId>
+                 <artifactId>cxf-codegen-plugin</artifactId>
+                 <version>${project.version}</version>
+                 <executions>
+                     <execution>
+                         <id>generate-test-sources-static</id>
+                         <phase>generate-test-sources</phase>
+                         <configuration>
+                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
+                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_sdo</testWsdlRoot>
+                             <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_sdo/HelloService_static.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>sdo</extraarg>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>http://apache.org/hello_world_soap_http/types=helloworld.static_types.sdo</extraarg>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>http://apache.org/hello_world_soap_http=helloworld.static_types.ws</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_sdo/HelloService_dynamic.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>sdo-dynamic</extraarg>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>http://apache.org/hello_world_soap_http=helloworld.dynamic_types.ws</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
+                         </configuration>
+                         <goals>
+                             <goal>wsdl2java</goal>
+                         </goals>
+                     </execution>
+                 </executions>
+             </plugin>
+        </plugins>
+    </build>
+
+
+    <profiles>
+        <profile>
+            <id>setup.eclipse</id>
+            <build>
+                <defaultGoal>process-test-sources</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-antrun-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>setup.eclipse.project.sdo</id>
+                                <phase>process-test-sources</phase>
+                                <configuration>
+                                     <tasks>
+                                         <echo file="${basedir}/.settings/org.eclipse.jdt.core.prefs" append="true">org.eclipse.jdt.core.compiler.problem.unusedLocal=ignore
+                                         </echo>
+                                     </tasks>
+                                </configuration>
+                                <goals>
+                                    <goal>run</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>

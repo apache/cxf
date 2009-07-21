@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -59,30 +60,39 @@ public class SDODataBinding extends AbstractDataBinding
         private final List<String> partNames;
         private Method fact;
         private Object factory;
+        private QName wrapperName;
 
-        private SDOWrapperHelper(List<String> partNames, Class<?> wrapperType) {
+        private SDOWrapperHelper(List<String> partNames, Class<?> wrapperType, QName wrapperName) {
             this.partNames = partNames;
-            try {
-                String s = wrapperType.getPackage().getName() + ".SdoFactory";
-                Class<?> cls = Class.forName(s, false, wrapperType.getClassLoader());
-                for (Method m : cls.getMethods()) {
-                    if (m.getReturnType() == wrapperType) {
-                        fact = m;
-                        break;
+            if (DataObject.class != wrapperType) {
+                try {
+                    String s = wrapperType.getPackage().getName() + ".SdoFactory";
+                    Class<?> cls = Class.forName(s, false, wrapperType.getClassLoader());
+                    for (Method m : cls.getMethods()) {
+                        if (m.getReturnType() == wrapperType) {
+                            fact = m;
+                            break;
+                        }
                     }
+                    factory = cls.getField("INSTANCE").get(null);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
-                factory = cls.getField("INSTANCE").get(null);
-            } catch (Exception ex) {
-                ex.printStackTrace();
             }
+            this.wrapperName = wrapperName;
         }
 
         public Object createWrapperObject(List<?> lst) throws Fault {
             DataObject o;
-            try {
-                o = (DataObject)fact.invoke(factory);
-            } catch (Exception e) {
-                throw new Fault(e); 
+            if (fact != null) {
+                try {
+                    o = (DataObject)fact.invoke(factory);
+                } catch (Exception e) {
+                    throw new Fault(e); 
+                }
+            } else {
+                o = context.getDataFactory().create(wrapperName.getNamespaceURI(), 
+                                                    wrapperName.getLocalPart());
             }
             for (int x = 0; x < lst.size(); x++) {
                 o.set(partNames.get(x), lst.get(x));
@@ -121,6 +131,9 @@ public class SDODataBinding extends AbstractDataBinding
             cc.walk();
             
             for (Class<?> cls : cc.getClasses()) {
+                if (DataObject.class == cls) {
+                    continue;
+                }
                 String pkg = cls.getPackage().getName();
                 if (!pkgs.contains(pkg)) {
                     try {
@@ -195,11 +208,12 @@ public class SDODataBinding extends AbstractDataBinding
     
     
     public WrapperHelper createWrapperHelper(final Class<?> wrapperType,
+                                             final QName wrapperName, 
                                              final List<String> partNames,
                                              final List<String> elTypeNames,
                                              final List<Class<?>> partClasses) {
         
         
-        return new SDOWrapperHelper(partNames, wrapperType);
+        return new SDOWrapperHelper(partNames, wrapperType, wrapperName);
     }
 }

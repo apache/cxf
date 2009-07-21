@@ -237,6 +237,9 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
         }
 
         if (genModel == null) {
+            if (dynamic) {
+                return DataObject.class.getName();
+            }
             return type.getName();
         }
 

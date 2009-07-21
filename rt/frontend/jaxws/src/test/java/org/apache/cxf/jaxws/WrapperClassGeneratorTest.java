@@ -70,7 +70,7 @@ public class WrapperClassGeneratorTest extends Assert {
         String className = requestClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
         
-        WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass,
+        WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(requestClass, null,
                                                              partNames, elTypeNames, partClasses);        
         
         List<Object> paraList = new ArrayList<Object>();
@@ -89,7 +89,7 @@ public class WrapperClassGeneratorTest extends Assert {
         className = responseClass.getName();
         className = className.substring(0, className.lastIndexOf(".") + 1);
         
-        wh = new JAXBDataBinding().createWrapperHelper(responseClass,
+        wh = new JAXBDataBinding().createWrapperHelper(responseClass, null,
                                                              partNames, elTypeNames, partClasses);        
         List<Object> resPara = new ArrayList<Object>();
         List<Integer> intValueList = new ArrayList<Integer>();
