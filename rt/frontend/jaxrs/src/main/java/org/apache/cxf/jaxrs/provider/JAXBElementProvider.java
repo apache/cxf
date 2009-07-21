@@ -72,6 +72,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
+    private List<String> jaxbElementClassNames;
     
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
@@ -89,6 +90,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
+    }
+    
+    public void setJaxbElementClassNames(List<String> names) {
+        jaxbElementClassNames = names;
     }
     
     public void setValidationHandler(ValidationEventHandler handler) {
@@ -224,7 +229,16 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                      Type genericType, String encoding, OutputStream os, MediaType m) 
         throws Exception {
         
-        QName qname = getCollectionWrapperQName(actualClass, genericType, actualObject, true);
+        Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
+        
+        QName qname = null;
+        if (arr.length > 0 && arr[0] instanceof JAXBElement) {
+            JAXBElement el = (JAXBElement)arr[0];
+            qname = el.getName();
+            actualClass = el.getDeclaredType();
+        } else {
+            qname = getCollectionWrapperQName(actualClass, genericType, actualObject, true);
+        }
         if (qname == null) {
             String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
                                                                     BUNDLE).toString();
@@ -243,10 +257,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             endTag = "</" + qname.getLocalPart() + ">";
         }
         os.write(startTag.getBytes());
-        Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
         for (Object o : arr) {
-            marshalCollectionMember(o, actualClass, genericType, encoding, os, m, 
-                                    qname.getNamespaceURI());    
+            marshalCollectionMember(o instanceof JAXBElement ? ((JAXBElement)o).getValue() : o, 
+                                    actualClass, genericType, encoding, os, m, qname.getNamespaceURI());    
         }
         os.write(endTag.getBytes());
     }
@@ -269,6 +282,17 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
                            String enc, OutputStream os, MediaType mt) throws Exception {
+        
+        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName())) {
+            QName name = getJaxbQName(cls, genericType, obj, false);
+            if (name != null) {
+                @SuppressWarnings("unchecked")
+                JAXBElement el = new JAXBElement(name, cls, null, obj);
+                obj = el;
+                cls = JAXBElement.class;
+            }
+        }
+        
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         marshal(obj, cls, genericType, enc, os, mt, ms);
     }

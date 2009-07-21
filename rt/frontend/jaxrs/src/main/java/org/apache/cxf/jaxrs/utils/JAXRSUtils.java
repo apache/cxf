@@ -97,6 +97,7 @@ public final class JAXRSUtils {
     public static final MediaType ALL_TYPES = new MediaType();
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
+    private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propogate.exception";
 
     private JAXRSUtils() {        
     }
@@ -1025,4 +1026,19 @@ public final class JAXRSUtils {
         return sb.toString();
     }
         
+    public static boolean propogateException(Message m) {
+        
+        Object value = m.getContextualProperty(PROPOGATE_EXCEPTION);
+        
+        if (value == null) {
+            return true;
+        }
+
+        if (Boolean.TRUE.equals(value) || "true".equalsIgnoreCase(value.toString())) {
+            return true;
+        }
+        
+        return false;
+    }
+    
 }

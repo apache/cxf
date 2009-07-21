@@ -26,9 +26,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
 
 
 @XmlRootElement(name = "Book")
+@XmlSeeAlso({SuperBook.class })
 public class Book implements Comparable<Book> {
     private String name;
     private long id;

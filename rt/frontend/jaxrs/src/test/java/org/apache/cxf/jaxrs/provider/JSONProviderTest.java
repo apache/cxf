@@ -162,13 +162,45 @@ public class JSONProviderTest extends Assert {
         
         String s = os.toString();
         assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+    }
+    
+    @Test
+    public void testDropRootElement() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setDropRootElement(true);
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns1");
+        p.setNamespaceMap(namespaceMap);
+        TagVO2 tag = createTag2("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"group\":\"b\",\"name\":\"a\"}", s);
         
     }
     
     @Test
     public void testWriteQualifiedCollection() throws Exception {
+        String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
+            + ",{\"group\":\"d\",\"name\":\"c\"}]}";
+        doWriteQualifiedCollection(false, data);
+    }
+    
+    @Test
+    public void testWriteQualifiedCollection2() throws Exception {
+        String data = "{{\"group\":\"b\",\"name\":\"a\"}"
+            + ",{\"group\":\"d\",\"name\":\"c\"}}";
+        doWriteQualifiedCollection(true, data);
+    }
+    
+    public void doWriteQualifiedCollection(boolean drop, String data) throws Exception {
         JSONProvider p = new JSONProvider();
         p.setCollectionWrapperName("{http://tags}tag");
+        p.setDropCollectionWrapperElement(drop);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
@@ -181,8 +213,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
-            + ",{\"group\":\"d\",\"name\":\"c\"}]}";
         assertEquals(s, data);
     }
     

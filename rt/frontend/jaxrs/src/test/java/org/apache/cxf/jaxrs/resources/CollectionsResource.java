@@ -24,6 +24,7 @@ import java.util.Set;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.xml.bind.JAXBElement;
 
 public class CollectionsResource {
     @GET
@@ -33,6 +34,16 @@ public class CollectionsResource {
     
     @GET
     public Collection<Book> getBookCollection() {
+        return null;
+    }
+    
+    @GET
+    public List<JAXBElement<Book>> getBookElements() {
+        return null;
+    }
+    
+    @GET
+    public List<JAXBElement> getBookElements2() {
         return null;
     }
     
