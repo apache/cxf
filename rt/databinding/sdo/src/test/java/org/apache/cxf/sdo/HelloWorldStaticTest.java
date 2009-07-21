@@ -20,20 +20,21 @@
 package org.apache.cxf.sdo;
 
 
+
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Node;
 
 import org.apache.cxf.frontend.ServerFactoryBean;
 
 import org.junit.Before;
-import org.junit.Test;
+
+import helloworld.static_types.sdo.Structure;
 
 /**
  * 
  */
-public class HelloWorldStaticTest extends AbstractSDOTest {
+public class HelloWorldStaticTest extends AbstractHelloWorldTest {
 
 
     @Before 
@@ -47,7 +48,7 @@ public class HelloWorldStaticTest extends AbstractSDOTest {
                 name = "Greeter",
                 serviceName = "TestService",
                 endpointInterface = "helloworld.static_types.ws.Greeter")
-    public static class Server {
+    public static class Server implements helloworld.static_types.ws.Greeter {
         public java.lang.String sayHi() {
             return "Hi!";
         }
@@ -60,6 +61,10 @@ public class HelloWorldStaticTest extends AbstractSDOTest {
 
         public java.lang.String greetMe(String s) {
             return "Hello " + s;            
+        }
+
+        public Structure echoStruct(Structure struct) {
+            return struct;
         }
     }
     
@@ -77,21 +82,4 @@ public class HelloWorldStaticTest extends AbstractSDOTest {
         return sf;
     }
     
-    @Test
-    public void testBasicInvoke() throws Exception {
-        Node response = invoke("TestService", "bean11.xml");
-        addNamespace("ns1", "http://apache.org/hello_world_soap_http/types");
-        assertValid("/s:Envelope/s:Body/ns1:greetMeResponse", response);
-        assertValid("//ns1:greetMeResponse/ns1:responseType", response);
-        assertValid("//ns1:greetMeResponse/ns1:responseType[text()='Hello World']", response);
-    }
-    
-    @Test
-    public void testWSDL() throws Exception {
-        Node doc = getWSDLDocument("TestService");
-        assertNotNull(doc);
-        assertValid("/wsdl:definitions/wsdl:types/xsd:schema"
-                    + "[@targetNamespace='http://apache.org/hello_world_soap_http/types']", 
-                    doc);
-    }
 }

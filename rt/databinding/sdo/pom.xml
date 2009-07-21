@@ -32,6 +32,7 @@
 
     <properties>
         <pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</pmd.eclipse.ruleset>
+        <compile.flags>-Xlint:unchecked,fallthrough,finally</compile.flags>
     </properties>
 
     <dependencies>
@@ -203,7 +204,9 @@
                                 <phase>process-test-sources</phase>
                                 <configuration>
                                      <tasks>
-                                         <echo file="${basedir}/.settings/org.eclipse.jdt.core.prefs" append="true">org.eclipse.jdt.core.compiler.problem.unusedLocal=ignore
+                                         <echo file="${basedir}/.settings/org.eclipse.jdt.core.prefs" append="true">
+org.eclipse.jdt.core.compiler.problem.unusedLocal=ignore
+org.eclipse.jdt.core.compiler.problem.uncheckedTypeOperation=ignore
                                          </echo>
                                      </tasks>
                                 </configuration>

@@ -28,6 +28,30 @@
                     <maxLength value="30" />
                 </restriction>
             </simpleType>
+            <complexType name="Structure">
+            	<sequence>
+            		<element name="text" type="string"/>
+            		<element name="int" type="int"/>
+            		<element name="dbl" type="double"/>
+            		<element name="texts" type="string" maxOccurs="unbounded"/>
+            	</sequence>
+            </complexType>
+            
+            <element name="echoStruct">
+                <complexType>
+                    <sequence>
+                        <element name="struct" type="tns:Structure" />
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="echoStructResponse">
+                <complexType>
+                    <sequence>
+                        <element name="return" type="tns:Structure" />
+                    </sequence>
+                </complexType>
+            </element>
+            
 
             <element name="sayHi">
                 <complexType />
@@ -88,6 +112,12 @@
     <wsdl:message name="greetMeResponse">
         <wsdl:part element="x1:greetMeResponse" name="out" />
     </wsdl:message>
+    <wsdl:message name="echoStructRequest">
+        <wsdl:part element="x1:echoStruct" name="in" />
+    </wsdl:message>
+    <wsdl:message name="echoStructResponse">
+        <wsdl:part element="x1:echoStructResponse" name="out" />
+    </wsdl:message>
     <wsdl:message name="greetMeOneWayRequest">
         <wsdl:part element="x1:greetMeOneWay" name="in" />
     </wsdl:message>
@@ -110,6 +140,10 @@
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest" />
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse" />
+        </wsdl:operation>
+        <wsdl:operation name="echoStruct">
+            <wsdl:input message="tns:echoStructRequest" name="echoStructRequest" />
+            <wsdl:output message="tns:echoStructResponse" name="echoStructResponse" />
         </wsdl:operation>
 
         <wsdl:operation name="greetMeOneWay">
@@ -141,6 +175,15 @@
                 <soap:body use="literal" />
             </wsdl:input>
             <wsdl:output name="greetMeResponse">
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="echoStruct">
+            <soap:operation soapAction="" style="document" />
+            <wsdl:input name="echoStructRequest">
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output name="echoStructResponse">
                 <soap:body use="literal" />
             </wsdl:output>
         </wsdl:operation>
