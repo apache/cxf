@@ -126,7 +126,8 @@ public class JAXRSInvoker extends AbstractInvoker {
                 if (criRoot != null) {
                     criRoot.clearThreadLocalProxies();
                 }
-                exchange.put(Message.PROPOGATE_EXCEPTION, Boolean.TRUE);
+                exchange.put(Message.PROPOGATE_EXCEPTION, 
+                             JAXRSUtils.propogateException(exchange.getInMessage()));
                 throw ex;
             }
             return new MessageContentsList(excResponse);

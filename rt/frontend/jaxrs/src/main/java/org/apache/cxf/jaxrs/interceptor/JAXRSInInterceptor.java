@@ -54,7 +54,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInInterceptor.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
-
+    
     public JAXRSInInterceptor() {
         super(Phase.UNMARSHAL);
     }
@@ -67,7 +67,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse == null) {
                 ProviderFactory.getInstance(message).clearThreadLocalProxies();
-                message.getExchange().put(Message.PROPOGATE_EXCEPTION, Boolean.TRUE);
+                message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
+                                          JAXRSUtils.propogateException(message));
                 throw ex;
             }
             message.getExchange().put(Response.class, excResponse);

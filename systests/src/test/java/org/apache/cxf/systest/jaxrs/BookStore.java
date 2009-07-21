@@ -60,6 +60,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
 public class BookStore {
@@ -95,6 +96,12 @@ public class BookStore {
         throw new BookNotFoundFault("Book Exception");
     }
     
+    @GET
+    @Path("propogateexception2")
+    public Book propogateException2() throws BookNotFoundFault {
+        PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propogate.exception", Boolean.FALSE);
+        throw new BookNotFoundFault("Book Exception");
+    }
     
     @GET
     @Path("books/check/{id}")

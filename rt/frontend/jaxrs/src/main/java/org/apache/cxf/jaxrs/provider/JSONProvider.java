@@ -72,10 +72,20 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean unwrapped;
     private String wrapperName;
     private Map<String, String> wrapperMap;
+    private boolean dropRootElement;
+    private boolean dropCollectionWrapperElement;
     
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
+    }
+    
+    public void setDropRootElement(boolean drop) {
+        this.dropRootElement = drop;
+    }
+    
+    public void setDropCollectionWrapperElement(boolean drop) {
+        this.dropCollectionWrapperElement = drop;
     }
     
     public void setSupportUnwrapped(boolean unwrap) {
@@ -131,7 +141,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             Unmarshaller unmarshaller = createUnmarshaller(theType, genericType);
             
             InputStream realStream = getInputStream(type, genericType, is);
-            XMLStreamReader xsw = getStreamReader(type, realStream);
+            XMLStreamReader xsw = createReader(type, realStream);
             
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type)) {
@@ -155,7 +165,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
         return null;
     }
 
-    protected XMLStreamReader getStreamReader(Class<?> type, InputStream is) 
+    protected XMLStreamReader createReader(Class<?> type, InputStream is) 
         throws Exception {
         MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
         return factory.createXMLStreamReader(is);
@@ -246,21 +256,26 @@ public class JSONProvider extends AbstractJAXBProvider  {
                                      Type genericType, String encoding, OutputStream os, MediaType m) 
         throws Exception {
         
-        QName qname = getCollectionWrapperQName(actualClass, genericType, actualObject, false);
-        if (qname == null) {
-            String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
-                                                                    BUNDLE).toString();
-            throw new WebApplicationException(Response.serverError()
-                                              .entity(message).build());
-        }
         String startTag = null;
         String endTag = null;
-        if (qname.getNamespaceURI().length() > 0) {
-            startTag = "{\"ns1." + qname.getLocalPart() + "\":[";
+        if (!dropCollectionWrapperElement) {
+            QName qname = getCollectionWrapperQName(actualClass, genericType, actualObject, false);
+            if (qname == null) {
+                String message = new org.apache.cxf.common.i18n.Message("NO_COLLECTION_ROOT", 
+                                                                        BUNDLE).toString();
+                throw new WebApplicationException(Response.serverError()
+                                                  .entity(message).build());
+            }
+            if (qname.getNamespaceURI().length() > 0) {
+                startTag = "{\"ns1." + qname.getLocalPart() + "\":[";
+            } else {
+                startTag = "{\"" + qname.getLocalPart() + "\":[";
+            }
+            endTag = "]}";
         } else {
-            startTag = "{\"" + qname.getLocalPart() + "\":[";
+            startTag = "{";
+            endTag = "}";
         }
-        endTag = "]}";
         os.write(startTag.getBytes());
         Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
         for (int i = 0; i < arr.length; i++) {
@@ -275,12 +290,21 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Marshaller ms, Object actualObject, Class<?> actualClass, 
                   Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
+        
+        XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
+                                              os, isCollection);
+        ms.marshal(actualObject, writer);
+        writer.close();
+    }
+    
+    protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
+        Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         QName qname = getQName(actualClass, genericType, actualObject, true);
         Configuration c = new Configuration(namespaceMap);
         MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
         AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
-                                           convention, 
-                                           new OutputStreamWriter(os, enc));
+                                            convention, 
+                                            new OutputStreamWriter(os, enc));
         if (serializeAsArray) {
             if (arrayKeys != null) {
                 for (String key : arrayKeys) {
@@ -292,12 +316,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             }
         }
 
-        XMLStreamWriter writer = isCollection ? new JSONCollectionWriter(xsw, qname) : xsw; 
-        ms.marshal(actualObject, writer);
-        xsw.close();
+        return isCollection || dropRootElement ? new JSONCollectionWriter(xsw, qname) : xsw; 
     }
-    
-    
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
                            Type genericType, String enc, OutputStream os) throws Exception {
