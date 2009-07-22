@@ -33,6 +33,7 @@
     <properties>
         <pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</pmd.eclipse.ruleset>
         <compile.flags>-Xlint:unchecked,fallthrough,finally</compile.flags>
+        <compile.show.deprecation>false</compile.show.deprecation>
     </properties>
 
     <dependencies>
