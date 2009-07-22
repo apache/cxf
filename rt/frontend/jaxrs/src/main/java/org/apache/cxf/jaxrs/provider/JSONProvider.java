@@ -74,7 +74,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private Map<String, String> wrapperMap;
     private boolean dropRootElement;
     private boolean dropCollectionWrapperElement;
-    
+    private boolean ignoreMixedContent; 
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
@@ -86,6 +86,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     public void setDropCollectionWrapperElement(boolean drop) {
         this.dropCollectionWrapperElement = drop;
+    }
+    
+    public void setIgnoreMixedContent(boolean ignore) {
+        this.ignoreMixedContent = ignore;
     }
     
     public void setSupportUnwrapped(boolean unwrap) {
@@ -293,6 +297,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
         
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
                                               os, isCollection);
+        if (ignoreMixedContent) {
+            writer = new IgnoreMixedContentWriter(writer);
+        }
         ms.marshal(actualObject, writer);
         writer.close();
     }
@@ -373,5 +380,24 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
     }
     
-    
+    protected static class IgnoreMixedContentWriter extends DelegatingXMLStreamWriter {
+        boolean lastWriteChars;
+        
+        public IgnoreMixedContentWriter(XMLStreamWriter writer) {
+            super(writer);
+        }
+
+        public void writeCharacters(String text) throws XMLStreamException {
+            if (!lastWriteChars) {
+                super.writeCharacters(text);
+                lastWriteChars = true;
+            }
+        }
+
+        public void writeStartElement(String prefix, String localName, String namespaceURI) 
+            throws XMLStreamException {
+            super.writeStartElement(prefix, localName, namespaceURI);
+            lastWriteChars = false;
+        }
+    }
 }

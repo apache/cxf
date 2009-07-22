@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
@@ -155,7 +157,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected QName getJaxbQName(Class<?> cls, Type type, Object object, boolean pluralName) 
         throws Exception {
-        //try the easy way first
+        
+        if (cls == JAXBElement.class) {
+            return object != null ? ((JAXBElement)object).getName() : null;
+        }
+        
         XmlRootElement root = cls.getAnnotation(XmlRootElement.class);
         QName qname = null;
         if (root != null) {
@@ -431,6 +437,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected static void handleJAXBException(JAXBException e) {
+        StringWriter sw = new StringWriter();
+        e.printStackTrace(new PrintWriter(sw));
+        LOG.warning(sw.toString());
         StringBuilder sb = new StringBuilder();
         if (e.getMessage() != null) {
             sb.append(e.getMessage()).append(". ");
@@ -445,7 +454,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             ? e.getLinkedException() : e.getCause() != null ? e.getCause() : e;
         String message = new org.apache.cxf.common.i18n.Message("JAXB_EXCEPTION", 
                              BUNDLE, sb.toString()).toString();
-        LOG.warning(message);
         Response r = Response.status(Response.Status.INTERNAL_SERVER_ERROR)
             .type(MediaType.TEXT_PLAIN).entity(message).build();
         throw new WebApplicationException(t, r);

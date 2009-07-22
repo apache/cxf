@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -31,8 +32,16 @@ import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
+import javax.xml.bind.Unmarshaller;
+import javax.xml.bind.annotation.XmlAnyElement;
+import javax.xml.bind.annotation.XmlMixed;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
 import org.apache.cxf.jaxrs.resources.TagVO;
@@ -288,6 +297,31 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteIgnoreMixedContent() throws Exception {
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125}}", true);
+    }
+    
+    @Test
+    public void testWriteMixedContent() throws Exception {
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"\\n     \\n\"}}", false);
+    }
+    
+    private void doTestMixedContent(String data, boolean ignore) throws Exception {
+        InputStream is = getClass().getResourceAsStream("book.xml");
+        JAXBContext context = JAXBContext.newInstance(new Class[]{Books.class, Book.class});
+        Unmarshaller um = context.createUnmarshaller();
+        JAXBElement jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
+        JSONProvider p = new JSONProvider();
+        p.setIgnoreMixedContent(ignore);
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(jaxbEl, (Class)JAXBElement.class, JAXBElement.class, JAXBElement.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        String s = os.toString();
+        assertEquals(data, s);
+    }
+    
+    @Test
     public void testWriteToListWithManyValues() throws Exception {
         JSONProvider p = new JSONProvider();
         Tags tags = new Tags();
@@ -341,7 +375,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals(
             "{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}",
             s);
@@ -353,5 +386,12 @@ public class JSONProviderTest extends Assert {
     
     private TagVO2 createTag2(String name, String group) {
         return new TagVO2(name, group);
+    }
+    
+    @XmlRootElement()
+    public static class Books {
+        @XmlMixed
+        @XmlAnyElement(lax = true)
+        protected List<Object> books;
     }
 }
