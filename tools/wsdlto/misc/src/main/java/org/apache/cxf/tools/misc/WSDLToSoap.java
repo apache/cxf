@@ -73,16 +73,16 @@ public class WSDLToSoap extends AbstractCXFToolContainer {
             if (ex.getCause() instanceof BadUsageException) {
                 printUsageException(TOOL_NAME, (BadUsageException)ex.getCause());
             }
-            System.err.println();
-            System.err.println("WSDLToSoap Error : " + ex.getMessage());
+            err.println();
+            err.println("WSDLToSoap Error : " + ex.getMessage());
             if (isVerboseOn()) {
-                ex.printStackTrace();
+                ex.printStackTrace(err);
             }
         } catch (Exception ex) {
-            System.err.println();
-            System.err.println("WSDLToSoap Error : " + ex.getMessage());
+            err.println();
+            err.println("WSDLToSoap Error : " + ex.getMessage());
             if (isVerboseOn()) {
-                ex.printStackTrace();
+                ex.printStackTrace(err);
             }
         } finally {
             tearDown();

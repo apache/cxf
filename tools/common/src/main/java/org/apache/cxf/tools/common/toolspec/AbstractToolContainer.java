@@ -46,6 +46,8 @@ public abstract class AbstractToolContainer implements ToolContainer {
 
     protected ToolSpec toolspec;
     protected ToolContext context;
+    protected PrintStream out = System.out;
+    protected PrintStream err = System.err;
     
     private String arguments[];
     private boolean isVerbose;
@@ -54,9 +56,6 @@ public abstract class AbstractToolContainer implements ToolContainer {
     private CommandLineParser parser;
     private OutputStream outOutputStream;
     private OutputStream errOutputStream;
-
-    private PrintStream stdOutputStream;
-    private PrintStream stdErrorStream;
  
     public class GenericOutputStream extends OutputStream {
         public void write(int b) throws IOException {
@@ -126,15 +125,10 @@ public abstract class AbstractToolContainer implements ToolContainer {
     }
 
     public void redirectOutput() {
-        stdOutputStream = System.out;
-        stdErrorStream = System.err;
-
         outOutputStream = new GenericOutputStream();
         errOutputStream = new GenericOutputStream();
-        System.setErr(new PrintStream(errOutputStream));
-        System.setOut(new PrintStream(outOutputStream));
     }
-
+    
     public boolean isQuietMode() {
         return isQuiet;
     }
@@ -150,9 +144,21 @@ public abstract class AbstractToolContainer implements ToolContainer {
     public OutputStream getOutOutputStream() {
         return outOutputStream;
     }
+    
+    public void setOutOutputStream(OutputStream outOutputStream) {
+        this.outOutputStream = outOutputStream;
+        this.out = (outOutputStream instanceof PrintStream)
+            ? (PrintStream)outOutputStream : new PrintStream(outOutputStream);
+    }
 
     public OutputStream getErrOutputStream() {
         return errOutputStream;
+    }
+    
+    public void setErrOutputStream(OutputStream errOutputStream) {
+        this.errOutputStream = errOutputStream;
+        this.err = (errOutputStream instanceof PrintStream)
+            ? (PrintStream)errOutputStream : new PrintStream(errOutputStream);
     }
     
     public void setContext(ToolContext c) {
@@ -176,10 +182,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
     }
 
     public void tearDown() {
-        if (isQuietMode()) {
-            System.setOut(stdOutputStream);
-            System.setErr(stdErrorStream);
-        }
+        //nothing to do
     }
     
     public Bus getBus() {
@@ -192,7 +195,7 @@ public abstract class AbstractToolContainer implements ToolContainer {
             try {
                 catalogManager.loadCatalog(new URI(catalogLocation).toURL());
             } catch (Exception e) {
-                e.printStackTrace();
+                e.printStackTrace(err);
                 throw new ToolException(new Message("FOUND_NO_FRONTEND", LOG, catalogLocation));
             }
         }
