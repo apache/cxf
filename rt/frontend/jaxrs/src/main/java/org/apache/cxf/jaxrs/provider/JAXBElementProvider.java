@@ -72,7 +72,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     private Map<String, Object> mProperties = new HashMap<String, Object>();
     private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
-    private List<String> jaxbElementClassNames;
     
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
@@ -90,10 +89,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
-    }
-    
-    public void setJaxbElementClassNames(List<String> names) {
-        jaxbElementClassNames = names;
     }
     
     public void setValidationHandler(ValidationEventHandler handler) {
@@ -282,15 +277,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
                            String enc, OutputStream os, MediaType mt) throws Exception {
-        
-        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName())) {
-            QName name = getJaxbQName(cls, genericType, obj, false);
-            if (name != null) {
-                @SuppressWarnings("unchecked")
-                JAXBElement el = new JAXBElement(name, cls, null, obj);
-                obj = el;
-                cls = JAXBElement.class;
-            }
+        obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
+        if (obj instanceof JAXBElement && cls != JAXBElement.class) {
+            cls = JAXBElement.class;
         }
         
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);

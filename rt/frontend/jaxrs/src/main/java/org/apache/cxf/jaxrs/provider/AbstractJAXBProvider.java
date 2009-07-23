@@ -87,6 +87,23 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private Schema schema;
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
+    private List<String> jaxbElementClassNames;
+    
+    public void setJaxbElementClassNames(List<String> names) {
+        jaxbElementClassNames = names;
+    }
+
+    @SuppressWarnings("unchecked")
+    protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
+        throws Exception {
+        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName())) {
+            QName name = getJaxbQName(cls, genericType, obj, false);
+            if (name != null) {
+                return new JAXBElement(name, cls, null, obj);
+            }
+        }
+        return obj;
+    }
     
     public void setCollectionWrapperName(String wName) {
         collectionWrapperName = wName;

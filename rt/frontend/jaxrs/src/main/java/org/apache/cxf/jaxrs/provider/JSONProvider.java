@@ -328,6 +328,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
                            Type genericType, String enc, OutputStream os) throws Exception {
+        
+        actualObject = convertToJaxbElementIfNeeded(actualObject, actualClass, genericType);
+        if (actualObject instanceof JAXBElement && actualClass != JAXBElement.class) {
+            actualClass = JAXBElement.class;
+        }
+        
         Marshaller ms = createMarshaller(actualObject, actualClass, genericType, enc);
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
     }
@@ -388,7 +394,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
 
         public void writeCharacters(String text) throws XMLStreamException {
-            if (!lastWriteChars) {
+            if (!lastWriteChars || text.trim().length() > 0) {
+                if (lastWriteChars) {
+                    text = text.trim();
+                }
                 super.writeCharacters(text);
                 lastWriteChars = true;
             }
