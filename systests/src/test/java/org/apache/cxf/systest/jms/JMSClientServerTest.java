@@ -18,8 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
+import java.lang.Thread.State;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -36,6 +35,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.soap.SOAPFaultException;
 
 
 import org.apache.cxf.endpoint.Client;
@@ -425,8 +425,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 new GreeterImplQueueDecoupledOneWaysDeferredReply();
             replyEndpoint = Endpoint.publish("", replyServant);
             
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = (BindingProvider)handler;
+            BindingProvider  bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
@@ -492,8 +491,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             
             Client client = ClientProxy.getClient(greeter);
             ((JMSConduit)client.getConduit()).getJmsConfig().setEnforceSpec(true);
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = (BindingProvider)handler;
+            BindingProvider  bp = (BindingProvider)greeter;
             Map<String, Object> requestContext = bp.getRequestContext();
             JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
             requestHeader.setJMSReplyTo("dynamicQueues/test.jmstransport.oneway.with.set.replyto.reply");
@@ -558,8 +556,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         
         public void run() {
             try {
-                InvocationHandler handler  = Proxy.getInvocationHandler(port);
-                BindingProvider  bp = (BindingProvider)handler;
+                BindingProvider  bp = (BindingProvider)port;
                 Map<String, Object> requestContext = bp.getRequestContext();
                 JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
                 requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
@@ -589,7 +586,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
         }
     }
-    
     @Test
     public void testTwoWayQueueAppCorrelationIDStaticPrefix() throws Exception {
         QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
@@ -631,7 +627,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join();
+            t.join(5000);
+            assertTrue("No terminated state: " + t.getState(), t.getState() == State.TERMINATED);
         }
 
         Throwable e = (engClient.getException() != null) 
@@ -688,16 +685,18 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             clients.add(client);
             thread.start();
         }
-    
-        for (Thread t : threads) {
-            t.join();
-        }
 
-        for (ClientRunnable client : clients) {
-            if (client.getException() != null 
-                && client.getException().getMessage().contains("Timeout")) {
-                // exceptions expected
-                return;
+        //Sleep for up to 10 seconds.   The timeout should be at 5 seconds so this
+        //should bail earlier
+        for (int x = 0; x < 10; x++) {
+            Thread.sleep(1000);
+
+            for (ClientRunnable client : clients) {
+                if (client.getException() != null 
+                    && client.getException().getMessage().contains("Timeout")) {
+                    // exceptions expected
+                    return;
+                }
             }
         }
        
@@ -770,7 +769,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join();
+            t.join(2000);
+            assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
         }
 
         for (ClientRunnable client : clients) {
@@ -812,7 +812,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join();
+            t.join(5000);
+            assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
         }
 
         for (ClientRunnable client : clients) {
@@ -822,7 +823,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    
     @Test
     public void testContextPropogation() throws Exception {
         final String testReturnPropertyName = "Test_Prop";
@@ -838,52 +838,44 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         try {
             HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = null;
-            
-            if (handler instanceof BindingProvider) {
-                bp = (BindingProvider)handler;                
-                Map<String, Object> requestContext = bp.getRequestContext();
-                JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
-                requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
-                requestHeader.setJMSExpiration(3600000L);
-                JMSPropertyType propType = new JMSPropertyType();
-                propType.setName(testReturnPropertyName);
-                propType.setValue("mustReturn");
-                requestHeader.getProperty().add(propType);
-                propType = new JMSPropertyType();
-                propType.setName(testIgnoredPropertyName);
-                propType.setValue("mustNotReturn");
-                requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
-            } 
+            Map<String, Object> requestContext = ((BindingProvider)greeter).getRequestContext();
+            JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+            requestHeader.setJMSCorrelationID("JMS_SAMPLE_CORRELATION_ID");
+            requestHeader.setJMSExpiration(3600000L);
+            JMSPropertyType propType = new JMSPropertyType();
+            propType.setName(testReturnPropertyName);
+            propType.setValue("mustReturn");
+            requestHeader.getProperty().add(propType);
+            propType = new JMSPropertyType();
+            propType.setName(testIgnoredPropertyName);
+            propType.setValue("mustNotReturn");
+            requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
  
             String greeting = greeter.greetMe("Milestone-");
             assertNotNull("no response received from service", greeting);
 
             assertEquals("Hello Milestone-", greeting);
 
-            if (bp != null) {
-                Map<String, Object> responseContext = bp.getResponseContext();
-                JMSMessageHeadersType responseHdr = 
-                     (JMSMessageHeadersType)responseContext.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-                if (responseHdr == null) {
-                    fail("response Header should not be null");
-                }
-                
-                assertTrue("CORRELATION ID should match :", 
-                           "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
-                assertTrue("response Headers must conain the app property set in request context.", 
-                           responseHdr.getProperty() != null);
-                
-                boolean found = false;
-                for (JMSPropertyType p : responseHdr.getProperty()) {
-                    if (testReturnPropertyName.equals(p.getName())) {
-                        found = true;
-                    }
-                }
-                assertTrue("response Headers must match the app property set in request context.",
-                             found);
+            Map<String, Object> responseContext = ((BindingProvider)greeter).getResponseContext();
+            JMSMessageHeadersType responseHdr = 
+                 (JMSMessageHeadersType)responseContext.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            if (responseHdr == null) {
+                fail("response Header should not be null");
             }
+            
+            assertTrue("CORRELATION ID should match :", 
+                       "JMS_SAMPLE_CORRELATION_ID".equals(responseHdr.getJMSCorrelationID()));
+            assertTrue("response Headers must conain the app property set in request context.", 
+                       responseHdr.getProperty() != null);
+            
+            boolean found = false;
+            for (JMSPropertyType p : responseHdr.getProperty()) {
+                if (testReturnPropertyName.equals(p.getName())) {
+                    found = true;
+                }
+            }
+            assertTrue("response Headers must match the app property set in request context.",
+                         found);
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
@@ -927,23 +919,19 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
-        try {
-            JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
-            for (int idx = 0; idx < 5; idx++) {
+        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
+        for (int idx = 0; idx < 5; idx++) {
 
-                greeter.greetMeOneWay("test String");
+            greeter.greetMeOneWay("test String");
 
-                String greeting = greeter.greetMe("Milestone-" + idx);
-                assertNotNull("no response received from service", greeting);
-                String exResponse = response1 + idx;
-                assertEquals(exResponse, greeting);
+            String greeting = greeter.greetMe("Milestone-" + idx);
+            assertNotNull("no response received from service", greeting);
+            String exResponse = response1 + idx;
+            assertEquals(exResponse, greeting);
 
-                String reply = greeter.sayHi();
-                assertNotNull("no response received from service", reply);
-                assertEquals(response2, reply);
-            }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals(response2, reply);
         }
     }
     
@@ -961,38 +949,30 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String response = new String("Bonjour");
         try {
             JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = null;
-            if (handler instanceof BindingProvider) {
-                bp = (BindingProvider)handler;                
-                Map<String, Object> requestContext = bp.getRequestContext();
-                JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
-                requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
-            } 
+            Map<String, Object> requestContext = ((BindingProvider)greeter).getRequestContext();
+            JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+            requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
             
             String reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);
             assertEquals(response, reply);
             
-            if (handler instanceof BindingProvider) {
-                bp = (BindingProvider)handler;                
-                Map<String, Object> requestContext = bp.getRequestContext();
-                JMSMessageHeadersType requestHeader = (JMSMessageHeadersType)requestContext
-                    .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
-                assertEquals(requestHeader.getSOAPJMSBindingVersion(), "1.0");
-                assertEquals(requestHeader.getSOAPJMSSOAPAction(), "\"test\"");
-                assertEquals(requestHeader.getTimeToLive(), 3000);
-                assertEquals(requestHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
-                assertEquals(requestHeader.getJMSPriority(), 7);
-                
-                Map<String, Object> responseContext = bp.getResponseContext();
-                JMSMessageHeadersType responseHeader = (JMSMessageHeadersType)responseContext
-                    .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-                assertEquals(responseHeader.getSOAPJMSBindingVersion(), "1.0");
-                assertEquals(responseHeader.getSOAPJMSSOAPAction(), null);
-                assertEquals(responseHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
-                assertEquals(responseHeader.getJMSPriority(), 7);
-            } 
+            requestContext = ((BindingProvider)greeter).getRequestContext();
+            requestHeader = (JMSMessageHeadersType)requestContext
+                .get(JMSConstants.JMS_CLIENT_REQUEST_HEADERS);
+            assertEquals(requestHeader.getSOAPJMSBindingVersion(), "1.0");
+            assertEquals(requestHeader.getSOAPJMSSOAPAction(), "\"test\"");
+            assertEquals(requestHeader.getTimeToLive(), 3000);
+            assertEquals(requestHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
+            assertEquals(requestHeader.getJMSPriority(), 7);
+            
+            Map<String, Object> responseContext = ((BindingProvider)greeter).getResponseContext();
+            JMSMessageHeadersType responseHeader = (JMSMessageHeadersType)responseContext
+                .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            assertEquals(responseHeader.getSOAPJMSBindingVersion(), "1.0");
+            assertEquals(responseHeader.getSOAPJMSSOAPAction(), null);
+            assertEquals(responseHeader.getJMSDeliveryMode(), DeliveryMode.PERSISTENT);
+            assertEquals(responseHeader.getJMSPriority(), 7);
             
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -1044,33 +1024,27 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         JMSGreeterService service = new JMSGreeterService(wsdl, serviceName);
         assertNotNull(service);
 
-        try {
-            JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
-            InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-            BindingProvider  bp = null;
-            
-            if (handler instanceof BindingProvider) {
-                bp = (BindingProvider)handler;                
-                Map<String, Object> requestContext = bp.getRequestContext();
-                JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
-                requestHeader.setSOAPJMSBindingVersion("0.3");
-                requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
-            } 
+        JMSGreeterPortType greeter = service.getPort(portName, JMSGreeterPortType.class);
+        BindingProvider  bp = (BindingProvider)greeter;
+        
+        Map<String, Object> requestContext = bp.getRequestContext();
+        JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+        requestHeader.setSOAPJMSBindingVersion("0.3");
+        requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
  
-            String greeting = greeter.greetMe("Milestone-");
-            assertNull("should have response received from service", greeting);
-
-            if (bp != null) {
-                Map<String, Object> responseContext = bp.getResponseContext();
-                JMSMessageHeadersType responseHdr = 
-                     (JMSMessageHeadersType)responseContext.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-                if (responseHdr == null) {
-                    fail("response Header should not be null");
-                }
-                assertTrue(responseHdr.isSOAPJMSIsFault());
+        try {
+            greeter.greetMe("Milestone-");
+            fail("Should have thrown a fault");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("0.3"));
+            Map<String, Object> responseContext = bp.getResponseContext();
+            JMSMessageHeadersType responseHdr = 
+                 (JMSMessageHeadersType)responseContext.get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
+            if (responseHdr == null) {
+                fail("response Header should not be null");
             }
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+            assertTrue(responseHdr.isSOAPJMSIsFault());
         }
+
     }
 }
