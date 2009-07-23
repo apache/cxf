@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
+import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
@@ -298,16 +299,24 @@ public class JSONProviderTest extends Assert {
     
     @Test
     public void testWriteIgnoreMixedContent() throws Exception {
-        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125}}", true);
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125}}",
+                           true, "book.xml");
+    }
+    
+    @Test
+    public void testWriteIgnoreMixedContent2() throws Exception {
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"books\"}}",
+                           true, "book2.xml");
     }
     
     @Test
     public void testWriteMixedContent() throws Exception {
-        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"\\n     \\n\"}}", false);
+        doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"\\n     \\n\"}}",
+                           false, "book.xml");
     }
     
-    private void doTestMixedContent(String data, boolean ignore) throws Exception {
-        InputStream is = getClass().getResourceAsStream("book.xml");
+    private void doTestMixedContent(String data, boolean ignore, String fileName) throws Exception {
+        InputStream is = getClass().getResourceAsStream(fileName);
         JAXBContext context = JAXBContext.newInstance(new Class[]{Books.class, Book.class});
         Unmarshaller um = context.createUnmarshaller();
         JAXBElement jaxbEl = um.unmarshal(new StreamSource(is), Books.class);
@@ -319,6 +328,44 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         String s = os.toString();
         assertEquals(data, s);
+    }
+    
+    @Test
+    public void testWriteListOfDerivedTypes() throws Exception {
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+        p.setNamespaceMap(namespaceMap);
+        Books2 books2 = new Books2();
+        books2.setBooks(Collections.singletonList(
+                            new SuperBook("CXF Rocks", 123L, 124L)));
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(books2, (Class)Books2.class, Books2.class, Books2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        String s = os.toString();
+        String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
+            + "\"name\":\"CXF Rocks\",\"superId\":124}}}";
+        assertEquals(data, s);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadListOfDerivedTypes() throws Exception {
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+        p.setNamespaceMap(namespaceMap);
+        String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
+            + "\"name\":\"CXF Rocks\",\"superId\":124}}}";
+        byte[] bytes = data.getBytes();
+        Object books2Object = p.readFrom((Class)Books2.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        Books2 books = (Books2)books2Object;
+        List<? extends Book> list = books.getBooks();
+        assertEquals(1, list.size());
+        SuperBook book = (SuperBook)list.get(0);
+        assertEquals(124L, book.getSuperId());
     }
     
     @Test
@@ -393,5 +440,18 @@ public class JSONProviderTest extends Assert {
         @XmlMixed
         @XmlAnyElement(lax = true)
         protected List<Object> books;
+    }
+    
+    @XmlRootElement()
+    public static class Books2 {
+        protected List<? extends Book> books;
+        
+        public void setBooks(List<? extends Book> list) {
+            books = list;
+        }
+        
+        public List<? extends Book> getBooks() {
+            return books;
+        }
     }
 }

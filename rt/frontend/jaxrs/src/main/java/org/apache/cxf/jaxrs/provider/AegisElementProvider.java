@@ -44,21 +44,24 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
-public final class AegisElementProvider extends AbstractAegisProvider  {
+public class AegisElementProvider extends AbstractAegisProvider  {
     
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         AegisContext context = getAegisContext(type, genericType);
         AegisReader<XMLStreamReader> aegisReader = context.createXMLStreamReader();
-        XMLStreamReader xmlStreamReader = StaxUtils.createXMLStreamReader(is);
         try {
+            XMLStreamReader xmlStreamReader = createStreamReader(type, is);
             return aegisReader.read(xmlStreamReader);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
     }
 
+    protected XMLStreamReader createStreamReader(Class<?> type, InputStream is) throws Exception {
+        return StaxUtils.createXMLStreamReader(is);
+    }
     
     public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
@@ -69,13 +72,19 @@ public final class AegisElementProvider extends AbstractAegisProvider  {
         AegisContext context = getAegisContext(type, genericType);
         org.apache.cxf.aegis.type.Type aegisType = TypeUtil.getWriteTypeStandalone(context, obj, null);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
-        XMLStreamWriter xmlStreamWriter = StaxUtils.createXMLStreamWriter(os);
         try {
+            XMLStreamWriter xmlStreamWriter = createStreamWriter(type, os);
             // use type qname as element qname?
+            xmlStreamWriter.writeStartDocument();
             aegisWriter.write(obj, aegisType.getSchemaType(), false, xmlStreamWriter, aegisType);
+            xmlStreamWriter.writeEndDocument();
             xmlStreamWriter.close();
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
+    }
+    
+    protected XMLStreamWriter createStreamWriter(Class<?> type, OutputStream os) throws Exception {
+        return StaxUtils.createXMLStreamWriter(os);
     }
 }

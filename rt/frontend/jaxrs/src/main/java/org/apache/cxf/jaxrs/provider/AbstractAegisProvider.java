@@ -41,8 +41,18 @@ public abstract class AbstractAegisProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static Map<Class<?>, AegisContext> classContexts = new WeakHashMap<Class<?>, AegisContext>();
+    protected boolean writeXsiType = true;
+    protected boolean readXsiType = true;
+    @Context 
+    protected ContextResolver<AegisContext> resolver;
     
-    @Context protected ContextResolver<AegisContext> resolver;
+    public void setWriteXsiType(boolean write) {
+        writeXsiType = write;
+    }
+    
+    public void setReadXsiType(boolean read) {
+        readXsiType = read;
+    }
     
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         return isSupported(type, genericType, anns);
@@ -94,8 +104,8 @@ public abstract class AbstractAegisProvider
             AegisContext context = classContexts.get(type);
             if (context == null) {
                 context = new AegisContext();
-                context.setWriteXsiTypes(true); // needed, since we know no element/type maps.
-                context.setReadXsiTypes(true);
+                context.setWriteXsiTypes(writeXsiType); 
+                context.setReadXsiTypes(readXsiType);
                 Set<Class<?>> rootClasses = new HashSet<Class<?>>();
                 rootClasses.add(type);
                 if (!(genericType instanceof Class)) {
@@ -118,5 +128,9 @@ public abstract class AbstractAegisProvider
      */
     protected boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations) {
         return true;
+    }
+    
+    void clearContexts() {
+        classContexts.clear();
     }
 }
