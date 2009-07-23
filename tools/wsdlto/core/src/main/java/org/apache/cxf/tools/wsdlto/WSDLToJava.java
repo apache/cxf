@@ -20,6 +20,8 @@
 package org.apache.cxf.tools.wsdlto;
 
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -41,6 +43,7 @@ public class WSDLToJava {
     public static final String DEFAULT_DATABINDING_NAME = "jaxb";
 
     private String[] args;
+    private PrintStream out = System.out;
 
     private PluginLoader pluginLoader = PluginLoader.getInstance();
 
@@ -56,7 +59,7 @@ public class WSDLToJava {
             name = DEFAULT_FRONTEND_NAME;
         }
         if (isVerbose()) {
-            System.out.println("Loading FrontEnd " + name + " ...");
+            out.println("Loading FrontEnd " + name + " ...");
         }
         return pluginLoader.getFrontEndProfile(name);
     }
@@ -66,7 +69,7 @@ public class WSDLToJava {
             name = DEFAULT_DATABINDING_NAME;
         }
         if (isVerbose()) {
-            System.out.println("Loading DataBinding " + name + " ...");
+            out.println("Loading DataBinding " + name + " ...");
         }
         return pluginLoader.getDataBindingProfile(name);
     }
@@ -78,8 +81,15 @@ public class WSDLToJava {
         }
         return "YES".equalsIgnoreCase(exit) || "TRUE".equalsIgnoreCase(exit);
     }
-
+    
     public void run(ToolContext context) throws Exception {
+        run(context, null);
+    }
+
+    public void run(ToolContext context, OutputStream os) throws Exception {
+        if (os != null) {
+            this.out = (os instanceof PrintStream) ? (PrintStream)os : new PrintStream(os);
+        }
         FrontEndProfile frontend = null;
         if (args != null) {
             context.put(ToolConstants.CFG_CMD_ARG, args);
@@ -105,7 +115,8 @@ public class WSDLToJava {
                            false,
                            args,
                            isExitOnFinish(),
-                           context);
+                           context,
+                           os);
     }
 
     protected boolean isVerbose() {

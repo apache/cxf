@@ -21,12 +21,13 @@ package org.apache.cxf.tools.common.toolspec.parser;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.PrintStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
@@ -182,7 +183,9 @@ public class CommandLineParser {
                                     new StreamSource(Tool.class
                                         .getResourceAsStream("indent-no-xml-declaration.xsl")));
 
-                serializer.transform(new DOMSource(resultDoc), new StreamResult(new PrintStream(System.out)));
+                OutputStream os = new ByteArrayOutputStream();
+                serializer.transform(new DOMSource(resultDoc), new StreamResult(os));
+                LOG.fine(os.toString());
             } catch (Exception ex) {
                 LOG.log(Level.SEVERE, "ERROR_SERIALIZE_COMMAND_MSG", ex);
             }

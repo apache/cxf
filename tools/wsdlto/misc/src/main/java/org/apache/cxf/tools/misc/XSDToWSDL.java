@@ -68,16 +68,16 @@ public class XSDToWSDL extends AbstractCXFToolContainer {
             if (ex.getCause() instanceof BadUsageException) {
                 printUsageException(TOOL_NAME, (BadUsageException)ex.getCause());
             }
-            System.err.println();
-            System.err.println("XSDToWSDL Error: " + ex.getMessage());
+            err.println();
+            err.println("XSDToWSDL Error: " + ex.getMessage());
             if (isVerboseOn()) {
-                ex.printStackTrace();
+                ex.printStackTrace(err);
             }
         } catch (Exception ex) {
-            System.err.println();
-            System.err.println("XSDToWSDL Error: " + ex.getMessage());
+            err.println();
+            err.println("XSDToWSDL Error: " + ex.getMessage());
             if (isVerboseOn()) {
-                ex.printStackTrace();
+                ex.printStackTrace(err);
             }
         }
     }

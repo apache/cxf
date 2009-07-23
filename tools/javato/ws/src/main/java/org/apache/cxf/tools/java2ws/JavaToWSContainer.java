@@ -78,15 +78,15 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
             if (ex.getCause() instanceof BadUsageException) {
                 printUsageException(TOOL_NAME, (BadUsageException)ex.getCause());
                 if (isVerboseOn()) {
-                    ex.printStackTrace();
+                    ex.printStackTrace(err);
                 }
             }
             throw ex;
         } catch (Exception ex) {
-            System.err.println("Error: " + ex.getMessage());
-            System.err.println();
+            err.println("Error: " + ex.getMessage());
+            err.println();
             if (isVerboseOn()) {
-                ex.printStackTrace();
+                ex.printStackTrace(err);
             }
 
             throw new ToolException(ex.getMessage(), ex.getCause());

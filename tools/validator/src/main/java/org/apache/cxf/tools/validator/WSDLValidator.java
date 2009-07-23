@@ -83,23 +83,23 @@ public class WSDLValidator extends AbstractCXFToolContainer {
                 }
             }
         } catch (ToolException ex) {
-            System.err.println("WSDLValidator Error : " + ex.getMessage());
+            err.println("WSDLValidator Error : " + ex.getMessage());
             if (ex.getCause() instanceof BadUsageException) {
                 printUsageException(TOOL_NAME, (BadUsageException)ex.getCause());
             }
-            System.err.println();
+            err.println();
             if (isVerboseOn()) {
-                System.err.println("[+] Verbose turned on");
-                System.err.println();                
-                ex.printStackTrace();
+                err.println("[+] Verbose turned on");
+                err.println();                
+                ex.printStackTrace(err);
             }
         } catch (Exception ex) {
-            System.err.println("WSDLValidator Error : " + ex.getMessage());
-            System.err.println();
+            err.println("WSDLValidator Error : " + ex.getMessage());
+            err.println();
             if (isVerboseOn()) {
-                System.err.println("[+] Verbose turned on");
-                System.err.println();
-                ex.printStackTrace();
+                err.println("[+] Verbose turned on");
+                err.println();
+                ex.printStackTrace(err);
             }
         }
     }
