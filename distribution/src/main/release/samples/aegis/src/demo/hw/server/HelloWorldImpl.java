@@ -33,18 +33,18 @@ public class HelloWorldImpl implements HelloWorld {
     }
 
     public Document getADocument() {
-    	DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-    	DocumentBuilder db;
-    	try {
-    		db = dbf.newDocumentBuilder();
-		} catch (ParserConfigurationException e) {
-			throw new RuntimeException(e);
-		}
-		Document doc = db.newDocument();
-		Element carrot = doc.createElement("carrot");
-		doc.appendChild(carrot);
-		carrot.appendChild(doc.createTextNode("Carrots are roots"));
-		
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db;
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
+        Document doc = db.newDocument();
+        Element carrot = doc.createElement("carrot");
+        doc.appendChild(carrot);
+        carrot.appendChild(doc.createTextNode("Carrots are roots"));
+
         return doc;
     }
 }

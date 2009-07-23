@@ -23,6 +23,6 @@ import org.w3c.dom.Document;
 public interface HelloWorld {
     
     String sayHi(String text);
-    public Document getADocument();
+    Document getADocument();
 }
 

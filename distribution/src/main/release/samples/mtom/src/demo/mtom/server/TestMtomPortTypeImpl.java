@@ -18,10 +18,14 @@
  */
 
 package demo.mtom.server;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import javax.activation.DataHandler;
 import javax.jws.WebService;
+import javax.mail.util.ByteArrayDataSource;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.mime.TestMtomPortType;
@@ -44,12 +48,29 @@ public class TestMtomPortTypeImpl implements TestMtomPortType {
         try {
             System.out.println("Received image with mtom enabled from client");
             InputStream mtomIn = attachinfo.value.getInputStream();
-            long fileSize = 0;
-            System.out.println("The image data size is " + mtomIn.available());
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            copy(mtomIn, out);
+            System.out.println("The image data size is " + out.size());
             name.value = "Hello " + name.value;
             mtomIn.close();
+            attachinfo.value = new DataHandler(new ByteArrayDataSource(out.toByteArray(),
+                                                                       attachinfo.value.getContentType()));
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    public static int copy(final InputStream input, final OutputStream output) throws IOException {
+        final byte[] buffer = new byte[4096];
+        int n = 0;
+        n = input.read(buffer);
+        int total = 0;
+        while (-1 != n) {
+            output.write(buffer, 0, n);
+            total += n;
+            n = input.read(buffer);
+        }
+        return total;
+    }
+    
+    
 }

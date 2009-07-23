@@ -19,10 +19,12 @@
 
 package demo.hw.client;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
+
 
 import demo.hw.server.HelloWorld;
 
