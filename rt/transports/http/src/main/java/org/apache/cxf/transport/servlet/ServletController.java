@@ -402,7 +402,7 @@ public class ServletController {
         }
     }
     
-    private String getBaseURL(HttpServletRequest request) {
+    protected String getBaseURL(HttpServletRequest request) {
         String reqPrefix = request.getRequestURL().toString();        
         String pathInfo = request.getPathInfo() == null ? "" : request.getPathInfo();
         //fix for CXF-898
@@ -413,7 +413,7 @@ public class ServletController {
             reqPrefix = UrlUtils.pathDecode(reqPrefix);
             // pathInfo drops matrix parameters attached to a last path segment
             int offset = 0;
-            int index = getMatrixParameterIndex(reqPrefix, pathInfo.length());
+            int index = getMatrixParameterIndex(reqPrefix, pathInfo);
             if (index >= pathInfo.length()) {
                 offset = reqPrefix.length() - index;
             }
@@ -422,12 +422,15 @@ public class ServletController {
         return reqPrefix;
     }
     
-    private int getMatrixParameterIndex(String reqPrefix, int pathInfoLength) {
+    private int getMatrixParameterIndex(String reqPrefix, String pathInfo) {
         int index = reqPrefix.lastIndexOf(';');
         int lastIndex = -1;
-        while (index >= pathInfoLength) {
+        while (index >= pathInfo.length()) {
             lastIndex = index;
             reqPrefix = reqPrefix.substring(0, index);
+            if (reqPrefix.endsWith(pathInfo)) {
+                break;
+            }
             index = reqPrefix.lastIndexOf(';');
         }
         return lastIndex;
