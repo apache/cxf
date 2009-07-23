@@ -73,10 +73,11 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.servicemix</groupId>
-            <artifactId>servicemix-jbi</artifactId>
+            <groupId>org.apache.servicemix.specs</groupId>
+            <artifactId>org.apache.servicemix.specs.jbi-api-1.0</artifactId>
             <scope>provided</scope>
         </dependency>
+
     </dependencies>
 
     <build>

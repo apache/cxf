@@ -31,6 +31,7 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
@@ -387,26 +389,60 @@ public class JSONProvider extends AbstractJAXBProvider  {
     }
     
     protected static class IgnoreMixedContentWriter extends DelegatingXMLStreamWriter {
-        boolean lastWriteChars;
+        String lastText;
+        boolean isMixed;
+        List<Boolean> mixed = new LinkedList<Boolean>();
         
         public IgnoreMixedContentWriter(XMLStreamWriter writer) {
             super(writer);
         }
 
         public void writeCharacters(String text) throws XMLStreamException {
-            if (!lastWriteChars || text.trim().length() > 0) {
-                if (lastWriteChars) {
-                    text = text.trim();
-                }
-                super.writeCharacters(text);
-                lastWriteChars = true;
+            if (StringUtils.isEmpty(text.trim())) {
+                lastText = text; 
+            } else if (lastText != null) {
+                lastText += text;
+            } else if (!isMixed) {
+                super.writeCharacters(text);                                
             }
         }
-
-        public void writeStartElement(String prefix, String localName, String namespaceURI) 
-            throws XMLStreamException {
-            super.writeStartElement(prefix, localName, namespaceURI);
-            lastWriteChars = false;
+        
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(prefix, local, uri);
         }
+        public void writeStartElement(String uri, String local) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(uri, local);
+        }
+        public void writeStartElement(String local) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(local);
+        }
+        public void writeEndElement() throws XMLStreamException {
+            if (lastText != null && !isMixed) {
+                super.writeCharacters(lastText);                
+            }
+            super.writeEndElement();
+            isMixed = mixed.get(0);
+            mixed.remove(0);
+        }
+
+        
     }
 }

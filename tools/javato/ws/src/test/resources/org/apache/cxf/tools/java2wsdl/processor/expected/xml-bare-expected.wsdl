@@ -19,15 +19,15 @@
 -->
 <wsdl:definitions name="GreeterService" targetNamespace="http://apache.org/xml_bare" xmlns:tns="http://apache.org/xml_bare" xmlns:ns1="http://apache.org/xml_bare/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/xml_bare/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/xml_bare/types">
-<xs:element name="myComplexStruct" nillable="true" type="tns:myComplexStructType"/>
-<xs:element name="requestType" nillable="true" type="xs:string"/>
-<xs:element name="responseType" nillable="true" type="xs:string"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/xml_bare/types" elementFormDefault="qualified" targetNamespace="http://apache.org/xml_bare/types" version="1.0">
+<xs:element name="myComplexStruct" type="tns:myComplexStructType"/>
+<xs:element name="requestType" type="xs:string"/>
+<xs:element name="responseType" type="xs:string"/>
 <xs:complexType name="myComplexStructType">
 <xs:sequence>
-<xs:element form="qualified" name="elem1" type="xs:string"/>
-<xs:element form="qualified" name="elem2" type="xs:string"/>
-<xs:element form="qualified" name="elem3" type="xs:int"/>
+<xs:element name="elem1" type="xs:string"/>
+<xs:element name="elem2" type="xs:string"/>
+<xs:element name="elem3" type="xs:int"/>
 </xs:sequence>
 </xs:complexType>
 </xs:schema>

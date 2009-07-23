@@ -310,6 +310,7 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    @Ignore("This is hitting http://jira.codehaus.org/browse/JETTISON-44")
     public void testWriteMixedContent() throws Exception {
         doTestMixedContent("{\"Book\":{\"name\":\"CXF\",\"id\":125,\"$\":\"\\n     \\n\"}}",
                            false, "book.xml");
