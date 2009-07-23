@@ -743,10 +743,7 @@ public abstract class AbstractTypeTestClient
         yOrig.setHour(22);
         yOrig.setMinute(4);
         yOrig.setSecond(15);
-        // XXX - Setting the millisecond part here seems to cause
-        // a xerces validation error with the ibm jdk. That should
-        // be valid.
-        // yOrig.setMillisecond(250);
+        yOrig.setMillisecond(250);
 
         Holder<XMLGregorianCalendar> y = new Holder<XMLGregorianCalendar>(yOrig);
         Holder<XMLGregorianCalendar> z = new Holder<XMLGregorianCalendar>();
@@ -820,7 +817,7 @@ public abstract class AbstractTypeTestClient
 
     @Test
     public void testGMonth() throws Exception {
-        if (!shouldRunTest("GMonth")) {
+        if (!shouldRunTest("GMonth")) { 
             return;
         }
         javax.xml.datatype.DatatypeFactory datatypeFactory = javax.xml.datatype.DatatypeFactory.newInstance();
