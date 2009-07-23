@@ -27,7 +27,7 @@ public class Server extends AbstractBusTestServerBase {
 
     protected void run()  {    
         Object implementor = new HelloImpl();
-        String address = "http://localhost:9090/jaxws-mtom/hello";
+        String address = "http://localhost:9091/jaxws-mtom/hello";
         Endpoint.publish(address, implementor);
     }
 
