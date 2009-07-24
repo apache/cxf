@@ -326,6 +326,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         setService(factory.create());
 
         setServiceProperties();
+        
+        EndpointInfo epInfo = getEndpointInfo();
+        if (epInfo != null) {
+            serviceConfigurations.add(new WSDLBasedServiceConfiguration(getEndpointInfo().getBinding()));
+        }
 
         initializeWSDLOperations();
 
