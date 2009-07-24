@@ -18,34 +18,47 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf-xjc</artifactId>
-    <packaging>pom</packaging>
+    <groupId>org.apache.cxf.xjcplugins</groupId>
+    <artifactId>cxf-xjc-bug671</artifactId>
+    <packaging>jar</packaging>
     <version>2.3.0-SNAPSHOT</version>
-    <name>Apache CXF XJC Plugins</name>
+    <name>Apache CXF XJC Plugin To Workaround JAXB Bug 671</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>2.3.0-SNAPSHOT</version>
-        <relativePath>../../parent/pom.xml</relativePath>
+        <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
-    <modules>
-        <module>dv</module>
-        <module>ts</module>
-        <module>wsdlextension</module>
-	<module>bug671</module>
-        <module>dv-test</module>
-        <module>ts-test</module>
-        <module>wsdlextension-test</module>
-    </modules>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-common-utilities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+    </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</developerConnection>
     </scm>
 
 </project>
