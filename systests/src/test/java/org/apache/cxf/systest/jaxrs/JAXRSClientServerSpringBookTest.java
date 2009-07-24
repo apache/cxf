@@ -26,6 +26,7 @@ import java.io.InputStreamReader;
 import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +42,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -158,6 +160,22 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         assertEquals(getStringFromInputStream(expected), getStringFromInputStream(in));
     }
     
+    private void getBookAegis(String endpointAddress, String type) throws Exception {
+        getBookAegis(endpointAddress, type, null);
+    }
+    
+    private void getBookAegis(String endpointAddress, String type, String mHeader) throws Exception {
+        WebClient client = WebClient.create(endpointAddress,
+            Collections.singletonList(new AegisElementProvider()));
+        if (mHeader != null) {
+            client = client.header("X-HTTP-Method-Override", mHeader);
+        }
+        Book book = client.accept(type).get(Book.class);
+
+        assertEquals(124L, book.getId());
+        assertEquals("CXF in Action - 2", book.getName());
+    }
+    
     @Test
     public void testAddInvalidXmlBook() throws Exception {
         
@@ -208,13 +226,13 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
                "resources/expected_get_book123.txt");
                 
     }
-    
+
     @Test
     public void testGetBookAegis() throws Exception {
         
         String endpointAddress =
             "http://localhost:9080/the/thebooks4/bookstore/books/aegis"; 
-        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+        getBookAegis(endpointAddress, "application/xml"); 
     }
     
     @Test
@@ -222,7 +240,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
         String endpointAddress =
             "http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve?_method=RETRIEVE"; 
-        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml"); 
+        getBookAegis(endpointAddress, "application/xml"); 
     }
     
     @Test
@@ -230,7 +248,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         
         String endpointAddress =
             "http://localhost:9080/the/thebooks4/bookstore/books/aegis/retrieve"; 
-        getBook(endpointAddress, "resources/expected_add_book_aegis.txt", "application/xml", "RETRIEVE"); 
+        getBookAegis(endpointAddress, "application/xml", "RETRIEVE"); 
     }
     
     @Test
@@ -253,9 +271,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         String aegisData = sb.toString();
         s.getInputStream().close();
         s.close();
-        String expected = getStringFromInputStream(
-                              getClass().getResourceAsStream("resources/expected_add_book_aegis.txt"));
-        assertTrue(aegisData.contains(expected));
+        assertTrue(aegisData.contains("CXF in Action - 2"));
         
     }
     
