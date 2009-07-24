@@ -82,6 +82,19 @@ public class ClassCollector {
         return typesClassNames.get(key(packagename, type));
     }
 
+    public boolean containsTypeIgnoreCase(String packagename, String type) {
+        String key = key(packagename, type);
+        if (typesClassNames.containsKey(key)) {
+            //try the common fast case first
+            return true;
+        }
+        for (String s : typesClassNames.keySet()) {
+            if (key.equalsIgnoreCase(s)) {
+                return true;
+            }
+        }
+        return false;
+    }
     private String key(String packagename, String type) {
         return packagename + "#" + type;
     }
