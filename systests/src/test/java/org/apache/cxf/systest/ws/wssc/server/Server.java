@@ -106,6 +106,12 @@ public class Server extends AbstractBusTestServerBase {
                     "org/apache/cxf/systest/ws/wssec11/server/bob.properties");
             ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES + ".sct", 
                     "org/apache/cxf/systest/ws/wssec11/server/alice.properties");
+        } else if (url.contains("MutualCert")) {
+            ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES + ".sct", 
+                "org/apache/cxf/systest/ws/wssec11/server/bob.properties");
+            ep.getProperties().put(SecurityConstants.SIGNATURE_PROPERTIES + ".sct", 
+                "org/apache/cxf/systest/ws/wssec11/server/alice.properties");
+            ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         }
         ep.publish(url);
     }

@@ -34,6 +34,32 @@
                 <xsl:when test="@schemaLocation='http://ndgo-introp-s24/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?xsd=xsd3'">
                     <xsl:attribute name="schemaLocation">WSSecureConversation_3.xsd</xsl:attribute>
                 </xsl:when>
+
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc?xsd=xsd0'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_0.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?xsd=xsd0'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_0.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc?xsd=xsd1'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_1.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?xsd=xsd1'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_1.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc?xsd=xsd2'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_2.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?xsd=xsd2'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_2.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc?xsd=xsd3'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_3.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?xsd=xsd3'">
+                    <xsl:attribute name="schemaLocation">WSSecureConversation_3.xsd</xsl:attribute>
+                </xsl:when>
+
                 <xsl:otherwise>
                     <xsl:attribute name="schemaLocation">
                         <xsl:value-of select="@schemaLocation"/>
@@ -51,6 +77,12 @@
                     <xsl:attribute name="location">WSSecureConversation.wsdl</xsl:attribute>
                 </xsl:when>
                 <xsl:when test="@location='http://ndgo-introp-s24/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?wsdl'">
+                    <xsl:attribute name="location">WSSecureConversation.wsdl</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@location='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversation.svc?wsdl'">
+                    <xsl:attribute name="location">WSSecureConversation.wsdl</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@location='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WSSecureConversationSign.svc?wsdl'">
                     <xsl:attribute name="location">WSSecureConversation.wsdl</xsl:attribute>
                 </xsl:when>
                 <xsl:otherwise>
