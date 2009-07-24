@@ -25,6 +25,8 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -33,11 +35,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.Provider;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
@@ -99,17 +103,17 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     
     @Override
     protected XMLStreamReader createStreamReader(Class<?> type, InputStream is) throws Exception {
+        if (readXsiType) {
+            namespaceMap.putIfAbsent("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+        }
+        getQName(type);
         MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
-        return factory.createXMLStreamReader(is);
+        return new NamespaceContextReader(factory.createXMLStreamReader(is));
     }
     
     private QName getQName(Class<?> type) {
-        String nsURI = PackageUtils.getNamespace(PackageUtils.getPackageName(type));
-        if (nsURI.endsWith("/")) {
-            nsURI = nsURI.substring(0, nsURI.length() - 1);
-        }
-        QName qname = new QName(nsURI, type.getSimpleName(), "ns1"); 
-        namespaceMap.putIfAbsent(nsURI, "ns1");
+        QName qname = JAXRSUtils.getClassQName(type); 
+        namespaceMap.putIfAbsent(qname.getNamespaceURI(), "ns1");
         return qname;
     }
     
@@ -118,4 +122,36 @@ public final class AegisJSONProvider extends AegisElementProvider  {
                                     qname.getNamespaceURI(),
                                     qname.getLocalPart());
     }
+    
+    private class NamespaceContextReader extends DepthXMLStreamReader {
+        public NamespaceContextReader(XMLStreamReader reader) {
+            super(reader);
+        }
+        
+        @Override
+        public NamespaceContext getNamespaceContext() {
+            return new NamespaceContext() {
+
+                public String getNamespaceURI(String prefix) {
+                    for (Map.Entry<String, String> entry : namespaceMap.entrySet()) {
+                        if (entry.getValue().equals(prefix)) {
+                            return entry.getKey();
+                        }
+                    }
+                    return null;
+                }
+
+                public String getPrefix(String ns) {
+                    return namespaceMap.get(ns);
+                }
+
+                public Iterator getPrefixes(String ns) {
+                    String prefix = getPrefix(ns);
+                    return prefix == null ? null : Collections.singletonList(prefix).iterator();
+                }
+                
+            };
+        }
+    }
+    
 }

@@ -35,7 +35,6 @@ import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisJSONProviderTest extends Assert {
@@ -52,14 +51,27 @@ public class AegisJSONProviderTest extends Assert {
         assertFalse(p.isReadable(AegisTestBean.class, null, null, null));
     }
     
-    @SuppressWarnings("unchecked")
+    
     @Test
-    @Ignore
     public void testReadFrom() throws Exception {
+        doTestRead(true);
+    }
+    
+    @Test
+    public void testReadFromNoMap() throws Exception {
+        doTestRead(false);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void doTestRead(boolean setNsMap) throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
-        Map<String, String> namespaceMap = new HashMap<String, String>();
-        namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
-        namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "ns2");
+        p.clearContexts();
+        if (setNsMap) {
+            Map<String, String> namespaceMap = new HashMap<String, String>();
+            namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
+            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+            p.setNamespaceMap(namespaceMap);
+        }
         String data = "{\"ns1.AegisTestBean\":{\"@xsins.type\":\"ns1:AegisTestBean\","
             + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}}";
         

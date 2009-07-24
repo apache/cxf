@@ -63,9 +63,11 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Providers;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
@@ -1039,6 +1041,14 @@ public final class JAXRSUtils {
         }
         
         return false;
+    }
+    
+    public static QName getClassQName(Class<?> type) {
+        String nsURI = PackageUtils.getNamespace(PackageUtils.getPackageName(type));
+        if (nsURI.endsWith("/")) {
+            nsURI = nsURI.substring(0, nsURI.length() - 1);
+        }
+        return new QName(nsURI, type.getSimpleName(), "ns1"); 
     }
     
 }
