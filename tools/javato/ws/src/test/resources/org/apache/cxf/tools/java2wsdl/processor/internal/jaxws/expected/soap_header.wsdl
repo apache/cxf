@@ -19,8 +19,8 @@
 -->
 <wsdl:definitions name="HeaderTesterService" targetNamespace="http://apache.org/samples/headers" xmlns:tns="http://apache.org/samples/headers" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <wsdl:types>
-<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/samples/headers" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/samples/headers">
-<xs:element name="SOAPHeaderInfo" nillable="true" type="tns:SOAPHeaderData"/>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/samples/headers" targetNamespace="http://apache.org/samples/headers" version="1.0">
+<xs:element name="SOAPHeaderInfo" type="tns:SOAPHeaderData"/>
 <xs:element name="inHeader">
 <xs:complexType>
 <xs:sequence>
