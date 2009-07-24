@@ -107,7 +107,7 @@ public class AegisJSONProviderTest extends Assert {
     
     private void doTestWriteTo(String data, boolean writeXsi, boolean setNsMap) throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
-        p.clearContexts();
+        AbstractAegisProvider.clearContexts();
         p.setWriteXsiType(writeXsi);
         if (setNsMap) {
             Map<String, String> namespaceMap = new HashMap<String, String>();
@@ -131,7 +131,7 @@ public class AegisJSONProviderTest extends Assert {
     @Test
     public void testManyTags() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
-        p.clearContexts();
+        AbstractAegisProvider.clearContexts();
         p.setWriteXsiType(false);
         p.setSerializeAsArray(true);
         
