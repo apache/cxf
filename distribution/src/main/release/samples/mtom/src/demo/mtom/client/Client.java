@@ -22,7 +22,6 @@ package demo.mtom.client;
 import java.awt.Image;
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
@@ -50,9 +49,6 @@ public final class Client {
     }
 
     public static void main(String args[]) throws Exception {
-
-        Client client = new Client();
-
         if (args.length == 0) {
             System.out.println("Please specify the WSDL file.");
             System.exit(1);
@@ -83,7 +79,10 @@ public final class Client {
         Holder<byte[]> param = new Holder<byte[]>();
         param.value = new byte[(int) fileSize];
         InputStream in = fileURL.openStream();
-        in.read(param.value);
+        int len = in.read(param.value);
+        while (len < fileSize) {
+            len += in.read(param.value, len, (int)(fileSize - len));
+        }
         System.out.println("--Sending the me.bmp image to server");
         System.out.println("--Sending a name value of " + name.value);
 
@@ -123,8 +122,4 @@ public final class Client {
         System.exit(0);
     }
 
-    private static InputStream getResourceStream(File file) throws Exception {
-        InputStream in = new FileInputStream(file);
-        return in;
-    }
 }
