@@ -404,6 +404,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
                 lastText += text;
             } else if (!isMixed) {
                 super.writeCharacters(text);                                
+            } else {
+                lastText = text;
             }
         }
         
@@ -435,8 +437,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             super.writeStartElement(local);
         }
         public void writeEndElement() throws XMLStreamException {
-            if (lastText != null && !isMixed) {
-                super.writeCharacters(lastText);                
+            if (lastText != null && (!isMixed || !StringUtils.isEmpty(lastText.trim()))) {
+                super.writeCharacters(lastText.trim());                
             }
             super.writeEndElement();
             isMixed = mixed.get(0);

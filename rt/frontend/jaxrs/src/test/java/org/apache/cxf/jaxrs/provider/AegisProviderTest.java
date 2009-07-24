@@ -31,6 +31,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.fortest.AegisTestBean;
 
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +43,11 @@ public class AegisProviderTest extends Assert {
             + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:AegisTestBean\">"
             + "<ns1:boolValue>true</ns1:boolValue><ns1:strValue>hovercraft</ns1:strValue>"
             + "</ns1:AegisTestBean>";
+    
+    @After
+    public void clearCache() {
+        AbstractAegisProvider.clearContexts();
+    }
     
     @Test
     public void testIsWriteable() {

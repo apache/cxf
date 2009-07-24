@@ -41,6 +41,7 @@ public abstract class AbstractAegisProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static Map<Class<?>, AegisContext> classContexts = new WeakHashMap<Class<?>, AegisContext>();
+    
     protected boolean writeXsiType = true;
     protected boolean readXsiType = true;
     @Context 
@@ -130,7 +131,7 @@ public abstract class AbstractAegisProvider
         return true;
     }
     
-    void clearContexts() {
+    static void clearContexts() {
         classContexts.clear();
     }
 }
