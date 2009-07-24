@@ -48,7 +48,7 @@ under the License.
   </wsdl:binding>
   <wsdl:service name="HelloService">
     <wsdl:port name="HelloPort" binding="ns1:HelloServiceSoapBinding">
-      <soap:address location="http://localhost:9090/hello"/>
+      <soap:address location="http://localhost:9091/hello"/>
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions> 
