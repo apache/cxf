@@ -47,12 +47,12 @@
 
         <!-- please maintain alphabetical order here -->
         <abdera.version>0.4.0-incubating</abdera.version>
-        <activemq.version>4.1.1</activemq.version>
+        <activemq.version>5.1.0</activemq.version>
         <derby.version>10.2.2.0</derby.version>
         <jaxb.version>2.1</jaxb.version>
         <jaxb.impl.version>2.1.9</jaxb.impl.version>
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
-        <jetty.version>6.1.18</jetty.version>
+        <jetty.version>6.1.19</jetty.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.0.8</spring.version>
         <spring.mock>spring-mock</spring.mock>
@@ -73,7 +73,6 @@
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
 
         <downloadSources>true</downloadSources>
-        <servicemix.version>3.2.1</servicemix.version>
     </properties>
 
 
@@ -473,24 +472,10 @@
                 <version>1.4.2</version>
             </dependency>
             <dependency>
-                <groupId>org.apache.servicemix</groupId>
-                <artifactId>servicemix-jbi</artifactId>
-                <version>${servicemix.version}</version>
+                <groupId>org.apache.servicemix.specs</groupId>
+                <artifactId>org.apache.servicemix.specs.jbi-api-1.0</artifactId>
+                <version>1.3.0</version>
                 <scope>provided</scope>
-                <exclusions>
-                    <exclusion>
-                        <groupId>servicemix</groupId>
-                        <artifactId>jaxp</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>mx4j</groupId>
-                        <artifactId>mx4j</artifactId>
-                    </exclusion>
-                    <exclusion>
-                        <groupId>org.codehaus.woodstox</groupId>
-                        <artifactId>wstx-asl</artifactId>
-                    </exclusion>
-                </exclusions>
             </dependency>
 
             <dependency>
@@ -593,6 +578,11 @@
                         <artifactId>stax-api</artifactId>
                     </exclusion>
                 </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-jdk14</artifactId>
+                <version>1.5.8</version>
             </dependency>
             <dependency>
                 <groupId>org.mortbay.jetty</groupId>
