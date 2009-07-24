@@ -81,6 +81,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     public static final String PRINCIPAL_RESULT = "wss4j.principal.result";
     public static final String PROCESSOR_MAP = "wss4j.processor.map";
 
+    private static final String SECURITY_PROCESSED = WSS4JInInterceptor.class.getName() + ".DONE";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(WSS4JInInterceptor.class);
     private static final Logger TIME_LOG = LogUtils.getL7dLogger(WSS4JInInterceptor.class,
                                                                  null,
@@ -142,6 +144,10 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     }
     
     public void handleMessage(SoapMessage msg) throws Fault {
+        if (msg.containsKey(SECURITY_PROCESSED)) {
+            return;
+        }
+        msg.put(SECURITY_PROCESSED, Boolean.TRUE);
         SOAPMessage doc = getSOAPMessage(msg);
         
         boolean doDebug = LOG.isLoggable(Level.FINE);
