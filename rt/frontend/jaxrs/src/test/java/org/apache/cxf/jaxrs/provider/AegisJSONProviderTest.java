@@ -65,7 +65,7 @@ public class AegisJSONProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     private void doTestRead(boolean setNsMap) throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
-        p.clearContexts();
+        AbstractAegisProvider.clearContexts();
         if (setNsMap) {
             Map<String, String> namespaceMap = new HashMap<String, String>();
             namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
