@@ -35,6 +35,7 @@
     <modules>
         <module>dv</module>
         <module>ts</module>
+	<module>bug671</module>
         <module>dv-test</module>
         <module>ts-test</module>
     </modules>

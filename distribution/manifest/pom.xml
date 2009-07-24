@@ -108,7 +108,11 @@
             <artifactId>cxf-xjc-ts</artifactId>
             <version>${pom.version}</version>
         </dependency>
-
+        <dependency>
+            <groupId>${pom.groupId}.xjcplugins</groupId>
+            <artifactId>cxf-xjc-bug671</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
