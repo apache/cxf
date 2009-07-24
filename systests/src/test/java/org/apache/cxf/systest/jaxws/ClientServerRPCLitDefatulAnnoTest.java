@@ -33,7 +33,7 @@ public class ClientServerRPCLitDefatulAnnoTest extends AbstractClientServerTestB
 
         protected void run() {
             Object implementor = new HelloImpl();
-            String address = "http://localhost:9090/hello";
+            String address = "http://localhost:9091/hello";
             Endpoint.publish(address, implementor);
         }
 
