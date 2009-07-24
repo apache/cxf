@@ -309,13 +309,17 @@ public class JaxWsImplementorInfo {
 
     public Class<?> getProviderParameterType() {
         // The Provider Implementor inherits out of Provider<T>
-        Type intfTypes[] = implementorClass.getGenericInterfaces();
-        for (Type t : intfTypes) {
-            Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
-            if (Provider.class == clazz) {
-                Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
-                return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
+        Class<?> c = implementorClass;
+        while (c != null) {
+            Type intfTypes[] = c.getGenericInterfaces();
+            for (Type t : intfTypes) {
+                Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
+                if (Provider.class == clazz) {
+                    Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
+                    return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
+                }
             }
+            c = c.getSuperclass();
         }
         return null;
     }
