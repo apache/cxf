@@ -42,6 +42,7 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -129,10 +130,11 @@ public class JBIConduitOutputStream extends CachedOutputStream {
                 xchng.setOperation(bop.getName());
                 //copy context
                 Map<String, Object> invocationContext = 
-                    (Map<String, Object>) message.get(Message.INVOCATION_CONTEXT);
+                    CastUtils.cast((Map)message.get(Message.INVOCATION_CONTEXT));
                 if (invocationContext != null) {
-                    for (Map.Entry<String, Object> ent : ((Map<String, Object>) invocationContext
-                            .get("RequestContext")).entrySet()) {
+                    for (Map.Entry<String, Object> ent 
+                        : CastUtils.cast((Map)invocationContext.get("RequestContext"), 
+                                             String.class, Object.class).entrySet()) {
                         // check if value is Serializable, and if value is Map
                         // or collection,
                         // just exclude it since the entry of it may not be
