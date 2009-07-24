@@ -129,8 +129,12 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             ping.setScenario("Scenario5");
             ping.setText("ping");
             params.setPing(ping);
-            PingResponse output = port.ping(params);
-            assertEquals(OUT, output.getPingResponse().getText());
+            try {
+                PingResponse output = port.ping(params);
+                assertEquals(OUT, output.getPingResponse().getText());
+            } catch (Exception ex) {
+                throw new Exception("Error doing " + portPrefix, ex);
+            }
         }
     }
 

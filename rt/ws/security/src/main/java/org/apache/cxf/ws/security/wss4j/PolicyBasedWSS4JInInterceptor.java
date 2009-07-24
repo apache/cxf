@@ -262,9 +262,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 Object s = message.getContextualProperty(SecurityConstants.SIGNATURE_PROPERTIES);
                 Object e = message.getContextualProperty(SecurityConstants.ENCRYPT_PROPERTIES);
                 if (abinding.getProtectionToken() != null) {
-                    if (e != null) {
+                    if (e != null && s == null) {
                         s = e;
-                    } else if (s != null) {
+                    } else if (s != null && e == null) {
                         e = s;
                     }
                 }

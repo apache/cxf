@@ -84,6 +84,10 @@ public class Server {
         if (url.contains("X10_I")) {
             ep.getProperties().put(SecurityConstants.SIGNATURE_PROPERTIES + ".sct", "etc/bob.properties");
             ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES + ".sct", "etc/alice.properties");
+        } else if (url.contains("MutualCert")) {
+            ep.getProperties().put(SecurityConstants.ENCRYPT_PROPERTIES + ".sct", "etc/bob.properties");
+            ep.getProperties().put(SecurityConstants.SIGNATURE_PROPERTIES + ".sct", "etc/alice.properties");
+            ep.getProperties().put(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         }
         ep.publish(url);
     }
