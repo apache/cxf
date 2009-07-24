@@ -346,9 +346,22 @@ public class ManagedConnectionImpl implements ManagedConnection {
                 LOG.finest("invoke connection spec:" + spec + " method=" + method);
             }
             
-            if ("hashCode".equals(method.getName()) || "equals".equals(method.getName())) {
+            if ("hashCode".equals(method.getName())) {
                 return method.invoke(Proxy.getInvocationHandler(proxy), args);
-                
+            }
+            
+            if ("equals".equals(method.getName())) {
+                // These are proxies.  We don't really care if their targets are equal.
+                // We do care if these are the same proxy instances that we created.  
+                // Therefore, if their proxy and invocation handler are consistent, 
+                // we believe they are equal.
+                boolean result = false;
+                try {
+                    result = proxy == args[0] && this == Proxy.getInvocationHandler(args[0]);
+                } catch (Exception e) {
+                    // ignore and assume not equal
+                }      
+                return result;
             }
             
             if ("toString".equals(method.getName())) {
@@ -383,15 +396,13 @@ public class ManagedConnectionImpl implements ManagedConnection {
         private Object handleCloseMethod(Object proxy, Method method,
                 Object[] args) {
             
+
             handles.remove(proxy);
             associatedHandle = null;
-            if (handles.isEmpty()) {
-                isClosed = true;
-                ConnectionEvent event = new ConnectionEvent(ManagedConnectionImpl.this,
-                        ConnectionEvent.CONNECTION_CLOSED);
-                event.setConnectionHandle(proxy);
-                sendEvent(event);
-            }
+            ConnectionEvent event = new ConnectionEvent(ManagedConnectionImpl.this,
+                    ConnectionEvent.CONNECTION_CLOSED);
+            event.setConnectionHandle(proxy);
+            sendEvent(event);
             
             return null;
         }
