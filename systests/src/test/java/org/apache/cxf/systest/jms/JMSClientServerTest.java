@@ -758,9 +758,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             clients.add(client);
             thread.start();
         }
-    
+
         for (Thread t : threads) {
             t.join(2000);
+        }
+
+        for (Thread t : threads) {
+            t.join(1000);
             assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
         }
 
