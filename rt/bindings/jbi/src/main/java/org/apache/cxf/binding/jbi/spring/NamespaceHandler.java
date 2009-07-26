@@ -16,27 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.binding.jbi;
+package org.apache.cxf.binding.jbi.spring;
 
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.ServiceInfo;
+import org.springframework.beans.factory.xml.NamespaceHandlerSupport;
 
-public class JBIBindingInfo extends BindingInfo {
-    private JBIBindingConfiguration configuration;
-    
-    public JBIBindingInfo(ServiceInfo service, String bindingId) {
-        super(service, bindingId);
+public class NamespaceHandler extends NamespaceHandlerSupport {
+    public void init() {
+        registerBeanDefinitionParser("jbiBinding", new JBIBindingInfoConfigBeanDefinitionParser());        
     }
-    
-    public void setJBIBindingConfiguration(JBIBindingConfiguration conf) {
-        configuration = conf;
-    }
-    
-    public JBIBindingConfiguration getJBIBindingConfiguration() {
-        if (configuration == null) {
-            configuration = new JBIBindingConfiguration();
-        }
-        return configuration;
-    }
-
 }
