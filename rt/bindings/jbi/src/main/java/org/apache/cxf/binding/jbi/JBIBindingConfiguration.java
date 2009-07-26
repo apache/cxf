@@ -18,25 +18,24 @@
  */
 package org.apache.cxf.binding.jbi;
 
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.binding.BindingConfiguration;
 
-public class JBIBindingInfo extends BindingInfo {
-    private JBIBindingConfiguration configuration;
+public class JBIBindingConfiguration extends BindingConfiguration {
     
-    public JBIBindingInfo(ServiceInfo service, String bindingId) {
-        super(service, bindingId);
-    }
-    
-    public void setJBIBindingConfiguration(JBIBindingConfiguration conf) {
-        configuration = conf;
-    }
-    
-    public JBIBindingConfiguration getJBIBindingConfiguration() {
-        if (configuration == null) {
-            configuration = new JBIBindingConfiguration();
-        }
-        return configuration;
-    }
+    // set the MTOM and other configuration here
+    private boolean mtomEnabled;
 
+    @Override
+    public String getBindingId() {
+        return JBIConstants.NS_JBI_BINDING;
+    }
+    
+    public boolean isMtomEnabled() {
+        return mtomEnabled;
+    }
+    
+    public void setMtomEnabled(boolean flag) {
+        mtomEnabled = flag;
+    }
+    
 }

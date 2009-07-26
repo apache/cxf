@@ -16,27 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.binding.jbi;
+package org.apache.cxf.binding.jbi.spring;
 
-import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.ServiceInfo;
+import org.w3c.dom.Element;
 
-public class JBIBindingInfo extends BindingInfo {
-    private JBIBindingConfiguration configuration;
-    
-    public JBIBindingInfo(ServiceInfo service, String bindingId) {
-        super(service, bindingId);
-    }
-    
-    public void setJBIBindingConfiguration(JBIBindingConfiguration conf) {
-        configuration = conf;
-    }
-    
-    public JBIBindingConfiguration getJBIBindingConfiguration() {
-        if (configuration == null) {
-            configuration = new JBIBindingConfiguration();
-        }
-        return configuration;
+import org.apache.cxf.binding.jbi.JBIBindingConfiguration;
+import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
+
+public class JBIBindingInfoConfigBeanDefinitionParser extends AbstractBeanDefinitionParser {
+
+    @Override
+    protected Class getBeanClass(Element arg0) {
+        return JBIBindingConfiguration.class;
     }
 
 }
