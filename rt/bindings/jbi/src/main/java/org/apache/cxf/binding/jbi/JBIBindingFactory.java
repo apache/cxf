@@ -27,6 +27,8 @@ import org.apache.cxf.binding.jbi.interceptor.JBIFaultOutInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIOperationInInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIWrapperInInterceptor;
 import org.apache.cxf.binding.jbi.interceptor.JBIWrapperOutInterceptor;
+import org.apache.cxf.interceptor.AttachmentInInterceptor;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.service.model.BindingInfo;
@@ -37,7 +39,9 @@ import org.apache.cxf.service.model.ServiceInfo;
 public class JBIBindingFactory extends AbstractBindingFactory {
 
     public Binding createBinding(BindingInfo binding) {
-        JBIBinding jb = new JBIBinding((JBIBindingInfo) binding);
+        JBIBindingInfo bindingInfo = (JBIBindingInfo) binding;
+        JBIBinding jb = new JBIBinding(bindingInfo);
+        
         jb.getInInterceptors().add(new StaxInInterceptor());
         jb.getInInterceptors().add(new JBIOperationInInterceptor());
         jb.getInInterceptors().add(new JBIWrapperInInterceptor());
@@ -47,11 +51,23 @@ public class JBIBindingFactory extends AbstractBindingFactory {
         jb.getOutFaultInterceptors().add(new JBIFaultOutInterceptor());
         
         jb.getInFaultInterceptors().add(new JBIFaultInInterceptor());
+        
+        if (bindingInfo.getJBIBindingConfiguration().isMtomEnabled()) {
+            jb.getInInterceptors().add(new AttachmentInInterceptor());
+            jb.getOutInterceptors().add(new AttachmentOutInterceptor());
+        }
         return jb;
     }
 
     public BindingInfo createBindingInfo(ServiceInfo service, String namespace, Object config) {
-        JBIBindingInfo info = new JBIBindingInfo(service, JBIConstants.NS_JBI_BINDING);        
+        JBIBindingConfiguration configuration;
+        if (config instanceof JBIBindingConfiguration) {
+            configuration = (JBIBindingConfiguration) config;
+        } else {
+            configuration = new JBIBindingConfiguration();
+        }
+        JBIBindingInfo info = new JBIBindingInfo(service, JBIConstants.NS_JBI_BINDING);
+        info.setJBIBindingConfiguration(configuration);
         info.setName(new QName(service.getName().getNamespaceURI(), 
                                service.getName().getLocalPart() + "JBIBinding"));
 
