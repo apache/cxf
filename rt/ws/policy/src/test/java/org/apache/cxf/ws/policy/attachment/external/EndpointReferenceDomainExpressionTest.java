@@ -38,7 +38,13 @@ import org.junit.Test;
 public class EndpointReferenceDomainExpressionTest extends Assert {
 
     private IMocksControl control;
-    
+   
+    // Avoid spurious failures on EasyMock detecting finalize calls
+    // by using data members rather than local variables for these.
+    private ServiceInfo si;
+    private BindingOperationInfo boi;
+    private BindingMessageInfo bmi;
+    private BindingFaultInfo bfi;
     
     @Before
     public void setUp() {
@@ -54,10 +60,10 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         eprde.setEndpointReference(epr);
         assertSame(epr, eprde.getEndpointReference());
         
-        ServiceInfo si = control.createMock(ServiceInfo.class);
-        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        BindingMessageInfo bmi = control.createMock(BindingMessageInfo.class);
-        BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
+        si = control.createMock(ServiceInfo.class);
+        boi = control.createMock(BindingOperationInfo.class);
+        bmi = control.createMock(BindingMessageInfo.class);
+        bfi = control.createMock(BindingFaultInfo.class);
         
         assertTrue(!eprde.appliesTo(si));
         assertTrue(!eprde.appliesTo(boi));
@@ -80,6 +86,11 @@ public class EndpointReferenceDomainExpressionTest extends Assert {
         control.replay();
         assertTrue(eprde.appliesTo(ei));
         control.verify();
+        
+        bfi = null;
+        bmi = null;
+        boi = null;
+        si = null;
     }
     
 }
