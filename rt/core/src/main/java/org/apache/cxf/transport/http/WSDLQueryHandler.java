@@ -207,7 +207,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 doc = XMLUtils.getParser().parse(src);
             }
             
-            updateDoc(doc, base, mp, smp);
+            updateDoc(doc, base, mp, smp, endpointInfo);
             String enc = doc.getXmlEncoding();
             if (enc == null) {
                 enc = "utf-8";
@@ -226,9 +226,10 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
     }
     
-    private void updateDoc(Document doc, String base,
+    protected void updateDoc(Document doc, String base,
                            Map<String, Definition> mp,
-                           Map<String, SchemaReference> smp) {        
+                           Map<String, SchemaReference> smp,
+                           EndpointInfo ei) {        
         List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                        "http://www.w3.org/2001/XMLSchema",
                                                                        "import");
@@ -258,6 +259,33 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 el.setAttribute("location", base + "?wsdl=" + sl);
             }
         }
+        
+        Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
+        
+        if (rewriteSoapAddress != null && rewriteSoapAddress.booleanValue()) {
+            List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                              "http://schemas.xmlsoap.org/wsdl/",
+                                                              "service");
+            for (Element serviceEl : serviceList) {
+                String serviceName = serviceEl.getAttribute("name");
+                if (serviceName.equals(ei.getService().getName().getLocalPart())) {
+                    elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                                      "http://schemas.xmlsoap.org/wsdl/",
+                                                                      "port");
+                    for (Element el : elementList) {
+                        String name = el.getAttribute("name");
+                        if (name.equals(ei.getName().getLocalPart())) {
+                            Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
+                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
+                                                                 "address")
+                                                                       .iterator().next();
+                            soapAddress.setAttribute("location", base);
+                        }
+                    }
+                }
+            }
+        }
+        
         doc.setXmlStandalone(true);
     }
 
