@@ -76,7 +76,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.5.8-SNAPSHOT</version>
+            <version>1.5.8</version>
             <exclusions>
                 <exclusion>
                     <groupId>axis</groupId>
@@ -89,18 +89,6 @@
                 <exclusion>
                     <groupId>axis</groupId>
                     <artifactId>axis-ant</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk15</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk13</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>bouncycastle</groupId>
-                    <artifactId>bcprov-jdk14</artifactId>
                 </exclusion>
                 <exclusion>
                     <groupId>xerces</groupId>
@@ -128,7 +116,7 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>bouncycastle</groupId>
+            <groupId>org.bouncycastle</groupId>
             <artifactId>bcprov-jdk15</artifactId>
             <scope>runtime</scope>
         </dependency>
