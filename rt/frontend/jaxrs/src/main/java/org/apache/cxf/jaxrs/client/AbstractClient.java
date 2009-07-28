@@ -398,6 +398,7 @@ public class AbstractClient implements Client, InvocationHandlerAware {
         List<Interceptor> i1 = bus.getInInterceptors();
         List<Interceptor> i2 = inInterceptors;
         List<Interceptor> i3 = endpoint.getInInterceptors();
+        
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
     }
     

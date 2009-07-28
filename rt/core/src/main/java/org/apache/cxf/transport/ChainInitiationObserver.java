@@ -30,6 +30,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -74,12 +75,26 @@ public class ChainInitiationObserver implements MessageObserver {
             exchange.setInMessage(message);
             setExchangeProperties(exchange, message);
     
+            InterceptorProvider dbp = null;
+            if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
+                dbp = (InterceptorProvider)endpoint.getService().getDataBinding();
+            }
             // setup chain
-            phaseChain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
-                                                         bus.getInInterceptors(),
-                                                         endpoint.getService().getInInterceptors(),
-                                                         endpoint.getInInterceptors(),
-                                                         getBinding().getInInterceptors());
+            if (dbp == null) {
+                phaseChain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
+                                                             bus.getInInterceptors(),
+                                                             endpoint.getService().getInInterceptors(),
+                                                             endpoint.getInInterceptors(),
+                                                             getBinding().getInInterceptors());
+            } else {
+                phaseChain = chainCache.get(bus.getExtension(PhaseManager.class).getInPhases(),
+                                            bus.getInInterceptors(),
+                                            endpoint.getService().getInInterceptors(),
+                                            endpoint.getInInterceptors(),
+                                            getBinding().getInInterceptors(),
+                                            dbp.getInInterceptors());
+            }
+        
             
             
             message.setInterceptorChain(phaseChain);

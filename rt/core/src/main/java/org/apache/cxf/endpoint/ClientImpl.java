@@ -46,6 +46,7 @@ import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.ClientOutFaultObserver;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -615,7 +616,17 @@ public class ClientImpl
             LOG.fine("Interceptors contributed by binding: " + i4);
         }
 
-        PhaseInterceptorChain chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4);
+        PhaseInterceptorChain chain;
+        if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
+            InterceptorProvider p = (InterceptorProvider)endpoint.getService().getDataBinding();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Interceptors contributed by databinging: " + p.getInInterceptors());
+            }
+            chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4,
+                                          p.getInInterceptors());
+        } else {
+            chain = inboundChainCache.get(pm.getInPhases(), i1, i2, i3, i4);
+        }
         message.setInterceptorChain(chain);
 
         chain.setFaultObserver(outFaultObserver);
@@ -781,6 +792,16 @@ public class ClientImpl
         List<Interceptor> i4 = endpoint.getBinding().getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by binding: " + i4);
+        }
+        List<Interceptor> i5 = null;
+        if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
+            i5 = ((InterceptorProvider)endpoint.getService().getDataBinding()).getOutInterceptors();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Interceptors contributed by databinding: " + i5);
+            }
+        }
+        if (i5 != null) {
+            return outboundChainCache.get(pm.getOutPhases(), i1, i2, i3, i4, i5);
         }
         return outboundChainCache.get(pm.getOutPhases(), i1, i2, i3, i4);
     }

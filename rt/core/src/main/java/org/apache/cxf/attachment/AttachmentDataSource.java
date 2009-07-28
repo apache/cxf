@@ -40,6 +40,13 @@ public class AttachmentDataSource implements DataSource {
         cache.lockOutputStream();
     }
 
+    public void hold() {
+        cache.holdTempFile();
+    }
+    public void release() {
+        cache.releaseTempFileHold();
+    }
+    
     public String getContentType() {
         return ct;
     }

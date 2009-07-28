@@ -146,14 +146,28 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
         List<Interceptor> i4 = null;
-        PhaseInterceptorChain chain;
         if (binding != null) {
             i4 = binding.getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Interceptors contributed by binding: " + i4);
             }
         }
-        if (i4 != null) {
+        List<Interceptor> i5 = null;
+        if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
+            i5 = ((InterceptorProvider)ep.getService().getDataBinding()).getOutInterceptors();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Interceptors contributed by databinding: " + i5);
+            }
+            if (i4 == null) {
+                i4 = i5;
+                i5 = null;
+            }
+        }
+        PhaseInterceptorChain chain;
+        if (i5 != null) {
+            chain = chainCache.get(bus.getExtension(PhaseManager.class).getOutPhases(),
+                                   i1, i2, i3, i4, i5);
+        } else if (i4 != null) {
             chain = chainCache.get(bus.getExtension(PhaseManager.class).getOutPhases(),
                                    i1, i2, i3, i4);
         } else {
