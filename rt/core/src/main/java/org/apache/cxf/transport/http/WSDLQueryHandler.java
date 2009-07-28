@@ -276,8 +276,8 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         String name = el.getAttribute("name");
                         if (name.equals(ei.getName().getLocalPart())) {
                             Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
-                                                                       "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                                       "address")
+                                                                 "http://schemas.xmlsoap.org/wsdl/soap/",
+                                                                 "address")
                                                                        .iterator().next();
                             soapAddress.setAttribute("location", base);
                         }
