@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.systest.jms;
 
-import java.lang.Thread.State;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -621,10 +620,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         for (Thread t : threads) {
             t.join(10000);
         }
-        for (Thread t : threads) {
-            t.join(1000);
-            assertTrue("No terminated state: " + t.getState(), t.getState() == State.TERMINATED);
-        }
 
         Throwable e = (engClient.getException() != null) 
                           ? engClient.getException() 
@@ -750,7 +745,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
         HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
         
-        for (int i = 0; i < 10; ++i) {
+        for (int i = 0; i < 5; ++i) {
             ClientRunnable client =  new ClientRunnable(portEng, "com.mycompany.eng:");
             Thread thread = new Thread(client);
             threads.add(thread);
@@ -764,13 +759,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
 
         for (Thread t : threads) {
-            t.join(2000);
+            t.join(10000);
         }
 
-        for (Thread t : threads) {
-            t.join(1000);
-            assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
-        }
 
         for (ClientRunnable client : clients) {
             if (client.getException() != null 
@@ -811,8 +802,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join(5000);
-            assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
+            t.join(10000);
         }
 
         for (ClientRunnable client : clients) {
