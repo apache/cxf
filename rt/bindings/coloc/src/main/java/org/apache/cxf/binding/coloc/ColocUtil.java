@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -83,6 +84,15 @@ public final class ColocUtil {
             LOG.fine("Interceptors contributed by bus: " + il);
         }
         chain.add(il);
+        
+        if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
+            il = ((InterceptorProvider)ep.getService().getDataBinding()).getOutInterceptors();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Interceptors contributed by databinding: " + il);
+            }
+            chain.add(il);
+
+        }
 
         return chain;
     }
@@ -107,6 +117,14 @@ public final class ColocUtil {
             LOG.fine("Interceptors contributed by bus: " + il);
         }
         chain.add(il);
+        
+        if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
+            il = ((InterceptorProvider)ep.getService().getDataBinding()).getInInterceptors();
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Interceptors contributed by databinding: " + il);
+            }
+            chain.add(il);
+        }
         chain.setFaultObserver(new ColocOutFaultObserver(bus));
 
         return chain;

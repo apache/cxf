@@ -63,6 +63,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.CachedClass;
+import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
@@ -73,6 +74,9 @@ import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
 import org.apache.cxf.resource.URIResolver;
@@ -81,7 +85,9 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.ObjectFactory;
 
-public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapableDatabinding {
+public class JAXBDataBinding extends AbstractDataBinding 
+    implements WrapperCapableDatabinding, InterceptorProvider {
+    
     public static final String SCHEMA_RESOURCE = "SCHEMRESOURCE";
     public static final String MTOM_THRESHOLD = "org.apache.cxf.jaxb.mtomThreshold";
 
@@ -219,6 +225,11 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
 
     private boolean qualifiedSchemas;
     private Service service;
+    
+    private List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
 
     public JAXBDataBinding() {
     }
@@ -296,6 +307,10 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
     @SuppressWarnings("unchecked")
     public void initialize(Service aservice) {
         this.service = aservice;
+        
+        getInInterceptors().add(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        getInFaultInterceptors().add(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        
         // context is already set, don't redo it
         if (context != null) {
             return;
@@ -880,5 +895,22 @@ public class JAXBDataBinding extends AbstractDataBinding  implements WrapperCapa
         }
         return null;
     }   
+    
+    public List<Interceptor> getOutFaultInterceptors() {
+        return outFault;
+    }
+
+    public List<Interceptor> getInFaultInterceptors() {
+        return inFault;
+    }
+
+    public List<Interceptor> getInInterceptors() {
+        return in;
+    }
+
+    public List<Interceptor> getOutInterceptors() {
+        return out;
+    }
+
 
 }

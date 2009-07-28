@@ -45,6 +45,9 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
         chain.add(e.getService().getInFaultInterceptors());
         chain.add(e.getInFaultInterceptors());
         chain.add(e.getBinding().getInFaultInterceptors());
+        if (e.getService().getDataBinding() instanceof InterceptorProvider) {
+            chain.add(((InterceptorProvider)e.getService().getDataBinding()).getInFaultInterceptors());
+        }
     }
     
     protected SortedSet<Phase> getPhases() {
