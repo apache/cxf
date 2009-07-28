@@ -100,6 +100,7 @@ public final class JAXRSUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propogate.exception";
+    private static final String FORM_PARAM_MAP = JAXRSUtils.class.getName() + ".FORM_DATA";
 
     private JAXRSUtils() {        
     }
@@ -592,19 +593,25 @@ public final class JAXRSUtils {
         MessageContext mc = new MessageContextImpl(m);
         MediaType mt = mc.getHttpHeaders().getMediaType();
         
-        MultivaluedMap<String, String> params = new MetadataMap<String, String>();
+        @SuppressWarnings("unchecked")
+        MultivaluedMap<String, String> params = (MultivaluedMap<String, String>)m.get(FORM_PARAM_MAP); 
         
-        if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
-            String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
-            if (body == null) {
-                body = FormUtils.readBody(m.getContent(InputStream.class));
-                m.put("org.apache.cxf.jaxrs.provider.form.body", body);
+        if (params == null) {
+            params = new MetadataMap<String, String>();
+            m.put(FORM_PARAM_MAP, params);
+        
+            if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
+                String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
+                if (body == null) {
+                    body = FormUtils.readBody(m.getContent(InputStream.class));
+                    m.put("org.apache.cxf.jaxrs.provider.form.body", body);
+                }
+                HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
+                FormUtils.populateMapFromString(params, (String)body, decode, request);
+            } else {
+                MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+                FormUtils.populateMapFromMultipart(params, body, decode);
             }
-            HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
-            FormUtils.populateMapFromString(params, (String)body, decode, request);
-        } else {
-            MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-            FormUtils.populateMapFromMultipart(params, body, decode);
         }
         
         if ("".equals(key)) {
