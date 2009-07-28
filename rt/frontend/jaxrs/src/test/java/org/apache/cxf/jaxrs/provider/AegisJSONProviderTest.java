@@ -146,9 +146,11 @@ public class AegisJSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        String data = "{\"ns1.ManyTags\":[{\"ns1.tags\":[{},{\"ns1.TagVO\""
+        String data1 = "{\"ns1.ManyTags\":[{\"ns1.tags\":[{},{\"ns1.TagVO\""
             + ":{\"ns1.group\":\"b\",\"ns1.name\":\"a\"}}]}]}";
-        assertEquals(data, s);
+        String data2 = "{\"ns1.ManyTags\":[{\"ns1.tags\":[{},{\"ns1.TagVO\""
+            + ":{\"ns1.name\":\"a\",\"ns1.group\":\"b\"}}]}]}";
+        assertTrue(data1.equals(s) || data2.equals(s));
     }
     
     private TagVO createTag(String name, String group) {
