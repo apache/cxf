@@ -89,6 +89,7 @@ public final class ToolConstants {
     public static final String CFG_LIB_REF = "library.references";
     public static final String CFG_ANT_PROP = "ant.prop";
     public static final String CFG_NO_ADDRESS_BINDING = "noAddressBinding";
+    public static final String CFG_ALLOW_ELEMENT_REFS = "allowElementReferences";
 
 
 
@@ -107,7 +108,6 @@ public final class ToolConstants {
     public static final String CFG_GEN_NEW_ONLY = "newonly";
 
     // Java2WSDL Constants
-
     public static final String CFG_CLASSPATH = "classpath";
     public static final String CFG_TNS = "tns";
     public static final String CFG_SERVICENAME = "servicename";
