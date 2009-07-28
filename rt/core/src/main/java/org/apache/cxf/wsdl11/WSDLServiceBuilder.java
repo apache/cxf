@@ -102,6 +102,7 @@ public class WSDLServiceBuilder {
     private Bus bus;
     private Map<String, Element> schemaList = new HashMap<String, Element>();
     private boolean recordOriginal = true;
+    private boolean allowRefs;
     private boolean ignoreUnknownBindings;
 
     public WSDLServiceBuilder(Bus bus) {
@@ -114,6 +115,9 @@ public class WSDLServiceBuilder {
 
     public void setIgnoreUnknownBindings(boolean b) {
         ignoreUnknownBindings = b;
+    }
+    public void setAllowElementRefs(boolean b) {
+        allowRefs = b;
     }
     
     private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
@@ -582,10 +586,13 @@ public class WSDLServiceBuilder {
             copyExtensors(finfo, entry.getValue().getExtensibilityElements());
             copyExtensionAttributes(finfo, entry.getValue());
         }
-        checkForWrapped(opInfo, false);
+        checkForWrapped(opInfo, allowRefs, false);
     }
 
     public static void checkForWrapped(OperationInfo opInfo, boolean relaxed) {
+        checkForWrapped(opInfo, relaxed, relaxed);
+    }
+    public static void checkForWrapped(OperationInfo opInfo, boolean allowRefs, boolean relaxed) {
         MessageInfo inputMessage = opInfo.getInput();
         MessageInfo outputMessage = opInfo.getOutput();
         boolean passedRule = true;
@@ -659,7 +666,7 @@ public class WSDLServiceBuilder {
             if (hasAttributes(xsct)
                 || (inputEl.isNillable() && !relaxed)
                 || !isWrappableSequence(xsct, inputEl.getQName().getNamespaceURI(),
-                                        unwrappedInput, relaxed)) {
+                                        unwrappedInput, allowRefs)) {
                 passedRule = false;
             }
         } else {
@@ -681,7 +688,7 @@ public class WSDLServiceBuilder {
                 if (hasAttributes(xsct)
                     || (outputEl.isNillable() && !relaxed)
                     || !isWrappableSequence(xsct, outputEl.getQName().getNamespaceURI(), unwrappedOutput,
-                                            relaxed)) {
+                                            allowRefs)) {
                     passedRule = false;
                 }
             } else {

@@ -170,6 +170,17 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
                 WSDLServiceBuilder serviceBuilder = new WSDLServiceBuilder(getBus());
                 serviceBuilder.setIgnoreUnknownBindings(true);
+                String allowRefs = (String)context.get(ToolConstants.CFG_ALLOW_ELEMENT_REFS);
+                if (!StringUtils.isEmpty(allowRefs) 
+                    || context.optionSet(ToolConstants.CFG_ALLOW_ELEMENT_REFS)) {
+                    if (allowRefs.length() > 0 && allowRefs.charAt(0) == '=') {
+                        allowRefs = allowRefs.substring(1);
+                    }
+                    if (StringUtils.isEmpty(allowRefs)) {
+                        allowRefs = "true";
+                    }
+                    serviceBuilder.setAllowElementRefs(Boolean.valueOf(allowRefs));
+                }
                 String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
 
                 if (serviceName != null) {

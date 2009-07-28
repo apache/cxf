@@ -140,6 +140,11 @@ public class Option {
      * Disable generation of service address binding in the generated Java classes
      */
     boolean noAddressBinding;
+    
+    /**
+     * Allow element references when determining if an operation can be unwrapped or not 
+     */
+    boolean allowElementRefs;
 
 
     public Option() {
@@ -315,6 +320,14 @@ public class Option {
         this.noAddressBinding = noAddressBinding;
     }
 
+    public boolean isAllowElementRefs() {
+        return allowElementRefs;
+    }
+
+    public void setAllowElementRefs(boolean allowElementRefs) {
+        this.allowElementRefs = allowElementRefs;
+    }
+
     public void copyOptions(Option destination) {
         destination.setAutoNameResolution(isAutoNameResolution());
         destination.setBindingFiles(getBindingFiles());
@@ -333,6 +346,7 @@ public class Option {
         destination.setPackagenames(getPackagenames());
         destination.setServiceName(getServiceName());
         destination.setValidateWsdl(isValidateWsdl());
+        destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
         }
