@@ -55,6 +55,7 @@ public final class JMSConstants {
     public static final String JMS_SERVER_CONFIG_ID = "jms-server";
     
     public static final String JMS_REBASED_REPLY_TO = "org.apache.cxf.jms.server.replyto";
+    public static final String JMS_SET_REPLY_TO = "org.apache.cxf.jms.client.set.replyto";
     
     
     private JMSConstants() {

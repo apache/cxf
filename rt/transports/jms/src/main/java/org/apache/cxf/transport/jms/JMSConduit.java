@@ -164,13 +164,15 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                 String messageType = jmsConfig.getMessageType();
                 final javax.jms.Message jmsMessage;
                 Destination replyToDestination = replyTo;
-                if (exchange.isOneWay() && !jmsConfig.isEnforceSpec()) {
-                    final String contextReplyToName = 
-                        (headers != null) ? headers.getJMSReplyTo() : null;
-                    if (contextReplyToName != null) {
+                if (exchange.isOneWay() && !jmsConfig.isEnforceSpec() && isSetReplyTo(outMessage)) {
+                    String replyToName = (headers != null) ? headers.getJMSReplyTo() : null; 
+                    if (replyToName == null && jmsConfig.getReplyDestination() != null) {
+                        replyToName = jmsConfig.getReplyDestination();
+                    }
+                    if (replyToName != null) {
                         replyToDestination = 
                             JMSFactory.resolveOrCreateDestination(jmsTemplate, 
-                                                                  contextReplyToName, 
+                                                                  replyToName, 
                                                                   jmsConfig.isPubSubDomain());
                     }
                 }
@@ -319,6 +321,11 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
     public void setJmsConfig(JMSConfiguration jmsConfig) {
         this.jmsConfig = jmsConfig;
+    }
+
+    protected static boolean isSetReplyTo(Message message) {         
+        Boolean ret = (Boolean)message.get(JMSConstants.JMS_SET_REPLY_TO);
+        return ret == null || (ret != null && ret.booleanValue());
     }
 
     @Override
