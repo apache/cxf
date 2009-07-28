@@ -43,6 +43,7 @@ import javax.jms.TextMessage;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
@@ -133,6 +134,8 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             return resolveDestinationName(jmsTemplate, replyToName);
         } else if (message.getJMSReplyTo() != null) {
             return message.getJMSReplyTo();
+        } else if (!StringUtils.isEmpty(jmsConfig.getReplyDestination())) {
+            return resolveDestinationName(jmsTemplate, jmsConfig.getReplyDestination());
         } else {
             throw new RuntimeException("No replyTo destination set on request message or cxf message");
         }
