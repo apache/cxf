@@ -261,18 +261,27 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
         
         Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
+        
         if (rewriteSoapAddress != null && rewriteSoapAddress.booleanValue()) {
-            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+            List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
-                                                              "port");
-            for (Element el : elementList) {
-                String name = el.getAttribute("name");
-                if (name.equals(ei.getName().getLocalPart())) {
-                    Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
-                                                               "http://schemas.xmlsoap.org/wsdl/soap/",
-                                                               "address")
-                                                               .iterator().next();
-                    soapAddress.setAttribute("location", base);
+                                                              "service");
+            for (Element serviceEl : serviceList) {
+                String serviceName = serviceEl.getAttribute("name");
+                if (serviceName.equals(ei.getService().getName().getLocalPart())) {
+                    elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                                      "http://schemas.xmlsoap.org/wsdl/",
+                                                                      "port");
+                    for (Element el : elementList) {
+                        String name = el.getAttribute("name");
+                        if (name.equals(ei.getName().getLocalPart())) {
+                            Element soapAddress = DOMUtils.findAllElementsByTagNameNS(el,
+                                                                       "http://schemas.xmlsoap.org/wsdl/soap/",
+                                                                       "address")
+                                                                       .iterator().next();
+                            soapAddress.setAttribute("location", base);
+                        }
+                    }
                 }
             }
         }
