@@ -26,6 +26,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
@@ -77,7 +78,11 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
                 }
                 xmlWriter.setPrefix(pfx, name.getNamespaceURI());
                 xmlWriter.writeStartElement(pfx, name.getLocalPart(), name.getNamespaceURI());
-                xmlWriter.writeNamespace(pfx, name.getNamespaceURI());
+                if (StringUtils.isEmpty(pfx)) {
+                    xmlWriter.writeDefaultNamespace(name.getNamespaceURI());
+                } else {
+                    xmlWriter.writeNamespace(pfx, name.getNamespaceURI());
+                }
             } catch (XMLStreamException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
             }
