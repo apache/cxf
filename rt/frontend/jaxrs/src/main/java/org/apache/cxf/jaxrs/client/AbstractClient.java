@@ -510,6 +510,7 @@ public class AbstractClient implements Client {
         List<Interceptor> i1 = cfg.getBus().getInInterceptors();
         List<Interceptor> i2 = cfg.getInInterceptors();
         List<Interceptor> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
+        
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
     }
     

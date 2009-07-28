@@ -76,6 +76,7 @@ public class CachedOutputStream extends OutputStream {
     private boolean tempFileFailed;
     private File tempFile;
     private File outputDir = DEFAULT_TEMP_DIR;
+    private boolean allowDeleteOfFile = true;
 
     private List<CachedOutputStreamCallback> callbacks;
     
@@ -97,6 +98,13 @@ public class CachedOutputStream extends OutputStream {
         inmem = true;
     }
 
+    public void holdTempFile() {
+        allowDeleteOfFile = false;
+    }
+    public void releaseTempFileHold() {
+        allowDeleteOfFile = true;
+    }
+    
     public void registerCallback(CachedOutputStreamCallback cb) {
         if (null == callbacks) {
             callbacks = new ArrayList<CachedOutputStreamCallback>();
@@ -451,7 +459,7 @@ public class CachedOutputStream extends OutputStream {
     
     private void maybeDeleteTempFile(Object stream) {
         streamList.remove(stream);
-        if (!inmem && tempFile != null && streamList.isEmpty()) {
+        if (!inmem && tempFile != null && streamList.isEmpty() && allowDeleteOfFile) {
             if (currentStream != null) {
                 try {
                     currentStream.close();

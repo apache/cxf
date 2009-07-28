@@ -45,6 +45,9 @@ public class OutFaultChainInitiatorObserver extends AbstractFaultChainInitiatorO
         chain.add(e.getService().getOutFaultInterceptors());
         chain.add(e.getOutFaultInterceptors());
         chain.add(e.getBinding().getOutFaultInterceptors());
+        if (e.getService().getDataBinding() instanceof InterceptorProvider) {
+            chain.add(((InterceptorProvider)e.getService().getDataBinding()).getOutFaultInterceptors());
+        }
     }
     
     protected SortedSet<Phase> getPhases() {

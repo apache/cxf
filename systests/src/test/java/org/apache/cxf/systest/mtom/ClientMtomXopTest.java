@@ -30,6 +30,7 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.axiom.attachments.utils.IOUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
@@ -59,29 +60,13 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         TestUtilities.setKeepAliveSystemProperty(false);
-        assertTrue("server did not launch correctly", launchServer(Server.class, true));
+        assertTrue("server did not launch correctly", launchServer(Server.class));
     }
 
     @AfterClass
     public static void cleanup() {
         TestUtilities.recoverKeepAliveSystemProperty();
     }
-
-    /*
-     * @Test @Ignore public void testMtomSWA() throws Exception { TestMtom
-     * mtomPort = createPort(MTOM_SERVICE, MTOM_PORT, TestMtom.class); try {
-     * InputStream pre =
-     * this.getClass().getResourceAsStream("/wsdl/mtom_xop.wsdl"); long fileSize =
-     * 0; for (int i = pre.read(); i != -1; i = pre.read()) { fileSize++; }
-     * ByteArrayDataSource bads = new
-     * ByteArrayDataSource(this.getClass().getResourceAsStream(
-     * "/wsdl/mtom_xop.wsdl"), "application/octet-stream"); DataHandler dh = new
-     * DataHandler(bads); DataHandler dhResp = mtomPort.testSWA(dh); DataSource
-     * ds = dhResp.getDataSource(); InputStream in = ds.getInputStream(); long
-     * count = 0; for (int i = in.read(); i != -1; i = in.read()) { count++; }
-     * assertEquals("attachemnt length different", fileSize, count); } catch
-     * (UndeclaredThrowableException ex) { throw (Exception) ex.getCause(); } }
-     */
 
     @Test
     public void testMtomXop() throws Exception {
@@ -110,8 +95,23 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             mtomPort.testXop(name, param);
             assertEquals("name unchanged", "return detail + call detail", name.value);
             assertNotNull(param.value);
-            param.value.getInputStream().close();
             
+            InputStream in = param.value.getInputStream();
+            byte bytes[] = IOUtils.getStreamAsByteArray(in);
+            assertEquals(data.length, bytes.length);
+            in.close();
+
+            param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
+            name = new Holder<String>("call detail");
+            mtomPort.testXop(name, param);
+            assertEquals("name unchanged", "return detail + call detail", name.value);
+            assertNotNull(param.value);
+            
+            in = param.value.getInputStream();
+            bytes = IOUtils.getStreamAsByteArray(in);
+            assertEquals(data.length, bytes.length);
+            in.close();
+
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
