@@ -30,11 +30,11 @@ import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.soap.SOAPBinding;
 
-import org.apache.axiom.attachments.utils.IOUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
@@ -89,7 +89,6 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             
             ((BindingProvider)mtomPort).getRequestContext().put("schema-validation-enabled",
                                                                 Boolean.TRUE);
-            
             param.value = new DataHandler(new ByteArrayDataSource(data, "application/octet-stream"));
             Holder<String> name = new Holder<String>("call detail");
             mtomPort.testXop(name, param);
@@ -97,7 +96,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             assertNotNull(param.value);
             
             InputStream in = param.value.getInputStream();
-            byte bytes[] = IOUtils.getStreamAsByteArray(in);
+            byte bytes[] = IOUtils.readBytesFromStream(in);
             assertEquals(data.length, bytes.length);
             in.close();
 
@@ -108,10 +107,9 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
             assertNotNull(param.value);
             
             in = param.value.getInputStream();
-            bytes = IOUtils.getStreamAsByteArray(in);
+            bytes = IOUtils.readBytesFromStream(in);
             assertEquals(data.length, bytes.length);
             in.close();
-
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

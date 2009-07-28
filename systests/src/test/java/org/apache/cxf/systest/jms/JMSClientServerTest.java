@@ -51,6 +51,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDStaticPre
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDDynamicPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDStaticPrefix;
 import org.apache.cxf.hello_world_jms.NoSuchCodeLitFault;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -900,7 +901,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         handler1.value = new DataHandler(fileURL);
         int size = handler1.value.getInputStream().available();
         mtom.testDataHandler(name, handler1);
-        int size2 = handler1.value.getInputStream().available();
-        assertTrue("The response file is not same with the sent file.", size == size2);
+        
+        byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
+        assertEquals("The response file is not same with the sent file.", size, bytes.length);
     }
 }

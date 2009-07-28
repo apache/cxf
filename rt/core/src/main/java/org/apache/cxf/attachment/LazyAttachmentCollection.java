@@ -58,6 +58,15 @@ public class LazyAttachmentCollection
             throw new RuntimeException(e);
         }
     }
+    public boolean hasNext() throws IOException {
+        Attachment a = deserializer.readNext();
+        if (a != null) {
+            attachments.add(a);
+            return true;
+        }
+        return false;
+    }
+
 
     public Iterator<Attachment> iterator() {
         return new Iterator<Attachment>() {
