@@ -28,6 +28,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -62,14 +63,21 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
             QName name = part.getConcreteName();
 
             try {
-                
-                int x = 1;
-                while (xmlWriter.getNamespaceContext().getNamespaceURI("ns" + x) != null) {
-                    x++;
+                String pfx = null;
+                Service service = message.getExchange().get(Service.class);
+                if (service.getDataBinding().getDeclaredNamespaceMappings() != null) {
+                    pfx = service.getDataBinding().getDeclaredNamespaceMappings().get(name.getNamespaceURI());
                 }
-                xmlWriter.setPrefix("ns" + x, name.getNamespaceURI());
-                xmlWriter.writeStartElement("ns" + x, name.getLocalPart(), name.getNamespaceURI());
-                xmlWriter.writeNamespace("ns" + x, name.getNamespaceURI());
+                if (pfx == null) {
+                    int x = 1;
+                    while (xmlWriter.getNamespaceContext().getNamespaceURI("ns" + x) != null) {
+                        x++;
+                    }
+                    pfx = "ns" + x;
+                }
+                xmlWriter.setPrefix(pfx, name.getNamespaceURI());
+                xmlWriter.writeStartElement(pfx, name.getLocalPart(), name.getNamespaceURI());
+                xmlWriter.writeNamespace(pfx, name.getNamespaceURI());
             } catch (XMLStreamException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
             }
