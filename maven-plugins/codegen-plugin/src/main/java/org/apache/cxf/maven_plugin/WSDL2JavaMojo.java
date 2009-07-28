@@ -422,6 +422,10 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
         if (wsdlOption.isExtendedSoapHeaders()) {
             list.add("-exsh");
+            list.add("true");
+        }
+        if (wsdlOption.isAllowElementRefs()) {
+            list.add("-allowElementRefs");
         }
         if (wsdlOption.isValidateWsdl()) {
             list.add("-validate");

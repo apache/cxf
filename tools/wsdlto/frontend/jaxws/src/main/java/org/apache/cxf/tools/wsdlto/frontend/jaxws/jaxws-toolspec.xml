@@ -171,6 +171,17 @@ Examples:
                 </annotation>
                 <switch>autoNameResolution</switch>
             </option>
+            
+            <option id="allowElementReferences" maxOccurs="1">
+            	<annotaion>
+            	</annotaion>
+            	<associatedArgument placement="immediate">
+                    <annotation>=true</annotation>
+                    <valueenum>true|false</valueenum>
+                </associatedArgument>
+            	<switch>allowElementReferences</switch>
+            	<switch>aer</switch>
+            </option>
 
 	        <option id="defaultValues" maxOccurs="1">
                 <annotation>
