@@ -25,19 +25,24 @@ import java.io.InputStream;
 
 final class DelegatingInputStream extends InputStream {
     private InputStream is;
+    private AttachmentDeserializer deserializer;
     private boolean isClosed;
 
     /**
      * @param source
      */
-    DelegatingInputStream(InputStream is) {
+    DelegatingInputStream(InputStream is, AttachmentDeserializer ads) {
         this.is = is;
+        deserializer = ads;
     }
 
     @Override
     public void close() throws IOException {
         is.close();
         isClosed = true;
+        if (!isClosed) {
+            deserializer.markClosed(this);
+        }
     }
 
     public boolean isClosed() {

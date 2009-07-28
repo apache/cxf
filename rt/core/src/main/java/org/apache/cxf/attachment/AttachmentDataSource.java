@@ -31,17 +31,35 @@ import org.apache.cxf.io.CachedOutputStream;
 public class AttachmentDataSource implements DataSource {
 
     private final String ct;    
-    private final CachedOutputStream cache;
+    private CachedOutputStream cache;
+    private InputStream ins;
+    private DelegatingInputStream lastIns;
     
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;        
-        cache = new CachedOutputStream();
-        IOUtils.copy(inParam, cache);
-        cache.lockOutputStream();
+        ins = inParam;
     }
 
+    public boolean isCached() {
+        return cache != null;
+    }
+    
     public void hold() {
-        cache.holdTempFile();
+        try {
+            if (cache == null) {
+                cache = new CachedOutputStream();
+                IOUtils.copy(ins, cache);
+                cache.lockOutputStream();
+                cache.holdTempFile();
+                ins.close();
+                ins = null;
+                if (lastIns != null) {
+                    lastIns.setInputStream(cache.getInputStream());
+                }
+            }
+        } catch (IOException e) {
+            //shouldn't happen
+        }
     }
     public void release() {
         cache.releaseTempFileHold();
@@ -53,9 +71,14 @@ public class AttachmentDataSource implements DataSource {
 
     public InputStream getInputStream() {
         try {
-            return new DelegatingInputStream(cache.getInputStream());
+            if (cache != null) {
+                return cache.getInputStream();
+            }
+            if (ins instanceof DelegatingInputStream) {
+                lastIns = (DelegatingInputStream)ins;
+            }
+            return ins;
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }

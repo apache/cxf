@@ -58,6 +58,8 @@ public class AttachmentDeserializer {
 
     private int pbAmount = 2048;
     private PushbackInputStream stream;
+    private int createCount; 
+    private int closedCount;
 
     private byte boundary[];
 
@@ -122,7 +124,9 @@ public class AttachmentDeserializer {
                 throw new RuntimeException(e);
             }
 
-            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount));
+            body = new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
+                                             this);
+            createCount++;
             message.setContent(InputStream.class, body);
         }
     }
@@ -199,13 +203,15 @@ public class AttachmentDeserializer {
             && !((DelegatingInputStream) body).isClosed()) {
 
             cache((DelegatingInputStream) body, true);
-            message.setContent(InputStream.class, body);
         }
 
         for (Attachment a : attachments.getLoadedAttachments()) {
             DataSource s = a.getDataHandler().getDataSource();
-            if (!(s instanceof AttachmentDataSource)) {
-                //AttachementDataSource objects are already cached
+            if (s instanceof AttachmentDataSource) {
+                if (!((AttachmentDataSource)s).isCached()) {
+                    cache((DelegatingInputStream) s.getInputStream(), false);
+                }
+            } else {
                 cache((DelegatingInputStream) s.getInputStream(), false);
             }
         }
@@ -279,7 +285,9 @@ public class AttachmentDeserializer {
      */
     private Attachment createAttachment(InternetHeaders headers) throws IOException {
         InputStream partStream = 
-            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount));
+            new DelegatingInputStream(new MimeBodyPartInputStream(stream, boundary, pbAmount),
+                                      this);
+        createCount++;
         return AttachmentUtil.createAttachment(partStream, headers);
     }
 
@@ -289,5 +297,12 @@ public class AttachmentDeserializer {
 
     public void setLazyLoading(boolean lazyLoading) {
         this.lazyLoading = lazyLoading;
+    }
+
+    public void markClosed(DelegatingInputStream delegatingInputStream) throws IOException {
+        closedCount++;
+        if (closedCount == createCount && !attachments.hasNext()) {
+            stream.close();
+        }
     }
 }
