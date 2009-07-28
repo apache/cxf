@@ -930,9 +930,9 @@
                 <version>2.4</version>
             </dependency>
             <dependency>
-                <groupId>bouncycastle</groupId>
+                <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15</artifactId>
-                <version>140</version>
+                <version>1.43</version>
             </dependency>
 
             <dependency>
