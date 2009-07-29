@@ -162,7 +162,9 @@ public final class AttachmentUtil {
         }
         
         if (quotedPrintable) {
-            DataSource source = new AttachmentDataSource(ct, new QuotedPrintableDecoderStream(stream));
+            DataSource source = new AttachmentDataSource(ct, 
+                                                         new QuotedPrintableDecoderStream(stream),
+                                                         stream);
             att.setDataHandler(new DataHandler(source));
         } else {
             DataSource source = new AttachmentDataSource(ct, stream);
