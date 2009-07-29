@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf.xjcplugins</groupId>
     <artifactId>cxf-xjc-bug671</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
     <name>Apache CXF XJC Plugin To Workaround JAXB Bug 671</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6-SNAPSHOT</version>
+        <version>2.1.6</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -57,8 +57,8 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/common/xjc/bug671</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/common/xjc/bug671</developerConnection>
     </scm>
 
 </project>

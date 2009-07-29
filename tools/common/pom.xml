@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-common</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
     <name>Apache CXF Command Line Tools Common</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6-SNAPSHOT</version>
+        <version>2.1.6</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
@@ -104,8 +104,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/common</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/common</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/tools/common</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/tools/common</developerConnection>
     </scm>
 
 </project>

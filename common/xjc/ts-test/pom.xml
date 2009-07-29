@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-xjc-ts-test</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
     <name>Apache CXF XJC toString Plugin Tests</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6-SNAPSHOT</version>
+        <version>2.1.6</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -101,8 +101,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts-test</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts-test</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/common/xjc/ts-test</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/common/xjc/ts-test</developerConnection>
     </scm>
 
 </project>

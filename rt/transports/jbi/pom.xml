@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-transports-jbi</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6-SNAPSHOT</version>
+    <version>2.1.6</version>
     <name>Apache CXF Runtime JBI Transport</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6-SNAPSHOT</version>
+        <version>2.1.6</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -149,8 +149,8 @@
     </build>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/transports/jbi</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/transports/jbi</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/rt/transports/jbi</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/rt/transports/jbi</developerConnection>
     </scm>
 
 </project>
