@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-frontend-simple</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.3-SNAPSHOT</version>
+    <version>2.2.3</version>
     <name>Apache CXF Runtime Simple Frontend</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.3-SNAPSHOT</version>
+        <version>2.2.3</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -96,8 +96,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/frontend/simple</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/frontend/simple</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/rt/frontend/simple</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/rt/frontend/simple</developerConnection>
     </scm>
 
 </project>

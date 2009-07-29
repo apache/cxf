@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-xjc-ts</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.3-SNAPSHOT</version>
+    <version>2.2.3</version>
     <name>Apache CXF XJC toString Plugin</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.3-SNAPSHOT</version>
+        <version>2.2.3</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -57,8 +57,8 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/common/xjc/ts</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/common/xjc/ts</developerConnection>
     </scm>
 
 </project>

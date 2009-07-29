@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-wsdlto-databinding-jaxb</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.3-SNAPSHOT</version>
+    <version>2.2.3</version>
     <name>Apache CXF Command Line Tools WSDLTo JAXB Databinding</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.3-SNAPSHOT</version>
+        <version>2.2.3</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -65,8 +65,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/databinding/jaxb</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/databinding/jaxb</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/tools/wsdlto/databinding/jaxb</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/tools/wsdlto/databinding/jaxb</developerConnection>
     </scm>
 
 </project>
