@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.soap.saaj;
 
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -43,6 +44,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapHeader;
@@ -112,6 +114,13 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             Collection<Attachment> atts = message.getAttachments();
             if (atts != null) {
                 for (Attachment a : atts) {
+                    if (a.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
+                        try {
+                            ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache();
+                        } catch (IOException e) {
+                            throw new Fault(e);
+                        }
+                    }
                     AttachmentPart ap = soapMessage.createAttachmentPart(a.getDataHandler());
                     ap.setContentId(a.getId());
                     Iterator<String> i = a.getHeaderNames();
