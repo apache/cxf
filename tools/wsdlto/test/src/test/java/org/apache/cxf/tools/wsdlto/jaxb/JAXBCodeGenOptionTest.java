@@ -21,13 +21,11 @@ package org.apache.cxf.tools.wsdlto.jaxb;
 import java.io.File;
 
 import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.junit.Test;
 
 public class JAXBCodeGenOptionTest extends AbstractCodeGenTest {
    
-    @org.junit.Ignore // CXF-1934
     @Test
     public void testJaxbNpa() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/echo_date.wsdl"));
@@ -42,13 +40,5 @@ public class JAXBCodeGenOptionTest extends AbstractCodeGenTest {
         assertFalse(piFile.getAbsolutePath(), piFile.exists());
     }
 
-    // this case exists only until we can fix CXF-1934
-    @Test(expected = ToolException.class)
-    public void testJaxbNpaError() throws Exception {
-        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/echo_date.wsdl"));
-        env.put(ToolConstants.CFG_XJC_ARGS, "-npa"); 
-        processor.setContext(env);
-        processor.execute();
-    }
 
 }

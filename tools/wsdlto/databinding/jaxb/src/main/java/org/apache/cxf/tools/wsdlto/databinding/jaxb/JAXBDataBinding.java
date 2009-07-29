@@ -272,9 +272,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             StringTokenizer tokenizer = new StringTokenizer(xjcArgs, ",", false);
             while (tokenizer.hasMoreTokens()) {
                 String arg = tokenizer.nextToken();
-                if ("-npa".equalsIgnoreCase(arg)) {
-                    throw new ToolException("NPA_NOT_SUPPORTED", LOG);
-                }
                 args.add(arg);
                 LOG.log(Level.FINE, "xjc arg:" + arg);
             }
