@@ -37,6 +37,7 @@
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="binding" type="xsd:anyType" minOccurs="0" />  
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="invoker" type="xsd:anyType" minOccurs="0"/>
@@ -72,6 +73,7 @@
             <xsd:element name="executor" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="features" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="binding" type="xsd:anyType" minOccurs="0" />
+            <xsd:element name="dataBinding" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="inInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="inFaultInterceptors" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="outInterceptors" type="xsd:anyType" minOccurs="0"/>

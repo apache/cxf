@@ -346,7 +346,7 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         String s = os.toString();
         String data = "{\"books2\":{\"books\":{\"@xsins.type\":\"superBook\",\"id\":123,"
-            + "\"name\":\"CXF Rocks\",\"superId\":124}}}";
+            + "\"name\":\"CXF Rocks\",\"state\":\"\",\"superId\":124}}}";
         assertEquals(data, s);
     }
     

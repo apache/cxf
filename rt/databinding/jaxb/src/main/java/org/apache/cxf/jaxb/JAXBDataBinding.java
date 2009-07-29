@@ -328,13 +328,10 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         }
 
-        String tns = service.getName().getNamespaceURI();
+        String tns = getNamespaceToUse();
         CachedContextAndSchemas cachedContextAndSchemas = null;
         JAXBContext ctx = null;
         try {
-            if (service.getServiceInfos().size() > 0) {
-                tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
-            }
             cachedContextAndSchemas = createJAXBContextAndSchemas(contextClasses, tns);
         } catch (JAXBException e1) {
             // load jaxb needed class and try to create jaxb context for more
@@ -435,6 +432,19 @@ public class JAXBDataBinding extends AbstractDataBinding
                 cachedContextAndSchemas.setSchemas(schemas);
             }
         }
+    }
+    
+    private String getNamespaceToUse() {
+        if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
+            return null;    
+        }
+        String tns = null;
+        if (service.getServiceInfos().size() > 0) {
+            tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
+        } else {
+            tns = service.getName().getNamespaceURI();
+        }
+        return tns;
     }
     
     public void setExtraClass(Class[] userExtraClass) {

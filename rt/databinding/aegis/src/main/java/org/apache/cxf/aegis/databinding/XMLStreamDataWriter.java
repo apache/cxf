@@ -62,7 +62,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
 
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
         Type type = databinding.getType(part);
-
+        if (type == null) {
+            type = databinding.getTypeFromClass(obj.getClass());
+        }
         if (type == null) {
             throw new Fault(new Message("NO_MESSAGE_FOR_PART", LOG, part));
         }
@@ -87,7 +89,8 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 }
             }
             ElementWriter writer = new ElementWriter(output);
-            MessageWriter w2 = writer.getElementWriter(part.getConcreteName());
+            MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName() 
+                : type.getSchemaType());
             type.writeObject(obj, w2, context);
             w2.close();
         } catch (DatabindingException e) {

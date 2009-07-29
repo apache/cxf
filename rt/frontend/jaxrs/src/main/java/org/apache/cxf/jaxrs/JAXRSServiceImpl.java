@@ -19,12 +19,14 @@
 
 package org.apache.cxf.jaxrs;
 
-import java.util.Collections;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+import javax.ws.rs.core.Response;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.util.PackageUtils;
@@ -33,9 +35,18 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
+import org.apache.cxf.jaxrs.model.Parameter;
+import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 
@@ -78,7 +89,62 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     }
     
     public List<ServiceInfo> getServiceInfos() {
-        return Collections.emptyList();
+        // try to convert to WSDL-centric model so that CXF DataBindings can get initialized
+        // might become useful too if we support wsdl2
+        
+        // make databindings to use databinding-specific information 
+        // like @XmlRootElement for ex to select a namespace
+        this.put("org.apache.cxf.databinding.namespace", "true");
+        
+        List<ServiceInfo> infos = new ArrayList<ServiceInfo>();
+        for (ClassResourceInfo cri : classResourceInfos) {
+            ServiceInfo si = new ServiceInfo();
+            infos.add(si);
+            QName qname = JAXRSUtils.getClassQName(cri.getServiceClass());
+            si.setName(qname);
+            InterfaceInfo inf = new InterfaceInfo(si, qname);
+            si.setInterface(inf);
+            for (OperationResourceInfo ori : cri.getMethodDispatcher().getOperationResourceInfos()) {
+                Method m = ori.getMethodToInvoke();
+                QName oname = new QName(qname.getNamespaceURI(), m.getName());
+                OperationInfo oi = inf.addOperation(oname);
+                createMessagePartInfo(oi, m.getReturnType(), qname, m, false);
+                for (Parameter pm : ori.getParameters()) {
+                    
+                    if (pm.getType() == ParameterType.REQUEST_BODY) {
+                        createMessagePartInfo(oi, 
+                                              ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()],
+                                              qname, m, true);    
+                    }
+                }
+            }
+            
+        }
+        return infos;
+    }
+
+    private void createMessagePartInfo(OperationInfo oi, Class<?> type, QName qname, Method m,
+                                       boolean input) {
+        if (type == void.class) {
+            return;
+        }
+        if (InjectionUtils.isPrimitive(type) || Response.class == type) {
+            return;
+        }
+        QName mName = new QName(qname.getNamespaceURI(), 
+                                (input ? "in" : "out") + m.getName());
+        MessageInfo ms = oi.createMessage(mName, 
+                                           input ? MessageInfo.Type.INPUT : MessageInfo.Type.OUTPUT);
+        if (input) {
+            oi.setInput("in", ms);
+        } else {
+            oi.setOutput("out", ms);
+        }
+        QName mpQName = JAXRSUtils.getClassQName(type);
+        MessagePartInfo mpi = ms.addMessagePart(mpQName);
+        mpi.setConcreteName(mpQName);
+        mpi.setTypeQName(mpQName);
+        mpi.setTypeClass(type);
     }
     
     public EndpointInfo getEndpointInfo(QName endpoint) {        

@@ -41,6 +41,7 @@ import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.tuscany.sdo.api.SDOUtil;
 
@@ -148,11 +149,14 @@ public class SDODataBinding extends AbstractDataBinding
             }
         }
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            String uri = serviceInfo.getDescription().getBaseURI();
-            ExtendedURIResolver resolver = new ExtendedURIResolver();
-            InputStream ins = resolver.resolve(uri, "").getByteStream();
-            context.getXSDHelper().define(ins, uri);
-            resolver.close();
+            DescriptionInfo dInfo = serviceInfo.getDescription();
+            if (dInfo != null) {
+                String uri = dInfo.getBaseURI();
+                ExtendedURIResolver resolver = new ExtendedURIResolver();
+                InputStream ins = resolver.resolve(uri, "").getByteStream();
+                context.getXSDHelper().define(ins, uri);
+                resolver.close();
+            }
         }        
     }
     void registerFactory(Class<?> factoryClass) throws Exception {

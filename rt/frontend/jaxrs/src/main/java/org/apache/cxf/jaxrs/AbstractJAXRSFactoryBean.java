@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -34,12 +36,14 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.provider.DataBindingProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -232,6 +236,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }
+        if (getDataBinding() != null) {
+            setDataBindingProvider(factory, ep.getService());
+        }
         factory.setBus(getBus());
         if (schemaLocations != null) {
             factory.setSchemaLocations(schemaLocations);
@@ -240,6 +247,19 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         return factory;
     }
 
+    protected void setDataBindingProvider(ProviderFactory factory, Service s) {
+        DataBinding db = getDataBinding();
+        try {
+            Method m = db.getClass().getMethod("setAllClasses", new Class[]{Set.class});
+            Set<Class<?>> allClasses = ResourceUtils.getAllRequestResponseTypes(
+                                                         serviceFactory.getRealClassResourceInfo(), false);
+            m.invoke(db, new Object[]{allClasses});
+        } catch (Exception ex) { 
+            db.initialize(s);
+        }
+        factory.setUserProviders(Collections.singletonList(new DataBindingProvider(db)));
+    }
+    
     public void setModelBeans(UserResource... resources) {
         setModelBeans(Arrays.asList(resources));
     }

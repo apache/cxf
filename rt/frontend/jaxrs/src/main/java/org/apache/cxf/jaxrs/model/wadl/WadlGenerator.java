@@ -20,7 +20,6 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -39,7 +38,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
@@ -72,8 +70,8 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
-import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -111,7 +109,7 @@ public class WadlGenerator implements RequestHandler {
         
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
         
-        Set<Class<?>> jaxbTypes = getAllJaxbTypes(cris);
+        Set<Class<?>> jaxbTypes = ResourceUtils.getAllRequestResponseTypes(cris, true);
         JAXBContext context = createJaxbContext(jaxbTypes);
         SchemaCollection coll = getSchemaCollection(context);
         JAXBContextProxy proxy = null;
@@ -471,31 +469,6 @@ public class WadlGenerator implements RequestHandler {
             prefix = "prefix" + (size + 1);
         }
         return prefix;
-    }
-    
-    private Set<Class<?>> getAllJaxbTypes(List<ClassResourceInfo> cris) {
-        Set<Class<?>> types = new HashSet<Class<?>>();
-        for (ClassResourceInfo root : cris) {
-            for (OperationResourceInfo ori : root.getMethodDispatcher().getOperationResourceInfos()) {
-                checkJaxbType(ori.getMethodToInvoke().getReturnType(), types);
-                for (Parameter pm : ori.getParameters()) {
-                    if (pm.getType() == ParameterType.REQUEST_BODY) {
-                        checkJaxbType(ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()], types);
-                    }
-                }
-            }
-        }
-        
-        return types;
-    }
-
-    private void checkJaxbType(Class<?> type, Set<Class<?>> types) {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        if (!InjectionUtils.isPrimitive(type) 
-            && !JAXBElement.class.isAssignableFrom(type)
-            && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
-            types.add(type);
-        }        
     }
     
     private JAXBContext createJaxbContext(Set<Class<?>> classes) {
