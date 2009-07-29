@@ -23,13 +23,13 @@
     <artifactId>cxf-bundle-jaxrs</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Bundle Jar</name>
-    <version>2.2.3</version>
+    <version>2.2.4-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4-SNAPSHOT</version>
     </parent>
 
 
@@ -212,8 +212,8 @@
 
    
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/distribution/bundle/jaxrs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/distribution/bundle/jaxrs</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</developerConnection>
     </scm>
 
 </project>

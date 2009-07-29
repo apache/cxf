@@ -3,7 +3,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-wsdl-validator-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>2.2.3</version>
+    <version>2.2.4-SNAPSHOT</version>
     <name>Apache CXF WSDL Validator Maven2 Plugin</name>
     <url>http://cxf.apache.org</url>
 
@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
@@ -59,8 +59,8 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/maven-plugins/wsdl-validator-plugin</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/maven-plugins/wsdl-validator-plugin</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/wsdl-validator-plugin</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/wsdl-validator-plugin</developerConnection>
     </scm>
 
 </project>

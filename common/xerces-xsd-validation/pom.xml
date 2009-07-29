@@ -22,13 +22,13 @@
   <groupId>org.apache.cxf</groupId>
   <artifactId>cxf-xerces-xsd-validation</artifactId>
   <packaging>jar</packaging>
-  <version>2.2.3</version>
+  <version>2.2.4-SNAPSHOT</version>
   <name>Apache CXF XML Schema Validation with Xerces</name>
   <url>http://cxf.apache.org</url>
   <parent>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>2.2.3</version>
+    <version>2.2.4-SNAPSHOT</version>
     <relativePath>../../parent/pom.xml</relativePath>
   </parent>
   <dependencies>
@@ -61,7 +61,7 @@
     </dependency>
   </dependencies>
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/common/xerces-xsd-validation</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/common/xerces-xsd-validation</developerConnection>
+    <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xerces-xsd-validation</connection>
+    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xerces-xsd-validation</developerConnection>
   </scm>
 </project>

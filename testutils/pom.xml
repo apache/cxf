@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-testutils</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.3</version>
+    <version>2.2.4-SNAPSHOT</version>
     <name>Apache CXF Test Utilities</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.3</version>
+        <version>2.2.4-SNAPSHOT</version>
         <relativePath>../parent/pom.xml</relativePath>
     </parent>
 
@@ -288,8 +288,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/testutils</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.2.3/testutils</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/testutils</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/testutils</developerConnection>
     </scm>
 
 </project>
