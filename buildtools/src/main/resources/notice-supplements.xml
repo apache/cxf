@@ -141,6 +141,7 @@
     <project>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+      <name>Simple Logging Facade for Java - API</name>
       <licenses>
         <license>
           <name>MIT License</name>
@@ -153,6 +154,7 @@
     <project>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
+      <name>Simple Logging Facade for Java - JDK Logging</name>
       <licenses>
         <license>
           <name>MIT License</name>
@@ -166,6 +168,7 @@
     <project>
       <groupId>jaxen</groupId>
       <artifactId>jaxen</artifactId>
+      <name>Jaxen</name>
       <licenses>
         <license>
           <name>BSD</name>
@@ -178,10 +181,11 @@
     <project>
       <groupId>asm</groupId>
       <artifactId>asm</artifactId>
+      <name>ASM</name>
       <licenses>
         <license>
           <name>BSD</name>
-          <url>http://asm.objectweb.org/license.html</url>
+          <url>http://asm.ow2.org/license.html</url>
         </license>
       </licenses>
     </project>
