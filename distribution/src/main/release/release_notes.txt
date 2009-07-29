@@ -1,9 +1,10 @@
-Apache CXF 2.1.5 Release Notes
+Apache CXF 2.1.6 Release Notes
 
 1. Overview
 
-Apache CXF 2.1.5 delivers the latest set of patches and bug fixes for Apache
-CXF.   This release fixes 87 JIRA issues that have been reported by users.
+Apache CXF 2.1.6 delivers the latest set of patches and bug fixes for the Apache
+CXF 2.1.x branch.   This release fixes 74 JIRA issues that have been reported by 
+users.
 
 2. Installation Prerequisites 
 
@@ -15,7 +16,7 @@ with the specified versions, are installed on your system:
 
 2.1 Java 5 Development Kit
 
-You must install the J2SE Development Kit (JDK) 5.0, which can be downloaded
+You must install the J2SE Development Kit (JDK) 5.0 or 6, which can be downloaded
 from:
 
     http://java.sun.com/j2se/1.5.0/download.jsp
@@ -65,111 +66,99 @@ http://issues.apache.org/jira/browse/CXF
 
 6. JAX-RS/JSR-311
 
-2.1.2 upgrades the JAX-RS/JSR-311 support level to 0.8 from 0.6.   This may cause 
+2.1.2 upgraded the JAX-RS/JSR-311 support level to 0.8 from 0.6.   This may cause 
 existing JAX-RS applications to fail.  JAX-RS/JSR-311 is a work in progress and as
 the specification changes, we'll be updating the implementation to keep track with 
-the specification.
+the specification.   However, users of JAX-RS are highly encouraged to migrate to 
+CXF 2.2.2 or newer as the JAX-RS implementations there are fully JAX-RS 1.0 
+compliant.
 
 
 7. Specific issues, features, and improvements fixed in this version 
 
-
 ** Sub-task
-    * [CXF-2110] - Missing parameterOrder attribute in java2wsdl generated RPC wsdls
-    * [CXF-2112] - Missing element in generated WSDL definition
-    * [CXF-2114] - java2ws generates invalid import statement when using member classes
-    * [CXF-2129] - Provider endpoint causes NPE in AbstractPolicyInterceptor
-    * [CXF-2138] - Missing parameterOrder attribute in java2wsdl generated Doc/Lit wsdls
-    * [CXF-2147] - wsdl2java does not generate @XmlList with doc/lit wsdl
-    * [CXF-2148] - wsdl2java does not generate @XmlJavaTypeAdapter in SEI
+    * [CXF-2185] - Handler protocol match fails when multiple protocols are specified
 
 ** Bug
-    * [CXF-973] - WebFault(faultBean="...") not used
-    * [CXF-1766] - handler chain wildcard matching does not quite work
-    * [CXF-1858] - JAXRSOutInterceptor throws NullPointerException for unknown requests when using exception mapper
-    * [CXF-1884] - ExceptionMapper is not called due to a NullPointerException at JAXRSOutInterceptor
-    * [CXF-1950] - wsdl2java omits @WebParam's header=true where <wsdl:service> element is missing.
-    * [CXF-1999] - HTTP conduit configuration is not loaded when not using Spring
-    * [CXF-2025] - Null Pointer Exception in AbstractInvoker.createFault()
-    * [CXF-2030] - JMS transport is not usable with IBM MQI interface endpoints
-    * [CXF-2031] - CacheControlHeaderProvider produces invalid no-cache headers
-    * [CXF-2033] - StaxUtils assumes DOM Node::appendChild(c) returns the passed-in child
-    * [CXF-2034] - JMS client transport (JMSConduit) does not tear down its reply awaiting listener on Bus shutdown
-    * [CXF-2037] - SoapFault subcode not outputted correctly in Soap12FaultOutInterceptor
-    * [CXF-2038] - changes for signaturePropFile and decryptionPropFile of WSS4JInteceptor can't be reloaded if we use cxf in container
-    * [CXF-2040] - One way operations return response after impl is invoked...
-    * [CXF-2043] - CXF failed to deal with attachment if client sends in attachment with "Multipart/Related" instead of "multipart/related" as Content-type
-    * [CXF-2044] - Aegis Custom Type Mapping
-    * [CXF-2045] - Custom headers lost when using Cxf Interceptors
-    * [CXF-2049] - Temporary files are not deleted under windows
-    * [CXF-2050] - MimeBodyPartInputStream never finishes reading certain streams
-    * [CXF-2051] - Exception in REST Service creates not-well-formed xml responses
-    * [CXF-2054] - wsdl2java NPE on Async WSDL
-    * [CXF-2058] - org.apache.cxf.jaxrs.provider.AbstractJAXBProvider.getPackageContext erroneously returns null value
-    * [CXF-2059] - org.apache.cxf.interceptor.Fault: No such operation
-    * [CXF-2062] - MTOM content-type header missing required "type" parameter
-    * [CXF-2071] - Missing import on 'com.sun.xml.bind.api' for cxf-bundle
-    * [CXF-2072] - Persistant HTTPS connections appear to be disabled.
-    * [CXF-2074] - 2.1.4 now throws "No DestinationFactory was found for the namespace http://schemas.xmlsoap.org/soap/http"
-    * [CXF-2075] - Error in spring config file reported as a missing config file during initialization of BusApplicationContext
-    * [CXF-2077] - When using wsdl2java with the -db xmlbeans flag, the generated build.xml doesn't work OOTB
-    * [CXF-2080] - Default value is not assigned to HeaderParam
-    * [CXF-2082] - client using decoupled ws-addressing with async handler hang from time to time
-    * [CXF-2084] - AbstractMessageResponseTimeInterceptor has protected methods, but default (package) scope constructor
-    * [CXF-2087] - CXFServlet / URIResolver tries to load file "" (empty file name)
-    * [CXF-2088] - Wrong serialisation order of elements when using Aegis databinding.
-    * [CXF-2095] - wsdl2java -db xmlbeans can't generate right wrapped class
-    * [CXF-2097] - If wrapped style is used and multiple message parts are generated (because, for example, a soap header parameter is declared), the generated wsdl does not interop with RI or CXF client.
-    * [CXF-2100] - Digest auth is broken
-    * [CXF-2101] - Cannot add headers to request from Dispatch client in async mode -- ThreadLocal issue
-    * [CXF-2103] - Some attributes marshalled through JAXBSource have wrong names
-    * [CXF-2104] - Caller application hangs in case it uses the polling (Response) method with JAX-WS async mapping and an http error occurs during sending. In case of callback style (AsyncHandler), the client application has no way of getting the exception.
-    * [CXF-2105] - The CxfBusLifeCycleManager can cause ConcurrentModificationExceptions to be thrown
-    * [CXF-2106] - Temp files created for data over 64kb are never deleted
-    * [CXF-2108] - idl2wsdl NullPointerException at typedef with sequence of (named) fixed array
-    * [CXF-2109] - samples\corba\bank_ws_addressing does not compile
-    * [CXF-2115] - refactor JBIConduitOutputStream exception handle
-    * [CXF-2117] - method AnnotationHandlerChainBuilder.patternMatches() causes CXF portability issues with other JAX-WS stacks
-    * [CXF-2119] - wsdl2java failes with NPE with void Async Methods
-    * [CXF-2122] - NPE in AbstractJAXWSMethodInvoker
-    * [CXF-2124] - DynamicClientFactory.createClient API would throw an exception with source path instead of classes path when classes.mkdir() call fails
-    * [CXF-2128] - wsdl2js gives NullPointerException on http://lcorp.ulif.org.ua/ILib5/Service.svc?wsdl
-    * [CXF-2132] - @Oneway doesn't work with simple/bare element types
-    * [CXF-2139] - Deserializer for complex types is not created inside the generated JavaScript client code
-    * [CXF-2143] - Timezone problems with special dates (e.g. birthdays)
-    * [CXF-2145] - Proxy in JCA connector throws exception due to concurrency issues
-    * [CXF-2149] - java.lang.ArrayStoreException getting headers in handler
-    * [CXF-2152] - Certain Spring AOP proxies cannot be used any more as service bean since CXF 2.1.4 because the real (non-proxy) target class is not found correctly by SpringAopClassHelper
-    * [CXF-2160] - LoggingOutInterceptor logs message twice
-    * [CXF-2161] - WSA handler class MAPCodec is not decoding From header
-    * [CXF-2163] - org.apache.cxf.resource.URIResolver on Websphere 6.1 doesn't resolve from "wsjar:" base URI's
-    * [CXF-2170] - Aegis logging inconsistent....
-    * [CXF-2172] - RPC/Lit types with both XmlType and XmlRootElement are ending up as element parts, not type parts
-    * [CXF-2175] - DynamicClientFactory.setupClasspath throws a null pointer exception if URI contains undefined path.
-    * [CXF-2180] - ProxyHelper requires cglib even if interface is used as client service class
+    * [CXF-1079] - wsdl2java fails to genrate wrapped style
+    * [CXF-1161] - Javadoc for classes generated XSD with WSDL is defective
+    * [CXF-1822] - WSDL Schema Imports
+    * [CXF-1852] - Provider classes must implement Provider<T> even when superclass does
+    * [CXF-1880] - org.apache.cxf.xjc.ts.ToStringPlugin cannot be used with a 1.6 JVM
+    * [CXF-1934] - -npa does not work in wsdl2java due to JAXB bug.
+    * [CXF-1972] - cannot send MTOM attachment over 64K when server schema validation on
+    * [CXF-1996] - NPE on JAXWS service initialization
+    * [CXF-2083] - XMLBeans - XmlBeansSchemaInitializer can't handle xs:import
+    * [CXF-2107] - wsdlLocation paramater and xmlbeans databinding throwing NPE
+    * [CXF-2184] - XSD import statements do not apply given confguration
+    * [CXF-2191] - cxf-codegen plugin does not accept files with (upper-case) .WSDL extension
+    * [CXF-2201] - NullPointerException by XMLFormatValidator
+    * [CXF-2203] - AttachmentSerializer content id incorrect
+    * [CXF-2205] - Aegis databinding always trims strings
+    * [CXF-2206] - Mapping jaxb types to "default" package causes exception
+    * [CXF-2207] - JMS Transport send MTOM message as a TextMessage. The attachment becomes wrong.
+    * [CXF-2210] - Change Jsr250BeanPostProcessor bean defination in cxf.xml
+    * [CXF-2211] - Investigate possible OOM exception caused by Continuations
+    * [CXF-2212] - SAAJInInterceptor creates a SAAJ SOAPFault with only one "Detail" child
+    * [CXF-2213] - Currently CXF always produces true/false value for for mustUnderstand attribute irrespective of the SOAP version on the wire
+    * [CXF-2219] - org.apache.cxf.service.model.OperationInformation should overwrite hash()
+    * [CXF-2220] - Heavily reused "default" Work Queue Problem
+    * [CXF-2221] - Missing Soap Headers
+    * [CXF-2228] - WSDL2XML generated binding not passing correct method arguments in service implementation
+    * [CXF-2229] - thread safe issue caused by XMLOutputFactoryImpl
+    * [CXF-2241] - wsdl2java produces code with compile error, trying to instantiate abstract class
+    * [CXF-2243] - JMSFactory.createJmsListener does not use property from JMSConfiguration to set the receiveTimeout on the constructed Spring DMLC
+    * [CXF-2245] - Can't set orb properties in CorbaBindinfgFactory
+    * [CXF-2250] - MessageContext.INBOUND_MESSAGE_ATTACHMENTS not working on client side
+    * [CXF-2271] - autoNameResolution not working for wrapper elements
+    * [CXF-2274] - HTTP transport assumes UTF-8 instead of ISO-8859-1 if charset not specified
+    * [CXF-2279] - Current ConfigureImpl is not application refresh friendly
+    * [CXF-2292] - Java first one-way operations generating faults
+    * [CXF-2294] - HTTP-binding miss URL parameters for GET requests
+    * [CXF-2295] - NullPointerException creating service proxy
+    * [CXF-2298] - encryptionUser=useReqSigCert fails to find request certificate
+    * [CXF-2300] - Generics not supported in response wrapper generation
+    * [CXF-2302] - HTTP continuations are not working correctly if keep-alives are on
+    * [CXF-2317] - NPE in WS-RM RetransmissionQueueImpl
+    * [CXF-2318] - Invalid message created when using MTOM and WS-RM
+    * [CXF-2325] - Provider services don't work with Spring AOP JDK proxies
+    * [CXF-2328] - Corba Exceptions not being mapped correctly
+    * [CXF-2329] - NullPointerException in JAXBEncoderDecoder when marshalling a null Array
+    * [CXF-2331] - AbstractDataBinding makes invalid DOM mods with Java 1.6
+    * [CXF-2332] - can't publish endpoint with XmlBeans databinding when build servicemodel from class
+    * [CXF-2344] - attachment headers not copied into SAAJ message
+    * [CXF-2349] - Space in namespace localName causes org.w3c.dom.DOMException: INVALID_CHARACTER_ERR
+    * [CXF-2357] - The equals() method of JCA connection handle always return false.  
+    * [CXF-2358] - autoNameResolution doesn't catch classes that differ only by case
+    * [CXF-2359] - wss4jin stuff is only verifying the first signature and first timestamp
+    * [CXF-2360] - soap.xsd in the soapbinding has the wrong elements
+    * [CXF-2363] - ReplyDestinationName settings not used in JMSDestination
 
 ** Improvement
-    * [CXF-1549] - Let TLSClientParameters take an SSLSocketFactory
-    * [CXF-1650] - Allow JAX-RS Resources, without XmlRootElement JAXB annotation
-    * [CXF-2042] - Expose totalHandlingTime attribute in ResponseTimeCounterMBean to offer trendsup monitoring
-    * [CXF-2063] - should set catalogManager debug level a bit ealier
-    * [CXF-2081] - Allow specifying a Java heap size when wsdl2java -compile invokes Java compiler
-    * [CXF-2086] - CFX does not log caught RuntimeException
-    * [CXF-2099] - support XMLSchema Vaildation in XMLBeans DataBinding
-    * [CXF-2116] - Refactoring of the WrapperHelper
-    * [CXF-2140] - Allow injection of an existing MBeanServer into the InstrumentationManagerImpl
-    * [CXF-2141] - Expose faults count in ResponseTimeCounter in addition to existing invocations count
-    * [CXF-2167] - WS-Addressing handler should not drop messages when the RelatesTo property is explicitly set by client code
-    * [CXF-2169] - JBIConduitOutputStream need save JBI MessageExchange in response message for later possible use
-    * [CXF-2177] - add ability to modify log of response before logging in LoggingInInterceptor
-    * [CXF-2181] - Dynamic Dispatch classes should cache MessageFactory instances
+    * [CXF-2002] - Server async jms transport needs dynamic mechanism to throttle message consumption
+    * [CXF-2113] - http:client configuration with Spring PropertyPlaceholderConfigurer
+    * [CXF-2186] - Validate WSS headers using new checkReceiverResultsAnyOrder method in WSHandler.
+    * [CXF-2209] - Add support for tomcat's context.xml in cxf webapp samples
+    * [CXF-2246] - jaxws:endpoint should support to configure the transportId
+    * [CXF-2278] - Implement serialize method on JaxbAssertions
+    * [CXF-2289] - CachedOutputStream should continue keeping the message in memory if the creation of Temp file fails
+    * [CXF-2299] - should catch RejectedExecutionException in OneWayProcessorInterceptor and run the task in caller thread
+    * [CXF-2307] - PhaseInterceptorChain should log errors above INFO
+    * [CXF-2316] - Allow JMS replyTo destination value be set on the outgoing messsage for a one-way call
+    * [CXF-2327] - [SoapBindingFactory] Verify QName properties before calling constructor
+    * [CXF-2336] - SOAP Binding (i.e. SOAP Version) of out going message should be same as incoming message
+    * [CXF-2342] - Performance issue in StaxInInterceptor
+    * [CXF-2343] - Improve Message Performance Under High Volume with Low Latency Consumers
+    * [CXF-2350] - JBIConduitOutputStream should copy properties between JBI NormalizedMessage and cxf message invocation context
+    * [CXF-2361] - Adding JBIBindingConfigure to configure the JBIBinding from the spring configuration 
+    * [CXF-2364] - Allow SOAP address rewrite in wsdl according to the request call
+    * [CXF-2366] - Allow for 1-way over JMS requests to set replyTo destination in JMS message when explicitly enabled
 
 ** New Feature
-    * [CXF-2069] - provide services list that's easily parseable
-    * [CXF-2174] - WSDLToJava to support generating a list of wsdls all at once
+    * [CXF-1030] - JCA 1.5 support
 
 ** Test
-    * [CXF-2120] - Add a systest for XMLBeans databinding
+    * [CXF-2248] - Added the unit tests for the spring configuration of JAXRSServerFactoryBean and JAXRSClientFactoryBean
 
 
 
