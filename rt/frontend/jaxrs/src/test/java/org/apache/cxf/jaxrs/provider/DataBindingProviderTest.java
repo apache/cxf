@@ -25,6 +25,7 @@ import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
 
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -37,7 +38,10 @@ import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.sdo.Structure;
+import org.apache.cxf.jaxrs.resources.sdo.impl.StructureImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.sdo.SDODataBinding;
 import org.apache.cxf.service.Service;
 
 import org.junit.Assert;
@@ -48,10 +52,12 @@ import org.junit.Test;
 public class DataBindingProviderTest extends Assert {
 
     private ClassResourceInfo c;
+    private ClassResourceInfo c2;
     
     @Before
     public void setUp() {
         c = ResourceUtils.createClassResourceInfo(TheBooks.class, TheBooks.class, true, true);
+        c2 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
     }
     
     @Test
@@ -120,6 +126,51 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(127L, book.getId());
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testSDOWrite() throws Exception {
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c2));
+        DataBinding binding = new SDODataBinding();
+        binding.initialize(s);
+        DataBindingProvider p = new DataBindingProvider(binding);
+        Structure struct = new StructureImpl();
+        struct.getTexts().add("text1");
+        struct.setText("sdo");
+        struct.setInt(3);
+        struct.setDbl(123.5);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        p.writeTo(struct, Structure.class, Structure.class,
+            new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String data = "<p0:Structure xmlns:p0=\"http://apache.org/structure/types\" " 
+            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " 
+            + "xsi:type=\"p0:Structure\">"
+            + "<p0:text>sdo</p0:text><p0:int>3</p0:int><p0:dbl>123.5</p0:dbl><p0:texts>text1</p0:texts>"
+            + "</p0:Structure>";
+        assertEquals(bos.toString(), data);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    @Ignore
+    public void testSDORead() throws Exception {
+        String data = "<p0:Structure xmlns:p0=\"http://apache.org/structure/types\" " 
+            + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " 
+            + "xsi:type=\"p0:Structure\">"
+            + "<p0:text>sdo</p0:text><p0:int>3</p0:int><p0:dbl>123.5</p0:dbl><p0:texts>text1</p0:texts>"
+            + "</p0:Structure>";
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c2));
+        DataBinding binding = new SDODataBinding();
+        binding.initialize(s);
+        DataBindingProvider p = new DataBindingProvider(binding);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Structure struct = (Structure)p.readFrom((Class)Structure.class, Structure.class,
+                                      new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
+                                      new MetadataMap<String, String>(), is);
+        assertEquals("sdo", struct.getText());
+        assertEquals(123.5, struct.getDbl());
+        assertEquals(3, struct.getInt());
+    }
+    
     @Path("/")
     @Ignore
     public static class TheBooks {
@@ -144,4 +195,15 @@ public class DataBindingProviderTest extends Assert {
         }
     }
     
+    @Path("/")
+    @Ignore
+    public static class TheSDOBooks {
+
+        @GET
+        @Path("/books/{bookId}/{new}")
+        public Structure getStructure() {
+            return null;
+        }
+        
+    }
 }
