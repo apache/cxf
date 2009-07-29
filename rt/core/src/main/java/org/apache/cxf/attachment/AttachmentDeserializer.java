@@ -208,8 +208,8 @@ public class AttachmentDeserializer {
         for (Attachment a : attachments.getLoadedAttachments()) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
-                if (!((AttachmentDataSource)s).isCached()) {
-                    cache((DelegatingInputStream) s.getInputStream(), false);
+                if (((AttachmentDataSource)s).getDelegatingInputStream() != null) {
+                    cache(((AttachmentDataSource)s).getDelegatingInputStream(), false);
                 }
             } else {
                 cache((DelegatingInputStream) s.getInputStream(), false);

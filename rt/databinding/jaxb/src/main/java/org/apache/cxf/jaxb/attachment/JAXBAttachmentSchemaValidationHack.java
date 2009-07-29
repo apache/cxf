@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxb.attachment;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -51,7 +52,11 @@ public final class JAXBAttachmentSchemaValidationHack extends AbstractPhaseInter
             for (Attachment at : message.getAttachments()) {
                 if (at.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
                     AttachmentDataSource ds = (AttachmentDataSource)at.getDataHandler().getDataSource();
-                    ds.hold();
+                    try {
+                        ds.hold();
+                    } catch (IOException e) {
+                        throw new Fault(e);
+                    }
                     dss.add(ds);
                 }
             }

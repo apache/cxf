@@ -33,33 +33,43 @@ public class AttachmentDataSource implements DataSource {
     private final String ct;    
     private CachedOutputStream cache;
     private InputStream ins;
-    private DelegatingInputStream lastIns;
+    private DelegatingInputStream delegating;
     
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;        
         ins = inParam;
+        if (ins instanceof DelegatingInputStream) {
+            delegating = (DelegatingInputStream)ins;
+        }
+    }
+    public AttachmentDataSource(String ctParam, 
+                                InputStream inParam,
+                                InputStream delegate) throws IOException {
+        this.ct = ctParam;        
+        ins = inParam;
+        if (delegate instanceof DelegatingInputStream) {
+            delegating = (DelegatingInputStream)delegate;
+        }
     }
 
     public boolean isCached() {
         return cache != null;
     }
-    
-    public void hold() {
-        try {
-            if (cache == null) {
-                cache = new CachedOutputStream();
-                IOUtils.copy(ins, cache);
-                cache.lockOutputStream();
-                cache.holdTempFile();
-                ins.close();
-                ins = null;
-                if (lastIns != null) {
-                    lastIns.setInputStream(cache.getInputStream());
-                }
+    public void cache() throws IOException {
+        if (cache == null) {
+            cache = new CachedOutputStream();
+            IOUtils.copy(ins, cache);
+            cache.lockOutputStream();  
+            ins.close();
+            ins = null;
+            if (delegating != null) {
+                delegating.setInputStream(cache.getInputStream());
             }
-        } catch (IOException e) {
-            //shouldn't happen
         }
+    }
+    public void hold() throws IOException {
+        cache();
+        cache.holdTempFile();
     }
     public void release() {
         cache.releaseTempFileHold();
@@ -68,14 +78,13 @@ public class AttachmentDataSource implements DataSource {
     public String getContentType() {
         return ct;
     }
-
+    public DelegatingInputStream getDelegatingInputStream() {
+        return delegating;
+    }
     public InputStream getInputStream() {
         try {
             if (cache != null) {
                 return cache.getInputStream();
-            }
-            if (ins instanceof DelegatingInputStream) {
-                lastIns = (DelegatingInputStream)ins;
             }
             return ins;
         } catch (IOException e) {
