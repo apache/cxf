@@ -21,14 +21,14 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6</version>
+        <version>2.1.7-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.archetype</groupId>
     <artifactId>cxf-jaxws-javafirst</artifactId>
     <name>Apache CXF Archetype - Simple JAX-WS Java First</name>
-    <version>2.1.6</version>
+    <version>2.1.7-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     <properties>
         <maven.test.skip>true</maven.test.skip>

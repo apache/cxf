@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-rt-transports-http</artifactId>
     <packaging>jar</packaging>
-    <version>2.1.6</version>
+    <version>2.1.7-SNAPSHOT</version>
     <name>Apache CXF Runtime HTTP Transport</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6</version>
+        <version>2.1.7-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
@@ -117,8 +117,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/rt/transports/http</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/rt/transports/http</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http</developerConnection>
     </scm>
 
 </project>

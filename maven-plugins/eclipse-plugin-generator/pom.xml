@@ -22,14 +22,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-eclipse-plugin-generator</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>2.1.6</version>
+    <version>2.1.7-SNAPSHOT</version>
     <name>Apache CXF Eclipse Plugin Generator Maven2 Plugin</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.1.6</version>
+        <version>2.1.7-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
@@ -95,8 +95,8 @@
     </dependencies>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/maven-plugins/eclipse-plugin-generator</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.6/maven-plugins/eclipse-plugin-generator</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/eclipse-plugin-generator</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/eclipse-plugin-generator</developerConnection>
     </scm>
 
 </project>
