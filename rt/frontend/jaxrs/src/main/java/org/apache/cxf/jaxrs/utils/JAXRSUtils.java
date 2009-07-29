@@ -333,8 +333,16 @@ public final class JAXRSUtils {
     public static ResponseBuilder createResponseBuilder(ClassResourceInfo cri, int status, boolean addAllow) {
         ResponseBuilder rb = Response.status(status);
         if (addAllow) {
-            for (String m : cri.getAllowedMethods()) {
+            Set<String> allowedMethods = cri.getAllowedMethods();
+            for (String m : allowedMethods) {
                 rb.header("Allow", m);
+            }
+            // "OPTIONS" are supported all the time really
+            if (!allowedMethods.contains("OPTIONS")) {
+                rb.header("Allow", "OPTIONS");
+            }
+            if (!allowedMethods.contains("HEAD") && allowedMethods.contains("GET")) {
+                rb.header("Allow", "HEAD");
             }
         }
         return rb;
