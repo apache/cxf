@@ -20,7 +20,12 @@
 package org.apache.cxf.sdo;
 
 
+import java.util.Collection;
+
+import org.w3c.dom.Document;
 import org.w3c.dom.Node;
+
+import junit.framework.AssertionFailedError;
 
 import org.junit.Test;
 
@@ -51,10 +56,17 @@ public abstract class AbstractHelloWorldTest extends AbstractSDOTest {
     
     @Test
     public void testWSDL() throws Exception {
-        Node doc = getWSDLDocument("TestService");
-        assertNotNull(doc);
-        assertValid("/wsdl:definitions/wsdl:types/xsd:schema"
-                    + "[@targetNamespace='http://apache.org/hello_world_soap_http/types']", 
-                    doc);
+        Collection<Document> docs = getWSDLDocuments("TestService");
+        for (Document doc : docs) {
+            try {
+                assertValid("/wsdl:definitions/wsdl:types/xsd:schema"
+                            + "[@targetNamespace='http://apache.org/hello_world_soap_http/types']", 
+                            doc);
+                return;
+            } catch (AssertionFailedError ex) {
+                //ignore
+            }
+        }
+        fail("Did not find schemas");
     }
 }

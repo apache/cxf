@@ -19,7 +19,8 @@
 
 package org.apache.cxf.sdo;
 
-import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -33,17 +34,17 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
 import org.apache.cxf.databinding.WrapperHelper;
 import org.apache.cxf.interceptor.Fault;
-import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.tuscany.sdo.api.SDOUtil;
+import org.apache.ws.commons.schema.XmlSchema;
 
 import commonj.sdo.DataObject;
 import commonj.sdo.Type;
@@ -149,13 +150,13 @@ public class SDODataBinding extends AbstractDataBinding
             }
         }
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            DescriptionInfo dInfo = serviceInfo.getDescription();
-            if (dInfo != null) {
-                String uri = dInfo.getBaseURI();
-                ExtendedURIResolver resolver = new ExtendedURIResolver();
-                InputStream ins = resolver.resolve(uri, "").getByteStream();
-                context.getXSDHelper().define(ins, uri);
-                resolver.close();
+            for (XmlSchema schema : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
+                if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
+                    continue;
+                }
+                StringWriter writer = new StringWriter();
+                schema.write(writer);
+                context.getXSDHelper().define(new StringReader(writer.toString()), schema.getSourceURI());
             }
         }        
     }

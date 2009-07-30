@@ -20,11 +20,10 @@
 package org.apache.cxf.sdo.tools;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -34,6 +33,8 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -41,9 +42,10 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
-import org.apache.tuscany.sdo.api.SDOUtil;
 import org.apache.tuscany.sdo.generate.XSD2JavaGenerator;
 import org.apache.tuscany.sdo.helper.HelperContextImpl;
+import org.apache.tuscany.sdo.helper.XSDHelperImpl;
+import org.apache.ws.commons.schema.XmlSchema;
 import org.eclipse.emf.codegen.ecore.genmodel.GenClass;
 import org.eclipse.emf.codegen.ecore.genmodel.GenModel;
 import org.eclipse.emf.codegen.ecore.genmodel.GenPackage;
@@ -71,23 +73,19 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
     private ExtendedMetaData extendedMetaData;
     private GenModel genModel;
     private Map<EClassifier, GenClass> genClasses = new HashMap<EClassifier, GenClass>();
-
+    private SchemaCollection schemaCollection;
+    
     public void generate(ToolContext context) throws ToolException {
-        if (dynamic) {
-            // Node XSD2Java is needed for dynamic SDO
-            return;
-        }
-
         Map<String, String> ns2pkgMap = context.getNamespacePackageMap();
 
         String outputDir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
         String pkg = context.getPackageName();
 
-        String wsdl = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
 
         // preparing the directories where files to be written.
         File targetDir;
         if (outputDir == null) {
+            String wsdl = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
             try {
                 outputDir = new File(new URI(wsdl)).getParentFile().getAbsolutePath();
             } catch (URISyntaxException e) {
@@ -105,33 +103,60 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
             argList.add("-javaPackage");
             argList.add(pkg);
         }
+        schemaCollection = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
 
-        // We need to copy the wsdl to a local file if it is not
-        argList.add(new File(URI.create(wsdl)).getAbsolutePath());
-
+        argList.add(""); //bogus arg
         String[] args = argList.toArray(new String[argList.size()]);
         ClassCollector classCollector = context.get(ClassCollector.class);
 
+        EPackage.Registry packageRegistry = new EPackageRegistryImpl(EPackage.Registry.INSTANCE);
+        extendedMetaData = new BasicExtendedMetaData(packageRegistry);
+        HelperContext hc = new HelperContextImpl(extendedMetaData, false);
+        xsdHelper = hc.getXSDHelper();
+        typeHelper = hc.getTypeHelper();
+
+        
         try {
             processArguments(args);
-            genModel = runXSD2Java(args, ns2pkgMap); 
             
-            List<GenPackage> packages = CastUtils.cast(genModel.getGenPackages());
-            for (Iterator<GenPackage> iter = packages.iterator(); iter.hasNext();) {
-                // loop through the list, once to build up the eclass to genclass mapper
-                GenPackage genPackage = iter.next();
-                List<GenClass> classes = CastUtils.cast(genPackage.getGenClasses());
-                for (Iterator<GenClass> classIter = classes.iterator(); classIter.hasNext();) {
-                    GenClass genClass = classIter.next();
-                    genClasses.put(genClass.getEcoreClass(), genClass);
 
-                    //This gets the "impl" classes, how do we get everything else?
-                    String s = genClass.getQualifiedClassName();
-                    String p = s.substring(0, s.lastIndexOf('.'));
-                    s = s.substring(s.lastIndexOf('.') + 1);
-                    classCollector.addTypesClassName(p, 
-                                                     s,
-                                                     genClass.getQualifiedClassName());
+            ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
+            
+            Map<String, PackageInfo> packageInfoTable =
+                createPackageInfoTable(schemaCollection, ns2pkgMap);
+            for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+                if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
+                    continue;
+                }
+                StringWriter writer = new StringWriter();
+                schema.write(writer);
+                xsdHelper.define(new StringReader(writer.toString()), schema.getSourceURI());
+            }
+            if (!dynamic) {
+                // No XSD2Java is needed for dynamic SDO
+
+                genModel = generatePackages(packageRegistry.values(), targetDirectory,
+                                            new Hashtable<String, PackageInfo>(packageInfoTable),
+                                            genOptions, allNamespaces);
+                
+                
+                List<GenPackage> packages = CastUtils.cast(genModel.getGenPackages());
+                for (Iterator<GenPackage> iter = packages.iterator(); iter.hasNext();) {
+                    // loop through the list, once to build up the eclass to genclass mapper
+                    GenPackage genPackage = iter.next();
+                    List<GenClass> classes = CastUtils.cast(genPackage.getGenClasses());
+                    for (Iterator<GenClass> classIter = classes.iterator(); classIter.hasNext();) {
+                        GenClass genClass = classIter.next();
+                        genClasses.put(genClass.getEcoreClass(), genClass);
+    
+                        //This gets the "impl" classes, how do we get everything else?
+                        String s = genClass.getQualifiedClassName();
+                        String p = s.substring(0, s.lastIndexOf('.'));
+                        s = s.substring(s.lastIndexOf('.') + 1);
+                        classCollector.addTypesClassName(p, 
+                                                         s,
+                                                         genClass.getQualifiedClassName());
+                    }
                 }
             }
         } catch (Exception e) {
@@ -140,32 +165,10 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
             return;
         }
 
-        HelperContext hc = new HelperContextImpl(extendedMetaData, false);
-        xsdHelper = hc.getXSDHelper();
-        typeHelper = hc.getTypeHelper();
     }
 
-    protected GenModel runXSD2Java(String args[], Map<String, String> ns2PkgMap) {
-        String xsdFileName = args[inputIndex];
-        EPackage.Registry packageRegistry = new EPackageRegistryImpl(EPackage.Registry.INSTANCE);
-        extendedMetaData = new BasicExtendedMetaData(packageRegistry);
-        String packageURI = getSchemaNamespace(xsdFileName);
-        Map<String, PackageInfo> packageInfoTable =
-            createPackageInfoTable(packageURI, schemaNamespace, javaPackage, prefix, ns2PkgMap);
-        return generateFromXMLSchema(xsdFileName,
-                                     packageRegistry,
-                                     extendedMetaData,
-                                     targetDirectory,
-                                     new Hashtable<String, PackageInfo>(packageInfoTable),
-                                     genOptions,
-                                     generateBuiltIn,
-                                     allNamespaces);
-    }
 
-    private static Map<String, PackageInfo> createPackageInfoTable(String packageURI,
-                                                                   String schemaNamespace,
-                                                                   String javaPackage,
-                                                                   String prefix,
+    private Map<String, PackageInfo> createPackageInfoTable(SchemaCollection schemas,
                                                                    Map<String, String> ns2PkgMap) {
         Map<String, PackageInfo> packageInfoTable = new HashMap<String, PackageInfo>();
 
@@ -174,11 +177,9 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
                 packageInfoTable.put(e.getKey(), new PackageInfo(e.getValue(), null, e.getKey(), null));
             }
         } else {
-            if (schemaNamespace != null) {
-                packageInfoTable.put(schemaNamespace,
-                                     new PackageInfo(javaPackage, prefix, schemaNamespace, null));
-            } else if (packageURI != null) {
-                packageInfoTable.put(packageURI, new PackageInfo(javaPackage, prefix, null, null));
+            for (XmlSchema schema : schemas.getXmlSchemas()) {
+                packageInfoTable.put(schema.getTargetNamespace(),
+                                     new PackageInfo(javaPackage, prefix, schema.getTargetNamespace(), null));
             }
         }
         return packageInfoTable;
@@ -191,24 +192,6 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
         }
 
         generatedPackages = null;
-        String wsdl = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
-
-        if (dynamic) {
-            HelperContext helperContext = SDOUtil.createHelperContext();
-            xsdHelper = helperContext.getXSDHelper();
-            URL location;
-            try {
-                location = new URL(wsdl);
-                InputStream is = location.openStream();
-                xsdHelper.define(is, wsdl);
-            } catch (IOException e) {
-                throw new ToolException(e);
-            }
-            this.typeHelper = helperContext.getTypeHelper();
-        }
-        
-
-
     }
 
     public String getType(QName qName, boolean element) {
@@ -264,6 +247,7 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
         Property property =
             xsdHelper.getGlobalProperty(wrapperElement.getNamespaceURI(), 
                                         wrapperElement.getLocalPart(), true);
+        
         if (property != null) {
             type = property.getType();
             Property itemProp = type.getProperty(item.getLocalPart());
