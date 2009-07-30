@@ -21,8 +21,11 @@ package org.apache.cxf.binding.soap;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.wsdl.Port;
@@ -33,6 +36,7 @@ import javax.wsdl.factory.WSDLFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
+import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -64,7 +68,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public SoapTransportFactory() {
         super();
     }
-    
+    public Set<String> getUriPrefixes() {
+        return Collections.singleton("soap.tcp");
+    }
     public String mapTransportURI(String s) {
         if ("http://www.w3.org/2008/07/soap/bindings/JMS/".equals(s)) {
             s = "http://cxf.apache.org/transports/jms";
@@ -145,6 +151,11 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {
+        if (ei.getAddress().startsWith("soap.tcp://")) {
+            //TODO - examine policies and stuff to look for the sun tcp policies
+            return new TCPConduit(ei);
+        }
+        
         SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
         ConduitInitiator conduitInit;
         try {
