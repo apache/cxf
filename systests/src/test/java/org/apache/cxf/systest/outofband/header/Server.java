@@ -49,14 +49,32 @@ public class Server extends AbstractBusTestServerBase {
         // Register expected Headers (namespace, element and class type mapping)
         
         Object implementor = new OOBHdrServiceImpl();
-        String address = "http://localhost:9107/SOAPDocLitBareService/SoapPort";      
         Endpoint ep = Endpoint.create(implementor);
         Map<String, Object> props = new HashMap<String, Object>(2);
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         ep.setProperties(props);
-        ep.publish(address);
+        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPort");
+        
+        ep = Endpoint.create(implementor);
+        props = new HashMap<String, Object>(2);
+        props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
+                                                   "SOAPService"));
+        props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
+        props.put("endpoint.handles.headers", "");
+        ep.setProperties(props);
+        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortNoHeader");
+        
+        ep = Endpoint.create(implementor);
+        props = new HashMap<String, Object>(2);
+        props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
+                                                   "SOAPService"));
+        props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
+        props.put("endpoint.handles.headers", "{http://cxf.apache.org/outofband/Header}outofbandHeader");
+        ep.setProperties(props);
+        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortHeader");
+
     }
 
 

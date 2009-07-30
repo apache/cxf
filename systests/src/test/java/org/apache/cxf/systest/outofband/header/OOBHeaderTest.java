@@ -34,6 +34,8 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
+import javax.xml.ws.soap.SOAPFaultException;
+
 import org.w3c.dom.Node;
 
 import org.apache.cxf.BusFactory;
@@ -79,7 +81,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
     
-    private void addOutOfBoundHeader(PutLastTradedPricePortType portType, boolean invalid) {
+    private void addOutOfBoundHeader(PutLastTradedPricePortType portType, boolean invalid, boolean mu) {
         InvocationHandler handler  = Proxy.getInvocationHandler(portType);
         BindingProvider  bp = null;
 
@@ -97,7 +99,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
                         new QName(TEST_HDR_NS, TEST_HDR_REQUEST_ELEM), 
                         ob, 
                         new JAXBDataBinding(ob.getClass()));
-                hdr.setMustUnderstand(true);
+                hdr.setMustUnderstand(mu);
 
                 List<Header> holder = new ArrayList<Header>();
                 holder.add(hdr);
@@ -180,18 +182,52 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         TradePriceData priceData = new TradePriceData();
         priceData.setTickerPrice(1.0f);
         priceData.setTickerSymbol("CELTIX");
+
+        assertTrue(check(0, putLastTradedPrice, false, true, priceData));
+        assertFalse(check(1, putLastTradedPrice, false, true, priceData));
+        assertTrue(check(2, putLastTradedPrice, false, true, priceData));        
+
+        assertFalse(check(0, putLastTradedPrice, true, true, priceData));
+        assertFalse(check(1, putLastTradedPrice, true, true, priceData));
+        assertFalse(check(2, putLastTradedPrice, true, true, priceData));        
+
+        assertTrue(check(0, putLastTradedPrice, false, false, priceData));
+        assertTrue(check(1, putLastTradedPrice, false, false, priceData));
+        assertTrue(check(2, putLastTradedPrice, false, false, priceData));        
+
+        assertTrue(check(0, putLastTradedPrice, true, false, priceData));
+        assertTrue(check(1, putLastTradedPrice, true, false, priceData));
+        assertTrue(check(2, putLastTradedPrice, true, false, priceData));        
+    }
+    
+    private boolean check(int i, PutLastTradedPricePortType putLastTradedPrice, 
+                       boolean invalid, boolean mu,
+                       TradePriceData priceData) {
+        String address = "";
+        switch (i) {
+        case 0:
+            address = "http://localhost:9107/SOAPDocLitBareService/SoapPort";
+            break;
+        case 1:
+            address = "http://localhost:9107/SOAPDocLitBareService/SoapPortNoHeader";
+            break;
+        default:
+            address = "http://localhost:9107/SOAPDocLitBareService/SoapPortHeader";                
+        }
+        ((BindingProvider)putLastTradedPrice).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+        
         Holder<TradePriceData> holder = new Holder<TradePriceData>(priceData);
-        
-        addOutOfBoundHeader(putLastTradedPrice, false);
-        putLastTradedPrice.sayHi(holder);
-        checkReturnedOOBHeader(putLastTradedPrice);
-        
-        addOutOfBoundHeader(putLastTradedPrice, true);
         try {
+            addOutOfBoundHeader(putLastTradedPrice, invalid, mu);
             putLastTradedPrice.sayHi(holder);
-            fail("mustUnderstand header should not have been processed");
-        } catch (Exception ex) {
-            assertTrue(ex.getMessage(), ex.getMessage().contains("MustUnderstand"));
+            checkReturnedOOBHeader(putLastTradedPrice);
+            return true;
+        } catch (SOAPFaultException ex) {
+            if (ex.getMessage().contains("MustUnderstand")) {
+                return false;
+            }
+            throw ex;
         }
     }
 }

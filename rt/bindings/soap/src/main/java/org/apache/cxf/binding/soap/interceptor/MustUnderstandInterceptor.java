@@ -20,7 +20,10 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.net.URI;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
@@ -37,6 +40,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.phase.Phase;
@@ -63,22 +67,62 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         Set<Header> ultimateReceiverHeaders = new HashSet<Header>();
         Set<QName> mustUnderstandQNames = new HashSet<QName>();
 
+        initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles);
         buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage,
                                    serviceRoles, ultimateReceiverHeaders);
-        initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles);
         
-        checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames,
-                             notUnderstandHeaders);
+        checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames, notUnderstandHeaders);
+        
         if (!notUnderstandHeaders.isEmpty()) {
             throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
                             soapVersion.getMustUnderstand());
         }
         if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
-            soapMessage.getInterceptorChain()
-                .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
+            checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
     }
 
+    private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
+                                              Set<QName> mustUnderstandQNames, 
+                                              SoapMessage soapMessage) {
+        soapMessage.getInterceptorChain()
+            .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
+        Object o = soapMessage.getContextualProperty("endpoint.handles.headers");
+        if (o == null) {
+            //The default here really should be to make o = "" and process
+            //so any mustUnderstands are kill immediately. That will break
+            //existing apps though.  Thus, it's a migration issue.
+            return;
+        }
+        Collection<Object> o2;
+        if (o instanceof Collection) {
+            o2 = CastUtils.cast((Collection<?>)o);
+        } else {
+            o2 = Collections.singleton(o);
+        }
+        for (Object obj : o2) {
+            QName qn;
+            if (obj instanceof QName) {
+                qn = (QName)obj;
+            } else {
+                qn = QName.valueOf((String)obj);
+            }
+            Iterator<Header> hit = ultimateReceiverHeaders.iterator();
+            while (hit.hasNext()) {
+                if (qn.equals(hit.next().getName())) {
+                    hit.remove();
+                }
+            }
+        }
+        if (!ultimateReceiverHeaders.isEmpty()) {
+            Set<QName> notFound = new HashSet<QName>();
+            for (Header h : ultimateReceiverHeaders) {
+                notFound.add(h.getName());
+            }
+            throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
+                                soapMessage.getVersion().getMustUnderstand());
+        }
+    }
     private void initServiceSideInfo(Set<QName> mustUnderstandQNames, SoapMessage soapMessage,
                     Set<URI> serviceRoles) {
 
