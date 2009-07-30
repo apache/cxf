@@ -69,7 +69,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
     private void checkSoapAction(SoapMessage message, Map<String, List<String>> headers) {
         List<String> sa = headers.get(SoapJMSConstants.SOAPACTION_FIELD);
         if (sa != null && sa.size() > 0) {
-            String soapAction = sa.get(0);
+            //String soapAction = sa.get(0);
             // ToDO
         }
     }
@@ -82,7 +82,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         List<String> ru = headers.get(SoapJMSConstants.REQUESTURI_FIELD);
         JMSFault jmsFault = null;
         if (ru != null && ru.size() > 0) {
-            String requestURI = ru.get(0);
+            //String requestURI = ru.get(0);
             // ToDO malformedRequestURI
             // ToDO tagetServiceNotAllowedInRequestURI
         } else {
@@ -104,7 +104,7 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
         JMSFault jmsFault = null;
         if (ct != null && ct.size() > 0) {
-            String contentType = ct.get(0);
+            //String contentType = ct.get(0);
             // ToDO
         } else {
             jmsFault = JMSFaultFactory.createMissingContentTypeFault();
