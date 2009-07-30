@@ -105,7 +105,7 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
-                        <id>generate-test-sources</id>
+                        <id>generate-xmlbeans-test-sources</id>
                         <phase>generate-test-sources</phase>
                         <configuration>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
@@ -228,7 +228,7 @@
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
                         <configuration>
-                            <sourceRoot>${basedir}/target/generated/src/test/java</sourceRoot>
+                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
                                 <xsdOption>
                                     <xsd>${basedir}/src/test/resources/jms/testcase.xsd</xsd>
