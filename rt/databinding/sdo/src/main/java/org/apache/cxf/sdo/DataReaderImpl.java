@@ -30,6 +30,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 
 import commonj.sdo.helper.HelperContext;
 
@@ -54,6 +55,9 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
     public Object read(MessagePartInfo part, XMLStreamReader reader) {
         if (xmlStreamHelper != null) {
             try {
+                if (reader.getEventType() == XMLStreamReader.START_DOCUMENT) {
+                    StaxUtils.toNextTag(reader);
+                }
                 Object o = xmlStreamHelper.getClass().getMethod("loadObject", 
                                                      new Class[] {XMLStreamReader.class})
                                                          .invoke(xmlStreamHelper, reader);

@@ -151,7 +151,6 @@ public class DataBindingProviderTest extends Assert {
     
     @SuppressWarnings("unchecked")
     @Test
-    @Ignore
     public void testSDORead() throws Exception {
         String data = "<p0:Structure xmlns:p0=\"http://apache.org/structure/types\" " 
             + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" " 
@@ -167,7 +166,7 @@ public class DataBindingProviderTest extends Assert {
                                       new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
                                       new MetadataMap<String, String>(), is);
         assertEquals("sdo", struct.getText());
-        assertEquals(123.5, struct.getDbl());
+        assertEquals(123.5, struct.getDbl(), 0.01);
         assertEquals(3, struct.getInt());
     }
     
