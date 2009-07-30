@@ -26,6 +26,7 @@ import org.apache.cxf.jms.testsuite.services.Server;
 import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 
 import org.junit.BeforeClass;
+import org.junit.Test;
 
 /**
  * 
@@ -43,6 +44,11 @@ public class SOAPJMSTestSuiteServerTest extends AbstractSOAPJMSTestSuite {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJMSBrokerLauncher.class,
                                                                    props, null));
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
+    }
+    
+    @Test
+    public void test001() {
+        // do nothing here , just to make the surefire happy.
     }
 
 /*    @Test
