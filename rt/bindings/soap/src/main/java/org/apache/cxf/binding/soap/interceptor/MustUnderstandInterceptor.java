@@ -87,7 +87,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                                               SoapMessage soapMessage) {
         soapMessage.getInterceptorChain()
             .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
-        Object o = soapMessage.getContextualProperty("endpoint.handles.headers");
+        Object o = soapMessage.getContextualProperty("endpoint-processes-headers");
         if (o == null) {
             //The default here really should be to make o = "" and process
             //so any mustUnderstands are kill immediately. That will break
