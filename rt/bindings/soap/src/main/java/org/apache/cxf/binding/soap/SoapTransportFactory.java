@@ -38,6 +38,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -151,7 +152,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {
-        if (ei.getAddress().startsWith("soap.tcp://")) {
+        if (!StringUtils.isEmpty(ei.getAddress()) && ei.getAddress().startsWith("soap.tcp://")) {
             //TODO - examine policies and stuff to look for the sun tcp policies
             return new TCPConduit(ei);
         }
