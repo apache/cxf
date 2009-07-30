@@ -19,8 +19,6 @@
 
 package org.apache.cxf.systest.ws.wssc;
 
-import java.net.URL;
-
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 
@@ -101,13 +99,9 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
             new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client/client.xml");
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
-        URL wsdlLocation = null;
         
+        PingService svc = new PingService();
         for (String portPrefix : argv) {
-            PingService svc;
-            wsdlLocation = new URL("http://localhost:9001/" + portPrefix + "?wsdl");
-            
-            svc = new PingService(wsdlLocation);
             final IPingService port = 
                 svc.getPort(
                     new QName(
@@ -117,7 +111,8 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                     IPingService.class
                 );
            
-            
+            ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                            "http://localhost:9001/" + portPrefix);
             if (portPrefix.charAt(0) == '_') {
                 //MS would like the _ versions to send a cancel
                 ((BindingProvider)port).getRequestContext()
