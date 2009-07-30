@@ -568,7 +568,7 @@ public final class JMSUtils {
         // JMSDestination
 
         messageProperties.setSOAPJMSRequestURI(inMessageProperties.getSOAPJMSRequestURI());
-        messageProperties.setSOAPJMSBindingVersion(inMessageProperties.getSOAPJMSBindingVersion());
+        messageProperties.setSOAPJMSBindingVersion("1.0");
         // contenttype.
     }
 

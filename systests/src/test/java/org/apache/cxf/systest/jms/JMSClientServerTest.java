@@ -18,13 +18,13 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.lang.Thread.State;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.jms.DeliveryMode;
@@ -48,6 +48,7 @@ import org.apache.cxf.hello_world_jms.HelloWorldPubSubPort;
 import org.apache.cxf.hello_world_jms.HelloWorldPubSubService;
 import org.apache.cxf.hello_world_jms.HelloWorldQueueDecoupledOneWaysService;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
+import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationID;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDNoPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceAppCorrelationIDStaticPrefix;
 import org.apache.cxf.hello_world_jms.HelloWorldServiceRuntimeCorrelationIDDynamicPrefix;
@@ -586,20 +587,21 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             }
         }
     }
+    
     @Test
-    public void testTwoWayQueueAppCorrelationIDStaticPrefix() throws Exception {
+    public void testTwoWayQueueAppCorrelationID() throws Exception {
         QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
-                                 "HelloWorldServiceAppCorrelationIDStaticPrefix"));
+                                 "HelloWorldServiceAppCorrelationID"));
         QName portNameEng = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
-                                               "HelloWorldPortAppCorrelationIDStaticPrefixEng"));
+                                               "HelloWorldPortAppCorrelationIDEng"));
         QName portNameSales = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
-                                               "HelloWorldPortAppCorrelationIDStaticPrefixSales"));
+                                               "HelloWorldPortAppCorrelationIDSales"));
 
         URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
-        HelloWorldServiceAppCorrelationIDStaticPrefix service = 
-            new HelloWorldServiceAppCorrelationIDStaticPrefix(wsdl, serviceName);
+        HelloWorldServiceAppCorrelationID service = 
+            new HelloWorldServiceAppCorrelationID(wsdl, serviceName);
         assertNotNull(service);
 
         ClientRunnable engClient = 
@@ -619,6 +621,52 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                         return "com.mycompany.sales:" + counter++;
                     }
                 });
+        
+        Thread[] threads = new Thread[] {new Thread(engClient), new Thread(salesClient)};
+        
+        for (Thread t : threads) {
+            t.start();
+        }
+    
+        for (Thread t : threads) {
+            t.join(5000);
+        }
+
+        Throwable e = (engClient.getException() != null) 
+                          ? engClient.getException() 
+                          : (salesClient.getException() != null) 
+                              ? salesClient.getException() : null;
+                              
+        if (e != null) {
+            StringBuffer message = new StringBuffer();
+            for (StackTraceElement ste : e.getStackTrace()) {
+                message.append(ste.toString() + System.getProperty("line.separator"));
+            }
+            fail(message.toString());
+        }
+    }
+    
+    @Test
+    public void testTwoWayQueueAppCorrelationIDStaticPrefix() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                 "HelloWorldServiceAppCorrelationIDStaticPrefix"));
+        QName portNameEng = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                               "HelloWorldPortAppCorrelationIDStaticPrefixEng"));
+        QName portNameSales = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
+                                               "HelloWorldPortAppCorrelationIDStaticPrefixSales"));
+
+        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        assertNotNull(wsdl);
+
+        HelloWorldServiceAppCorrelationIDStaticPrefix service = 
+            new HelloWorldServiceAppCorrelationIDStaticPrefix(wsdl, serviceName);
+        assertNotNull(service);
+
+        ClientRunnable engClient = 
+            new ClientRunnable(service.getPort(portNameEng, HelloWorldPortType.class));
+        
+        ClientRunnable salesClient = 
+             new ClientRunnable(service.getPort(portNameSales, HelloWorldPortType.class));
         
         Thread[] threads = new Thread[] {new Thread(engClient), new Thread(salesClient)};
         
@@ -670,26 +718,32 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         
         HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
         
-        for (int i = 0; i < 10; ++i) {
-            ClientRunnable client =  
-                new ClientRunnable(port,
-                    new CorrelationIDFactory() {
-                        public String createCorrealtionID() {
-                            return UUID.randomUUID().toString();
-                        }
-                    });
-            
+        for (int i = 0; i < 1; ++i) {
+            ClientRunnable client = new ClientRunnable(port);            
             Thread thread = new Thread(client);
             threads.add(thread);
             clients.add(client);
             thread.start();
         }
 
+        for (Thread t : threads) {
+            t.join(5000);
+            assertTrue("Not terminated state: " + t.getState(), t.getState() == State.TERMINATED);
+        }
+
+        for (ClientRunnable client : clients) {
+            if (client.getException() != null 
+                && client.getException().getMessage().contains("Timeout")) {
+                fail(client.getException().getMessage());
+            }
+        }
+        /*
+         * The result is not certain. sometimes right, sometime wrong. because the thread.
         //Sleep for up to 10 seconds.   The timeout should be at 5 seconds so this
         //should bail earlier
         for (int x = 0; x < 10; x++) {
             Thread.sleep(1000);
-
+            
             for (ClientRunnable client : clients) {
                 if (client.getException() != null 
                     && client.getException().getMessage().contains("Timeout")) {
@@ -703,6 +757,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
              + " has been added to the runtime or an unexpected exception received. " 
              + " If latter is true, then read method comments for details on missing QoS"
              + " and change this test to fail on exception");
+        */
     }
 
     /*
@@ -754,7 +809,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         HelloWorldPortType portEng = service.getPort(portNameEng, HelloWorldPortType.class);
         HelloWorldPortType portSales = service.getPort(portNameSales, HelloWorldPortType.class);
         
-        for (int i = 0; i < 5; ++i) {
+        for (int i = 0; i < 10; ++i) {
             ClientRunnable client =  new ClientRunnable(portEng, "com.mycompany.eng:");
             Thread thread = new Thread(client);
             threads.add(thread);
@@ -766,11 +821,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             clients.add(client);
             thread.start();
         }
-
+    
         for (Thread t : threads) {
             t.join(10000);
         }
-
 
         for (ClientRunnable client : clients) {
             if (client.getException() != null 
@@ -801,8 +855,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         HelloWorldPortType port = service.getPort(portName, HelloWorldPortType.class);
         
         for (int i = 0; i < 10; ++i) {
-            ClientRunnable client =  
-                new ClientRunnable(port);
+            ClientRunnable client = new ClientRunnable(port);
             
             Thread thread = new Thread(client);
             threads.add(thread);

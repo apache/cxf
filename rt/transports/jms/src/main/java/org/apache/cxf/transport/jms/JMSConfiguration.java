@@ -75,12 +75,12 @@ public class JMSConfiguration implements InitializingBean {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private Boolean useConduitIdSelector;
-    private String conduitSelectorPrefix = "";
+    private String conduitSelectorPrefix;
     private boolean autoResolveDestination;
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
-    private boolean enforceSpec = true;
+    private Boolean enforceSpec;
     private boolean acceptMessagesWhileStopping;
 
     //For jms spec.
@@ -216,9 +216,16 @@ public class JMSConfiguration implements InitializingBean {
     }
 
     public String getConduitSelectorPrefix() {
+        if (conduitSelectorPrefix == null) {
+            return "";
+        }
         return conduitSelectorPrefix;
     }
 
+    public boolean isSetConduitSelectorPrefix() {
+        return conduitSelectorPrefix != null;
+    }
+    
     public boolean isSubscriptionDurable() {
         return subscriptionDurable;
     }
@@ -469,10 +476,17 @@ public class JMSConfiguration implements InitializingBean {
     }
     
     public boolean isEnforceSpec() {
+        if (!isSetEnforceSpec()) {
+            return true;
+        }
         return enforceSpec;
     }
 
     public void setEnforceSpec(boolean enforceSpec) {
         this.enforceSpec = enforceSpec;
+    }
+    
+    public boolean isSetEnforceSpec() {
+        return this.enforceSpec != null;
     }
 }

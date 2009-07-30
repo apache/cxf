@@ -26,7 +26,24 @@ import javax.xml.namespace.QName;
  */
 public final class SoapJMSConstants {
 
-    public static final Object BINDINGVERSION = "SOAPJMS_bindingVersion";
+    public static final String SOAP_JMS_PREFIX = "SOAPJMS_";
+    
+    // JMS Message properties' names.
+    public static final String REQUESTURI_PARAMETER_NAME = "requestURI";
+    public static final String BINDINGVERSION_PARAMETER_NAME = "bindingVersion";
+    public static final String SOAPACTION_PARAMETER_NAME = "soapAction";
+    public static final String TARGETSERVICE_PARAMETER_NAME = "targetService";
+    public static final String CONTENTTYPE_PARAMETER_NAME = "contentType";
+    public static final String ISFAULT_PARAMETER_NAME = "isFault";
+    
+    // JMS Field name
+    public static final String REQUESTURI_FIELD = SOAP_JMS_PREFIX + REQUESTURI_PARAMETER_NAME;
+    public static final String BINDINGVERSION_FIELD = SOAP_JMS_PREFIX
+                                                      + BINDINGVERSION_PARAMETER_NAME;
+    public static final String SOAPACTION_FIELD = SOAP_JMS_PREFIX + SOAPACTION_PARAMETER_NAME;
+    public static final String TARGETSERVICE_FIELD = SOAP_JMS_PREFIX + TARGETSERVICE_PARAMETER_NAME;
+    public static final String CONTENTTYPE_FIELD = SOAP_JMS_PREFIX + CONTENTTYPE_PARAMETER_NAME;
+    public static final String ISFAULT_FIELD = SOAP_JMS_PREFIX + ISFAULT_PARAMETER_NAME;
 
     public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2008/07/"
                                                                      + "soap/bindings/JMS/";

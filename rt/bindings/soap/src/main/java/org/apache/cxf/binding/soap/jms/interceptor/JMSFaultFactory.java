@@ -21,6 +21,8 @@ package org.apache.cxf.binding.soap.jms.interceptor;
 
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
@@ -33,15 +35,67 @@ public final class JMSFaultFactory {
     private JMSFaultFactory() {
     }
 
-    public static JMSFault createUnrecognizedBindingVerionFault(String bindingVersion) {
-        JMSFaultType jmsFaultType = new JMSFaultType();
-        jmsFaultType.setFaultCode(SoapJMSConstants.getUnrecognizedBindingVersionQName());
+    public static JMSFault createContentTypeMismatchFault(String contentType) {
+        String m = new org.apache.cxf.common.i18n.Message("CONTENTTYPE_MISMATCH", LOG,
+                                                          new Object[] {
+                                                              contentType
+                                                          }).toString();
+        return createFault(SoapJMSConstants.getContentTypeMismatchQName(), m);
+    }
 
+    public static JMSFault createMalformedRequestURIFault(String requestURI) {
+        String m = new org.apache.cxf.common.i18n.Message("MALFORMED_REQUESTURI", LOG,
+                                                          new Object[] {
+                                                              requestURI
+                                                          }).toString();
+        return createFault(SoapJMSConstants.getMalformedRequestURIQName(), m);
+    }
+
+    public static JMSFault createMismatchedSoapActionFault(String soapAction) {
+        String m = new org.apache.cxf.common.i18n.Message("MISMATCHED_SOAPACTION", LOG,
+                                                          new Object[] {
+                                                              soapAction
+                                                          }).toString();
+        return createFault(SoapJMSConstants.getMismatchedSoapActionQName(), m);
+    }
+
+    public static JMSFault createMissingContentTypeFault() {
+        String m = new org.apache.cxf.common.i18n.Message("MISSING_CONTENTTYPE", LOG).toString();
+        return createFault(SoapJMSConstants.getMissingContentTypeQName(), m);
+    }
+
+    public static JMSFault createMissingRequestURIFault() {
+        String m = new org.apache.cxf.common.i18n.Message("MISSING_REQUESTURI", LOG).toString();
+        return createFault(SoapJMSConstants.getMissingRequestURIQName(), m);
+    }
+
+    public static JMSFault createTargetServiceNotAllowedInRequestURIFault() {
+        String m = new org.apache.cxf.common.i18n.Message(
+                                                          "TARGET_SERVICE_NOT_ALLOWED_IN_REQUESTURI",
+                                                          LOG).toString();
+        return createFault(SoapJMSConstants.getTargetServiceNotAllowedInRequestURIQName(), m);
+    }
+
+    public static JMSFault createUnrecognizedBindingVerionFault(String bindingVersion) {
         String m = new org.apache.cxf.common.i18n.Message("UNRECOGNIZED_BINDINGVERSION", LOG,
                                                           new Object[] {
                                                               bindingVersion
                                                           }).toString();
-        JMSFault jmsFault = new JMSFault(m);
+        return createFault(SoapJMSConstants.getUnrecognizedBindingVersionQName(), m);
+    }
+
+    public static JMSFault createUnsupportedJMSMessageFormatFault(String messageFormat) {
+        String m = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_JMSMESSAGEFORMAT", LOG,
+                                                          new Object[] {
+                                                              messageFormat
+                                                          }).toString();
+        return createFault(SoapJMSConstants.getUnsupportedJMSMessageFormatQName(), m);
+    }
+
+    private static JMSFault createFault(QName faultCode, String message) {
+        JMSFaultType jmsFaultType = new JMSFaultType();
+        jmsFaultType.setFaultCode(faultCode);
+        JMSFault jmsFault = new JMSFault(message);
         jmsFault.setJmsFaultType(jmsFaultType);
         jmsFault.setSender(true);
         return jmsFault;

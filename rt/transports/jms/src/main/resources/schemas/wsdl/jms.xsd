@@ -54,7 +54,7 @@
     				default="60000" />
     			<xs:attribute name="messageTimeToLive" type="xs:long"
     				default="0" />
-                <xs:attribute name="conduitSelectorPrefix" type="xs:string" use="optional" default=""/>    				
+                <xs:attribute name="conduitSelectorPrefix" type="xs:string" use="optional"/>    				
                 <xs:attribute name="useConduitIdSelector" type="xs:boolean" use="optional"/>
                 <xs:attribute name="enforceSpec" type="xs:boolean" use="optional" default="true"/>
     		</xs:extension>

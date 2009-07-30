@@ -329,8 +329,12 @@ public class JMSOldConfigHolder {
             if (jmsConfig.getMessageSelector() == null) {
                 jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());
             }
-            if (isConduit && runtimePolicy.isSetMessageType()) {
-                jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
+            if (isConduit) {
+                if (runtimePolicy.isSetMessageType()) {
+                    jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
+                } else {
+                    jmsConfig.setMessageType(JMSConstants.BYTE_MESSAGE_TYPE);
+                }
             }
             jmsConfig.setPubSubDomain(pubSubDomain);
             jmsConfig.setPubSubNoLocal(true);
@@ -469,7 +473,7 @@ public class JMSOldConfigHolder {
         return null;
     }
     
-    private static Properties getInitialContextEnv(JMSEndpoint endpoint) {
+    public static Properties getInitialContextEnv(JMSEndpoint endpoint) {
         Properties env = new Properties();
         env.put(Context.INITIAL_CONTEXT_FACTORY, endpoint.getJndiInitialContextFactory());
         env.put(Context.PROVIDER_URL, endpoint.getJndiURL());

@@ -46,32 +46,107 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         Map<String, List<String>> headers = CastUtils.cast((Map)message
             .get(Message.PROTOCOL_HEADERS));
         if (headers != null) {
+            checkContentType(message, headers);
+            checkRequestURI(message, headers);
+            checkSoapAction(message, headers);
             checkBindingVersion(message, headers);
+            checkJMSMessageFormat(message, headers);
         }
     }
 
     /**
-     * @param message 
+     * @param message
+     * @param headers
+     */
+    private void checkJMSMessageFormat(SoapMessage message, Map<String, List<String>> headers) {
+        // ToDO
+    }
+
+    /**
+     * @param message
+     * @param headers
+     */
+    private void checkSoapAction(SoapMessage message, Map<String, List<String>> headers) {
+        List<String> sa = headers.get(SoapJMSConstants.SOAPACTION_FIELD);
+        if (sa != null && sa.size() > 0) {
+            String soapAction = sa.get(0);
+            // ToDO
+        }
+    }
+
+    /**
+     * @param message
+     * @param headers
+     */
+    private void checkRequestURI(SoapMessage message, Map<String, List<String>> headers) {
+        List<String> ru = headers.get(SoapJMSConstants.REQUESTURI_FIELD);
+        JMSFault jmsFault = null;
+        if (ru != null && ru.size() > 0) {
+            String requestURI = ru.get(0);
+            // ToDO malformedRequestURI
+            // ToDO tagetServiceNotAllowedInRequestURI
+        } else {
+            jmsFault = JMSFaultFactory.createMissingRequestURIFault();
+        }
+        if (jmsFault != null) {
+            Fault f = createFault(message, jmsFault);
+            if (f != null) {
+                throw f;
+            }
+        }
+    }
+
+    /**
+     * @param message
+     * @param headers
+     */
+    private void checkContentType(SoapMessage message, Map<String, List<String>> headers) {
+        List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
+        JMSFault jmsFault = null;
+        if (ct != null && ct.size() > 0) {
+            String contentType = ct.get(0);
+            // ToDO
+        } else {
+            jmsFault = JMSFaultFactory.createMissingContentTypeFault();
+        }
+        if (jmsFault != null) {
+            Fault f = createFault(message, jmsFault);
+            if (f != null) {
+                throw f;
+            }
+        }
+    }
+
+    /**
+     * @param message
      * @param headers
      */
     private void checkBindingVersion(SoapMessage message, Map<String, List<String>> headers) {
-        List<String> bv = headers.get(SoapJMSConstants.BINDINGVERSION);
+        List<String> bv = headers.get(SoapJMSConstants.BINDINGVERSION_FIELD);
         if (bv != null && bv.size() > 0) {
             String bindingVersion = bv.get(0);
             if (!"1.0".equals(bindingVersion)) {
                 JMSFault jmsFault = JMSFaultFactory
                     .createUnrecognizedBindingVerionFault(bindingVersion);
-                Endpoint e = message.getExchange().get(Endpoint.class);
-                Binding b = null;
-                if (null != e) {
-                    b = e.getBinding();
-                }
-                if (null != b) {
-                    SoapFaultFactory sff = new SoapFaultFactory(b);
-                    Fault f = sff.createFault(jmsFault);
+                Fault f = createFault(message, jmsFault);
+                if (f != null) {
                     throw f;
                 }
             }
         }
+    }
+
+    private Fault createFault(SoapMessage message, JMSFault jmsFault) {
+        Fault f = null;
+        Endpoint e = message.getExchange().get(Endpoint.class);
+        Binding b = null;
+        if (null != e) {
+            b = e.getBinding();
+        }
+        if (null != b) {
+            SoapFaultFactory sff = new SoapFaultFactory(b);
+            f = sff.createFault(jmsFault);
+        }
+        return f;
     }
 }

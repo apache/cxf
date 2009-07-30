@@ -351,6 +351,27 @@
                <jms:server durableSubscriberName="CXF_subscriber"/>
            </port>
     </service>
+        
+    <service name="HelloWorldServiceAppCorrelationID">
+        <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDEng">
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id"
+                   jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.reply">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+        </port>
+        <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDSales">
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id"
+                   jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.reply">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+        </port>
+    </service>
     
     <service name="HelloWorldServiceAppCorrelationIDStaticPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDStaticPrefixEng">
@@ -380,7 +401,7 @@
     <service name="HelloWorldServiceAppCorrelationIDNoPrefix">
         <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortAppCorrelationIDNoPrefix">
             <jms:clientConfig clientReceiveTimeout = "5000"
-                              useConduitIdSelector="false"/>
+                              useConduitIdSelector="true"/>
             <jms:address
                    jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text.app.correlation.id.no.prefix"
@@ -436,7 +457,7 @@
             <jms:address
                 jndiConnectionFactoryName="ConnectionFactory" 
                 jndiDestinationName="dynamicQueues/test.jmstransport.binary"
-                jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary">
+                jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary.reply">
                 <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
                 <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
             </jms:address>
