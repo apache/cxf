@@ -38,6 +38,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlMixed;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -407,6 +408,33 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteUsingNaturalNotation() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setSerializeAsArray(true);
+        p.setArrayKeys(Collections.singletonList("comments"));
+        Post post = new Post();
+        post.setTitle("post");
+        Comment c1 = new Comment();
+        c1.setTitle("comment1");
+        Comment c2 = new Comment();
+        c2.setTitle("comment2");
+        post.getComments().add(c1);
+        post.getComments().add(c2);
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(post, (Class)Post.class, Post.class, Post.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        System.out.println(s);
+        assertEquals(
+            "{\"post\":{\"title\":\"post\",\"comments\":[{\"title\":\"comment1\"},"
+            + "{\"title\":\"comment2\"}]}}",
+            s);
+    }
+    
+    @Test
     public void testManyTags() throws Exception {
         JSONProvider p = new JSONProvider();
         p.setSerializeAsArray(true);
@@ -455,4 +483,37 @@ public class JSONProviderTest extends Assert {
             return books;
         }
     }
+    
+    @XmlRootElement()
+    @XmlType(name = "", propOrder = {"title", "comments" })
+    public static class Post {
+        private String title;
+        private List<Comment> comments = new ArrayList<Comment>();
+        public void setTitle(String title) {
+            this.title = title;
+        }
+        public String getTitle() {
+            return title;
+        }
+        public void setComments(List<Comment> comments) {
+            this.comments = comments;
+        }
+        public List<Comment> getComments() {
+            return comments;
+        }
+    }
+    
+    public static class Comment {
+        private String title;
+
+        public void setTitle(String title) {
+            this.title = title;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+    }
+
+
 }
