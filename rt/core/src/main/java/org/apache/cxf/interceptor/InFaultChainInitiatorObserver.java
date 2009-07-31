@@ -37,10 +37,13 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
     protected void initializeInterceptors(Exchange ex, PhaseInterceptorChain chain) {
         Endpoint e = ex.get(Endpoint.class);
         Client c = ex.get(Client.class);
+        InterceptorProvider ip = ex.get(InterceptorProvider.class);
         
         chain.add(getBus().getInFaultInterceptors());
         if (c != null) {
             chain.add(c.getInFaultInterceptors());
+        } else if (ip != null) {
+            chain.add(ip.getInFaultInterceptors());
         }
         chain.add(e.getService().getInFaultInterceptors());
         chain.add(e.getInFaultInterceptors());
