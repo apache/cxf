@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.jms.ConnectionFactory;
@@ -26,9 +27,11 @@ import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
 import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
@@ -112,23 +115,49 @@ public final class JMSFactory {
         }
         return jmsTemplate;
     }
-
     /**
      * Create and start listener using configuration information from jmsConfig. Uses
      * resolveOrCreateDestination to determine the destination for the listener.
      * 
+     * @param ei the EndpointInfo for the listener
      * @param jmsConfig configuration information
      * @param listenerHandler object to be called when a message arrives
      * @param destinationName null for temp dest or a destination name
-     * @param conduitId prefix for the messageselector
      * @return
      */
-    public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
+    public static DefaultMessageListenerContainer createJmsListener(EndpointInfo ei,
+                                                                    JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
-                                                                    String destinationName, 
-                                                                    String conduitId) {
-        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
-            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+                                                                    String destinationName) {
+        DefaultMessageListenerContainer jmsListener = null;
+        
+        if (jmsConfig.isUseJms11()) {
+            //Check to see if transport is being used in JCA RA with XA
+            Method method = ei.getProperty(JCATransactionalMessageListenerContainer.MDB_TRANSACTED_METHOD,
+                                           java.lang.reflect.Method.class);
+            if (method != null 
+                && 
+                jmsConfig.getConnectionFactory() instanceof XAConnectionFactory) {
+                jmsListener = new JCATransactionalMessageListenerContainer(ei); 
+            } else {
+                jmsListener = new DefaultMessageListenerContainer();
+            }
+        } else {
+            jmsListener = new DefaultMessageListenerContainer102();
+        }
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 destinationName);            
+    }
+    
+    public static DefaultMessageListenerContainer createJmsListener(
+                          DefaultMessageListenerContainer jmsListener,
+                          JMSConfiguration jmsConfig,
+                          MessageListener listenerHandler,
+                          String destinationName) {
+        
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
         jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
@@ -161,15 +190,11 @@ public final class JMSFactory {
         if (jmsConfig.isAcceptMessagesWhileStopping()) {
             jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
         }
-        /*String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        if (conduitId != null && jmsConfig.isUseConduitIdSelector()) {
-            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
-                                        + staticSelectorPrefix 
-                                        + conduitId + "%'");
-        } else if (staticSelectorPrefix.length() > 0) {
+        String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
+        if (staticSelectorPrefix.length() > 0) {
             jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
                                         + staticSelectorPrefix +  "%'");
-        }*/
+        }
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
         }

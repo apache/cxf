@@ -53,8 +53,20 @@ public class DispatchMDBInvoker extends MDBInvoker {
     
     @Override
     public Object getServiceObject(Exchange context) {
+        MessageEndpoint ep = null;
+        MessageEndpoint epFromMessage = null;
+        
+        if (context != null) {
+            epFromMessage = context.getInMessage().getContent(MessageEndpoint.class);
+        }
+         
+        if (epFromMessage == null) {
+            ep = getMessageEndpoint();
+        } else {
+            ep = epFromMessage;
+        }
+        
         Object target = null;
-        MessageEndpoint ep = getMessageEndpoint();
 
         if (ep == null) {
             LOG.log(Level.SEVERE, "Failed to obtain MessageEndpoint");
@@ -68,9 +80,11 @@ public class DispatchMDBInvoker extends MDBInvoker {
             LOG.log(Level.SEVERE, "Failed to obtain service object " + targetJndiName, e);
             return null;
         } finally {
-            releaseEndpoint(ep);
+            if (epFromMessage == null) {
+                releaseEndpoint(ep);
+            }
         }
-        
+
         return target;
     }
 
