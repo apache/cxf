@@ -121,7 +121,6 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
 
     
         processArguments(args);
-        ClassCollector classCollector = context.get(ClassCollector.class);
 
         ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
