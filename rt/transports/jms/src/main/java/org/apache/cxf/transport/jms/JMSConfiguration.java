@@ -20,6 +20,7 @@ package org.apache.cxf.transport.jms;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.Message;
+import javax.jms.XAConnectionFactory;
 
 import org.apache.cxf.configuration.ConfigurationException;
 import org.springframework.beans.factory.InitializingBean;
@@ -407,7 +408,11 @@ public class JMSConfiguration implements InitializingBean {
             if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
                 SingleConnectionFactory scf;
                 if (useJms11) {
-                    scf = new SingleConnectionFactory(connectionFactory);
+                    if (connectionFactory instanceof XAConnectionFactory) {
+                        scf = new XASingleConnectionFactory(connectionFactory);
+                    } else {
+                        scf = new SingleConnectionFactory(connectionFactory);
+                    }
                 } else {
                     scf = new SingleConnectionFactory102(connectionFactory, pubSubDomain);
                 }
