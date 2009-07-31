@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.addressing;
 
 
-import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
@@ -35,7 +34,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.TwoStageMap;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.NullConduitSelector;
@@ -77,11 +75,9 @@ public final class ContextUtils {
 
     private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = 
         EndpointReferenceUtils.getEndpointReference(Names.WSA_NONE_ADDRESS);
-    private static final Map<MessageInfo, String> ACTION_MAP =
-        new TwoStageMap<MessageInfo, String>();
     
     private static final Logger LOG = LogUtils.getL7dLogger(ContextUtils.class);
-    
+    private static final String ACTION = ContextUtils.class.getName() + ".ACTION";
     
     /**
      * Used to fabricate a Uniform Resource Name from a UUID string
@@ -737,7 +733,7 @@ public final class ContextUtils {
                         ContextUtils.isRequestor(message)
                         ? bindingOpInfo.getOperationInfo().getInput()
                         : bindingOpInfo.getOperationInfo().getOutput();
-                    String cachedAction = ACTION_MAP.get(msgInfo);
+                    String cachedAction = (String)msgInfo.getProperty(ACTION);
                     if (cachedAction == null) {
                         action = getActionFromMessageAttributes(msgInfo);
                     } else {
@@ -789,7 +785,7 @@ public final class ContextUtils {
             String attr = getAction(msgInfo);
             if (attr != null) {
                 action = attr;
-                ACTION_MAP.put(msgInfo, action);
+                msgInfo.setProperty(ACTION, action);
             }
         }
         return action;
