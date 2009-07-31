@@ -412,9 +412,73 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
         Book b = proxy.getBook(new Long("123"));
-        assertTrue("Interceptor not invoked", testFeature.handleMessageCalled());
+        assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
+        assertTrue("In Interceptor not invoked", testFeature.handleMessageOnInInterceptorCalled());    
         assertEquals(123, b.getId());
         assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
+    public void testServerFaultInInterceptor() throws Exception {
+        //testing faults created by server handled correctly
+        serverFaultInInterceptorTest("321");
+        //999 causes error code of 404, 404 has a different code path so need to test too
+        serverFaultInInterceptorTest("999");
+        //322 causes a checked exception to be thrown so need to 
+        serverFaultInInterceptorTest("322");
+    }
+    
+    @Test
+    public void testClientFaultOutInterceptor() throws Exception {
+        //testing faults created by client out interceptor chain handled correctly 
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseAddress);
+        bean.setResourceClass(BookStoreJaxrsJaxws.class);
+        final boolean addBadOutInterceptor = true;
+        TestFeature testFeature = new TestFeature(addBadOutInterceptor);
+        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        features.add((AbstractFeature)testFeature);
+        bean.setFeatures(features);
+        BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
+        try {
+            //321 is special case - causes error code of 525
+            proxy.getBook(new Long("123"));
+            fail("Method should have thrown an exception");
+        } catch (Exception e) {
+            assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
+            assertTrue("In Interceptor not invoked", !testFeature.handleMessageOnInInterceptorCalled());
+            assertTrue("Wrong exception caught", "fault from bad interceptor".equals(e.getMessage()));
+            assertTrue("Client In Fault In Interceptor was invoked", 
+                    !testFeature.faultInInterceptorCalled());
+        }
+    }
+    
+    private void serverFaultInInterceptorTest(String param) {
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(baseAddress);
+        bean.setResourceClass(BookStoreJaxrsJaxws.class);
+        TestFeature testFeature = new TestFeature();
+        List<AbstractFeature> features = new ArrayList<AbstractFeature>();
+        features.add((AbstractFeature)testFeature);
+        bean.setFeatures(features);
+        BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
+        try {
+            //321 is special case - causes error code of 525
+            proxy.getBook(new Long(param));
+            fail("Method should have thrown an exception");
+        } catch (Exception e) {
+            assertTrue("Out Interceptor not invoked", testFeature.handleMessageOnOutInterceptorCalled());
+            if ("322".equals(param)) {
+                //In interecptors not called when checked exception thrown from server
+                assertTrue("In Interceptor not invoked", testFeature.handleMessageOnInInterceptorCalled());
+            } else {
+                assertTrue("In Interceptor not invoked", !testFeature.handleMessageOnInInterceptorCalled());
+            }
+            assertTrue("Client In Fault In Interceptor not invoked", 
+                    testFeature.faultInInterceptorCalled());
+        }
     }
 
     private String getStringFromInputStream(InputStream in) throws Exception {        
@@ -483,27 +547,52 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     
     @Ignore
     public class TestFeature extends AbstractFeature {
-        private TestInterceptor testInterceptor;
+        private TestOutInterceptor testOutInterceptor;
+        private TestInInterceptor testInInterceptor;
+        private TestFaultInInterceptor testFaultInInterceptor;
+        private boolean addBadOutInterceptor;
+        
+        public TestFeature() {
+        }
+        
+        public TestFeature(boolean addBadOutInterceptor) {
+            this.addBadOutInterceptor = addBadOutInterceptor;
+        }
 
         @Override
         protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-            testInterceptor = new TestInterceptor();
-            provider.getOutInterceptors().add(testInterceptor);
+            testOutInterceptor = new TestOutInterceptor(addBadOutInterceptor);
+            testInInterceptor = new TestInInterceptor();
+            testFaultInInterceptor = new TestFaultInInterceptor();
+            provider.getOutInterceptors().add(testOutInterceptor);
+            provider.getInInterceptors().add(testInInterceptor);
+            provider.getInFaultInterceptors().add(testFaultInInterceptor);
+
+            
         }
 
-        protected boolean handleMessageCalled() {
-            return testInterceptor.handleMessageCalled();
+        protected boolean handleMessageOnOutInterceptorCalled() {
+            return testOutInterceptor.handleMessageCalled();
+        }
+        
+        protected boolean handleMessageOnInInterceptorCalled() {
+            return testInInterceptor.handleMessageCalled();
+        }
+        
+        protected boolean faultInInterceptorCalled() {
+            return testFaultInInterceptor.handleMessageCalled();
         }
     }
  
     @Ignore
-    public class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+    public class TestInInterceptor extends AbstractPhaseInterceptor<Message> {
         private boolean handleMessageCalled;
-        public TestInterceptor() {
+        
+        public TestInInterceptor() {
             this(Phase.PRE_STREAM);
         }
 
-        public TestInterceptor(String s) {
+        public TestInInterceptor(String s) {
             super(Phase.PRE_STREAM);
             
         } 
@@ -517,4 +606,56 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         }
 
     }
+    
+    @Ignore
+    public class TestOutInterceptor extends AbstractPhaseInterceptor<Message> {
+        private boolean handleMessageCalled;
+        private boolean isBadOutInterceptor;
+        
+        
+        public TestOutInterceptor(boolean isBadOutInterceptor) {
+            this(Phase.PRE_MARSHAL);
+            this.isBadOutInterceptor = isBadOutInterceptor;
+        }
+
+        public TestOutInterceptor(String s) {
+            super(Phase.PRE_MARSHAL);
+            
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+            handleMessageCalled = true;
+            if (isBadOutInterceptor) {
+                throw new Fault(new Exception("fault from bad interceptor"));
+            }
+        }
+
+        protected boolean handleMessageCalled() {
+            return handleMessageCalled;
+        }
+
+    }
+    
+    @Ignore
+    public class TestFaultInInterceptor extends AbstractPhaseInterceptor<Message> {
+        private boolean handleMessageCalled;
+        public TestFaultInInterceptor() {
+            this(Phase.PRE_STREAM);
+        }
+
+        public TestFaultInInterceptor(String s) {
+            super(Phase.PRE_STREAM);
+            
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+            handleMessageCalled = true;
+        }
+
+        protected boolean handleMessageCalled() {
+            return handleMessageCalled;
+        }
+
+    }
+    
 }

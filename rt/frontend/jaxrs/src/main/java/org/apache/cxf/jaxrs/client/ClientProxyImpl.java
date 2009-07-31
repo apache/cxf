@@ -43,8 +43,10 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -199,25 +201,41 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         return index;
     }
     
-    private static void checkResponse(Method m, Response r, Message message) throws Throwable {
-        
+    private void checkResponse(Method m, Response r, Message inMessage) throws Throwable {
+        Throwable t = null;
         int status = r.getStatus();
         
         if (status >= 400) {
-            
             if (m.getReturnType() == Response.class && m.getExceptionTypes().length == 0) {
                 return;
-            }
-            
-            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, message);
+            }            
+            ResponseExceptionMapper<?> mapper = findExceptionMapper(m, inMessage);
             if (mapper != null) {
-                Throwable t = mapper.fromResponse(r);
+                t = mapper.fromResponse(r);
                 if (t != null) {
                     throw t;
                 }
+            } 
+                        
+            if (t == null) {
+                t = new WebApplicationException(r);
+            }
+
+            
+            if (inMessage.getExchange().get(Message.RESPONSE_CODE) == null) {
+                throw t;
             }
             
-            throw new WebApplicationException(r);
+            Endpoint ep = inMessage.getExchange().get(Endpoint.class);
+            inMessage.getExchange().put(InterceptorProvider.class, getConfiguration());
+            inMessage.setContent(Exception.class, new Fault(t));
+            inMessage.getInterceptorChain().abort();
+            if (ep.getInFaultObserver() != null) {
+                ep.getInFaultObserver().onMessage(inMessage);
+            }
+            
+            throw t;
+            
         }
     }
     
@@ -392,7 +410,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             m.getInterceptorChain().add(new BodyWriter());
         }
         
-        // execute chain        
+        // execute chain    
         try {
             m.getInterceptorChain().doIntercept(m);
         } catch (Throwable ex) {
@@ -407,7 +425,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     protected Object handleResponse(HttpURLConnection connect, Message outMessage, OperationResourceInfo ori) 
         throws Throwable {
-        Response r = setResponseBuilder(connect, outMessage.getExchange().getInMessage()).clone().build();
+        Response r = setResponseBuilder(connect, outMessage.getExchange()).clone().build();
         Method method = ori.getMethodToInvoke();
         checkResponse(method, r, outMessage);
         if (method.getReturnType() == Void.class) { 

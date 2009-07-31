@@ -1422,6 +1422,9 @@ public class HTTPConduit
     ) throws IOException {
 
         int responseCode = connection.getResponseCode();
+        if ((message != null) && (message.getExchange() != null)) {
+            message.getExchange().put(Message.RESPONSE_CODE, responseCode);
+        }
         
         // Process Redirects first.
         switch(responseCode) {
@@ -2044,6 +2047,9 @@ public class HTTPConduit
         }
         protected void handleResponseInternal() throws IOException {
             int responseCode = connection.getResponseCode();
+            if ((outMessage != null) && (outMessage.getExchange() != null)) {
+                outMessage.getExchange().put(Message.RESPONSE_CODE, responseCode);
+            }
             
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Response Code: " 
@@ -2137,6 +2143,7 @@ public class HTTPConduit
             
             
             incomingObserver.onMessage(inMessage);
+            
         }
 
 

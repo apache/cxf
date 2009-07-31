@@ -291,13 +291,22 @@ public class AbstractClient implements Client {
         currentBuilder = new UriBuilderImpl(uri);
     }
     
-    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Message inMessage) throws Throwable {
-        
+    protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Exchange exchange) throws Throwable {
+        Message inMessage = exchange.getInMessage();
         if (conn == null) {
             throw new WebApplicationException(); 
         }
-        
-        int status = conn.getResponseCode();
+        Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
+        if (responseCode == null) {
+            //Invocation was never made to server, something stopped the outbound 
+            //interceptor chain, we dont have a response code.
+            //Do not call conn.getResponseCode() as that will
+            //result in a call to the server when we have already decided not to.
+            //Throw an exception if we have one
+            Exception ex = exchange.getOutMessage().getContent(Exception.class);
+            throw ex;
+        } 
+        int status = responseCode.intValue(); //conn.getResponseCode();
         responseBuilder = Response.status(status);
         for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
             if (null == entry.getKey()) {

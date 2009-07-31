@@ -538,7 +538,7 @@ public class WebClient extends AbstractClient {
     
     protected Response handleResponse(HttpURLConnection conn, Message outMessage, Class<?> responseClass) {
         try {
-            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange().getInMessage()).clone();
+            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange()).clone();
             Response currentResponse = rb.clone().build();
             
             Object entity = readBody(currentResponse, conn, outMessage, responseClass, responseClass,

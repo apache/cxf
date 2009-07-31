@@ -77,7 +77,15 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
                     throw new RuntimeException();
                 }
             }
-            Response r = Response.status(404).header("BOOK-HEADER", 
+            int returnCode = 404;
+            if (id == 321) {
+                returnCode = 525;
+            } else if (id == 322) {
+                BookNotFoundDetails details = new BookNotFoundDetails();
+                details.setId(id);
+                throw new BookNotFoundFault(details);
+            }
+            Response r = Response.status(returnCode).header("BOOK-HEADER", 
                 "No Book with id " + id + " is available").build();
             throw new WebApplicationException(r);
         }
