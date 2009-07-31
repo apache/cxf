@@ -74,10 +74,15 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
     private GenModel genModel;
     private Map<EClassifier, GenClass> genClasses = new HashMap<EClassifier, GenClass>();
     private SchemaCollection schemaCollection;
+    private EPackage.Registry packageRegistry;
     
-    public void generate(ToolContext context) throws ToolException {
-        Map<String, String> ns2pkgMap = context.getNamespacePackageMap();
+    public void initialize(ToolContext context) throws ToolException {
+        String databinding = (String)context.get(ToolConstants.CFG_DATABINDING);
+        if (DATABINDING_DYNAMIC_SDO.equalsIgnoreCase(databinding)) {
+            dynamic = true;
+        }
 
+        generatedPackages = null;
         String outputDir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
         String pkg = context.getPackageName();
 
@@ -107,31 +112,32 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
 
         argList.add(""); //bogus arg
         String[] args = argList.toArray(new String[argList.size()]);
-        ClassCollector classCollector = context.get(ClassCollector.class);
 
-        EPackage.Registry packageRegistry = new EPackageRegistryImpl(EPackage.Registry.INSTANCE);
+        packageRegistry = new EPackageRegistryImpl(EPackage.Registry.INSTANCE);
         extendedMetaData = new BasicExtendedMetaData(packageRegistry);
         HelperContext hc = new HelperContextImpl(extendedMetaData, false);
         xsdHelper = hc.getXSDHelper();
         typeHelper = hc.getTypeHelper();
 
-        
-        try {
-            processArguments(args);
-            
-
-            ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
-            
-            Map<String, PackageInfo> packageInfoTable =
-                createPackageInfoTable(schemaCollection, ns2pkgMap);
-            for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-                if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
-                    continue;
-                }
-                StringWriter writer = new StringWriter();
-                schema.write(writer);
-                xsdHelper.define(new StringReader(writer.toString()), schema.getSourceURI());
+    
+        processArguments(args);
+    
+        ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
+        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
+            if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
+                continue;
             }
+            StringWriter writer = new StringWriter();
+            schema.write(writer);
+            xsdHelper.define(new StringReader(writer.toString()), schema.getSourceURI());
+        }
+    }
+    public void generate(ToolContext context) throws ToolException {
+        Map<String, String> ns2pkgMap = context.getNamespacePackageMap();
+        Map<String, PackageInfo> packageInfoTable =
+            createPackageInfoTable(schemaCollection, ns2pkgMap);
+        ClassCollector classCollector = context.get(ClassCollector.class);
+        try {
             if (!dynamic) {
                 // No XSD2Java is needed for dynamic SDO
 
@@ -160,9 +166,7 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            printUsage();
-            return;
+            throw new ToolException(e);
         }
 
     }
@@ -185,14 +189,7 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
         return packageInfoTable;
     }
 
-    public void initialize(ToolContext context) throws ToolException {
-        String databinding = (String)context.get(ToolConstants.CFG_DATABINDING);
-        if (DATABINDING_DYNAMIC_SDO.equalsIgnoreCase(databinding)) {
-            dynamic = true;
-        }
 
-        generatedPackages = null;
-    }
 
     public String getType(QName qName, boolean element) {
         Type type = null;
