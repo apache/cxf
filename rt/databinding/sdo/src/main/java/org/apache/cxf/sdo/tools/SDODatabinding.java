@@ -121,7 +121,8 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
 
     
         processArguments(args);
-    
+        ClassCollector classCollector = context.get(ClassCollector.class);
+
         ((XSDHelperImpl)xsdHelper).setRedefineBuiltIn(generateBuiltIn);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (schema.getTargetNamespace().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
@@ -155,14 +156,30 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
                         GenClass genClass = classIter.next();
                         genClasses.put(genClass.getEcoreClass(), genClass);
     
-                        //This gets the "impl" classes, how do we get everything else?
+                        //This gets the "impl" classes, how do we get everything else?                        
                         String s = genClass.getQualifiedClassName();
                         String p = s.substring(0, s.lastIndexOf('.'));
                         s = s.substring(s.lastIndexOf('.') + 1);
                         classCollector.addTypesClassName(p, 
                                                          s,
                                                          genClass.getQualifiedClassName());
+                        
+                        p = genClass.getGenPackage().getInterfacePackageName();
+                        s = genClass.getInterfaceName();
+                        classCollector.addTypesClassName(p, 
+                                                         s,
+                                                         p + "." + s);
                     }
+                    String p = genPackage.getInterfacePackageName();
+                    String s = genPackage.getFactoryInterfaceName();
+                    classCollector.addTypesClassName(p, 
+                                                     s,
+                                                     p + "." + s);
+                    p = genPackage.getClassPackageName();
+                    s = genPackage.getFactoryClassName();
+                    classCollector.addTypesClassName(p, 
+                                                     s,
+                                                     p + "." + s);
                 }
             }
         } catch (Exception e) {
