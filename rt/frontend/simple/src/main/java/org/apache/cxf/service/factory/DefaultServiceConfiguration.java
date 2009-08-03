@@ -220,8 +220,7 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         }
         
         final int modifiers = method.getModifiers();
-
-        if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers)) {
+        if (Modifier.isPublic(modifiers) && !Modifier.isStatic(modifiers) && !method.isSynthetic()) {
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
