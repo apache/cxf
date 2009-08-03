@@ -91,6 +91,11 @@
         	<version>${spring.version}</version>
         </dependency>
 
+        <dependency>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-j2ee-connector_1.5_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>        
     </dependencies>
 
     <build>

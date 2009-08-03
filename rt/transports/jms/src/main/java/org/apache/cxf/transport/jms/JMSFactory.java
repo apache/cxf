@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.jms;
 
+import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
 import javax.jms.ConnectionFactory;
@@ -26,9 +27,11 @@ import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.QueueSession;
 import javax.jms.Session;
+import javax.jms.XAConnectionFactory;
 import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
@@ -113,6 +116,37 @@ public final class JMSFactory {
         return jmsTemplate;
     }
 
+    public static DefaultMessageListenerContainer createJmsListener(EndpointInfo ei,
+                                                                    JMSConfiguration jmsConfig,
+                                                                    MessageListener listenerHandler,
+                                                                    String destinationName, 
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
+        DefaultMessageListenerContainer jmsListener = null;
+        
+        if (jmsConfig.isUseJms11()) {
+            //Check to see if transport is being used in JCA RA with XA
+            Method method = ei.getProperty(JCATransactionalMessageListenerContainer.MDB_TRANSACTED_METHOD,
+                                           java.lang.reflect.Method.class);
+            if (method != null 
+                && 
+                jmsConfig.getConnectionFactory() instanceof XAConnectionFactory) {
+                jmsListener = new JCATransactionalMessageListenerContainer(ei); 
+            } else {
+                jmsListener = new DefaultMessageListenerContainer();
+            }
+        } else {
+            jmsListener = new DefaultMessageListenerContainer102();
+        }
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 destinationName, 
+                                 messageSelectorPrefix,
+                                 userCID);            
+    }
+    
     /**
      * Create and start listener using configuration information from jmsConfig. Uses
      * resolveOrCreateDestination to determine the destination for the listener.
@@ -130,6 +164,23 @@ public final class JMSFactory {
                                                                     boolean userCID) {
         DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
             ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 destinationName, 
+                                 messageSelectorPrefix,
+                                 userCID);    
+    }
+    
+    public static DefaultMessageListenerContainer 
+    createJmsListener(DefaultMessageListenerContainer jmsListener,
+                      JMSConfiguration jmsConfig,
+                      MessageListener listenerHandler,
+                      String destinationName, 
+                      String messageSelectorPrefix,
+                      boolean userCID) {
+        
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
         jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
