@@ -151,10 +151,10 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isWebMethod(final Method method) {
         if (method == null
             || method.getReturnType().equals(Future.class)
-            || method.getReturnType().equals(Response.class)) {
+            || method.getReturnType().equals(Response.class)
+            || method.isSynthetic()) {
             return Boolean.FALSE;
         }
-        
         WebMethod wm = method.getAnnotation(WebMethod.class);
         if (wm != null) {
             if (wm.exclude()) {
