@@ -62,7 +62,7 @@ public class Server extends AbstractBusTestServerBase {
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
-        props.put("endpoint.handles.headers", "");
+        props.put("endpoint-processes-headers", "");
         ep.setProperties(props);
         ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortNoHeader");
         
@@ -71,7 +71,7 @@ public class Server extends AbstractBusTestServerBase {
         props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
-        props.put("endpoint.handles.headers", "{http://cxf.apache.org/outofband/Header}outofbandHeader");
+        props.put("endpoint-processes-headers", "{http://cxf.apache.org/outofband/Header}outofbandHeader");
         ep.setProperties(props);
         ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortHeader");
 
