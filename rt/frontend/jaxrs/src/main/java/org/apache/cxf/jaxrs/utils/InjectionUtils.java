@@ -263,7 +263,18 @@ public final class InjectionUtils {
         }
         
         if (pClass.isPrimitive()) {
-            return PrimitiveUtils.read(value, pClass);
+            try {
+                return PrimitiveUtils.read(value, pClass);
+            } catch (NumberFormatException nfe) {
+                //
+                //  For a path parameter this is probably a 404,
+                //  for others a 400...
+                //
+                if (pType == ParameterType.PATH) {
+                    throw new WebApplicationException(nfe, Response.Status.NOT_FOUND);
+                }
+                throw new WebApplicationException(nfe, Response.Status.BAD_REQUEST);
+            }
         }
         // check constructors accepting a single String value
         try {
