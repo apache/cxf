@@ -30,7 +30,11 @@
         </xs:annotation>
 
         <xs:sequence>
-            <xs:element name="property" type="jms-context:JMSPropertyType" minOccurs="0" maxOccurs="unbounded" />
+            <xs:element name="property" type="jms-context:JMSPropertyType" minOccurs="0" maxOccurs="unbounded">
+                <xs:annotation>
+                    <xs:documentation>A collection of user provided JMS properties</xs:documentation>
+                </xs:annotation>
+            </xs:element>
         </xs:sequence>
         <xs:attribute name="JMSCorrelationID" type="xs:string"/>
         <xs:attribute name="JMSDeliveryMode" type="xs:int" />
@@ -45,7 +49,7 @@
 
     <xs:complexType name="JMSServerHeadersType">
         <xs:annotation>
-            <xs:documentation>JMS header properties.</xs:documentation>
+            <xs:documentation>JMS header properties for use by server-side endpoints</xs:documentation>
         </xs:annotation>
 
         <xs:complexContent>
@@ -57,7 +61,7 @@
 
     <xs:complexType name="JMSClientHeadersType">
         <xs:annotation>
-            <xs:documentation>JMS header properties.</xs:documentation>
+            <xs:documentation>JMS header properties for client-side endpoints</xs:documentation>
         </xs:annotation>
 
         <xs:complexContent>
@@ -68,6 +72,10 @@
     </xs:complexType>
 
     <xs:complexType name="JMSPropertyType">
+        <xs:annotation>
+            <xs:documentation>Name/value pair used to hold user specified JMS 
+                header properties</xs:documentation>
+        </xs:annotation>
         <xs:sequence>
             <xs:element name="name" type="xs:string"/>
             <xs:element name="value" type="xs:string"/>
@@ -76,7 +84,8 @@
 
     <xs:complexType name="JMSConnectionSecurityInfoType">
         <xs:annotation>
-            <xs:documentation>Contains username/password sometimes required when establishing a connection.</xs:documentation>
+            <xs:documentation>Contains username/password sometimes required when 
+                establishing a connection to a JMS broker.</xs:documentation>
         </xs:annotation>
 
         <xs:sequence>
