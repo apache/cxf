@@ -28,6 +28,7 @@ public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
     String wsdlUrl;
     InputSource last;
     String baseUri;
+    String lastImport;
     boolean fromParent;
     
     public AbstractWrapperWSDLLocator(String wsdlUrl,
@@ -50,6 +51,7 @@ public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
     }
 
     public abstract InputSource getInputSource();
+    public abstract InputSource getInputSource(String parentLocation, String importLocation);
     
     public InputSource getBaseInputSource() {
         InputSource is = parent.getBaseInputSource();
@@ -80,10 +82,21 @@ public abstract class AbstractWrapperWSDLLocator implements WSDLLocator {
     }
 
     public InputSource getImportInputSource(String parentLocation, String importLocation) {
-        return parent.getImportInputSource(parentLocation, importLocation);
+        InputSource src = parent.getImportInputSource(parentLocation, importLocation);
+        lastImport = null;
+        if (src == null || (src.getByteStream() == null && src.getCharacterStream() == null)) {
+            src = getInputSource(parentLocation, importLocation);
+            if (src != null) {
+                lastImport = src.getSystemId(); 
+            }
+        }
+        return src;
     }
 
     public String getLatestImportURI() {
+        if (lastImport != null) {
+            return lastImport;
+        }
         return parent.getLatestImportURI();
     }
 
