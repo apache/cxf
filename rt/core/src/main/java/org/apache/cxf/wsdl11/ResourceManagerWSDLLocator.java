@@ -45,19 +45,23 @@ public class ResourceManagerWSDLLocator extends AbstractWrapperWSDLLocator {
         this.bus = bus;
     }
 
-
     public InputSource getInputSource() {
-        InputStream ins = bus.getExtension(ResourceManager.class).getResourceAsStream(wsdlUrl);
-        InputSource is = new InputSource(ins);
-        is.setSystemId(wsdlUrl);
-        is.setPublicId(wsdlUrl);
+        InputSource src = getInputSource(null, wsdlUrl);
+        baseUri = src.getPublicId();
+        return src;
+    }
 
-        URL url = bus.getExtension(ResourceManager.class).resolveResource(wsdlUrl, URL.class);
+    public InputSource getInputSource(String parentLocation, String importLocation) {
+        InputStream ins = bus.getExtension(ResourceManager.class).getResourceAsStream(importLocation);
+        InputSource is = new InputSource(ins);
+        is.setSystemId(importLocation);
+        is.setPublicId(importLocation);
+
+        URL url = bus.getExtension(ResourceManager.class).resolveResource(importLocation, URL.class);
         if (url != null) {
             is.setSystemId(url.toString());
             is.setPublicId(url.toString());
         }
-        baseUri = is.getPublicId();
         return is;
     }
     
