@@ -170,12 +170,6 @@ public class HTTPConduit
     private static final String SC_HTTP_CONDUIT_SUFFIX = ".http-conduit";
     
     /**
-     * Buffer to use to pull unread bytes off of input streams
-     */
-    private static final byte BUFFER[] = new byte[1024];
-
-
-    /**
      * This field holds the connection factory, which primarily is used to 
      * factor out SSL specific code from this implementation.
      * <p>
@@ -619,7 +613,8 @@ public class HTTPConduit
         try {
             if (in != null) {
                 int count = 0;
-                while (in.read(BUFFER) != -1
+                byte buffer[] = new byte[1024];
+                while (in.read(buffer) != -1
                     && count < 25) {
                     //don't do anything, we just need to pull off the unread data (like
                     //closing tags that we didn't need to read
