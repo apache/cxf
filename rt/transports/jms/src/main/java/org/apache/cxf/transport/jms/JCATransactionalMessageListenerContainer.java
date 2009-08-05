@@ -47,7 +47,8 @@ public class JCATransactionalMessageListenerContainer extends DefaultMessageList
         this.setCacheLevel(CACHE_CONNECTION);
     }
     
-    protected boolean receiveAndExecute(Object invoker, Session session, MessageConsumer consumer)
+    @Override
+    protected boolean receiveAndExecute(Session session, MessageConsumer consumer)
         throws JMSException {
         boolean messageReceived = false;
         MessageEndpoint ep = null;
@@ -62,8 +63,8 @@ public class JCATransactionalMessageListenerContainer extends DefaultMessageList
             mc = s.createConsumer(getDestination());            
             ep = factory.createEndpoint(xar);
             ENDPOINT_LOCAL.set(ep);
-            ep.beforeDelivery(method);                
-            messageReceived = doReceiveAndExecute(invoker, s, mc, null);
+            ep.beforeDelivery(method);   
+            messageReceived = doReceiveAndExecute(s, mc, null);
             ep.afterDelivery();
         } catch (Exception ex) {
             throw new JMSException(ex.getMessage());
