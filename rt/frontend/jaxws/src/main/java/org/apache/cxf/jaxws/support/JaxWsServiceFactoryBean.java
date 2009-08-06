@@ -64,6 +64,7 @@ import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -185,8 +186,10 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     @Override
     public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {        
-        return new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures, 
+        Endpoint ep = new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures, 
                                      this.getFeatures(), this.isFromWsdl());
+        sendEvent(FactoryBeanListener.Event.ENDPOINT_CREATED, ei, ep);
+        return ep;
     }
 
     @Override

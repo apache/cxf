@@ -38,6 +38,7 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
+import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.systest.jaxws.types.Bar;
@@ -49,6 +50,7 @@ import org.apache.cxf.systest.jaxws.types.Bar;
 //@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
 @Features(features = { "org.apache.cxf.transport.http.gzip.GZIPFeature", 
                        "org.apache.cxf.feature.FastInfosetFeature" })
+@WSDLDocumentation("DocLitWrappedCodeFirstService interface")                       
 public interface DocLitWrappedCodeFirstService {
 
     @Oneway

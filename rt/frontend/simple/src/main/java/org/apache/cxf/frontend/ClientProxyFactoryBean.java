@@ -34,6 +34,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 
 /**
@@ -115,10 +116,13 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
 
         ClientProxy handler = clientClientProxy(c);
 
+        Class classes[] = getImplementingClasses();
         Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(), 
-                                            getImplementingClasses(), 
+                                            classes, 
                                             handler);
 
+        this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
+                                           classes, handler, obj);
         return obj;
     }
 

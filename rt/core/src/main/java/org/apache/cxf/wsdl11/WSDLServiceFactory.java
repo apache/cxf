@@ -98,6 +98,11 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
     public void setEndpointName(QName qn) {
         endpointName = qn;
     }
+    
+    public Definition getDefinition() {
+        return definition;
+    }
+    
     public Service create() {
 
         List<ServiceInfo> services;

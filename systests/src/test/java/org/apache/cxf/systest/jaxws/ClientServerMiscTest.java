@@ -49,6 +49,7 @@ import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
@@ -72,6 +73,14 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(ServerMisc.class));
+    }
+
+    @Test
+    public void testWSDLDocs() throws Exception {
+        String s = IOUtils.toString(this.getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl")
+                                          .getInputStream());
+        assertTrue(s.contains("DocLitWrappedCodeFirstService impl"));
+        assertTrue(s.contains("DocLitWrappedCodeFirstService interface"));        
     }
     
     @Test

@@ -122,7 +122,9 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     <bean id="org.apache.cxf.catalog.OASISCatalogManager" class="org.apache.cxf.catalog.OASISCatalogManager">
         <property name="bus" ref="cxf"/>
     </bean>
-
+    <bean id="org.apache.cxf.service.factory.FactoryBeanListenerManager" class="org.apache.cxf.service.factory.FactoryBeanListenerManager">
+        <property name="bus" ref="cxf"/>
+    </bean>
     <bean id="org.apache.cxf.endpoint.ServiceContractResolverRegistry" class="org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl">
         <property name="bus" ref="cxf"/>
     </bean>

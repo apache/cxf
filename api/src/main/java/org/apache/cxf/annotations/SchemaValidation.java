@@ -17,35 +17,19 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.schema_validation;
+package org.apache.cxf.annotations;
 
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import javax.xml.ws.Endpoint;
-
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
-public class ValidationServer extends AbstractBusTestServerBase {
-
-    public ValidationServer() {
-    }
-
-    protected void run() {
-        Object implementor = new SchemaValidationImpl();
-        String address = "http://localhost:9900/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
-    }
-
-
-
-    public static void main(String[] args) {
-        try {
-            ValidationServer s = new ValidationServer();
-            s.start();
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            System.exit(-1);
-        } finally {
-            System.out.println("done!");
-        }
-    }
+/**
+ * Enables SchemaValidation
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.TYPE })
+public @interface SchemaValidation {
+    boolean enabled() default true;
 }
+

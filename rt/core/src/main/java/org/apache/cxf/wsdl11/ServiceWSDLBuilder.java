@@ -44,6 +44,7 @@ import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
+import javax.wsdl.WSDLElement;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.AttributeExtensible;
 import javax.wsdl.extensions.ElementExtensible;
@@ -96,6 +97,7 @@ public class ServiceWSDLBuilder {
     private int xsdCount;
     private final Bus bus;
     private final NSManager nsMan;
+    private Document docDoc;
     
     /**
      * Sets up the builder on a bus with a list of services.
@@ -220,6 +222,21 @@ public class ServiceWSDLBuilder {
         return holder.getExtensors(ExtensibilityElement.class);
     }
     
+    protected void addDocumentation(WSDLElement wsdlel, String text) {
+        if (text == null) {
+            return;
+        }
+        if (docDoc == null) {
+            try {
+                docDoc = XMLUtils.newDocument();
+            } catch (ParserConfigurationException e) {
+                //ignore
+            }
+        }
+        Element el = docDoc.createElementNS(WSDLConstants.NS_WSDL11, "wsdl:documentation");
+        el.setTextContent(text);
+        wsdlel.setDocumentationElement(el);
+    }
     protected void addExtensibilityElements(ElementExtensible elementExtensible, 
         List<ExtensibilityElement> extensibilityElements) {
         if (extensibilityElements != null) {
@@ -403,6 +420,7 @@ public class ServiceWSDLBuilder {
         }
         
         Service serv = definition.createService();
+        addDocumentation(serv, serviceInfo.getDocumentation());
         serv.setQName(serviceInfo.getName());
         addNamespace(serviceInfo.getName().getNamespaceURI());
         definition.addService(serv);
@@ -428,6 +446,7 @@ public class ServiceWSDLBuilder {
         if (portType == null) {
             portType = def.createPortType();
             portType.setQName(intf.getName());
+            addDocumentation(portType, intf.getDocumentation());
             addNamespace(intf.getName().getNamespaceURI(), def);
             portType.setUndefined(false);
             buildPortTypeOperation(portType, intf.getOperations(), def);

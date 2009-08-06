@@ -86,6 +86,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.ServiceModelSchemaValidator;
+import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
@@ -190,6 +191,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     
     @Override
     public Service create() {
+        sendEvent(Event.START_CREATE);
         initializeServiceConfigurations();
 
         initializeServiceModel();
@@ -215,7 +217,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         fillInSchemaCrossreferences();
 
-        return getService();
+        Service serv = getService();
+        sendEvent(Event.END_CREATE, serv);
+        return serv;
     }
 
     /**
@@ -292,7 +296,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {
-        return new EndpointImpl(getBus(), getService(), ei);
+        Endpoint ep = new EndpointImpl(getBus(), getService(), ei);
+        sendEvent(Event.ENDPOINT_CREATED, ei, ep, getServiceClass());
+        return ep;
     }
 
     protected void initializeServiceConfigurations() {
@@ -310,6 +316,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     protected void buildServiceFromWSDL(String url) {
+        sendEvent(Event.CREATE_FROM_WSDL, url);        
+        
         if (LOG.isLoggable(Level.INFO)) {
             LOG.info("Creating Service " + getServiceQName() + " from WSDL: " + url);
         }
@@ -326,9 +334,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (setEPName) {
             factory.setEndpointName(getEndpointName(false));
         }
+        sendEvent(Event.WSDL_LOADED, factory.getDefinition());
         setService(factory.create());
-
         setServiceProperties();
+        
+        sendEvent(Event.SERVICE_SET, getService());
         
         EndpointInfo epInfo = getEndpointInfo();
         if (epInfo != null) {
@@ -343,7 +353,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 si.setProperty(EXTRA_CLASS, cls);
             }
         }
-        getDataBinding().initialize(getService());
+        initializeDataBindings();
     }
 
     protected void buildServiceFromClass() {
@@ -355,6 +365,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (Proxy.isProxyClass(this.getServiceClass())) {
             LOG.log(Level.WARNING, "USING_PROXY_FOR_SERVICE", getServiceClass());
         }
+        
+        sendEvent(Event.CREATE_FROM_CLASS, getServiceClass());
+
         ServiceInfo serviceInfo = new ServiceInfo();
         SchemaCollection col = serviceInfo.getXmlSchemaCollection();
         col.getXmlSchemaCollection().setSchemaResolver(new CatalogXmlSchemaURIResolver(this.getBus()));
@@ -362,11 +375,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         ServiceImpl service = new ServiceImpl(serviceInfo);
         setService(service);
-
         setServiceProperties();
 
         serviceInfo.setName(getServiceQName());
         serviceInfo.setTargetNamespace(serviceInfo.getName().getNamespaceURI());
+
+        sendEvent(Event.SERVICE_SET, getService());
 
         createInterface(serviceInfo);
 
@@ -377,8 +391,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 si.setProperty(EXTRA_CLASS, wrapperClasses);
             }
         }
-
-        getDataBinding().initialize(service);
+        initializeDataBindings();
 
         boolean isWrapped = isWrapped() || hasWrappedMethods(serviceInfo.getInterface());
         if (isWrapped) {
@@ -609,6 +622,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         }
+        sendEvent(Event.INTERFACE_CREATED, intf, getServiceClass());
     }
 
     protected void initializeWSDLOperation(InterfaceInfo intf, OperationInfo o, Method method) {
@@ -622,6 +636,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         } else {
             LOG.log(Level.WARNING, "NO_METHOD_FOR_OP", o.getName());
         }
+        sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
     }
     
     /**
@@ -631,6 +646,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
      * @param method
      */
     protected boolean initializeClassInfo(OperationInfo o, Method method, List<String> paramOrder) {
+        OperationInfo origOp = o;
         if (isWrapped(method)) {
             if (o.getUnwrappedOperation() == null) {
                 //the "normal" algorithm didn't allow for unwrapping,
@@ -679,7 +695,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 return false;
             }
         }
-
+        sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, origOp, method, origOp.getInput());
         // Initialize return type
         Class paramType = method.getReturnType();
         Type genericType = method.getGenericReturnType();
@@ -687,6 +703,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (o.hasOutput()
             && !initializeParameter(o, method, -1, paramType, genericType)) {
             return false;
+        }
+        if (origOp.hasOutput()) {
+            sendEvent(Event.OPERATIONINFO_OUT_MESSAGE_SET, origOp, method, origOp.getOutput());
         }
 
         setFaultClassInfo(o, method);
@@ -779,6 +798,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                         && name.getNamespaceURI().equals(ns)) {
                         fi.setProperty(Class.class.getName(), exClass);
                         mpi.setTypeClass(beanClass);
+                        sendEvent(Event.OPERATIONINFO_FAULT, o, exClass, fi);
                     }
                 }
             }
@@ -818,7 +838,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 createOperation(serviceInfo, intf, m);
             }
         }
-
+        sendEvent(Event.INTERFACE_CREATED, intf, getServiceClass());
         return intf;
     }
 
@@ -870,6 +890,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         bindOperation(op, m);
 
+        sendEvent(Event.INTERFACE_OPERATION_BOUND, op, m);
         return op;
     }
     
@@ -1385,7 +1406,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 part.setIndex(j);
             }
         }
-
+        sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, op, method, inMsg);
+        
         boolean hasOut = hasOutMessage(method);
         if (hasOut) {
             // Setup the output message
@@ -1458,6 +1480,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     }
                 }
             }
+            sendEvent(Event.OPERATIONINFO_OUT_MESSAGE_SET, op, method, outMsg);
         }
         
         //setting the parameterOrder that
@@ -1906,6 +1929,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             .getSimpleName()));
         mpi.setElementQName(faultName);
         mpi.setTypeClass(beanClass);
+        sendEvent(Event.OPERATIONINFO_FAULT, op, exClass, fi);
         return fi;
     }
 
