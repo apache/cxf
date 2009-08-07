@@ -304,9 +304,13 @@ public class AbstractClient implements Client {
             //result in a call to the server when we have already decided not to.
             //Throw an exception if we have one
             Exception ex = exchange.getOutMessage().getContent(Exception.class);
-            throw ex;
+            if (ex != null) {
+                throw ex; 
+            } else {
+                throw new RuntimeException("Unknown client side exception");
+            }
         } 
-        int status = responseCode.intValue(); //conn.getResponseCode();
+        int status = responseCode.intValue();
         responseBuilder = Response.status(status);
         for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
             if (null == entry.getKey()) {

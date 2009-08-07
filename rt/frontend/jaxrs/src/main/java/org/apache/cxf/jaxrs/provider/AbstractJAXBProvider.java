@@ -83,21 +83,38 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private static Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
     private static JAXBContext collectionContext; 
     
+    protected Map<String, String> jaxbElementClassMap;
+    protected boolean unmarshalAsJaxbElement;
+    
     private MessageContext mc;
     private Schema schema;
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames;
     
+    public void setUnmarshallAsJaxbElement(boolean value) {
+        unmarshalAsJaxbElement = value;
+    }
+    
     public void setJaxbElementClassNames(List<String> names) {
         jaxbElementClassNames = names;
+    }
+    
+    public void setJaxbElementClassMap(Map<String, String> map) {
+        jaxbElementClassMap = map;
     }
 
     @SuppressWarnings("unchecked")
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
-        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName())) {
-            QName name = getJaxbQName(cls, genericType, obj, false);
+        if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName()) 
+            || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(cls.getName())) {
+            QName name = null;
+            if (jaxbElementClassMap != null) {
+                name = convertStringToQName(jaxbElementClassMap.get(cls.getName()));
+            } else {
+                name = getJaxbQName(cls, genericType, obj, false);
+            }
             if (name != null) {
                 return new JAXBElement(name, cls, null, obj);
             }
@@ -147,6 +164,10 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             return getJaxbQName(cls, type, object, pluralName);
         }
             
+        return convertStringToQName(name);
+    }
+    
+    private QName convertStringToQName(String name) {
         int ind1 = name.indexOf('{');
         if (ind1 != 0) {
             return new QName(name);

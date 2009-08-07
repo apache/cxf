@@ -19,34 +19,22 @@
 
 package org.apache.cxf.jaxrs.fortest.jaxb;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
 
-@XmlSeeAlso({SuperBook.class })
-public class Book {
-    private String name;
-    private long id;
-    
-    public Book(String name, long id) {
-        this.name = name;
-        this.id = id;
+public class SuperBook extends Book {
+    private long superId;
+    public SuperBook() {
     }
     
-    public Book() {
+    public SuperBook(String name, long id, long superId) {
+        super(name, id);
+        this.superId = superId;
     }
     
-    public void setName(String n) {
-        name = n;
-    }
-
-    public String getName() {
-        return name;
+    public void setSuperId(long i) {
+        superId = i;
     }
     
-    public void setId(long i) {
-        id = i;
+    public long getSuperId() {
+        return superId;
     }
-    public long getId() {
-        return id;
-    }
-   
 }

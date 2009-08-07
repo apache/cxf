@@ -150,10 +150,15 @@ public class JSONProvider extends AbstractJAXBProvider  {
             XMLStreamReader xsw = createReader(type, realStream);
             
             Object response = null;
-            if (JAXBElement.class.isAssignableFrom(type)) {
+            if (JAXBElement.class.isAssignableFrom(type) 
+                || unmarshalAsJaxbElement
+                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
                 response = unmarshaller.unmarshal(xsw, theType);
             } else {
                 response = unmarshaller.unmarshal(xsw);
+            }
+            if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
+                response = ((JAXBElement)response).getValue();    
             }
             response = checkAdapter(response, anns, false);
             return response;
