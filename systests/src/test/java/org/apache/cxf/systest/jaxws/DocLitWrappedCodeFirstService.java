@@ -59,7 +59,7 @@ import org.apache.cxf.systest.jaxws.types.Bar;
         @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc", 
                            placement = WSDLDocumentation.Placement.BINDING),   
         @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc", 
-                           placement = WSDLDocumentation.Placement.SERVICE_PORT),   
+                           placement = WSDLDocumentation.Placement.SERVICE_PORT)   
     }
 )
 public interface DocLitWrappedCodeFirstService {
@@ -108,7 +108,7 @@ public interface DocLitWrappedCodeFirstService {
             @WSDLDocumentation(value = "multiInOut binding Input doc", 
                                placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),   
             @WSDLDocumentation(value = "multiInOut binding Output doc", 
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT),   
+                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)   
         }
     )
     String multiInOut(@WebParam(mode = WebParam.Mode.OUT)
