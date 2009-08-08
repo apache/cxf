@@ -40,9 +40,17 @@ public class ServiceInfo extends AbstractDescriptionElement implements NamedItem
     Map<QName, MessageInfo> messages;
     List<SchemaInfo> schemas = new ArrayList<SchemaInfo>(4);
     private SchemaCollection xmlSchemaCollection;
+    private String topLevelDoc;
 
     public ServiceInfo() {
         xmlSchemaCollection = new SchemaCollection();
+    }
+    
+    public String getTopLevelDoc() {
+        return topLevelDoc;
+    }
+    public void setTopLevelDoc(String s) {
+        topLevelDoc = s;
     }
 
     public String getTargetNamespace() {

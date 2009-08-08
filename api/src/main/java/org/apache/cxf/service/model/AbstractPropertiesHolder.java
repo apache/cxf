@@ -48,6 +48,12 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
         return propertyMap.get().get(name);
     }
+    public Object removeProperty(String name) {
+        if (null == propertyMap.get()) {
+            return null;
+        }
+        return propertyMap.get().remove(name);
+    }
     
     public <T> T getProperty(String name, Class<T> cls) {
         return cls.cast(getProperty(name));

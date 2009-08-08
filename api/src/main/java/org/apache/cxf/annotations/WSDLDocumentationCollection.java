@@ -30,44 +30,8 @@ import java.lang.annotation.Target;
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
-public @interface WSDLDocumentation {
-    String value();
+@Target({ ElementType.TYPE, ElementType.METHOD })
+public @interface WSDLDocumentationCollection {
+    WSDLDocumentation[] value();
     
-    Placement placement() default Placement.DEFAULT;
-    
-    /**
-     * If Placement is FAULT_MESSAGE, PORT_FAULT, or BINDING_FAULT,
-     * return the fault class associated with this documentation 
-     * @return the fault class
-     */
-    Class<?> faultClass() default DEFAULT.class;
-    
-    enum Placement {
-        DEFAULT,
-        TOP,
-        
-        INPUT_MESSAGE,
-        OUTPUT_MESSAGE,
-        FAULT_MESSAGE,
-        
-        PORT_TYPE,
-        PORT_TYPE_OPERATION,
-        PORT_TYPE_OPERATION_INPUT,
-        PORT_TYPE_OPERATION_OUTPUT,
-        PORT_TYPE_OPERATION_FAULT,
-
-        BINDING,
-        BINDING_OPERATION,
-        BINDING_OPERATION_INPUT,
-        BINDING_OPERATION_OUTPUT,
-        BINDING_OPERATION_FAULT,
-
-        SERVICE,
-        SERVICE_PORT,
-        
-    };
-    
-
-    static final class DEFAULT { }
 }
