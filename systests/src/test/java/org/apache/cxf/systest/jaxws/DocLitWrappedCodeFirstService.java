@@ -139,6 +139,18 @@ public interface DocLitWrappedCodeFirstService {
     List<Foo[]> listObjectArrayOutput();
     
     @WebMethod
+    @WSDLDocumentationCollection({
+        @WSDLDocumentation(value = "fault message doc",
+                           placement = WSDLDocumentation.Placement.FAULT_MESSAGE,
+                           faultClass = CustomException.class),   
+        @WSDLDocumentation(value = "fault binding doc",
+                           placement = WSDLDocumentation.Placement.BINDING_OPERATION_FAULT,
+                           faultClass = CustomException.class),   
+        @WSDLDocumentation(value = "fault porttype doc",
+                           placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_FAULT,
+                           faultClass = CustomException.class),   
+        }
+    )
     int throwException(int i) 
         throws ServiceTestFault,
         CustomException,

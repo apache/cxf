@@ -82,7 +82,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         XPathUtils xpu = new XPathUtils(ns);
         Document wsdl = XMLUtils.parse(this.getHttpConnection(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl")
                                           .getInputStream());
-        XMLUtils.printDOM(wsdl.getDocumentElement());
+        //XMLUtils.printDOM(wsdl.getDocumentElement());
         assertEquals("DocLitWrappedCodeFirstService impl",
                      xpu.getValue("/wsdl:definitions/wsdl:service/wsdl:documentation",
                                   wsdl.getDocumentElement(),
@@ -141,6 +141,21 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("multiInOut binding Output doc",
                      xpu.getValue("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='multiInOut']"
                                   + "/wsdl:output/wsdl:documentation",
+                                  wsdl.getDocumentElement(),
+                                  XPathConstants.STRING));
+        assertEquals("fault binding doc",
+                     xpu.getValue("/wsdl:definitions/wsdl:binding/wsdl:operation[@name='throwException']"
+                                  + "/wsdl:fault/wsdl:documentation",
+                                  wsdl.getDocumentElement(),
+                                  XPathConstants.STRING));
+        assertEquals("fault porttype doc",
+                     xpu.getValue("/wsdl:definitions/wsdl:portType/wsdl:operation[@name='throwException']"
+                                  + "/wsdl:fault/wsdl:documentation",
+                                  wsdl.getDocumentElement(),
+                                  XPathConstants.STRING));
+        assertEquals("fault message doc",
+                     xpu.getValue("/wsdl:definitions/wsdl:message[@name='CustomException']"
+                                  + "/wsdl:documentation",
                                   wsdl.getDocumentElement(),
                                   XPathConstants.STRING));
     }

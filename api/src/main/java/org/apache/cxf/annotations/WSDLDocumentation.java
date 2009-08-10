@@ -27,13 +27,24 @@ import java.lang.annotation.Target;
 
 
 /**
- * 
+ * Adds documentation nodes to the generated WSDL
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE, ElementType.METHOD, ElementType.PARAMETER })
+@Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface WSDLDocumentation {
+    /**
+     * The documentation to add
+     * @return documentation string
+     */
     String value();
     
+    /**
+     * The place to put the documentation.  The Default is depends on the 
+     * location of the annotation.   On the method in the SEI, it would be
+     * the portType/operation, on the SEI, it would be the portType, on the 
+     * service impl, the service element.
+     * @return location
+     */
     Placement placement() default Placement.DEFAULT;
     
     /**
