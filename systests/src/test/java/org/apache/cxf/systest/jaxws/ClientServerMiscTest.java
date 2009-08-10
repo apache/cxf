@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.io.InputStream;
+import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -49,6 +50,7 @@ import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -314,7 +316,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testStringListOutDocLitNoWsdl() throws Exception {
+    public void testDocLitWrappedCodeFirstServiceNoWsdl() throws Exception {
         QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
                                    "DocLitWrappedCodeFirstServicePort");
         QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
@@ -328,7 +330,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testStringListOutDocLitWsdl() throws Exception {
+    public void testDocLitWrappedCodeFirstServiceWsdl() throws Exception {
         QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
                                    "DocLitWrappedCodeFirstServicePort");
         QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
@@ -340,6 +342,52 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                                              DocLitWrappedCodeFirstService.class);
         runDocLitTest(port);
     }
+
+    private void setASM(boolean b) throws Exception {
+        Field f = ASMHelper.class.getDeclaredField("oldASM");
+        f.setAccessible(true);
+        f.set(null, b);
+    }
+    
+    @Test
+    public void testDocLitWrappedCodeFirstServiceNoWsdlNoASM() throws Exception {
+        try {
+            setASM(false);
+            QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
+                                       "DocLitWrappedCodeFirstServicePort");
+            QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
+                                       "DocLitWrappedCodeFirstService");
+            
+            Service service = Service.create(servName);
+            service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, ServerMisc.DOCLIT_CODEFIRST_URL);
+            DocLitWrappedCodeFirstService port = service.getPort(portName,
+                                                                 DocLitWrappedCodeFirstService.class);
+            runDocLitTest(port);
+        } finally {
+            setASM(true);
+        }
+    }
+
+    @Test
+    public void testDocLitWrappedCodeFirstServiceWsdlNoASM() throws Exception {
+        try {
+            setASM(false);
+            QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
+                                       "DocLitWrappedCodeFirstServicePort");
+            QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
+                                       "DocLitWrappedCodeFirstService");
+            
+            Service service = Service.create(new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl"),
+                                             servName);
+            DocLitWrappedCodeFirstService port = service.getPort(portName,
+                                                                 DocLitWrappedCodeFirstService.class);
+            runDocLitTest(port);
+        } finally {
+            setASM(true);
+        }
+    }
+    
+
     
     @Test
     public void testSimpleClientWithWsdl() throws Exception {
@@ -361,16 +409,18 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        
+        assertEquals("hello", port.outOnly(new Holder<String>(), new Holder<String>()));
+        
         long start = System.currentTimeMillis();
         port.doOneWay();
         assertTrue((System.currentTimeMillis() - start) < 500);
         
         assertEquals("Hello", port.echoStringNotReallyAsync("Hello"));
-        
+
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
         assertEquals("size: 2", port.doFooList(new ArrayList<Foo>(fooSet)));
-        
         
         assertEquals(24, port.echoIntDifferentWrapperName(24));
         
@@ -449,8 +499,12 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         int ints[] = port.echoIntArray(new int[] {1, 2 , 3}, null);
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
-        
-        assertEquals("Val", port.createBar("Val").getName());
+
+        if (new ASMHelper().createClassWriter() != null) {
+            //doing the type adapter things and such really 
+            //requires the ASM generated helper classes
+            assertEquals("Val", port.createBar("Val").getName());
+        }
         testExceptionCases(port);
     }
     

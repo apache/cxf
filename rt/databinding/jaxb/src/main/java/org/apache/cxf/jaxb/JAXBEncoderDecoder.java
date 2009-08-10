@@ -34,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -509,7 +510,9 @@ public final class JAXBEncoderDecoder {
                                                    createList(part));
                 Object o = ret;
                 if (!isList(part)) {
-                    if (clazz.getComponentType().isPrimitive()) {
+                    if (isSet(part)) {
+                        o = createSet(part, ret);
+                    } else if (clazz.getComponentType().isPrimitive()) {
                         o = java.lang.reflect.Array.newInstance(clazz.getComponentType(), ret.size());
                         for (int x = 0; x < ret.size(); x++) {
                             Array.set(o, x, ret.get(x));
@@ -534,6 +537,39 @@ public final class JAXBEncoderDecoder {
             o = ret;
         }
         return o;
+    }
+
+    private static Object createSet(MessagePartInfo part, List<Object> ret) {
+        Type genericType = (Type)part.getProperty("generic.type");
+        Class tp2 = (Class)((ParameterizedType)genericType).getRawType();
+        if (tp2.isInterface()) {
+            return new HashSet<Object>(ret);
+        }
+        Collection<Object> c;
+        try {
+            c = CastUtils.cast((Collection<?>)tp2.newInstance());
+        } catch (Exception e) {
+            c = new HashSet<Object>();
+        }
+        c.addAll(ret);
+        return c;
+    }
+
+    private static boolean isSet(MessagePartInfo part) {
+        if (part.getTypeClass().isArray() && !part.getTypeClass().getComponentType().isPrimitive()) {
+            // && Collection.class.isAssignableFrom(part.getTypeClass())) {
+            // it's List Para
+            //
+            Type genericType = (Type)part.getProperty("generic.type");
+
+            if (genericType instanceof ParameterizedType) {
+                Type tp2 = ((ParameterizedType)genericType).getRawType();
+                if (tp2 instanceof Class) {
+                    return Set.class.isAssignableFrom((Class<?>)tp2);
+                }
+            }
+        }
+        return false;
     }
 
     private static List<Object> createList(MessagePartInfo part) {
@@ -573,7 +609,7 @@ public final class JAXBEncoderDecoder {
             if (genericType instanceof ParameterizedType) {
                 Type tp2 = ((ParameterizedType)genericType).getRawType();
                 if (tp2 instanceof Class) {
-                    return Collection.class.isAssignableFrom((Class<?>)tp2);
+                    return List.class.isAssignableFrom((Class<?>)tp2);
                 }
             }
         }
