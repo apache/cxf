@@ -23,13 +23,21 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.FastInfoset;
+import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
 import org.apache.cxf.annotations.WSDLDocumentationCollection;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.FIStaxInInterceptor;
+import org.apache.cxf.interceptor.FIStaxOutInterceptor;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -62,34 +70,34 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
-            SchemaValidation val = cls.getAnnotation(SchemaValidation.class);
-            if (val != null && val.enabled()) {
-                ((Endpoint)args[1]).put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-            }
-            break;
+            Endpoint ep = (Endpoint)args[1];
+            addSchemaValidationSupport(ep, cls.getAnnotation(SchemaValidation.class));
+            addFastInfosetSupport(ep, cls.getAnnotation(FastInfoset.class));
+            addGZipSupport(ep, factory.getBus(), cls.getAnnotation(GZIP.class));
+            break; 
         }
         case SERVER_CREATED: {
             Class<?> cls = (Class<?>)args[2];
-            SchemaValidation val = cls.getAnnotation(SchemaValidation.class);
-            if (val != null && val.enabled()) {
-                ((Server)args[0]).getEndpoint().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
-            }
+            Server server = (Server)args[0];
+            addGZipSupport(server.getEndpoint(), factory.getBus(), cls.getAnnotation(GZIP.class));
+            addSchemaValidationSupport(server.getEndpoint(), cls.getAnnotation(SchemaValidation.class));
+            addFastInfosetSupport(server.getEndpoint(), cls.getAnnotation(FastInfoset.class));
             WSDLDocumentation doc = cls.getAnnotation(WSDLDocumentation.class);
             if (doc != null) {
-                addDocumentation((Server)args[0], WSDLDocumentation.Placement.SERVICE, doc);
+                addDocumentation(server, WSDLDocumentation.Placement.SERVICE, doc);
             }
             WSDLDocumentationCollection col = cls.getAnnotation(WSDLDocumentationCollection.class);
             if (col != null) {
-                addDocumentation((Server)args[0], WSDLDocumentation.Placement.SERVICE, col.value());
+                addDocumentation(server, WSDLDocumentation.Placement.SERVICE, col.value());
             }
-            InterfaceInfo i = ((Server)args[0]).getEndpoint().getEndpointInfo().getInterface();
+            InterfaceInfo i = server.getEndpoint().getEndpointInfo().getInterface();
             List<WSDLDocumentation> docs = CastUtils.cast((List<?>)i.removeProperty(EXTRA_DOCUMENTATION));
             if (docs != null) {
-                addDocumentation((Server)args[0], 
+                addDocumentation(server, 
                                  WSDLDocumentation.Placement.SERVICE,
                                  docs.toArray(new WSDLDocumentation[docs.size()]));
             }
-            addBindingOperationDocs((Server)args[0]);
+            addBindingOperationDocs(server);
             break;
         }
         case INTERFACE_OPERATION_BOUND: {
@@ -107,6 +115,40 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         default:
             //do nothing
+        }
+    }
+
+    private void addGZipSupport(Endpoint ep, Bus bus, GZIP annotation) {
+        if (annotation != null) {
+            try {
+                Class<?> cls = ClassLoaderUtils
+                    .loadClass("org.apache.cxf.transport.http.gzip.GZIPFeature",
+                               this.getClass());
+                
+                AbstractFeature feature = (AbstractFeature)cls.newInstance();
+                cls.getMethod("setThreshold", new Class[] {Integer.TYPE})
+                    .invoke(feature, annotation.threshold());
+                feature.initialize(ep, bus);
+            } catch (Exception e) {
+                //ignore - just assume it's an unsupported/unknown annotation
+            }
+        }
+    }
+
+    private void addSchemaValidationSupport(Endpoint endpoint, SchemaValidation annotation) {
+        if (annotation != null) {
+            endpoint.put(Message.SCHEMA_VALIDATION_ENABLED, annotation.enabled());
+        }
+    }
+
+    private void addFastInfosetSupport(InterceptorProvider provider, FastInfoset annotation) {
+        if (annotation != null) {
+            FIStaxInInterceptor in = new FIStaxInInterceptor();
+            FIStaxOutInterceptor out = new FIStaxOutInterceptor(annotation.force());
+            provider.getInInterceptors().add(in);
+            provider.getInFaultInterceptors().add(in);
+            provider.getOutInterceptors().add(out);
+            provider.getOutFaultInterceptors().add(out);
         }
     }
 

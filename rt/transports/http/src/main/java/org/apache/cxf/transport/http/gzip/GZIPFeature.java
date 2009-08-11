@@ -18,8 +18,11 @@
  */
 package org.apache.cxf.transport.http.gzip;
 
+import java.util.List;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
 /**
@@ -69,8 +72,20 @@ public class GZIPFeature extends AbstractFeature {
         } else {
             GZIPOutInterceptor out = new GZIPOutInterceptor();
             out.setThreshold(threshold);
+            remove(provider.getOutInterceptors());
+            remove(provider.getOutFaultInterceptors());
             provider.getOutInterceptors().add(out);
             provider.getOutFaultInterceptors().add(out);
+        }
+    }
+
+    private void remove(List<Interceptor> outInterceptors) {
+        int x = outInterceptors.size();
+        while (x > 0) {
+            --x;
+            if (outInterceptors.get(x) instanceof GZIPOutInterceptor) {
+                outInterceptors.remove(x);
+            }
         }
     }
 

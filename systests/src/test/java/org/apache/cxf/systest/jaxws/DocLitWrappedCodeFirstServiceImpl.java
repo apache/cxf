@@ -29,8 +29,9 @@ import javax.jws.WebService;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceContext;
 
+import org.apache.cxf.annotations.FastInfoset;
+import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.WSDLDocumentation;
-import org.apache.cxf.feature.Features;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 import org.apache.cxf.systest.jaxws.types.Bar;
@@ -40,10 +41,9 @@ import org.apache.cxf.systest.jaxws.types.BarImpl;
             serviceName = "DocLitWrappedCodeFirstService",
             portName = "DocLitWrappedCodeFirstServicePort",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService")
-//@Features(features = { "org.apache.cxf.feature.FastInfosetFeature" })
-@Features(features = { "org.apache.cxf.transport.http.gzip.GZIPFeature", 
-                       "org.apache.cxf.feature.FastInfosetFeature" })
-@WSDLDocumentation("DocLitWrappedCodeFirstService impl")                       
+@WSDLDocumentation("DocLitWrappedCodeFirstService impl")
+@GZIP(threshold = 10)
+@FastInfoset(force = true)
 public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirstService {
     public static final String DATA[] = new String[] {"string1", "string2", "string3"};
     

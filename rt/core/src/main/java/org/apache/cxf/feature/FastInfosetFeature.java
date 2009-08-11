@@ -64,7 +64,7 @@ public class FastInfosetFeature extends AbstractFeature {
     }
     
     /**
-     * Retrieve the value set with {@link #setLimit(int)}.
+     * Retrieve the value set with {@link #setForce(int)}.
      * @return
      */
     public boolean getForce() {

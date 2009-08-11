@@ -312,6 +312,10 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
 
         int[] ret = port.echoIntArray(new int[] {1, 2});
         assertNotNull(ret);
+        ret = port.echoIntArray(new int[] {1, 2});
+        assertNotNull(ret);
+        ret = port.echoIntArray(new int[] {1, 2});
+        assertNotNull(ret);
         //port.arrayOutput();
     }
     
