@@ -18,11 +18,12 @@
  */
 package org.apache.cxf.jaxrs;
 
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,6 +38,7 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.databinding.PropertiesAwareDataBinding;
 import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -249,12 +251,13 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
     protected void setDataBindingProvider(ProviderFactory factory, Service s) {
         DataBinding db = getDataBinding();
-        try {
-            Method m = db.getClass().getMethod("setAllClasses", new Class[]{Set.class});
+        if (db instanceof PropertiesAwareDataBinding) {
             Set<Class<?>> allClasses = ResourceUtils.getAllRequestResponseTypes(
                                                          serviceFactory.getRealClassResourceInfo(), false);
-            m.invoke(db, new Object[]{allClasses});
-        } catch (Exception ex) { 
+            Map<String, Object> props = new HashMap<String, Object>();
+            props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
+            ((PropertiesAwareDataBinding)db).initialize(props);
+        } else { 
             db.initialize(s);
         }
         factory.setUserProviders(Collections.singletonList(new DataBindingProvider(db)));
