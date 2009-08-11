@@ -39,7 +39,7 @@ public abstract class AbstractHelloWorldTest extends AbstractSDOTest {
     @Test
     public void testBasicInvoke() throws Exception {
         Node response = invoke("TestService", "bean11.xml");
-        addNamespace("ns1", "http://apache.org/hello_world_soap_http/types");
+        addNamespace("ns1", "http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types");
         assertValid("/s:Envelope/s:Body/ns1:greetMeResponse", response);
         assertValid("//ns1:greetMeResponse/ns1:responseType", response);
         assertValid("//ns1:greetMeResponse/ns1:responseType[text()='Hello World']", response);
@@ -48,7 +48,7 @@ public abstract class AbstractHelloWorldTest extends AbstractSDOTest {
     @Test
     public void testStructure() throws Exception {
         Node response = invoke("TestService", "structure.xml");
-        addNamespace("ns1", "http://apache.org/hello_world_soap_http/types");
+        addNamespace("ns1", "http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types");
         assertValid("/s:Envelope/s:Body/ns1:echoStructResponse", response);
         assertValid("//ns1:echoStructResponse/ns1:return", response);
         assertValid("//ns1:echoStructResponse/ns1:return/ns1:text[text()='Hello']", response);        
@@ -60,7 +60,8 @@ public abstract class AbstractHelloWorldTest extends AbstractSDOTest {
         for (Document doc : docs) {
             try {
                 assertValid("/wsdl:definitions/wsdl:types/xsd:schema"
-                            + "[@targetNamespace='http://apache.org/hello_world_soap_http/types']", 
+                            + "[@targetNamespace='http://apache.org/cxf"
+                            + "/databinding/sdo/hello_world_soap_http/types']", 
                             doc);
                 return;
             } catch (AssertionFailedError ex) {

@@ -167,9 +167,9 @@
                                         <extraarg>-db</extraarg>
                                         <extraarg>sdo</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>http://apache.org/hello_world_soap_http/types=helloworld.static_types.sdo</extraarg>
+                                        <extraarg>http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types=helloworld.static_types.sdo</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>http://apache.org/hello_world_soap_http=helloworld.static_types.ws</extraarg>
+                                        <extraarg>http://apache.org/cxf/databinding/sdo/hello_world_soap_http=helloworld.static_types.ws</extraarg>
                                     </extraargs>
                                 </wsdlOption>
                                 <wsdlOption>
@@ -178,7 +178,7 @@
                                         <extraarg>-db</extraarg>
                                         <extraarg>sdo-dynamic</extraarg>
                                         <extraarg>-p</extraarg>
-                                        <extraarg>http://apache.org/hello_world_soap_http=helloworld.dynamic_types.ws</extraarg>
+                                        <extraarg>http://apache.org/cxf/databinding/sdo/hello_world_soap_http=helloworld.dynamic_types.ws</extraarg>
                                     </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>

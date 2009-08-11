@@ -44,7 +44,7 @@ public class HelloWorldStaticTest extends AbstractHelloWorldTest {
     }
     
     
-    @WebService(targetNamespace = "http://apache.org/hello_world_soap_http",
+    @WebService(targetNamespace = "http://apache.org/cxf/databinding/sdo/hello_world_soap_http",
                 name = "Greeter",
                 serviceName = "TestService",
                 endpointInterface = "helloworld.static_types.ws.Greeter")
@@ -77,8 +77,10 @@ public class HelloWorldStaticTest extends AbstractHelloWorldTest {
         ServerFactoryBean sf = super.createServiceFactory(serviceClass, serviceBean, address, name, binding);
         sf.setWsdlLocation(HelloWorldStaticTest.class
                                .getResource("/wsdl_sdo/HelloService_static.wsdl").toString());
-        sf.setServiceName(new QName("http://apache.org/hello_world_soap_http", "SOAPService"));
-        sf.setEndpointName(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
+        sf.setServiceName(new QName("http://apache.org/cxf/databinding/sdo/hello_world_soap_http",
+                                    "SOAPService"));
+        sf.setEndpointName(new QName("http://apache.org/cxf/databinding/sdo/hello_world_soap_http",
+                                     "SoapPort"));
         return sf;
     }
     

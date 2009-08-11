@@ -17,11 +17,11 @@
  * specific language governing permissions and limitations
  * under the License.
  -->      
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http" xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:x1="http://apache.org/hello_world_soap_http/types"
+<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/cxf/databinding/sdo/hello_world_soap_http" xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/cxf/databinding/sdo/hello_world_soap_http" xmlns:x1="http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
-    <wsdl:import location="HelloService.wsdl" namespace="http://apache.org/hello_world_soap_http" />
+    <wsdl:import location="HelloService.wsdl" namespace="http://apache.org/cxf/databinding/sdo/hello_world_soap_http" />
 
     <wsdl:service name="SOAPService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort">

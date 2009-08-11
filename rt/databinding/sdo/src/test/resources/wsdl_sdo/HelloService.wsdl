@@ -17,12 +17,17 @@
  * specific language governing permissions and limitations
  * under the License.
  -->      
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http" xmlns="http://schemas.xmlsoap.org/wsdl/"
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://apache.org/hello_world_soap_http" xmlns:x1="http://apache.org/hello_world_soap_http/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+<wsdl:definitions name="HelloWorld" 
+    targetNamespace="http://apache.org/cxf/databinding/sdo/hello_world_soap_http"
+     xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="http://apache.org/cxf/databinding/sdo/hello_world_soap_http" 
+    xmlns:x1="http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types"
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema"
-            xmlns:tns="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+        <schema targetNamespace="http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema"
+            xmlns:tns="http://apache.org/cxf/databinding/sdo/hello_world_soap_http/types" elementFormDefault="qualified">
             <simpleType name="MyStringType">
                 <restriction base="string">
                     <maxLength value="30" />
