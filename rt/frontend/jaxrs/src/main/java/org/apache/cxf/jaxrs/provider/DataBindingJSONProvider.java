@@ -16,9 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.jaxrs.provider;
-
 
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,15 +37,22 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
-@Produces({"application/json" })
-@Consumes({"application/json" })
-public final class AegisJSONProvider extends AegisElementProvider  {
+@Produces("application/json")
+@Consumes("application/json")
+public class DataBindingJSONProvider extends DataBindingProvider {
     
     private List<String> arrayKeys;
     private boolean serializeAsArray;
     private ConcurrentHashMap<String, String> namespaceMap = new ConcurrentHashMap<String, String>();
+    private boolean writeXsiType = true;
+    private boolean readXsiType = true;
     
-    public AegisJSONProvider() {
+    public void setWriteXsiType(boolean write) {
+        writeXsiType = write;
+    }
+    
+    public void setReadXsiType(boolean read) {
+        readXsiType = read;
     }
     
     public void setArrayKeys(List<String> keys) {
@@ -68,14 +73,21 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     }
     
     @Override
-    protected XMLStreamWriter createStreamWriter(Class<?> type, OutputStream os) throws Exception {
+    protected XMLStreamWriter createWriter(Class<?> type, OutputStream os) throws Exception {
         QName qname = getQName(type);
         return JSONUtils.createStreamWriter(os, qname, writeXsiType, namespaceMap, 
-                                                           serializeAsArray, arrayKeys);
+                                            serializeAsArray, arrayKeys);
     }
     
     @Override
-    protected XMLStreamReader createStreamReader(Class<?> type, InputStream is) throws Exception {
+    protected void writeToWriter(XMLStreamWriter writer, Object o) throws Exception {
+        writer.writeStartDocument();
+        super.writeToWriter(writer, o);
+        writer.writeEndDocument();
+    }
+    
+    @Override
+    protected XMLStreamReader createReader(Class<?> type, InputStream is) throws Exception {
         getQName(type);
         return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
@@ -85,4 +97,5 @@ public final class AegisJSONProvider extends AegisElementProvider  {
         namespaceMap.putIfAbsent(qname.getNamespaceURI(), "ns1");
         return qname;
     }
+    
 }
