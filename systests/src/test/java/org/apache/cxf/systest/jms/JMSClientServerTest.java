@@ -737,27 +737,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                 fail(client.getException().getMessage());
             }
         }
-        /*
-         * The result is not certain. sometimes right, sometime wrong. because the thread.
-        //Sleep for up to 10 seconds.   The timeout should be at 5 seconds so this
-        //should bail earlier
-        for (int x = 0; x < 10; x++) {
-            Thread.sleep(1000);
-            
-            for (ClientRunnable client : clients) {
-                if (client.getException() != null 
-                    && client.getException().getMessage().contains("Timeout")) {
-                    // exceptions expected
-                    return;
-                }
-            }
-        }
        
-        fail("This is a negative pass. If this test passed this means that the missing QoS" 
-             + " has been added to the runtime or an unexpected exception received. " 
-             + " If latter is true, then read method comments for details on missing QoS"
-             + " and change this test to fail on exception");
-        */
     }
 
     /*
