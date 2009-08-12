@@ -19,6 +19,7 @@
 package org.apache.cxf.feature;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
@@ -39,22 +40,41 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
   </pre>
  */
 public class LoggingFeature extends AbstractFeature {
-    private static final int DEFAULT_LIMIT = 100 * 1024;
+    private static final int DEFAULT_LIMIT = 64 * 1024;
     private static final LoggingInInterceptor IN = new LoggingInInterceptor(DEFAULT_LIMIT);
     private static final LoggingOutInterceptor OUT = new LoggingOutInterceptor(DEFAULT_LIMIT);
     
-    int limit = DEFAULT_LIMIT;
     
+    String inLocation;
+    String outLocation;
+    
+    int limit = DEFAULT_LIMIT;
+
+    public LoggingFeature() {
+        
+    }
+
+    public LoggingFeature(Logging annotation) {
+        inLocation = annotation.inLocation();
+        outLocation = annotation.outLocation();
+        limit = annotation.limit();
+    }
+
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
-        if (limit == DEFAULT_LIMIT) {
+        if (limit == DEFAULT_LIMIT && inLocation == null && outLocation == null) {
             provider.getInInterceptors().add(IN);
+            provider.getInFaultInterceptors().add(IN);
             provider.getOutInterceptors().add(OUT);
             provider.getOutFaultInterceptors().add(OUT);
         } else {
             LoggingInInterceptor in = new LoggingInInterceptor(limit);
+            in.setOutputLocation(inLocation);
             LoggingOutInterceptor out = new LoggingOutInterceptor(limit);
+            out.setOutputLocation(outLocation);
+            
             provider.getInInterceptors().add(in);
+            provider.getInFaultInterceptors().add(in);
             provider.getOutInterceptors().add(out);
             provider.getOutFaultInterceptors().add(out);
         }

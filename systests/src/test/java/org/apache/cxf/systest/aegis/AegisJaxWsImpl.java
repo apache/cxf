@@ -23,11 +23,11 @@ import java.util.Map;
 
 import javax.jws.WebService;
 
-import org.apache.cxf.feature.Features;
+import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.systest.aegis.bean.Item;
 
-@Features(features = "org.apache.cxf.feature.LoggingFeature")
-@WebService (endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWs")
+@Logging
+@WebService(endpointInterface = "org.apache.cxf.systest.aegis.AegisJaxWs")
 public class AegisJaxWsImpl implements AegisJaxWs {
     
     Map<Integer, Item> items = new HashMap<Integer, Item>();

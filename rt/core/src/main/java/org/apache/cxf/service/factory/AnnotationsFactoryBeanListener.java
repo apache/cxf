@@ -26,6 +26,7 @@ import java.util.List;
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
+import org.apache.cxf.annotations.Logging;
 import org.apache.cxf.annotations.SchemaValidation;
 import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
@@ -34,6 +35,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
@@ -71,17 +73,21 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
             Endpoint ep = (Endpoint)args[1];
+            Bus bus = factory.getBus();
             addSchemaValidationSupport(ep, cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(ep, cls.getAnnotation(FastInfoset.class));
-            addGZipSupport(ep, factory.getBus(), cls.getAnnotation(GZIP.class));
+            addGZipSupport(ep, bus, cls.getAnnotation(GZIP.class));
+            addLoggingSupport(ep, bus, cls.getAnnotation(Logging.class));
             break; 
         }
         case SERVER_CREATED: {
             Class<?> cls = (Class<?>)args[2];
             Server server = (Server)args[0];
-            addGZipSupport(server.getEndpoint(), factory.getBus(), cls.getAnnotation(GZIP.class));
+            Bus bus = factory.getBus();
+            addGZipSupport(server.getEndpoint(), bus, cls.getAnnotation(GZIP.class));
             addSchemaValidationSupport(server.getEndpoint(), cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(server.getEndpoint(), cls.getAnnotation(FastInfoset.class));
+            addLoggingSupport(server.getEndpoint(), bus, cls.getAnnotation(Logging.class));
             WSDLDocumentation doc = cls.getAnnotation(WSDLDocumentation.class);
             if (doc != null) {
                 addDocumentation(server, WSDLDocumentation.Placement.SERVICE, doc);
@@ -115,6 +121,13 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         default:
             //do nothing
+        }
+    }
+
+    private void addLoggingSupport(Endpoint endpoint, Bus bus, Logging annotation) {
+        if (annotation != null) {
+            LoggingFeature lf = new LoggingFeature(annotation);
+            lf.initialize(endpoint, bus);
         }
     }
 

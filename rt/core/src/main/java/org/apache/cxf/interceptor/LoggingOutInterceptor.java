@@ -22,26 +22,18 @@ package org.apache.cxf.interceptor;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 /**
  * 
  */
-public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
+public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
    
-    private static final Logger LOG = LogUtils.getL7dLogger(LoggingOutInterceptor.class); 
-
-    private int limit = 100 * 1024;
-    private PrintWriter writer;
-    
     public LoggingOutInterceptor(String phase) {
         super(phase);
         addBefore(StaxOutInterceptor.class.getName());
@@ -59,20 +51,12 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
         this.writer = w;
     }
     
-    public void setLimit(int lim) {
-        limit = lim;
-    }
-    
-    public int getLimit() {
-        return limit;
-    }    
 
     public void handleMessage(Message message) throws Fault {
         final OutputStream os = message.getContent(OutputStream.class);
         if (os == null) {
             return;
         }
-
         if (LOG.isLoggable(Level.INFO) || writer != null) {
             // Write the output while caching it for the log message
             final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
@@ -81,18 +65,6 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
         }
     }
     
-    /**
-     * Transform the string before display. The implementation in this class 
-     * does nothing. Override this method if you want to change the contents of the 
-     * logged message before it is delivered to the output. 
-     * For example, you can use this to masking out sensitive information.
-     * @param originalLogString the raw log message.
-     * @return transformed data
-     */
-    protected String transform(String originalLogString) {
-        return originalLogString;
-    } 
-
     class LoggingCallback implements CachedOutputStreamCallback {
         
         private final Message message;
@@ -154,11 +126,7 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
                 //ignore
             }
 
-            if (writer != null) {
-                writer.println(transform(buffer.toString()));
-            } else if (LOG.isLoggable(Level.INFO)) {
-                LOG.info(transform(buffer.toString()));
-            }
+            log(buffer.toString());
             try {
                 //empty out the cache
                 cos.lockOutputStream();
