@@ -291,16 +291,19 @@ public final class InjectionUtils {
             throw new WebApplicationException(ex, HttpUtils.getParameterFailureStatus(pType));
         }
         
+        Object result = null;
         // check for valueOf(String) static methods
         String[] methodNames = pClass.isEnum() 
-            ? new String[] {"fromString", "valueOf"} 
+            ? new String[] {"fromString", "fromValue", "valueOf"} 
             : new String[] {"valueOf", "fromString"};
-        Object result = evaluateFactoryMethod(value, pClass, pType, methodNames[0]);
-        if (result == null) {
-            result = evaluateFactoryMethod(value, pClass, pType, methodNames[1]);
+        for (String mName : methodNames) {   
+            result = evaluateFactoryMethod(value, pClass, pType, mName);
+            if (result != null) {
+                break;
+            }
         }
         
-        if (message != null) {
+        if (result == null && message != null) {
             ParameterHandler<?> pm = ProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {

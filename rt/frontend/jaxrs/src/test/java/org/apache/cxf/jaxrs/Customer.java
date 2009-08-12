@@ -110,7 +110,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @QueryParam("b")
     private String b;
     private String name;
-
+    
     public Customer() {
         
     }
@@ -285,6 +285,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                     @QueryParam("p3") CustomerGender gender2) {
         // complete
     }
+    
+    public void testFromValueParam(@QueryParam("p1") Timezone tzone) {
+        // complete
+    }
+    
 //  CHECKSTYLE:OFF
     public void testWrongType(@QueryParam("p1") HashMap map) {
         // complete

@@ -52,6 +52,7 @@ import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
+import org.apache.cxf.jaxrs.Timezone;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -569,6 +570,20 @@ public class JAXRSUtilsTest extends Assert {
                      u.toString(), params.get(0).toString());
         assertSame(CustomerGender.FEMALE, params.get(1));
         assertSame(CustomerGender.MALE, params.get(2));
+    }
+    
+    @Test
+    public void testFromValueEnum() throws Exception {
+        Class[] argType = {Timezone.class};
+        Method m = Customer.class.getMethod("testFromValueParam", argType);
+        Message messageImpl = createMessage();
+        messageImpl.put(Message.QUERY_STRING, "p1=Europe%2FLondon");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(1, params.size());
+        assertSame("Timezone Parameter was not processed correctly", 
+                   Timezone.EUROPE_LONDON, params.get(0));
     }
     
     @Test
