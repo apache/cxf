@@ -59,7 +59,17 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
      * @param headers
      */
     private void checkJMSMessageFormat(SoapMessage message, Map<String, List<String>> headers) {
-        // ToDO
+        List<String> mt = headers.get(SoapJMSConstants.JMS_MESSAGE_TYPE);
+        if (mt != null && mt.size() > 0) {
+            String messageType = mt.get(0);
+            if (!"text".equals(messageType) && !"byte".equals(messageType)) {
+                JMSFault jmsFault = JMSFaultFactory.createUnsupportedJMSMessageFormatFault(messageType);
+                Fault f = createFault(message, jmsFault);
+                if (f != null) {
+                    throw f;
+                }
+            }
+        }
     }
 
     /**
@@ -82,9 +92,16 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         List<String> ru = headers.get(SoapJMSConstants.REQUESTURI_FIELD);
         JMSFault jmsFault = null;
         if (ru != null && ru.size() > 0) {
-            //String requestURI = ru.get(0);
-            // ToDO malformedRequestURI
-            // ToDO tagetServiceNotAllowedInRequestURI
+            String requestURI = ru.get(0);
+            List<String> mr = headers.get(SoapJMSConstants.MALFORMED_REQUESTURI);
+            if (mr != null && mr.size() > 0 && mr.get(0).equals("true")) {
+                jmsFault = JMSFaultFactory.createMalformedRequestURIFault(requestURI);
+            }
+
+            List<String> trn = headers.get(SoapJMSConstants.TARGET_SERVICE_IN_REQUESTURI);
+            if (trn != null && trn.size() > 0 && trn.get(0).equals("true")) {
+                jmsFault = JMSFaultFactory.createTargetServiceNotAllowedInRequestURIFault();
+            }
         } else {
             jmsFault = JMSFaultFactory.createMissingRequestURIFault();
         }
@@ -104,8 +121,12 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
         List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
         JMSFault jmsFault = null;
         if (ct != null && ct.size() > 0) {
-            //String contentType = ct.get(0);
-            // ToDO
+            String contentType = ct.get(0);
+            if (!contentType.startsWith("text/xml")
+                && !contentType.startsWith("application/soap+xml")
+                && !contentType.startsWith("multipart/related")) {
+                jmsFault = JMSFaultFactory.createContentTypeMismatchFault(contentType);
+            }
         } else {
             jmsFault = JMSFaultFactory.createMissingContentTypeFault();
         }

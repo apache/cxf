@@ -675,7 +675,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join(10000);
+            t.join(1000);
         }
 
         Throwable e = (engClient.getException() != null) 
@@ -823,7 +823,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join(10000);
+            t.join(1000);
         }
 
         for (ClientRunnable client : clients) {
@@ -864,7 +864,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
     
         for (Thread t : threads) {
-            t.join(10000);
+            t.join(1000);
         }
 
         for (ClientRunnable client : clients) {

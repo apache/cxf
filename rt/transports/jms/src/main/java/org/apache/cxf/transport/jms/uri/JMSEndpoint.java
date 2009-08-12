@@ -46,6 +46,9 @@ public class JMSEndpoint extends JMSEndpointType {
         Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
             String key = (String)iter.next();
+            if ("targetService".equals(key)) {
+                continue;
+            }
             String value = (String)parameters.get(key);
             if (first) {
                 requestUri += "?" + key + "=" + value;

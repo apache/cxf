@@ -28,22 +28,24 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
+import javax.jms.StreamMessage;
 import javax.jms.TextMessage;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.Unmarshaller;
 
+import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testsuite.testcase.TestCasesType;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.JNDIConfiguration;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.apache.cxf.transport.jms.uri.JMSURIConstants;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -56,26 +58,7 @@ public final class JMSTestUtil {
 
     private JMSTestUtil() {
     }
-
-    public static void createSession(String address) throws Exception {
-        JMSEndpoint endpoint = JMSEndpointParser.createEndpoint(address);
-        try {
-            JmsTemplate jmsTemplate = JMSFactory
-                .createJmsTemplate(getInitJMSConfiguration(address), null);
-            Destination dest = JMSFactory.resolveOrCreateDestination(jmsTemplate, endpoint
-                .getDestinationName(), false);
-            jmsTemplate.send(dest, new MessageCreator() {
-                public Message createMessage(Session session) throws JMSException {
-                    TextMessage message = session.createTextMessage();
-                    message.setText("This is message " + 1);
-                    return message;
-                }
-            });
-        } catch (JMSException e) {
-            System.out.println("Exception occurred: " + e.toString());
-        }
-    }
-
+    
     public static List<TestCaseType> getTestCases() {
         try {
             if (testcases == null) {
@@ -119,7 +102,7 @@ public final class JMSTestUtil {
         return JMSFactory.resolveOrCreateDestination(jmsTemplate, destinationName, pubSubDomain);
     }
 
-    private static JMSConfiguration getInitJMSConfiguration(String address) throws Exception {
+    public static JMSConfiguration getInitJMSConfiguration(String address) throws Exception {
         JMSEndpoint endpoint = JMSEndpointParser.createEndpoint(address);
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
@@ -168,5 +151,76 @@ public final class JMSTestUtil {
             }
         }
         return jmsConfig;
+    }
+
+    /**
+     * @param testcase
+     * @param session
+     * @param rtd
+     * @return
+     * @throws JMSException 
+     */
+    public static Message buildJMSMessageFromTestCase(TestCaseType testcase, Session session,
+                                                      Destination rtd) throws JMSException {
+        MessagePropertiesType messageProperties = testcase.getRequestMessage();
+        Message jmsMessage = null;
+        String messageType = messageProperties.getMessageType();
+        if ("text".equals(messageType)) {
+            jmsMessage = session.createTextMessage();
+            ((TextMessage)jmsMessage).setText("test");
+        } else if ("byte".equals(messageType)) {
+            jmsMessage = session.createBytesMessage();
+        } else if ("stream".equals(messageType)) {
+            jmsMessage = session.createStreamMessage();
+            ((StreamMessage)jmsMessage).writeString("test");
+        } else {
+            jmsMessage = session.createBytesMessage();
+        }
+
+        jmsMessage.setJMSReplyTo(rtd);
+
+        if (messageProperties.isSetDeliveryMode()) {
+            jmsMessage.setJMSDeliveryMode(messageProperties.getDeliveryMode());
+        }
+        if (messageProperties.isSetExpiration()) {
+            jmsMessage.setJMSExpiration(messageProperties.getExpiration());
+        }
+        if (messageProperties.isSetPriority()) {
+            jmsMessage.setJMSPriority(messageProperties.getPriority());
+        }
+        if (messageProperties.isSetExpiration()) {
+            jmsMessage.setJMSPriority(messageProperties.getExpiration());
+        }
+        
+        if (messageProperties.isSetTargetService()
+            && !"".equals(messageProperties.getTargetService().trim())) {
+            jmsMessage.setStringProperty(JMSSpecConstants.TARGETSERVICE_FIELD, messageProperties
+                .getTargetService().trim());
+        }
+
+        if (messageProperties.isSetBindingVersion()
+            && !"".equals(messageProperties.getBindingVersion().trim())) {
+            jmsMessage.setStringProperty(JMSSpecConstants.BINDINGVERSION_FIELD, messageProperties
+                                         .getBindingVersion().trim());
+        }
+
+        if (messageProperties.isSetContentType()
+            && !"".equals(messageProperties.getContentType().trim())) {
+            jmsMessage.setStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD, messageProperties
+                .getContentType().trim());
+        }
+
+        if (messageProperties.isSetSoapAction()
+            && !"".equals(messageProperties.getSoapAction().trim())) {
+            jmsMessage.setStringProperty(JMSSpecConstants.SOAPACTION_FIELD, messageProperties
+                .getSoapAction().trim());
+        }
+
+        if (messageProperties.isSetRequestURI()
+            && !"".equals(messageProperties.getRequestURI().trim())) {
+            jmsMessage.setStringProperty(JMSSpecConstants.REQUESTURI_FIELD, messageProperties
+                .getRequestURI().trim());
+        }
+        return jmsMessage;
     }
 }

@@ -19,9 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.UUID;
@@ -215,9 +213,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender {
         try {
             JMSUtils.populateIncomingContext(jmsMessage, inMessage, JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
         
-            byte[] response = JMSUtils.retrievePayload(jmsMessage, (String)inMessage.get(Message.ENCODING));
-            LOG.log(Level.FINE, "The Response Message payload is : [" + response + "]");
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(response));
+            JMSUtils.retrieveAndSetPayload(inMessage, jmsMessage, (String)inMessage.get(Message.ENCODING));
 
             if (exchange.isSynchronous()) {
                 synchronized (exchange) {

@@ -190,6 +190,8 @@ public final class JMSEndpointParser {
             remaining = removeStartingCharacters(remaining.substring(JMSURIConstants.JNDI_PREFIX
                 .length()), '/');
             isJndi = true;
+        } else {
+            throw new Exception("Unknow JMS Variant");
         }
 
         final String subject = convertPathToActualDestination(remaining);

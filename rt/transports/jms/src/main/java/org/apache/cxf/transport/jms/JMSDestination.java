@@ -19,9 +19,7 @@
 
 package org.apache.cxf.transport.jms;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
@@ -175,9 +173,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             MessageImpl inMessage = new MessageImpl();            
             JMSUtils.populateIncomingContext(message, inMessage, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
             
-            byte[] request = JMSUtils.retrievePayload(message, (String)inMessage.get(Message.ENCODING));
-            getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
+            JMSUtils.retrieveAndSetPayload(inMessage, message, (String)inMessage.get(Message.ENCODING));
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);

@@ -72,7 +72,7 @@ public class SOAPJMSTestSuiteClientTest extends AbstractSOAPJMSTestSuite {
 
         Message message = jmsTemplate.receive(dest);
         try {
-            checkJMSProperties(message, testcase.getRequestMessage(), true);
+            checkJMSProperties(message, testcase.getRequestMessage());
         } catch (Exception ex) {
             ex.printStackTrace();
         }
@@ -99,7 +99,7 @@ public class SOAPJMSTestSuiteClientTest extends AbstractSOAPJMSTestSuite {
         serviceThread.start();
 
         Message message = jmsTemplate.receive(dest);
-        checkJMSProperties(message, testcase.getRequestMessage(), false);
+        checkJMSProperties(message, testcase.getRequestMessage());
 
         serviceThread.interrupt();
     }

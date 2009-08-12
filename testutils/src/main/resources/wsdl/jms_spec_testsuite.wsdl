@@ -218,4 +218,40 @@
             <soap:address location="jms:jndi:dynamicQueues/testqueue1001?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
         </wsdl:port>
     </wsdl:service>
+    
+    <wsdl:service name="JMSSimpleService1002">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1002?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
+    
+    <wsdl:service name="JMSSimpleService1003">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1003?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
+    
+   <wsdl:service name="JMSSimpleService1004">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1004?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
+    
+    <wsdl:service name="JMSSimpleService1006">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1006?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
+    
+    <wsdl:service name="JMSSimpleService1007">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1007?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
+    
+    <wsdl:service name="JMSSimpleService1008">
+        <wsdl:port binding="tns:JMSSimplePortBinding" name="SimplePort">
+            <soap:address location="jms:jndi:dynamicQueues/testqueue1008?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

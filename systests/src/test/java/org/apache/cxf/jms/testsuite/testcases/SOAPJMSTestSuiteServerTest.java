@@ -50,28 +50,4 @@ public class SOAPJMSTestSuiteServerTest extends AbstractSOAPJMSTestSuite {
     public void test001() {
         // do nothing here , just to make the surefire happy.
     }
-
-/*    @Test
-    public void test0002() throws Exception {
-        TestCaseType testcase = JMSTestUtil.getTestCase("test0002");
-        final JMSSimplePortType simplePort = getPort("JMSSimpleService", "SimplePort",
-                                                     JMSSimpleService.class,
-                                                     JMSSimplePortType.class);
-        InvocationHandler handler = Proxy.getInvocationHandler(simplePort);
-        BindingProvider bp = null;
-
-        if (handler instanceof BindingProvider) {
-            bp = (BindingProvider)handler;
-        }
-
-        String response = simplePort.echo("test");
-        assertEquals(response, "test");
-
-        if (bp != null) {
-            Map<String, Object> responseContext = bp.getResponseContext();
-            Message m = (Message)responseContext
-                .get(JMSConstants.JMS_CLIENT_RESPONSE_JMSMESSAGE);
-            checkJMSProperties(m, testcase.getResponseMessage(), false);
-        }
-    }*/
 }

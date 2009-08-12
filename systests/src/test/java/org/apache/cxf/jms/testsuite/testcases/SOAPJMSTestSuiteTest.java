@@ -248,4 +248,46 @@ public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
             assertTrue(e.getMessage().contains("Unrecognized BindingVersion"));
         }
     }
+    
+    @Test
+    public void test1002() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1002");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
+    
+    @Test
+    public void test1003() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1003");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
+    
+    @Test
+    public void test1004() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1004");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
+    
+    @Test
+    public void test1006() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1006");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
+    
+    @Test
+    public void test1007() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1007");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
+    
+    @Test
+    public void test1008() throws Exception {
+        TestCaseType testcase = JMSTestUtil.getTestCase("test1008");
+        
+        twoWayTestWithCreateMessage(testcase);
+    }
 }
