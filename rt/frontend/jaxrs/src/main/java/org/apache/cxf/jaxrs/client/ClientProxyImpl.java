@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -268,12 +269,12 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             }
         }
         
-        List<MediaType> accepts = getAccept();
+        List<MediaType> accepts = getAccept(headers);
         if (accepts == null) {
             accepts = InjectionUtils.isPrimitive(responseClass) 
                 ? Collections.singletonList(MediaType.TEXT_PLAIN_TYPE)
                 : ori.getProduceTypes().size() == 0 
-                || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
+                || ori.getProduceTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
                 ? Collections.singletonList(MediaType.APPLICATION_XML_TYPE) : ori.getProduceTypes();
             for (MediaType mt : accepts) {
                 headers.add(HttpHeaders.ACCEPT, mt.toString());
@@ -281,6 +282,18 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
             
         return headers;
+    }
+    
+    private List<MediaType> getAccept(MultivaluedMap<String, String> allHeaders) {
+        List<String> headers = allHeaders.get(HttpHeaders.ACCEPT);
+        if (headers == null || headers.size() == 0) {
+            return null;
+        }
+        List<MediaType> types = new ArrayList<MediaType>();
+        for (String s : headers) {
+            types.add(MediaType.valueOf(s));
+        }
+        return types;
     }
     
     private List<Object> getPathParamValues(MultivaluedMap<ParameterType, Parameter> map,
@@ -358,7 +371,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
             if (params[p.getIndex()] != null) {
-                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()]);
+                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()].toString());
             }
         }
         
@@ -401,10 +414,11 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             m.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
         }
         
-        if (bodyIndex != -1 || types.containsKey(ParameterType.FORM)) {
+        boolean isForm = types.containsKey(ParameterType.FORM);
+        if (bodyIndex != -1 || isForm) {
             m.setContent(OperationResourceInfo.class, ori);
             m.put("BODY_INDEX", bodyIndex);
-            Object body = bodyIndex != -1 ? params[bodyIndex] : handleForm(types, params); 
+            Object body = isForm ? handleForm(types, params) : params[bodyIndex];
             MessageContentsList contents = new MessageContentsList(new Object[]{body});
             m.setContent(List.class, contents);
             m.getInterceptorChain().add(new BodyWriter());

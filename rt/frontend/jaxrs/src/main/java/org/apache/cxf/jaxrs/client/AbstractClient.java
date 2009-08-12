@@ -27,7 +27,6 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -256,24 +255,6 @@ public class AbstractClient implements Client {
     }
 
     
-    protected List<MediaType> getAccept() {
-        List<String> headers = requestHeaders.get(HttpHeaders.ACCEPT);
-        if (headers == null || headers.size() == 0) {
-            return null;
-        }
-        List<MediaType> types = new ArrayList<MediaType>();
-        for (String s : headers) {
-            types.add(MediaType.valueOf(s));
-        }
-        return types;
-    }
-
-    
-    protected MediaType getType() {
-        String type = requestHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
-        return type == null ? null : MediaType.valueOf(type);
-    }
-
     protected UriBuilder getCurrentBuilder() {
         return currentBuilder;
     }

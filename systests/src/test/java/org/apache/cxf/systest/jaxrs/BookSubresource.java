@@ -38,6 +38,10 @@ public interface BookSubresource {
     @Produces("application/xml")
     Book getTheBook() throws BookNotFoundFault;
     
+    @GET
+    @Path("/subresource/noproduces")
+    Book getTheBookNoProduces() throws BookNotFoundFault;
+    
     @POST
     @Path("/subresource2/{n1:.*}")
     @Consumes("text/plain")
@@ -53,7 +57,8 @@ public interface BookSubresource {
     @POST
     @Path("/subresource3")
     Book getTheBook3(@FormParam("id") String id,
-                     @FormParam("name") String name) throws BookNotFoundFault;
+                     @FormParam("name") String name,
+                     @FormParam("nameid") Integer nameid) throws BookNotFoundFault;
     
     @GET
     @Path("/subresource4/{id}/{name}")

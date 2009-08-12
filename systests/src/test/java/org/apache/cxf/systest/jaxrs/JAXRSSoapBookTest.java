@@ -203,6 +203,18 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookSubresourceClientNoProduces() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                                  BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("125");
+        Book b = bs.getTheBookNoProduces();
+        assertEquals(125, b.getId());
+        assertEquals("CXF in Action", b.getName());
+    }
+    
+    @Test
     public void testGetBookSubresourceParamExtensions() throws Exception {
         
         String baseAddress = "http://localhost:9092/test/services/rest";
@@ -295,7 +307,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create(baseAddress);
         MultivaluedMap<String, Object> map = new MetadataMap<String, Object>();
         map.putSingle("id", "679");
-        map.putSingle("name", "CXF in Action - 679");
+        map.putSingle("name", "CXF in Action - ");
+        map.putSingle("nameid", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
                           .form((Map<String, List<Object>>)map).getEntity());
         assertEquals(679, b.getId());
@@ -308,7 +321,8 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         String baseAddress = "http://localhost:9092/test/services/rest/bookstore/books/679/subresource3";
         WebClient wc = WebClient.create(baseAddress);
         Form f = new Form();
-        f.set("id", "679").set("name", "CXF in Action - 679");
+        f.set("id", "679").set("name", "CXF in Action - ")
+            .set("nameid", "679");
         Book b = readBook((InputStream)wc.accept("application/xml")
                           .form(f).getEntity());
         assertEquals(679, b.getId());
@@ -322,7 +336,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
                                                                   BookStoreJaxrsJaxws.class);
         BookSubresource bs = proxy.getBookSubresource("679");
-        Book b = bs.getTheBook3("679", "CXF in Action - 679");
+        Book b = bs.getTheBook3("679", "CXF in Action - ", new Integer(679));
         assertEquals(679, b.getId());
         assertEquals("CXF in Action - 679", b.getName());
     }
