@@ -28,6 +28,8 @@ import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.SingleConnectionFactory102;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -42,7 +44,10 @@ public class JMSConfiguration implements InitializingBean {
     static final boolean DEFAULT_USEJMS11 = true;
     
     private boolean usingEndpointInfo = true;
-
+    
+    private JmsTemplate jmsTemplate;
+    private AbstractMessageListenerContainer messageListenerContainer;
+    
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
@@ -493,5 +498,21 @@ public class JMSConfiguration implements InitializingBean {
     
     public boolean isSetEnforceSpec() {
         return this.enforceSpec != null;
+    }
+
+    public void setJmsTemplate(JmsTemplate jmsTemplate) {
+        this.jmsTemplate = jmsTemplate;
+    }
+
+    public JmsTemplate getJmsTemplate() {
+        return jmsTemplate;
+    }
+
+    public AbstractMessageListenerContainer getMessageListenerContainer() {
+        return messageListenerContainer;
+    }
+
+    public void setMessageListenerContainer(AbstractMessageListenerContainer messageListenerContainer) {
+        this.messageListenerContainer = messageListenerContainer;
     }
 }

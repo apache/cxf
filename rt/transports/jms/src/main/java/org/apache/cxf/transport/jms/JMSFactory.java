@@ -36,6 +36,7 @@ import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapte
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.JmsTemplate102;
 import org.springframework.jms.core.SessionCallback;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer102;
 import org.springframework.jms.support.destination.DestinationResolver;
@@ -93,6 +94,9 @@ public final class JMSFactory {
      */
     public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig,
                                                 JMSMessageHeadersType messageProperties) {
+        if (jmsConfig.getJmsTemplate() != null) {
+            return jmsConfig.getJmsTemplate();
+        }
         JmsTemplate jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
@@ -125,10 +129,13 @@ public final class JMSFactory {
      * @param destinationName null for temp dest or a destination name
      * @return
      */
-    public static DefaultMessageListenerContainer createJmsListener(EndpointInfo ei,
+    public static AbstractMessageListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
                                                                     String destinationName) {
+        if (jmsConfig.getMessageListenerContainer() != null) {
+            return jmsConfig.getMessageListenerContainer();
+        }
         DefaultMessageListenerContainer jmsListener = null;
         
         if (jmsConfig.isUseJms11()) {
@@ -165,7 +172,7 @@ public final class JMSFactory {
         
         jmsListener.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
-        //jmsListener.setSubscriptionDurable(jmsConfig.isSubscriptionDurable());
+        jmsListener.setSubscriptionDurable(jmsConfig.isSubscriptionDurable());
         jmsListener.setDurableSubscriptionName(jmsConfig.getDurableSubscriptionName());
         jmsListener.setSessionTransacted(jmsConfig.isSessionTransacted());
         jmsListener.setTransactionManager(jmsConfig.getTransactionManager());
