@@ -21,7 +21,10 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
@@ -30,11 +33,13 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.jaxrs.fortest.AegisTestBean;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisJSONProviderTest extends Assert {
@@ -126,6 +131,27 @@ public class AegisJSONProviderTest extends Assert {
         String json = new String(bytes, "utf-8");
         assertEquals(data, json);
         
+    }
+    
+    @Test
+    @Ignore
+    public void testWriteCollection() throws Exception {
+        AegisJSONProvider p = new AegisJSONProvider();
+        AbstractAegisProvider.clearContexts();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        AegisTestBean bean = new AegisTestBean();
+        bean.setBoolValue(Boolean.TRUE);
+        bean.setStrValue("hovercraft");
+        List<AegisTestBean> beans = new ArrayList<AegisTestBean>();
+        beans.add(bean);
+        Method m = CollectionsResource.class.getMethod("getAegisBeans", new Class[]{});
+        p.writeTo(beans, (Class)m.getReturnType(), m.getGenericReturnType(), 
+                  AegisTestBean.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        byte[] bytes = os.toByteArray();
+        String json = new String(bytes, "utf-8");
+        System.out.println(json);
+        //assertEquals(data, json);
     }
     
     @Test

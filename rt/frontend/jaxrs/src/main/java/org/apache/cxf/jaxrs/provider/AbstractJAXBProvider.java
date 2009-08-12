@@ -85,6 +85,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected Map<String, String> jaxbElementClassMap;
     protected boolean unmarshalAsJaxbElement;
+    protected boolean marshalAsJaxbElement;
     
     private MessageContext mc;
     private Schema schema;
@@ -94,6 +95,10 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     public void setUnmarshallAsJaxbElement(boolean value) {
         unmarshalAsJaxbElement = value;
+    }
+    
+    public void setMarshallAsJaxbElement(boolean value) {
+        marshalAsJaxbElement = value;
     }
     
     public void setJaxbElementClassNames(List<String> names) {
@@ -107,17 +112,21 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     @SuppressWarnings("unchecked")
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
+        
+        QName name = null;
         if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName()) 
             || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(cls.getName())) {
-            QName name = null;
             if (jaxbElementClassMap != null) {
                 name = convertStringToQName(jaxbElementClassMap.get(cls.getName()));
             } else {
                 name = getJaxbQName(cls, genericType, obj, false);
             }
-            if (name != null) {
-                return new JAXBElement(name, cls, null, obj);
-            }
+        }
+        if (name == null && marshalAsJaxbElement) {
+            name = convertStringToQName(cls.getName());
+        }
+        if (name != null) {
+            return new JAXBElement(name, cls, null, obj);
         }
         return obj;
     }
@@ -249,7 +258,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
-        return isSupported(type, genericType, anns);
+        return marshalAsJaxbElement || isSupported(type, genericType, anns);
     }
 
     public void setSchemaLocations(List<String> locations) {
