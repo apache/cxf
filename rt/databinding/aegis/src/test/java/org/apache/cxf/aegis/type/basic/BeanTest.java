@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
@@ -62,6 +63,9 @@ public class BeanTest extends AbstractAegisTest {
         addNamespace("a", "urn:anotherns");
         addNamespace("xsi", SOAPConstants.XSI_NS);
 
+    }
+
+    private void defaultContext() {
         context = new AegisContext();
         context.initialize();
         mapping = context.getTypeMapping();
@@ -69,6 +73,7 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testBean() throws Exception {
+        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
@@ -108,6 +113,7 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testBeanWithXsiType() throws Exception {
+        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
@@ -132,6 +138,8 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testUnmappedProperty() throws Exception {
+        
+        defaultContext();
         String ns = "urn:Bean";
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, ns, false);
 
@@ -162,6 +170,7 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testAttributeMap() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.mapAttribute("howdy", new QName("urn:Bean", "howdy"));
         info.mapAttribute("bleh", new QName("urn:Bean", "bleh"));
@@ -209,6 +218,7 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testAttributeMapDifferentNS() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.mapAttribute("howdy", new QName("urn:Bean2", "howdy"));
         info.mapAttribute("bleh", new QName("urn:Bean2", "bleh"));
@@ -247,6 +257,7 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testNullProperties() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
         info.mapAttribute("howdy", new QName("urn:Bean", "howdy"));
@@ -300,6 +311,7 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testNillableInt() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(IntBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -333,10 +345,50 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(int1ok);
         assertTrue(int2ok);
     }
+    
+    @Test
+    public void testNillableAnnotation() throws Exception {
+        context = new AegisContext();
+        TypeCreationOptions config = new TypeCreationOptions();
+        config.setDefaultNillable(false);
+        config.setDefaultMinOccurs(1);
+        context.setTypeCreationOptions(config);
+        context.initialize();
+        mapping = context.getTypeMapping();
+
+        BeanType type = (BeanType)mapping.getTypeCreator().createType(BeanWithNillableItem.class);
+        type.setTypeClass(BeanWithNillableItem.class);
+        type.setTypeMapping(mapping);
+
+        XmlSchema schema = newXmlSchema("urn:Bean");
+        type.writeSchema(schema);
+        
+        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("BeanWithNillableItem");
+        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
+        boolean itemFound = false;
+        boolean itemNotNillableFound = false;
+        for (int x = 0; x < seq.getItems().getCount(); x++) {
+            XmlSchemaObject o = seq.getItems().getItem(x);
+            if (o instanceof XmlSchemaElement) {
+                XmlSchemaElement oe = (XmlSchemaElement) o;
+                if ("item".equals(oe.getName())) {
+                    itemFound = true;
+                    assertTrue(oe.isNillable());
+                    assertEquals(0, oe.getMinOccurs());
+                } else if ("itemNotNillable".equals(oe.getName())) {
+                    itemNotNillableFound = true;
+                    assertFalse(oe.isNillable());
+                }
+            }
+        }
+        assertTrue(itemFound);
+        assertTrue(itemNotNillableFound);
+    }
+    
+    
     @Test
     public void testNillableIntMinOccurs1() throws Exception {
         context = new AegisContext();
-
         TypeCreationOptions config = new TypeCreationOptions();
         config.setDefaultMinOccurs(1);
         config.setDefaultNillable(false);
@@ -370,9 +422,7 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testCharMappings() throws Exception {
-        context = new AegisContext();
-        context.initialize();
-        mapping = context.getTypeMapping();
+        defaultContext();
 
         BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
         type.setTypeClass(SimpleBean.class);
@@ -403,9 +453,7 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testByteMappings() throws Exception {
-        context = new AegisContext();
-        context.initialize();
-        mapping = context.getTypeMapping();
+        defaultContext();
 
         BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
         type.setTypeClass(SimpleBean.class);
@@ -457,6 +505,7 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testNullNonNillableWithDate() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -476,8 +525,10 @@ public class BeanTest extends AbstractAegisTest {
         assertInvalid("/b:root/b:date", element);
         assertValid("/b:root", element);
     }
+    
     @Test
     public void testExtendedBean() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(ExtendedBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -495,8 +546,10 @@ public class BeanTest extends AbstractAegisTest {
         Element element = writeObjectToElement(type, bean, getContext());
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
+    
     @Test
     public void testByteBean() throws Exception {
+        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(ByteBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -530,6 +583,7 @@ public class BeanTest extends AbstractAegisTest {
     }
     @Test
     public void testGetSetRequired() throws Exception {
+        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(GoodBean.class);
         type.setTypeMapping(mapping);
@@ -583,6 +637,30 @@ public class BeanTest extends AbstractAegisTest {
         public void setInt2(int int2) {
             this.int2 = int2;
         }
+    }
+    
+    public static class BeanWithNillableItem {
+        private IntBean item;
+        private Integer itemNotNillable;
+
+        @XmlElement(nillable = true)
+        public IntBean getItem() {
+            return item;
+        }
+
+        public void setItem(IntBean item) {
+            this.item = item;
+        }
+
+        public Integer getItemNotNillable() {
+            return itemNotNillable;
+        }
+
+        public void setItemNotNillable(Integer itemNotNillable) {
+            this.itemNotNillable = itemNotNillable;
+        }
+
+        
     }
 
     public static class ByteBean {
