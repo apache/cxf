@@ -27,7 +27,7 @@ import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 
 public class JMSContinuationProvider implements ContinuationProvider {
 
@@ -35,14 +35,14 @@ public class JMSContinuationProvider implements ContinuationProvider {
     private Message inMessage;
     private MessageObserver incomingObserver;
     private Collection<JMSContinuation> continuations;
-    private DefaultMessageListenerContainer jmsListener;
+    private AbstractMessageListenerContainer jmsListener;
     private JMSConfiguration jmsConfig;
     
     public JMSContinuationProvider(Bus b,
                                    Message m, 
                                    MessageObserver observer,
                                    Collection<JMSContinuation> cList,
-                                   DefaultMessageListenerContainer jmsListener,
+                                   AbstractMessageListenerContainer jmsListener,
                                    JMSConfiguration jmsConfig) {
         bus = b;
         inMessage = m;    
