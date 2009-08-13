@@ -90,19 +90,22 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
         if (part != null && part.getProperty("honor.jaxb.annotations") != null) {
             honorJaxbAnnotation = (Boolean)part.getProperty("honor.jaxb.annotations");
         }
-        Annotation[] anns = getJAXBAnnotation(part);
-        if (honorJaxbAnnotation && anns.length > 0) {
-            //RpcLit will use the JAXB Bridge to unmarshall part message when it is 
-            //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
-            //TODO:Cache the JAXBRIContext
-            QName qname = new QName(null, part.getConcreteName().getLocalPart());
-
-            return JAXBEncoderDecoder.unmarshalWithBridge(qname,
-                                                          part.getTypeClass(),
-                                                          anns, 
-                                                          databinding.getContextClasses(),
-                                                          reader,
-                                                          getAttachmentUnmarshaller());
+        Annotation[] anns = null;
+        if (honorJaxbAnnotation) {
+            anns = getJAXBAnnotation(part);
+            if (anns.length > 0) {
+                //RpcLit will use the JAXB Bridge to unmarshall part message when it is 
+                //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
+                //TODO:Cache the JAXBRIContext
+                QName qname = new QName(null, part.getConcreteName().getLocalPart());
+    
+                return JAXBEncoderDecoder.unmarshalWithBridge(qname,
+                                                              part.getTypeClass(),
+                                                              anns, 
+                                                              databinding.getContextClasses(),
+                                                              reader,
+                                                              getAttachmentUnmarshaller());
+            }
         }
         
         return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), reader, part, 

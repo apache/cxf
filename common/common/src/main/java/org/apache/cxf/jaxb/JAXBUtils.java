@@ -561,7 +561,9 @@ public final class JAXBUtils {
             typeRefs.add(ref);
             List<Class<?>> clses = new ArrayList<Class<?>>(ctxClasses);
             clses.add(refClass.getField("type").get(ref).getClass());
-            clses.add(refcls);
+            if (!refcls.isInterface()) {
+                clses.add(refcls);
+            }
             
             Object ctx = null;
             for (Method m : cls.getDeclaredMethods()) {

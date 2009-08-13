@@ -192,9 +192,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
     
             }
     
-            if (parameters.size() > 0) {
-                message.setContent(List.class, parameters);
-            }
+            message.setContent(List.class, parameters);
         } catch (Fault f) {
             if (!isRequestor(message)) {
                 f.setFaultCode(Fault.FAULT_CODE_CLIENT);

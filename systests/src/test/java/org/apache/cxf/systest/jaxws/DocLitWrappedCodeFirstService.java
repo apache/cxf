@@ -106,6 +106,9 @@ public interface DocLitWrappedCodeFirstService {
     @WebMethod
     List<Foo[]> listObjectArrayOutput();
     
+    String outOnly(@WebParam(mode = WebParam.Mode.OUT) Holder<String> out1, 
+                   @WebParam(mode = WebParam.Mode.OUT) Holder<String> out2);
+    
     @WebMethod
     int throwException(int i) 
         throws ServiceTestFault, CustomException, ComplexException;

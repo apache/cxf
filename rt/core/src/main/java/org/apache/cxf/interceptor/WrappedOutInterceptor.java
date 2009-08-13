@@ -71,7 +71,8 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
                 }
                 if (pfx == null) {
                     int x = 1;
-                    while (xmlWriter.getNamespaceContext().getNamespaceURI("ns" + x) != null) {
+                    while (!StringUtils.isEmpty(xmlWriter.getNamespaceContext()
+                                                     .getNamespaceURI("ns" + x))) {
                         x++;
                     }
                     pfx = "ns" + x;
