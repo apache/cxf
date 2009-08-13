@@ -44,7 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JMSDestinationTest extends AbstractJMSTester {
-    private static final int MAX_RECEIVE_TIME = 5;
+    private static final int MAX_RECEIVE_TIME = 10;
     private Message destMessage;
 
     public JMSDestinationTest() {
@@ -188,7 +188,9 @@ public class JMSDestinationTest extends AbstractJMSTester {
         JMSDestination destination = setupJMSDestination(true);
         sendoutMessage(conduit, outMessage, true);
         // wait for the message to be get from the destination
+        //long time = System.currentTimeMillis();
         waitForReceiveDestMessage();
+        //System.out.println("time: " + (System.currentTimeMillis() - time));
         // just verify the Destination inMessage
         assertTrue("The destiantion should have got the message ", destMessage != null);
         verifyReceivedMessage(destMessage);
