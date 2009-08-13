@@ -159,7 +159,7 @@ public class JAXBElementProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(b, Book.class, Book.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        readSuperBook(bos.toString());
+        readSuperBook(bos.toString(), true);
     }
     
     @Test
@@ -171,15 +171,109 @@ public class JAXBElementProviderTest extends Assert {
         provider.writeTo(b, Book.class, Book.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         
-        readSuperBook(bos.toString());
+        readSuperBook(bos.toString(), false);
+    }
+    
+    @Test
+    public void testWriteWithoutXmlRootElement() throws Exception {
+        doTestWriteWithoutXmlRootElement("SuperBook", false);
+    }
+    
+    @Test
+    public void testWriteWithoutXmlRootElement2() throws Exception {
+        doTestWriteWithoutXmlRootElement("SuperBook", true);
+    }
+    
+    @Test
+    public void testWriteWithoutXmlRootElement3() throws Exception {
+        doTestWriteWithoutXmlRootElement("{http://books}SuperBook", false);
+    }
+    
+    public void doTestWriteWithoutXmlRootElement(String name, boolean unmarshalAsJaxbElement) 
+        throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
+            name));
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        readSuperBook2(bos.toString(), unmarshalAsJaxbElement);
+    }
+    
+    @Test
+    public void testWriteWithoutXmlRootElementDerived() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+            org.apache.cxf.jaxrs.fortest.jaxb.Book.class.getName(), "Book"));
+        org.apache.cxf.jaxrs.fortest.jaxb.Book b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.Book.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        readSuperBook2(bos.toString(), false);
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testWriteWithoutXmlRootElementObjectFactory() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class.getName(), 
+            "{http://books}SuperBook2"));
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2("CXF in Action", 123L, 124L);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        JAXBElementProvider provider2 = new JAXBElementProvider();
+        ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 book = 
+            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2)provider2.readFrom(
+                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
+                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(124L, book.getSuperId());
     }
     
     @SuppressWarnings("unchecked")
-    private void readSuperBook(String data) throws Exception {
+    private void readSuperBook(String data, boolean xsiTypeExpected) throws Exception {
+        if (xsiTypeExpected) {
+            assertTrue(data.contains("xsi:type"));
+        }
         JAXBElementProvider provider = new JAXBElementProvider();
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
         SuperBook book = (SuperBook)provider.readFrom(
                        (Class)SuperBook.class, SuperBook.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        assertEquals(124L, book.getSuperId());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readSuperBook2(String data, boolean unmarshalAsJaxbElement) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        if (!unmarshalAsJaxbElement) {
+            provider.setJaxbElementClassMap(Collections.singletonMap(
+                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), "SuperBook"));
+        } else {
+            provider.setUnmarshallAsJaxbElement(true);
+        }
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook book = 
+            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook)provider.readFrom(
+                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
+                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
         assertEquals(124L, book.getSuperId());
     }

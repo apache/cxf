@@ -144,10 +144,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 unmarshaller.setEventHandler(eventHandler);
             }
             Object response = null;
-            if (JAXBElement.class.isAssignableFrom(type)) {
+            if (JAXBElement.class.isAssignableFrom(type) 
+                || unmarshalAsJaxbElement 
+                || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
                 response = unmarshaller.unmarshal(new StreamSource(is), theType);
             } else {
                 response = doUnmarshal(unmarshaller, type, is, mt);
+            }
+            if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
+                response = ((JAXBElement)response).getValue();    
             }
             if (isCollection) {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type); 
