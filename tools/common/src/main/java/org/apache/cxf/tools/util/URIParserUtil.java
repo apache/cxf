@@ -97,7 +97,8 @@ public final class URIParserUtil {
             String lastToken = tokens.get(tokens.size() - 1);
             idx = lastToken.lastIndexOf('.');
             if (idx > 0) {
-                lastToken = lastToken.substring(0, idx);
+                //lastToken = lastToken.substring(0, idx);
+                lastToken = lastToken.replace('.', '_');
                 tokens.set(tokens.size() - 1, lastToken);
             }
         }

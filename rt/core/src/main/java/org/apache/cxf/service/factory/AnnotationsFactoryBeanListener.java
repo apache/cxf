@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.Logging;
@@ -32,6 +33,7 @@ import org.apache.cxf.annotations.WSDLDocumentation;
 import org.apache.cxf.annotations.WSDLDocumentation.Placement;
 import org.apache.cxf.annotations.WSDLDocumentationCollection;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
@@ -41,6 +43,7 @@ import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -59,15 +62,17 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
         switch (ev) {
         case INTERFACE_CREATED: {
+            InterfaceInfo ii = (InterfaceInfo)args[0];
             Class<?> cls = (Class<?>)args[1];
             WSDLDocumentation doc = cls.getAnnotation(WSDLDocumentation.class);
             if (doc != null) {
-                addDocumentation((InterfaceInfo)args[0], WSDLDocumentation.Placement.PORT_TYPE, doc);
+                addDocumentation(ii, WSDLDocumentation.Placement.PORT_TYPE, doc);
             }
             WSDLDocumentationCollection col = cls.getAnnotation(WSDLDocumentationCollection.class);
             if (col != null) {
-                addDocumentation((InterfaceInfo)args[0], WSDLDocumentation.Placement.PORT_TYPE, col.value());
+                addDocumentation(ii, WSDLDocumentation.Placement.PORT_TYPE, col.value());
             }
+            setDataBinding(factory, cls.getAnnotation(DataBinding.class));
             break;
         }
         case ENDPOINT_SELECTED: {
@@ -121,6 +126,22 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         default:
             //do nothing
+        }
+    }
+
+    private void setDataBinding(AbstractServiceFactoryBean factory,
+                                DataBinding annotation) {
+        if (annotation != null && factory.getDataBinding(false) == null) { 
+            try {
+                if (!StringUtils.isEmpty(annotation.ref())) {
+                    factory.setDataBinding(factory.getBus().getExtension(ResourceManager.class)
+                        .resolveResource(annotation.ref(), annotation.value()));
+                }
+
+                factory.setDataBinding(annotation.value().newInstance());
+            } catch (Exception e) {
+                //REVISIT - log a warning
+            }
         }
     }
 

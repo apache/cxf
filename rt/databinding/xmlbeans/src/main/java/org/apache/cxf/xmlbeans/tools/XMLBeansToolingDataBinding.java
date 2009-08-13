@@ -91,6 +91,9 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     StscState state;
     
     public void initialize(ToolContext context) throws ToolException {
+        context.put(ToolConstants.RUNTIME_DATABINDING_CLASS,
+            "org.apache.cxf.xmlbeans.XmlBeansDataBinding.class");
+        
         String wsdl = (String)context.get(ToolConstants.CFG_WSDLURL);
         String catalog = (String)context.get(ToolConstants.CFG_CATALOG);
         Object o = context.get(ToolConstants.CFG_BINDING);

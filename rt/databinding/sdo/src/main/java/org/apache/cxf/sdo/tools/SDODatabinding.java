@@ -77,6 +77,8 @@ public class SDODatabinding extends XSD2JavaGenerator implements DataBindingProf
     private EPackage.Registry packageRegistry;
     
     public void initialize(ToolContext context) throws ToolException {
+        context.put(ToolConstants.RUNTIME_DATABINDING_CLASS,
+                    "org.apache.cxf.sdo.SDODataBinding.class");
         String databinding = (String)context.get(ToolConstants.CFG_DATABINDING);
         if (DATABINDING_DYNAMIC_SDO.equalsIgnoreCase(databinding)) {
             dynamic = true;
