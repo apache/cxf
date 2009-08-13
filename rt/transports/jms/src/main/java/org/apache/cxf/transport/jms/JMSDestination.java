@@ -66,7 +66,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
-import org.springframework.jms.listener.DefaultMessageListenerContainer;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.destination.DestinationResolver;
 
@@ -78,7 +78,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
     private JMSConfiguration jmsConfig;
     private Bus bus;
     private EndpointInfo ei;
-    private DefaultMessageListenerContainer jmsListener;
+    private AbstractMessageListenerContainer jmsListener;
     private Collection<JMSContinuation> continuations = 
         new ConcurrentLinkedQueue<JMSContinuation>();
 

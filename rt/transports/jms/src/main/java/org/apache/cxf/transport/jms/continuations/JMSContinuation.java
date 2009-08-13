@@ -30,6 +30,7 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 
 public class JMSContinuation implements Continuation {
@@ -38,7 +39,7 @@ public class JMSContinuation implements Continuation {
     private Message inMessage;
     private MessageObserver incomingObserver;
     private Collection<JMSContinuation> continuations;
-    private DefaultMessageListenerContainer jmsListener;
+    private AbstractMessageListenerContainer jmsListener;
     private JMSConfiguration jmsConfig;
     
     private Object userObject;
@@ -50,7 +51,7 @@ public class JMSContinuation implements Continuation {
     
     public JMSContinuation(Bus b, Message m, MessageObserver observer,
                            Collection<JMSContinuation> cList, 
-                           DefaultMessageListenerContainer jmsListener,
+                           AbstractMessageListenerContainer jmsListener,
                            JMSConfiguration jmsConfig) {
         bus = b;
         inMessage = m;    
@@ -151,7 +152,9 @@ public class JMSContinuation implements Continuation {
     protected void updateContinuations(boolean remove) {
 
         if (jmsConfig.getMaxSuspendedContinuations() < 0
-            || jmsListener.getCacheLevel() >= DefaultMessageListenerContainer.CACHE_CONSUMER) {
+            || (jmsListener instanceof DefaultMessageListenerContainer
+                && ((DefaultMessageListenerContainer)jmsListener).getCacheLevel() 
+                    >= DefaultMessageListenerContainer.CACHE_CONSUMER)) {
             modifyList(remove);
             return;
         }
