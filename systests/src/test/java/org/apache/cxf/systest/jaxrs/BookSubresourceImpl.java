@@ -53,11 +53,11 @@ public class BookSubresourceImpl implements BookSubresource {
         return b;
     }
     
-    public Book getTheBook3(String sid, String name) throws BookNotFoundFault {
+    public Book getTheBook3(String sid, String name, Integer nameid) throws BookNotFoundFault {
         Book b = new Book();
         
         b.setId(Long.valueOf(sid)); 
-        b.setName(name);
+        b.setName(name + nameid.toString());
         return b;
     }
     
@@ -78,6 +78,10 @@ public class BookSubresourceImpl implements BookSubresource {
             throw new RuntimeException();
         }
         return bookPath;
+    }
+
+    public Book getTheBookNoProduces() throws BookNotFoundFault {
+        return getTheBook();
     }
 
 }
