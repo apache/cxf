@@ -213,5 +213,11 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
     public String doFooList(List<Foo> fooList) {
         return "size: " + fooList.size();
     }
+
+    public String outOnly(Holder<String> out1, Holder<String> out2) {
+        out1.value = "out1";
+        out2.value = "out2";
+        return "hello";
+    }
     
 }
