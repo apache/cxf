@@ -36,6 +36,7 @@ import javax.wsdl.factory.WSDLFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
+import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
 import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
 import org.apache.cxf.common.util.StringUtils;
@@ -80,6 +81,11 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
+        if (ei.getAddress() != null && ei.getAddress().startsWith("soap.tcp")) {
+            return new SoapTcpDestination(ei.getTarget(), ei);
+            //return SoapTcpDestination.getInstance(ei.getTarget(), ei);
+        }
+        
         SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
         DestinationFactory destinationFactory;
         try {

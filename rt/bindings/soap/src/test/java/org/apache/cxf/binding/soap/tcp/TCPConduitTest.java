@@ -19,7 +19,7 @@
 
 package org.apache.cxf.binding.soap.tcp;
 
-import java.io.ByteArrayInputStream;
+//import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,13 +28,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
+//import javax.xml.stream.XMLStreamException;
+//import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.staxutils.StaxUtils;
+//import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -42,6 +42,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
+//import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -64,8 +65,8 @@ public class TCPConduitTest {
 
     @Test
     public void testPrepare() {
-        int num1 = 2;
-        int num2 = 3;
+        //int num1 = 2;
+        //int num2 = 3;
         /*
         final String messageData = "<s:Envelope xmlns:s=\"http://www.w3.org/2003/05/soap-envelope\""
             + " xmlns:a=\"http://www.w3.org/2005/08/addressing\"><s:Header><a:Action s:mustUnderstand=\"1\">"
@@ -80,12 +81,19 @@ public class TCPConduitTest {
             */
         
         
-        final String messageData = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+        /*final String messageData = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<S:Body><ns2:add xmlns:ns2=\"http://calculator.me.org/\"><i>"
-            + num1 + "</i><j>" + num2 + "</j></ns2:add></S:Body></S:Envelope>";
+            + num1 + "</i><j>" + num2 + "</j></ns2:add></S:Body></S:Envelope>";*/
+        String name = new String("CXF");
+        /*for (int i = 0; i < 6000; i++) {
+            name += "A";
+        }*/
+        final String messageData = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+            + "<S:Body><sayHi><text>" + name + "</text></sayHi></S:Body></S:Envelope>";
         
         final AttributedURIType a = new AttributedURIType();
-        a.setValue("soap.tcp://localhost:8080/CalculatorApp/CalculatorWSService");
+        //a.setValue("soap.tcp://localhost:8080/CalculatorApp/CalculatorWSService");
+        a.setValue("soap.tcp://localhost:9999/HelloWorld");
         final EndpointReferenceType t = new EndpointReferenceType();
         t.setAddress(a);
         
@@ -123,18 +131,20 @@ public class TCPConduitTest {
     private class TestMessageObserver implements MessageObserver {
 
         public void onMessage(final Message message) {
-            int correctResult = 5;
+            //int correctResult = 5;
             assertNotNull(message);
             InputStream input = message.getContent(InputStream.class);
             byte response[] = null;
             try {
                 response = new byte[input.available()];
                 input.read(response);
+                String s = new String(response, "UTF-8");
+                System.out.println(s);
             } catch (IOException e) {
                 e.printStackTrace();
             }
             
-            try {
+            /*try {
                 ByteArrayInputStream bais = new ByteArrayInputStream(response);
 
                 XMLStreamReader xmlReader = StaxUtils.createXMLStreamReader(bais, "UTF-8");
@@ -147,7 +157,7 @@ public class TCPConduitTest {
                 }
             } catch (XMLStreamException e) {
                 e.printStackTrace();
-            }
+            }*/
         }
         
     }

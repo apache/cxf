@@ -17,28 +17,26 @@
  * under the License.
  */
 
-package org.apache.cxf.binding.soap.tcp.frames;
+package org.apache.cxf.binding.soap.tcp;
 
-public class SoapTcpFrame {
-    private SoapTcpFrameHeader header;
-    private byte[] payload;
+public class SoapTcpSessionState {
+    public static final byte SOAP_TCP_SESSION_STATE_NEW = 0;
+    public static final byte SOAP_TCP_SESSION_STATE_AFTER_HANDSHAKE = 1;
+    public static final byte SOAP_TCP_SESSION_STATE_INITIATED = 2;
     
-    public int getChannelId() {
-        return header.getChannelId();
+    private byte stateId;
+    
+    public SoapTcpSessionState() {
+        stateId = SOAP_TCP_SESSION_STATE_NEW;
     }
-    public void setChannelId(int channelId) {
-        this.header.setChannelId(channelId);
+
+    public byte getStateId() {
+        return stateId;
     }
-    public SoapTcpFrameHeader getHeader() {
-        return header;
+
+    public void setStateId(byte stateId) {
+        this.stateId = stateId;
     }
-    public void setHeader(SoapTcpFrameHeader header) {
-        this.header = header;
-    }
-    public byte[] getPayload() {
-        return payload;
-    }
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
+    
+    
 }

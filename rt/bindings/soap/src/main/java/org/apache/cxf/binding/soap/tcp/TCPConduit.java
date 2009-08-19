@@ -47,20 +47,11 @@ public class TCPConduit
 
     private static final Logger LOG = LogUtils.getL7dLogger(TCPConduit.class);
     
-    private static final String MAGIC_IDENTIFIER = "vnd.sun.ws.tcp";
-    private static final int PROTOCOL_VERSION_MAJOR = 1;
-    private static final int PROTOCOL_VERSION_MINOR = 0;
-    private static final int CONNECTION_MANAGEMENT_VERSION_MAJOR = 1;
-    private static final int CONNECTION_MANAGEMENT_VERSION_MINOR = 0;
-    
     private Socket socket;
     private InputStream in;
     private OutputStream out;
     private String endPointAddress;
     
-    public TCPConduit(EndpointInfo t) throws IOException {
-        this(t.getTarget());
-    }
     public TCPConduit(EndpointReferenceType t) throws IOException {
         super(t);
         
@@ -84,10 +75,11 @@ public class TCPConduit
         in = socket.getInputStream();
         out = socket.getOutputStream();
         
-        out.write(MAGIC_IDENTIFIER.getBytes("US-ASCII"));
-        DataCodingUtils.writeInts4(out, PROTOCOL_VERSION_MAJOR, PROTOCOL_VERSION_MINOR,
-                                   CONNECTION_MANAGEMENT_VERSION_MAJOR,
-                                   CONNECTION_MANAGEMENT_VERSION_MINOR);
+        out.write(SoapTcpProtocolConsts.MAGIC_IDENTIFIER.getBytes("US-ASCII"));
+        DataCodingUtils.writeInts4(out, SoapTcpProtocolConsts.PROTOCOL_VERSION_MAJOR,
+                                   SoapTcpProtocolConsts.PROTOCOL_VERSION_MINOR,
+                                   SoapTcpProtocolConsts.CONNECTION_MANAGEMENT_VERSION_MAJOR,
+                                   SoapTcpProtocolConsts.CONNECTION_MANAGEMENT_VERSION_MINOR);
         out.flush();
         
         final int version[] = new int[4];
@@ -101,6 +93,10 @@ public class TCPConduit
         initSession();
     }
     
+    public TCPConduit(EndpointInfo ei) throws IOException {
+        this(ei.getTarget());
+    }
+
     private void initSession() throws IOException {
         final String initSessionMessage = "<s:Envelope xmlns:s=\"http://schemas.xmlsoap.org/soap/envelope/\">"
             + "<s:Body><initiateSession xmlns=\"http://servicechannel.tcp.transport.ws.xml.sun.com/\""
@@ -124,8 +120,8 @@ public class TCPConduit
         final SoapTcpFrameHeader header =
             new SoapTcpFrameHeader(SoapTcpFrameHeader.SINGLE_FRAME_MESSAGE, contentDesc);
         SoapTcpFrame frame = new SoapTcpFrame();
-        frame.setChannelId(0);
         frame.setHeader(header);
+        frame.setChannelId(0);
         frame.setPayload(initSessionMessageBytes);
         try {
             SoapTcpUtils.writeMessageFrame(out, frame);

@@ -17,28 +17,18 @@
  * under the License.
  */
 
-package org.apache.cxf.binding.soap.tcp.frames;
+package org.apache.cxf.binding.soap.tcp;
 
-public class SoapTcpFrame {
-    private SoapTcpFrameHeader header;
-    private byte[] payload;
+public final class SoapTcpProtocolConsts {
+
+    public static final String MAGIC_IDENTIFIER = "vnd.sun.ws.tcp";
+    public static final int PROTOCOL_VERSION_MAJOR = 1;
+    public static final int PROTOCOL_VERSION_MINOR = 0;
+    public static final int CONNECTION_MANAGEMENT_VERSION_MAJOR = 1;
+    public static final int CONNECTION_MANAGEMENT_VERSION_MINOR = 0;
     
-    public int getChannelId() {
-        return header.getChannelId();
+    private SoapTcpProtocolConsts() {
+        
     }
-    public void setChannelId(int channelId) {
-        this.header.setChannelId(channelId);
-    }
-    public SoapTcpFrameHeader getHeader() {
-        return header;
-    }
-    public void setHeader(SoapTcpFrameHeader header) {
-        this.header = header;
-    }
-    public byte[] getPayload() {
-        return payload;
-    }
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
+
 }

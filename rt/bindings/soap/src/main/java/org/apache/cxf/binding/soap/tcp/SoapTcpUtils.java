@@ -35,12 +35,20 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.cxf.binding.soap.tcp.frames.SoapTcpFrame;
 import org.apache.cxf.binding.soap.tcp.frames.SoapTcpFrameContentDescription;
 import org.apache.cxf.binding.soap.tcp.frames.SoapTcpFrameHeader;
+import org.apache.cxf.binding.soap.tcp.frames.SoapTcpMessage;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public final class SoapTcpUtils {
 
     private SoapTcpUtils() {
         
+    }
+    
+    public static void writeSoapTcpMessage(final OutputStream out, final SoapTcpMessage msg)
+        throws IOException {
+        for (SoapTcpFrame frame : msg.getFrames()) {
+            writeMessageFrame(out, frame);
+        }
     }
     
     /**
@@ -101,42 +109,41 @@ public final class SoapTcpUtils {
             
         final int payloadLength = DataCodingUtils.readInt8(inputStream);
         final byte payload[] = new byte[payloadLength];
-        inputStream.read(payload, 0, payload.length);
+        if (inputStream.read(payload, 0, payload.length) != payloadLength) {
+            throw new IOException();
+        }
         frame.setPayload(payload);
         
         return frame;
     }
     
-    private static SoapTcpFrameContentDescription readContentDescription(final InputStream inputStream) {
+    private static SoapTcpFrameContentDescription readContentDescription(final InputStream inputStream)
+        throws IOException {
         final int response[] = new int[2];
-        try {
-            DataCodingUtils.readInts4(inputStream, response, 2); //[0] content-id, [1] number-of-parameters
-            
-            final SoapTcpFrameContentDescription contentDesc = new SoapTcpFrameContentDescription();
-            contentDesc.setContentId(response[0]);
-            final int numOfParams = response[1];
-            
-            final Map<Integer, String> parameters = new Hashtable<Integer, String>();
-            for (int i = 0; i < numOfParams; i++) {
-                DataCodingUtils.readInts4(inputStream, response, 2); //[0] parameter-id, [1] string-length
-                if (response[1] > 0) {
-                    final byte[] buffer = new byte[response[1]];
-                    if (inputStream.read(buffer) > 0) {
-                        final String value = new String(buffer, "UTF-8");
-                        parameters.put(Integer.valueOf(response[0]), value);
-                        //System.out.println("parameter-id = " + response[0] + " parameter-value = " + value);
-                    }
+        DataCodingUtils.readInts4(inputStream, response, 2); //[0] content-id, [1] number-of-parameters
+        
+        final SoapTcpFrameContentDescription contentDesc = new SoapTcpFrameContentDescription();
+        contentDesc.setContentId(response[0]);
+        final int numOfParams = response[1];
+        
+        final Map<Integer, String> parameters = new Hashtable<Integer, String>();
+        for (int i = 0; i < numOfParams; i++) {
+            DataCodingUtils.readInts4(inputStream, response, 2); //[0] parameter-id, [1] string-length
+            if (response[1] > 0) {
+                final byte[] buffer = new byte[response[1]];
+                if (inputStream.read(buffer) > 0) {
+                    final String value = new String(buffer, "UTF-8");
+                    parameters.put(Integer.valueOf(response[0]), value);
+                    //System.out.println("parameter-id = " + response[0] + " parameter-value = " + value);
                 }
             }
-            contentDesc.setParameters(parameters);
-            
-            return contentDesc;
-        } catch (IOException e) {
-            e.printStackTrace();
-            return null;
         }
+        contentDesc.setParameters(parameters);
+        
+        return contentDesc;
     }
 
+    
     /**
      * Method that parse SoapTcpFrame payload to find important tag. 
      *  

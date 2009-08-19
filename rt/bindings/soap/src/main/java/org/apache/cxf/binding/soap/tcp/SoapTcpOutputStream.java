@@ -128,8 +128,8 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
         final SoapTcpFrameHeader header =
             new SoapTcpFrameHeader(SoapTcpFrameHeader.SINGLE_FRAME_MESSAGE, contentDesc);
         final SoapTcpFrame frame = new SoapTcpFrame();
-        frame.setChannelId(0);
         frame.setHeader(header);
+        frame.setChannelId(0);
         try {
             frame.setPayload(openChannelMsg.getBytes("UTF-8"));
             SoapTcpUtils.writeMessageFrame(outStream, frame);
@@ -174,8 +174,8 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
                 new SoapTcpFrameHeader(SoapTcpFrameHeader.SINGLE_FRAME_MESSAGE, contentDesc);
             header.setChannelId(channelId);
             final SoapTcpFrame frame = new SoapTcpFrame();
-            frame.setChannelId(channelId);
             frame.setHeader(header);
+            frame.setChannelId(channelId);
             frame.setPayload(this.buffer.toByteArray());
             SoapTcpUtils.writeMessageFrame(outStream, frame);
             messageSent = true;
@@ -206,8 +206,8 @@ public class SoapTcpOutputStream extends AbstractThresholdOutputStream {
                 new SoapTcpFrameHeader(SoapTcpFrameHeader.MESSAGE_START_CHUNK, contentDesc);
             header.setChannelId(channelId);
             SoapTcpFrame frame = new SoapTcpFrame();
-            frame.setChannelId(channelId);
             frame.setHeader(header);
+            frame.setChannelId(channelId);
             frame.setPayload(this.buffer.toByteArray());
             SoapTcpUtils.writeMessageFrame(outStream, frame);
             messageSent = true;

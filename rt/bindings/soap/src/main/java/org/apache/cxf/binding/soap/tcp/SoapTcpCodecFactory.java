@@ -17,28 +17,28 @@
  * under the License.
  */
 
-package org.apache.cxf.binding.soap.tcp.frames;
+package org.apache.cxf.binding.soap.tcp;
 
-public class SoapTcpFrame {
-    private SoapTcpFrameHeader header;
-    private byte[] payload;
+import org.apache.mina.core.session.IoSession;
+import org.apache.mina.filter.codec.ProtocolCodecFactory;
+import org.apache.mina.filter.codec.ProtocolDecoder;
+import org.apache.mina.filter.codec.ProtocolEncoder;
+
+public class SoapTcpCodecFactory implements ProtocolCodecFactory {
+    private SoapTcpMessageEncoder encoder;
+    private SoapTcpMessageDecoder decoder;
     
-    public int getChannelId() {
-        return header.getChannelId();
+    public SoapTcpCodecFactory() {
+        encoder = new SoapTcpMessageEncoder();
+        decoder = new SoapTcpMessageDecoder();
     }
-    public void setChannelId(int channelId) {
-        this.header.setChannelId(channelId);
+    
+    public ProtocolDecoder getDecoder(IoSession arg0) throws Exception {
+        return decoder;
     }
-    public SoapTcpFrameHeader getHeader() {
-        return header;
+
+    public ProtocolEncoder getEncoder(IoSession arg0) throws Exception {
+        return encoder;
     }
-    public void setHeader(SoapTcpFrameHeader header) {
-        this.header = header;
-    }
-    public byte[] getPayload() {
-        return payload;
-    }
-    public void setPayload(byte[] payload) {
-        this.payload = payload;
-    }
+
 }
