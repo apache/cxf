@@ -158,12 +158,13 @@ public class ClientImpl
     }
 
     public void destroy() {
-
-        // TODO: also inform the conduit so it can shutdown any response listeners
-
         ClientLifeCycleManager mgr = bus.getExtension(ClientLifeCycleManager.class);
         if (null != mgr) {
             mgr.clientDestroyed(this);
+        }
+
+        if (conduitSelector != null) {
+            getConduit().close();
         }
     }
 
