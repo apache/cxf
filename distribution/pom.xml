@@ -414,6 +414,19 @@
                     </execution>
                 </executions>
             </plugin>
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-checkstyle-plugin</artifactId>
+              <executions>
+                <execution>
+                  <phase>validate</phase>
+                  <id>validate</id>
+                  <configuration>
+                    <excludes>**/target/generated-sources/**</excludes>
+                  </configuration>
+                </execution>
+              </executions>
+            </plugin>
         </plugins>
     </build>
 
