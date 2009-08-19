@@ -405,7 +405,7 @@ public class JMSConfiguration implements InitializingBean {
      * 
      * @return usable connectionFactory
      */
-    public ConnectionFactory getOrCreateWrappedConnectionFactory() {
+    public synchronized ConnectionFactory getOrCreateWrappedConnectionFactory() {
         if (wrappedConnectionFactory == null) {
             if (connectionFactory == null) {
                 connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
@@ -432,7 +432,9 @@ public class JMSConfiguration implements InitializingBean {
         }
         return wrappedConnectionFactory;
     }
-
+    public ConnectionFactory getWrappedConnectionFactory() {
+        return wrappedConnectionFactory;
+    }
     /**
      * Only for tests
      * @return

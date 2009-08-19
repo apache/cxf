@@ -50,6 +50,8 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -394,15 +396,19 @@ public class ManagedConnectionImpl implements ManagedConnection {
         }
         
         private Object handleCloseMethod(Object proxy, Method method,
-                Object[] args) {
+                Object[] args) { 
             
-
             handles.remove(proxy);
             associatedHandle = null;
             ConnectionEvent event = new ConnectionEvent(ManagedConnectionImpl.this,
                     ConnectionEvent.CONNECTION_CLOSED);
             event.setConnectionHandle(proxy);
             sendEvent(event);
+            
+            ConnectionInvocationHandler ch = 
+                (ConnectionInvocationHandler)Proxy.getInvocationHandler(proxy);            
+            Client client = ClientProxy.getClient(ch.target);
+            client.destroy();
             
             return null;
         }
