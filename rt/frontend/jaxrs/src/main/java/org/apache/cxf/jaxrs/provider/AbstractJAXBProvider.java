@@ -143,7 +143,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             }
         }
         
-        return isSupported(type, genericType, anns);
+        return unmarshalAsJaxbElement || isSupported(type, genericType, anns);
     }
     
     protected JAXBContext getCollectionContext(Class<?> type) throws JAXBException {
@@ -329,6 +329,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected boolean isSupported(Class<?> type, Type genericType, Annotation[] anns) {
+        if (jaxbElementClassMap != null && jaxbElementClassMap.containsKey(type.getName())) {
+            return true;
+        }
         return type.getAnnotation(XmlRootElement.class) != null
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)

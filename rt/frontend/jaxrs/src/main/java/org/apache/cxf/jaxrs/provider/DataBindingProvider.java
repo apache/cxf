@@ -26,6 +26,7 @@ import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -64,12 +65,16 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
     public Object readFrom(Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
                        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
-        XMLStreamReader reader = createReader(clazz, is);
-        DataReader<XMLStreamReader> dataReader = binding.createReader(XMLStreamReader.class);
-        return dataReader.read(null, reader, clazz);
+        try {
+            XMLStreamReader reader = createReader(clazz, is);
+            DataReader<XMLStreamReader> dataReader = binding.createReader(XMLStreamReader.class);
+            return dataReader.read(null, reader, clazz);
+        } catch (Exception ex) {
+            throw new WebApplicationException(ex);
+        }
     }
 
-    protected XMLStreamReader createReader(Class<?> clazz, InputStream is) {
+    protected XMLStreamReader createReader(Class<?> clazz, InputStream is) throws Exception {
         return StaxUtils.createXMLStreamReader(is);
     }
     
@@ -87,20 +92,22 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
     public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        XMLStreamWriter writer = createWriter(clazz, os);
-        DataWriter<XMLStreamWriter> dataWriter = binding.createWriter(XMLStreamWriter.class);
-        
-        dataWriter.write(o, writer);
         try {
-            writer.flush();
+            XMLStreamWriter writer = createWriter(clazz, os);
+            writeToWriter(writer, o);
         } catch (Exception ex) {
-            // ignore
+            throw new WebApplicationException(ex);
         }
     }
     
-    protected XMLStreamWriter createWriter(Class<?> clazz, OutputStream os) {
-        return StaxUtils.createXMLStreamWriter(os);
+    protected void writeToWriter(XMLStreamWriter writer, Object o) throws Exception {
+        DataWriter<XMLStreamWriter> dataWriter = binding.createWriter(XMLStreamWriter.class);
+        dataWriter.write(o, writer);
+        writer.flush();
     }
     
+    protected XMLStreamWriter createWriter(Class<?> clazz, OutputStream os) throws Exception {
+        return StaxUtils.createXMLStreamWriter(os);
+    }
 }
 

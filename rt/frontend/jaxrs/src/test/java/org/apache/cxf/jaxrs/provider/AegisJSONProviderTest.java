@@ -48,7 +48,7 @@ public class AegisJSONProviderTest extends Assert {
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new AegisJSONProvider();
-        assertFalse(p.isReadable(AegisTestBean.class, null, null, null));
+        assertTrue(p.isReadable(AegisTestBean.class, null, null, null));
     }
     
     
@@ -69,10 +69,10 @@ public class AegisJSONProviderTest extends Assert {
         if (setNsMap) {
             Map<String, String> namespaceMap = new HashMap<String, String>();
             namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
-            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsins");
+            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
             p.setNamespaceMap(namespaceMap);
         }
-        String data = "{\"ns1.AegisTestBean\":{\"@xsins.type\":\"ns1:AegisTestBean\","
+        String data = "{\"ns1.AegisTestBean\":{\"@xsi.type\":\"ns1:AegisTestBean\","
             + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}}";
         
         byte[] simpleBytes = data.getBytes("utf-8");
@@ -85,14 +85,14 @@ public class AegisJSONProviderTest extends Assert {
     
     @Test
     public void testWriteToWithXsiType() throws Exception {
-        String data = "{\"ns1.AegisTestBean\":{\"@ns2.type\":\"ns1:AegisTestBean\","
+        String data = "{\"ns1.AegisTestBean\":{\"@xsi.type\":\"ns1:AegisTestBean\","
             + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}}";
         doTestWriteTo(data, true, true);
     }
     
     @Test
     public void testWriteToWithXsiTypeNoNamespaces() throws Exception {
-        String data = "{\"ns1.AegisTestBean\":{\"@xsins.type\":\"ns1:AegisTestBean\","
+        String data = "{\"ns1.AegisTestBean\":{\"@xsi.type\":\"ns1:AegisTestBean\","
             + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}}";
         doTestWriteTo(data, true, false);
     }
@@ -112,7 +112,7 @@ public class AegisJSONProviderTest extends Assert {
         if (setNsMap) {
             Map<String, String> namespaceMap = new HashMap<String, String>();
             namespaceMap.put("http://fortest.jaxrs.cxf.apache.org", "ns1");
-            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "ns2");
+            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
             p.setNamespaceMap(namespaceMap);
         }    
         ByteArrayOutputStream os = new ByteArrayOutputStream();

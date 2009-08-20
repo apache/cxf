@@ -24,7 +24,6 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.OutputStreamWriter;
 import java.io.SequenceInputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
@@ -57,11 +56,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
-import org.codehaus.jettison.AbstractXMLStreamWriter;
-import org.codehaus.jettison.mapped.Configuration;
-import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
-import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 @Produces("application/json")
 @Consumes("application/json")
@@ -314,22 +309,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         QName qname = getQName(actualClass, genericType, actualObject, true);
-        Configuration c = new Configuration(namespaceMap);
-        MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
-        AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
-                                            convention, 
-                                            new OutputStreamWriter(os, enc));
-        if (serializeAsArray) {
-            if (arrayKeys != null) {
-                for (String key : arrayKeys) {
-                    xsw.seriliazeAsArray(key);
-                }
-            } else {
-                String key = getKey(convention, qname);
-                xsw.seriliazeAsArray(key);
-            }
-        }
-
+        XMLStreamWriter xsw = JSONUtils.createStreamWriter(os, qname, false, 
+                                                           namespaceMap, serializeAsArray, arrayKeys);
+        
         return isCollection || dropRootElement ? new JSONCollectionWriter(xsw, qname) : xsw; 
     }
     
@@ -343,14 +325,6 @@ public class JSONProvider extends AbstractJAXBProvider  {
         
         Marshaller ms = createMarshaller(actualObject, actualClass, genericType, enc);
         marshal(ms, actualObject, actualClass, genericType, enc, os, false);
-    }
-    
-    private String getKey(MappedNamespaceConvention convention, QName qname) throws Exception {
-        return convention.createKey(qname.getPrefix(), 
-                                    qname.getNamespaceURI(),
-                                    qname.getLocalPart());
-            
-        
     }
     
     private QName getQName(Class<?> cls, Type type, Object object, boolean allocatePrefix) 
