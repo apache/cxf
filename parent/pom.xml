@@ -1137,6 +1137,20 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
             </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <configuration>
+                    <encoding>UTF-8</encoding>
+                    <configLocation>cxf-checkstyle${checkstyle.extension}.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                    <suppressionsLocation>cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                    <sourceDirectory>${basedir}/src</sourceDirectory>
+                    <excludes>**/archetype-resources/**/*.java</excludes>
+                </configuration>
+            </plugin>
         </plugins>
     </reporting>
 
