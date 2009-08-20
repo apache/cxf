@@ -123,7 +123,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             }
         }
         if (name == null && marshalAsJaxbElement) {
-            name = convertStringToQName(cls.getName());
+            name = convertStringToQName(cls.getSimpleName());
         }
         if (name != null) {
             return new JAXBElement(name, cls, null, obj);
