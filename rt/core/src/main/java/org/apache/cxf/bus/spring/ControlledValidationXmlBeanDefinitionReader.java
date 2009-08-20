@@ -82,7 +82,8 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         super(beanFactory);
         tunedDocumentLoader = new TunedDocumentLoader();
         this.setDocumentLoader(tunedDocumentLoader);
-        noFastinfoset = System.getProperty("org.apache.cxf.nofastinfoset") != null;
+        noFastinfoset = System.getProperty("org.apache.cxf.nofastinfoset") != null 
+            || !TunedDocumentLoader.hasFastInfoSet();
     }
 
     @Override
@@ -118,15 +119,16 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
 
     @Override
     public int loadBeanDefinitions(EncodedResource encodedResource) throws BeanDefinitionStoreException {
-        if (noFastinfoset) {
-            return super.loadBeanDefinitions(encodedResource);
+        if (!noFastinfoset) {
+            try {
+                return fastInfosetLoadBeanDefinitions(encodedResource);
+            } catch (BeanDefinitionStoreException bdse) {
+                throw bdse;
+            } catch (Throwable e) {
+                //ignore - just call the super to load them
+            }
         }
-
-        try {
-            return fastInfosetLoadBeanDefinitions(encodedResource);
-        } catch (Exception e) {
-            return super.loadBeanDefinitions(encodedResource);
-        }
+        return super.loadBeanDefinitions(encodedResource);
     }
     
     private int fastInfosetLoadBeanDefinitions(EncodedResource encodedResource)
@@ -161,7 +163,11 @@ public class ControlledValidationXmlBeanDefinitionReader extends XmlBeanDefiniti
         }
         
         Resource newResource = new UrlResource(fixmlUrl); 
-        Document doc = tunedDocumentLoader.loadFastinfosetDocument(fixmlUrl);
+        Document doc = TunedDocumentLoader.loadFastinfosetDocument(fixmlUrl);
+        if (doc == null) {
+            //something caused FastinfoSet to not be able to read the doc
+            throw new StaleFastinfosetException();
+        }
         return registerBeanDefinitions(doc, newResource);
     }
 
