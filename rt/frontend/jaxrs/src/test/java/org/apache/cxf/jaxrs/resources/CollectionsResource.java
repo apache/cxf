@@ -26,7 +26,15 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.xml.bind.JAXBElement;
 
+import org.apache.cxf.jaxrs.fortest.AegisTestBean;
+
 public class CollectionsResource {
+    
+    @GET
+    public List<AegisTestBean> getAegisBeans() {
+        return null;
+    }
+    
     @GET
     public List<Book> getBooks() {
         return null;

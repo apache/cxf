@@ -83,7 +83,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             }
         }
         
-        return isSupported(type, genericType, anns);
+        return super.isReadable(type, genericType, anns, mt);
     }
     
     @Context

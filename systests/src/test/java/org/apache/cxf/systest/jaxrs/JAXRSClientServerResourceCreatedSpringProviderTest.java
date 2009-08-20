@@ -142,6 +142,23 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     }
     
     @Test
+    public void testGetBookNotExistent() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/webapp/bookstore/nonexistent"; 
+        URL url = new URL(endpointAddress);
+        HttpURLConnection connect = (HttpURLConnection)url.openConnection();
+        connect.addRequestProperty("Accept", "application/xml");
+        assertEquals(405, connect.getResponseCode());
+        InputStream in = connect.getErrorStream();
+        assertNotNull(in);           
+
+        assertEquals("Exception is not mapped correctly", 
+                     "Nonexistent method",
+                     getStringFromInputStream(in).trim());
+    }
+    
+    @Test
     public void testPostPetStatus() throws Exception {
         
         String endpointAddress =

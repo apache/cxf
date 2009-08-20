@@ -139,6 +139,11 @@ public class DataBindingJSONProviderTest extends Assert {
             return new Book();
         }
         
+//        @Path("/books/{bookId}/{new}")
+//        public List<Book> getNewBook3() {
+//            return null;
+//        }
+        
         @POST
         public void setNewBook(Book b) {
         }

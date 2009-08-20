@@ -176,25 +176,35 @@ public class JAXBElementProviderTest extends Assert {
     
     @Test
     public void testWriteWithoutXmlRootElement() throws Exception {
-        doTestWriteWithoutXmlRootElement("SuperBook", false);
+        doTestWriteWithoutXmlRootElement("SuperBook", false, false);
     }
     
     @Test
     public void testWriteWithoutXmlRootElement2() throws Exception {
-        doTestWriteWithoutXmlRootElement("SuperBook", true);
+        doTestWriteWithoutXmlRootElement("SuperBook", true, false);
     }
     
     @Test
     public void testWriteWithoutXmlRootElement3() throws Exception {
-        doTestWriteWithoutXmlRootElement("{http://books}SuperBook", false);
+        doTestWriteWithoutXmlRootElement("{http://books}SuperBook", false, false);
     }
     
-    public void doTestWriteWithoutXmlRootElement(String name, boolean unmarshalAsJaxbElement) 
+    @Test
+    public void testWriteWithoutXmlRootElement4() throws Exception {
+        doTestWriteWithoutXmlRootElement("SuperBook", true, true);
+    }
+    
+    public void doTestWriteWithoutXmlRootElement(String name, boolean unmarshalAsJaxbElement,
+                                                 boolean marshalAsJaxbElement) 
         throws Exception {
         JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setJaxbElementClassMap(Collections.singletonMap(
-            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
-            name));
+        if (!marshalAsJaxbElement) {
+            provider.setJaxbElementClassMap(Collections.singletonMap(
+                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
+                name));
+        } else {
+            provider.setMarshallAsJaxbElement(marshalAsJaxbElement);
+        }
         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
             new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
         
