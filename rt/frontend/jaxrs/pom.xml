@@ -156,6 +156,26 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency> 
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-bindings-soap</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope> 
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-jaxb</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+<!--
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-sdo</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency> 
+-->
 	<dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>

@@ -63,6 +63,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
+import org.apache.ws.commons.schema.XmlSchemaException;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
@@ -332,6 +333,9 @@ public class AegisDatabinding
 
     protected void initializeMessage(Service s, TypeMapping serviceTM, AbstractMessageContainer container,
                                      int partType, Set<Type> deps) {
+        if (container == null) {
+            return;
+        }
         for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
             MessagePartInfo part = (MessagePartInfo)itr.next();
 
@@ -372,6 +376,9 @@ public class AegisDatabinding
     }
 
     protected void initializeMessageTypes(ServiceInfo s, AbstractMessageContainer container, int partType) {
+        if (container == null) {
+            return;
+        }
         SchemaCollection col = s.getXmlSchemaCollection();
         for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
             MessagePartInfo part = (MessagePartInfo)itr.next();
@@ -473,7 +480,19 @@ public class AegisDatabinding
                 schema.setAttributeFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
 
                 for (Type t : entry.getValue()) {
-                    t.writeSchema(schema);
+                    try {
+                        t.writeSchema(schema);
+                    } catch (XmlSchemaException ex) {
+                        QName name = t.getSchemaType();
+                        String expected = " Schema for namespace '" + name.getNamespaceURI() 
+                            + "' already contains type '" + name.getLocalPart() + "'";
+                        String message = ex.getMessage();
+                        if (expected.equals(message)) {
+                            continue;
+                        } else {
+                            throw ex;
+                        }
+                    }
                 }
 
                 if (schemaImportsXmime(schema)) {
@@ -586,11 +605,29 @@ public class AegisDatabinding
     private Method getMethod(Service s, OperationInfo op) {
         MethodDispatcher md = (MethodDispatcher)s.get(MethodDispatcher.class.getName());
         SimpleMethodDispatcher smd = (SimpleMethodDispatcher)md;
-        return smd.getPrimaryMethod(op);
+        return smd != null ? smd.getPrimaryMethod(op) : null;
     }
 
     public Type getType(MessagePartInfo part) {
         return part2Type.get(part);
+    }
+    
+    public MessagePartInfo getPartFromClass(Class<?> cls) {
+        for (Map.Entry<MessagePartInfo, Type> entry : part2Type.entrySet()) {
+            if (entry.getValue().getTypeClass() == cls) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+    
+    public Type getTypeFromClass(Class<?> cls) {
+        for (Type t : part2Type.values()) {
+            if (t.getTypeClass() == cls) {
+                return t;
+            }
+        }
+        return null;
     }
 
     public Service getService() {

@@ -70,6 +70,10 @@ public class Book implements Comparable<Book> {
         return "";
     }
     
+    
+    public void setState(String s) {
+    }
+    
     public int hashCode() { 
         return name.hashCode() * 37 + new Long(id).hashCode();
     }

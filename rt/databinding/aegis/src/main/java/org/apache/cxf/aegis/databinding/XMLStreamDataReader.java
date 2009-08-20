@@ -65,7 +65,8 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader>, DataBin
     }
 
     public Object read(QName name, XMLStreamReader input, Class typeClass) {
-        return read(input);
+        MessagePartInfo info = databinding.getPartFromClass(typeClass);
+        return info == null ? read(input) : read(info, input);
     }
 
     public Object read(XMLStreamReader input) {

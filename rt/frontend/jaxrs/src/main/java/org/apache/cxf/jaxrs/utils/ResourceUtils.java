@@ -29,10 +29,12 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
@@ -44,6 +46,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -64,6 +68,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.resource.ResourceManager;
 
 public final class ResourceUtils {
@@ -389,6 +394,42 @@ public final class ResourceUtils {
             resources.add(getResourceFromElement(e));
         }
         return resources;
+    }
+    
+
+    public static Set<Class<?>> getAllRequestResponseTypes(List<ClassResourceInfo> cris, boolean jaxbOnly) {
+        Set<Class<?>> types = new HashSet<Class<?>>();
+        for (ClassResourceInfo root : cris) {
+            for (OperationResourceInfo ori : root.getMethodDispatcher().getOperationResourceInfos()) {
+                if (jaxbOnly) {
+                    checkJaxbType(ori.getMethodToInvoke().getReturnType(), types);
+                } else {
+                    types.add(ori.getMethodToInvoke().getReturnType());
+                }
+                for (Parameter pm : ori.getParameters()) {
+                    if (pm.getType() == ParameterType.REQUEST_BODY) {
+                        Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+                        if (jaxbOnly) {
+                            checkJaxbType(inType, types);
+                        } else {
+                            types.add(inType);
+                        }
+                    }
+                }
+                
+            }
+        }
+        
+        return types;
+    }
+
+    private static void checkJaxbType(Class<?> type, Set<Class<?>> types) {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        if (!InjectionUtils.isPrimitive(type) 
+            && !JAXBElement.class.isAssignableFrom(type)
+            && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
+            types.add(type);
+        }        
     }
     
     private static UserResource getResourceFromElement(Element e) {

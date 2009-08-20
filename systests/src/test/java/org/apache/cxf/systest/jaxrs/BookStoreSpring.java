@@ -64,6 +64,13 @@ public class BookStoreSpring {
     }
     
     @GET
+    @Path("/bookstore/books/{id}")
+    @Produces("application/xml")
+    public Book getBookXml(@PathParam("id") Long id) {
+        return books.get(id);
+    }
+    
+    @GET
     @Path("/bookinfo")
     public Book getBookByUriInfo() throws Exception {
         MultivaluedMap<String, String> params = ui.getQueryParameters();
