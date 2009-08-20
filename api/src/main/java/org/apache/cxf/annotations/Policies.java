@@ -19,19 +19,22 @@
 
 package org.apache.cxf.annotations;
 
+
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+
 /**
- * Enables GZIP compression negotiation
+ * Used to attache multiple Policy annotations 
+ * to a method or type if policies need to be added
+ * to more than one place in the wsdl. 
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-public @interface GZIP {
-    int threshold() default -1;
+@Target({ ElementType.TYPE, ElementType.METHOD })
+public @interface Policies {
+    Policy[] value();
 }
-

@@ -20,6 +20,7 @@
 package org.apache.cxf.annotations;
 
 
+import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -27,8 +28,11 @@ import java.lang.annotation.Target;
 
 
 /**
- * 
+ * Used to attache multiple WSDLDocumentation annotations 
+ * to a method or type if documentation needs to be added
+ * to more than one place in the wsdl. 
  */
+@Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
 public @interface WSDLDocumentationCollection {

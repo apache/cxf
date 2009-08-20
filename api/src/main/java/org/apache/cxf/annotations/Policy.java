@@ -19,38 +19,36 @@
 
 package org.apache.cxf.annotations;
 
-
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-
 /**
- * Adds documentation nodes to the generated WSDL
+ * Enables message Logging
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE, ElementType.METHOD })
-public @interface WSDLDocumentation {
-    /**
-     * The documentation to add
-     * @return documentation string
-     */
-    String value();
+public @interface Policy {
+    
+    String uri();
+    
+    boolean includeInWSDL() default true;
+    
     
     /**
-     * The place to put the documentation.  The Default depends on the 
+     * The place to put the PolicyReference.  The Default depends on the 
      * location of the annotation.   On the method in the SEI, it would be
-     * the portType/operation, on the SEI, it would be the portType, on the 
+     * the binding/operation, on the SEI, it would be the binding, on the 
      * service impl, the service element.
      * @return location
      */
     Placement placement() default Placement.DEFAULT;
     
     /**
-     * If Placement is FAULT_MESSAGE, PORT_FAULT, or BINDING_FAULT,
+     * If Placement is PORT_TYPE_OPERATION_FAULT, or BINDING_OPERATION_FAULT,
      * return the fault class associated with this documentation 
      * @return the fault class
      */
@@ -58,11 +56,6 @@ public @interface WSDLDocumentation {
     
     enum Placement {
         DEFAULT,
-        TOP,
-        
-        INPUT_MESSAGE,
-        OUTPUT_MESSAGE,
-        FAULT_MESSAGE,
         
         PORT_TYPE,
         PORT_TYPE_OPERATION,
@@ -78,9 +71,8 @@ public @interface WSDLDocumentation {
 
         SERVICE,
         SERVICE_PORT,
-        
     };
     
-
     static final class DEFAULT { }
 }
+

@@ -30,6 +30,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.service.factory.FactoryBeanListenerManager;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -289,7 +290,15 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     protected final void init() {
         registry = new PolicyRegistryImpl();
-
+    }
+    
+    @PostConstruct
+    public synchronized void postConsruct() {
+        addBusInterceptors();
+        FactoryBeanListenerManager fblm = bus.getExtension(FactoryBeanListenerManager.class);
+        if (fblm != null) {
+            fblm.addListener(new PolicyAnnotationListener());
+        }
     }
 
 
@@ -302,7 +311,6 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         addedBusInterceptors = false;
     }
 
-    @PostConstruct
     public synchronized void addBusInterceptors() {
     
         if (null == alternativeSelector) {

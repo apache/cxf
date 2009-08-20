@@ -858,7 +858,14 @@ public final class StaxUtils {
         attr.setValue(uri);
         node.setAttributeNodeNS(attr);
     }
-
+    public static XMLStreamReader createXMLStreamReader(InputSource src) {
+        if (src.getByteStream() != null) {
+            return createXMLStreamReader(src.getByteStream(), src.getEncoding());
+        } else if (src.getCharacterStream() != null) {
+            return createXMLStreamReader(src.getCharacterStream());
+        }
+        throw new IllegalArgumentException("InputSource must have a ByteStream or CharacterStream");
+    }
     /**
      * @param in
      * @param encoding
@@ -1140,4 +1147,5 @@ public final class StaxUtils {
             //shouldn't get here
         }
     }
+
 }

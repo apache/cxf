@@ -105,7 +105,7 @@ public class PolicyEngineTest extends Assert {
         assertTrue(engine.isEnabled()); 
         assertSame(selector, engine.getAlternativeSelector());
         assertNotNull(engine.createOutPolicyInfo());
-        
+        bus.shutdown(true);
     }
     
     @Test

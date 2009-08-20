@@ -49,6 +49,7 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.AttributeExtensible;
 import javax.wsdl.extensions.ElementExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
+import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -168,7 +169,7 @@ public class ServiceWSDLBuilder {
             ServiceInfo si = services.get(0);
             definition = newDefinition(si.getName(), si.getTargetNamespace());
             addNamespace(WSDLConstants.CONVENTIONAL_TNS_PREFIX, si.getTargetNamespace(), definition);
-            addExtensibilityElements(definition, getWSDL11Extensors(si));
+            addExtensibilityElements(definition, getWSDL11Extensors(si.getDescription()));
 
             Collection<PortType> portTypes = new HashSet<PortType>();
             for (ServiceInfo service : services) {
@@ -219,6 +220,9 @@ public class ServiceWSDLBuilder {
      * @return the extensibility elements.
      */
     public List<ExtensibilityElement> getWSDL11Extensors(AbstractPropertiesHolder holder) {
+        if (holder == null) {
+            return null;
+        }
         return holder.getExtensors(ExtensibilityElement.class);
     }
     
@@ -241,8 +245,14 @@ public class ServiceWSDLBuilder {
         List<ExtensibilityElement> extensibilityElements) {
         if (extensibilityElements != null) {
             for (ExtensibilityElement element : extensibilityElements) {
-                QName qn = element.getElementType();
-                addNamespace(qn.getNamespaceURI());
+                if (element instanceof UnknownExtensibilityElement) {
+                    UnknownExtensibilityElement uee = (UnknownExtensibilityElement)element;
+                    String pfx = uee.getElement().getPrefix();
+                    addNamespace(pfx, element.getElementType().getNamespaceURI());
+                } else {
+                    QName qn = element.getElementType();
+                    addNamespace(qn.getNamespaceURI());
+                }
                 elementExtensible.addExtensibilityElement(element);
             }
         }
@@ -430,6 +440,7 @@ public class ServiceWSDLBuilder {
         addDocumentation(serv, serviceInfo.getDocumentation());
         serv.setQName(serviceInfo.getName());
         addNamespace(serviceInfo.getName().getNamespaceURI());
+        addExtensibilityElements(serv, getWSDL11Extensors(serviceInfo));
         definition.addService(serv);
 
         for (EndpointInfo ei : serviceInfo.getEndpoints()) {
@@ -456,6 +467,7 @@ public class ServiceWSDLBuilder {
             portType.setQName(intf.getName());
             addDocumentation(portType, intf.getDocumentation());
             addNamespace(intf.getName().getNamespaceURI(), def);
+            addExtensibilityElements(portType, getWSDL11Extensors(intf));
             portType.setUndefined(false);
             buildPortTypeOperation(portType, intf.getOperations(), def);
         }
@@ -517,13 +529,14 @@ public class ServiceWSDLBuilder {
                 if (operationInfo.isOneWay()) {
                     operation.setStyle(OperationType.ONE_WAY);
                 }
-                this.addExtensibilityElements(operation, getWSDL11Extensors(operationInfo));
+                addExtensibilityElements(operation, getWSDL11Extensors(operationInfo));
                 Input input = def.createInput();
                 addDocumentation(input, operationInfo.getInput().getDocumentation());
                 input.setName(operationInfo.getInputName());
                 Message message = def.createMessage();
                 buildMessage(message, operationInfo.getInput(), def);
                 this.addExtensibilityAttributes(input, getInputExtensionAttributes(operationInfo));
+                this.addExtensibilityElements(input, getWSDL11Extensors(operationInfo.getInput()));
                 input.setMessage(message);
                 operation.setInput(input);
                 operation.setParameterOrdering(operationInfo.getParameterOrdering());
@@ -535,6 +548,7 @@ public class ServiceWSDLBuilder {
                     message = def.createMessage();
                     buildMessage(message, operationInfo.getOutput(), def);
                     this.addExtensibilityAttributes(output, getOutputExtensionAttributes(operationInfo));
+                    this.addExtensibilityElements(output, getWSDL11Extensors(operationInfo.getOutput()));
                     output.setMessage(message);
                     operation.setOutput(output);
                 }
@@ -548,6 +562,7 @@ public class ServiceWSDLBuilder {
                     message = def.createMessage();
                     buildMessage(message, faultInfo, def);
                     this.addExtensibilityAttributes(fault, faultInfo.getExtensionAttributes());
+                    this.addExtensibilityElements(fault, getWSDL11Extensors(faultInfo));
                     fault.setMessage(message);
                     operation.addFault(fault);
                 }
