@@ -182,6 +182,12 @@ public interface DocLitWrappedCodeFirstService {
         }
         
         public void setName(String n) {
+            if ("NoName".equals(n)) {
+                throw new IllegalArgumentException(n + " is not a valid name");
+            }
+            name = n;
+        }
+        public void setNameIgnore(String n) {
             name = n;
         }
         public String getName() {
@@ -190,6 +196,8 @@ public interface DocLitWrappedCodeFirstService {
     }
     
     Set<Foo> getFooSet();
+    
+    Foo modifyFoo(Foo foo);
     
     @RequestWrapper(className = "org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService$DoFooListRequest")
     @WebMethod(operationName = "doFooList")

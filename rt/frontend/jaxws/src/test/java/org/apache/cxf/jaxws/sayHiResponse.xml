@@ -19,7 +19,7 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
 	<soap:Body>
 	<sayHiResponse xmlns="http://apache.org/hello_world_soap_http/types">
-		<text>hi</text>
+		<responseType>hi</responseType>
 	</sayHiResponse>
 	</soap:Body>
 

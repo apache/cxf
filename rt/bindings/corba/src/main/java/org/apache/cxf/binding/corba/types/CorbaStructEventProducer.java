@@ -32,6 +32,11 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
         iterator = handler.members.iterator();
         serviceInfo = service;
         orb = orbRef;
+        if (handler.members.isEmpty() 
+            && handler.getSimpleName().equals(handler.getIdlType().getLocalPart() + "_f")) {
+            state = states.length;
+        }
+
     }
 
     public int next() { 
@@ -49,11 +54,22 @@ public class CorbaStructEventProducer extends AbstractStartEndEventProducer {
                 && (!CorbaHandlerUtils.isOctets(obj.getType()))) {
                 currentEventProducer =
                     new CorbaPrimitiveSequenceEventProducer(obj, serviceInfo, orb);
+            } else if (obj.getSimpleName().equals(obj.getIdlType().getLocalPart() + "_f")) { 
+                //some "special cases" we need to make sure are mapped correctly
+
+                currentEventProducer =
+                    CorbaHandlerUtils.getTypeEventProducer(obj, serviceInfo, orb);
+                
             } else {
                 currentEventProducer =
                     CorbaHandlerUtils.getTypeEventProducer(obj, serviceInfo, orb);
             }
-            event = currentEventProducer.next();
+            if (currentEventProducer.hasNext()) {
+                event = currentEventProducer.next();
+            } else {
+                currentEventProducer = null;
+                return next();
+            }
         } else {
             // all done with content, move past state 0
             event = states[++state];
