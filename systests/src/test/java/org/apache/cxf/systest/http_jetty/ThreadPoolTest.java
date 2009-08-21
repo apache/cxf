@@ -72,6 +72,10 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
         }
         for (int i = 0; i < invokers.length; i++) {
             invokers[i].join(15 * 1000);
+            long end = System.currentTimeMillis();
+            if ((end - start) > (10 * 1000L)) {
+                return;
+            }
         }
         long end = System.currentTimeMillis();
         assertTrue("unexpected duration: " + (end - start),

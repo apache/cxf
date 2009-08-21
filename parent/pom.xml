@@ -119,13 +119,6 @@
                 </includes>
             </testResource>
             <testResource>
-                <directory>src/test/java</directory>
-                <includes>
-                    <include>**/*.xml</include>
-                </includes>
-                <filtering>true</filtering>
-            </testResource>
-            <testResource>
                 <directory>target/generated/src/test/resources</directory>
                 <includes>
                     <include>**</include>
@@ -448,8 +441,8 @@
                         <artifactId>xmlParserAPIs</artifactId>
                     </exclusion>
                     <exclusion>
-                        <groupId>nekohtml</groupId>
-                        <artifactId>nekohtml</artifactId>
+                        <groupId>jtidy</groupId>
+                        <artifactId>jtidy</artifactId>
                     </exclusion>
                 </exclusions>
             </dependency>
