@@ -58,6 +58,8 @@ public class CorbaUnionEventProducer extends AbstractStartEndEventProducer {
                     list.add(contents);
                     iterator = list.iterator();
                 }
+            } else if (handler.getSimpleName().equals(handler.getIdlType().getLocalPart() + "_f")) {
+                state = states.length;
             }
         }
     }

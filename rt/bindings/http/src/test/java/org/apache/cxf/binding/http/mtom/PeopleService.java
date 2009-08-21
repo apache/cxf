@@ -18,16 +18,24 @@
  */
 package org.apache.cxf.binding.http.mtom;
 
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 
 import org.apache.cxf.person.People;
 import org.apache.cxf.person.Person;
 
-@WebService
+@WebService(targetNamespace = "http://cxf.apache.org/person/")
 public interface PeopleService {
+    @WebResult(name = "Person",
+               targetNamespace = "http://cxf.apache.org/person/")
     People getPeople();
 
-    void addPerson(Person p);
-
-    Person getPerson(String name);
+    void addPerson(@WebParam(name = "Person",
+                             targetNamespace = "http://cxf.apache.org/person/")
+                             Person p);
+    
+    @WebResult(name = "Person",
+               targetNamespace = "http://cxf.apache.org/person/")
+    Person getPerson(@WebParam(name = "name") String name);
 }

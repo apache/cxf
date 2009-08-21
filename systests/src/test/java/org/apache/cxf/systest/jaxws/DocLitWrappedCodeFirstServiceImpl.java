@@ -219,5 +219,12 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         out2.value = "out2";
         return "hello";
     }
+
+    public Foo modifyFoo(Foo f) {
+        if ("DoNoName".equals(f.getName())) {
+            f.setNameIgnore("NoName");
+        }
+        return f;
+    }
     
 }
