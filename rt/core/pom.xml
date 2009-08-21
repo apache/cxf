@@ -59,11 +59,11 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-javamail_1.4_spec</artifactId>
         </dependency>
-        <dependency>                                                      
-            <groupId>xml-resolver</groupId>                               
+        <dependency>
+            <groupId>xml-resolver</groupId>
             <artifactId>xml-resolver</artifactId>
             <optional>true</optional>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -76,11 +76,11 @@
             <scope>test</scope>
         </dependency>
 
-       <dependency>
-         <groupId>com.sun.xml.fastinfoset</groupId>
-         <artifactId>FastInfoset</artifactId>
+        <dependency>
+            <groupId>com.sun.xml.fastinfoset</groupId>
+            <artifactId>FastInfoset</artifactId>
+            <optional>true</optional>
         </dependency>
-        
     </dependencies>
 
 

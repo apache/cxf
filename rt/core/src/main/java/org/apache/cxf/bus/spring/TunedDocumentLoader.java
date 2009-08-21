@@ -23,16 +23,14 @@ import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.sax.SAXSource;
 
 import org.w3c.dom.Document;
@@ -45,6 +43,7 @@ import org.xml.sax.XMLReader;
 import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.springframework.beans.factory.xml.DefaultDocumentLoader;
@@ -54,27 +53,25 @@ import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
  * A Spring DocumentLoader that uses WoodStox when we are not validating to speed up the process. 
  */
 class TunedDocumentLoader extends DefaultDocumentLoader {
+    private static final Logger LOG = LogUtils.getL7dLogger(TunedDocumentLoader.class); 
     
-    // DocumentBuilderFactories are somewhat expensive but not thread-safe.
-    // We only use this builder with WoodStox, and Fast Infoset 
-    // and we respect Spring's desire to make new factories 
-    // when we aren't doing the optimization.
-    private static DocumentBuilder documentBuilder;
+    private static boolean hasFastInfoSet;
+    
     static {
-        try {
-            documentBuilder = 
-                DocumentBuilderFactory.newInstance().newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
+        try { 
+            ClassLoaderUtils
+                .loadClass("com.sun.xml.fastinfoset.stax.StAXDocumentParser", 
+                           TunedDocumentLoader.class); 
+            hasFastInfoSet = true;
+        } catch (Throwable e) { 
+            LOG.fine("FastInfoset not found on classpath. Disabling context load optimizations.");
+            hasFastInfoSet = false;
+        } 
     }
-    private TransformerFactory transformerFactory;
     private SAXParserFactory saxParserFactory;
     private SAXParserFactory nsasaxParserFactory;
     
     TunedDocumentLoader() {
-        transformerFactory = TransformerFactory.newInstance();
-        
         try {
             Class<?> cls = ClassLoaderUtils.loadClass("com.ctc.wstx.sax.WstxSAXParserFactory",
                                                       TunedDocumentLoader.class);
@@ -93,6 +90,11 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         } catch (Throwable e) {
             //ignore
         }
+        
+    }
+    
+    public static boolean hasFastInfoSet() {
+        return hasFastInfoSet;
     }
 
     @Override
@@ -100,7 +102,6 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
                                  ErrorHandler errorHandler, int validationMode, boolean namespaceAware)
         throws Exception {
         if (validationMode == XmlBeanDefinitionReader.VALIDATION_NONE) {
-            
             SAXParserFactory parserFactory = 
                 namespaceAware ? nsasaxParserFactory : saxParserFactory;
             SAXParser parser = parserFactory.newSAXParser();
@@ -108,14 +109,9 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
             reader.setEntityResolver(entityResolver);
             reader.setErrorHandler(errorHandler);
             SAXSource saxSource = new SAXSource(reader, inputSource);
-            Document document;
-            // collisions are quite unlikely here, but making documentBuilderFactory objects is expensive.
-            synchronized (documentBuilder) {
-                document = documentBuilder.newDocument();
-            }
-            DOMResult domResult = new DOMResult(document, inputSource.getSystemId());
-            transformerFactory.newTransformer().transform(saxSource, domResult);
-            return document;
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+            StaxUtils.copy(saxSource, writer);
+            return writer.getDocument();
         } else {
             return super.loadDocument(inputSource, entityResolver, errorHandler, validationMode,
                                       namespaceAware);
@@ -136,9 +132,8 @@ class TunedDocumentLoader extends DefaultDocumentLoader {
         return factory;
     }
     
-    Document loadFastinfosetDocument(URL url) 
+    static Document loadFastinfosetDocument(URL url) 
         throws IOException, ParserConfigurationException, XMLStreamException {
-        
         InputStream is = url.openStream();
         InputStream in = new BufferedInputStream(is);
         XMLStreamReader staxReader = new StAXDocumentParser(in);
