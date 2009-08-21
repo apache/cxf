@@ -662,7 +662,7 @@ public final class XmlSchemaUtils {
     }
 
     public static String cleanedUpSchemaSource(XmlSchemaObject subject) {
-        if (subject.getSourceURI() == null) {
+        if (subject == null || subject.getSourceURI() == null) {
             return "";
         } else {
             return subject.getSourceURI() + ":" + subject.getLineNumber(); 
