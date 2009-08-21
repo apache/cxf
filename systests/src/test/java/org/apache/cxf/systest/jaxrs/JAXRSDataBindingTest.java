@@ -26,7 +26,6 @@ import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
@@ -47,7 +46,6 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore("Aegis Schema Validation gets in the way")
     public void testGetBookAegis() throws Exception {
         WebClient client = WebClient.create("http://localhost:9080/databinding/aegis/bookstore/books/123",
                                             Collections.singletonList(new AegisElementProvider()));
