@@ -206,7 +206,8 @@ public final class ParticleInfo implements ItemInfo {
         elementInfo.type = element.getSchemaType();
         if (elementInfo.type == null) {
             if (element.getSchemaTypeName() == null) {
-                Message message = new Message("ELEMENT_WITH_NO_TYPE", LOG, XmlSchemaUtils
+                Message message = new Message("ELEMENT_WITH_NO_TYPE", LOG, element.getName(),
+                                              XmlSchemaUtils
                                               .cleanedUpSchemaSource(elementInfo.getParticle()));
                 LOG.severe(message.toString());
                 throw new UnsupportedConstruct(message);
