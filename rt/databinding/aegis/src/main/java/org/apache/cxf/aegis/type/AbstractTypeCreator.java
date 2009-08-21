@@ -410,7 +410,9 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             java.lang.reflect.Type rawType = pt.getRawType();
             if (rawType instanceof Class) {
                 info.setTypeClass((Class)rawType);
-            }
+            } 
+        } else if (t instanceof Class) {
+            info.setTypeClass((Class)t);
         }
         
         info.setDescription("reflected type " + t.toString());

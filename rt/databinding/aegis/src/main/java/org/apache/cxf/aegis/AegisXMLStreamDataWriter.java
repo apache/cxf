@@ -33,7 +33,7 @@ import org.apache.cxf.common.logging.LogUtils;
 public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements AegisWriter<XMLStreamWriter> {
 
     private static final Logger LOG = LogUtils.getL7dLogger(AegisXMLStreamDataWriter.class);
-
+    
     AegisXMLStreamDataWriter(AegisContext globalContext) {
         super(globalContext);
     }
@@ -77,7 +77,9 @@ public class AegisXMLStreamDataWriter extends AbstractAegisIoImpl implements Aeg
         
         ElementWriter writer = new ElementWriter(output);
         MessageWriter w2 = writer.getElementWriter(elementName);
-        if (aegisType != null && aegisType.getSchemaType() != null) {
+        if (getContext().isWriteXsiTypes()
+            && aegisType != null 
+            && aegisType.getSchemaType() != null) {
             // if we know the type, write it. We are standalone, and the reader needs it.
             w2.writeXsiType(aegisType.getSchemaType());
         }

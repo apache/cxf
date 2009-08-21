@@ -38,11 +38,11 @@ import org.junit.Test;
 public class AegisProviderTest extends Assert {
     
     private static final String SIMPLE_BEAN_XML 
-        = "<?xml version='1.0' encoding='UTF-8'?><ns1:AegisTestBean "
-            + "xmlns:ns1=\"http://fortest.jaxrs.cxf.apache.org\" "
-            + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:AegisTestBean\">"
-            + "<ns1:boolValue>true</ns1:boolValue><ns1:strValue>hovercraft</ns1:strValue>"
-            + "</ns1:AegisTestBean>";
+        = "<?xml version='1.0' encoding='UTF-8'?>" 
+           + "<ns1:AegisTestBean xmlns:ns1=\"http://fortest.jaxrs.cxf.apache.org\""
+           + " xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\""
+           + " ns2:type=\"ns1:AegisTestBean\">"
+           + "<ns1:boolValue>true</ns1:boolValue><ns1:strValue>hovercraft</ns1:strValue></ns1:AegisTestBean>";
 
     @After
     public void clearCache() {
