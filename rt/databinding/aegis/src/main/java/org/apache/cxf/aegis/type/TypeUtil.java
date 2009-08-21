@@ -157,6 +157,26 @@ public final class TypeUtil {
         return type;
     }
     
+    /**
+     * Allow writing of collections when the type of the collection object is known via
+     * an {@link java.lang.reflect.Type} object.
+     * @param globalContext the context
+     * @param value the object to write.
+     * @param reflectType the type to use in writing the object.
+     * @return
+     */
+    public static Type getWriteTypeStandalone(AegisContext globalContext, 
+                                              Object value, 
+                                              java.lang.reflect.Type reflectType) {
+        if (reflectType == null) {
+            return getWriteTypeStandalone(globalContext, value, (Type)null);
+        } else {
+            return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
+        }
+        
+        
+    }
+    
     
     public static void setAttributeAttributes(QName name, Type type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();

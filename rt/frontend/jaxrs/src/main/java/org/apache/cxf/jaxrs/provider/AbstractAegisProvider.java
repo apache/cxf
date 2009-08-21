@@ -114,6 +114,13 @@ public abstract class AbstractAegisProvider
                 }
                 context.setRootClasses(rootClasses);
                 context.initialize();
+                /* It's not enough, in the presence of generic types, to just add it as a root.
+                    a mapping is also needed */
+                if (genericType != null) {
+                    org.apache.cxf.aegis.type.Type aegisType;
+                    aegisType = context.getTypeMapping().getTypeCreator().createType(genericType);
+                    context.getTypeMapping().register(aegisType);
+                }
                 classContexts.put(type, context);
             }
             return context;
