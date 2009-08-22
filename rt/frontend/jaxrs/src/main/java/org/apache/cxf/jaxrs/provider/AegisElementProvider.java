@@ -32,6 +32,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -75,7 +76,7 @@ public class AegisElementProvider extends AbstractAegisProvider  {
         org.apache.cxf.aegis.type.Type aegisType = TypeUtil.getWriteTypeStandalone(context, obj, genericType);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         try {
-            XMLStreamWriter xmlStreamWriter = createStreamWriter(type, os);
+            XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);
             // use type qname as element qname?
             xmlStreamWriter.writeStartDocument();
             aegisWriter.write(obj, aegisType.getSchemaType(), false, xmlStreamWriter, aegisType);
@@ -86,7 +87,8 @@ public class AegisElementProvider extends AbstractAegisProvider  {
         }
     }
     
-    protected XMLStreamWriter createStreamWriter(Class<?> type, OutputStream os) throws Exception {
+    protected XMLStreamWriter createStreamWriter(QName typeQName, 
+                                                 OutputStream os) throws Exception {
         return StaxUtils.createXMLStreamWriter(os);
     }
 }

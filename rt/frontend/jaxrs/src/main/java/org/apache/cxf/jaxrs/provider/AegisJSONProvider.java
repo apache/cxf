@@ -68,10 +68,11 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     }
     
     @Override
-    protected XMLStreamWriter createStreamWriter(Class<?> type, OutputStream os) throws Exception {
-        QName qname = getQName(type);
-        return JSONUtils.createStreamWriter(os, qname, writeXsiType, namespaceMap, 
-                                                           serializeAsArray, arrayKeys);
+    protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
+        namespaceMap.putIfAbsent(typeQName.getNamespaceURI(), "ns1");
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, writeXsiType, namespaceMap, 
+                                                              serializeAsArray, arrayKeys);
+        return writer;
     }
     
     @Override
