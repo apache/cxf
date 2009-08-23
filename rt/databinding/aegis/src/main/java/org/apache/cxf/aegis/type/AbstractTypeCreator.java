@@ -135,7 +135,8 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             result = type;
         }
 
-        if (newType && !getConfiguration().isDefaultNillable()) {
+        if (newType
+            && !getConfiguration().isDefaultNillable()) {
             result.setNillable(false);
         }
 
@@ -337,11 +338,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         if (info.nonDefaultAttributes()) {
             localName += "-";
             if (info.getMinOccurs() >= 0) {
-                localName += info.minOccurs;
+                localName += info.getMinOccurs();
             }
             localName += "-";
             if (info.getMaxOccurs() >= 0) {
-                localName += info.maxOccurs;
+                localName += info.getMaxOccurs();
             }
             if (info.isFlat()) {
                 localName += "Flat";
@@ -432,132 +433,5 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     public void setConfiguration(TypeCreationOptions tpConfiguration) {
         this.typeConfiguration = tpConfiguration;
-    }
-
-    /**
-     * Object to carry information for a type, such as that from an XML mapping file. 
-     */
-    public static class TypeClassInfo {
-        Class typeClass;
-
-        Object[] annotations;
-
-        Object genericType;
-
-        Object keyType;
-        Object valueType;
-        QName mappedName;
-        QName typeName;
-        Class type;
-        String description;
-        long minOccurs = -1;
-        long maxOccurs = -1;
-        boolean flat;
-        
-        public boolean nonDefaultAttributes() {
-            return minOccurs != -1 || maxOccurs != -1 || flat;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        public void setDescription(String description) {
-            this.description = description;
-        }
-
-        public Object[] getAnnotations() {
-            return annotations;
-        }
-
-        public void setAnnotations(Object[] annotations) {
-            this.annotations = annotations;
-        }
-
-        public Object getGenericType() {
-            return genericType;
-        }
-
-        public void setGenericType(Object genericType) {
-            this.genericType = genericType;
-        }
-
-        public Object getKeyType() {
-            return keyType;
-        }
-
-        public void setKeyType(Object keyType) {
-            this.keyType = keyType;
-        }
-
-        public Class getTypeClass() {
-            return typeClass;
-        }
-
-        public void setTypeClass(Class typeClass) {
-            this.typeClass = typeClass;
-        }
-
-        public QName getTypeName() {
-            return typeName;
-        }
-
-        public void setTypeName(QName name) {
-            this.typeName = name;
-        }
-
-        public Class getType() {
-            return type;
-        }
-
-        public void setType(Class type) {
-            this.type = type;
-        }
-
-        public QName getMappedName() {
-            return mappedName;
-        }
-
-        public void setMappedName(QName mappedName) {
-            this.mappedName = mappedName;
-        }
-
-        public long getMaxOccurs() {
-            return maxOccurs;
-        }
-
-        public void setMaxOccurs(long maxOccurs) {
-            this.maxOccurs = maxOccurs;
-        }
-
-        public long getMinOccurs() {
-            return minOccurs;
-        }
-
-        public void setMinOccurs(long minOccurs) {
-            this.minOccurs = minOccurs;
-        }
-
-        public boolean isFlat() {
-            return flat;
-        }
-
-        public void setFlat(boolean flat) {
-            this.flat = flat;
-        }
-
-        @Override
-        public String toString() {
-            return "TypeClassInfo " + getDescription();
-        }
-
-        public Object getValueType() {
-            return valueType;
-        }
-
-        public void setValueType(Object valueType) {
-            this.valueType = valueType;
-        }
-
     }
 }

@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.TypeClassInfo;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.util.ServiceUtils;
