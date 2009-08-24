@@ -53,14 +53,15 @@ public class AegisElementProvider extends AbstractAegisProvider  {
         AegisContext context = getAegisContext(type, genericType);
         AegisReader<XMLStreamReader> aegisReader = context.createXMLStreamReader();
         try {
-            XMLStreamReader xmlStreamReader = createStreamReader(type, is);
+            XMLStreamReader xmlStreamReader = createStreamReader(type, genericType, is);
             return aegisReader.read(xmlStreamReader);
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
     }
 
-    protected XMLStreamReader createStreamReader(Class<?> type, InputStream is) throws Exception {
+    protected XMLStreamReader createStreamReader(Class<?> type, Type genericType, InputStream is) 
+        throws Exception {
         return StaxUtils.createXMLStreamReader(is);
     }
     

@@ -23,7 +23,9 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.lang.annotation.Annotation;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -147,6 +149,26 @@ public class DataBindingJSONProviderTest extends Assert {
         p.writeTo(b, Book.class, Book.class,
             new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), bos);
         doTestAegisRead(bos.toString());
+    }
+    
+    @Test
+    @Ignore
+    public void testAegisCollectionWrite() throws Exception {
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        s.put("writeXsiType", true);
+        AegisDatabinding binding = new AegisDatabinding();
+        binding.initialize(s);
+        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        p.setDataBinding(binding);
+        
+        Book b = new Book("CXF", 127L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(b);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        p.writeTo(books, List.class, Book.class,
+            new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), bos);
+        
+        System.out.println(bos.toString());         
     }
     
     @Test

@@ -35,7 +35,7 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
-public class AegisProviderTest extends Assert {
+public class AegisElementProviderTest extends Assert {
     
     private static final String SIMPLE_BEAN_XML 
         = "<?xml version='1.0' encoding='UTF-8'?>" 
@@ -87,16 +87,12 @@ public class AegisProviderTest extends Assert {
         assertEquals(SIMPLE_BEAN_XML, xml);
     }
     
-    private static interface InterfaceWithMap {
-        Map<AegisTestBean, String> mapFunction();
-    }
-    
-    
     
     @SuppressWarnings("unchecked")
     @Test
     public void testReadWriteComplexMap() throws Exception {
-        Map<AegisTestBean, String> testMap = new HashMap<AegisTestBean, String>();
+        Map<AegisTestBean, AegisSuperBean> testMap = 
+            new HashMap<AegisTestBean, AegisSuperBean>();
         
         Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
         Method method = iwithMapClass.getMethod("mapFunction");
@@ -105,7 +101,11 @@ public class AegisProviderTest extends Assert {
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        testMap.put(bean, "hovercraft");
+        
+        AegisSuperBean bean2 = new AegisSuperBean();
+        bean2.setBoolValue(Boolean.TRUE);
+        bean2.setStrValue("hovercraft2");
+        testMap.put(bean, bean2);
         
         MessageBodyWriter<Object> writer = new AegisElementProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -113,20 +113,29 @@ public class AegisProviderTest extends Assert {
         writer.writeTo(testMap, testMap.getClass(), mapType, null, null, null, os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
-                
+        System.out.println(xml);        
         MessageBodyReader<Object> reader = new AegisElementProvider();         
         byte[] simpleBytes = xml.getBytes("utf-8");
         
-        
         Object beanObject = reader.readFrom((Class)Map.class, mapType, null, 
                                           null, null, new ByteArrayInputStream(simpleBytes));
-        Map<AegisTestBean, String> map2 = (Map)beanObject;
-        AegisTestBean bean2 = map2.keySet().iterator().next();
-        assertEquals("hovercraft", bean2.getStrValue());
-        assertEquals(Boolean.TRUE, bean2.getBoolValue());
-        
+        Map<AegisTestBean, AegisSuperBean> map2 = (Map)beanObject;
+        assertEquals(1, map2.size());
+        Map.Entry<AegisTestBean, AegisSuperBean> entry = map2.entrySet().iterator().next();
+        AegisTestBean bean1 = entry.getKey();
+        assertEquals("hovercraft", bean1.getStrValue());
+        assertEquals(Boolean.TRUE, bean1.getBoolValue());
+        AegisTestBean bean22 = entry.getValue();
+        assertEquals("hovercraft2", bean22.getStrValue());
+        assertEquals(Boolean.TRUE, bean22.getBoolValue());
         
     }
     
+    public static class AegisSuperBean extends AegisTestBean {
+    }
+    
+    private static interface InterfaceWithMap {
+        Map<AegisTestBean, AegisSuperBean> mapFunction();
+    }
     
 }

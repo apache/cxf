@@ -213,6 +213,12 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         QName qname = null;
         if (root != null) {
             String namespace = getNamespace(root.namespace());
+            if ("".equals(namespace)) {
+                String packageNs = JAXBUtils.getPackageNamespace(cls);
+                if (packageNs != null) {
+                    namespace = getNamespace(packageNs);
+                }
+            }
             String name = getLocalName(root.name(), cls.getSimpleName(), pluralName);
             return new QName(namespace, name);
         } else {

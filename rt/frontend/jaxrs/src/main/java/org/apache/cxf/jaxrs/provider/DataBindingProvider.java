@@ -66,7 +66,7 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
                        MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         try {
-            XMLStreamReader reader = createReader(clazz, is);
+            XMLStreamReader reader = createReader(clazz, genericType, is);
             DataReader<XMLStreamReader> dataReader = binding.createReader(XMLStreamReader.class);
             return dataReader.read(null, reader, clazz);
         } catch (Exception ex) {
@@ -74,7 +74,8 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
         }
     }
 
-    protected XMLStreamReader createReader(Class<?> clazz, InputStream is) throws Exception {
+    protected XMLStreamReader createReader(Class<?> clazz, Type genericType, InputStream is) 
+        throws Exception {
         return StaxUtils.createXMLStreamReader(is);
     }
     
@@ -93,7 +94,7 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         try {
-            XMLStreamWriter writer = createWriter(clazz, os);
+            XMLStreamWriter writer = createWriter(clazz, genericType, os);
             writeToWriter(writer, o);
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
@@ -106,7 +107,8 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
         writer.flush();
     }
     
-    protected XMLStreamWriter createWriter(Class<?> clazz, OutputStream os) throws Exception {
+    protected XMLStreamWriter createWriter(Class<?> clazz, Type genericType, OutputStream os) 
+        throws Exception {
         return StaxUtils.createXMLStreamWriter(os);
     }
 }

@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs;
 
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -25,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -252,8 +252,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     protected void setDataBindingProvider(ProviderFactory factory, Service s) {
         DataBinding db = getDataBinding();
         if (db instanceof PropertiesAwareDataBinding) {
-            Set<Class<?>> allClasses = ResourceUtils.getAllRequestResponseTypes(
-                                                         serviceFactory.getRealClassResourceInfo(), false);
+            Map<Class<?>, Type> allClasses = ResourceUtils.getAllRequestResponseTypes(
+                                                 serviceFactory.getRealClassResourceInfo(), false);
             Map<String, Object> props = new HashMap<String, Object>();
             props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
             ((PropertiesAwareDataBinding)db).initialize(props);
