@@ -338,9 +338,7 @@ public class WadlGenerator implements RequestHandler {
                     sb.append("<!-- Primitive type : " + value + " -->");
                 }
                 sb.append("<representation");
-                if (!mt.isWildcardType()) {
-                    sb.append(" mediaType=\"").append(mt.toString()).append("\"");
-                }
+                sb.append(" mediaType=\"").append(mt.toString()).append("\"");
                 if (jaxbProxy != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
                     generateQName(sb, jaxbProxy, clsMap, type);
                 }

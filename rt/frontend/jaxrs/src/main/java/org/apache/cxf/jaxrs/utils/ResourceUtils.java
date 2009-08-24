@@ -400,33 +400,43 @@ public final class ResourceUtils {
     public static Map<Class<?>, Type> getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
                                                                  boolean jaxbOnly) {
         Map<Class<?>, Type> types = new HashMap<Class<?>, Type>();
-        for (ClassResourceInfo root : cris) {
-            for (OperationResourceInfo ori : root.getMethodDispatcher().getOperationResourceInfos()) {
-                Class<?> cls = ori.getMethodToInvoke().getReturnType();
-                Type type = ori.getMethodToInvoke().getGenericReturnType();
-                if (jaxbOnly) {
-                    checkJaxbType(cls, types);
-                } else {
-                    types.put(cls, type);
-                }
-                for (Parameter pm : ori.getParameters()) {
-                    if (pm.getType() == ParameterType.REQUEST_BODY) {
-                        Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
-                        Type type2 = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
-                        if (jaxbOnly) {
-                            checkJaxbType(inType, types);
-                        } else {
-                            types.put(inType, type2);
-                        }
-                    }
-                }
-                
-            }
+        for (ClassResourceInfo resource : cris) {
+            getAllTypesForResource(resource, types, jaxbOnly);
         }
-        
         return types;
     }
 
+    private static void getAllTypesForResource(ClassResourceInfo resource, Map<Class<?>, Type> types,
+                                               boolean jaxbOnly) {
+        for (OperationResourceInfo ori : resource.getMethodDispatcher().getOperationResourceInfos()) {
+            Class<?> cls = ori.getMethodToInvoke().getReturnType();
+            Type type = ori.getMethodToInvoke().getGenericReturnType();
+            if (jaxbOnly) {
+                checkJaxbType(cls, types);
+            } else {
+                types.put(cls, type);
+            }
+            for (Parameter pm : ori.getParameters()) {
+                if (pm.getType() == ParameterType.REQUEST_BODY) {
+                    Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+                    Type type2 = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
+                    if (jaxbOnly) {
+                        checkJaxbType(inType, types);
+                    } else {
+                        types.put(inType, type2);
+                    }
+                }
+            }
+            
+        }
+        
+        for (ClassResourceInfo sub : resource.getSubResources()) {
+            if (sub != resource) {
+                getAllTypesForResource(sub, types, jaxbOnly);
+            }
+        }
+    }
+    
     private static void checkJaxbType(Class<?> type, Map<Class<?>, Type> types) {
         JAXBElementProvider provider = new JAXBElementProvider();
         if (!InjectionUtils.isPrimitive(type) 

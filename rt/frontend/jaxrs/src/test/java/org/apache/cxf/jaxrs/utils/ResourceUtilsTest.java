@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.utils;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,9 @@ import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
+import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookInterface;
+import org.apache.cxf.jaxrs.resources.Chapter;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -77,4 +81,14 @@ public class ResourceUtilsTest extends Assert {
         assertEquals("id", p.getName());
     }
     
+    @Test
+    public void testGetAllJaxbClasses() {
+        ClassResourceInfo cri1 = 
+            ResourceUtils.createClassResourceInfo(BookInterface.class, BookInterface.class, true, true);
+        Map<Class<?>, Type> types = 
+            ResourceUtils.getAllRequestResponseTypes(Collections.singletonList(cri1), true);
+        assertEquals(2, types.size());
+        assertTrue(types.containsKey(Book.class));
+        assertTrue(types.containsKey(Chapter.class));
+    }
 }
