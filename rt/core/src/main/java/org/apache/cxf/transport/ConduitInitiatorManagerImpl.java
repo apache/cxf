@@ -20,10 +20,12 @@
 package org.apache.cxf.transport;
 
 import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
+import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArraySet;
+
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
@@ -32,26 +34,43 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.bus.extension.DeferredMap;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.MapProvider;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManager {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ConduitInitiatorManager.class);
 
     Map<String, ConduitInitiator> conduitInitiators;
-    
+    Set<String> failed = new CopyOnWriteArraySet<String>();
+    Set<String> loaded = new CopyOnWriteArraySet<String>();
+
     private Bus bus;
     public ConduitInitiatorManagerImpl() {
         conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>();
+    }
+    public ConduitInitiatorManagerImpl(Bus b) {
+        conduitInitiators = new ConcurrentHashMap<String, ConduitInitiator>();
+        setBus(b);
     }
     
 
     public ConduitInitiatorManagerImpl(MapProvider<String, ConduitInitiator> conduitInitiators) {
         this.conduitInitiators = conduitInitiators.createMap();
     }
+    public ConduitInitiatorManagerImpl(MapProvider<String, ConduitInitiator> conduitInitiators,
+                                       Bus b) {
+        this.conduitInitiators = conduitInitiators.createMap();
+        setBus(b);
+    }
 
     public ConduitInitiatorManagerImpl(Map<String, ConduitInitiator> conduitInitiators) {
         this.conduitInitiators = conduitInitiators;
+    }
+    public ConduitInitiatorManagerImpl(Map<String, ConduitInitiator> conduitInitiators, Bus b) {
+        this.conduitInitiators = conduitInitiators;
+        setBus(b);
     }
     
     /**
@@ -66,10 +85,6 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     @Resource
     public void setBus(Bus b) {
         bus = b;
-    }
-    
-    @PostConstruct
-    public void register() {
         if (null != bus) {
             bus.setExtension(this, ConduitInitiatorManager.class);
         }
@@ -108,7 +123,15 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
      */
     public ConduitInitiator getConduitInitiator(String namespace) throws BusException {
         ConduitInitiator factory = conduitInitiators.get(namespace);
-        if (null == factory) {
+        if (factory == null && !failed.contains(namespace)) {
+            factory = new TransportFinder<ConduitInitiator>(bus,
+                    conduitInitiators,
+                    loaded,
+                    ConduitInitiator.class)
+                .findTransportForNamespace(namespace);
+        }
+        if (factory == null) {
+            failed.add(namespace);
             throw new BusException(new Message("NO_CONDUIT_INITIATOR", BUNDLE, namespace));
         }
         return factory;
@@ -120,15 +143,13 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
     }
 
     public ConduitInitiator getConduitInitiatorForUri(String uri) {
-        for (ConduitInitiator ci : conduitInitiators.values()) {
-            for (String prefix : ci.getUriPrefixes()) {
-                if (uri.startsWith(prefix)) {
-                    return ci;
-                }
-            }
-        }
+        ConduitInitiator factory = new TransportFinder<ConduitInitiator>(bus,
+            conduitInitiators,
+            loaded,
+            ConduitInitiator.class).findTransportForURI(uri);
+        
         //looks like we'll need to undefer everything so we can try again.
-        if (conduitInitiators instanceof DeferredMap) {
+        if (factory == null && conduitInitiators instanceof DeferredMap) {
             ((DeferredMap)conduitInitiators).undefer();
             for (ConduitInitiator df : conduitInitiators.values()) {
                 for (String prefix : df.getUriPrefixes()) {
@@ -138,7 +159,6 @@ public final class ConduitInitiatorManagerImpl implements ConduitInitiatorManage
                 }
             }
         }
-        return null;
+        return factory;
     }
-    
 }

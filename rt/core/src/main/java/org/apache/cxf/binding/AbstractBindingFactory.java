@@ -21,7 +21,6 @@ package org.apache.cxf.binding;
 
 import java.util.Collection;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
@@ -51,11 +50,29 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
 
     protected Bus bus;
 
-    @PostConstruct
-    void registerWithBindingManager() {
-        BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);
-        for (String ns : activationNamespaces) {
-            manager.registerBindingFactory(ns, this);
+    public AbstractBindingFactory() {
+    }
+    
+    public AbstractBindingFactory(Collection<String> ns) {
+        activationNamespaces = ns;
+    }
+    public AbstractBindingFactory(Bus b) {
+        bus = b;
+        registerWithBindingManager();
+    }
+    
+    public AbstractBindingFactory(Bus b, Collection<String> ns) {
+        activationNamespaces = ns;
+        bus = b;
+        registerWithBindingManager();
+    }
+    
+    private void registerWithBindingManager() {
+        if (bus != null && activationNamespaces != null) {
+            BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);
+            for (String ns : activationNamespaces) {
+                manager.registerBindingFactory(ns, this);
+            }
         }
     }
 
@@ -171,6 +188,7 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
     @Resource
     public void setBus(Bus bus) {
         this.bus = bus;
+        registerWithBindingManager();
     }
 
     public Collection<String> getActivationNamespaces() {
@@ -180,6 +198,7 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
     @Resource(name = "activationNamespaces")
     public void setActivationNamespaces(Collection<String> activationNamespaces) {
         this.activationNamespaces = activationNamespaces;
+        registerWithBindingManager();
     }
 
 }

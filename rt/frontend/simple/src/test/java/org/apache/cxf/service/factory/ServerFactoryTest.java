@@ -19,11 +19,11 @@
 package org.apache.cxf.service.factory;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -48,7 +48,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         svrBean.setServiceClass(HelloService.class);
         svrBean.setServiceBean(new HelloServiceImpl());
         svrBean.setBus(getBus());
-        svrBean.setDestinationFactory(new CustomDestinationFactory());
+        svrBean.setDestinationFactory(new CustomDestinationFactory(getBus()));
 
         ServerImpl server = (ServerImpl)svrBean.create();
         assertTrue(server.getDestination() instanceof CustomDestination);
@@ -78,16 +78,11 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
     }
 
     public class CustomDestinationFactory extends AbstractTransportFactory implements DestinationFactory {
-
+        public CustomDestinationFactory(Bus b) {
+            super(Arrays.asList("id"), b);
+        }
         public Destination getDestination(EndpointInfo ei) throws IOException {
             return new CustomDestination();
-        }
-
-        @Override
-        public List<String> getTransportIds() {
-            List<String> ids = new ArrayList<String>();
-            ids.add("id");
-            return ids;
         }
 
     }

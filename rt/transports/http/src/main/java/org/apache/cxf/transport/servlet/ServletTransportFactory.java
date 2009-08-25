@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
@@ -72,10 +71,6 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     @Resource(name = "cxf")
     public void setBus(Bus b) {
         super.setBus(b);
-    }
-    
-    @PostConstruct
-    public void register() {
         if (null == bus) {
             return;
         }

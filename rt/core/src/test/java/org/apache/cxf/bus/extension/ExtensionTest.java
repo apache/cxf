@@ -50,7 +50,7 @@ public class ExtensionTest extends Assert {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         e.setClassname("no.such.Extension");        
         try {
-            e.load(cl);                  
+            e.load(cl, null);                  
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap ClassNotFoundException",
                        ex.getCause() instanceof ClassNotFoundException);
@@ -58,20 +58,20 @@ public class ExtensionTest extends Assert {
 
         e.setClassname("java.lang.System");
         try {
-            e.load(cl);                  
+            e.load(cl, null);                  
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap IllegalAccessException",
                        ex.getCause() instanceof IllegalAccessException);
         } 
         e.setClassname(MyServiceConstructorThrowsException.class.getName());
         try {
-            e.load(cl);                  
+            e.load(cl, null);                  
         } catch (ExtensionException ex) {
             assertTrue("ExtensionException does not wrap InstantiationException",
                        ex.getCause() instanceof InstantiationException);
         } 
         e.setClassname("java.lang.String");
-        Object obj = e.load(cl);
+        Object obj = e.load(cl, null);
         assertTrue("Object is not type String", obj instanceof String);        
     }
     

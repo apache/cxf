@@ -91,7 +91,8 @@ public class ExtensionManagerBus extends CXFBusImpl {
         ExtensionManagerImpl em = new ExtensionManagerImpl(
                                  Thread.currentThread().getContextClassLoader(),
                                  extensions,
-                                 resourceManager);
+                                 resourceManager, 
+                                 this);
         
         setState(BusState.INITIAL);
         
@@ -103,21 +104,21 @@ public class ExtensionManagerBus extends CXFBusImpl {
 
         DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
         if (null == dfm) {
-            dfm = new DestinationFactoryManagerImpl(new DeferredMap<DestinationFactory>(em, 
-                DestinationFactory.class));
-            extensions.put(DestinationFactoryManager.class, dfm);
+            dfm = new DestinationFactoryManagerImpl(
+                new DeferredMap<DestinationFactory>(em, DestinationFactory.class),
+                this);
         }
 
         ConduitInitiatorManager cfm = this.getExtension(ConduitInitiatorManager.class);
         if (null == cfm) {
             cfm = new ConduitInitiatorManagerImpl(new DeferredMap<ConduitInitiator>(em, 
-                ConduitInitiator.class));
-            extensions.put(ConduitInitiatorManager.class, cfm);
+                ConduitInitiator.class), this);
         }
         
         BindingFactoryManager bfm = this.getExtension(BindingFactoryManager.class);
         if (null == bfm) {
-            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(em, BindingFactory.class));
+            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(em, BindingFactory.class),
+                                                this);
             extensions.put(BindingFactoryManager.class, bfm);
         }
         

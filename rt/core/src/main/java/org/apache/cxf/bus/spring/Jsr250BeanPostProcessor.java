@@ -38,6 +38,7 @@ public class Jsr250BeanPostProcessor
 
     private boolean isProcessing = true;
     //private int count;
+    //private int count2;
 
     Jsr250BeanPostProcessor() {
     }
@@ -88,8 +89,11 @@ public class Jsr250BeanPostProcessor
         }
         if (bean != null 
             && injectable(bean, beanId)) {
-            //System.err.println(++count + ": " + bean.getClass().getName() + " " + beanId);
+            //System.err.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
             new ResourceInjector(getResourceManager(bean)).inject(bean);
+        //} else if (bean != null) {
+            //System.err.println("np: " + (++count2) 
+            //                   + ": " + bean.getClass().getName() + " " + beanId);            
         }
         return bean;
     }

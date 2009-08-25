@@ -26,16 +26,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     
     <bean id="org.apache.cxf.binding.soap.SoapBindingFactory"
 	  class="org.apache.cxf.binding.soap.SoapBindingFactory" lazy-init="true">
-        <property name="activationNamespaces">
-            <set>
-                <value>http://schemas.xmlsoap.org/soap/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-                <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
-            </set>
-        </property>
-        <property name="bus" ref="cxf"/>
+        <constructor-arg ref="cxf"/>
     </bean>
     
     <bean class="org.apache.cxf.binding.soap.SoapTransportFactory"

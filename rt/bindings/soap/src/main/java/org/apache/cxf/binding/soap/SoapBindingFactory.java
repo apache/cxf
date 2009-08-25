@@ -20,6 +20,9 @@
 package org.apache.cxf.binding.soap;
 
 import java.util.ArrayList;
+
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,6 +39,7 @@ import javax.wsdl.extensions.mime.MIMEMultipartRelated;
 import javax.wsdl.extensions.mime.MIMEPart;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -60,6 +64,7 @@ import org.apache.cxf.binding.soap.model.SoapBodyInfo;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
@@ -95,8 +100,18 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
-public class SoapBindingFactory extends AbstractBindingFactory {
 
+@NoJSR250Annotations(unlessNull = { "bus", "activationNamespaces" })
+public class SoapBindingFactory extends AbstractBindingFactory {
+    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
+        "http://schemas.xmlsoap.org/soap/",
+        "http://schemas.xmlsoap.org/wsdl/soap/",
+        "http://schemas.xmlsoap.org/wsdl/soap12/",
+        "http://schemas.xmlsoap.org/wsdl/soap/http",
+        "http://www.w3.org/2003/05/soap/bindings/HTTP/"
+    );
+    
+    
     public static final String SOAP_11_BINDING = "http://schemas.xmlsoap.org/wsdl/soap/";
     public static final String SOAP_12_BINDING = "http://schemas.xmlsoap.org/wsdl/soap12/";
 
@@ -105,6 +120,13 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
     private boolean mtomEnabled = true;
 
+    public SoapBindingFactory() {
+    }
+    
+    public SoapBindingFactory(Bus b) {
+        super(b, DEFAULT_NAMESPACES);
+    }
+    
     public BindingInfo createBindingInfo(ServiceInfo si, String bindingid, Object conf) {
         SoapBindingConfiguration config;
         if (conf instanceof SoapBindingConfiguration) {

@@ -46,7 +46,7 @@ public class ExtensionManagerTest extends Assert {
         extensions.put(Integer.class, new Integer(0));
         
         manager = new ExtensionManagerImpl("test-extension.xml", 
-            Thread.currentThread().getContextClassLoader(), extensions, rm); 
+            Thread.currentThread().getContextClassLoader(), extensions, rm, null); 
         myService = null;
     }
     

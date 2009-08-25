@@ -29,10 +29,14 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 	<context:annotation-config/>
 	-->
     <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
-    <bean id="org.apache.cxf.bus.spring.BusApplicationListener" class="org.apache.cxf.bus.spring.BusApplicationListener"/>
-    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
-    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
-    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.BusApplicationListener" 
+    	class="org.apache.cxf.bus.spring.BusApplicationListener"/>
+    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" 
+    	class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" 
+    	class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
+    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" 
+    	class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
     
     <bean id="org.apache.cxf.resource.ResourceManager" 
     	class="org.apache.cxf.bus.resource.ResourceManagerImpl" 
@@ -54,37 +58,19 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     <bean id="org.apache.cxf.binding.BindingFactoryManager"
      	class="org.apache.cxf.binding.BindingFactoryManagerImpl"
      	lazy-init="true">
-        <property name="mapProvider">
-            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
-              <property name="type" value="org.apache.cxf.binding.BindingFactory"/>
-              <property name="idsProperty" value="activationNamespaces"/>
-            </bean>
-        </property>
-        <property name="bus" ref="cxf"/>
+        <constructor-arg ref="cxf"/>
     </bean>
     
     <bean id="org.apache.cxf.transport.DestinationFactoryManager"
     	class="org.apache.cxf.transport.DestinationFactoryManagerImpl"
     	lazy-init="true">
-        <property name="mapProvider">
-            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
-              <property name="type" value="org.apache.cxf.transport.DestinationFactory"/>
-              <property name="idsProperty" value="transportIds"/>
-            </bean>
-        </property>
-        <property name="bus" ref="cxf"/>
+        <constructor-arg ref="cxf"/>
     </bean>
     
     <bean id="org.apache.cxf.transport.ConduitInitiatorManager" 
     	class="org.apache.cxf.transport.ConduitInitiatorManagerImpl"
     	lazy-init="true">
-        <property name="mapProvider">
-            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
-              <property name="type" value="org.apache.cxf.transport.ConduitInitiator"/>
-              <property name="idsProperty" value="transportIds"/>
-            </bean>
-        </property>
-        <property name="bus" ref="cxf"/>
+        <constructor-arg ref="cxf"/>
     </bean>
     
     <bean id="org.apache.cxf.wsdl.WSDLManager" 

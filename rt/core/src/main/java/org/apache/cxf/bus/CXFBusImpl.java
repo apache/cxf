@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 
@@ -37,7 +38,6 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     private String id;
     private BusState state;      
     private Collection<AbstractFeature> features;
-    private ExtensionFinder finder;
     private Map<String, Object> properties = new ConcurrentHashMap<String, Object>();
     
     public CXFBusImpl() {
@@ -61,18 +61,24 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         this.state = state;
     }
     
-    public void setExtensionFinder(ExtensionFinder f) {
-        finder = f;
-    }
-    
     public void setId(String i) {
         id = i;
     }
 
     public final <T> T getExtension(Class<T> extensionType) {
         Object obj = extensions.get(extensionType);
-        if (obj == null && finder != null) {
-            obj = finder.findExtension(extensionType);
+        if (obj == null) {
+            ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+            if (loc != null) {
+                //force loading
+                Collection<?> objs = loc.getBeansOfType(extensionType);
+                if (objs != null) {
+                    for (Object o : objs) {
+                        extensions.put(extensionType, o);
+                    }
+                }
+                obj = extensions.get(extensionType);
+            }
         }
         if (null != obj) {
             return extensionType.cast(obj);

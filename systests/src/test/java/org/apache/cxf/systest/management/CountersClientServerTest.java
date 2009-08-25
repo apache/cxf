@@ -36,6 +36,7 @@ import org.apache.cxf.management.counters.CounterRepository;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -87,6 +88,7 @@ public class CountersClientServerTest extends AbstractBusClientServerTestBase {
     public void testCountersWithInstrumentationManager() throws Exception {
         // create Client with other bus
         Bus bus = BusFactory.getDefaultBus();
+        bus.getExtension(WorkQueueManager.class);
                                 
         CounterRepository cr = bus.getExtension(CounterRepository.class);
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);

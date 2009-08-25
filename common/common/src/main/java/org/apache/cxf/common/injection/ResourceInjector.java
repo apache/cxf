@@ -64,7 +64,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
     private final List<ResourceResolver> resourceResolvers;
 
     public ResourceInjector(ResourceManager resMgr) {
-        this(resMgr, resMgr.getResourceResolvers());
+        this(resMgr, resMgr == null ? null : resMgr.getResourceResolvers());
     }
 
     public ResourceInjector(ResourceManager resMgr, List<ResourceResolver> resolvers) {

@@ -32,6 +32,8 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
  */
 @NoJSR250Annotations(unlessNull = "bus")
 public class FactoryBeanListenerManager {
+    Bus bus;
+    
     List<FactoryBeanListener> listeners
         = new CopyOnWriteArrayList<FactoryBeanListener>();
     
@@ -45,7 +47,8 @@ public class FactoryBeanListenerManager {
     
     @Resource
     public final void setBus(Bus bus) {
-        bus.setExtension(this, FactoryBeanListenerManager.class);
+        this.bus = bus;
+        this.bus.setExtension(this, FactoryBeanListenerManager.class);
     }
     
     public List<FactoryBeanListener> getListeners() {
