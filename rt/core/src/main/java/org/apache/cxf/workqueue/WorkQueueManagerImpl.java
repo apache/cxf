@@ -24,14 +24,15 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.management.JMException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.management.InstrumentationManager;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class WorkQueueManagerImpl implements WorkQueueManager {
 
     private static final Logger LOG =
@@ -42,17 +43,20 @@ public class WorkQueueManagerImpl implements WorkQueueManager {
     boolean inShutdown;
     Bus bus;  
     
+    public WorkQueueManagerImpl() {
+        
+    }
+    public WorkQueueManagerImpl(Bus b) {
+        setBus(b);
+    }
+    
     public Bus getBus() {
         return bus;
     }
     
     @Resource
-    public void setBus(Bus bus) {        
+    public final void setBus(Bus bus) {        
         this.bus = bus;
-    }
-    
-    @PostConstruct
-    public void register() {
         if (null != bus) {
             bus.setExtension(this, WorkQueueManager.class);
             InstrumentationManager manager = bus.getExtension(InstrumentationManager.class);

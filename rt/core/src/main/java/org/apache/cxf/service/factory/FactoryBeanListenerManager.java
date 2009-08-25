@@ -25,10 +25,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class FactoryBeanListenerManager {
     List<FactoryBeanListener> listeners
         = new CopyOnWriteArrayList<FactoryBeanListener>();
@@ -36,9 +38,13 @@ public class FactoryBeanListenerManager {
     public FactoryBeanListenerManager() {
         listeners.add(new AnnotationsFactoryBeanListener());
     }
+    public FactoryBeanListenerManager(Bus b) {
+        this();
+        setBus(b);
+    }
     
     @Resource
-    public void setBus(Bus bus) {
+    public final void setBus(Bus bus) {
         bus.setExtension(this, FactoryBeanListenerManager.class);
     }
     

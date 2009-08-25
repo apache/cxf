@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.resource.ResourceResolver;
 
 import org.springframework.beans.BeansException;
@@ -30,7 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 
-
+@NoJSR250Annotations
 public class BusApplicationContextResourceResolver 
     implements ResourceResolver, ApplicationContextAware {
     

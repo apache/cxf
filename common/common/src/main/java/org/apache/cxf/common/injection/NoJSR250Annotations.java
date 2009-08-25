@@ -17,32 +17,25 @@
  * under the License.
  */
 
-package org.apache.cxf.resource;
+package org.apache.cxf.common.injection;
 
-
-import java.io.InputStream;
-import java.net.URL;
-
-import org.apache.cxf.common.injection.NoJSR250Annotations;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * Resolve resources from the system class path.
+ * Marker annotation to let our JSR250 Processor know
+ * not to bother examining the class for annotations
+ * as it's know not to have any 
  */
-@NoJSR250Annotations
-public class ClasspathResolver implements ResourceResolver {
-
-    public <T> T resolve(String resourceName, Class<T> resourceType) { 
-        if (resourceName == null) {
-            return null;
-        }
-        URL url = ClassLoader.getSystemResource(resourceName);
-        if (resourceType.isInstance(url)) {
-            return resourceType.cast(url);
-        }
-        return null;
-    } 
-
-    public InputStream getAsStream(String name) { 
-        return ClassLoader.getSystemResourceAsStream(name);
-    } 
+@Target({ ElementType.TYPE })
+@Retention(RetentionPolicy.RUNTIME)
+public @interface NoJSR250Annotations {
+    
+    /**
+     * If these fields are null, it will go ahead and do JSR250 processing
+     * as it assumes the values were not set via a constructor
+     */
+    String[] unlessNull() default { };
 }

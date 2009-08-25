@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanIsAbstractException;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.support.ManagedSet;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
+@NoJSR250Annotations
 public class SpringBeanMap<V> 
     extends AbstractSpringBeanMap<String, V> {
 

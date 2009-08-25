@@ -22,13 +22,14 @@ package org.apache.cxf.transport.http;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     
     List<QueryHandler> queryHandlers;
@@ -39,16 +40,20 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     }
     
     public QueryHandlerRegistryImpl(Bus b, List<QueryHandler> handlers) {
-        bus = b;
         queryHandlers = new CopyOnWriteArrayList<QueryHandler>(handlers);
+        setBus(b);
     }
     
     public void setQueryHandlers(List<QueryHandler> handlers) {
         this.queryHandlers = new CopyOnWriteArrayList<QueryHandler>(handlers);
     }
-
-    @PostConstruct
-    public void register() {
+    
+    public Bus getBus() {
+        return bus;
+    }
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
         if (queryHandlers == null) {
             queryHandlers = new CopyOnWriteArrayList<QueryHandler>();
             if (bus != null) {
@@ -73,15 +78,7 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     public void registerHandler(QueryHandler handler, int position) {
         queryHandlers.add(position, handler);
     }
-    
-    @Resource
-    public void setBus(Bus b) {
-        bus = b;
-    }
 
-    public Bus getBus() {
-        return bus;
-    }
 
 }
 

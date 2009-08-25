@@ -21,7 +21,6 @@ package org.apache.cxf.endpoint;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -64,22 +63,7 @@ public class EndpointResolverRegistryImplTest extends Assert {
     }
 
     @Test
-    public void testInit() {
-        assertNull("unexpected resolvers list", registry.getResolvers());
-        Bus bus = control.createMock(Bus.class);
-        registry.setBus(bus);
-        bus.setExtension(registry, EndpointResolverRegistry.class);
-        control.replay();
-        
-        registry.init();
-        
-        assertNotNull("expected resolvers list", registry.getResolvers());
-        control.verify();
-    }
-    
-    @Test
     public void testRegister() {
-        registry.init();
         assertEquals("unexpected resolver count",
                      0,
                      registry.getResolvers().size());
@@ -124,7 +108,6 @@ public class EndpointResolverRegistryImplTest extends Assert {
     
     @Test
     public void testResolve() {
-        registry.init();
         registry.register(resolver1);
         registry.register(resolver2);
         resolver1.resolve(logical);
@@ -163,7 +146,6 @@ public class EndpointResolverRegistryImplTest extends Assert {
     
     @Test
     public void testRenew() {
-        registry.init();
         registry.register(resolver1);
         registry.register(resolver2);
         resolver1.renew(logical, physical);
@@ -202,7 +184,6 @@ public class EndpointResolverRegistryImplTest extends Assert {
     
     @Test
     public void testMintFromServiceName() {
-        registry.init();
         registry.register(resolver1);
         registry.register(resolver2);
         resolver1.mint(serviceName);
@@ -241,7 +222,6 @@ public class EndpointResolverRegistryImplTest extends Assert {
     
     @Test
     public void testMintFromPhysical() {
-        registry.init();
         registry.register(resolver1);
         registry.register(resolver2);
         resolver1.mint(physical);

@@ -20,29 +20,40 @@
 package org.apache.cxf.endpoint;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 
 /**
  * A simple contract resolver registry. It maintains a list of contract resolvers in an
  * <code>ArrayList</code>.
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class ServiceContractResolverRegistryImpl implements ServiceContractResolverRegistry {
 
     private Bus bus;
-    private List<ServiceContractResolver> resolvers;
+    private List<ServiceContractResolver> resolvers 
+        = new CopyOnWriteArrayList<ServiceContractResolver>();
+
+    public ServiceContractResolverRegistryImpl() {
+        
+    }
+    public ServiceContractResolverRegistryImpl(Bus b) {
+        setBus(b);
+    }
+    
 
     /**
-     * Initialize registry, and register itself on Bus as an extension.
+     * Sets the bus with which the registry is associated.
+     *
+     * @param bus
      */
-    @PostConstruct
-    public void init() {
-        resolvers = new ArrayList<ServiceContractResolver>();
+    public final void setBus(Bus b) {
+        this.bus = b;
         if (bus != null) {
             bus.setExtension(this, ServiceContractResolverRegistry.class);
         }
@@ -94,14 +105,6 @@ public class ServiceContractResolverRegistryImpl implements ServiceContractResol
         resolvers.remove(resolver);        
     }
 
-    /**
-     * Sets the bus with which the registry is associated.
-     *
-     * @param bus
-     */
-    public void setBus(Bus bus) {
-        this.bus = bus;
-    }
     
     protected List<ServiceContractResolver> getResolvers() {
         return resolvers;

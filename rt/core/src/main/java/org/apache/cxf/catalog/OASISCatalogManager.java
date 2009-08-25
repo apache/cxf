@@ -31,15 +31,16 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.xml.resolver.Catalog;
 import org.apache.xml.resolver.CatalogManager;
 import org.apache.xml.resolver.tools.CatalogResolver;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class OASISCatalogManager {
     public static final String DEFAULT_CATALOG_NAME = "META-INF/jax-ws-catalog.xml";
     public static final String CATALOG_DEBUG_KEY = "OASISCatalogManager.catalog.debug.level";
@@ -48,7 +49,6 @@ public class OASISCatalogManager {
         LogUtils.getL7dLogger(OASISCatalogManager.class);
     private static final String DEBUG_LEVEL = System.getProperty(CATALOG_DEBUG_KEY);
     
-    
 
     private Object resolver;
     private Set<URL> loadedCatalogs = Collections.synchronizedSet(new HashSet<URL>());
@@ -56,6 +56,12 @@ public class OASISCatalogManager {
 
     public OASISCatalogManager() {
         resolver = getResolver();
+    }
+    
+    public OASISCatalogManager(Bus b) {
+        bus = b;
+        resolver = getResolver();
+        loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
     
     private static Object getResolver() {
@@ -81,25 +87,16 @@ public class OASISCatalogManager {
     @Resource
     public void setBus(Bus bus) {
         this.bus = bus;
-    }
-
-    @PostConstruct
-    public void register() {
         if (null != bus) {
             bus.setExtension(this, OASISCatalogManager.class);
         }
         loadContextCatalogs();
     }
 
-    /*
-    public Catalog getCatalog() {
-        return this.resolver;
-    }
-*/
     public void loadContextCatalogs() {
         loadContextCatalogs(DEFAULT_CATALOG_NAME);
     }
-    public void loadContextCatalogs(String name) {
+    public final void loadContextCatalogs(String name) {
         try {
             loadCatalogs(Thread.currentThread().getContextClassLoader(), name);
         } catch (IOException e) {
@@ -107,7 +104,7 @@ public class OASISCatalogManager {
         }
     }
 
-    public void loadCatalogs(ClassLoader classLoader, String name) throws IOException {
+    public final void loadCatalogs(ClassLoader classLoader, String name) throws IOException {
         if (classLoader == null || resolver == null) {
             return;
         }
@@ -122,7 +119,7 @@ public class OASISCatalogManager {
         }
     }
 
-    public void loadCatalog(URL catalogURL) throws IOException {
+    public final void loadCatalog(URL catalogURL) throws IOException {
         if (!loadedCatalogs.contains(catalogURL) && resolver != null) {
             if ("file".equals(catalogURL.getProtocol())) {
                 try {

@@ -21,6 +21,7 @@ package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
 
 import org.springframework.beans.BeansException;
@@ -30,6 +31,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 
+@NoJSR250Annotations
 public class BusExtensionPostProcessor implements BeanPostProcessor, ApplicationContextAware, Ordered {
 
     private Bus bus;

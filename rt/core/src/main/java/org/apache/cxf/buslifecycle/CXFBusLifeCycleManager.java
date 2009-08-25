@@ -22,11 +22,12 @@ package org.apache.cxf.buslifecycle;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class CXFBusLifeCycleManager implements BusLifeCycleManager {
 
     private final List<BusLifeCycleListener> listeners;
@@ -37,14 +38,14 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     public CXFBusLifeCycleManager() {
         listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
     }
-    
-    @Resource
-    public void setBus(Bus b) {
-        bus = b;
+    public CXFBusLifeCycleManager(Bus b) {
+        listeners = new CopyOnWriteArrayList<BusLifeCycleListener>();
+        setBus(b);
     }
     
-    @PostConstruct
-    public void register() {
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
         if (null != bus) {
             bus.setExtension(this, BusLifeCycleManager.class);
         }

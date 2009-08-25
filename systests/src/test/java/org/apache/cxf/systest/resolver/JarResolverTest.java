@@ -52,7 +52,6 @@ public class JarResolverTest extends AbstractBusClientServerTestBase {
         ServiceContractResolverRegistryImpl registry = 
             new ServiceContractResolverRegistryImpl();
         registry.setBus(bus);
-        registry.init();
         assertNotNull(bus.getExtension(ServiceContractResolverRegistry.class));
 
         JarServiceContractResolver resolver = new JarServiceContractResolver();

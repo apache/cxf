@@ -26,9 +26,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 
+@NoJSR250Annotations
 public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus {    
     
     protected final Map<Class, Object> extensions;
