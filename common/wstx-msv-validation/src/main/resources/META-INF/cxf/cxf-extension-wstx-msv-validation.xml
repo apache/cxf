@@ -23,8 +23,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
 	<bean id="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"
 		class="org.apache.cxf.wstx_msv_validation.WoodstoxValidationImpl"
-		>
-		<property name="bus" ref="cxf"/>
+		lazy-init="true">
+		<constructor-arg ref="cxf"/>
 	</bean>
 
 </beans>

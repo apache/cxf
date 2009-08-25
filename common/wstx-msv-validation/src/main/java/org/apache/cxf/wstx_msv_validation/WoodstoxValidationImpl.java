@@ -22,13 +22,12 @@ package org.apache.cxf.wstx_msv_validation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.StaxValidationManager;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -36,19 +35,16 @@ import org.apache.cxf.service.model.ServiceInfo;
 /**
  * 
  */
+@NoJSR250Annotations
 public class WoodstoxValidationImpl implements StaxValidationManager {
     private static final Logger LOG = LogUtils.getL7dLogger(WoodstoxValidationImpl.class);
     
     private Bus bus;
     private Stax2ValidationUtils utils;
 
-    @Resource
-    public void setBus(Bus b) {
-        bus = b;
-    }
     
-    @PostConstruct
-    public void register() {
+    public WoodstoxValidationImpl(Bus b) {
+        bus = b;
         
         try {
             utils = new Stax2ValidationUtils();
