@@ -43,6 +43,7 @@ abstract class AbstractSpringBeanMap<X, V>
     protected ApplicationContext context;
     protected Class<?> type;
     protected String idsProperty;
+    protected String staticFieldName;
     protected Map<X, List<String>> idToBeanName = new ConcurrentHashMap<X, List<String>>();
     protected Map<X, V> putStore = new ConcurrentHashMap<X, V>();
 
@@ -105,6 +106,14 @@ abstract class AbstractSpringBeanMap<X, V>
 
     public void setIdsProperty(String idsProperty) {
         this.idsProperty = idsProperty;
+    }
+
+    public String getStaticFieldName() {
+        return staticFieldName;
+    }
+
+    public void setStaticFieldName(String staticFieldName) {
+        this.staticFieldName = staticFieldName;
     }
 
     public void clear() {
@@ -214,7 +223,7 @@ abstract class AbstractSpringBeanMap<X, V>
         }
     }
     
-    private class SpringBeanMapWrapper implements Map<X, V> {
+    private class SpringBeanMapWrapper extends ConcurrentHashMap<X, V> implements Map<X, V> {
 
         public void clear() {
             AbstractSpringBeanMap.this.clear();

@@ -22,13 +22,13 @@ package org.apache.cxf.xsdvalidation;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.transform.TransformerException;
 
 import org.w3c.dom.DOMErrorHandler;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
@@ -37,19 +37,23 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerExcep
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class XercesXsdValidationImpl implements XmlSchemaValidationManager {
     private static final Logger LOG = LogUtils.getL7dLogger(XercesXsdValidationImpl.class);
 
     private Bus bus;
     private XercesSchemaValidationUtils utils;
 
-    @Resource
-    public void setBus(Bus b) {
-        bus = b;
+    public XercesXsdValidationImpl() {
     }
-
-    @PostConstruct
-    public void register() {
+    
+    public XercesXsdValidationImpl(Bus b) {
+        setBus(b);
+    }
+    
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
 
         try {
             utils = new XercesSchemaValidationUtils();

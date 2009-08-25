@@ -18,19 +18,26 @@
  */
 package org.apache.cxf.configuration.spring;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.helpers.CastUtils;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.BeanIsAbstractException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanDefinitionHolder;
 import org.springframework.beans.factory.config.BeanReference;
+import org.springframework.beans.factory.config.ConstructorArgumentValues;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ConfigurableApplicationContext;
 
+@NoJSR250Annotations
 public class SpringBeanQNameMap<V> 
     extends AbstractSpringBeanMap<QName, V> {
 
@@ -70,7 +77,20 @@ public class SpringBeanQNameMap<V>
                         ids = (Collection<?>)value;
                     }
                 } 
-              
+                if (ids == null && staticFieldName != null) {
+                    Class<?> cls = context.getType(beanNames[i]);
+                    try {
+                        Field f = cls.getDeclaredField(staticFieldName);
+                        f.setAccessible(true);
+                        Collection<QName> sids = CastUtils.cast((Collection<?>)f.get(null));
+                        if (sids != null) {
+                            ids = new ArrayList<QName>(sids);
+                        }
+                    } catch (Exception ex) {
+                        //ignore, fall through
+                    }
+                }
+
                 // if values are not legal keys (for lazy-init bean definitions id values may be
                 // BeanDefinitionHolders), load the bean and get its id values instead
                 // for BeanReference type values, simply resolve reference
@@ -84,7 +104,29 @@ public class SpringBeanQNameMap<V>
                             BeanReference br = (BeanReference)id;
                             Object refId = context.getBean(br.getBeanName());
                             checked.add(refId);
+                        } else if (id instanceof BeanDefinitionHolder) {
+                            BeanDefinitionHolder bdh = (BeanDefinitionHolder)id;
+                            if (QName.class.getName().equals(bdh.getBeanDefinition().getBeanClassName())) {
+                                try {
+                                    java.util.List l = bdh.getBeanDefinition().getConstructorArgumentValues()
+                                        .getGenericArgumentValues();
+                                    
+                                    ConstructorArgumentValues.ValueHolder v 
+                                        = (ConstructorArgumentValues.ValueHolder)l.get(0);
+                                    
+                                    TypedStringValue nss = (TypedStringValue)v.getValue();
+                                    v = (ConstructorArgumentValues.ValueHolder)l.get(1);
+                                    TypedStringValue ln = (TypedStringValue)v.getValue();
+                                    checked.add(new QName(nss.getValue(), ln.getValue()));
+                                } catch (Exception ex) {
+                                    //ignore
+                                    break;
+                                }
+                            } else {
+                                break;
+                            }
                         } else {
+                            
                             break;
                         }
                     }

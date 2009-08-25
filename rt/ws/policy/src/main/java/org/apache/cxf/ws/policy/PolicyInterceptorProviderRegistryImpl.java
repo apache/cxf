@@ -24,8 +24,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
@@ -34,12 +38,20 @@ import org.apache.cxf.interceptor.Interceptor;
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class PolicyInterceptorProviderRegistryImpl 
     extends RegistryImpl<QName, PolicyInterceptorProvider> 
     implements PolicyInterceptorProviderRegistry, BusExtension {
 
+    private Bus bus;
+    private boolean dynamicLoaded;
+
     public PolicyInterceptorProviderRegistryImpl() {
         super(null);
+    }
+    public PolicyInterceptorProviderRegistryImpl(Bus b) {
+        super(null);
+        setBus(b);
     }
 
     public PolicyInterceptorProviderRegistryImpl(Map<QName, PolicyInterceptorProvider> interceptors) {
@@ -48,7 +60,18 @@ public class PolicyInterceptorProviderRegistryImpl
     public PolicyInterceptorProviderRegistryImpl(MapProvider<QName, PolicyInterceptorProvider> interceptors) {
         super(interceptors.createMap());
     }    
-
+    public PolicyInterceptorProviderRegistryImpl(Bus b, 
+                                                 MapProvider<QName, PolicyInterceptorProvider> interceptors) {
+        super(interceptors.createMap());
+        setBus(b);
+    }    
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
+        if (b != null) {
+            b.setExtension(this, PolicyInterceptorProviderRegistry.class);
+        }
+    }
     public void register(PolicyInterceptorProvider provider) {
         for (QName qn : provider.getAssertionTypes()) {
             super.register(qn, provider);
@@ -58,9 +81,18 @@ public class PolicyInterceptorProviderRegistryImpl
     public Class<?> getRegistrationType() {
         return PolicyInterceptorProviderRegistry.class;
     }
-    
+    private synchronized void loadDynamic() {
+        if (!dynamicLoaded && bus != null) {
+            dynamicLoaded = true;
+            ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
+            if (c != null) {
+                c.getBeansOfType(PolicyInterceptorProviderLoader.class);
+            }
+        }
+    }
     public List<Interceptor> getInterceptors(Collection<PolicyAssertion> alternative, 
                                              boolean out, boolean fault) {
+        loadDynamic();
         List<Interceptor> interceptors = new ArrayList<Interceptor>();
         for (PolicyAssertion a : alternative) {
             if (a.isOptional()) {

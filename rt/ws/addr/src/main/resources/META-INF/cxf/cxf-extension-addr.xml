@@ -23,15 +23,18 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <bean class="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder"
-	  id="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder">
+	  id="org.apache.cxf.ws.addressing.policy.AddressingAssertionBuilder" 
+	  lazy-init="true">
         <constructor-arg ref="cxf"/>
     </bean>
 
     <bean class="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
-	  id="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"/>
+	  id="org.apache.cxf.ws.addressing.policy.AddressingPolicyInterceptorProvider"
+	  lazy-init="true"/>
  
     <bean id="org.apache.cxf.ws.addressing.policy.UsingAddressingAssertionBuilder"
-        class="org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder">
+        class="org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder"
+        lazy-init="true">
         <property name="knownElements">
             <set>
                 <bean class="javax.xml.namespace.QName">

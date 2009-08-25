@@ -20,6 +20,7 @@
 package org.apache.cxf.resource;
 
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -43,8 +44,8 @@ public class DefaultResourceManager implements ResourceManager {
         addResourceResolver(resolver);
     }
     
-    public DefaultResourceManager(List<ResourceResolver> resolvers) {
-        registeredResolvers.addAll(resolvers);
+    public DefaultResourceManager(List<? extends ResourceResolver> resolvers) {
+        addResourceResolvers(resolvers);
     }
  
     public final <T> T resolveResource(String name, Class<T> type) { 
@@ -60,10 +61,14 @@ public class DefaultResourceManager implements ResourceManager {
         return findResource(name, InputStream.class, true, registeredResolvers);
     } 
 
-
     public final void addResourceResolver(ResourceResolver resolver) { 
         if (!registeredResolvers.contains(resolver)) { 
             registeredResolvers.add(0, resolver);
+        }
+    } 
+    public final void addResourceResolvers(Collection<? extends ResourceResolver> resolvers) { 
+        for (ResourceResolver r : resolvers) {
+            addResourceResolver(r);
         }
     } 
 

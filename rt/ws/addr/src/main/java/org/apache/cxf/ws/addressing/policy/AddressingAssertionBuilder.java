@@ -44,7 +44,7 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
  */
 public class AddressingAssertionBuilder implements AssertionBuilder {
 
-    private static final Collection<QName> KNOWN = new ArrayList<QName>();
+    private static final Collection<QName> KNOWN_ELEMENTS = new ArrayList<QName>();
     private Bus bus;
     
     public AddressingAssertionBuilder(Bus b) {
@@ -52,12 +52,12 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
     }
     
     static {
-        KNOWN.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
-        KNOWN.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705);
-        KNOWN.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-        KNOWN.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
+        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
+        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
+        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
+        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705);
+        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
+        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
     }
     
     public PolicyAssertion build(Element elem) {
@@ -92,7 +92,7 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
     }
 
     public Collection<QName> getKnownElements() {
-        return KNOWN;
+        return KNOWN_ELEMENTS;
     }
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {

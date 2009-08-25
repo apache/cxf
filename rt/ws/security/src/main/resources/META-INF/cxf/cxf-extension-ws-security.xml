@@ -24,7 +24,8 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <bean id="org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader"
-         class="org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader">
-        <property name="bus" ref="cxf"/>
+         class="org.apache.cxf.ws.security.policy.WSSecurityPolicyLoader"
+         lazy-init="true">
+        <constructor-arg ref="cxf"/>
     </bean>
 </beans>

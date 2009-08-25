@@ -164,8 +164,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     registry.registerDeserializer(parentType, elementType, helper); 
                     registry.registerSerializer(parentType, elementType, helper);                         
                     registry.mapExtensionTypes(parentType, elementType, cls);
-                    
-                    helper.getJAXBContext();
+
                     found = true;
                 }
             }

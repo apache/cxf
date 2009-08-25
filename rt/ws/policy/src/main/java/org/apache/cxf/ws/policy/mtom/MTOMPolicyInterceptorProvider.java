@@ -24,8 +24,10 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 
+@NoJSR250Annotations
 public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvider {
 
     private static final Collection<QName> ASSERTION_TYPES;
@@ -39,6 +41,8 @@ public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProv
     
     public MTOMPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
+        Thread.dumpStack();
+
         getInInterceptors().add(INTERCEPTOR);
         
         getOutInterceptors().add(INTERCEPTOR);

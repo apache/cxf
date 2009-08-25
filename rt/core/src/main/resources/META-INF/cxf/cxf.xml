@@ -42,13 +42,6 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     	class="org.apache.cxf.bus.resource.ResourceManagerImpl" 
     	lazy-init="true">
     	<constructor-arg ref="cxf"/>
-       	<constructor-arg>
-            <list>
-                <bean class="org.apache.cxf.resource.ClasspathResolver"/>
-                <bean class="org.apache.cxf.resource.ClassLoaderResolver"/>
-                <bean class="org.apache.cxf.bus.spring.BusApplicationContextResourceResolver"/>
-            </list>
-       </constructor-arg>
     </bean>
 
     <bean id="org.apache.cxf.configuration.Configurer" 

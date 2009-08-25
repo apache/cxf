@@ -21,22 +21,29 @@ package org.apache.cxf.jaxws.context;
 
 import java.io.InputStream;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
-
+@NoJSR250Annotations(unlessNull = "bus")
 public class WebServiceContextResourceResolver implements ResourceResolver {
     
-    @Resource
     Bus bus;
+
+    public WebServiceContextResourceResolver() {
+    }
     
-    @PostConstruct
-    public void register() {
+    public WebServiceContextResourceResolver(Bus b) {
+        setBus(b);
+    }
+    
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
         if (bus != null
             && bus.getExtension(ResourceManager.class) != null) {
             bus.getExtension(ResourceManager.class).addResourceResolver(this);

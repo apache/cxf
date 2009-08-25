@@ -33,6 +33,7 @@ import org.w3c.dom.Node;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -52,6 +53,7 @@ import org.springframework.core.io.Resource;
 /**
  * 
  */
+@NoJSR250Annotations
 public class ExternalAttachmentProvider extends AbstractPolicyProvider
     implements PolicyProvider {
     

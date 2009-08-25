@@ -23,23 +23,16 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="org.apache.cxf.ws.rm.RMManager" class="org.apache.cxf.ws.rm.RMManager">
+    <bean id="org.apache.cxf.ws.rm.RMManager" class="org.apache.cxf.ws.rm.RMManager" lazy-init="true">
         <property name="bus" ref="cxf"/>
     </bean>
 
     <bean class="org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider"
-	  id="org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider">
-     	<constructor-arg><ref bean="cxf"/></constructor-arg>
+	  id="org.apache.cxf.ws.rm.policy.RMPolicyInterceptorProvider"  lazy-init="true">
+     	<constructor-arg ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.ws.rm.RMAssertionBuilder" class="org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertionBuilder">
-        <constructor-arg value="org.apache.cxf.ws.rm.policy.RMAssertion"/>
-        <constructor-arg>
-            <bean class="javax.xml.namespace.QName">
-                <constructor-arg value="http://schemas.xmlsoap.org/ws/2005/02/rm/policy"/>
-                <constructor-arg value="RMAssertion"/>
-            </bean>
-        </constructor-arg>
-    </bean>
-    
+    <bean id="org.apache.cxf.ws.rm.policy.RMAssertionBuilder" 
+        class="org.apache.cxf.ws.rm.policy.RMAssertionBuilder" 
+    	lazy-init="true"/>
 </beans>

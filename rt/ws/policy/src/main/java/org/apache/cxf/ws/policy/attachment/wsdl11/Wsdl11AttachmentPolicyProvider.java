@@ -30,6 +30,7 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.AbstractDescriptionElement;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -55,6 +56,7 @@ import org.apache.neethi.PolicyReference;
  * calculate effective policies based on the policy subject's scope.
  * 
  */
+@NoJSR250Annotations
 public class Wsdl11AttachmentPolicyProvider extends AbstractPolicyProvider 
     implements PolicyProvider {
 

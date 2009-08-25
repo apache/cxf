@@ -35,9 +35,9 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
 
 public class MTOMAssertionBuilder implements AssertionBuilder {
-    private static final Collection<QName> KNOWN = new ArrayList<QName>();
+    private static final Collection<QName> KNOWN_ELEMENTS = new ArrayList<QName>();
     static {
-        KNOWN.add(MetadataConstants.MTOM_ASSERTION_QNAME);
+        KNOWN_ELEMENTS.add(MetadataConstants.MTOM_ASSERTION_QNAME);
     }
     
     public PolicyAssertion build(Element elem) {
@@ -58,7 +58,7 @@ public class MTOMAssertionBuilder implements AssertionBuilder {
     }
 
     public Collection<QName> getKnownElements() {
-        return KNOWN;
+        return KNOWN_ELEMENTS;
     }
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {

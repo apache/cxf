@@ -56,7 +56,6 @@ public class ExternalAttachmentProviderTest extends Assert {
 
     private static final QName TEST_ASSERTION_TYPE = new QName("http://a.b.c", "x");
     
-    private ExternalAttachmentProvider eap;
     
     private IMocksControl control;
     private Policy policy;
@@ -66,12 +65,12 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Before
     public void setUp() {
-        eap = new ExternalAttachmentProvider();
         control = EasyMock.createNiceControl();  
     } 
     
     @Test
     public void testBasic() {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         assertNull(eap.getLocation());
         Resource uri = control.createMock(Resource.class);
         eap.setLocation(uri);
@@ -81,14 +80,15 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Test
     public void testGetEffectiveFaultPolicy() {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
-        setUpAttachment(bfi, false);
+        setUpAttachment(bfi, false, eap);
         control.replay();
         assertTrue(eap.getEffectivePolicy(bfi).isEmpty());
         control.verify();
         
         control.reset();
-        setUpAttachment(bfi, true);
+        setUpAttachment(bfi, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(bfi).getAssertions().get(0));
         control.verify();
@@ -96,14 +96,15 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Test
     public void testGetEffectiveMessagePolicy() {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         BindingMessageInfo bmi = control.createMock(BindingMessageInfo.class);
-        setUpAttachment(bmi, false);
+        setUpAttachment(bmi, false, eap);
         control.replay();
         assertTrue(eap.getEffectivePolicy(bmi).isEmpty());
         control.verify();
         
         control.reset();
-        setUpAttachment(bmi, true);
+        setUpAttachment(bmi, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(bmi).getAssertions().get(0));
         control.verify();
@@ -112,13 +113,14 @@ public class ExternalAttachmentProviderTest extends Assert {
     @Test
     public void testGetEffectiveOperationPolicy() {
         BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
-        setUpAttachment(boi, false);
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
+        setUpAttachment(boi, false, eap);
         control.replay();
         assertTrue(eap.getEffectivePolicy(boi).isEmpty());
         control.verify();
         
         control.reset();
-        setUpAttachment(boi, true);
+        setUpAttachment(boi, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(boi).getAssertions().get(0));
         control.verify();
@@ -126,14 +128,15 @@ public class ExternalAttachmentProviderTest extends Assert {
 
     @Test
     public void testGetEffectiveEndpointPolicy() {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         EndpointInfo ei = control.createMock(EndpointInfo.class);
-        setUpAttachment(ei, false);
+        setUpAttachment(ei, false, eap);
         control.replay();
         assertTrue(eap.getEffectivePolicy(ei).isEmpty());
         control.verify();
         
         control.reset();
-        setUpAttachment(ei, true);
+        setUpAttachment(ei, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(ei).getAssertions().get(0));
         control.verify();
@@ -141,14 +144,15 @@ public class ExternalAttachmentProviderTest extends Assert {
 
     @Test
     public void testGetEffectiveServicePolicy() {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         ServiceInfo si = control.createMock(ServiceInfo.class);
-        setUpAttachment(si, false);
+        setUpAttachment(si, false, eap);
         control.replay();
         assertTrue(eap.getEffectivePolicy(si).isEmpty());
         control.verify();
         
         control.reset();
-        setUpAttachment(si, true);
+        setUpAttachment(si, true, eap);
         control.replay();
         assertSame(assertion, eap.getEffectivePolicy(si).getAssertions().get(0));
         control.verify();
@@ -156,6 +160,7 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Test
     public void testReadDocumentNotExisting() throws MalformedURLException {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments1.xml");
         String uri = url.toExternalForm();
         uri = uri.replaceAll("attachments1.xml", "attachments0.xml");
@@ -170,6 +175,7 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Test
     public void testReadDocumentWithoutAttachmentElements() throws MalformedURLException {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments1.xml");
         String uri = url.toExternalForm();
         eap.setLocation(new UrlResource(uri));
@@ -179,6 +185,7 @@ public class ExternalAttachmentProviderTest extends Assert {
     
     @Test
     public void testReadDocumentAttachmentElementWithoutAppliesTo() throws MalformedURLException {
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider();
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments2.xml");
         String uri = url.toExternalForm();
         eap.setLocation(new UrlResource(uri));
@@ -191,16 +198,16 @@ public class ExternalAttachmentProviderTest extends Assert {
 
         Bus bus = control.createMock(Bus.class);
         
-        eap = new ExternalAttachmentProvider(bus);
         DomainExpressionBuilderRegistry debr = control.createMock(DomainExpressionBuilderRegistry.class);
         EasyMock.expect(bus.getExtension(DomainExpressionBuilderRegistry.class)).andReturn(debr);
         EasyMock.expect(debr.build(EasyMock.isA(Element.class)))
             .andThrow(new PolicyException(new Exception()));
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments3.xml");
         String uri = url.toExternalForm();
-        eap.setLocation(new UrlResource(uri));
         
         control.replay();
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider(bus);
+        eap.setLocation(new UrlResource(uri));
         try {
             eap.readDocument();
             fail("Expected PolicyException not thrown.");
@@ -215,21 +222,21 @@ public class ExternalAttachmentProviderTest extends Assert {
         
         Bus bus = control.createMock(Bus.class);
         
-        eap = new ExternalAttachmentProvider(bus);
         DomainExpressionBuilderRegistry debr = control.createMock(DomainExpressionBuilderRegistry.class);
         EasyMock.expect(bus.getExtension(DomainExpressionBuilderRegistry.class)).andReturn(debr);
         DomainExpression de = control.createMock(DomainExpression.class);
         EasyMock.expect(debr.build(EasyMock.isA(Element.class))).andReturn(de);
         PolicyBuilder pb = control.createMock(PolicyBuilder.class);
-        eap.setBuilder(pb);
+        EasyMock.expect(bus.getExtension(PolicyBuilder.class)).andReturn(pb).anyTimes();
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(pb.getPolicy(EasyMock.isA(Element.class))).andReturn(p);
                 
+        
+        control.replay();
+        ExternalAttachmentProvider eap = new ExternalAttachmentProvider(bus);
         URL url = ExternalAttachmentProviderTest.class.getResource("resources/attachments4.xml");
         String uri = url.toExternalForm();
         eap.setLocation(new UrlResource(uri));
-        
-        control.replay();
         eap.readDocument();
         assertEquals(1, eap.getAttachments().size());
         PolicyAttachment pa = eap.getAttachments().iterator().next();
@@ -239,7 +246,7 @@ public class ExternalAttachmentProviderTest extends Assert {
         control.verify();
     }
     
-    void setUpAttachment(Object subject, boolean applies) {
+    void setUpAttachment(Object subject, boolean applies, ExternalAttachmentProvider eap) {
         attachments.clear();
         attachment = control.createMock(PolicyAttachment.class);
         attachments.add(attachment);

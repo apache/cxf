@@ -370,7 +370,6 @@ public class PolicyEngineTest extends Assert {
         engine = new PolicyEngineImpl(enabled);
     
         Bus bus = control.createMock(Bus.class);
-        engine.setBus(bus);
         List<Interceptor> out = new ArrayList<Interceptor>();
         List<Interceptor> in = new ArrayList<Interceptor>();
         List<Interceptor> inFault = new ArrayList<Interceptor>();
@@ -382,8 +381,7 @@ public class PolicyEngineTest extends Assert {
             EasyMock.expect(bus.getOutFaultInterceptors()).andReturn(outFault);
             control.replay();
         }
-        
-        engine.addBusInterceptors();
+        engine.setBus(bus);
         
         if (enabled) {
             Set<String> idsOut = getInterceptorIds(out);
@@ -407,8 +405,8 @@ public class PolicyEngineTest extends Assert {
         }
         if (enabled) {
             control.verify();
+            assertNotNull(engine.getAlternativeSelector());
         }
-        assertNotNull(engine.getAlternativeSelector());
     }
     
     @Test

@@ -55,8 +55,10 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
+import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
@@ -111,14 +113,18 @@ public class WSDLManagerImpl implements WSDLManager {
     }
     public WSDLManagerImpl(Bus b) throws BusException {
         this();
-        bus = b;
+        setBus(b);
     }
     
     @Resource
-    public void setBus(Bus b) {
+    public final void setBus(Bus b) {
         bus = b;
         if (null != bus) {
             bus.setExtension(this, WSDLManager.class);
+            ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
+            if (loc != null) {
+                loc.getBeansOfType(WSDLExtensionLoader.class);
+            }
         }
     }
 

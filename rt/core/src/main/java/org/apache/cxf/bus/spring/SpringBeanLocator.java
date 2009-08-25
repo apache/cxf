@@ -39,7 +39,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
 
     /** {@inheritDoc}*/
     public List<String> getBeanNamesOfType(Class<?> type) {
-        return Arrays.asList(context.getBeanNamesForType(type));
+        return Arrays.asList(context.getBeanNamesForType(type, false, true));
     }
 
     /** {@inheritDoc}*/
@@ -50,13 +50,15 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     /** {@inheritDoc}*/
     @SuppressWarnings("unchecked")
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        return context.getBeansOfType(type).values();
+        return context.getBeansOfType(type, false, true).values();
     }
 
     @SuppressWarnings("unchecked")
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
-        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type)));
+        List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type, 
+                                                                                            false, 
+                                                                                            true)));
         Collections.reverse(list);
         for (String s : list) {
             Class<? extends T> c = context.getType(s);

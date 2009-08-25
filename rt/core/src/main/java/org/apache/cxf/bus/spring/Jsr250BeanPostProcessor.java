@@ -65,9 +65,14 @@ public class Jsr250BeanPostProcessor
         if (resourceManager == null) {
             if (bean instanceof ResourceManager) {
                 resourceManager = (ResourceManager)bean;
+                resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
             } else {
                 Bus b = (Bus)context.getBean("cxf");
-                resourceManager = b.getExtension(ResourceManager.class);
+                ResourceManager m = b.getExtension(ResourceManager.class);
+                if (resourceManager == null && m != null) {
+                    resourceManager = m;
+                    resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
+                }
             }
         }
         return resourceManager;
@@ -89,11 +94,13 @@ public class Jsr250BeanPostProcessor
         }
         if (bean != null 
             && injectable(bean, beanId)) {
-            //System.err.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
             new ResourceInjector(getResourceManager(bean)).inject(bean);
-        //} else if (bean != null) {
-            //System.err.println("np: " + (++count2) 
-            //                   + ": " + bean.getClass().getName() + " " + beanId);            
+            /*
+            System.err.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
+        } else if (bean != null) {
+            System.err.println("np: " + (++count2) 
+                               + ": " + bean.getClass().getName() + " " + beanId);
+            */
         }
         return bean;
     }

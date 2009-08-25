@@ -39,6 +39,9 @@ public class BusApplicationContextResourceResolver
     
     public BusApplicationContextResourceResolver() {
     }
+    public BusApplicationContextResourceResolver(ApplicationContext c) {
+        context = c;
+    }
     
 
     public InputStream getAsStream(String name) {

@@ -23,8 +23,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 
 	<bean id="org.apache.cxf.xsdvalidation.XercesXsdValidationImpl"
 		class="org.apache.cxf.xsdvalidation.XercesXsdValidationImpl"
-		>
-		<property name="bus" ref="cxf"/>
+		lazy-init="true">
+		<constructor-arg ref="cxf"/>
 	</bean>
 
 </beans>

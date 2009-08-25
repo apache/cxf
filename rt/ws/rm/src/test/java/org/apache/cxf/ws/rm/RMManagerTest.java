@@ -92,7 +92,7 @@ public class RMManagerTest extends Assert {
         assertSame(store, manager.getStore());
         assertSame(queue, manager.getRetransmissionQueue());
         control.replay();
-        control.verify();
+        control.reset();
     }
     
     @Test

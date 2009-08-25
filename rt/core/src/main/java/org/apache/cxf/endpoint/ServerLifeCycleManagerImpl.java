@@ -20,10 +20,13 @@
 package org.apache.cxf.endpoint;
 
 import java.util.List;
+
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
 
+@NoJSR250Annotations
 public class ServerLifeCycleManagerImpl implements ServerLifeCycleManager, BusExtension {
     
     private List<ServerLifeCycleListener> listeners = 

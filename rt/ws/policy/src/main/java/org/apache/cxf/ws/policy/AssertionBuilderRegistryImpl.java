@@ -26,13 +26,17 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
@@ -41,6 +45,7 @@ import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionBuilder> implements
     AssertionBuilderRegistry, BusExtension {
 
@@ -50,9 +55,15 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
     private static final int IGNORED_CACHE_SIZE = 10;
     private boolean ignoreUnknownAssertions = true; 
     private List<QName> ignored = new ArrayList<QName>(IGNORED_CACHE_SIZE);
+    private Bus bus;
+    private boolean dynamicLoaded;
     
     public AssertionBuilderRegistryImpl() {
         super(null);
+    }
+    public AssertionBuilderRegistryImpl(Bus b) {
+        super(null);
+        setBus(b);
     }
 
     public AssertionBuilderRegistryImpl(Map<QName, AssertionBuilder> builders) {
@@ -60,6 +71,17 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
     }
     public AssertionBuilderRegistryImpl(MapProvider<QName, AssertionBuilder> builders) {
         super(builders.createMap());
+    }
+    public AssertionBuilderRegistryImpl(Bus b, MapProvider<QName, AssertionBuilder> builders) {
+        super(builders.createMap());
+        setBus(b);
+    }
+    @Resource
+    public final void setBus(Bus b) {
+        bus = b;
+        if (b != null) {
+            b.setExtension(this, AssertionBuilderRegistry.class);
+        }
     }
 
     public Class<?> getRegistrationType() {
@@ -81,8 +103,18 @@ public class AssertionBuilderRegistryImpl extends RegistryImpl<QName, AssertionB
         ignoreUnknownAssertions = ignore;
     }
 
+    private synchronized void loadDynamic() {
+        if (!dynamicLoaded && bus != null) {
+            dynamicLoaded = true;
+            ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
+            if (c != null) {
+                c.getBeansOfType(AssertionBuilderLoader.class);
+            }
+        }
+    }
     public PolicyAssertion build(Element element) {
-
+        loadDynamic();
+        
         AssertionBuilder builder;
 
         QName qname = new QName(element.getNamespaceURI(), element.getLocalName());

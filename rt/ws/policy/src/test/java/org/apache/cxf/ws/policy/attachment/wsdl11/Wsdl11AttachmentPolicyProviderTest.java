@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -35,7 +36,9 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl;
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilderImpl;
+import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.PolicyRegistryImpl;
 import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
@@ -117,6 +120,8 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
     public void setUp() {   
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
+        bus.getExtension(ConfiguredBeanLocator.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
         abr.setIgnoreUnknownAssertions(false);
         XMLPrimitiveAssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
@@ -125,9 +130,14 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         abr.register(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
         abr.register(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
         
-        PolicyBuilderImpl pb = new PolicyBuilderImpl(); 
+        PolicyBuilderImpl pb = new PolicyBuilderImpl();
+        bus.getExtension(PolicyBuilder.class);
+        EasyMock.expectLastCall().andReturn(pb).anyTimes();
+        bus.getExtension(PolicyEngine.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        
         pb.setAssertionBuilderRegistry(abr);
-        app = new Wsdl11AttachmentPolicyProvider(bus);
+        app = new Wsdl11AttachmentPolicyProvider();
         app.setBuilder(pb);
         app.setRegistry(new PolicyRegistryImpl());
         control.replay();

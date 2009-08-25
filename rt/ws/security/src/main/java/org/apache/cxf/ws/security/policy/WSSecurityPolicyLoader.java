@@ -19,12 +19,12 @@
 
 package org.apache.cxf.ws.security.policy;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.ws.policy.AssertionBuilderLoader;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyInterceptorProviderLoader;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
 import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
@@ -61,17 +61,12 @@ import org.apache.cxf.ws.security.policy.interceptors.SecureConversationTokenInt
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
 
-
-public class WSSecurityPolicyLoader {
+@NoJSR250Annotations
+public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLoader, AssertionBuilderLoader {
     Bus bus;
     
-    @Resource(name = "cxf")
-    public void setBus(Bus b) {
+    WSSecurityPolicyLoader(Bus b) {
         bus = b;
-    }
-    
-    @PostConstruct
-    public void register() {
         registerBuilders();
         try {
             registerProviders();

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.bus.resource;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -26,6 +27,7 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -41,10 +43,14 @@ public class ResourceManagerImpl extends DefaultResourceManager implements BusEx
     public ResourceManagerImpl() {
     }
 
-    public ResourceManagerImpl(List<ResourceResolver> r) {
+    public ResourceManagerImpl(List<? extends ResourceResolver> r) {
         super(r);
     }
-    public ResourceManagerImpl(Bus b, List<ResourceResolver> r) {
+    public ResourceManagerImpl(Bus b) {
+        super();
+        setBus(b);
+    }
+    public ResourceManagerImpl(Bus b, List<? extends ResourceResolver> r) {
         super(r);
         setBus(b);
     }
@@ -60,17 +66,30 @@ public class ResourceManagerImpl extends DefaultResourceManager implements BusEx
      * Set the list of resolvers for this resource manager.
      * @param resolvers
      */
-    public void setResolvers(List<ResourceResolver> resolvers) {
+    public final void setResolvers(List<? extends ResourceResolver> resolvers) {
         registeredResolvers.clear();
         registeredResolvers.addAll(resolvers);
     }
     
+    public final void addResolvers(Collection<? extends ResourceResolver> resolvers) {
+        super.addResourceResolvers(resolvers);
+    }
+    public final void addResolver(ResourceResolver resolver) {
+        super.addResourceResolver(resolver);
+    }
+    
     @Resource
     public final void setBus(Bus b) {
-        bus = b;
-        super.addResourceResolver(new ObjectTypeResolver(bus));
-        if (null != bus) {
-            bus.setExtension(this, ResourceManager.class);
+        if (bus != b) {
+            bus = b;
+            super.addResourceResolver(new ObjectTypeResolver(bus));
+            if (null != bus) {
+                bus.setExtension(this, ResourceManager.class);
+            }
+            ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
+            if (locator != null) {
+                this.addResolvers(locator.getBeansOfType(ResourceResolver.class));
+            }
         }
     }
 

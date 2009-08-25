@@ -35,6 +35,7 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.neethi.All;
@@ -50,6 +51,7 @@ import org.apache.neethi.PolicyReference;
  * provides methods to create Policy and PolicyReferenceObjects
  * from DOM elements, but also from an input stream etc.
  */
+@NoJSR250Annotations
 public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(PolicyBuilderImpl.class);

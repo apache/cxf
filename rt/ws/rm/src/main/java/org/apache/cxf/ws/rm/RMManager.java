@@ -125,10 +125,6 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     @Resource
     public void setBus(Bus b) {
         bus = b;
-    }
-
-    @PostConstruct
-    public void register() {
         if (null != bus) { 
             bus.setExtension(this, RMManager.class);
         }

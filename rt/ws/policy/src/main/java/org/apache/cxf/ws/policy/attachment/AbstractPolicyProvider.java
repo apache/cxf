@@ -21,8 +21,6 @@ package org.apache.cxf.ws.policy.attachment;
 
 import java.util.ResourceBundle;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -53,31 +51,29 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
     }
     
     protected AbstractPolicyProvider(Bus b) {
+        setBus(b);
+    }
+    
+    public final void setBus(Bus b) {
         bus = b;
-    }
-    
-    public void setBus(Bus b) {
-        bus = b;
-    }
-    
-    public void setBuilder(PolicyBuilder b) {
-        builder = b;
-    }
-    
-    public void setRegistry(PolicyRegistry r) {
-        registry = r;
-    }  
-    
-    @PostConstruct
-    public void init() {
         if (null != bus) {
             setBuilder(bus.getExtension(PolicyBuilder.class));
             PolicyEngine pe = (PolicyEngine)bus.getExtension(PolicyEngine.class);
-            setRegistry(pe.getRegistry());
-            
-            ((PolicyEngineImpl)pe).getPolicyProviders().add(this);
+            if (pe != null) {
+                setRegistry(pe.getRegistry());
+                ((PolicyEngineImpl)pe).getPolicyProviders().add(this);
+            }
         }
     }
+    
+    public final void setBuilder(PolicyBuilder b) {
+        builder = b;
+    }
+    
+    public final void setRegistry(PolicyRegistry r) {
+        registry = r;
+    }  
+    
     
     protected Policy resolveExternal(PolicyReference ref,  String baseURI) {
         Policy resolved = registry.lookup(ref.getURI());

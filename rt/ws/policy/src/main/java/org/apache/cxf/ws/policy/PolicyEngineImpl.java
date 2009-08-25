@@ -23,11 +23,13 @@ import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 
-import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.factory.FactoryBeanListenerManager;
@@ -49,6 +51,7 @@ import org.apache.neethi.PolicyRegistry;
 /**
  * 
  */
+@NoJSR250Annotations(unlessNull = "bus")
 public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyEngineImpl.class);
     
@@ -65,9 +68,9 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     
     private Bus bus;
     private PolicyRegistry registry;
-    private Collection<PolicyProvider> policyProviders = new CopyOnWriteArrayList<PolicyProvider>();
+    private Collection<PolicyProvider> policyProviders;
     private boolean enabled = true;
-    private boolean ignoreUnknownAssertions = true;
+    private Boolean ignoreUnknownAssertions;
     private boolean addedBusInterceptors;
     private AlternativeSelector alternativeSelector;
 
@@ -79,6 +82,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         enabled = en;
         init();
     }
+    public PolicyEngineImpl(Bus b) {
+        init();
+        setBus(b);        
+    }
 
     // configuration
 
@@ -86,8 +93,14 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return enabled;
     }
 
-    public void setBus(Bus b) {
+    @Resource
+    public final void setBus(Bus b) {
         bus = b;
+        addBusInterceptors();
+        FactoryBeanListenerManager fblm = bus.getExtension(FactoryBeanListenerManager.class);
+        if (fblm != null) {
+            fblm.addListener(new PolicyAnnotationListener());
+        }
     }
 
     public Bus getBus() {
@@ -98,7 +111,16 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         policyProviders = new CopyOnWriteArrayList<PolicyProvider>(p);
     }
    
-    public Collection<PolicyProvider> getPolicyProviders() {
+    public synchronized Collection<PolicyProvider> getPolicyProviders() {
+        if (policyProviders == null) {
+            policyProviders = new CopyOnWriteArrayList<PolicyProvider>();
+            if (bus != null) {
+                ConfiguredBeanLocator loc = bus.getExtension(ConfiguredBeanLocator.class);
+                if (loc != null) {
+                    loc.getBeansOfType(PolicyProvider.class);
+                }
+            }
+        }
         return policyProviders;
     }
 
@@ -119,7 +141,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         }
     }
 
-    public AlternativeSelector getAlternativeSelector() {    
+    public synchronized AlternativeSelector getAlternativeSelector() {  
+        if (alternativeSelector == null && enabled) {
+            alternativeSelector = new MinimalAlternativeSelector();
+        }
         return alternativeSelector;
     }
 
@@ -128,7 +153,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
     }
 
     public boolean isIgnoreUnknownAssertions() {
-        return ignoreUnknownAssertions;
+        return ignoreUnknownAssertions == null ? true : ignoreUnknownAssertions;
     }
 
     public void setIgnoreUnknownAssertions(boolean ignore) {
@@ -292,14 +317,6 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         registry = new PolicyRegistryImpl();
     }
     
-    @PostConstruct
-    public synchronized void postConsruct() {
-        addBusInterceptors();
-        FactoryBeanListenerManager fblm = bus.getExtension(FactoryBeanListenerManager.class);
-        if (fblm != null) {
-            fblm.addListener(new PolicyAnnotationListener());
-        }
-    }
 
 
     public synchronized void removeBusInterceptors() {
@@ -311,19 +328,16 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         addedBusInterceptors = false;
     }
 
-    public synchronized void addBusInterceptors() {
-    
-        if (null == alternativeSelector) {
-            alternativeSelector = new MinimalAlternativeSelector();
-        }
-    
+    public final synchronized void addBusInterceptors() {
         if (null == bus || !enabled) {
             return;
         }
     
-        AssertionBuilderRegistry abr = bus.getExtension(AssertionBuilderRegistry.class);
-        if (null != abr) {
-            abr.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
+        if (ignoreUnknownAssertions != null) {
+            AssertionBuilderRegistry abr = bus.getExtension(AssertionBuilderRegistry.class);
+            if (null != abr) {
+                abr.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
+            }
         }
 
         bus.getInInterceptors().add(PolicyInInterceptor.INSTANCE);

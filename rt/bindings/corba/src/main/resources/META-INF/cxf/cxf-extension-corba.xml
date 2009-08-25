@@ -35,12 +35,13 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         </property>
         <property name="transportIds">
             <list>
-		<value>http://cxf.apache.org/bindings/corba</value>
-	        <value>http://schemas.apache.org/yoko/bindings/corba</value>
+				<value>http://cxf.apache.org/bindings/corba</value>
+	        	<value>http://schemas.apache.org/yoko/bindings/corba</value>
             </list>
         </property>
     </bean>
     
-    <bean class="org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister" lazy-init="false"/>
-
+    <bean class="org.apache.cxf.binding.corba.wsdl.WSDLExtensionRegister" lazy-init="true">
+    	<constructor-arg ref="cxf"/>
+	</bean>
 </beans>

@@ -19,7 +19,11 @@
 
 package org.apache.cxf.ws.rm.policy;
 
+import java.util.Collections;
+import java.util.List;
+
 import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
@@ -32,7 +36,9 @@ import org.apache.neethi.PolicyComponent;
  * 
  */
 public class RMAssertionBuilder extends JaxbAssertionBuilder<RMAssertion> {
- 
+    public static final List<QName> KNOWN_ELEMENTS 
+        = Collections.singletonList(RMConstants.getRMAssertionQName());
+
     public RMAssertionBuilder() throws JAXBException {
         super(RMAssertion.class, RMConstants.getRMAssertionQName());     
     }

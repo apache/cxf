@@ -19,30 +19,27 @@
 
 package org.apache.cxf.binding.corba.wsdl;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 import javax.xml.bind.JAXBException;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.cxf.wsdl.TExtensibilityElementImpl;
+import org.apache.cxf.wsdl.WSDLExtensionLoader;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
  * 
  */
-public final class WSDLExtensionRegister {
+@NoJSR250Annotations
+public final class WSDLExtensionRegister implements WSDLExtensionLoader { 
     private static final String YOKO_NAMESPACE = "http://schemas.apache.org/yoko/bindings/corba";
-
-    Bus bus;
     
-    @Resource
-    public void setBus(Bus b) {
-        bus = b;
+    public WSDLExtensionRegister(Bus b) {
+        registerYokoCompatibleExtensors(b);
     }
     
-    @PostConstruct
-    void registerYokoCompatibleExtensors() {
+    void registerYokoCompatibleExtensors(Bus bus) {
         WSDLManager manager = bus.getExtension(WSDLManager.class);
         createCompatExtensor(manager, javax.wsdl.Binding.class,
                              org.apache.cxf.binding.corba.wsdl.BindingType.class);
