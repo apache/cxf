@@ -101,7 +101,7 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 import static org.apache.cxf.helpers.CastUtils.cast;
 
 
-@NoJSR250Annotations(unlessNull = { "bus", "activationNamespaces" })
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class SoapBindingFactory extends AbstractBindingFactory {
     public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://schemas.xmlsoap.org/soap/",

@@ -187,15 +187,16 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
 
     @Resource
     public void setBus(Bus bus) {
-        this.bus = bus;
-        registerWithBindingManager();
+        if (this.bus != bus) {
+            this.bus = bus;
+            registerWithBindingManager();
+        }
     }
 
     public Collection<String> getActivationNamespaces() {
         return activationNamespaces;
     }
 
-    @Resource(name = "activationNamespaces")
     public void setActivationNamespaces(Collection<String> activationNamespaces) {
         this.activationNamespaces = activationNamespaces;
         registerWithBindingManager();
