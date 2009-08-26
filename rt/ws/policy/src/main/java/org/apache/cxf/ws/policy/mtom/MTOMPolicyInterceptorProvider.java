@@ -41,7 +41,6 @@ public class MTOMPolicyInterceptorProvider extends AbstractPolicyInterceptorProv
     
     public MTOMPolicyInterceptorProvider() {
         super(ASSERTION_TYPES);
-        Thread.dumpStack();
 
         getInInterceptors().add(INTERCEPTOR);
         
