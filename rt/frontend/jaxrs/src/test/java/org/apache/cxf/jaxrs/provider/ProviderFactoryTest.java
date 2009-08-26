@@ -55,6 +55,7 @@ import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -164,6 +165,29 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testMessageBodyHandlerHierarchy() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<Object>();
+        BookReaderWriter bookHandler = new BookReaderWriter();
+        providers.add(bookHandler);
+        SuperBookReaderWriter superBookHandler = new SuperBookReaderWriter();
+        providers.add(superBookHandler);
+        pf.setUserProviders(providers);
+        assertSame(bookHandler, 
+                   pf.createMessageBodyReader(Book.class, Book.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(superBookHandler, 
+                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(bookHandler, 
+                   pf.createMessageBodyWriter(Book.class, Book.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(superBookHandler, 
+                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+    }
+    
+    @Test
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
@@ -179,8 +203,6 @@ public class ProviderFactoryTest extends Assert {
         assertTrue(indexOf(writers, TestStringProvider.class) 
                    < indexOf(writers, PrimitiveTextProvider.class));
         
-        //REVISIT the compare algorithm
-        //assertTrue(indexOf(providers, JSONProvider.class) < indexOf(providers, TestStringProvider.class));
     }
     
     @Test
@@ -284,7 +306,7 @@ public class ProviderFactoryTest extends Assert {
     public void testRegisterCustomJSONEntityProvider() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new CustomJSONProvider());
-        verifyProvider(pf, org.apache.cxf.jaxrs.resources.Book.class, CustomJSONProvider.class, 
+        verifyProvider(pf, Book.class, CustomJSONProvider.class, 
                        "application/json");
     }
     
@@ -375,7 +397,7 @@ public class ProviderFactoryTest extends Assert {
     @Consumes("application/json")
     @Produces("application/json")
     private final class CustomJSONProvider 
-        implements MessageBodyReader<String>, MessageBodyWriter<String>  {
+        implements MessageBodyReader<Book>, MessageBodyWriter<Book>  {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType m) {
@@ -387,18 +409,18 @@ public class ProviderFactoryTest extends Assert {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations,
+        public long getSize(Book b, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType m) {
-            return s.length();
+            return -1;
         }
 
-        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations, 
                                MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
             //Dummy
             return null;
         }
 
-        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
@@ -408,7 +430,7 @@ public class ProviderFactoryTest extends Assert {
     @Consumes("application/widget")
     @Produces("application/widget")
     private final class CustomWidgetProvider
-        implements MessageBodyReader<String>, MessageBodyWriter<String>  {
+        implements MessageBodyReader<Book>, MessageBodyWriter<Book>  {
 
         public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations,
                                   MediaType m) {
@@ -420,19 +442,19 @@ public class ProviderFactoryTest extends Assert {
             return type.getAnnotation(XmlRootElement.class) != null;
         }
         
-        public long getSize(String s, Class<?> type, Type genericType, Annotation[] annotations,
+        public long getSize(Book s, Class<?> type, Type genericType, Annotation[] annotations,
                             MediaType m) {
-            return s.length();
+            return -1;
         }
 
 
-        public String readFrom(Class<String> clazz, Type genericType, Annotation[] annotations, 
+        public Book readFrom(Class<Book> clazz, Type genericType, Annotation[] annotations, 
                                MediaType m, MultivaluedMap<String, String> headers, InputStream is) {    
             //Dummy
             return null;
         }
 
-        public void writeTo(String obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
+        public void writeTo(Book obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
             MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
             //Dummy
         }
@@ -460,5 +482,78 @@ public class ProviderFactoryTest extends Assert {
         }
         
     }
-     
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    private static class BookReaderWriter 
+        implements MessageBodyReader<Book>, MessageBodyWriter<Book> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Book readFrom(Class<Book> arg0, Type arg1, Annotation[] arg2, 
+                             MediaType arg3, MultivaluedMap<String, String> arg4, InputStream arg5) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public long getSize(Book t, Class<?> type, Type genericType, Annotation[] annotations, 
+                            MediaType mediaType) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
+                                   MediaType mediaType) {
+            return true;
+        }
+
+        public void writeTo(Book arg0, Class<?> arg1, Type arg2, Annotation[] arg3, 
+                            MediaType arg4, MultivaluedMap<String, Object> arg5, OutputStream arg6) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            
+        }
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    private static class SuperBookReaderWriter 
+        implements MessageBodyReader<SuperBook>, MessageBodyWriter<SuperBook> {
+
+        public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public SuperBook readFrom(Class<SuperBook> arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
+                                  MultivaluedMap<String, String> arg4, InputStream arg5) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public long getSize(SuperBook t, Class<?> type, Type genericType, 
+                            Annotation[] annotations, MediaType mediaType) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public boolean isWriteable(Class<?> type, Type genericType, 
+                                   Annotation[] annotations, MediaType mediaType) {
+            return true;
+        }
+
+        public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2, 
+                            Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, 
+                            OutputStream arg6) throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    }
+    
 }
