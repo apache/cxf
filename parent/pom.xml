@@ -146,6 +146,7 @@
                             <nature>com.atlassw.tools.eclipse.checkstyle.CheckstyleNature</nature>
                             <nature>net.sourceforge.pmd.eclipse.plugin.pmdNature</nature>
                         </projectnatures>
+                        <ajdtVersion>none</ajdtVersion>
                         <additionalConfig>
                             <file>
                                 <name>.checkstyle</name>
