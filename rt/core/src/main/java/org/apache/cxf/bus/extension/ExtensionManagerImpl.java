@@ -83,7 +83,12 @@ public class ExtensionManagerImpl implements ExtensionManager {
         resourceManager.addResourceResolver(new ObjectTypeResolver(this));
 
         deferred = new ConcurrentHashMap<String, Collection<Extension>>();
-
+        load(resources);
+    }
+    public final void load(String resources[]) {
+        if (resources == null) {
+            return;
+        }
         try {
             for (String resource : resources) {
                 load(resource);

@@ -96,9 +96,9 @@ public class Jsr250BeanPostProcessor
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).inject(bean);
             /*
-            System.err.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
+            System.out.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
         } else if (bean != null) {
-            System.err.println("np: " + (++count2) 
+            System.out.println("np: " + (++count2) 
                                + ": " + bean.getClass().getName() + " " + beanId);
             */
         }

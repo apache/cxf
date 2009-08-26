@@ -24,9 +24,10 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-	<!--  For Testing using the Swing commons processor, uncomment one of: 
-	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
-	<context:annotation-config/>
+	<!--  For Testing using the Swing commons processor, uncomment one of:--> 
+	<!-- 
+		<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+		<context:annotation-config/>
 	-->
     <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
     <bean id="org.apache.cxf.bus.spring.BusApplicationListener" 

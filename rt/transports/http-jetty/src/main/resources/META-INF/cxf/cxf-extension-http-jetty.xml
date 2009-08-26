@@ -27,8 +27,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         
     <bean class="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"
 	  id="org.apache.cxf.transport.http_jetty.JettyHTTPTransportFactory"
-    	lazy-init="false" 
-    	depends-on="org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory">
+    	lazy-init="true">
         <property name="bus" ref="cxf"/>
         <property name="transportIds">
             <list>

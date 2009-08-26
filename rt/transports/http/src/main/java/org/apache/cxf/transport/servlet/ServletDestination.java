@@ -32,7 +32,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
@@ -57,13 +56,12 @@ public class ServletDestination extends AbstractHTTPDestination {
      * @throws IOException
      */    
     public ServletDestination(Bus b,
-                              ConduitInitiator ci,
                               EndpointInfo ei,
                               ServletTransportFactory fact,
                               String p)
         throws IOException {
         // would add the default port to the address
-        super(b, ci, ei, false);
+        super(b, ei, false);
         factory = fact;
         path = p;
     }

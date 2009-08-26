@@ -23,9 +23,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
@@ -34,6 +37,7 @@ import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.util.Base64Utility;
@@ -51,6 +55,8 @@ import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transports.http.QueryHandler;
@@ -460,8 +466,8 @@ public class JettyHTTPDestinationTest extends Assert {
         Conduit fullBackChannel =
             destination.getBackChannel(inMessage, null, replyTo);
         assertSame("unexpected back channel",
-                   fullBackChannel,
-                   decoupledBackChannel);
+                   decoupledBackChannel, 
+                   fullBackChannel);
         fullBackChannel.prepare(outMessage);
     }
     
@@ -576,16 +582,46 @@ public class JettyHTTPDestinationTest extends Assert {
                 }
                 return serverEngineFactory;   
             }
-            
-            @Override
-            public Conduit getConduit(EndpointInfo epi,
-                                      EndpointReferenceType target) throws IOException {
+        };
+
+        final ConduitInitiator ci = new ConduitInitiator() {
+            public Conduit getConduit(EndpointInfo targetInfo) throws IOException {
                 return decoupledBackChannel;
+            }
+
+            public Conduit getConduit(EndpointInfo localInfo, EndpointReferenceType target)
+                throws IOException {
+                return decoupledBackChannel;
+            }
+
+            public List<String> getTransportIds() {
+                return null;
+            }
+
+            public Set<String> getUriPrefixes() {
+                return new HashSet<String>(Collections.singletonList("http"));
+            }
+            
+        };
+        ConduitInitiatorManager mgr = new ConduitInitiatorManager() {
+            public void deregisterConduitInitiator(String name) {
+            }
+
+            public ConduitInitiator getConduitInitiator(String name) throws BusException {
+                return null;
+            }
+
+            public ConduitInitiator getConduitInitiatorForUri(String uri) {
+                return ci;
+            }
+
+            public void registerConduitInitiator(String name, ConduitInitiator factory) {
             }
         };
         
         if (!mockedBus) {
             bus = new CXFBusImpl();
+            bus.setExtension(mgr, ConduitInitiatorManager.class);
         } else {
             bus = EasyMock.createMock(Bus.class);
             bus.getExtension(EndpointResolverRegistry.class);
@@ -594,6 +630,7 @@ public class JettyHTTPDestinationTest extends Assert {
             EasyMock.expectLastCall().andReturn(null);
             EasyMock.replay(bus);
         }
+        
         
         engine = EasyMock.createNiceMock(JettyHTTPServerEngine.class);
         ServiceInfo serviceInfo = new ServiceInfo();

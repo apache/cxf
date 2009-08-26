@@ -60,7 +60,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
@@ -90,7 +89,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     private static final long serialVersionUID = 1L;
 
     protected final Bus bus;
-    protected final ConduitInitiator conduitInitiator;
 
     // Configuration values
     protected HTTPServerPolicy server;
@@ -108,13 +106,11 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      * @throws IOException
      */    
     public AbstractHTTPDestination(Bus b,
-                                   ConduitInitiator ci,
                                    EndpointInfo ei,
                                    boolean dp)
         throws IOException {
         super(b, getTargetReference(getAddressValue(ei, dp), b), ei);  
         bus = b;
-        conduitInitiator = ci;
         
         initConfig();
     }
@@ -180,13 +176,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         return ex == null ? false : ex.isOneWay();
     }
     
-    /**
-     * @return the associated conduit initiator
-     */
-    protected ConduitInitiator getConduitInitiator() {
-        return conduitInitiator;
-    }
-
     /**
      * Copy the request headers into the message.
      * 

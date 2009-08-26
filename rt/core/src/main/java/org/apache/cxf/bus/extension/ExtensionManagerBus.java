@@ -88,18 +88,17 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         extensions.put(ResourceManager.class, resourceManager);
 
-        ExtensionManagerImpl em = new ExtensionManagerImpl(
-                                 Thread.currentThread().getContextClassLoader(),
-                                 extensions,
-                                 resourceManager, 
-                                 this);
-        
+        ExtensionManagerImpl em = new ExtensionManagerImpl(new String[0],
+                                                           Thread.currentThread().getContextClassLoader(),
+                                                           extensions,
+                                                           resourceManager, 
+                                                           this);
+                                  
         setState(BusState.INITIAL);
         
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
             lifeCycleManager.initComplete();
-            
         }
 
         DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
@@ -121,6 +120,9 @@ public class ExtensionManagerBus extends CXFBusImpl {
                                                 this);
             extensions.put(BindingFactoryManager.class, bfm);
         }
+        em.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
+                              ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
+        
         
         this.setExtension(em, ExtensionManager.class);
     }
