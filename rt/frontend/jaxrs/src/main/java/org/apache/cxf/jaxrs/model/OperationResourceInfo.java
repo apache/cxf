@@ -68,7 +68,7 @@ public class OperationResourceInfo {
             parameters = ResourceUtils.getParameters(mAnnotated);
         }
         classResourceInfo = cri;
-        checkMediaTypes();
+        checkMediaTypes(null, null);
         checkEncoded();
         checkDefaultParameterValue();
     }
@@ -85,8 +85,7 @@ public class OperationResourceInfo {
         classResourceInfo = cri;
         uriTemplate = template;
         httpMethod = httpVerb;
-        consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes);
-        produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes);
+        checkMediaTypes(consumeMediaTypes, produceMediaTypes);
         parameters = params;
     }
 
@@ -141,23 +140,29 @@ public class OperationResourceInfo {
         return consumeMimes;
     }
     
-    private void checkMediaTypes() {
-        Consumes cm = 
-            (Consumes)AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
-        if (cm != null) {
-            consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
-        } else if (classResourceInfo != null) {
-            consumeMimes = JAXRSUtils.sortMediaTypes(
-                               JAXRSUtils.getConsumeTypes(classResourceInfo.getConsumeMime()));
+    private void checkMediaTypes(String consumeMediaTypes,
+                                 String produceMediaTypes) {
+        if (consumeMediaTypes != null) {
+            consumeMimes = JAXRSUtils.sortMediaTypes(consumeMediaTypes);
+        } else {
+            Consumes cm = 
+                (Consumes)AnnotationUtils.getMethodAnnotation(annotatedMethod, Consumes.class);
+            if (cm != null) {
+                consumeMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(cm.value()));
+            } else if (classResourceInfo != null) {
+                consumeMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getConsumeMime());
+            }
         }
-        
-        Produces pm = 
-            (Produces)AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
-        if (pm != null) {
-            produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
-        } else if (classResourceInfo != null) {
-            produceMimes = JAXRSUtils.sortMediaTypes(
-                               JAXRSUtils.getProduceTypes(classResourceInfo.getProduceMime()));
+        if (produceMediaTypes != null) {
+            produceMimes = JAXRSUtils.sortMediaTypes(produceMediaTypes);
+        } else {
+            Produces pm = 
+                (Produces)AnnotationUtils.getMethodAnnotation(annotatedMethod, Produces.class);
+            if (pm != null) {
+                produceMimes = JAXRSUtils.sortMediaTypes(JAXRSUtils.getMediaTypes(pm.value()));
+            } else if (classResourceInfo != null) {
+                produceMimes = JAXRSUtils.sortMediaTypes(classResourceInfo.getProduceMime());
+            }
         }
     }
     

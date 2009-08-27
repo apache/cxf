@@ -67,7 +67,7 @@ public class ResourceUtilsTest extends Assert {
         
         Map<String, UserResource> resources = new HashMap<String, UserResource>();
         resources.put(ur.getName(), ur);
-        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(resources, ur, true);
+        ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(resources, ur, true, true);
         assertNotNull(cri);
         assertEquals("/hashmap", cri.getURITemplate().getValue());
         Method method = 

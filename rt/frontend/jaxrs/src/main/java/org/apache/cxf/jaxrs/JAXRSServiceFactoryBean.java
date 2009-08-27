@@ -126,6 +126,17 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     public void setResourceClasses(List<Class> classes) {
         for (Class resourceClass : classes) {
+            
+            ClassResourceInfo cri = getCreatedFromModel(resourceClass);
+            if (cri != null) {
+                if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
+                    cri = new ClassResourceInfo(cri);
+                    cri.setResourceClass(resourceClass);
+                    classResourceInfos.add(cri);
+                }
+                continue;
+            }
+            
             createResourceInfo(resourceClass, true);
         }
     }
@@ -134,7 +145,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         Map<String, UserResource> map = userResourcesAsMap(resources);
         for (UserResource ur : resources) {
             if (ur.getPath() != null) {
-                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true);
+                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true, enableStatic);
                 if (cri != null) {
                     classResourceInfos.add(cri);
                 }
@@ -144,7 +155,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> sClass) {
         Map<String, UserResource> map = userResourcesAsMap(resources);
-        ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(map, sClass, true);
+        ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
+            map, map.get(sClass.getName()), sClass, true, enableStatic);
         if (cri != null) {
             classResourceInfos.add(cri);
         }

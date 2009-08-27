@@ -48,7 +48,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:serviceBeans>
     <jaxrs:providers>
       <ref bean="exceptionMapper"/>
-      <ref bean="exceptionMapper2"/>
     </jaxrs:providers>		   
   </jaxrs:server>
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStore"/>
@@ -56,7 +55,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
       <property name="toHandle" value="true"/>
   </bean>   
-  <bean id="exceptionMapper2" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper"/>  
   <jaxrs:server id="bookservice2" address="/2"
     modelRef="classpath:/org/apache/cxf/systest/jaxrs/resources/resources.xml">
     <jaxrs:serviceBeans>
