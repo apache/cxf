@@ -132,7 +132,6 @@ public class AegisJSONProviderTest extends Assert {
         
     }
     
-   // @org.junit.Ignore
     @Test
     public void testWriteCollection() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
