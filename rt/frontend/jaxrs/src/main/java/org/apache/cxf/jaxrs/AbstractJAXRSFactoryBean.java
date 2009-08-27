@@ -19,12 +19,12 @@
 package org.apache.cxf.jaxrs;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -251,8 +251,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         DataBinding db = getDataBinding();
         try {
             Method m = db.getClass().getMethod("setAllClasses", new Class[]{Set.class});
-            Set<Class<?>> allClasses = ResourceUtils.getAllRequestResponseTypes(
-                                                         serviceFactory.getRealClassResourceInfo(), false);
+            Map<Class<?>, Type> allClasses = ResourceUtils.getAllRequestResponseTypes(
+                                                 serviceFactory.getRealClassResourceInfo(), false);
             m.invoke(db, new Object[]{allClasses});
         } catch (Exception ex) { 
             db.initialize(s);

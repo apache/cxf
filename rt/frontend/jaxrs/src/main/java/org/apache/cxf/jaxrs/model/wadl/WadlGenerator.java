@@ -109,7 +109,7 @@ public class WadlGenerator implements RequestHandler {
         
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
         
-        Set<Class<?>> jaxbTypes = ResourceUtils.getAllRequestResponseTypes(cris, true);
+        Set<Class<?>> jaxbTypes = ResourceUtils.getAllRequestResponseTypes(cris, true).keySet();
         JAXBContext context = createJaxbContext(jaxbTypes);
         SchemaCollection coll = getSchemaCollection(context);
         JAXBContextProxy proxy = null;
@@ -438,7 +438,16 @@ public class WadlGenerator implements RequestHandler {
         
         XmlRootElement root = type.getAnnotation(XmlRootElement.class);
         if (root != null) {
-            return getQNameFromParts(root.name(), root.namespace(), clsMap);
+            QName qname = getQNameFromParts(root.name(), root.namespace(), clsMap);
+            if (qname != null) {
+                return qname;
+            }
+            String ns = JAXBUtils.getPackageNamespace(type);
+            if (ns != null) {
+                return getQNameFromParts(root.name(), ns, clsMap);
+            } else {
+                return null;
+            }
         }
         
         try {

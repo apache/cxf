@@ -36,6 +36,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
@@ -76,8 +77,13 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     }
     
     @Override
-    protected XMLStreamReader createStreamReader(Class<?> type, InputStream is) throws Exception {
-        getQName(type);
+    protected XMLStreamReader createStreamReader(Class<?> type,  Type genericType, InputStream is) 
+        throws Exception {
+        if (!InjectionUtils.isSupportedCollectionOrArray(type) && !Map.class.isAssignableFrom(type)) {
+            getQName(type);
+        } else {
+            getQName(InjectionUtils.getActualType(genericType));
+        }
         return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
     
@@ -86,4 +92,5 @@ public final class AegisJSONProvider extends AegisElementProvider  {
         namespaceMap.putIfAbsent(qname.getNamespaceURI(), "ns1");
         return qname;
     }
+    
 }

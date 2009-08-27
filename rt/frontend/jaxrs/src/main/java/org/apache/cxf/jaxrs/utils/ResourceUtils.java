@@ -26,15 +26,15 @@ import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.CookieParam;
@@ -397,22 +397,26 @@ public final class ResourceUtils {
     }
     
 
-    public static Set<Class<?>> getAllRequestResponseTypes(List<ClassResourceInfo> cris, boolean jaxbOnly) {
-        Set<Class<?>> types = new HashSet<Class<?>>();
+    public static Map<Class<?>, Type> getAllRequestResponseTypes(List<ClassResourceInfo> cris, 
+                                                                 boolean jaxbOnly) {
+        Map<Class<?>, Type> types = new HashMap<Class<?>, Type>();
         for (ClassResourceInfo root : cris) {
             for (OperationResourceInfo ori : root.getMethodDispatcher().getOperationResourceInfos()) {
+                Class<?> cls = ori.getMethodToInvoke().getReturnType();
+                Type type = ori.getMethodToInvoke().getGenericReturnType();
                 if (jaxbOnly) {
-                    checkJaxbType(ori.getMethodToInvoke().getReturnType(), types);
+                    checkJaxbType(cls, types);
                 } else {
-                    types.add(ori.getMethodToInvoke().getReturnType());
+                    types.put(cls, type);
                 }
                 for (Parameter pm : ori.getParameters()) {
                     if (pm.getType() == ParameterType.REQUEST_BODY) {
                         Class<?> inType = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
+                        Type type2 = ori.getMethodToInvoke().getGenericParameterTypes()[pm.getIndex()];
                         if (jaxbOnly) {
                             checkJaxbType(inType, types);
                         } else {
-                            types.add(inType);
+                            types.put(inType, type2);
                         }
                     }
                 }
@@ -423,12 +427,12 @@ public final class ResourceUtils {
         return types;
     }
 
-    private static void checkJaxbType(Class<?> type, Set<Class<?>> types) {
+    private static void checkJaxbType(Class<?> type, Map<Class<?>, Type> types) {
         JAXBElementProvider provider = new JAXBElementProvider();
         if (!InjectionUtils.isPrimitive(type) 
             && !JAXBElement.class.isAssignableFrom(type)
             && provider.isReadable(type, type, new Annotation[0], MediaType.APPLICATION_XML_TYPE)) {
-            types.add(type);
+            types.put(type, type);
         }        
     }
     

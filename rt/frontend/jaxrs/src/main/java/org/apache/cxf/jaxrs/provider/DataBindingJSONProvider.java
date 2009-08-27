@@ -34,6 +34,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 @Provider
@@ -73,8 +74,14 @@ public class DataBindingJSONProvider extends DataBindingProvider {
     }
     
     @Override
-    protected XMLStreamWriter createWriter(Class<?> type, OutputStream os) throws Exception {
-        QName qname = getQName(type);
+    protected XMLStreamWriter createWriter(Class<?> type, Type genericType, OutputStream os) 
+        throws Exception {
+        QName qname = null;
+        if (!InjectionUtils.isSupportedCollectionOrArray(type)) {
+            qname = getQName(type);
+        } else {
+            qname = getQName(InjectionUtils.getActualType(genericType));
+        }
         return JSONUtils.createStreamWriter(os, qname, writeXsiType, namespaceMap, 
                                             serializeAsArray, arrayKeys);
     }
@@ -87,8 +94,13 @@ public class DataBindingJSONProvider extends DataBindingProvider {
     }
     
     @Override
-    protected XMLStreamReader createReader(Class<?> type, InputStream is) throws Exception {
-        getQName(type);
+    protected XMLStreamReader createReader(Class<?> type, Type genericType, InputStream is) 
+        throws Exception {
+        if (!InjectionUtils.isSupportedCollectionOrArray(type)) {
+            getQName(type);
+        } else {
+            getQName(InjectionUtils.getActualType(genericType));
+        }
         return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
     

@@ -682,6 +682,18 @@ public final class JAXBUtils {
         return results;
     }
     
+    public static String getPackageNamespace(Class<?> cls) {
+        Package p = Package.getPackage(PackageUtils.getPackageName(cls));
+        if (p != null) {
+            javax.xml.bind.annotation.XmlSchema schemaAnn = 
+                p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
+            if (schemaAnn != null) {
+                return schemaAnn.namespace();
+            }
+        }
+        return null;
+    }
+    
     public static void scanPackages(Set<Class<?>> classes, 
                                     Map<Package, CachedClass> objectFactoryCache) {
         // try and read any jaxb.index files that are with the other classes.

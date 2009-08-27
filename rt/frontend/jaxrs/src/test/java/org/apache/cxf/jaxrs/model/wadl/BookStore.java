@@ -31,6 +31,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
+
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
@@ -68,6 +70,12 @@ public class BookStore {
     @Path("itself")
     public BookStore getItself() {
         return this;
+    }
+    
+    @Path("book2")
+    @GET
+    public Book2 getBook2() {
+        return new Book2();
     }
     
     public static class QueryBean {
