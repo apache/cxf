@@ -100,7 +100,7 @@ public abstract class AbstractAegisProvider
             rootClasses.add(ct);
         }
     }
-    private AegisContext getClassContext(Class<?> type, Type genericType) {
+    private AegisContext getClassContext(Class<?> type, Type reflectionType) {
         synchronized (classContexts) {
             AegisContext context = classContexts.get(type);
             if (context == null) {
@@ -108,17 +108,24 @@ public abstract class AbstractAegisProvider
                 context.setWriteXsiTypes(writeXsiType); 
                 context.setReadXsiTypes(readXsiType);
                 Set<Class<?>> rootClasses = new HashSet<Class<?>>();
-                rootClasses.add(type);
-                if (!(genericType instanceof Class)) {
-                    addType(rootClasses, genericType, true);
+                /* we do not want raw collection types in here.
+                 * so we only add the 'type' to the root classes if the 
+                 * un-erased (reflection) type is non-generic.
+                 * Now, perhaps we should tolerate non-collection
+                 * generic types.  
+                 */
+                if (reflectionType == null || reflectionType instanceof Class) {
+                    rootClasses.add(type);
+                } else {
+                    addType(rootClasses, reflectionType, true);
                 }
                 context.setRootClasses(rootClasses);
                 context.initialize();
                 /* It's not enough, in the presence of generic types, to just add it as a root.
                     a mapping is also needed */
-                if (genericType != null) {
+                if (reflectionType != null) {
                     org.apache.cxf.aegis.type.Type aegisType;
-                    aegisType = context.getTypeMapping().getTypeCreator().createType(genericType);
+                    aegisType = context.getTypeMapping().getTypeCreator().createType(reflectionType);
                     context.getTypeMapping().register(aegisType);
                 }
                 classContexts.put(type, context);

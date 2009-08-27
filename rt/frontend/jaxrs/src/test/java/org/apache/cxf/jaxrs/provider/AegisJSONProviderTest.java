@@ -39,7 +39,6 @@ import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisJSONProviderTest extends Assert {
@@ -133,10 +132,11 @@ public class AegisJSONProviderTest extends Assert {
         
     }
     
+    @org.junit.Ignore
     @Test
-    @Ignore
     public void testWriteCollection() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
+        p.setWriteXsiType(false);
         AbstractAegisProvider.clearContexts();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         AegisTestBean bean = new AegisTestBean();
@@ -157,8 +157,8 @@ public class AegisJSONProviderTest extends Assert {
     @Test
     public void testManyTags() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
-        AbstractAegisProvider.clearContexts();
         p.setWriteXsiType(false);
+        AbstractAegisProvider.clearContexts();
         p.setSerializeAsArray(true);
         
         Tags tags = new Tags();
