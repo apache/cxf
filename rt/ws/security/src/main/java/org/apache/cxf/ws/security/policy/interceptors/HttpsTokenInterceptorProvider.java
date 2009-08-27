@@ -34,6 +34,10 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.transport.TLSSessionInfo;
+import org.apache.cxf.transport.http.MessageTrustDecider;
+import org.apache.cxf.transport.http.URLConnectionInfo;
+import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
+import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -46,7 +50,7 @@ import org.apache.cxf.ws.security.policy.model.HttpsToken;
  * 
  */
 public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
-
+    
     public HttpsTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.HTTPS_TOKEN, SP12Constants.HTTPS_TOKEN));
         this.getOutInterceptors().add(new HttpsTokenOutInterceptor());
@@ -67,7 +71,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
 
     static class HttpsTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
         public HttpsTokenOutInterceptor() {
-            super(Phase.PREPARE_SEND);
+            super(Phase.PRE_STREAM);
         }
         public void handleMessage(Message message) throws Fault {
             AssertionInfoMap aim = message.get(AssertionInfoMap.class);
@@ -96,11 +100,29 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 
                 ai.setAsserted(true);
                 Map<String, List<String>> headers = getSetProtocolHeaders(message);
+                
                 if (connection instanceof HttpsURLConnection) {
-                    HttpsURLConnection https = (HttpsURLConnection)connection;
-                    if (token.isRequireClientCertificate()
-                        && https.getLocalCertificates().length == 0) {
-                        ai.setNotAsserted("RequireClientCertificate is set, but no local certificates");
+                    if (token.isRequireClientCertificate()) {
+                        final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
+                        MessageTrustDecider trust = new MessageTrustDecider() {
+                            public void establishTrust(String conduitName,
+                                                       URLConnectionInfo connectionInfo,
+                                                       Message message)
+                                throws UntrustedURLConnectionIOException {
+                                if (orig != null) {
+                                    orig.establishTrust(conduitName, connectionInfo, message);
+                                }
+                                HttpsURLConnectionInfo info = (HttpsURLConnectionInfo)connectionInfo;
+                                if (info.getLocalCertificates() == null 
+                                    || info.getLocalCertificates().length == 0) {
+                                    throw new UntrustedURLConnectionIOException(
+                                        "RequireClientCertificate is set, "
+                                        + "but no local certificates we negotiated.  Is"
+                                        + " the server set to ask for client authorization?");
+                                }
+                            }
+                        };
+                        message.put(MessageTrustDecider.class, trust);
                     }
                     if (token.isHttpBasicAuthentication()) {
                         List<String> auth = headers.get("Authorization");
@@ -174,7 +196,8 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                 TLSSessionInfo tlsInfo = message.get(TLSSessionInfo.class);                
                 if (tlsInfo != null) {
                     if (token.isRequireClientCertificate()
-                        && tlsInfo.getPeerCertificates().length == 0) {
+                        && (tlsInfo.getPeerCertificates() == null 
+                            || tlsInfo.getPeerCertificates().length == 0)) {
                         asserted = false;
                     }
                 } else {
