@@ -541,6 +541,10 @@
                     <artifactId>jaxen</artifactId>
                 </exclusion>
                 <exclusion>
+                    <groupId>org.jencks</groupId>
+                    <artifactId>jencks</artifactId>
+                </exclusion>
+                <exclusion>
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
