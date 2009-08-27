@@ -26,6 +26,7 @@ import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
@@ -56,14 +57,22 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
         bus = b;
         if (queryHandlers == null) {
             queryHandlers = new CopyOnWriteArrayList<QueryHandler>();
-            if (bus != null) {
-                WSDLQueryHandler wsdlQueryHandler = new WSDLQueryHandler();
-                wsdlQueryHandler.setBus(bus);
-                queryHandlers.add(wsdlQueryHandler);
-            }
         }
         if (null != bus) {
             bus.setExtension(this, QueryHandlerRegistry.class);
+            
+            WSDLQueryHandler wsdlQueryHandler = new WSDLQueryHandler();
+            wsdlQueryHandler.setBus(bus);
+            queryHandlers.add(wsdlQueryHandler);
+            
+            ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
+            if (c != null) {
+                for (WSDLQueryHandler handler : c.getBeansOfType(WSDLQueryHandler.class)) {
+                    if (!queryHandlers.contains(handler)) {
+                        queryHandlers.add(handler);
+                    }
+                }
+            }
         }
     }
 

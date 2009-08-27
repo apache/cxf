@@ -37,8 +37,8 @@ public class Jsr250BeanPostProcessor
     private ApplicationContext context;
 
     private boolean isProcessing = true;
-    //private int count;
-    //private int count2;
+    private int count;
+    private int count2;
 
     Jsr250BeanPostProcessor() {
     }
@@ -95,12 +95,10 @@ public class Jsr250BeanPostProcessor
         if (bean != null 
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).inject(bean);
-            /*
             System.out.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
         } else if (bean != null) {
             System.out.println("np: " + (++count2) 
                                + ": " + bean.getClass().getName() + " " + beanId);
-            */
         }
         return bean;
     }

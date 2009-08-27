@@ -22,9 +22,9 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean class="org.apache.cxf.javascript.JavascriptQueryHandlerRegistry"
-    	id="org.apache.cxf.javascript.JavascriptQueryHandlerRegistry" 
-    	init-method="register"
+    <bean class="org.apache.cxf.javascript.JavascriptQueryHandler"
+    	id="org.apache.cxf.javascript.JavascriptQueryHandler" 
+    	lazy-init="true"
     	>
         <constructor-arg ref="cxf"/>
     </bean>
