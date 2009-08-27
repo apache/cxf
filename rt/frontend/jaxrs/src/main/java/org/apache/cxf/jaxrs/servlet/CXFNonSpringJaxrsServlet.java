@@ -36,7 +36,7 @@ import javax.servlet.ServletException;
 import javax.ws.rs.core.Application;
 import javax.ws.rs.ext.Provider;
 
-import org.apache.commons.lang.ClassUtils;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
@@ -49,6 +49,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
 
     private static final Logger LOG = LogUtils.getL7dLogger(CXFNonSpringJaxrsServlet.class);
     
+    private static final String USER_MODEL_PARAM = "user.model";
     private static final String SERVICE_ADDRESS_PARAM = "jaxrs.address";
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
@@ -68,18 +69,24 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return;
         }
         
+        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        
         String address = servletConfig.getInitParameter(SERVICE_ADDRESS_PARAM);
         if (address == null) {
             address = "/";
         }
-        List<Class> resourceClasses = getServiceClasses(servletConfig);
+        bean.setAddress(address);
+        String modelRef = servletConfig.getInitParameter(USER_MODEL_PARAM);
+        if (modelRef != null) {
+            bean.setModelRef(modelRef.trim());
+        }
+        
+        List<Class> resourceClasses = getServiceClasses(servletConfig, modelRef != null);
         Map<Class, ResourceProvider> resourceProviders = 
             getResourceProviders(servletConfig, resourceClasses);
         
         List<?> providers = getProviders(servletConfig);
-        
-        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
-        bean.setAddress(address);
+                
         bean.setResourceClasses(resourceClasses);
         bean.setProviders(providers);
         for (Map.Entry<Class, ResourceProvider> entry : resourceProviders.entrySet()) {
@@ -88,9 +95,13 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         bean.create();
     }
 
-    protected List<Class> getServiceClasses(ServletConfig servletConfig) throws ServletException {
+    protected List<Class> getServiceClasses(ServletConfig servletConfig,
+                                            boolean modelAvailable) throws ServletException {
         String serviceBeans = servletConfig.getInitParameter(SERVICE_CLASSES_PARAM);
         if (serviceBeans == null) {
+            if (modelAvailable) {
+                return Collections.emptyList();
+            }
             throw new ServletException("At least one resource class should be specified");
         }
         String[] classNames = serviceBeans.split(" ");
@@ -229,7 +240,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-            return ClassUtils.getClass(CXFNonSpringJaxrsServlet.class.getClassLoader(), cName.trim());
+            return ClassLoaderUtils.loadClass(cName.trim(), CXFNonSpringJaxrsServlet.class);
         } catch (ClassNotFoundException ex) {
             throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex); 
         }

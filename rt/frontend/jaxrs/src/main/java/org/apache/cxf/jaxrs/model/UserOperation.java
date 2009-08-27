@@ -21,8 +21,6 @@ package org.apache.cxf.jaxrs.model;
 import java.util.Collections;
 import java.util.List;
 
-import javax.ws.rs.core.MediaType;
-
 import org.apache.cxf.helpers.CastUtils;
 
 public class UserOperation {
@@ -73,11 +71,11 @@ public class UserOperation {
     }
     
     public String getConsumes() {
-        return consumesTypes == null ? MediaType.APPLICATION_XML : consumesTypes;
+        return consumesTypes;
     }
     
     public String getProduces() {
-        return producesTypes == null ? MediaType.APPLICATION_XML : producesTypes;
+        return producesTypes;
     }
     
     public void setConsumes(String types) {

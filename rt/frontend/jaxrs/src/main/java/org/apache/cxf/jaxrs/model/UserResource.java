@@ -29,6 +29,8 @@ public class UserResource {
 
     private String className; 
     private String pathValue;
+    private String consumesTypes;
+    private String producesTypes;
     private List<UserOperation> opers; 
     
     public UserResource() {
@@ -46,6 +48,26 @@ public class UserResource {
         this.className = className;
         this.pathValue = pathValue;
         this.opers = ops;
+    }
+    
+    public String getConsumes() {
+        return consumesTypes;
+    }
+    
+    public String getProduces() {
+        return producesTypes;
+    }
+    
+    public void setConsumes(String types) {
+        if (!"".equals(types)) {
+            consumesTypes = types;
+        }
+    }
+    
+    public void setProduces(String types) {
+        if (!"".equals(types)) {
+            producesTypes = types;
+        }
     }
     
     public String getName() {

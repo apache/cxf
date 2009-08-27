@@ -33,10 +33,12 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class ClassResourceInfo extends AbstractResourceInfo {
@@ -51,6 +53,8 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     private List<Method> paramMethods;
     private boolean enableStatic;
     private boolean createdFromModel; 
+    private String consumesTypes;
+    private String producesTypes;
     
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
@@ -104,6 +108,14 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             initParamMethods();
         }
         this.createdFromModel = createdFromModel;
+    }
+    
+    public ClassResourceInfo(Class<?> theResourceClass, Class<?> c, 
+                             boolean theRoot, boolean enableStatic,  boolean createdFromModel,
+                             String consumesTypes, String producesTypes) {
+        this(theResourceClass, theResourceClass, theRoot, enableStatic, createdFromModel);
+        this.consumesTypes = consumesTypes;
+        this.producesTypes = producesTypes;
     }
     
     public ClassResourceInfo findResource(Class<?> typedClass, Class<?> instanceClass) {
@@ -214,12 +226,20 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         resourceProvider = rp;
     }
     
-    public Produces getProduceMime() {
-        return (Produces)AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class);
+    public List<MediaType> getProduceMime() {
+        if (producesTypes != null) {
+            return JAXRSUtils.parseMediaTypes(producesTypes);
+        }
+        return JAXRSUtils.getProduceTypes(
+             (Produces)AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class));
     }
     
-    public Consumes getConsumeMime() {
-        return (Consumes)AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class);
+    public List<MediaType> getConsumeMime() {
+        if (consumesTypes != null) {
+            return JAXRSUtils.parseMediaTypes(consumesTypes);
+        }
+        return JAXRSUtils.getConsumeTypes(
+             (Consumes)AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class));
     }
     
     public Path getPath() {

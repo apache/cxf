@@ -141,25 +141,25 @@ public class ClassResourceInfoTest extends Assert {
     @Test
     public void testGetProduce() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        assertEquals("test/bar", c.getProduceMime().value()[0]);
+        assertEquals("test/bar", c.getProduceMime().get(0).toString());
         
         c = new ClassResourceInfo(TestClass1.class);
-        assertEquals("test/bar", c.getProduceMime().value()[0]);
+        assertEquals("test/bar", c.getProduceMime().get(0).toString());
         
         c = new ClassResourceInfo(TestClass2.class);
-        assertEquals("test/bar", c.getProduceMime().value()[0]);
+        assertEquals("test/bar", c.getProduceMime().get(0).toString());
     }
     
     @Test
     public void testGetConsume() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        assertEquals("test/foo", c.getConsumeMime().value()[0]);
+        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
         
         c = new ClassResourceInfo(TestClass1.class);
-        assertEquals("test/foo", c.getConsumeMime().value()[0]);
+        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
         
         c = new ClassResourceInfo(TestClass2.class);
-        assertEquals("test/foo", c.getConsumeMime().value()[0]);
+        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
     }
     
     @Test

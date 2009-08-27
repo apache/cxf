@@ -59,7 +59,6 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -82,58 +81,21 @@ public final class ResourceUtils {
     }
     
     public static ClassResourceInfo createClassResourceInfo(
-        Map<String, UserResource> resources, UserResource model, boolean isRoot) {
-        if (model.getName() == null) {
-            return null;
-        }
+        Map<String, UserResource> resources, UserResource model, boolean isRoot, boolean enableStatic) {
+        
         Class<?> sClass = loadClass(model.getName());
-        ClassResourceInfo cri  = new ClassResourceInfo(sClass, sClass, isRoot, true, true);
-        if (InjectionUtils.isConcreteClass(cri.getServiceClass())) {
-            try {
-                cri.setResourceProvider(new SingletonResourceProvider(sClass.newInstance()));
-            } catch (Exception ex) {
-                throw new RuntimeException("Resource class " + model.getName() + " can not be created");
-            }
-        }
-        URITemplate t = URITemplate.createTemplate(model.getPath());
-        cri.setURITemplate(t);
-        MethodDispatcher md = new MethodDispatcher();
-        Map<String, UserOperation> ops = model.getOperationsAsMap();
-        for (Method m : cri.getServiceClass().getMethods()) {
-            UserOperation op = ops.get(m.getName());
-            if (op == null || op.getName() == null) {
-                continue;
-            }
-            OperationResourceInfo ori = 
-                new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
-                                          op.getVerb(), op.getConsumes(), op.getProduces(),
-                                          op.getParameters());
-            String rClassName = m.getReturnType().getName();
-            if (op.getVerb() == null) {
-                if (resources.containsKey(rClassName)) {
-                    ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
-                        : createClassResourceInfo(resources, resources.get(rClassName), false);
-                    if (subCri != null) {
-                        cri.addSubClassResourceInfo(subCri);
-                        md.bind(ori, m);
-                    }
-                }
-            } else {
-                md.bind(ori, m);
-            }
-        }
-        cri.setMethodDispatcher(md);
-        return checkMethodDispatcher(cri) ? cri : null;
-
+        return createServiceClassResourceInfo(resources, model, sClass, isRoot, enableStatic);
     }
     
     public static ClassResourceInfo createServiceClassResourceInfo(
-        Map<String, UserResource> resources, Class<?> sClass, boolean isRoot) {
-        UserResource model = resources.get(sClass.getName());
+        Map<String, UserResource> resources, UserResource model, 
+        Class<?> sClass, boolean isRoot, boolean enableStatic) {
         if (model == null) {
             throw new RuntimeException("Resource class " + sClass.getName() + " has no model info");
         }
-        ClassResourceInfo cri  = new ClassResourceInfo(sClass, sClass, isRoot, true, true);
+        ClassResourceInfo cri = 
+            new ClassResourceInfo(sClass, sClass, isRoot, enableStatic, true,
+                                  model.getConsumes(), model.getProduces());
         URITemplate t = URITemplate.createTemplate(model.getPath());
         cri.setURITemplate(t);
         MethodDispatcher md = new MethodDispatcher();
@@ -151,7 +113,8 @@ public final class ResourceUtils {
             if (op.getVerb() == null) {
                 if (resources.containsKey(rClassName)) {
                     ClassResourceInfo subCri = rClassName.equals(model.getName()) ? cri 
-                        : createServiceClassResourceInfo(resources, m.getReturnType(), false);
+                        : createServiceClassResourceInfo(resources, resources.get(rClassName),
+                                                         m.getReturnType(), false, enableStatic);
                     if (subCri != null) {
                         cri.addSubClassResourceInfo(subCri);
                         md.bind(ori, m);
@@ -450,6 +413,8 @@ public final class ResourceUtils {
         UserResource resource = new UserResource();
         resource.setName(e.getAttribute("name"));
         resource.setPath(e.getAttribute("path"));
+        resource.setConsumes(e.getAttribute("consumes"));
+        resource.setProduces(e.getAttribute("produces"));
         List<Element> operEls = 
             DOMUtils.findAllElementsByTagNameNS(e, 
                  "http://cxf.apache.org/jaxrs", "operation");
@@ -476,7 +441,7 @@ public final class ResourceUtils {
             Element paramEl = paramEls.get(i);
             Parameter p = new Parameter(paramEl.getAttribute("type"), i, paramEl.getAttribute("name"));
             p.setEncoded(Boolean.valueOf(paramEl.getAttribute("encoded")));
-            p.setDefaultValue(paramEl.getAttribute("default"));
+            p.setDefaultValue(paramEl.getAttribute("defaultValue"));
             params.add(p);
         }
         op.setParameters(params);
