@@ -43,7 +43,7 @@ public class AegisProviderTest extends Assert {
             + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:AegisTestBean\">"
             + "<ns1:boolValue>true</ns1:boolValue><ns1:strValue>hovercraft</ns1:strValue>"
             + "</ns1:AegisTestBean>";
-    
+
     @After
     public void clearCache() {
         AbstractAegisProvider.clearContexts();
@@ -91,29 +91,32 @@ public class AegisProviderTest extends Assert {
         Map<AegisTestBean, String> mapFunction();
     }
     
+    
+    
     @SuppressWarnings("unchecked")
     @Test
-    @org.junit.Ignore
     public void testReadWriteComplexMap() throws Exception {
-        Map<AegisTestBean, String> map = new HashMap<AegisTestBean, String>();
+        Map<AegisTestBean, String> testMap = new HashMap<AegisTestBean, String>();
+        
+        Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
+        Method method = iwithMapClass.getMethod("mapFunction");
+        Type mapType = method.getGenericReturnType();
+
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        map.put(bean, "hovercraft");
+        testMap.put(bean, "hovercraft");
         
         MessageBodyWriter<Object> writer = new AegisElementProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         
-        writer.writeTo(bean, null, null, null, null, null, os);
+        writer.writeTo(testMap, testMap.getClass(), mapType, null, null, null, os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
                 
         MessageBodyReader<Object> reader = new AegisElementProvider();         
         byte[] simpleBytes = xml.getBytes("utf-8");
         
-        Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
-        Method method = iwithMapClass.getMethod("mapFunction");
-        Type mapType = method.getGenericReturnType();
         
         Object beanObject = reader.readFrom((Class)Map.class, mapType, null, 
                                           null, null, new ByteArrayInputStream(simpleBytes));

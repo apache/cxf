@@ -21,6 +21,7 @@ package org.apache.cxf.aegis.type;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.util.Collection;
 import java.util.Map;
 
@@ -90,7 +91,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         info.setDescription("field " + f.getName() + " in  " + f.getDeclaringClass());
         return info;
     }
-
+    
     public TypeClassInfo createBasicClassInfo(Class typeClass) {
         TypeClassInfo info = new TypeClassInfo();
         info.setDescription("class '" + typeClass.getName() + '\'');
@@ -392,6 +393,29 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         TypeClassInfo info = createClassInfo(f);
         info.setDescription("field " + f.getName() + " in " + f.getDeclaringClass());
         return createTypeForClass(info);
+    }
+    
+    /**
+     * Create an Aegis type from a reflected type description.
+     * This will only work for the restricted set of collection
+     * types supported by Aegis. 
+     * @param t the reflected type.
+     * @return the type
+     */
+    public Type createType(java.lang.reflect.Type t) {
+        TypeClassInfo info = new TypeClassInfo();
+        info.setGenericType(t);
+        if (t instanceof ParameterizedType) {
+            ParameterizedType pt = (ParameterizedType) t;
+            java.lang.reflect.Type rawType = pt.getRawType();
+            if (rawType instanceof Class) {
+                info.setTypeClass((Class)rawType);
+            }
+        }
+        
+        info.setDescription("reflected type " + t.toString());
+        return createTypeForClass(info);
+        
     }
 
     public Type createType(Class clazz) {

@@ -42,6 +42,8 @@ public interface TypeCreator {
     Type createType(Method m, int index);
 
     Type createType(PropertyDescriptor pd);
+    
+    Type createType(java.lang.reflect.Type type);
 
     Type createType(Field f);
 
