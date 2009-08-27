@@ -27,12 +27,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -43,7 +43,7 @@ import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 public final class JSONUtils {
 
     private static final String XSI_PREFIX = "xsi";
-    private static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+    private static final String XSI_URI = WSDLConstants.NS_SCHEMA_XSI; 
     private static final Charset UTF8 = Charset.forName("utf-8");
 
     private JSONUtils() {
