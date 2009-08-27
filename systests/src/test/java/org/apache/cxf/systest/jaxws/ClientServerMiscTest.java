@@ -323,7 +323,11 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        Foo foo = new Foo();
+        foo.setName("blah");
+        assertEquals("blah", port.modifyFoo(foo).getName());
         
+
         assertEquals("hello", port.outOnly(new Holder<String>(), new Holder<String>()));
         
         long start = System.currentTimeMillis();
@@ -459,7 +463,26 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             fail("Expected exception not found");
         } catch (ComplexException ex) {
             assertEquals("Throw user fault -3", ex.getMessage());
-        }          
+        }    
+        
+        try {
+            Foo foo = new Foo();
+            foo.setNameIgnore("DoNoName");
+            port.modifyFoo(foo);
+            fail("Expected exception not found");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("NoName is not a valid name"));
+        }    
+        try {
+            Foo foo = new Foo();
+            foo.setNameIgnore("NoName");
+            port.modifyFoo(foo);
+            fail("Expected exception not found");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("NoName is not a valid name"));
+        }    
+
+
     }
     
     
