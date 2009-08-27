@@ -650,22 +650,39 @@ public class HTTPConduit
         HttpURLConnection connection = 
             (HttpURLConnection) message.get(KEY_HTTP_CONNECTION);
         
-        if (trustDecider != null) {
+        MessageTrustDecider decider2 = message.get(MessageTrustDecider.class);
+        if (trustDecider != null || decider2 != null) {
             try {
                 // We must connect or we will not get the credentials.
                 // The call is (said to be) ingored internally if
                 // already connected.
                 connection.connect();
-                trustDecider.establishTrust(
-                    getConduitName(), 
-                    getConnectionFactory(connection.getURL()).getConnectionInfo(connection),
-                    message);
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "Trust Decider "
-                        + trustDecider.getLogicalName()
-                        + " considers Conduit "
-                        + getConduitName() 
-                        + " trusted.");
+                URLConnectionInfo info = getConnectionFactory(connection.getURL())
+                    .getConnectionInfo(connection);
+                if (trustDecider != null) {
+                    trustDecider.establishTrust(
+                        getConduitName(), 
+                        info,
+                        message);
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, "Trust Decider "
+                            + trustDecider.getLogicalName()
+                            + " considers Conduit "
+                            + getConduitName() 
+                            + " trusted.");
+                    }
+                }
+                if (decider2 != null) {
+                    decider2.establishTrust(getConduitName(), 
+                                            info,
+                                            message);
+                    if (LOG.isLoggable(Level.FINE)) {
+                        LOG.log(Level.FINE, "Trust Decider "
+                            + decider2.getLogicalName()
+                            + " considers Conduit "
+                            + getConduitName() 
+                            + " trusted.");
+                    }
                 }
             } catch (UntrustedURLConnectionIOException untrustedEx) {
                 // This cast covers HttpsURLConnection as well.

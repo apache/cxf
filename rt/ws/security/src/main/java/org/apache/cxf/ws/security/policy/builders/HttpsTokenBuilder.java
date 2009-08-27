@@ -76,7 +76,7 @@ public class HttpsTokenBuilder implements AssertionBuilder {
             if (attr != null) {
                 httpsToken.setRequireClientCertificate("true".equals(attr));
             }
-        } else if (consts.getVersion() == SPConstants.Version.SP_V11) {
+        } else {
             Element polEl = PolicyConstants.findPolicyElement(element);
              
             if (polEl != null) {
