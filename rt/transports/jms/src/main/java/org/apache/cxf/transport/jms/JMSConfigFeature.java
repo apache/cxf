@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.ConfigurationException;
 import org.apache.cxf.endpoint.Client;
@@ -36,6 +37,7 @@ import org.springframework.beans.factory.annotation.Required;
  * Features and reference a JMSConfiguration. The configuration inside this class takes precedence over a
  * configuration that is generated from the old configuration style.
  */
+@NoJSR250Annotations
 public class JMSConfigFeature extends AbstractFeature {
     static final Logger LOG = LogUtils.getL7dLogger(JMSConfigFeature.class);
 

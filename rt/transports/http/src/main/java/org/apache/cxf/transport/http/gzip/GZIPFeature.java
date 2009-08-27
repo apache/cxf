@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http.gzip;
 import java.util.List;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -53,6 +54,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
  * ]]>
  * </pre>
  */
+@NoJSR250Annotations
 public class GZIPFeature extends AbstractFeature {
     private static final GZIPInInterceptor IN = new GZIPInInterceptor();
     private static final GZIPOutInterceptor OUT = new GZIPOutInterceptor();

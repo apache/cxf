@@ -19,6 +19,7 @@
 package org.apache.cxf.clustering;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.feature.AbstractFeature;
 
@@ -27,6 +28,7 @@ import org.apache.cxf.feature.AbstractFeature;
  * failover from the initial target endpoint to any other
  * compatible endpoint for the target service.
  */
+@NoJSR250Annotations
 public class FailoverFeature extends AbstractFeature {
 
     private FailoverStrategy failoverStrategy;

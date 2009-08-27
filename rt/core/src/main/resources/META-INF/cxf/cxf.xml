@@ -107,13 +107,6 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
     	class="org.apache.cxf.transport.http.QueryHandlerRegistryImpl"
     	lazy-init="true">
         <constructor-arg ref="cxf"/>
-        <constructor-arg>
-        	<list>
-        		<bean class="org.apache.cxf.transport.http.WSDLQueryHandler">
-			        <constructor-arg ref="cxf"/>
-        		</bean>	
-        	</list>
-        </constructor-arg>
     </bean>
 
     <bean id="org.apache.cxf.endpoint.EndpointResolverRegistry" 

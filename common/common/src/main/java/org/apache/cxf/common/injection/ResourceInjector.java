@@ -34,7 +34,6 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.annotation.Resources;
-import javax.xml.namespace.QName;
 
 
 import org.apache.cxf.common.annotation.AbstractAnnotationVisitor;
@@ -85,7 +84,8 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
     }
     
     public static boolean processable(Class<?> cls, Object o) {
-        if (QName.class.equals(cls)) {
+        if (cls.getName().startsWith("java.")
+            || cls.getName().startsWith("javax.")) {
             return false;
         }
         NoJSR250Annotations njsr = cls.getAnnotation(NoJSR250Annotations.class);

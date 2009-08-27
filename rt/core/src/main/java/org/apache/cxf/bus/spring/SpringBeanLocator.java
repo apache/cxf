@@ -23,10 +23,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.springframework.beans.Mergeable;
+import org.springframework.beans.PropertyValue;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.TypedStringValue;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * 
@@ -66,6 +72,47 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                 Object o = context.getBean(s);
                 if (listener.beanLoaded(s, type.cast(o))) {
                     return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean hasConfiguredPropertyValue(String beanName, String propertyName, String searchValue) {
+        ConfigurableApplicationContext ctxt = (ConfigurableApplicationContext)context;
+        BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanName);
+        if (!def.isSingleton() || def.isAbstract() || def.isAbstract()) {
+            return false;
+        }
+        Collection<?> ids = null;
+        PropertyValue pv = def.getPropertyValues().getPropertyValue(propertyName);
+        
+        if (pv != null) {
+            Object value = pv.getValue();
+            if (!(value instanceof Collection)) {
+                throw new RuntimeException("The property " + propertyName + " must be a collection!");
+            }
+
+            if (value instanceof Mergeable) {
+                if (!((Mergeable)value).isMergeEnabled()) {
+                    ids = (Collection<?>)value;
+                }
+            } else {
+                ids = (Collection<?>)value;
+            }
+        } 
+        
+        if (ids != null) {
+            for (Iterator itr = ids.iterator(); itr.hasNext();) {
+                Object o = itr.next();
+                if (o instanceof TypedStringValue) {
+                    if (searchValue.equals(((TypedStringValue) o).getValue())) {
+                        return true;
+                    }
+                } else {
+                    if (searchValue.equals((String)o)) {
+                        return true;
+                    }
                 }
             }
         }

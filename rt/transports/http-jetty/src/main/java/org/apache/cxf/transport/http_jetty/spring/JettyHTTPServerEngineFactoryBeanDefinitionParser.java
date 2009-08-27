@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
@@ -137,6 +138,7 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
         return SpringJettyHTTPServerEngineFactory.class;
     }
     
+    @NoJSR250Annotations(unlessNull = "bus")
     public static class SpringJettyHTTPServerEngineFactory extends JettyHTTPServerEngineFactory 
         implements ApplicationContextAware {
 
@@ -154,7 +156,6 @@ public class JettyHTTPServerEngineFactoryBeanDefinitionParser
                 Bus bus = BusFactory.getThreadDefaultBus();
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
                 setBus(bus);
-                registerWithBus();
             }
         }
     }

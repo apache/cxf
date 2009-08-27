@@ -27,6 +27,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
@@ -74,7 +75,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         }
         return id;
     }
-    
+    @NoJSR250Annotations
     public static class BusConfig  {
         CXFBusImpl bus;
         

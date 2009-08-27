@@ -45,6 +45,10 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
 
     private Bus bus;
 
+    public JMSTransportFactory() {
+        
+    }
+    
     @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;

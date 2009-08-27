@@ -27,13 +27,53 @@ import java.util.List;
  */
 public interface ConfiguredBeanLocator {
     
+    /**
+     * Gets the names of all the configured beans of the specific type.  Does
+     * not cause them to be loaded.
+     * @param type
+     * @return
+     */
     List<String> getBeanNamesOfType(Class<?> type);
     
+    /**
+     * Gets all the configured beans of the specific types.  Causes them
+     * all to be loaded. 
+     * @param <T>
+     * @param type
+     * @return
+     */
     <T> Collection<? extends T> getBeansOfType(Class<T> type);
 
+    /**
+     * Returns the bean of the given type and name.  Causes it to be loaded.
+     * @param <T>
+     * @param name
+     * @param type
+     * @return
+     */
     <T> T getBeanOfType(String name, Class<T> type);
     
+    /**
+     * Iterates through the beans of the given type, calling the listener
+     * to determine if it should be loaded or not. 
+     * @param <T>
+     * @param type
+     * @param listener
+     * @return
+     */
     <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener);
+
+    /**
+     * For supporting "legacy" config, checks the configured bean to see if
+     * it has a property configured with the given name/value.  Mostly used 
+     * for supporting things configured with "activationNamespaces" set. 
+     * @param <T>
+     * @param type
+     * @param property
+     * @param value
+     * @return
+     */
+    boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value);
     
     public interface BeanLoaderListener<T> {
         /**

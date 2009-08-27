@@ -22,6 +22,7 @@ package org.apache.cxf.javascript;
 import java.util.Map;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 
@@ -40,6 +41,7 @@ import org.apache.cxf.feature.AbstractFeature;
   </pre>
   * At this time, there is no corresponding WSDL extension for this information.
  */
+@NoJSR250Annotations
 public class JavascriptOptionsFeature extends AbstractFeature {
     private Map<String, String> namespacePrefixMap;
 

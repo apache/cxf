@@ -109,7 +109,7 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
             if (!failed.contains(namespace)) {
                 factory = loadDefaultNamespace(namespace);
                 if (factory == null) {
-                    factory = loadNoDefaultNamespace(namespace);
+                    factory = loadActivationNamespace(namespace);
                 }
                 if (factory == null) {
                     factory = loadAll(namespace);
@@ -193,10 +193,13 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
         
         return bindingFactories.get(namespace);
     }
-    private BindingFactory loadNoDefaultNamespace(final String namespace) {
+    private BindingFactory loadActivationNamespace(final String namespace) {
+        final ConfiguredBeanLocator locator = bus.getExtension(ConfiguredBeanLocator.class);
+        
         //Second attempt will be to examine the factory class
         //for a DEFAULT_NAMESPACES field and if it doesn't exist, try 
-        //loading.  This will then load most of the "older" things
+        //using the older activation ns things.  This will then load most 
+        //of the "older" things
         ConfiguredBeanLocator.BeanLoaderListener<BindingFactory> listener 
             = new ConfiguredBeanLocator.BeanLoaderListener<BindingFactory>() {
                 public boolean beanLoaded(String name, BindingFactory bean) {
@@ -214,12 +217,11 @@ public final class BindingFactoryManagerImpl implements BindingFactoryManager {
                     } catch (Exception ex) {
                         //ignore
                     }
-                    return true;
+                    return locator.hasConfiguredPropertyValue(name, "activationNamespaces", namespace);
                 }
             };                
-        bus.getExtension(ConfiguredBeanLocator.class)
-            .loadBeansOfType(BindingFactory.class,
-                             listener);
+        locator.loadBeansOfType(BindingFactory.class,
+                                listener);
         
         return bindingFactories.get(namespace);
     }

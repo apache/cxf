@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
@@ -53,6 +54,7 @@ import org.springframework.context.ApplicationContextAware;
  * @see PolicyBuilder
  * @see AbstractFeature
  */
+@NoJSR250Annotations
 public class WSPolicyFeature extends AbstractFeature implements ApplicationContextAware {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WSPolicyFeature.class);

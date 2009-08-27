@@ -39,7 +39,9 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     
     public QueryHandlerRegistryImpl() {
     }
-    
+    public QueryHandlerRegistryImpl(Bus b) {
+        setBus(b);
+    }
     public QueryHandlerRegistryImpl(Bus b, List<QueryHandler> handlers) {
         queryHandlers = new CopyOnWriteArrayList<QueryHandler>(handlers);
         setBus(b);
@@ -67,7 +69,7 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
             
             ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
             if (c != null) {
-                for (WSDLQueryHandler handler : c.getBeansOfType(WSDLQueryHandler.class)) {
+                for (QueryHandler handler : c.getBeansOfType(QueryHandler.class)) {
                     if (!queryHandlers.contains(handler)) {
                         queryHandlers.add(handler);
                     }

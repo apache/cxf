@@ -54,10 +54,10 @@ public class TransportFinder<T> {
         }
         T factory = loadDefaultNamespace(namespace);
         if (factory == null) {
-            factory = loadNoDefaultNamespace(namespace);
+            factory = loadActivationNamespaces(namespace);
         }
         if (factory == null) {
-            factory = loadActivationNamespaces(namespace);
+            factory = loadNoDefaultNamespace(namespace);
         }
         if (factory == null) {
             loadAll();
@@ -164,8 +164,6 @@ public class TransportFinder<T> {
     
     private T loadActivationNamespaces(final String namespace) {
         //Try old method of having activationNamespaces configured in. 
-        //It activates all the factories in the list until one matches, thus
-        //it activates stuff that really aren't needed.
         ConfiguredBeanLocator.BeanLoaderListener<T> listener 
             = new ConfiguredBeanLocator.BeanLoaderListener<T>() {
                 public boolean beanLoaded(String name, T bean) {
@@ -177,7 +175,9 @@ public class TransportFinder<T> {
                 }
 
                 public boolean loadBean(String name, Class<? extends T> type) {
-                    return !map.containsKey(namespace) && !loaded.contains(name);
+                    return locator.hasConfiguredPropertyValue(name,
+                                                              "transportIds",
+                                                              namespace);
                 }
             };
         locator.loadBeansOfType(cls, listener);
@@ -189,7 +189,7 @@ public class TransportFinder<T> {
 
     private T loadDefaultURIs(final String uri) {
         //First attempt will be to examine the factory class
-        //for a DEFAULT_NAMESPACES field and use it
+        //for a DEFAULT_URIS field and use it
         URIBeanLoaderListener listener 
             = new URIBeanLoaderListener(uri) {
 

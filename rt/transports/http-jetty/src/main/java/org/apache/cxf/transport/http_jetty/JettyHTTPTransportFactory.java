@@ -73,7 +73,6 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         if (serverEngineFactory == null) {
             serverEngineFactory = new JettyHTTPServerEngineFactory();
             serverEngineFactory.setBus(getBus());
-            serverEngineFactory.finalizeConfig();
         }
         return serverEngineFactory;
     }
