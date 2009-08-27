@@ -37,7 +37,7 @@ public abstract class AbstractThresholdOutputStream extends AbstractWrappedOutpu
     
     public AbstractThresholdOutputStream(int threshold) {
         this.threshold = threshold;
-        if (threshold > 0) {
+        if (threshold >= 0) {
             buffer = new LoadingByteArrayOutputStream(threshold + 1);
         }
     }
