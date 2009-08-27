@@ -174,7 +174,8 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     @Test
-    //@Ignore("randomly fails.  Not sure why. Tried increased timeouts and such to no affect. - dkulp")
+    @org.junit.Ignore("randomly fails.  Not sure why. Tried increased"
+                      + "timeouts and such to no affect. - dkulp")
     public void testDurableSubscriber() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         BusFactory.setDefaultBus(null);
