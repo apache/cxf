@@ -132,7 +132,7 @@ public class AegisJSONProviderTest extends Assert {
         
     }
     
-    @org.junit.Ignore
+   // @org.junit.Ignore
     @Test
     public void testWriteCollection() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
@@ -144,14 +144,13 @@ public class AegisJSONProviderTest extends Assert {
         bean.setStrValue("hovercraft");
         List<AegisTestBean> beans = new ArrayList<AegisTestBean>();
         beans.add(bean);
-        Method m = CollectionsResource.class.getMethod("getAegisBeans", new Class[]{});
-        p.writeTo(beans, (Class)m.getReturnType(), m.getGenericReturnType(), 
-                  AegisTestBean.class.getAnnotations(), 
-                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        Method m = CollectionsResource.class.getMethod("getAegisBeans", new Class[] {});
+        p.writeTo(beans, (Class)m.getReturnType(), m.getGenericReturnType(), AegisTestBean.class
+            .getAnnotations(), MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         byte[] bytes = os.toByteArray();
         String json = new String(bytes, "utf-8");
-        System.out.println(json);
-        //assertEquals(data, json);
+        assertEquals("{\"ns1.ArrayOfAegisTestBean\":{\"ns1.AegisTestBean\":"
+                     + "{\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}}}", json);
     }
     
     @Test

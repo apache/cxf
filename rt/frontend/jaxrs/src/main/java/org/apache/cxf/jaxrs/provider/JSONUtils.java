@@ -21,11 +21,13 @@ package org.apache.cxf.jaxrs.provider;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
@@ -40,6 +42,10 @@ import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
 
 public final class JSONUtils {
 
+    private static final String XSI_PREFIX = "xsi";
+    private static final String XSI_URI = XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
+    private static final Charset UTF8 = Charset.forName("utf-8");
+
     private JSONUtils() {
     }
     
@@ -49,13 +55,13 @@ public final class JSONUtils {
                                                      boolean serializeAsArray,
                                                      List<String> arrayKeys) throws Exception {
         if (writeXsiType) {
-            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+            namespaceMap.put(XSI_URI, XSI_PREFIX);
         }
         Configuration c = new Configuration(namespaceMap);
         MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
         AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
                                             convention, 
-                                            new OutputStreamWriter(os, "UTF-8"));
+                                            new OutputStreamWriter(os, UTF8));
         if (serializeAsArray) {
             if (arrayKeys != null) {
                 for (String key : arrayKeys) {
@@ -80,7 +86,7 @@ public final class JSONUtils {
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
                                                Map<String, String> namespaceMap) throws Exception {
         if (readXsiType) {
-            namespaceMap.put("http://www.w3.org/2001/XMLSchema-instance", "xsi");
+            namespaceMap.put(XSI_URI, XSI_PREFIX);
         }
         MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
         return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is));
@@ -98,8 +104,8 @@ public final class JSONUtils {
         public String getAttributePrefix(int n) {
             QName name = getAttributeName(n);
             if (name != null 
-                && "http://www.w3.org/2001/XMLSchema-instance".equals(name.getNamespaceURI())) {
-                return "xsi";
+                && XSI_URI.equals(name.getNamespaceURI())) {
+                return XSI_PREFIX;
             } else {
                 return super.getAttributePrefix(n);
             }
