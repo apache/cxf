@@ -288,33 +288,24 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
         return (Boolean)mpi.getProperty("nillable");
     }
-    public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
-        String max = (String)mpi.getProperty("maxOccurs");
-        long maxi = 1;
-        if (max == null) {
-            if (mpi.getTypeClass() != null && mpi.getTypeClass().isArray()
-                && !Byte.TYPE.equals(mpi.getTypeClass().getComponentType())) {
-                maxi = Long.MAX_VALUE;
-            }
-        } else {
-            maxi = "unbounded".equals(max) ? Long.MAX_VALUE : Long.parseLong(max);
-        }
-        return maxi;
-    }
-    public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
-        String min = (String)mpi.getProperty("minOccurs");
-        
-        long mini = 1;
-        
-        if (min != null) {
-            mini = Long.parseLong(min);
-        }
-        
-        if (min == null && mpi.getTypeClass() != null && !mpi.getTypeClass().isPrimitive()) {
-            mini = 0;
-        }
-        return mini;
-    }
-
     
+    public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
+        String miString = (String)mpi.getProperty("maxOccurs");
+        if (miString != null) {
+            if ("unbounded".equals(miString)) {
+                return Long.MAX_VALUE;
+            } else {
+                return Long.valueOf(miString, 10);
+            }
+        }
+        return null;
+    }
+    
+    public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        String miString = (String)mpi.getProperty("minOccurs");
+        if (miString != null) {
+            return Long.valueOf(miString, 10);
+        }
+        return null;
+    }
 }
