@@ -209,6 +209,22 @@ public final class InjectionUtils {
         return t instanceof Class ? (Class<?>)t : getActualType(t, pos);
     }
     
+    public static Class<?> getRawType(Type genericType) {
+        
+        if (genericType == null) {
+            return null;
+        }
+        if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
+            return (Class<?>)genericType;
+        }
+        ParameterizedType paramType = (ParameterizedType)genericType;
+        
+        Type t = paramType.getRawType();
+        
+        return t instanceof Class ? (Class<?>)t : null;
+    }
+    
+    
     public static Type[] getActualTypes(Type genericType) {
         if (genericType == null 
             || !ParameterizedType.class.isAssignableFrom(genericType.getClass())) {

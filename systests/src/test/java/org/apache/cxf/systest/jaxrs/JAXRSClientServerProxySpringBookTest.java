@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -35,6 +36,26 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerProxySpring.class));
+    }
+    
+    @Test
+    public void testGetBookNotFound() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:9080/test/bookstore/books/12345"; 
+        URL url = new URL(endpointAddress);
+        HttpURLConnection connect = (HttpURLConnection)url.openConnection();
+        connect.addRequestProperty("Accept", "text/plain,application/xml");
+        assertEquals(500, connect.getResponseCode());
+        InputStream in = connect.getErrorStream();
+        assertNotNull(in);           
+
+        InputStream expected = getClass()
+            .getResourceAsStream("resources/expected_get_book_notfound_mapped.txt");
+
+        assertEquals("Exception is not mapped correctly", 
+                     getStringFromInputStream(expected).trim(),
+                     getStringFromInputStream(in).trim());
     }
     
     @Test

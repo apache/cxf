@@ -38,6 +38,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
@@ -185,7 +186,7 @@ public final class ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ParameterHandlerComparator());
+        Collections.sort(candidates, new ClassComparator());
         return candidates.get(0);
     }
     
@@ -201,20 +202,25 @@ public final class ProviderFactory {
         if (candidates.size() == 0) {
             return null;
         }
-        Collections.sort(candidates, new ResponseExceptionMapperComparator());
+        Collections.sort(candidates, new ClassComparator());
         return candidates.get(0);
     }
     
     private static void handleMapper(List<Object> candidates, ProviderInfo em, 
                                      Class<?> expectedType, Message m) {
         
-        Type[] types = em.getProvider().getClass().getGenericInterfaces();
+        Class<?> mapperClass =  ClassHelper.getRealClass(em.getProvider());
+        Type[] types = getGenericInterfaces(mapperClass);
         for (Type t : types) {
             if (t instanceof ParameterizedType) {
                 ParameterizedType pt = (ParameterizedType)t;
                 Type[] args = pt.getActualTypeArguments();
                 for (int i = 0; i < args.length; i++) {
-                    if (((Class<?>)args[i]).isAssignableFrom(expectedType)) {
+                    Class<?> actualClass = InjectionUtils.getRawType(args[i]);
+                    if (actualClass == null) {
+                        continue;
+                    }
+                    if (actualClass.isAssignableFrom(expectedType)) {
                         if (m != null) {
                             InjectionUtils.injectContextFields(em.getProvider(), em, m);
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
@@ -294,35 +300,37 @@ public final class ProviderFactory {
             if (o == null) {
                 continue;
             }
-            if (MessageBodyReader.class.isAssignableFrom(o.getClass())) {
+            Class<?> oClass = ClassHelper.getRealClass(o);
+            
+            if (MessageBodyReader.class.isAssignableFrom(oClass)) {
                 messageReaders.add(new ProviderInfo<MessageBodyReader>((MessageBodyReader)o)); 
             }
             
-            if (MessageBodyWriter.class.isAssignableFrom(o.getClass())) {
+            if (MessageBodyWriter.class.isAssignableFrom(oClass)) {
                 messageWriters.add(new ProviderInfo<MessageBodyWriter>((MessageBodyWriter)o)); 
             }
             
-            if (ContextResolver.class.isAssignableFrom(o.getClass())) {
+            if (ContextResolver.class.isAssignableFrom(oClass)) {
                 contextResolvers.add(new ProviderInfo<ContextResolver>((ContextResolver)o)); 
             }
             
-            if (RequestHandler.class.isAssignableFrom(o.getClass())) {
+            if (RequestHandler.class.isAssignableFrom(oClass)) {
                 requestHandlers.add(new ProviderInfo<RequestHandler>((RequestHandler)o)); 
             }
             
-            if (ResponseHandler.class.isAssignableFrom(o.getClass())) {
+            if (ResponseHandler.class.isAssignableFrom(oClass)) {
                 responseHandlers.add(new ProviderInfo<ResponseHandler>((ResponseHandler)o)); 
             }
             
-            if (ExceptionMapper.class.isAssignableFrom(o.getClass())) {
+            if (ExceptionMapper.class.isAssignableFrom(oClass)) {
                 exceptionMappers.add(new ProviderInfo<ExceptionMapper>((ExceptionMapper)o)); 
             }
             
-            if (ResponseExceptionMapper.class.isAssignableFrom(o.getClass())) {
+            if (ResponseExceptionMapper.class.isAssignableFrom(oClass)) {
                 responseExceptionMappers.add(new ProviderInfo<ResponseExceptionMapper>((ResponseExceptionMapper)o)); 
             }
             
-            if (ParameterHandler.class.isAssignableFrom(o.getClass())) {
+            if (ParameterHandler.class.isAssignableFrom(oClass)) {
                 paramHandlers.add(new ProviderInfo<ParameterHandler>((ParameterHandler)o)); 
             }
         }
@@ -377,16 +385,23 @@ public final class ProviderFactory {
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
+        List<MessageBodyReader<T>> candidates = new LinkedList<MessageBodyReader<T>>();
         for (ProviderInfo<MessageBodyReader> ep : messageReaders) {
-            
             if (matchesReaderCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
-                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
-                return ep.getProvider();
+                if (this == SHARED_FACTORY) {
+                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    return ep.getProvider();
+                }
+                handleMapper((List)candidates, ep, type, m);
             }
         }     
         
-        return null;
+        if (candidates.size() == 0) {
+            return null;
+        }
+        Collections.sort(candidates, new ClassComparator());
+        return candidates.get(0);
         
     }
     
@@ -424,16 +439,22 @@ public final class ProviderFactory {
                                                          Annotation[] annotations,
                                                          MediaType mediaType,
                                                          Message m) {
+        List<MessageBodyWriter<T>> candidates = new LinkedList<MessageBodyWriter<T>>();
         for (ProviderInfo<MessageBodyWriter> ep : messageWriters) {
             if (matchesWriterCriterias(ep.getProvider(), type, genericType, annotations, mediaType)) {
-                InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
-                InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
-                return ep.getProvider();
+                if (this == SHARED_FACTORY) {
+                    InjectionUtils.injectContextFields(ep.getProvider(), ep, m);
+                    InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
+                    return ep.getProvider();
+                }
+                handleMapper((List)candidates, ep, type, m);
             }
         }     
-        
-        return null;
-        
+        if (candidates.size() == 0) {
+            return null;
+        }
+        Collections.sort(candidates, new ClassComparator());
+        return candidates.get(0);
     }
     
     private <T> boolean matchesWriterCriterias(MessageBodyWriter<T> ep,
@@ -490,7 +511,6 @@ public final class ProviderFactory {
             types2 = JAXRSUtils.sortMediaTypes(types2);
     
             return JAXRSUtils.compareSortedMediaTypes(types1, types2);
-            
         }
     }
     
@@ -508,7 +528,6 @@ public final class ProviderFactory {
                 JAXRSUtils.sortMediaTypes(JAXRSUtils.getProviderProduceTypes(e2));
     
             return JAXRSUtils.compareSortedMediaTypes(types1, types2);
-            
         }
     }
     
@@ -596,34 +615,32 @@ public final class ProviderFactory {
 
         public int compare(ExceptionMapper<? extends Throwable> em1, 
                            ExceptionMapper<? extends Throwable> em2) {
-            return compareClasses(em1.getClass(), em2.getClass());
+            return compareClasses(em1, em2);
         }
         
     }
     
-    private static class ResponseExceptionMapperComparator implements 
-        Comparator<ResponseExceptionMapper<? extends Throwable>> {
+    private static class ClassComparator implements 
+        Comparator<Object> {
     
-        public int compare(ResponseExceptionMapper<? extends Throwable> em1, 
-                           ResponseExceptionMapper<? extends Throwable> em2) {
-            return compareClasses(em1.getClass(), em2.getClass());
+        public int compare(Object em1, Object em2) {
+            return compareClasses(em1, em2);
         }
         
     }
     
-    private static class ParameterHandlerComparator implements 
-        Comparator<ParameterHandler<? extends Object>> {
-
-        public int compare(ParameterHandler<? extends Object> em1, 
-                           ParameterHandler<? extends Object> em2) {
-            return compareClasses(em1.getClass(), em2.getClass());
+    private static int compareClasses(Object o1, Object o2) {
+        Class<?> cl1 = ClassHelper.getRealClass(o1); 
+        Class<?> cl2 = ClassHelper.getRealClass(o2);
+        
+        Type[] types1 = getGenericInterfaces(cl1);
+        Type[] types2 = getGenericInterfaces(cl2);
+        
+        if (types1.length == 0 && types2.length > 0) {
+            return 1;
+        } else if (types1.length > 0 && types2.length == 0) {
+            return -1;
         }
-    
-    }
-    
-    private static int compareClasses(Class<?> cl1, Class<?> cl2) {
-        Type[] types1 = cl1.getGenericInterfaces();
-        Type[] types2 = cl2.getGenericInterfaces();
         
         Class<?> realClass1 = InjectionUtils.getActualType(types1[0]);
         Class<?> realClass2 = InjectionUtils.getActualType(types2[0]);
@@ -635,5 +652,16 @@ public final class ProviderFactory {
             return 1;
         }
         return -1;
+    }
+    
+    private static Type[] getGenericInterfaces(Class<?> cls) {
+        if (Object.class == cls) {
+            return new Type[]{};
+        }
+        Type[] types = cls.getGenericInterfaces();
+        if (types.length > 0) {
+            return types;
+        }
+        return getGenericInterfaces(cls.getSuperclass());
     }
 }
