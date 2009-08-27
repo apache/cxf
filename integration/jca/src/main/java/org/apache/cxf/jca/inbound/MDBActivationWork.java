@@ -135,7 +135,7 @@ public class MDBActivationWork implements Work {
         Method method = null;
 
         try {
-            Class clazz = org.apache.cxf.jca.inbound.DispatchMDBMessageListener.class;
+            Class<?> clazz = org.apache.cxf.jca.inbound.DispatchMDBMessageListener.class;
             method = clazz.getMethod(MESSAGE_LISTENER_METHOD, new Class[] {String.class});
         } catch (Exception ex) {
             LOG.severe("Failed to get method " + MESSAGE_LISTENER_METHOD
