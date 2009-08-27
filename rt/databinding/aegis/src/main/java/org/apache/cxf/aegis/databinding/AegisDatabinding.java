@@ -35,8 +35,8 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.TypeClassInfo;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
@@ -350,7 +350,11 @@ public class AegisDatabinding
                 }
             }
             
-            part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
+            // The concept of type.isNillable is questionable: how are types nillable? 
+            // However, this if at least allow .aegis.xml files to get control.
+            if (part.getProperty("nillable") == null) {
+                part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
+            }
             if (type.hasMinOccurs()) {
                 long miValue = type.getMinOccurs();
                 if (miValue != 0) {
@@ -552,11 +556,6 @@ public class AegisDatabinding
     private Type getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
         Type type = tm.getType(param.getTypeQName());
 
-        /*
-         * if (type == null && tm.isRegistered(param.getTypeClass())) { type =
-         * tm.getType(param.getTypeClass()); part2type.put(param, type); }
-         */
-
         int offset = 0;
         if (paramtype == OUT_PARAM) {
             offset = 1;
@@ -567,12 +566,18 @@ public class AegisDatabinding
             OperationInfo op = param.getMessageInfo().getOperation();
 
             Method m = getMethod(s, op);
-            AbstractTypeCreator.TypeClassInfo info;
+            TypeClassInfo info;
             if (paramtype != FAULT_PARAM && m != null) {
                 info = typeCreator.createClassInfo(m, param.getIndex() - offset);
             } else {
                 info = typeCreator.createBasicClassInfo(param.getTypeClass());
             }
+            Boolean nillable = info.getNillable();
+            /* Note that, for types from the mapping, the minOccurs, maxOccurs, and nillable
+             * from the 'info' will be ignored by createTypeForClass below. So we need
+             * to override.
+             */
+
             if (param.getMessageInfo().getOperation().isUnwrapped() && param.getTypeClass().isArray()) {
                 // The service factory expects arrays going into the wrapper to
                 // be
@@ -582,15 +587,32 @@ public class AegisDatabinding
                 // want the default.
                 param.setProperty("minOccurs", "1");
                 param.setProperty("maxOccurs", "1");
-                param.setProperty("nillable", Boolean.TRUE);
+                if (nillable == null) {
+                    nillable = Boolean.TRUE;
+                }
+                param.setProperty("nillable", nillable);
+            } else {
+                if (nillable != null) {
+                    param.setProperty("nillable", nillable);
+                }
+                /*
+                 * TypeClassInfo uses -1 to mean 'not specified'
+                 */
+                if (info.getMinOccurs() != -1) {
+                    param.setProperty("minOccurs", Long.toString(info.getMinOccurs()));
+                }
+                if (info.getMaxOccurs() != -1) {
+                    param.setProperty("maxOccurs", Long.toString(info.getMaxOccurs()));
+                }
             }
             if (info.getMappedName() != null) {
                 param.setConcreteName(info.getMappedName());
                 param.setName(info.getMappedName());
             }
             type = typeCreator.createTypeForClass(info);
-            // We have to register the type if we want minOccurs and such to
-            // work.
+            
+            //We have to register the type if we want minOccurs and such to
+            // work. (for custom types)
             if (info.nonDefaultAttributes()) {
                 tm.register(type);
             }

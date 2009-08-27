@@ -471,6 +471,11 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         if (flat != null) {
             info.setFlat(Boolean.valueOf(flat.toLowerCase()).booleanValue());
         }
+        
+        String nillable = DOMUtils.getAttributeValueEmptyNull(parameter, "nillable");
+        if (nillable != null) {
+            info.setNillable(Boolean.valueOf(nillable.toLowerCase()).booleanValue());
+        }
     }
 
     @Override

@@ -24,7 +24,6 @@ import java.lang.reflect.Method;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.aegis.type.AbstractTypeCreator.TypeClassInfo;
 
 /**
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>

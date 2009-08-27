@@ -189,17 +189,34 @@ public abstract class AbstractServiceConfiguration {
         return null;
     }
     
+    /**
+     * If Aegis is at work, the XML can render a wrapper part non-nillable.
+     * @param mpi part
+     * @return nillability
+     */
     public Boolean isWrapperPartNillable(MessagePartInfo mpi) {
-        return null;
+        return (Boolean)mpi.getProperty("nillable");
     }
+    
     public Boolean isWrapperPartQualified(MessagePartInfo mpi) {
         return null;
     }
     public Long getWrapperPartMaxOccurs(MessagePartInfo mpi) {
-        //return Long.MAX_VALUE for unbounded
+        String miString = (String)mpi.getProperty("maxOccurs");
+        if (miString != null) {
+            if ("unbounded".equals(miString)) {
+                return Long.MAX_VALUE;
+            } else {
+                return Long.valueOf(miString, 10);
+            }
+        }
         return null;
     }
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        String miString = (String)mpi.getProperty("minOccurs");
+        if (miString != null) {
+            return Long.valueOf(miString, 10);
+        }
         return null;
     }
 }
