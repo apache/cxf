@@ -73,6 +73,10 @@
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
 
         <downloadSources>true</downloadSources>
+
+        <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
+        <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
+
     </properties>
 
 
@@ -294,9 +298,10 @@
                                 <value>${surefire.fork.vmargs}</value>
                             </property>
                             <property>
-                                <name>java.security.properties</name>
-                                <value>${basedir}/target/test-classes/ibm.security</value>
+                                <name>${extra.surefire.syspropery.name}</name>
+                                <value>${extra.surefire.syspropery.value}</value>
                             </property>
+    
                             <property>
                                 <!-- If we close the port after a client in the same JVM has opened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until

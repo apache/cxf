@@ -178,6 +178,10 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+            <properties>
+                <extra.surefire.syspropery.name>java.security.properties</extra.surefire.syspropery.name>
+                <extra.surefire.syspropery.value>${basedir}/target/test-classes/ibm.security</extra.surefire.syspropery.value>
+            </properties>
         </profile>
     </profiles>
 
