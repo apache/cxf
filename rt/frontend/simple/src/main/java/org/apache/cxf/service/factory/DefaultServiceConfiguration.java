@@ -298,6 +298,11 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
                 return Long.valueOf(miString, 10);
             }
         }
+        // If no explicit spec and an array of bytes, default to unbounded.
+        if (mpi.getTypeClass() != null && mpi.getTypeClass().isArray()
+            && !Byte.TYPE.equals(mpi.getTypeClass().getComponentType())) {
+            return Long.MAX_VALUE;
+        }
         return null;
     }
     
@@ -305,6 +310,11 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
         String miString = (String)mpi.getProperty("minOccurs");
         if (miString != null) {
             return Long.valueOf(miString, 10);
+        }
+        // If no explicit spec and not a primitive type (i.e. mappable to null)
+        // set to 0.
+        if (mpi.getTypeClass() != null && !mpi.getTypeClass().isPrimitive()) {
+            return Long.valueOf(0);
         }
         return null;
     }
