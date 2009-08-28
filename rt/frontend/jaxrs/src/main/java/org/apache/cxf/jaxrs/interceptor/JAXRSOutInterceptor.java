@@ -77,7 +77,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         } finally {
             ProviderFactory.getInstance(message).clearThreadLocalProxies();
             ClassResourceInfo cri =
-                (ClassResourceInfo)message.getExchange().get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
+                (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
             if (cri != null) {
                 cri.clearThreadLocalProxies();
             }
@@ -156,6 +156,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             (MultivaluedMap)message.get(Message.PROTOCOL_HEADERS);
         setResponseDate(responseHeaders, firstTry);
         if (isResponseNull(responseObj)) {
+            return;
+        }
+        
+        Object ignoreWritersProp = message.getExchange().get(JAXRSUtils.IGNORE_MESSAGE_WRITERS);
+        boolean ignoreWriters = 
+            ignoreWritersProp == null ? false : Boolean.valueOf(ignoreWritersProp.toString());
+        if (ignoreWriters) {
+            writeResponseToStream(message.getContent(OutputStream.class), responseObj);
             return;
         }
         
@@ -380,5 +388,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private boolean isResponseAlreadyCommited(Message m) {
         return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.RESPONSE_COMMITED));
+    }
+    
+    private void writeResponseToStream(OutputStream os, Object responseObj) {
+        try {
+            byte[] bytes = responseObj.toString().getBytes("UTF-8");
+            os.write(bytes, 0, bytes.length);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 }

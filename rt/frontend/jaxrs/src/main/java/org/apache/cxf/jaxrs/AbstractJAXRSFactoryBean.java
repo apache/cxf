@@ -258,6 +258,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
             props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
             ((PropertiesAwareDataBinding)db).initialize(props);
         } else { 
+            if (s instanceof JAXRSServiceImpl) {
+                ((JAXRSServiceImpl)s).setCreateServiceModel(true);
+            }
             db.initialize(s);
         }
         factory.setUserProviders(Collections.singletonList(new DataBindingProvider(db)));
@@ -271,8 +274,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         serviceFactory.setUserResources(resources);
     }
     
-    public void setModelBeansWithServiceClass(List<UserResource> resources, Class<?> sClass) {
-        serviceFactory.setUserResourcesWithServiceClass(resources, sClass);
+    public void setModelBeansWithServiceClass(List<UserResource> resources, Class<?>... sClasses) {
+        serviceFactory.setUserResourcesWithServiceClass(resources, sClasses);
     }
     
     public void setModelRef(String modelRef) {
@@ -282,10 +285,10 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         }
     }
     
-    public void setModelRefWithServiceClass(String modelRef, Class<?> sClass) {
+    public void setModelRefWithServiceClass(String modelRef, Class<?>... sClasses) {
         List<UserResource> resources = ResourceUtils.getUserResources(modelRef, getBus());
         if (resources != null) {
-            serviceFactory.setUserResourcesWithServiceClass(resources, sClass);
+            serviceFactory.setUserResourcesWithServiceClass(resources, sClasses);
         }
     }
     

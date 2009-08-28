@@ -65,7 +65,7 @@ public class DataBindingJSONProviderTest extends Assert {
     @SuppressWarnings("unchecked")
     @Test
     public void testSDOWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c2));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -89,7 +89,7 @@ public class DataBindingJSONProviderTest extends Assert {
     public void testSDORead() throws Exception {
         String data = "{\"p0.Structure\":{\"@xsi.type\":\"p0:Structure\",\"p0.text\":\"sdo\",\"p0.int\":3"
             + ",\"p0.dbl\":123.5,\"p0.texts\":\"text1\"}}";
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c2));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c2), true);
         DataBinding binding = new SDODataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -106,7 +106,7 @@ public class DataBindingJSONProviderTest extends Assert {
     
     @Test
     public void testJAXBWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -123,7 +123,7 @@ public class DataBindingJSONProviderTest extends Assert {
     @Test
     public void testJAXBRead() throws Exception {
         String data = "{\"Book\":{\"id\":127,\"name\":\"CXF\",\"state\":\"\"}}";
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -138,7 +138,7 @@ public class DataBindingJSONProviderTest extends Assert {
     
     @Test
     public void testAegisWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -154,7 +154,7 @@ public class DataBindingJSONProviderTest extends Assert {
     @Test
     @Ignore
     public void testAegisCollectionWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -180,7 +180,7 @@ public class DataBindingJSONProviderTest extends Assert {
     
     @SuppressWarnings("unchecked")
     public void doTestAegisRead(String data) throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);

@@ -46,9 +46,14 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     
     private List<String> arrayKeys;
     private boolean serializeAsArray;
+    private boolean dropRootElement; 
     private ConcurrentHashMap<String, String> namespaceMap = new ConcurrentHashMap<String, String>();
     
     public AegisJSONProvider() {
+    }
+    
+    public void setDropRootElement(boolean dropRootElement) {
+        this.dropRootElement = dropRootElement;
     }
     
     public void setArrayKeys(List<String> keys) {
@@ -72,7 +77,7 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
         namespaceMap.putIfAbsent(typeQName.getNamespaceURI(), "ns1");
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, writeXsiType, namespaceMap, 
-                                                              serializeAsArray, arrayKeys);
+                                                              serializeAsArray, arrayKeys, dropRootElement);
         return writer;
     }
     
@@ -92,5 +97,6 @@ public final class AegisJSONProvider extends AegisElementProvider  {
         namespaceMap.putIfAbsent(qname.getNamespaceURI(), "ns1");
         return qname;
     }
+
     
 }

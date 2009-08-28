@@ -38,7 +38,6 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -122,7 +121,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             if (excResponse == null) {
                 ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
-                    (ClassResourceInfo)exchange.get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
+                    (ClassResourceInfo)exchange.get(JAXRSUtils.ROOT_RESOURCE_CLASS);
                 if (criRoot != null) {
                     criRoot.clearThreadLocalProxies();
                 }
@@ -141,7 +140,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             try {
                 Message msg = exchange.getInMessage();
                 MultivaluedMap<String, String> values = getTemplateValues(msg);
-                String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
+                String subResourcePath = (String)msg.get(JAXRSUtils.RELATIVE_PATH);
                 String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
                 String contentType = (String)msg.get(Message.CONTENT_TYPE);
                 if (contentType == null) {
@@ -173,8 +172,7 @@ public class JAXRSInvoker extends AbstractInvoker {
 
 
                 exchange.put(OperationResourceInfo.class, subOri);
-                msg.put(JAXRSInInterceptor.RELATIVE_PATH,
-                        values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+                msg.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resouce class. Here we
                 // presume Inputstream has not been consumed yet by the root resource class.
