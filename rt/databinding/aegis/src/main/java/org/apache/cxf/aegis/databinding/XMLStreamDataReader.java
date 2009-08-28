@@ -27,6 +27,7 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.AegisXMLStreamDataReader;
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
@@ -41,11 +42,18 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
         this.databinding = databinding;
         reader = new AegisXMLStreamDataReader(databinding.getAegisContext());
     }
-
+    
     public Object read(MessagePartInfo part, XMLStreamReader input) {
-        Type type = databinding.getType(part);
         try {
-            return reader.read(input, type); 
+            Type type = part.getProperty("org.apache.cxf.aegis.outerType", Type.class);
+            if (type == null) {
+                type = databinding.getType(part);
+                return reader.read(input, type); 
+            } else {
+                ArrayType arrayType = (ArrayType) type;
+                return reader.readFlatArray(input, arrayType, part.getConcreteName());
+            }
+     
         } catch (Exception e) {
             throw new Fault(e);
         }

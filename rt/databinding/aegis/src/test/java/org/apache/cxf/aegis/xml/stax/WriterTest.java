@@ -24,10 +24,8 @@ import java.io.StringReader;
 
 import org.apache.cxf.aegis.util.jdom.StaxBuilder;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.jdom.Document;
-import org.jdom.Element;
 import org.jdom.output.DOMOutputter;
 import org.junit.After;
 import org.junit.Before;
@@ -67,15 +65,6 @@ public class WriterTest extends AbstractCXFTest {
         // System.out.println(bos.toString());
         StaxBuilder builder = new StaxBuilder();
         Document doc = builder.build(new StringReader(bos.toString()));
-
-        testWrite(doc);
-    }
-
-    @Test
-    public void testJDOM() throws Exception {
-        Document doc = new Document(new Element("root", "urn:test"));
-
-        write(new JDOMWriter(doc.getRootElement()));
 
         testWrite(doc);
     }

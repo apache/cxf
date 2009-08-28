@@ -31,6 +31,7 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
+import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.i18n.Message;
@@ -74,13 +75,21 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         context.setAttachments(attachments);
         type = TypeUtil.getWriteType(databinding.getAegisContext(), obj, type);
         
+        /* 
+         * We arrive here with a 'type' of the inner type if isWriteOuter is null.
+         * However, in that case, the original type is available. 
+         */
+        Type outerType  = null;
+        if (part != null) {
+            outerType = part.getProperty("org.apache.cxf.aegis.outerType", Type.class);
+        }
         try {
             if (obj == null) {
                 if (part.getXmlSchema() instanceof XmlSchemaElement
                     && ((XmlSchemaElement)part.getXmlSchema()).getMinOccurs() == 0) {
                     //skip writing minOccurs=0 stuff if obj is null
                     return;
-                } else if (type.isNillable() && type.isWriteOuter()) {
+                } else if (type.isNillable()) {
                     ElementWriter writer = new ElementWriter(output);
                     MessageWriter w2 = writer.getElementWriter(part.getConcreteName());
                     w2.writeXsiNil();
@@ -89,10 +98,18 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 }
             }
             ElementWriter writer = new ElementWriter(output);
-            MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName() 
-                : type.getSchemaType());
-            type.writeObject(obj, w2, context);
-            w2.close();
+            // outerType is only != null for a flat array.
+            if (outerType == null) {
+                MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName() 
+                    : type.getSchemaType());
+                type.writeObject(obj, w2, context);
+                w2.close();
+            } else {
+                // it has better be an array (!)
+                ArrayType aType = (ArrayType) outerType;
+                // the part has to have a name or we can't do this.
+                aType.writeObject(obj, writer, context, part.getConcreteName());
+            }
         } catch (DatabindingException e) {
             throw new RuntimeException(e);
         }

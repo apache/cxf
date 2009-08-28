@@ -262,26 +262,6 @@ public class ObjectType extends Type {
     }
 
     @Override
-    public boolean isAbstract() {
-        return super.isAbstract();
-    }
-
-    @Override
-    public boolean isNillable() {
-        return super.isNillable();
-    }
-
-    @Override
-    public boolean isWriteOuter() {
-        return super.isWriteOuter();
-    }
-
-    @Override
-    public void setNillable(boolean nillable) {
-        super.setNillable(nillable);
-    }
-
-    @Override
     public void writeSchema(XmlSchema root) {
         if (serializedWhenUnknown) {
             XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root);

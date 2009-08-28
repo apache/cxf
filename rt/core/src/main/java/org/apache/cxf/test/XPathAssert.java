@@ -72,7 +72,7 @@ public final class XPathAssert {
      * 
      * @param xpath
      */
-    public static boolean assertValidBoolean(String xpath, Node node, Map<String, String> namespaces)
+    public static void assertValidBoolean(String xpath, Node node, Map<String, String> namespaces)
         throws Exception {
         if (node == null) {
             throw new NullPointerException("Node cannot be null.");
@@ -84,8 +84,12 @@ public final class XPathAssert {
             throw new AssertionFailedError("Failed to select any nodes for expression:\n" + xpath
                                            + " from document:\n" + writeNodeToString(node));
         }
-
-        return b.booleanValue();
+        
+        if (!b.booleanValue()) {
+            throw new AssertionFailedError("Boolean XPath assertion evaluated to false:\n"
+                                           + xpath
+                                           + " from document:\n" + writeNodeToString(node));
+        }
     }
 
     private static String writeNodeToString(Node node) {

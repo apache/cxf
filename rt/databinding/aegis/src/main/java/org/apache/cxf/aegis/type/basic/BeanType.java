@@ -158,7 +158,13 @@ public class BeanType extends Type {
 
                 if (type != null) {
                     if (!childReader.isXsiNil()) {
-                        Object writeObj = type.readObject(childReader, context);
+                        Object writeObj;
+                        if (type.isFlatArray()) {
+                            ArrayType aType = (ArrayType) type;
+                            writeObj = aType.readObject(childReader, name, context);
+                        } else {
+                            writeObj = type.readObject(childReader, context);
+                        }
 
                         writeProperty(name, target, writeObj, clazz, propertyTypeInfo);
                     } else {
@@ -391,20 +397,21 @@ public class BeanType extends Type {
     }
 
     protected void writeElement(QName name, Object value, Type type, MessageWriter writer, Context context) {
-        MessageWriter cwriter = getWriter(writer, name, type);
 
-        type.writeObject(value, cwriter, context);
-
-        cwriter.close();
+        if (!type.isFlatArray()) {
+            MessageWriter cwriter = null;
+            cwriter = getWriter(writer, name, type);
+            type.writeObject(value, cwriter, context);
+            cwriter.close();
+        } else {
+            ArrayType arrayType = (ArrayType)type;
+            arrayType.writeObject(value, writer, context, name);
+        }
     }
 
     private MessageWriter getWriter(MessageWriter writer, QName name, Type type) {
         MessageWriter cwriter;
-        if (type.isAbstract()) {
-            cwriter = writer.getElementWriter(name);
-        } else {
-            cwriter = writer.getElementWriter(name);
-        }
+        cwriter = writer.getElementWriter(name);
         return cwriter;
     }
 
@@ -709,14 +716,24 @@ public class BeanType extends Type {
             sequence.getItems().add(element);
 
             Type type = getType(inf, name);
-            if (AbstractTypeCreator.
-                HTTP_CXF_APACHE_ORG_ARRAYS.equals(type.getSchemaType().getNamespaceURI())) {
-                XmlSchemaUtils.addImportIfNeeded(root, AbstractTypeCreator.HTTP_CXF_APACHE_ORG_ARRAYS);
+            if (type.isFlatArray()) {
+                // ok, we need some tricks here
+                element.setMinOccurs(type.getMinOccurs());
+                element.setMaxOccurs(type.getMaxOccurs());
+                // for now, assume ArrayType. Look at lists or more general solutions later.
+                ArrayType aType = (ArrayType)type;
+                type = aType.getComponentType();
+                element.setNillable(type.isNillable());
+            } else {
+                if (AbstractTypeCreator.
+                    HTTP_CXF_APACHE_ORG_ARRAYS.equals(type.getSchemaType().getNamespaceURI())) {
+                    XmlSchemaUtils.addImportIfNeeded(root, AbstractTypeCreator.HTTP_CXF_APACHE_ORG_ARRAYS);
+                }
             }
-
             writeTypeReference(name, element, type, root);
             needXmime |= type.usesXmime();
             needUtilityTypes |= type.usesUtilityTypes();
+
         }
 
         if (needXmime) {

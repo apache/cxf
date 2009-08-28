@@ -37,16 +37,12 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 public abstract class Type {
 
     protected Class typeClass;
-
     private QName schemaType;
-
     private TypeMapping typeMapping;
-
     private boolean abstrct = true;
-
     private boolean nillable = true;
-
     private boolean writeOuter = true;
+    private boolean flatArray;
 
     public Type() {
     }
@@ -202,6 +198,11 @@ public abstract class Type {
         schemaType = name;
     }
 
+    /**
+     * Defaults to true. False for types that disappear entirely when null,
+     * even when nillable.
+     * @return whether to write xsi:nil for null values.
+     */
     public boolean isWriteOuter() {
         return writeOuter;
     }
@@ -249,5 +250,13 @@ public abstract class Type {
         sb.append((q == null) ? "<null>" : q.toString());
         sb.append("]");
         return sb.toString();
+    }
+
+    public boolean isFlatArray() {
+        return flatArray;
+    }
+
+    public void setFlatArray(boolean flatArray) {
+        this.flatArray = flatArray;
     }
 }

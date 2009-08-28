@@ -49,7 +49,7 @@ public class CollectionType extends ArrayType {
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         try {
-            return readCollection(reader, context);
+            return readCollection(reader, null, context);
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument.", e);
         }
@@ -61,7 +61,7 @@ public class CollectionType extends ArrayType {
         Collection values = null;
         
         /*
-         * getTypeClass returns the type of the object. These ifs asked if the proposed
+         * getTypeClass returns the type of the object. These 'if's asked if the proposed
          * type can be assigned to the object, not the other way around. Thus List before
          * Vector and Set before SortedSet.
          */

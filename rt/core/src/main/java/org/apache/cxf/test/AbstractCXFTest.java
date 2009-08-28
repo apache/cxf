@@ -116,8 +116,8 @@ public class AbstractCXFTest extends Assert {
      * @param xpath
      * @throws Exception 
      */
-    public boolean assertValidBoolean(String xpath, Node node) throws Exception {
-        return testUtilities.assertValidBoolean(xpath, node);
+    public void assertValidBoolean(String xpath, Node node) throws Exception {
+        testUtilities.assertValidBoolean(xpath, node);
     }
     /**
      * Assert that the following XPath query selects no nodes.

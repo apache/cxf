@@ -31,11 +31,6 @@ public abstract class AbstractMessageWriter implements MessageWriter {
     
     private boolean xsiTypeWritten;
     
-    /**
-     * Create a LiteralWriter but without writing an element name.
-     * 
-     * @param writer
-     */
     public AbstractMessageWriter() {
     }
 

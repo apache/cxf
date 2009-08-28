@@ -49,6 +49,7 @@
       <xsd:element name="parameter" type="parameterType" />
     </xsd:choice>
     <xsd:attribute name="name" type="xsd:string" />
+    <xsd:attribute name="ignore" type="xsd:boolean" />
   </xsd:complexType>
 
   <xsd:complexType name="return-typeType">
@@ -72,7 +73,7 @@
     <xsd:attribute name="typeName" type="xsd:string" />
     <xsd:attribute name="mappedName" type="xsd:string" />
     <xsd:attribute name="nillable" type="xsd:boolean" />
-    <xsd:attribute name="flag" type="xsd:boolean" />
+    <xsd:attribute name="flat" type="xsd:boolean" />
     <xsd:attribute name="ignore" type="xsd:boolean" />
     <xsd:attribute name="componentType" type="xsd:string" />
     <xsd:attribute name="keyType" type="xsd:string" />
