@@ -263,7 +263,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                 String cType = 
                     bodyClass != null && InjectionUtils.isPrimitive(bodyClass) 
                         ? MediaType.TEXT_PLAIN : ori.getConsumeTypes().isEmpty() 
-                    || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD) 
+                    || ori.getConsumeTypes().get(0).equals(MediaType.WILDCARD_TYPE) 
                     ? MediaType.APPLICATION_XML : ori.getConsumeTypes().get(0).toString();   
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, cType);
             }
