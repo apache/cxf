@@ -153,12 +153,14 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
     
-    public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> sClass) {
+    public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> ...sClasses) {
         Map<String, UserResource> map = userResourcesAsMap(resources);
-        ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
-            map, map.get(sClass.getName()), sClass, true, enableStatic);
-        if (cri != null) {
-            classResourceInfos.add(cri);
+        for (Class<?> sClass : sClasses) {
+            ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
+                map, map.get(sClass.getName()), sClass, true, enableStatic);
+            if (cri != null) {
+                classResourceInfos.add(cri);
+            }
         }
     }
     

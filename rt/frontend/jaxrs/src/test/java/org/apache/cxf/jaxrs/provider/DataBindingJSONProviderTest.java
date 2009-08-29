@@ -56,10 +56,8 @@ public class DataBindingJSONProviderTest extends Assert {
         c = ResourceUtils.createClassResourceInfo(TheBooks.class, TheBooks.class, true, true);
     }
     
-    
-    @Test
     public void testJAXBWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -76,7 +74,7 @@ public class DataBindingJSONProviderTest extends Assert {
     @Test
     public void testJAXBRead() throws Exception {
         String data = "{\"Book\":{\"id\":127,\"name\":\"CXF\",\"state\":\"\"}}";
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingJSONProvider p = new DataBindingJSONProvider();
@@ -91,7 +89,7 @@ public class DataBindingJSONProviderTest extends Assert {
     
     @Test
     public void testAegisWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -107,7 +105,7 @@ public class DataBindingJSONProviderTest extends Assert {
     @Test
     @Ignore
     public void testAegisCollectionWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -133,7 +131,7 @@ public class DataBindingJSONProviderTest extends Assert {
     
     @SuppressWarnings("unchecked")
     public void doTestAegisRead(String data) throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);

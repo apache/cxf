@@ -1,6 +1,6 @@
 <model xmlns="http://cxf.apache.org/jaxrs">
  <resource name="org.apache.cxf.systest.jaxrs.BookStoreNoAnnotations" 
-    path="bookstore" producesTypes="application/xml" consumesTypes="application/xml">
+    path="bookstore" produces="application/xml" consumes="application/xml">
     <operation name="getBook" verb="GET" path="/books/{id}">
        <param name="id" type="PATH" encoded="false"/>
     </operation>

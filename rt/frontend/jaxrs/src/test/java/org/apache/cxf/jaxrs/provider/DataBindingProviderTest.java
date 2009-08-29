@@ -56,7 +56,7 @@ public class DataBindingProviderTest extends Assert {
     
     @Test
     public void testAegisWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -77,7 +77,7 @@ public class DataBindingProviderTest extends Assert {
         String data = "<ns1:Book xmlns:ns1=\"http://resources.jaxrs.cxf.apache.org\" "
             + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:Book\">"
             + "<ns1:id>127</ns1:id><ns1:name>CXF</ns1:name><ns1:state></ns1:state></ns1:Book>";
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
@@ -92,7 +92,7 @@ public class DataBindingProviderTest extends Assert {
     
     @Test
     public void testJAXBWrite() throws Exception {
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingProvider p = new DataBindingProvider(binding);
@@ -108,7 +108,7 @@ public class DataBindingProviderTest extends Assert {
     @Test
     public void testJAXBRead() throws Exception {
         String data = "<Book><id>127</id><name>CXF</name><state></state></Book>";
-        Service s = new JAXRSServiceImpl(Collections.singletonList(c));
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
         DataBindingProvider p = new DataBindingProvider(binding);

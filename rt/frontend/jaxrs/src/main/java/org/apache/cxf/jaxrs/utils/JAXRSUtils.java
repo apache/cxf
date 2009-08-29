@@ -97,6 +97,11 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public final class JAXRSUtils {
 
     public static final MediaType ALL_TYPES = new MediaType();
+    public static final String RELATIVE_PATH = "relative.path";
+    public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
+    public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
+    
+    
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propogate.exception";

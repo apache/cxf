@@ -71,6 +71,7 @@ import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
@@ -86,6 +87,8 @@ public class WadlGenerator implements RequestHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
+    
+    private boolean ignoreMessageWriters = true;
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -131,6 +134,8 @@ public class WadlGenerator implements RequestHandler {
         sbMain.append(sbGrammars.toString());
         sbMain.append(sbResources.toString());
         sbMain.append("</application>");
+        
+        m.getExchange().put(JAXRSUtils.IGNORE_MESSAGE_WRITERS, ignoreMessageWriters);
         
         HttpHeaders headers = new HttpHeadersImpl(m);
         MediaType type = headers.getAcceptableMediaTypes().contains(MediaType.APPLICATION_XML_TYPE)
@@ -595,6 +600,10 @@ public class WadlGenerator implements RequestHandler {
         String prefix = getPrefix(namespace, clsMap);
         return new QName(namespace, name, prefix);
     }
-    
-    
+
+    public void setIgnoreMessageWriters(boolean ignoreMessageWriters) {
+        this.ignoreMessageWriters = ignoreMessageWriters;
+    }
+
+
 }

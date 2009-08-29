@@ -49,9 +49,6 @@ import org.apache.cxf.service.Service;
 
 public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public static final String RELATIVE_PATH = "relative.path";
-    public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
-
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInInterceptor.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
     
@@ -125,7 +122,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
-        message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
+        message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         OperationResourceInfo ori = null;     
@@ -197,7 +194,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         
         message.getExchange().put(OperationResourceInfo.class, ori);
-        message.put(RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+        message.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
       
         //2. Process parameters

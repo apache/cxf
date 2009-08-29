@@ -24,15 +24,20 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
 import org.codehaus.jettison.mapped.Configuration;
@@ -50,12 +55,14 @@ public final class JSONUtils {
     }
     
     public static XMLStreamWriter createStreamWriter(OutputStream os, 
-                                                     QName qname, boolean writeXsiType,
-                                                     Map<String, String> namespaceMap,
+                                                     QName qname, 
+                                                     boolean writeXsiType,
+                                                     ConcurrentHashMap<String, String> namespaceMap,
                                                      boolean serializeAsArray,
-                                                     List<String> arrayKeys) throws Exception {
+                                                     List<String> arrayKeys,
+                                                     boolean dropRootElement) throws Exception {
         if (writeXsiType) {
-            namespaceMap.put(XSI_URI, XSI_PREFIX);
+            namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration c = new Configuration(namespaceMap);
         MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
@@ -72,8 +79,17 @@ public final class JSONUtils {
                 xsw.seriliazeAsArray(key);
             }
         }
-        return xsw;
+        XMLStreamWriter writer = !writeXsiType || dropRootElement 
+            ? new IgnoreContentJettisonWriter(xsw, writeXsiType, 
+                                              dropRootElement ? qname : null) : xsw;
+        
+        return writer;
     }    
+    
+    public static XMLStreamWriter createIgnoreMixedContentWriterIfNeeded(XMLStreamWriter writer, 
+                                                                         boolean ignoreMixedContent) {
+        return ignoreMixedContent ? new IgnoreMixedContentWriter(writer) : writer; 
+    }
     
     private static String getKey(MappedNamespaceConvention convention, QName qname) throws Exception {
         return convention.createKey(qname.getPrefix(), 
@@ -84,9 +100,9 @@ public final class JSONUtils {
     }
     
     public static XMLStreamReader createStreamReader(InputStream is, boolean readXsiType,
-                                               Map<String, String> namespaceMap) throws Exception {
+        ConcurrentHashMap<String, String> namespaceMap) throws Exception {
         if (readXsiType) {
-            namespaceMap.put(XSI_URI, XSI_PREFIX);
+            namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
         return new JettisonReader(namespaceMap, factory.createXMLStreamReader(is));
@@ -135,5 +151,95 @@ public final class JSONUtils {
                 
             };
         }
+    }
+    
+    private static class IgnoreContentJettisonWriter extends DelegatingXMLStreamWriter {
+        
+        private boolean writeXsiType;
+        private QName ignoredQName;
+        
+        public IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, QName qname) {
+            super(writer);
+            this.writeXsiType = writeXsiType;
+            ignoredQName = qname;
+        }
+        
+        public void writeAttribute(String prefix, String uri,
+                                   String local, String value) throws XMLStreamException {
+            if (!writeXsiType && "type".equals(local) && "xsi".equals(prefix)) {
+                return;
+            }
+            super.writeAttribute(prefix, uri, local, value);
+            
+        }
+        
+        @Override
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+            if (ignoredQName != null && ignoredQName.getLocalPart().equals(local) 
+                && ignoredQName.getNamespaceURI().equals(uri)) {
+                return;
+            }
+            super.writeStartElement(prefix, local, uri);
+        }
+    }
+    
+    private static class IgnoreMixedContentWriter extends DelegatingXMLStreamWriter {
+        String lastText;
+        boolean isMixed;
+        List<Boolean> mixed = new LinkedList<Boolean>();
+        
+        public IgnoreMixedContentWriter(XMLStreamWriter writer) {
+            super(writer);
+        }
+
+        public void writeCharacters(String text) throws XMLStreamException {
+            if (StringUtils.isEmpty(text.trim())) {
+                lastText = text; 
+            } else if (lastText != null) {
+                lastText += text;
+            } else if (!isMixed) {
+                super.writeCharacters(text);                                
+            } else {
+                lastText = text;
+            }
+        }
+        
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(prefix, local, uri);
+        }
+        public void writeStartElement(String uri, String local) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(uri, local);
+        }
+        public void writeStartElement(String local) throws XMLStreamException {
+            if (lastText != null) {
+                isMixed = true;
+            }
+            mixed.add(0, isMixed);
+            lastText = null;
+            isMixed = false;
+            super.writeStartElement(local);
+        }
+        public void writeEndElement() throws XMLStreamException {
+            if (lastText != null && (!isMixed || !StringUtils.isEmpty(lastText.trim()))) {
+                super.writeCharacters(lastText.trim());                
+            }
+            super.writeEndElement();
+            isMixed = mixed.get(0);
+            mixed.remove(0);
+        }
+
+        
     }
 }

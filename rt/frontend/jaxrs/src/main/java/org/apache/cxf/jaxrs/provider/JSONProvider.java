@@ -29,10 +29,9 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
@@ -51,19 +50,17 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
-import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
-import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 
 @Produces("application/json")
 @Consumes("application/json")
 @Provider
 public class JSONProvider extends AbstractJAXBProvider  {
     
-    private Map<String, String> namespaceMap = new HashMap<String, String>();
+    private ConcurrentHashMap<String, String> namespaceMap = 
+        new ConcurrentHashMap<String, String>();
     private boolean serializeAsArray;
     private List<String> arrayKeys;
     private boolean unwrapped;
@@ -72,6 +69,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean dropRootElement;
     private boolean dropCollectionWrapperElement;
     private boolean ignoreMixedContent; 
+    private boolean writeXsiType = true;
+    private boolean readXsiType = true;
+    
     @Context
     public void setMessageContext(MessageContext mc) {
         super.setContext(mc);
@@ -130,7 +130,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
     }
     
     public void setNamespaceMap(Map<String, String> namespaceMap) {
-        this.namespaceMap = namespaceMap;
+        this.namespaceMap.putAll(namespaceMap);
     }
 
     public Object readFrom(Class<Object> type, Type genericType, Annotation[] anns, MediaType mt, 
@@ -173,8 +173,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
 
     protected XMLStreamReader createReader(Class<?> type, InputStream is) 
         throws Exception {
-        MappedXMLInputFactory factory = new MappedXMLInputFactory(namespaceMap);
-        return factory.createXMLStreamReader(is);
+        return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
     
     protected InputStream getInputStream(Class<Object> cls, Type type, InputStream is) throws Exception {
@@ -299,9 +298,6 @@ public class JSONProvider extends AbstractJAXBProvider  {
         
         XMLStreamWriter writer = createWriter(actualObject, actualClass, genericType, enc, 
                                               os, isCollection);
-        if (ignoreMixedContent) {
-            writer = new IgnoreMixedContentWriter(writer);
-        }
         ms.marshal(actualObject, writer);
         writer.close();
     }
@@ -309,10 +305,10 @@ public class JSONProvider extends AbstractJAXBProvider  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         QName qname = getQName(actualClass, genericType, actualObject, true);
-        XMLStreamWriter xsw = JSONUtils.createStreamWriter(os, qname, false, 
-                                                           namespaceMap, serializeAsArray, arrayKeys);
-        
-        return isCollection || dropRootElement ? new JSONCollectionWriter(xsw, qname) : xsw; 
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, writeXsiType, 
+                                             namespaceMap, serializeAsArray, arrayKeys,
+                                             isCollection || dropRootElement);
+        return JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 
@@ -350,80 +346,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
         return prefix;
     }
     
-    protected static class JSONCollectionWriter extends DelegatingXMLStreamWriter {
-        private QName ignoredQName;
-        public JSONCollectionWriter(XMLStreamWriter writer, QName qname) {
-            super(writer);
-            ignoredQName = qname;
-        }
-        
-        @Override
-        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-            if (ignoredQName.getLocalPart().equals(local) 
-                && ignoredQName.getNamespaceURI().equals(uri)) {
-                return;
-            }
-            super.writeStartElement(prefix, local, uri);
-        }
+    public void setWriteXsiType(boolean writeXsiType) {
+        this.writeXsiType = writeXsiType;
     }
     
-    protected static class IgnoreMixedContentWriter extends DelegatingXMLStreamWriter {
-        String lastText;
-        boolean isMixed;
-        List<Boolean> mixed = new LinkedList<Boolean>();
-        
-        public IgnoreMixedContentWriter(XMLStreamWriter writer) {
-            super(writer);
-        }
-
-        public void writeCharacters(String text) throws XMLStreamException {
-            if (StringUtils.isEmpty(text.trim())) {
-                lastText = text; 
-            } else if (lastText != null) {
-                lastText += text;
-            } else if (!isMixed) {
-                super.writeCharacters(text);                                
-            } else {
-                lastText = text;
-            }
-        }
-        
-        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
-            if (lastText != null) {
-                isMixed = true;
-            }
-            mixed.add(0, isMixed);
-            lastText = null;
-            isMixed = false;
-            super.writeStartElement(prefix, local, uri);
-        }
-        public void writeStartElement(String uri, String local) throws XMLStreamException {
-            if (lastText != null) {
-                isMixed = true;
-            }
-            mixed.add(0, isMixed);
-            lastText = null;
-            isMixed = false;
-            super.writeStartElement(uri, local);
-        }
-        public void writeStartElement(String local) throws XMLStreamException {
-            if (lastText != null) {
-                isMixed = true;
-            }
-            mixed.add(0, isMixed);
-            lastText = null;
-            isMixed = false;
-            super.writeStartElement(local);
-        }
-        public void writeEndElement() throws XMLStreamException {
-            if (lastText != null && (!isMixed || !StringUtils.isEmpty(lastText.trim()))) {
-                super.writeCharacters(lastText.trim());                
-            }
-            super.writeEndElement();
-            isMixed = mixed.get(0);
-            mixed.remove(0);
-        }
-
-        
+    public void setReadXsiType(boolean readXsiType) {
+        this.readXsiType = readXsiType;
     }
+
 }

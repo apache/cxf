@@ -82,6 +82,31 @@ public class ResourceUtilsTest extends Assert {
     }
     
     @Test
+    public void testUserResourceFromFile() throws Exception {
+        List<UserResource> list = 
+            ResourceUtils.getUserResources("classpath:/resources.xml");
+        assertNotNull(list);
+        assertEquals(1, list.size());
+        UserResource resource = list.get(0);
+        assertEquals("java.util.Map", resource.getName());
+        assertEquals("map", resource.getPath());
+        assertEquals("application/xml", resource.getProduces());
+        assertEquals("application/json", resource.getConsumes());
+        UserOperation oper = resource.getOperations().get(0);
+        assertEquals("putAll", oper.getName());
+        assertEquals("/putAll", oper.getPath());
+        assertEquals("PUT", oper.getVerb());
+        assertEquals("application/json", oper.getProduces());
+        assertEquals("application/xml", oper.getConsumes());
+        
+        Parameter p = oper.getParameters().get(0);
+        assertEquals("map", p.getName());
+        assertEquals("emptyMap", p.getDefaultValue());
+        assertTrue(p.isEncoded());
+        assertEquals("REQUEST_BODY", p.getType().toString());
+    }
+    
+    @Test
     public void testGetAllJaxbClasses() {
         ClassResourceInfo cri1 = 
             ResourceUtils.createClassResourceInfo(BookInterface.class, BookInterface.class, true, true);
