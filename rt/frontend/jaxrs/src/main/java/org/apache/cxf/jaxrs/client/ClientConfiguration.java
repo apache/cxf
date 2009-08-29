@@ -33,6 +33,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 public class ClientConfiguration implements InterceptorProvider {
 
@@ -101,6 +102,16 @@ public class ClientConfiguration implements InterceptorProvider {
         exchange.put(MessageObserver.class, new ClientMessageObserver(this));
         exchange.put(Bus.class, bus);
         return getConduitSelector().selectConduit(message);
+    }
+    
+    public HTTPConduit getHttpConduit() {
+        Message message = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.put(MessageObserver.class, new ClientMessageObserver(this));
+        exchange.put(Bus.class, bus);
+        Conduit conduit = getConduitSelector().selectConduit(message);
+        return conduit instanceof HTTPConduit ? (HTTPConduit)conduit : null;
     }
     
     public Map<String, Object> getResponseContext() {
