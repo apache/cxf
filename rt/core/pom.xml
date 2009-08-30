@@ -39,6 +39,7 @@
                 <executions>
                     <execution>
                         <id>create-test-jar</id>
+                        <phase>install</phase>
                         <goals>
                             <goal>test-jar</goal>
                         </goals>
