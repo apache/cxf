@@ -237,12 +237,6 @@
             <version>${derby.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency>
-          <groupId>org.apache.cxf</groupId>
-          <artifactId>cxf-rt-testsupport</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-
     </dependencies>
     <properties>
         <surefire.fork.mode>pertest</surefire.fork.mode>
