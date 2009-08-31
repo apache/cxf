@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.jws.WebService;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
@@ -33,7 +34,6 @@ import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.greeter_control.ControlImpl;
-import org.apache.cxf.systest.ws.addressing.GreeterImpl;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 import org.junit.After;
@@ -181,5 +181,14 @@ public class LifeCycleTest extends Assert {
             }
         }
     }
+    
+    
+    @WebService(serviceName = "SOAPServiceAddressing", 
+                portName = "SoapPort", 
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+                targetNamespace = "http://apache.org/hello_world_soap_http",
+                wsdlLocation = "testutils/hello_world.wsdl")
+    public class GreeterImpl extends org.apache.hello_world_soap_http.BaseGreeterImpl {
 
+    }
 }

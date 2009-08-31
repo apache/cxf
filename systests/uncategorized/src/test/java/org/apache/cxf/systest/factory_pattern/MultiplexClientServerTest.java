@@ -65,7 +65,7 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         // requires ws-a support to propagate reference parameters
-        createStaticBus("org/apache/cxf/systest/ws/addressing/cxf.xml");
+        createStaticBus("org/apache/cxf/systest/factory_pattern/cxf_multiplex.xml");
         Map<String, String> props = new HashMap<String, String>();    
         if (System.getProperty("activemq.store.dir") != null) {
             props.put("activemq.store.dir", System.getProperty("activemq.store.dir"));
@@ -120,7 +120,8 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
             num.isEven().isEven();
             fail("there should be a fault on val 999");
         } catch (Exception expected) {
-            assertTrue("match on exception message", expected.getMessage().indexOf("999") != -1);
+            assertTrue("match on exception message " + expected.getMessage(),
+                       expected.getMessage().indexOf("999") != -1);
         }
         
         ref = factory.create("37");
