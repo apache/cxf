@@ -89,13 +89,13 @@
             <version>${project.version}</version>
         </dependency>
 
-        <dependency>
+        <!--dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-core</artifactId>
             <classifier>tests</classifier>
             <version>${project.version}</version>
-            <!--scope>test</scope-->
-        </dependency>
+            <scope>test</scope>
+        </dependency-->
 
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>

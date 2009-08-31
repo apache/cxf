@@ -32,7 +32,7 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
-    <build>
+    <!--build>
       <plugins>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
@@ -46,7 +46,7 @@
                 </executions>
             </plugin>
       </plugins>
-    </build>
+    </build-->
 
     <dependencies>
 
