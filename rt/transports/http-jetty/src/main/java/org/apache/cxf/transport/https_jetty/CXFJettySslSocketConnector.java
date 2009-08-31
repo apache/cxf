@@ -89,6 +89,7 @@ public class CXFJettySslSocketConnector extends SslSocketConnector {
      * configures an HTTP Destination.
      */
     protected void setClientAuthentication(ClientAuthentication clientAuth) {
+        setWantClientAuth(true);
         if (clientAuth != null) {
             if (clientAuth.isSetWant()) {
                 setWantClientAuth(clientAuth.isWant());
