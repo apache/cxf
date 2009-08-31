@@ -58,6 +58,14 @@
             <artifactId>cxf-rt-core</artifactId>
             <version>${project.version}</version>
         </dependency>
+
+        <!--dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-core</artifactId>
+            <classifier>tests</classifier>
+            <version>${project.version}</version>
+        </dependency-->
+
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
