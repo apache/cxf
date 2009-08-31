@@ -142,6 +142,7 @@ public class ClientImpl
     public ClientImpl(Bus bus, URL wsdlUrl, QName service,
                       QName port, EndpointImplFactory endpointImplFactory) {
         this.bus = bus;
+        outFaultObserver = new ClientOutFaultObserver(bus);
 
         WSDLServiceFactory sf = (service == null)
             ? (new WSDLServiceFactory(bus, wsdlUrl)) : (new WSDLServiceFactory(bus, wsdlUrl, service));
