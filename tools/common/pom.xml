@@ -94,7 +94,7 @@
             <artifactId>cxf-rt-core</artifactId>
             <classifier>tests</classifier>
             <version>${project.version}</version>
-            <scope>test</scope>
+            <!--scope>test</scope-->
         </dependency>
 
         <dependency>
