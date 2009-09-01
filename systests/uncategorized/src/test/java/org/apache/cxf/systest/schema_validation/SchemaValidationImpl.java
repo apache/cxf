@@ -32,7 +32,6 @@ import org.apache.schema_validation.types.OccuringStruct;
             portName = "SoapPort",
             endpointInterface = "org.apache.schema_validation.SchemaValidation",
             targetNamespace = "http://apache.org/schema_validation")
-@org.apache.cxf.annotations.SchemaValidation            
 public class SchemaValidationImpl implements SchemaValidation {
 
     public boolean setComplexStruct(ComplexStruct in) {
