@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.Collection;
 import java.util.Set;
 
@@ -181,8 +182,24 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 addType(t2);
             }
         } else if (cls instanceof GenericArrayType) {
+            Class ct;
             GenericArrayType gt = (GenericArrayType)cls;
-            Class ct = (Class) gt.getGenericComponentType();
+            Type componentType = gt.getGenericComponentType();
+            if (componentType instanceof Class) {
+                ct = (Class)componentType;
+            } else {
+                TypeVariable tv = (TypeVariable)componentType;
+                Type[] bounds = tv.getBounds();
+                if (bounds != null && bounds.length == 1) {
+                    if (bounds[0] instanceof Class) {
+                        ct = (Class)bounds[0];
+                    } else {
+                        throw new IllegalArgumentException("Unable to determine type for: " + tv);
+                    }
+                } else {
+                    throw new IllegalArgumentException("Unable to determine type for: " + tv);
+                }
+            }
             ct = Array.newInstance(ct, 0).getClass();
 
             addClass(ct);
