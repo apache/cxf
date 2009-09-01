@@ -1,0 +1,7 @@
+RETRIEVE /the/thebooks4/bookstore/books/aegis/retrieve HTTP/1.1
+Content-Type: */*
+Accept: application/xml
+User-Agent: Java/1.5.0_12
+Host: localhost:9080
+Connection: close
+

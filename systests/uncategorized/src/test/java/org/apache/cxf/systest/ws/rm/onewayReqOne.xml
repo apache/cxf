@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
+  <soap:Body>
+    <greetMeOneWay xmlns="http://cxf.apache.org/greeter_control/types">
+      <requestType>once</requestType>
+    </greetMeOneWay>
+  </soap:Body>
+</soap:Envelope>
