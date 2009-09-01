@@ -77,6 +77,8 @@
         <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
         <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
 
+        <resources.base.path/>
+
     </properties>
 
 
@@ -197,11 +199,11 @@
                             <id>validate</id>
                             <phase>validate</phase>
                             <configuration>
-                                <configLocation>cxf-checkstyle${checkstyle.extension}.xml</configLocation>
+                                <configLocation>${resources.base.path}cxf-checkstyle${checkstyle.extension}.xml</configLocation>
                                 <consoleOutput>true</consoleOutput>
                                 <failsOnError>true</failsOnError>
                                 <linkXRef>false</linkXRef>
-                                <suppressionsLocation>cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                                <suppressionsLocation>${resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
                                 <sourceDirectory>${basedir}/src</sourceDirectory>
                                 <excludes>**/archetype-resources/**/*.java</excludes>
                             </configuration>
@@ -224,8 +226,8 @@
                     </dependencies>
                     <configuration>
                         <rulesets>
-                            <ruleset>cxf-pmd-ruleset.xml</ruleset>
-                            <ruleset>cxf-pmd-custom.xml</ruleset>
+                            <ruleset>${resources.base.path}cxf-pmd-ruleset.xml</ruleset>
+                            <ruleset>${resources.base.path}cxf-pmd-custom.xml</ruleset>
                         </rulesets>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>1.5</targetJdk>
