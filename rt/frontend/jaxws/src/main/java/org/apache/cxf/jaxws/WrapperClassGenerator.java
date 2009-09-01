@@ -277,21 +277,25 @@ public final class WrapperClassGenerator extends ASMHelper {
         String classCode = getClassCode(clz);
         String fieldDescriptor = null;
         
-        if (genericType instanceof ParameterizedType
-            && (Collection.class.isAssignableFrom(clz) || clz.isArray())) {
-            ParameterizedType ptype = (ParameterizedType)genericType;
+        if (genericType instanceof ParameterizedType) {
+            if (Collection.class.isAssignableFrom(clz) || clz.isArray()) {
+                ParameterizedType ptype = (ParameterizedType)genericType;
 
-            Type[] types = ptype.getActualTypeArguments();
-            // TODO: more complex Parameterized type
-            if (types.length > 0) {
-                if (types[0] instanceof Class) {
-                    fieldDescriptor = getClassCode(genericType);
-                } else if (types[0] instanceof GenericArrayType) {
-                    fieldDescriptor = getClassCode(genericType);
-                } else if (types[0] instanceof ParameterizedType) {
-                    classCode = getClassCode(((ParameterizedType)types[0]).getRawType());
-                    fieldDescriptor = getClassCode(genericType);
+                Type[] types = ptype.getActualTypeArguments();
+                // TODO: more complex Parameterized type
+                if (types.length > 0) {
+                    if (types[0] instanceof Class) {
+                        fieldDescriptor = getClassCode(genericType);
+                    } else if (types[0] instanceof GenericArrayType) {
+                        fieldDescriptor = getClassCode(genericType);
+                    } else if (types[0] instanceof ParameterizedType) {
+                        classCode = getClassCode(((ParameterizedType)types[0]).getRawType());
+                        fieldDescriptor = getClassCode(genericType);
+                    }
                 }
+            } else {
+                classCode = getClassCode(((ParameterizedType)genericType).getRawType());
+                fieldDescriptor = getClassCode(genericType);
             }
         }
         String fieldName = JavaUtils.isJavaKeyword(name) ? JavaUtils.makeNonJavaKeyword(name) : name;

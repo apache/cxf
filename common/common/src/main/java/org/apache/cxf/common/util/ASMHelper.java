@@ -24,6 +24,7 @@ import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -99,6 +100,14 @@ public class ASMHelper {
         } else if (type instanceof GenericArrayType) {
             GenericArrayType at = (GenericArrayType)type;
             return "[" + getClassCode(at.getGenericComponentType());
+        } else if (type instanceof TypeVariable) {
+            TypeVariable tv = (TypeVariable)type;
+            Type[] bounds = tv.getBounds();
+            if (bounds != null && bounds.length == 1) {
+                return getClassCode(bounds[0]);
+            } else {
+                throw new IllegalArgumentException("Unable to determine type for: " + tv);
+            }
         } else if (type instanceof ParameterizedType) {
             ParameterizedType pt = (ParameterizedType)type;
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));
