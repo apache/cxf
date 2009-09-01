@@ -23,9 +23,6 @@ import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.systest.jaxws.Hello;
-import org.apache.cxf.systest.jaxws.HelloImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
