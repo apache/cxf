@@ -45,8 +45,6 @@ http://cxf.apache.org/schemas/core.xsd">
 
   <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
   
-  <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource" id="sdoBean"/>
-  
   <jaxrs:server id="jaxbbook" address="/jaxb">
     <jaxrs:serviceBeans>
       <ref bean="serviceBean" />
@@ -69,29 +67,7 @@ http://cxf.apache.org/schemas/core.xsd">
         </bean> 
     </jaxrs:dataBinding> 
   </jaxrs:server>
-  
-  
-  <jaxrs:server id="sdo" address="/sdo">
-    <jaxrs:serviceBeans>
-      <ref bean="sdoBean" />
-    </jaxrs:serviceBeans>		   
-    <jaxrs:dataBinding> 
-      <ref bean="sdoDatabinding"/>
-    </jaxrs:dataBinding> 
-    <jaxrs:providers>
-      <ref bean="jsonSdoBean" />
-    </jaxrs:providers>
-  </jaxrs:server>
 
-  <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
-  <bean id="jsonSdoBean" class="org.apache.cxf.jaxrs.provider.DataBindingJSONProvider">
-      <property name="dataBinding" ref="sdoDatabinding"/>
-      <property name="namespaceMap" ref="jsonNamespaceMap"/>
-  </bean>
-
-  <util:map id="jsonNamespaceMap" map-class="java.util.Hashtable">
-       <entry key="http://apache.org/structure/types" value="p0"/>
-  </util:map>
 
 </beans>
 <!-- END SNIPPET: beans -->
