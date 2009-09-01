@@ -28,13 +28,14 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
 import org.apache.cxf.aegis.type.java5.dto.MapDTO;
 import org.apache.cxf.aegis.type.java5.dto.MapDTOService;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,7 +58,7 @@ public class MapTest extends AbstractAegisTest {
     public void testType() throws Exception {
         Method m = MapService.class.getMethod("getMap", new Class[0]);
 
-        Type type = creator.createType(m, -1);
+        AegisType type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof MapType);
 
@@ -78,7 +79,7 @@ public class MapTest extends AbstractAegisTest {
     public void testRecursiveType() throws Exception {
         Method m = MapService.class.getMethod("getMapOfCollections", new Class[0]);
 
-        Type type = creator.createType(m, -1);
+        AegisType type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof MapType);
 
@@ -102,7 +103,7 @@ public class MapTest extends AbstractAegisTest {
     public void testPDType() throws Exception {
         PropertyDescriptor pd = Introspector.getBeanInfo(MapDTO.class,
                                                          Object.class).getPropertyDescriptors()[0];
-        Type type = creator.createType(pd);
+        AegisType type = creator.createType(pd);
         tm.register(type);
         assertTrue(type instanceof MapType);
 
@@ -127,10 +128,10 @@ public class MapTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
 
-        Type dto = creator.createType(MapDTO.class);
+        AegisType dto = creator.createType(MapDTO.class);
         Set deps = dto.getDependencies();
 
-        Type type = (Type)deps.iterator().next();
+        AegisType type = (AegisType)deps.iterator().next();
         assertTrue(type instanceof MapType);
 
         MapType mapType = (MapType)type;

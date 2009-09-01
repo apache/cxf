@@ -100,9 +100,9 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return info;
     }
 
-    public Type createTypeForClass(TypeClassInfo info) {
+    public AegisType createTypeForClass(TypeClassInfo info) {
         Class javaType = info.getTypeClass();
-        Type result = null;
+        AegisType result = null;
         boolean newType = true;
 
         if (info.getType() != null) {
@@ -118,7 +118,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         } else if (isEnum(javaType)) {
             result = createEnumType(info);
         } else {
-            Type type = getTypeMapping().getType(javaType);
+            AegisType type = getTypeMapping().getType(javaType);
             if (type == null) {
                 if (info.getTypeName() != null) {
                     type = getTypeMapping().getType(info.getTypeName());
@@ -148,7 +148,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return "javax.xml.ws.Holder".equals(javaType.getName());
     }
 
-    protected Type createHolderType(TypeClassInfo info) {
+    protected AegisType createHolderType(TypeClassInfo info) {
         if (info.getGenericType() == null) {
             throw new UnsupportedOperationException("To use holder types "
                     + "you must have an XML descriptor declaring the component type.");
@@ -165,9 +165,9 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return javaType.isArray() && !javaType.equals(byte[].class);
     }
 
-    protected Type createUserType(TypeClassInfo info) {
+    protected AegisType createUserType(TypeClassInfo info) {
         try {
-            Type type = (Type)info.getType().newInstance();
+            AegisType type = (AegisType)info.getType().newInstance();
 
             QName name = info.getTypeName();
             if (name == null) {
@@ -197,7 +197,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         }
     }
 
-    protected Type createArrayType(TypeClassInfo info) {
+    protected AegisType createArrayType(TypeClassInfo info) {
         ArrayType type = new ArrayType();
         type.setTypeMapping(getTypeMapping());
         type.setTypeClass(info.getTypeClass());
@@ -231,8 +231,8 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return Collection.class.isAssignableFrom(javaType);
     }
 
-    protected Type createCollectionTypeFromGeneric(TypeClassInfo info) {
-        Type component = getOrCreateGenericType(info);
+    protected AegisType createCollectionTypeFromGeneric(TypeClassInfo info) {
+        AegisType component = getOrCreateGenericType(info);
 
         CollectionType type = new CollectionType(component);
         type.setTypeMapping(getTypeMapping());
@@ -258,15 +258,15 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return type;
     }
 
-    protected Type getOrCreateGenericType(TypeClassInfo info) {
+    protected AegisType getOrCreateGenericType(TypeClassInfo info) {
         return createObjectType();
     }
 
-    protected Type getOrCreateMapKeyType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapKeyType(TypeClassInfo info) {
         return nextCreator.getOrCreateMapKeyType(info);
     }
 
-    protected Type createObjectType() {
+    protected AegisType createObjectType() {
         ObjectType type = new ObjectType();
         type.setSchemaType(XMLSchemaQNames.XSD_ANY);
         type.setTypeClass(Object.class);
@@ -274,11 +274,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return type;
     }
 
-    protected Type getOrCreateMapValueType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapValueType(TypeClassInfo info) {
         return nextCreator.getOrCreateMapValueType(info);
     }
 
-    protected Type createMapType(TypeClassInfo info, Type keyType, Type valueType) {
+    protected AegisType createMapType(TypeClassInfo info, AegisType keyType, AegisType valueType) {
         QName schemaType = createMapQName(info, keyType, valueType);
         MapType type = new MapType(schemaType, keyType, valueType);
         type.setTypeMapping(getTypeMapping());
@@ -287,14 +287,14 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return type;
     }
 
-    protected Type createMapType(TypeClassInfo info) {
-        Type keyType = getOrCreateMapKeyType(info);
-        Type valueType = getOrCreateMapValueType(info);
+    protected AegisType createMapType(TypeClassInfo info) {
+        AegisType keyType = getOrCreateMapKeyType(info);
+        AegisType valueType = getOrCreateMapValueType(info);
 
         return createMapType(info, keyType, valueType);
     }
 
-    protected QName createMapQName(TypeClassInfo info, Type keyType, Type valueType) {
+    protected QName createMapQName(TypeClassInfo info, AegisType keyType, AegisType valueType) {
         String name = keyType.getSchemaType().getLocalPart() + '2' + valueType.getSchemaType().getLocalPart()
                       + "Map";
 
@@ -312,15 +312,15 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return false;
     }
 
-    public Type createEnumType(TypeClassInfo info) {
+    public AegisType createEnumType(TypeClassInfo info) {
         return null;
     }
 
-    public abstract Type createCollectionType(TypeClassInfo info);
+    public abstract AegisType createCollectionType(TypeClassInfo info);
 
-    public abstract Type createDefaultType(TypeClassInfo info);
+    public abstract AegisType createDefaultType(TypeClassInfo info);
 
-    protected QName createCollectionQName(TypeClassInfo info, Type type) {
+    protected QName createCollectionQName(TypeClassInfo info, AegisType type) {
         String ns;
 
         if (type.isComplex()) {
@@ -355,13 +355,13 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     public abstract TypeClassInfo createClassInfo(Method m, int index);
 
     /**
-     * Create a Type for a Method parameter.
+     * Create a AegisType for a Method parameter.
      * 
      * @param m the method to create a type for
      * @param index The parameter index. If the index is less than zero, the
      *            return type is used.
      */
-    public Type createType(Method m, int index) {
+    public AegisType createType(Method m, int index) {
         TypeClassInfo info = createClassInfo(m, index);
         info.setDescription((index == -1 ? "return type" : "parameter " + index) + " of method "
                             + m.getName() + " in " + m.getDeclaringClass());
@@ -379,7 +379,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
      * 
      * @param pd the propertydescriptor
      */
-    public Type createType(PropertyDescriptor pd) {
+    public AegisType createType(PropertyDescriptor pd) {
         TypeClassInfo info = createClassInfo(pd);
         info.setDescription("property " + pd.getName());
         return createTypeForClass(info);
@@ -390,7 +390,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
      * 
      * @param f the field to create a type from
      */
-    public Type createType(Field f) {
+    public AegisType createType(Field f) {
         TypeClassInfo info = createClassInfo(f);
         info.setDescription("field " + f.getName() + " in " + f.getDeclaringClass());
         return createTypeForClass(info);
@@ -403,7 +403,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
      * @param t the reflected type.
      * @return the type
      */
-    public Type createType(java.lang.reflect.Type t) {
+    public AegisType createType(java.lang.reflect.Type t) {
         TypeClassInfo info = new TypeClassInfo();
         info.setGenericType(t);
         if (t instanceof ParameterizedType) {
@@ -421,7 +421,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         
     }
 
-    public Type createType(Class clazz) {
+    public AegisType createType(Class clazz) {
         TypeClassInfo info = createBasicClassInfo(clazz);
         info.setDescription(clazz.toString());
         return createTypeForClass(info);

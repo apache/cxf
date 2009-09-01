@@ -31,7 +31,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.basic.BeanType;
@@ -44,7 +44,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 
 import static org.apache.cxf.aegis.type.encoded.SoapEncodingUtil.readAttributeValue;
 
-public class SoapArrayType extends Type {
+public class SoapArrayType extends AegisType {
     private static final Logger LOG = LogUtils.getL7dLogger(SoapArrayType.class);
     private static final String SOAP_ENCODING_NS_1_1 = Soap11.getInstance().getSoapEncodingStyle();
     private static final QName SOAP_ARRAY_POSITION = new QName(SOAP_ENCODING_NS_1_1, "position");
@@ -137,7 +137,7 @@ public class SoapArrayType extends Type {
             }
 
             // nested element names can specify a type
-            Type compType = getTypeMapping().getType(creader.getName());
+            AegisType compType = getTypeMapping().getType(creader.getName());
             if (compType == null) {
                 // use the type declared in the arrayType attribute
                 compType = arrayTypeInfo.getType();
@@ -283,7 +283,7 @@ public class SoapArrayType extends Type {
         }
 
         // ComponentType
-        Type type = getComponentType();
+        AegisType type = getComponentType();
         if (type == null) {
             throw new DatabindingException("Couldn't find component type for array.");
         }
@@ -315,7 +315,7 @@ public class SoapArrayType extends Type {
     protected void writeValue(Object value,
             MessageWriter writer,
             Context context,
-            Type type) throws DatabindingException {
+            AegisType type) throws DatabindingException {
 
         type = TypeUtil.getWriteType(context.getGlobalContext(), value, type);
 
@@ -347,7 +347,7 @@ public class SoapArrayType extends Type {
     /**
      * We need to write a complex type schema for Beans, so return true.
      *
-     * @see org.apache.cxf.aegis.type.Type#isComplex()
+     * @see org.apache.cxf.aegis.type.AegisType#isComplex()
      */
     @Override
     public boolean isComplex() {
@@ -371,8 +371,8 @@ public class SoapArrayType extends Type {
     }
 
     @Override
-    public Set<Type> getDependencies() {
-        Set<Type> deps = new HashSet<Type>();
+    public Set<AegisType> getDependencies() {
+        Set<AegisType> deps = new HashSet<AegisType>();
 
         deps.add(getComponentType());
 
@@ -380,13 +380,13 @@ public class SoapArrayType extends Type {
     }
 
     /**
-     * Get the <code>Type</code> of the elements in the array.  This is only used for writing an array.
+     * Get the <code>AegisType</code> of the elements in the array.  This is only used for writing an array.
      * When reading the type is solely determined by the required arrayType soap attribute.
      */
-    public Type getComponentType() {
+    public AegisType getComponentType() {
         Class compType = getTypeClass().getComponentType();
 
-        Type type;
+        AegisType type;
         if (componentName == null) {
             type = getTypeMapping().getType(compType);
         } else {
@@ -413,7 +413,7 @@ public class SoapArrayType extends Type {
      * @return the QName of the root component type of this array
      */
     protected QName getRootType() {
-        Type componentType = getComponentType();
+        AegisType componentType = getComponentType();
         if (componentType instanceof SoapArrayType) {
             SoapArrayType arrayType = (SoapArrayType) componentType;
             return arrayType.getRootType();

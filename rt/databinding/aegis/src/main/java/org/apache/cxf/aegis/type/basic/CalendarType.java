@@ -22,17 +22,17 @@ import java.text.ParseException;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.util.date.XsDateTimeFormat;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * Type for the Calendar class.
+ * AegisType for the Calendar class.
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class CalendarType extends Type {
+public class CalendarType extends AegisType {
     private static XsDateTimeFormat format = new XsDateTimeFormat();
 
     @Override

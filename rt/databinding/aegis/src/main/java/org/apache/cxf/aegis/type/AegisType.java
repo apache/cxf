@@ -30,11 +30,11 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 /**
- * A Type reads and writes XML fragments to create and write objects.
+ * Aegis abstraction for a object. Types are responsible for reading and writing the contents 
+ * of objects, but not, almost always, their own outermost XML element.
  * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public abstract class Type {
+public abstract class AegisType {
 
     protected Class typeClass;
     private QName schemaType;
@@ -44,7 +44,7 @@ public abstract class Type {
     private boolean writeOuter = true;
     private boolean flatArray;
 
-    public Type() {
+    public AegisType() {
     }
 
     /**
@@ -140,12 +140,12 @@ public abstract class Type {
     }
 
     /**
-     * Return a set of Type dependencies. Returns null if this type has no
+     * Return a set of AegisType dependencies. Returns null if this type has no
      * dependencies.
      * 
-     * @return Set of <code>Type</code> dependencies
+     * @return Set of <code>AegisType</code> dependencies
      */
-    public Set<Type> getDependencies() {
+    public Set<AegisType> getDependencies() {
         return null;
     }
 
@@ -158,8 +158,8 @@ public abstract class Type {
             return true;
         }
 
-        if (obj instanceof Type) {
-            Type type = (Type)obj;
+        if (obj instanceof AegisType) {
+            AegisType type = (AegisType)obj;
 
             if (type.getSchemaType().equals(getSchemaType()) && type.getTypeClass().equals(getTypeClass())) {
                 return true;

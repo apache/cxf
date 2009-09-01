@@ -23,12 +23,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface XmlAttribute {
-    Class type() default Type.class;
+    Class type() default AegisType.class;
 
     String name() default "";
 

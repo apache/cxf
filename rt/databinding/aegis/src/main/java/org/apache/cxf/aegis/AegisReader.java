@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.aegis;
 
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 
 /**
  * Interface for Aegis readers.
@@ -40,6 +40,6 @@ public interface AegisReader<ReaderT> extends AegisIo {
      * @return
      * @throws Exception
      */
-    Object read(ReaderT reader, Type desiredType) throws Exception;
+    Object read(ReaderT reader, AegisType desiredType) throws Exception;
 
 }

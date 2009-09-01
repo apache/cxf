@@ -29,7 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -38,14 +38,14 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 
-public class MapType extends Type {
-    private Type keyType;
-    private Type valueType;
+public class MapType extends AegisType {
+    private AegisType keyType;
+    private AegisType valueType;
     private QName keyName;
     private QName valueName;
     private QName entryName;
 
-    public MapType(QName schemaType, Type keyType, Type valueType) {
+    public MapType(QName schemaType, AegisType keyType, AegisType valueType) {
         super();
 
         this.keyType = keyType;
@@ -61,8 +61,8 @@ public class MapType extends Type {
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         Map<Object, Object> map = instantiateMap();
         try {
-            Type kType = getKeyType();
-            Type vType = getValueType();
+            AegisType kType = getKeyType();
+            AegisType vType = getValueType();
 
             while (reader.hasMoreElementReaders()) {
                 MessageReader entryReader = reader.getNextElementReader();
@@ -143,8 +143,8 @@ public class MapType extends Type {
         try {
             Map map = (Map)object;
 
-            Type kType = getKeyType();
-            Type vType = getValueType();
+            AegisType kType = getKeyType();
+            AegisType vType = getValueType();
 
             for (Iterator itr = map.entrySet().iterator(); itr.hasNext();) {
                 Map.Entry entry = (Map.Entry)itr.next();
@@ -157,7 +157,7 @@ public class MapType extends Type {
     }
 
     private void writeEntry(MessageWriter writer, Context context,
-                            Type kType, Type vType,
+                            AegisType kType, AegisType vType,
                             Map.Entry entry) throws DatabindingException {
         kType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getKey(), kType);
         vType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getValue(), vType);
@@ -184,8 +184,8 @@ public class MapType extends Type {
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         complex.setParticle(sequence);
 
-        Type kType = getKeyType();
-        Type vType = getValueType();
+        AegisType kType = getKeyType();
+        AegisType vType = getValueType();
         
         XmlSchemaElement element = new XmlSchemaElement();
         sequence.getItems().add(element);
@@ -206,7 +206,7 @@ public class MapType extends Type {
     /**
      * Creates a element in a sequence for the key type and the value type.
      */
-    private void createElement(XmlSchemaSequence seq, QName name, Type type) {
+    private void createElement(XmlSchemaSequence seq, QName name, AegisType type) {
         XmlSchemaElement element = new XmlSchemaElement();
         seq.getItems().add(element);
         element.setName(name.getLocalPart());
@@ -216,18 +216,18 @@ public class MapType extends Type {
     }
 
     @Override
-    public Set<Type> getDependencies() {
-        Set<Type> deps = new HashSet<Type>();
+    public Set<AegisType> getDependencies() {
+        Set<AegisType> deps = new HashSet<AegisType>();
         deps.add(getKeyType());
         deps.add(getValueType());
         return deps;
     }
 
-    public Type getKeyType() {
+    public AegisType getKeyType() {
         return keyType;
     }
 
-    public Type getValueType() {
+    public AegisType getValueType() {
         return valueType;
     }
 

@@ -33,7 +33,7 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.namespaces.data.Name;
 import org.apache.cxf.aegis.namespaces.impl.NameServiceImpl;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.service.Service;
@@ -113,7 +113,7 @@ public class NamespaceConfusionTest extends AbstractAegisTest {
 
         String uri = getNamespaceForPrefix(rootElement, arrayOfNameElement, prefix);
         assertNotNull(uri);
-        Type nameType = tm.getTypeCreator().createType(Name.class);
+        AegisType nameType = tm.getTypeCreator().createType(Name.class);
         QName tmQname = nameType.getSchemaType();
         assertEquals(tmQname.getNamespaceURI(), uri);
         

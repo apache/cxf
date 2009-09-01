@@ -27,7 +27,7 @@ import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.custom.service.NoDefaultConstructorBeanKey;
 import org.apache.cxf.aegis.custom.service.NoDefaultConstructorBeanKeyImpl;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
@@ -61,8 +61,8 @@ public class NoDefaultConstructorBeanKeyType extends BeanType {
                     continue;
                 }
                 QName name = childReader.getName();
-                Type defaultType = inf.getType(name);
-                Type type = TypeUtil.getReadType(childReader.getXMLStreamReader(),
+                AegisType defaultType = inf.getType(name);
+                AegisType type = TypeUtil.getReadType(childReader.getXMLStreamReader(),
                                                  context.getGlobalContext(), defaultType);
                 if (type != null) {
                     String value = (String)type.readObject(childReader, context);
@@ -81,9 +81,9 @@ public class NoDefaultConstructorBeanKeyType extends BeanType {
     }
 
     @Override
-    public Set<Type> getDependencies() {
+    public Set<AegisType> getDependencies() {
         // The string type is provided by aegis, so it should always be there.
-        Type stringType = getTypeMapping().getType(String.class);
+        AegisType stringType = getTypeMapping().getType(String.class);
         return Collections.singleton(stringType);
     }
 }

@@ -29,7 +29,7 @@ import javax.xml.validation.Schema;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -62,7 +62,7 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     }
 
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
-        Type type = databinding.getType(part);
+        AegisType type = databinding.getType(part);
         if (type == null) {
             type = databinding.getTypeFromClass(obj.getClass());
         }
@@ -79,9 +79,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
          * We arrive here with a 'type' of the inner type if isWriteOuter is null.
          * However, in that case, the original type is available. 
          */
-        Type outerType  = null;
+        AegisType outerType  = null;
         if (part != null) {
-            outerType = part.getProperty("org.apache.cxf.aegis.outerType", Type.class);
+            outerType = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
         }
         try {
             if (obj == null) {

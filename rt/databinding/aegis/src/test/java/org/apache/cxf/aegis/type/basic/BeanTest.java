@@ -34,7 +34,7 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.services.SimpleBean;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
@@ -559,7 +559,7 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         QName name = new QName("urn:Bean", "data");
-        Type dataType = type.getTypeInfo().getType(name);
+        AegisType dataType = type.getTypeInfo().getType(name);
         assertNotNull(dataType);
 
         assertTrue(type.getTypeInfo().isNillable(name));

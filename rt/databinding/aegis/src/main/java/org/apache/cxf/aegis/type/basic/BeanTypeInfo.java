@@ -33,14 +33,14 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
 
 public class BeanTypeInfo {
     private Map<QName, QName> mappedName2typeName = new HashMap<QName, QName>();
     private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
-    private Map<QName, Type> mappedName2type = new HashMap<QName, Type>();
+    private Map<QName, AegisType> mappedName2type = new HashMap<QName, AegisType>();
     private Class<?> beanClass;
     private List<QName> attributes = new ArrayList<QName>();
     private List<QName> elements = new ArrayList<QName>();
@@ -55,12 +55,12 @@ public class BeanTypeInfo {
     private boolean qualifyElements = true;
 
     /**
-     * extensibleElements means adding xs:any to WSDL Complex Type Definition
+     * extensibleElements means adding xs:any to WSDL Complex AegisType Definition
      */
     private boolean extensibleElements = true;
 
     /**
-     * extensibleAttributes means adding xs:anyAttribute to WSDL Complex Type
+     * extensibleAttributes means adding xs:anyAttribute to WSDL Complex AegisType
      * Definition
      */
     private boolean extensibleAttributes = true;
@@ -151,9 +151,9 @@ public class BeanTypeInfo {
     /**
      * Get the type class for the field with the specified QName.
      */
-    public Type getType(QName name) {
+    public AegisType getType(QName name) {
         // 1. Try a prexisting mapped type
-        Type type = mappedName2type.get(name);
+        AegisType type = mappedName2type.get(name);
 
         // 2. Try to get the type by its name, if there is one
         if (type == null) {
@@ -212,7 +212,7 @@ public class BeanTypeInfo {
         return true;
     }
 
-    public void mapType(QName name, Type type) {
+    public void mapType(QName name, AegisType type) {
         mappedName2type.put(name, type);
     }
 
@@ -372,7 +372,7 @@ public class BeanTypeInfo {
      * @return
      */
     public boolean isNillable(QName name) {
-        Type type = getType(name);
+        AegisType type = getType(name);
         if (!type.isNillable()) {
             return false;
         }

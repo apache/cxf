@@ -38,15 +38,15 @@ public interface TypeCreator {
      */
     QName getElementName(Method m, int index);
 
-    Type createType(Method m, int index);
+    AegisType createType(Method m, int index);
 
-    Type createType(PropertyDescriptor pd);
+    AegisType createType(PropertyDescriptor pd);
     
-    Type createType(java.lang.reflect.Type type);
+    AegisType createType(java.lang.reflect.Type type);
 
-    Type createType(Field f);
+    AegisType createType(Field f);
 
-    Type createType(Class clazz);
+    AegisType createType(Class clazz);
 
     TypeCreator getParent();
     
@@ -72,5 +72,5 @@ public interface TypeCreator {
      * @param info
      * @return
      */
-    Type createTypeForClass(TypeClassInfo info);
+    AegisType createTypeForClass(TypeClassInfo info);
 }

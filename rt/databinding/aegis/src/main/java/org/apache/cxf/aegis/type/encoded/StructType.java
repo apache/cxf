@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.MessageReader;
@@ -68,7 +68,7 @@ public class StructType extends BeanType {
      * Returns a SoapRefType wrapping the actual type.
      */
     @Override
-    protected Type getElementType(QName name,
+    protected AegisType getElementType(QName name,
             BeanTypeInfo beanTypeInfo,
             MessageReader reader,
             Context context) {
@@ -76,7 +76,7 @@ public class StructType extends BeanType {
         // nested elements use unqualified names
         name = qualifyName(name);
 
-        Type type = super.getElementType(name, beanTypeInfo, reader, context);
+        AegisType type = super.getElementType(name, beanTypeInfo, reader, context);
         if (type != null) {
             type = new SoapRefType(type);
         }
@@ -113,7 +113,8 @@ public class StructType extends BeanType {
      * Writes a nested element with an unqualified name.
      */
     @Override
-    protected void writeElement(QName name, Object value, Type type, MessageWriter writer, Context context) {
+    protected void writeElement(QName name, Object value, 
+                                AegisType type, MessageWriter writer, Context context) {
         // Nested elements are unqualified
         name = new QName("", name.getLocalPart());
 
@@ -151,10 +152,10 @@ public class StructType extends BeanType {
         return name;
     }
     
-    private BeanType superBeanType(Type t) {
+    private BeanType superBeanType(AegisType t) {
         if (t instanceof BeanType) {
             BeanType bt = (BeanType)t;
-            Type supertype = bt.getSuperType();
+            AegisType supertype = bt.getSuperType();
             if (supertype instanceof BeanType) {
                 return (BeanType)supertype;
             }

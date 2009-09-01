@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.util.jdom.StaxBuilder;
 import org.apache.cxf.aegis.util.jdom.StaxSerializer;
 import org.apache.cxf.aegis.util.stax.JDOMStreamReader;
@@ -38,7 +38,7 @@ import org.jdom.Element;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class JDOMElementType extends Type {
+public class JDOMElementType extends AegisType {
     // private static final StaxBuilder builder = new StaxBuilder();
     private static final StaxSerializer SERIALIZER = new StaxSerializer();
 

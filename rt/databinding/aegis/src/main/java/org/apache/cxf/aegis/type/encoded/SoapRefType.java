@@ -24,7 +24,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -42,10 +42,10 @@ import org.apache.ws.commons.schema.XmlSchema;
  * instance is registered with the MarshalRegistry, and is written at the end of the message body by the
  * TrailingBlocks class.
  */
-public class SoapRefType extends Type {
-    private final Type baseType;
+public class SoapRefType extends AegisType {
+    private final AegisType baseType;
 
-    public SoapRefType(Type baseType) {
+    public SoapRefType(AegisType baseType) {
         if (baseType == null) {
             throw new NullPointerException("baseType is null");
         }
@@ -119,7 +119,7 @@ public class SoapRefType extends Type {
         baseType.setNillable(nillable);
     }
 
-    public Set<Type> getDependencies() {
+    public Set<AegisType> getDependencies() {
         return baseType.getDependencies();
     }
 

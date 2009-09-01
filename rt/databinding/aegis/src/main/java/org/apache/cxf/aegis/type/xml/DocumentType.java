@@ -29,7 +29,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
@@ -42,7 +42,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class DocumentType extends Type {
+public class DocumentType extends AegisType {
     private DocumentBuilder builder;
 
     public DocumentType() {

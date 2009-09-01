@@ -39,8 +39,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
@@ -49,6 +49,7 @@ import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -73,7 +74,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testType() throws Exception {
         Method m = CollectionService.class.getMethod("getStrings", new Class[0]);
 
-        Type type = creator.createType(m, -1);
+        AegisType type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -93,7 +94,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testRecursiveCollections() throws Exception {
         Method m = CollectionService.class.getMethod("getStringCollections", new Class[0]);
 
-        Type type = creator.createType(m, -1);
+        AegisType type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -120,7 +121,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testPDType() throws Exception {
         PropertyDescriptor pd = Introspector.getBeanInfo(CollectionDTO.class, Object.class)
             .getPropertyDescriptors()[0];
-        Type type = creator.createType(pd);
+        AegisType type = creator.createType(pd);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -138,10 +139,10 @@ public class CollectionTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
 
-        Type dto = creator.createType(CollectionDTO.class);
+        AegisType dto = creator.createType(CollectionDTO.class);
         Set deps = dto.getDependencies();
 
-        Type type = (Type)deps.iterator().next();
+        AegisType type = (AegisType)deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 
@@ -150,7 +151,7 @@ public class CollectionTest extends AbstractAegisTest {
         deps = dto.getDependencies();
         assertEquals(1, deps.size());
 
-        Type comType = colType.getComponentType();
+        AegisType comType = colType.getComponentType();
         assertEquals(String.class, comType.getTypeClass());
     }
 
@@ -161,12 +162,12 @@ public class CollectionTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
 
-        Type dto = creator.createType(ObjectDTO.class);
+        AegisType dto = creator.createType(ObjectDTO.class);
         Set deps = dto.getDependencies();
 
         assertFalse(deps.isEmpty());
 
-        Type type = (Type)deps.iterator().next();
+        AegisType type = (AegisType)deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 
@@ -175,7 +176,7 @@ public class CollectionTest extends AbstractAegisTest {
         deps = dto.getDependencies();
         assertEquals(1, deps.size());
 
-        Type comType = colType.getComponentType();
+        AegisType comType = colType.getComponentType();
         assertEquals(Object.class, comType.getTypeClass());
     }
 
@@ -262,11 +263,11 @@ public class CollectionTest extends AbstractAegisTest {
     public void testNestedMapType() throws Exception {
         Method m = CollectionService.class.getMethod("mapOfMapWithStringAndPojo", 
                                                      new Class[] {Map.class});
-        Type type = creator.createType(m, 0);
+        AegisType type = creator.createType(m, 0);
         tm.register(type);
         assertTrue(type instanceof MapType);
         MapType mapType = (MapType) type;
-        Type valueType = mapType.getValueType();
+        AegisType valueType = mapType.getValueType();
         assertFalse(valueType.getSchemaType().getLocalPart().contains("any"));
     }
     

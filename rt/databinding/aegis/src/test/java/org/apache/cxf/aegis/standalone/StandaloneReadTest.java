@@ -19,14 +19,18 @@
 
 package org.apache.cxf.aegis.standalone;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.services.SimpleBean;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.test.TestUtilities;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,6 +43,10 @@ import static org.junit.Assert.assertTrue;
 public class StandaloneReadTest {
     private AegisContext context;
     private TestUtilities testUtilities;
+    
+    private interface ListStringInterface {
+        List<String> method();
+    }
     
     @Before
     public void before() {
@@ -55,11 +63,58 @@ public class StandaloneReadTest {
         assertTrue("ball-of-yarn".equals(something));
     }
     
+    @Test
+    public void testCollectionReadNoXsiType() throws Exception {
+        context = new AegisContext();
+        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        java.lang.reflect.Type listStringType 
+            = ListStringInterface.class.getMethods()[0].getGenericReturnType();
+        roots.add(listStringType);
+        context.setRootClasses(roots);
+        context.initialize();
+        XMLStreamReader streamReader 
+            = testUtilities.getResourceAsXMLStreamReader("topLevelList.xml");
+        AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
+        // until I fix type mapping to use java.lang.reflect.Type instead of 
+        // Class, I need to do the following 
+        QName magicTypeQName = new QName("urn:org.apache.cxf.aegis.types", "ArrayOfString");
+        AegisType aegisRegisteredType = context.getTypeMapping().getType(magicTypeQName);
+
+        Object something = reader.read(streamReader, aegisRegisteredType);
+        List<String> correctAnswer = new ArrayList<String>();
+        correctAnswer.add("cat");
+        correctAnswer.add("dog");
+        correctAnswer.add("hailstorm");
+        assertEquals(correctAnswer, something);
+    }
+    
+    @Test
+    public void testCollectionReadXsiType() throws Exception {
+        context = new AegisContext();
+        Set<java.lang.reflect.Type> roots = new HashSet<java.lang.reflect.Type>();
+        java.lang.reflect.Type listStringType 
+            = ListStringInterface.class.getMethods()[0].getGenericReturnType();
+        roots.add(listStringType);
+        context.setRootClasses(roots);
+        context.initialize();
+        XMLStreamReader streamReader 
+            = testUtilities.getResourceAsXMLStreamReader("topLevelListWithXsiType.xml");
+        AegisReader<XMLStreamReader> reader = context.createXMLStreamReader();
+
+        Object something = reader.read(streamReader);
+        List<String> correctAnswer = new ArrayList<String>();
+        correctAnswer.add("cat");
+        correctAnswer.add("dog");
+        correctAnswer.add("hailstorm");
+        assertEquals(correctAnswer, something);
+    }
+    
+    
     // test using a .aegis.xml
     @Test
     public void testSimpleBeanRead() throws Exception {
         context = new AegisContext();
-        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
         rootClasses.add(SimpleBean.class);
         context.setRootClasses(rootClasses);
         context.initialize();

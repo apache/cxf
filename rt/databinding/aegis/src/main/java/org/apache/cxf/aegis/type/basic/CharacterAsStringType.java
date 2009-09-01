@@ -23,14 +23,14 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * 
  */
-public class CharacterAsStringType extends Type {
+public class CharacterAsStringType extends AegisType {
     
     public static final QName CHARACTER_AS_STRING_TYPE_QNAME 
         = new QName("http://cxf.apache.org/aegisTypes", "char");

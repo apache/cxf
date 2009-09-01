@@ -25,8 +25,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.java5.CurrencyService.Currency;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
@@ -82,14 +82,14 @@ public class EnumTypeTest extends AbstractAegisTest {
 
     @Test
     public void testAutoCreation() throws Exception {
-        Type type = tm.getTypeCreator().createType(smallEnum.class);
+        AegisType type = tm.getTypeCreator().createType(smallEnum.class);
 
         assertTrue(type instanceof EnumType);
     }
 
     @Test
     public void testTypeAttributeOnEnum() throws Exception {
-        Type type = tm.getTypeCreator().createType(TestEnum.class);
+        AegisType type = tm.getTypeCreator().createType(TestEnum.class);
 
         assertEquals("urn:xfire:foo", type.getSchemaType().getNamespaceURI());
 
@@ -98,7 +98,7 @@ public class EnumTypeTest extends AbstractAegisTest {
 
     @Test
     public void testXFireTypeAttributeOnEnum() throws Exception {
-        Type type = tm.getTypeCreator().createType(XFireTestEnum.class);
+        AegisType type = tm.getTypeCreator().createType(XFireTestEnum.class);
 
         assertEquals("urn:xfire:foo", type.getSchemaType().getNamespaceURI());
 
@@ -107,7 +107,7 @@ public class EnumTypeTest extends AbstractAegisTest {
 
     @Test
     public void testJaxbTypeAttributeOnEnum() throws Exception {
-        Type type = tm.getTypeCreator().createType(JaxbTestEnum.class);
+        AegisType type = tm.getTypeCreator().createType(JaxbTestEnum.class);
 
         assertEquals("urn:xfire:foo", type.getSchemaType().getNamespaceURI());
 
@@ -145,7 +145,7 @@ public class EnumTypeTest extends AbstractAegisTest {
 
     @Test
     public void testNillable() throws Exception {
-        Type type = tm.getTypeCreator().createType(EnumBean.class);
+        AegisType type = tm.getTypeCreator().createType(EnumBean.class);
 
         tm.register(type);
 

@@ -29,7 +29,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * Type for the Date class which serializes as an xsd:date (no time
+ * AegisType for the Date class which serializes as an xsd:date (no time
  * and timezone information).
  * 
  * @author Dennis Kieselhorst

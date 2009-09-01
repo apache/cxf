@@ -78,8 +78,8 @@ import org.apache.cxf.common.util.XMLSchemaQNames;
 public class DefaultTypeMapping implements TypeMapping {
     public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultTypeMapping.class);
-    private Map<Class, Type> class2Type;
-    private Map<QName, Type> xml2Type;
+    private Map<Class, AegisType> class2Type;
+    private Map<QName, AegisType> xml2Type;
     private Map<Class, QName> class2xml;
     private TypeMapping nextTM;
     private TypeCreator typeCreator;
@@ -97,9 +97,9 @@ public class DefaultTypeMapping implements TypeMapping {
 
     public DefaultTypeMapping(String identifierURI) {
         this.identifierURI = identifierURI;
-        class2Type = Collections.synchronizedMap(new HashMap<Class, Type>());
+        class2Type = Collections.synchronizedMap(new HashMap<Class, AegisType>());
         class2xml = Collections.synchronizedMap(new HashMap<Class, QName>());
-        xml2Type = Collections.synchronizedMap(new HashMap<QName, Type>());
+        xml2Type = Collections.synchronizedMap(new HashMap<QName, AegisType>());
     }
 
     public boolean isRegistered(Class javaType) {
@@ -122,7 +122,7 @@ public class DefaultTypeMapping implements TypeMapping {
         return registered;
     }
 
-    public void register(Class javaType, QName xmlType, Type type) {
+    public void register(Class javaType, QName xmlType, AegisType type) {
         type.setSchemaType(xmlType);
         type.setTypeClass(javaType);
 
@@ -132,7 +132,7 @@ public class DefaultTypeMapping implements TypeMapping {
     /**
      * {@inheritDoc}
      */
-    public void register(Type type) {
+    public void register(AegisType type) {
         type.setTypeMapping(this);
         /*
          * -- prb@codehaus.org; changing this to only register the type for
@@ -152,7 +152,7 @@ public class DefaultTypeMapping implements TypeMapping {
         }
     }
 
-    public void removeType(Type type) {
+    public void removeType(AegisType type) {
         if (!xml2Type.containsKey(type.getSchemaType())) {
             nextTM.removeType(type);
         } else {
@@ -165,8 +165,8 @@ public class DefaultTypeMapping implements TypeMapping {
     /**
      * @see org.apache.cxf.aegis.type.TypeMapping#getType(java.lang.Class)
      */
-    public Type getType(Class javaType) {
-        Type type = class2Type.get(javaType);
+    public AegisType getType(Class javaType) {
+        AegisType type = class2Type.get(javaType);
 
         if (type == null && nextTM != null) {
             type = nextTM.getType(javaType);
@@ -178,8 +178,8 @@ public class DefaultTypeMapping implements TypeMapping {
     /**
      * @see org.apache.cxf.aegis.type.TypeMapping#getType(javax.xml.namespace.QName)
      */
-    public Type getType(QName xmlType) {
-        Type type = xml2Type.get(xmlType);
+    public AegisType getType(QName xmlType) {
+        AegisType type = xml2Type.get(xmlType);
 
         if (type == null && nextTM != null) {
             type = nextTM.getType(xmlType);
@@ -216,7 +216,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class class1, QName name,
-                                        Type type) {
+                                        AegisType type) {
         if (!defaultNillable) {
             type.setNillable(false);
         }
@@ -322,7 +322,7 @@ public class DefaultTypeMapping implements TypeMapping {
      */
     public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
                                                              boolean enableMtomXmime, boolean enableJDOM) {
-        // Create a Type Mapping for SOAP 1.1 Encoding
+        // Create a AegisType Mapping for SOAP 1.1 Encoding
         DefaultTypeMapping soapTM = new DefaultTypeMapping(Soap11.SOAP_ENCODING_URI);
         fillStandardMappings(soapTM, defaultNillable, enableMtomXmime, enableJDOM);
 

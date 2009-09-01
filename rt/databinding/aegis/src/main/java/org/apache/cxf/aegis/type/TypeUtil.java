@@ -42,7 +42,7 @@ public final class TypeUtil {
         //utility class
     }
     
-    public static Type getReadType(XMLStreamReader xsr, AegisContext context, Type baseType) {
+    public static AegisType getReadType(XMLStreamReader xsr, AegisContext context, AegisType baseType) {
 
         if (!context.isReadXsiTypes()) {
             if (baseType == null) {
@@ -57,7 +57,7 @@ public final class TypeUtil {
             QName overrideName = NamespaceHelper.createQName(xsr.getNamespaceContext(), overrideType);
 
             if (baseType == null || !overrideName.equals(baseType.getSchemaType())) {
-                Type improvedType = null;
+                AegisType improvedType = null;
                 TypeMapping tm;
                 if (baseType != null) {
                     tm = baseType.getTypeMapping();
@@ -73,12 +73,12 @@ public final class TypeUtil {
         
             if (baseType != null) {
                 LOG.finest("xsi:type=\"" + overrideName
-                         + "\" was specified, but no corresponding Type was registered; defaulting to "
+                         + "\" was specified, but no corresponding AegisType was registered; defaulting to "
                          + baseType.getSchemaType());
                 return baseType;
             } else {
                 LOG.warning("xsi:type=\"" + overrideName
-                         + "\" was specified, but no corresponding Type was registered; no default.");
+                         + "\" was specified, but no corresponding AegisType was registered; no default.");
                 return null;
             }
         } else {
@@ -98,7 +98,8 @@ public final class TypeUtil {
      * @param context
      * @return
      */
-    public static Type getReadTypeStandalone(XMLStreamReader xsr, AegisContext context, Type baseType) {
+    public static AegisType getReadTypeStandalone(XMLStreamReader xsr, 
+                                                  AegisContext context, AegisType baseType) {
         
         if (baseType != null) {
             return getReadType(xsr, context, baseType);
@@ -116,7 +117,7 @@ public final class TypeUtil {
                                                                typeNameString);
             TypeMapping tm;
             tm = context.getTypeMapping();
-            Type type = tm.getType(schemaTypeName);
+            AegisType type = tm.getType(schemaTypeName);
             
             if (type == null) {
                 type = context.getRootType(schemaTypeName);
@@ -127,16 +128,16 @@ public final class TypeUtil {
             }
                     
             LOG.warning("xsi:type=\"" + schemaTypeName
-                     + "\" was specified, but no corresponding Type was registered; no default.");
+                     + "\" was specified, but no corresponding AegisType was registered; no default.");
             return null;
         }
         LOG.warning("xsi:type was not specified for top-level element " + xsr.getName());
         return null;
     }
     
-    public static Type getWriteType(AegisContext globalContext, Object value, Type type) {
+    public static AegisType getWriteType(AegisContext globalContext, Object value, AegisType type) {
         if (value != null && type != null && type.getTypeClass() != value.getClass()) {
-            Type overrideType = globalContext.getRootType(value.getClass());
+            AegisType overrideType = globalContext.getRootType(value.getClass());
             if (overrideType != null) {
                 return overrideType;
             }
@@ -144,7 +145,7 @@ public final class TypeUtil {
         return type;
     }
 
-    public static Type getWriteTypeStandalone(AegisContext globalContext, Object value, Type type) {
+    public static AegisType getWriteTypeStandalone(AegisContext globalContext, Object value, AegisType type) {
         if (type != null) {
             return getWriteType(globalContext, value, type);
         }
@@ -165,11 +166,11 @@ public final class TypeUtil {
      * @param reflectType the type to use in writing the object.
      * @return
      */
-    public static Type getWriteTypeStandalone(AegisContext globalContext, 
+    public static AegisType getWriteTypeStandalone(AegisContext globalContext, 
                                               Object value, 
                                               java.lang.reflect.Type reflectType) {
         if (reflectType == null) {
-            return getWriteTypeStandalone(globalContext, value, (Type)null);
+            return getWriteTypeStandalone(globalContext, value, (AegisType)null);
         } else {
             return globalContext.getTypeMapping().getTypeCreator().createType(reflectType);
         }
@@ -178,7 +179,7 @@ public final class TypeUtil {
     }
     
     
-    public static void setAttributeAttributes(QName name, Type type, XmlSchema root) {
+    public static void setAttributeAttributes(QName name, AegisType type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();
         XmlSchemaUtils.addImportIfNeeded(root, ns);
     }

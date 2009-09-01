@@ -30,7 +30,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -47,7 +47,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class ArrayType extends Type {
+public class ArrayType extends AegisType {
     private static final Logger LOG = LogUtils.getL7dLogger(ArrayType.class);
 
     private QName componentName;
@@ -101,7 +101,7 @@ public class ArrayType extends Type {
             // the reader does some really confusing things.
             XMLStreamReader xmlReader = reader.getXMLStreamReader();
             while (xmlReader.getName().equals(flatElementName)) {
-                Type compType = TypeUtil.getReadType(reader.getXMLStreamReader(),
+                AegisType compType = TypeUtil.getReadType(reader.getXMLStreamReader(),
                                                      context.getGlobalContext(), getComponentType());
                 // gosh, what about message readers of some other type?
                 ElementReader thisItemReader = new ElementReader(xmlReader);
@@ -110,7 +110,7 @@ public class ArrayType extends Type {
         } else {
             while (reader.hasMoreElementReaders()) {
                 MessageReader creader = reader.getNextElementReader();
-                Type compType = TypeUtil.getReadType(creader.getXMLStreamReader(),
+                AegisType compType = TypeUtil.getReadType(creader.getXMLStreamReader(),
                                                      context.getGlobalContext(), getComponentType());
                 collectOneItem(context, values, creader, compType);
             }
@@ -125,7 +125,7 @@ public class ArrayType extends Type {
     }
 
     private void collectOneItem(Context context, Collection<Object> values, MessageReader creader,
-                                Type compType) {
+                                AegisType compType) {
         if (creader.isXsiNil()) {
             values.add(null);
             creader.readToEnd();
@@ -223,7 +223,7 @@ public class ArrayType extends Type {
             return;
         }
 
-        Type type = getComponentType();
+        AegisType type = getComponentType();
         if (type == null) {
             throw new DatabindingException("Couldn't find type for array.");
         }
@@ -313,7 +313,8 @@ public class ArrayType extends Type {
         }
     }
 
-    protected void writeValue(Object value, MessageWriter writer, Context context, Type type, String name,
+    protected void writeValue(Object value, MessageWriter writer, Context context, 
+                              AegisType type, String name,
                               String ns) throws DatabindingException {
         type = TypeUtil.getWriteType(context.getGlobalContext(), value, type);
         MessageWriter cwriter;
@@ -352,7 +353,7 @@ public class ArrayType extends Type {
         XmlSchemaSequence seq = new XmlSchemaSequence();
         complex.setParticle(seq);
 
-        Type componentType = getComponentType();
+        AegisType componentType = getComponentType();
         XmlSchemaElement element = new XmlSchemaElement();
         element.setName(componentType.getSchemaType().getLocalPart());
         element.setSchemaTypeName(componentType.getSchemaType());
@@ -382,7 +383,7 @@ public class ArrayType extends Type {
     /**
      * We need to write a complex type schema for Beans, so return true.
      * 
-     * @see org.apache.cxf.aegis.type.Type#isComplex()
+     * @see org.apache.cxf.aegis.type.AegisType#isComplex()
      */
     @Override
     public boolean isComplex() {
@@ -398,11 +399,11 @@ public class ArrayType extends Type {
     }
 
     /**
-     * @see org.apache.cxf.aegis.type.Type#getDependencies()
+     * @see org.apache.cxf.aegis.type.AegisType#getDependencies()
      */
     @Override
-    public Set<Type> getDependencies() {
-        Set<Type> deps = new HashSet<Type>();
+    public Set<AegisType> getDependencies() {
+        Set<AegisType> deps = new HashSet<AegisType>();
 
         deps.add(getComponentType());
 
@@ -410,14 +411,14 @@ public class ArrayType extends Type {
     }
 
     /**
-     * Get the <code>Type</code> of the elements in the array.
+     * Get the <code>AegisType</code> of the elements in the array.
      * 
      * @return
      */
-    public Type getComponentType() {
+    public AegisType getComponentType() {
         Class compType = getTypeClass().getComponentType();
 
-        Type type;
+        AegisType type;
 
         if (componentName == null) {
             type = getTypeMapping().getType(compType);

@@ -228,7 +228,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createEnumType(TypeClassInfo info) {
+    public AegisType createEnumType(TypeClassInfo info) {
         Element mapping = findMapping(info.getTypeClass());
         if (mapping != null) {
             return super.createEnumType(info);
@@ -238,7 +238,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createCollectionType(TypeClassInfo info) {
+    public AegisType createCollectionType(TypeClassInfo info) {
         if (info.getGenericType() instanceof Class || info.getGenericType() instanceof TypeClassInfo) {
             return createCollectionTypeFromGeneric(info);
         }
@@ -319,7 +319,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createDefaultType(TypeClassInfo info) {
+    public AegisType createDefaultType(TypeClassInfo info) {
         Element mapping = findMapping(info.getTypeClass());
         List mappings = findMappings(info.getTypeClass());
 
@@ -479,8 +479,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    protected Type getOrCreateGenericType(TypeClassInfo info) {
-        Type type = null;
+    protected AegisType getOrCreateGenericType(TypeClassInfo info) {
+        AegisType type = null;
         if (info.getGenericType() != null) {
             type = createTypeFromGeneric(info.getGenericType());
         }
@@ -492,7 +492,7 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         return type;
     }
 
-    private Type createTypeFromGeneric(Object cType) {
+    private AegisType createTypeFromGeneric(Object cType) {
         if (cType instanceof TypeClassInfo) {
             return createTypeForClass((TypeClassInfo)cType);
         } else if (cType instanceof Class) {
@@ -503,8 +503,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    protected Type getOrCreateMapKeyType(TypeClassInfo info) {
-        Type type = null;
+    protected AegisType getOrCreateMapKeyType(TypeClassInfo info) {
+        AegisType type = null;
         if (info.getKeyType() != null) {
             type = createTypeFromGeneric(info.getKeyType());
         }
@@ -517,8 +517,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    protected Type getOrCreateMapValueType(TypeClassInfo info) {
-        Type type = null;
+    protected AegisType getOrCreateMapValueType(TypeClassInfo info) {
+        AegisType type = null;
         if (info.getGenericType() != null) {
             type = createTypeFromGeneric(info.getValueType());
         }

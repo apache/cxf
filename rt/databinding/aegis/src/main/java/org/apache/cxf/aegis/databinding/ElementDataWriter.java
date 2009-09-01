@@ -30,7 +30,7 @@ import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeUtil;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
@@ -64,7 +64,7 @@ public class ElementDataWriter implements DataWriter<Element> {
     }
 
     public void write(Object obj, MessagePartInfo part, Element output) {
-        Type type = databinding.getType(part);
+        AegisType type = databinding.getType(part);
 
         if (type == null) {
             throw new Fault(new Message("NO_MESSAGE_FOR_PART", LOG));

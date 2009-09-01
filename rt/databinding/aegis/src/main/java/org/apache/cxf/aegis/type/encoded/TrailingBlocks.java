@@ -23,7 +23,7 @@ import java.util.List;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.basic.ObjectType;
 import org.apache.cxf.aegis.xml.MessageReader;
@@ -125,7 +125,7 @@ public class TrailingBlocks {
 
         for (Object instance : MarshalRegistry.get(context)) {
             // determine instance type
-            Type type = objectType.determineType(context, instance.getClass());
+            AegisType type = objectType.determineType(context, instance.getClass());
             if (type == null) {
                 TypeMapping tm = context.getTypeMapping();
                 if (tm == null) {

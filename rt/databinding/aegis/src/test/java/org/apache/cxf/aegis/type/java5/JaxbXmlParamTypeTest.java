@@ -19,15 +19,17 @@
 package org.apache.cxf.aegis.type.java5;
 
 import java.lang.reflect.Method;
+
 import javax.jws.WebParam;
 import javax.jws.WebResult;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,7 +52,7 @@ public class JaxbXmlParamTypeTest extends AbstractAegisTest {
     public void testType() throws Exception {
         Method m = CustomTypeService.class.getMethod("doFoo", new Class[] {String.class});
 
-        Type type = creator.createType(m, 0);
+        AegisType type = creator.createType(m, 0);
         tm.register(type);
         assertTrue(type instanceof org.apache.cxf.aegis.type.basic.BeanType);
         assertEquals(new QName("urn:xfire:foo", "custom"), type.getSchemaType());

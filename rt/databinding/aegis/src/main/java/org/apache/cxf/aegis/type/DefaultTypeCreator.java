@@ -53,7 +53,7 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createCollectionType(TypeClassInfo info) {
+    public AegisType createCollectionType(TypeClassInfo info) {
         if (info.getGenericType() == null) {
             throw new DatabindingException("Cannot create mapping for " + info.getTypeClass().getName()
                                            + ", unspecified component type for " + info.getDescription());
@@ -63,7 +63,7 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createDefaultType(TypeClassInfo info) {
+    public AegisType createDefaultType(TypeClassInfo info) {
         BeanType type = new BeanType();
         type.setSchemaType(createQName(info.getTypeClass()));
         type.setTypeClass(info.getTypeClass());
@@ -76,11 +76,11 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
 
         return type;
     }
-    protected Type getOrCreateMapKeyType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapKeyType(TypeClassInfo info) {
         return createObjectType();
     }
 
-    protected Type getOrCreateMapValueType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapValueType(TypeClassInfo info) {
         return createObjectType();
     }
 }

@@ -27,7 +27,7 @@ import javax.xml.validation.Schema;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.AegisElementDataReader;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
@@ -60,7 +60,7 @@ public class ElementDataReader implements DataReader<Element> {
     /** {@inheritDoc}*/
     public Object read(MessagePartInfo part, Element input) {
         try {
-            Type type = databinding.getType(part);
+            AegisType type = databinding.getType(part);
             return reader.read(input, type);
         } catch (Exception e) {
             throw new Fault(e);

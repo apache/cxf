@@ -23,7 +23,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 
 /**
  * Annotates services method parameters to provide information about how they
@@ -34,7 +34,7 @@ import org.apache.cxf.aegis.type.Type;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.PARAMETER)
 public @interface XmlParamType {
-    Class type() default Type.class;
+    Class type() default AegisType.class;
 
     String name() default "";
 

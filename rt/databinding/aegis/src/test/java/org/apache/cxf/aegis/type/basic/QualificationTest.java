@@ -27,7 +27,7 @@ import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.services.AttributeBean;
 import org.apache.cxf.aegis.services.XmlMappedAttributeBean;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.common.util.SOAPConstants;
@@ -51,7 +51,7 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        Type type = mapping.getTypeCreator().createType(AttributeBean.class);
+        AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
@@ -73,7 +73,7 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        Type type = mapping.getTypeCreator().createType(AttributeBean.class);
+        AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
@@ -90,7 +90,7 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        Type type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
+        AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
@@ -111,7 +111,7 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        Type type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
+        AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);

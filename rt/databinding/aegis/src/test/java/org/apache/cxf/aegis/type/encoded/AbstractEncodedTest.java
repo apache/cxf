@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Element;
@@ -30,8 +31,8 @@ import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -78,7 +79,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     public <T> T readWriteReadRef(String file, Class<T> typeClass) throws XMLStreamException {
         Context context = getContext();
         
-        Type type = mapping.getType(typeClass);
+        AegisType type = mapping.getType(typeClass);
         assertNotNull("no type found for " + typeClass.getName());
 
         // read file
@@ -114,9 +115,9 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     public Object readRef(ElementReader root) throws XMLStreamException {
         Context context = getContext();
 
-        // get Type based on the element qname
+        // get AegisType based on the element qname
         MessageReader reader = root.getNextElementReader();
-        Type type = this.mapping.getType(reader.getName());
+        AegisType type = this.mapping.getType(reader.getName());
         assertNotNull("type is null", type);
 
         // read ref
@@ -136,7 +137,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     }
 
     public Element writeRef(Object instance) {
-        Type type = mapping.getType(instance.getClass());
+        AegisType type = mapping.getType(instance.getClass());
         assertNotNull("no type found for " + instance.getClass().getName());
 
         // create the document
@@ -148,7 +149,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
         ElementWriter rootWriter = getElementWriter(element, namespaces);
         Context context = getContext();
 
-        // get Type based on the object instance
+        // get AegisType based on the object instance
         assertNotNull("type is null", type);
 
         // write the ref
@@ -168,7 +169,7 @@ public abstract class AbstractEncodedTest extends AbstractAegisTest {
     }
 
     public void verifyInvalid(String resourceName, Class<?> expectedType) throws XMLStreamException {
-        Type type = mapping.getType(expectedType);
+        AegisType type = mapping.getType(expectedType);
         assertNotNull("type is null", type);
 
         Context context = getContext();

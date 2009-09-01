@@ -48,19 +48,19 @@ public interface TypeMapping {
      * @param xmlType XML Schema type QName.
      * @param type Aegis type object.
      */
-    void register(Class javaType, QName xmlType, Type type);
+    void register(Class javaType, QName xmlType, AegisType type);
 
     /**
      * Register a type that self-describes the schema type and the Java class.
      * @param type Aegis type object that 
      */
-    void register(Type type);
+    void register(AegisType type);
 
-    void removeType(Type type);
+    void removeType(AegisType type);
 
-    Type getType(Class javaType);
+    AegisType getType(Class javaType);
 
-    Type getType(QName xmlType);
+    AegisType getType(QName xmlType);
 
     QName getTypeQName(Class clazz);
 

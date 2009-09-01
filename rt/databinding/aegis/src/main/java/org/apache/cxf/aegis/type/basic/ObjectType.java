@@ -29,7 +29,7 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -41,21 +41,21 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 
 /**
- * Type for runtime inspection of types. Looks as the class to be written, and
+ * AegisType for runtime inspection of types. Looks as the class to be written, and
  * looks to see if there is a type for that class. If there is, it writes out
  * the value and inserts a <em>xsi:type</em> attribute to signal what the type
- * of the value is. Can specify an optional set of dependent <code>Type</code>'s
+ * of the value is. Can specify an optional set of dependent <code>AegisType</code>'s
  * in the constructor, in the case that the type is a custom type that may not
  * have its schema in the WSDL. Can specify whether or not unknown objects
  * should be serialized as a byte stream.
  * 
  * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
-public class ObjectType extends Type {
+public class ObjectType extends AegisType {
     private static final QName XSI_TYPE = new QName(SOAPConstants.XSI_NS, "type");
     private static final QName XSI_NIL = new QName(SOAPConstants.XSI_NS, "nil");
 
-    private Set<Type> dependencies;
+    private Set<AegisType> dependencies;
     private boolean serializedWhenUnknown;
     private boolean readToDocument;
 
@@ -65,7 +65,7 @@ public class ObjectType extends Type {
         readToDocument = true;
     }
 
-    public ObjectType(Set<Type> dependencies) {
+    public ObjectType(Set<AegisType> dependencies) {
         this(dependencies, false);
     }
 
@@ -74,7 +74,7 @@ public class ObjectType extends Type {
         this(Collections.EMPTY_SET, serializeWhenUnknown);
     }
 
-    public ObjectType(Set<Type> dependencies, boolean serializeWhenUnknown) {
+    public ObjectType(Set<AegisType> dependencies, boolean serializeWhenUnknown) {
         this.dependencies = dependencies;
         this.serializedWhenUnknown = serializeWhenUnknown;
     }
@@ -102,7 +102,7 @@ public class ObjectType extends Type {
         }
 
         typeName = typeName.trim();
-        Type type = null;
+        AegisType type = null;
         QName typeQName = null;
         if (typeName != null) {
             typeQName = extractQName(reader, typeName);
@@ -177,7 +177,7 @@ public class ObjectType extends Type {
 
             nilWriter.close();
         } else {
-            Type type = determineType(context, object.getClass());
+            AegisType type = determineType(context, object.getClass());
 
             if (null == type) {
                 TypeMapping tm = context.getTypeMapping();
@@ -199,12 +199,12 @@ public class ObjectType extends Type {
         }
     }
 
-    public Type determineType(Context context, Class clazz) {
+    public AegisType determineType(Context context, Class clazz) {
         TypeMapping tm = context.getTypeMapping();
         if (tm == null) {
             tm = getTypeMapping();
         }
-        Type type = tm.getType(clazz);
+        AegisType type = tm.getType(clazz);
 
         if (null != type) {
             return type;
@@ -247,12 +247,12 @@ public class ObjectType extends Type {
         this.serializedWhenUnknown = serializedWhenUnknown;
     }
 
-    public void setDependencies(Set<Type> dependencies) {
+    public void setDependencies(Set<AegisType> dependencies) {
         this.dependencies = dependencies;
     }
 
     @Override
-    public Set<Type> getDependencies() {
+    public Set<AegisType> getDependencies() {
         return dependencies;
     }
 

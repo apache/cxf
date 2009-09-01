@@ -28,7 +28,7 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeClassInfo;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
@@ -110,7 +110,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createCollectionType(TypeClassInfo info) {
+    public AegisType createCollectionType(TypeClassInfo info) {
         Object genericType = info.getGenericType();
         Class paramClass = getComponentType(genericType, 0);
 
@@ -121,19 +121,19 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         }
     }
 
-    protected Type getOrCreateGenericType(TypeClassInfo info) {
+    protected AegisType getOrCreateGenericType(TypeClassInfo info) {
         return getOrCreateParameterizedType(info.getGenericType(), 0);
     }
 
-    protected Type getOrCreateMapKeyType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapKeyType(TypeClassInfo info) {
         return getOrCreateParameterizedType(info.getGenericType(), 0);
     }
 
-    protected Type getOrCreateMapValueType(TypeClassInfo info) {
+    protected AegisType getOrCreateMapValueType(TypeClassInfo info) {
         return getOrCreateParameterizedType(info.getGenericType(), 1);
     }
 
-    protected Type getOrCreateParameterizedType(Object generic, int index) {
+    protected AegisType getOrCreateParameterizedType(Object generic, int index) {
         Class clazz = getComponentType(generic, index);
 
         if (clazz == null) {
@@ -150,7 +150,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         info.setDescription(clazz.toString());
         info.setGenericType(component);
 
-        Type type = createTypeForClass(info);
+        AegisType type = createTypeForClass(info);
 
         return type;
     }
@@ -197,7 +197,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createDefaultType(TypeClassInfo info) {
+    public AegisType createDefaultType(TypeClassInfo info) {
         QName typeName = info.getTypeName();
         if (typeName == null) {
             typeName = createQName(info.getTypeClass());
@@ -227,7 +227,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public Type createEnumType(TypeClassInfo info) {
+    public AegisType createEnumType(TypeClassInfo info) {
         EnumType type = new EnumType();
 
         type.setSchemaType(createQName(info.getTypeClass()));

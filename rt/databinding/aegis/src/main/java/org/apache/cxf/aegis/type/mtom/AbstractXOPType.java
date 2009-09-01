@@ -32,7 +32,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -45,7 +45,7 @@ import org.apache.ws.commons.schema.constants.Constants;
  * Base class for MtoM types.
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public abstract class AbstractXOPType extends Type {
+public abstract class AbstractXOPType extends AegisType {
     public static final String XOP_NS = "http://www.w3.org/2004/08/xop/include";
     public static final String XML_MIME_NS = "http://www.w3.org/2005/05/xmlmime";
     public static final String XML_MIME_ATTR_LOCAL_NAME = "expectedContentTypes";

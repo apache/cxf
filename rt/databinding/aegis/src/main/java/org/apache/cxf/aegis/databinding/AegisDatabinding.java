@@ -35,7 +35,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeClassInfo;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
@@ -101,7 +101,7 @@ public class AegisDatabinding extends AbstractDataBinding {
     private static final Logger LOG = LogUtils.getL7dLogger(AegisDatabinding.class);
 
     private AegisContext aegisContext;
-    private Map<MessagePartInfo, Type> part2Type;
+    private Map<MessagePartInfo, AegisType> part2Type;
     private Service service;
     private boolean isInitialized;
     private Set<String> overrideTypes;
@@ -111,7 +111,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     public AegisDatabinding() {
         super();
-        part2Type = new HashMap<MessagePartInfo, Type>();
+        part2Type = new HashMap<MessagePartInfo, AegisType>();
     }
 
     /**
@@ -263,7 +263,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         s.getInInterceptors()
             .add(new AegisSchemaValidationInInterceptor(getBus(), s.getServiceInfos().get(0)));
 
-        Set<Type> deps = new HashSet<Type>();
+        Set<AegisType> deps = new HashSet<AegisType>();
 
         for (ServiceInfo info : s.getServiceInfos()) {
             for (OperationInfo opInfo : info.getInterface().getOperations()) {
@@ -276,10 +276,10 @@ public class AegisDatabinding extends AbstractDataBinding {
             }
         }
 
-        Collection<Type> additional = aegisContext.getRootTypes();
+        Collection<AegisType> additional = aegisContext.getRootTypes();
 
         if (additional != null) {
-            for (Type t : additional) {
+            for (AegisType t : additional) {
                 if (!deps.contains(t)) {
                     deps.add(t);
                 }
@@ -299,7 +299,8 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo, Set<Type> deps) {
+    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo, 
+                                     Set<AegisType> deps) {
         try {
             initializeMessage(s, serviceTM, opInfo.getInput(), IN_PARAM, deps);
 
@@ -336,14 +337,14 @@ public class AegisDatabinding extends AbstractDataBinding {
     }
 
     protected void initializeMessage(Service s, TypeMapping serviceTM, AbstractMessageContainer container,
-                                     int partType, Set<Type> deps) {
+                                     int partType, Set<AegisType> deps) {
         if (container == null) {
             return;
         }
         for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
             MessagePartInfo part = (MessagePartInfo)itr.next();
 
-            Type type = getParameterType(s, serviceTM, part, partType);
+            AegisType type = getParameterType(s, serviceTM, part, partType);
 
             if (part.getXmlSchema() == null) {
                 // schema hasn't been filled in yet
@@ -402,10 +403,10 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void addDependencies(Set<Type> deps, Type type) {
-        Set<Type> typeDeps = type.getDependencies();
+    private void addDependencies(Set<AegisType> deps, AegisType type) {
+        Set<AegisType> typeDeps = type.getDependencies();
         if (typeDeps != null) {
-            for (Type t : typeDeps) {
+            for (AegisType t : typeDeps) {
                 if (!deps.contains(t)) {
                     deps.add(t);
                     addDependencies(deps, t);
@@ -414,14 +415,14 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void createSchemas(Service s, Set<Type> deps) {
+    private void createSchemas(Service s, Set<AegisType> deps) {
 
-        Map<String, Set<Type>> tns2Type = new HashMap<String, Set<Type>>();
-        for (Type t : deps) {
+        Map<String, Set<AegisType>> tns2Type = new HashMap<String, Set<AegisType>>();
+        for (AegisType t : deps) {
             String ns = t.getSchemaType().getNamespaceURI();
-            Set<Type> types = tns2Type.get(ns);
+            Set<AegisType> types = tns2Type.get(ns);
             if (types == null) {
-                types = new HashSet<Type>();
+                types = new HashSet<AegisType>();
                 tns2Type.put(ns, types);
             }
             types.add(t);
@@ -442,7 +443,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             boolean needXmimeSchema = false;
             boolean needTypesSchema = false;
 
-            for (Map.Entry<String, Set<Type>> entry : tns2Type.entrySet()) {
+            for (Map.Entry<String, Set<AegisType>> entry : tns2Type.entrySet()) {
 
                 String schemaNamespaceUri = entry.getKey();
 
@@ -487,7 +488,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 schema.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
                 schema.setAttributeFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
 
-                for (Type t : entry.getValue()) {
+                for (AegisType t : entry.getValue()) {
                     try {
                         t.writeSchema(schema);
                     } catch (XmlSchemaException ex) {
@@ -547,7 +548,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         // No mapped name was specified, so if its a complex type use that name
         // instead
         if (name == null) {
-            Type type = tm.getTypeCreator().createType(m, param);
+            AegisType type = tm.getTypeCreator().createType(m, param);
 
             if (type.isComplex() && !type.isAbstract()) {
                 name = type.getSchemaType();
@@ -557,8 +558,8 @@ public class AegisDatabinding extends AbstractDataBinding {
         return name;
     }
 
-    private Type getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
-        Type type = tm.getType(param.getTypeQName());
+    private AegisType getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
+        AegisType type = tm.getType(param.getTypeQName());
 
         int offset = 0;
         if (paramtype == OUT_PARAM) {
@@ -647,12 +648,12 @@ public class AegisDatabinding extends AbstractDataBinding {
         return smd != null ? smd.getPrimaryMethod(op) : null;
     }
 
-    public Type getType(MessagePartInfo part) {
+    public AegisType getType(MessagePartInfo part) {
         return part2Type.get(part);
     }
 
     public MessagePartInfo getPartFromClass(Class<?> cls) {
-        for (Map.Entry<MessagePartInfo, Type> entry : part2Type.entrySet()) {
+        for (Map.Entry<MessagePartInfo, AegisType> entry : part2Type.entrySet()) {
             if (entry.getValue().getTypeClass() == cls) {
                 return entry.getKey();
             }
@@ -660,8 +661,8 @@ public class AegisDatabinding extends AbstractDataBinding {
         return null;
     }
 
-    public Type getTypeFromClass(Class<?> cls) {
-        for (Type t : part2Type.values()) {
+    public AegisType getTypeFromClass(Class<?> cls) {
+        for (AegisType t : part2Type.values()) {
             if (t.getTypeClass() == cls) {
                 return t;
             }

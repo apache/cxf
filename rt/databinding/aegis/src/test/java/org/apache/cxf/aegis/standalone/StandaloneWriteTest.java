@@ -21,7 +21,9 @@ package org.apache.cxf.aegis.standalone;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.XMLConstants;
@@ -34,7 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.services.SimpleBean;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.StringType;
 import org.apache.cxf.test.TestUtilities;
 
@@ -51,6 +53,10 @@ public class StandaloneWriteTest {
     private XMLOutputFactory xmlOutputFactory;
     private XMLInputFactory xmlInputFactory;
     
+    private interface ListStringInterface {
+        List<String> method();
+    }
+    
     @Before
     public void before() {
         testUtilities = new TestUtilities(getClass());
@@ -63,7 +69,7 @@ public class StandaloneWriteTest {
     public void testTypeLookup() throws Exception {
         context = new AegisContext();
         context.initialize();
-        Type st = context.getTypeMapping().getType(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, 
+        AegisType st = context.getTypeMapping().getType(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, 
                                                              "string"));
         assertNotNull(st);
         assertEquals(st.getClass(), StringType.class);
@@ -91,16 +97,55 @@ public class StandaloneWriteTest {
     }
     
     @Test
+    public void testWriteCollection() throws Exception {
+        context = new AegisContext();
+        context.setWriteXsiTypes(true);
+        context.initialize();
+        List<String> strings = new ArrayList<String>();
+        strings.add("cat");
+        strings.add("dog");
+        strings.add("hailstorm");
+        AegisWriter<XMLStreamWriter> writer = context.createXMLStreamWriter();
+        StringWriter stringWriter = new StringWriter();
+        XMLStreamWriter xmlWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
+        java.lang.reflect.Type listStringType 
+            = ListStringInterface.class.getMethods()[0].getGenericReturnType();
+        writer.write(strings, new QName("urn:borghes", "items"),
+                      false, xmlWriter, listStringType);
+        xmlWriter.close();
+        String xml = stringWriter.toString();
+        XMLStreamReader reader = xmlInputFactory.createXMLStreamReader(new StringReader(xml));
+        reader.nextTag();
+        assertEquals("urn:borghes", reader.getNamespaceURI());
+        assertEquals("items", reader.getLocalName());
+        reader.nextTag();
+        assertEquals(reader.getNamespaceURI(), "urn:org.apache.cxf.aegis.types");
+        assertEquals("string", reader.getLocalName());
+        String text = reader.getElementText();
+        assertEquals("cat", text);
+        reader.nextTag();
+        assertEquals(reader.getNamespaceURI(), "urn:org.apache.cxf.aegis.types");
+        assertEquals("string", reader.getLocalName());
+        text = reader.getElementText();
+        assertEquals("dog", text);
+        reader.nextTag();
+        assertEquals(reader.getNamespaceURI(), "urn:org.apache.cxf.aegis.types");
+        assertEquals("string", reader.getLocalName());
+        text = reader.getElementText();
+        assertEquals("hailstorm", text);
+    }
+    
+    @Test
     public void testBean() throws Exception {
         context = new AegisContext();
-        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
         rootClasses.add(SimpleBean.class);
         context.setRootClasses(rootClasses);
         context.initialize();
         SimpleBean sb = new SimpleBean();
         sb.setCharacter('\u4000');
         sb.setHowdy("doody");
-        Type sbType = context.getTypeMapping().getType(sb.getClass());
+        AegisType sbType = context.getTypeMapping().getType(sb.getClass());
         AegisWriter<XMLStreamWriter> writer = context.createXMLStreamWriter();
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xmlWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);

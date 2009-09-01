@@ -20,9 +20,6 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,7 +37,8 @@ import org.apache.cxf.aegis.AegisContext;
 public abstract class AbstractAegisProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
-    private static Map<Class<?>, AegisContext> classContexts = new WeakHashMap<Class<?>, AegisContext>();
+    private static Map<java.lang.reflect.Type, AegisContext> classContexts      
+        = new WeakHashMap<java.lang.reflect.Type, AegisContext>();
     
     protected boolean writeXsiType = true;
     protected boolean readXsiType = true;
@@ -67,68 +65,38 @@ public abstract class AbstractAegisProvider
         return -1;
     }
 
-    protected AegisContext getAegisContext(Class<?> type, Type genericType) {
+    protected AegisContext getAegisContext(Class<?> plainClass, Type genericType) {
         
         if (resolver != null) {
-            AegisContext context = resolver.getContext(type);
+            /* wierdly, the JAX-RS API keys on Class, not AegisType, so it can't possibly
+             * keep generics straight. Should we ignore the resolver?
+             */
+            AegisContext context = resolver.getContext(plainClass);
             // it's up to the resolver to keep its contexts in a map
             if (context != null) {
                 return context;
             }
         }
         
-        return getClassContext(type, genericType);
-    }
-    
-    
-    private void addType(Set<Class<?>> rootClasses, Type cls, boolean allowArray) {
-        if (cls instanceof Class) {
-            if (((Class)cls).isArray() && !allowArray) {
-                rootClasses.add(((Class)cls).getComponentType());
-            } else {
-                rootClasses.add((Class)cls);
-            }
-        } else if (cls instanceof ParameterizedType) {
-            for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
-                addType(rootClasses, t2, false);
-            }
-        } else if (cls instanceof GenericArrayType) {
-            GenericArrayType gt = (GenericArrayType)cls;
-            Class ct = (Class) gt.getGenericComponentType();
-            ct = Array.newInstance(ct, 0).getClass();
-
-            rootClasses.add(ct);
+        if (genericType == null) {
+            genericType = plainClass;
         }
+        return getClassContext(genericType);
     }
-    private AegisContext getClassContext(Class<?> type, Type reflectionType) {
+    
+    
+    private AegisContext getClassContext(Type reflectionType) {
         synchronized (classContexts) {
-            AegisContext context = classContexts.get(type);
+            AegisContext context = classContexts.get(reflectionType);
             if (context == null) {
                 context = new AegisContext();
                 context.setWriteXsiTypes(writeXsiType); 
                 context.setReadXsiTypes(readXsiType);
-                Set<Class<?>> rootClasses = new HashSet<Class<?>>();
-                /* we do not want raw collection types in here.
-                 * so we only add the 'type' to the root classes if the 
-                 * un-erased (reflection) type is non-generic.
-                 * Now, perhaps we should tolerate non-collection
-                 * generic types.  
-                 */
-                if (reflectionType == null || reflectionType instanceof Class) {
-                    rootClasses.add(type);
-                } else {
-                    addType(rootClasses, reflectionType, true);
-                }
+                Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+                rootClasses.add(reflectionType);
                 context.setRootClasses(rootClasses);
                 context.initialize();
-                /* It's not enough, in the presence of generic types, to just add it as a root.
-                    a mapping is also needed */
-                if (reflectionType != null) {
-                    org.apache.cxf.aegis.type.Type aegisType;
-                    aegisType = context.getTypeMapping().getTypeCreator().createType(reflectionType);
-                    context.getTypeMapping().register(aegisType);
-                }
-                classContexts.put(type, context);
+                classContexts.put(reflectionType, context);
             }
             return context;
         }

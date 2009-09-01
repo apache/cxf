@@ -19,6 +19,9 @@
 package org.apache.cxf.aegis;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
+import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -34,9 +37,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
-import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
@@ -82,11 +85,11 @@ public class AegisContext {
     private boolean readXsiTypes = true;
 
     private Set<String> rootClassNames;
-    private Set<Class<?>> rootClasses;
+    private Set<java.lang.reflect.Type> rootClasses;
     private Set<QName> rootTypeQNames;
     // this type mapping is the front of the chain of delegating type mappings.
     private TypeMapping typeMapping;
-    private Set<Type> rootTypes;
+    private Set<AegisType> rootTypes;
     private Map<Class<?>, String> beanImplementationMap;
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
@@ -100,7 +103,7 @@ public class AegisContext {
      */
     public AegisContext() {
         beanImplementationMap = new HashMap<Class<?>, String>();
-        rootClasses = new HashSet<Class<?>>();
+        rootClasses = new HashSet<java.lang.reflect.Type>();
         rootTypeQNames = new HashSet<QName>();
     }
 
@@ -171,12 +174,12 @@ public class AegisContext {
     }
 
     /**
-     * If a class was provided as part of the 'root' list, retrieve it's Type by Class.
+     * If a class was provided as part of the 'root' list, retrieve it's AegisType by Class.
      * 
      * @param clazz
      * @return
      */
-    public Type getRootType(Class clazz) {
+    public AegisType getRootType(Class clazz) {
         if (rootClasses.contains(clazz)) {
             return typeMapping.getType(clazz);
         } else {
@@ -185,16 +188,44 @@ public class AegisContext {
     }
 
     /**
-     * If a class was provided as part of the root list, retrieve it's Type by schema type QName.
+     * If a class was provided as part of the root list, retrieve it's AegisType by schema type QName.
      * 
      * @param schemaTypeName
      * @return
      */
-    public Type getRootType(QName schemaTypeName) {
+    public AegisType getRootType(QName schemaTypeName) {
         if (rootTypeQNames.contains(schemaTypeName)) {
             return typeMapping.getType(schemaTypeName);
         } else {
             return null;
+        }
+    }
+    
+    private Set<Class<?>> rootMappableClasses() {
+        Set<Class<?>> mappableClasses = new HashSet<Class<?>>();
+        for (java.lang.reflect.Type jtype : rootClasses) {
+            addTypeToMappableClasses(mappableClasses, jtype);
+        }
+        return mappableClasses;
+    }
+
+    private void addTypeToMappableClasses(Set<Class<?>> mappableClasses, java.lang.reflect.Type jtype) {
+        if (jtype instanceof Class) {
+            Class<?> jclass = (Class<?>) jtype;
+            if (jclass.isArray()) {
+                mappableClasses.add(jclass.getComponentType());
+            }
+            mappableClasses.add(jclass);
+        } else if (jtype instanceof ParameterizedType) {
+            for (java.lang.reflect.Type t2 : ((ParameterizedType)jtype).getActualTypeArguments()) {
+                addTypeToMappableClasses(mappableClasses, t2);
+            }
+        } else if (jtype instanceof GenericArrayType) {
+            GenericArrayType gt = (GenericArrayType)jtype;
+            Class ct = (Class) gt.getGenericComponentType();
+            // this looks nutty, but there's no other way. Make an array and take it's class.
+            ct = Array.newInstance(ct, 0).getClass();
+            rootClasses.add(ct);
         }
     }
 
@@ -205,10 +236,10 @@ public class AegisContext {
      * @param classes list of class names
      */
     private void processRootTypes() {
-        rootTypes = new HashSet<Type>();
+        rootTypes = new HashSet<AegisType>();
         // app may have already supplied classes.
         if (rootClasses == null) {
-            rootClasses = new HashSet<Class<?>>();
+            rootClasses = new HashSet<java.lang.reflect.Type>();
         }
         rootTypeQNames = new HashSet<QName>();
         if (this.rootClassNames != null) {
@@ -224,8 +255,32 @@ public class AegisContext {
             }
         }
 
-        for (Class<?> c : rootClasses) {
-            Type t = typeMapping.getType(c);
+        // This is a list of AegisType rather than Class so that it can set up for generic collections.
+        // When we see a generic, we process both the generic outer class and each parameter class.
+        // This is not the same thing as allowing mappings of arbitrary x<q> types.
+        
+        Set<Class<?>> rootMappableClassSet = rootMappableClasses();
+        /*
+         * First loop: process non-Class roots, creating full types for them
+         * and registering them.
+         */
+        for (java.lang.reflect.Type reflectType : rootClasses) {
+            if (!(reflectType instanceof Class)) {
+                // if it's not a Class, it can't be mapped from Class to type in the mapping.
+                // so we create 
+                AegisType aegisType = typeMapping.getTypeCreator().createType(reflectType);
+                typeMapping.register(aegisType);
+                // note: we don't handle arbitrary generics, so no BeanType 
+                // check here.
+                rootTypeQNames.add(aegisType.getSchemaType());
+            } 
+        }
+        /*
+         * Second loop: process Class roots, including those derived from 
+         * generic types, creating when not in the default mappings.
+         */
+        for (Class<?> c : rootMappableClassSet) {
+            AegisType t = typeMapping.getType(c);
             if (t == null) {
                 t = typeMapping.getTypeCreator().createType(c);
                 typeMapping.register(t);
@@ -390,7 +445,7 @@ public class AegisContext {
      * 
      * @return the set of type objects.
      */
-    public Set<Type> getRootTypes() {
+    public Set<AegisType> getRootTypes() {
         return rootTypes;
     }
 
@@ -409,7 +464,7 @@ public class AegisContext {
         this.beanImplementationMap = beanImplementationMap;
     }
 
-    public Set<Class<?>> getRootClasses() {
+    public Set<java.lang.reflect.Type> getRootClasses() {
         return rootClasses;
     }
 
@@ -418,7 +473,7 @@ public class AegisContext {
      * 
      * @param rootClasses
      */
-    public void setRootClasses(Set<Class<?>> rootClasses) {
+    public void setRootClasses(Set<java.lang.reflect.Type> rootClasses) {
         this.rootClasses = rootClasses;
     }
 

@@ -22,7 +22,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
 
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 
 public class AnnotationReader {
     private static final Class<? extends Annotation> WEB_PARAM = load("javax.jws.WebParam");
@@ -91,7 +91,7 @@ public class AnnotationReader {
     public Class getType(AnnotatedElement element) {
         Class value = (Class) getAnnotationValue("type",
                 element,
-                Type.class,
+                AegisType.class,
                 XmlAttribute.class,
                 XmlElement.class,
                 XFIRE_XML_ATTRIBUTE,
@@ -112,7 +112,7 @@ public class AnnotationReader {
         return (Class) getAnnotationValue("type",
                 method,
                 index,
-                Type.class,
+                AegisType.class,
                 XmlParamType.class,
                 XFIRE_XML_PARAM_TYPE);
     }
@@ -121,7 +121,7 @@ public class AnnotationReader {
     public Class getReturnType(AnnotatedElement element) {
         return (Class) getAnnotationValue("type",
                 element,
-                Type.class,
+                AegisType.class,
                 XmlReturnType.class,
                 XFIRE_XML_RETURN_TYPE);
     }
@@ -155,7 +155,7 @@ public class AnnotationReader {
         return (String) getAnnotationValue("name",
                 method,
                 index,
-                Type.class,
+                AegisType.class,
                 XmlParamType.class,
                 XFIRE_XML_PARAM_TYPE,
                 WEB_PARAM);

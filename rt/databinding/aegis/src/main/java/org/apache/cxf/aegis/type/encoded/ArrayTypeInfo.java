@@ -29,7 +29,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -45,7 +45,7 @@ public class ArrayTypeInfo {
     private static final QName SOAP_ARRAY_TYPE = new QName(SOAP_ENCODING_NS_1_1, "arrayType");
     private static final QName SOAP_ARRAY_OFFSET = new QName(SOAP_ENCODING_NS_1_1, "offset");
 
-    private Type type;
+    private AegisType type;
     private QName typeName;
     private int ranks;
     private final List<Integer> dimensions = new ArrayList<Integer>();
@@ -195,7 +195,7 @@ public class ArrayTypeInfo {
         return typeName;
     }
 
-    public Type getType() {
+    public AegisType getType() {
         return type;
     }
 

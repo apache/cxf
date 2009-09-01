@@ -26,7 +26,7 @@ import javax.xml.validation.Schema;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.AegisXMLStreamDataReader;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
@@ -45,7 +45,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     
     public Object read(MessagePartInfo part, XMLStreamReader input) {
         try {
-            Type type = part.getProperty("org.apache.cxf.aegis.outerType", Type.class);
+            AegisType type = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
             if (type == null) {
                 type = databinding.getType(part);
                 return reader.read(input, type); 

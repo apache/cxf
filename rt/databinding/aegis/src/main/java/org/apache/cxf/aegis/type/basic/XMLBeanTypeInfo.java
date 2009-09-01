@@ -30,7 +30,7 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -127,7 +127,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                 try {
                     Class<?> typeClass = 
                         ClassLoaderUtils.loadClass(explicitTypeName, XMLBeanTypeInfo.class);
-                    Type customTypeObject = (Type) typeClass.newInstance();
+                    AegisType customTypeObject = (AegisType) typeClass.newInstance();
                     mapType(mappedName, customTypeObject);
                     QName schemaType = mappedType;
                     if (schemaType == null) {

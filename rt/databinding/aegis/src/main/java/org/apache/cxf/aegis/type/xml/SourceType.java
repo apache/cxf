@@ -33,7 +33,7 @@ import org.xml.sax.helpers.XMLReaderFactory;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
@@ -49,7 +49,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * @see javax.xml.stream.XMLInputFactory
  * @see org.apache.cxf.aegis.util.STAXUtils
  */
-public class SourceType extends Type {
+public class SourceType extends AegisType {
     public SourceType() {
         setTypeClass(Source.class);
         setWriteOuter(false);

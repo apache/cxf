@@ -26,7 +26,7 @@ import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.type.XMLTypeCreator;
@@ -69,7 +69,7 @@ public class JaxbTypeTest extends AbstractAegisTest {
         QName element = (QName)elements.next();
         assertTrue(elements.hasNext());
 
-        Type custom = info.getType(element);
+        AegisType custom = info.getType(element);
 
         if ("bogusProperty".equals(element.getLocalPart())) {
             assertTrue(custom instanceof StringType);

@@ -27,7 +27,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.aegis.type.mtom.ByteArrayType;
 import org.apache.cxf.aegis.xml.MessageReader;
@@ -41,7 +41,7 @@ import org.apache.cxf.common.util.Base64Utility;
  * inline base64 or an MTOM attachment. It passes the problem over the ByteArrayType for the later. 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class Base64Type extends Type {
+public class Base64Type extends AegisType {
     private AbstractXOPType optimizedType;
 
     public Base64Type() {

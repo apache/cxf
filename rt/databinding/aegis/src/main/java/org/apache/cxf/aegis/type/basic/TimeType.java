@@ -24,17 +24,17 @@ import java.util.Calendar;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.util.date.XsTimeFormat;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * Type for the Time class which serializes to an xs:time.
+ * AegisType for the Time class which serializes to an xs:time.
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class TimeType extends Type {
+public class TimeType extends AegisType {
     private static XsTimeFormat format = new XsTimeFormat();
 
     @Override

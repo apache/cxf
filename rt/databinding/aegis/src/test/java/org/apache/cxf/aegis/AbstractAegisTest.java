@@ -40,7 +40,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -315,11 +315,11 @@ public abstract class AbstractAegisTest extends AbstractCXFTest {
         return new ElementWriter(writer);
     }
 
-    protected Element writeObjectToElement(Type type, Object bean) {
+    protected Element writeObjectToElement(AegisType type, Object bean) {
         return writeObjectToElement(type, bean, getContext());
     }
 
-    protected Element writeObjectToElement(Type type, Object bean, Context context) {
+    protected Element writeObjectToElement(AegisType type, Object bean, Context context) {
         Element element = createElement("urn:Bean", "root", "b");
         ElementWriter writer = getElementWriter(element, new MapNamespaceContext());
         type.writeObject(bean, writer, getContext());

@@ -73,8 +73,10 @@ public class AegisElementProvider extends AbstractAegisProvider  {
         }
         AegisContext context = getAegisContext(type, genericType);
         // we need special cases for collection types.
+        // until we clean up mapping management.
         
-        org.apache.cxf.aegis.type.Type aegisType = TypeUtil.getWriteTypeStandalone(context, obj, genericType);
+        org.apache.cxf.aegis.type.AegisType aegisType 
+            = TypeUtil.getWriteTypeStandalone(context, obj, genericType);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         try {
             XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);

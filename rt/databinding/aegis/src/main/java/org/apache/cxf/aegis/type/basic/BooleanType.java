@@ -19,14 +19,14 @@
 package org.apache.cxf.aegis.type.basic;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * Aegis type for {@link java.lang.Boolean}. These can be null.
  */
-public class BooleanType extends Type {
+public class BooleanType extends AegisType {
     @Override
     public Object readObject(MessageReader reader, Context context) {
         if (reader.isXsiNil()) {

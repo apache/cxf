@@ -19,14 +19,14 @@
 package org.apache.cxf.aegis.type.basic;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class StringType extends Type {
+public class StringType extends AegisType {
 
     public StringType() {
     }
