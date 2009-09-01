@@ -20,16 +20,10 @@
 package demo.jms_greeter.client;
 
 import java.io.File;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Proxy;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 import org.apache.cxf.jms_greeter.JMSGreeterService;
-import org.apache.cxf.transport.jms.JMSMessageHeadersType;
-import org.apache.cxf.transport.jms.JMSPropertyType;
 
 
 public final class Client {
