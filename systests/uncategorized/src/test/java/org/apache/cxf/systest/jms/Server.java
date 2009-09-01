@@ -42,8 +42,6 @@ public class Server extends AbstractBusTestServerBase {
         Object i4 = new GreeterImplTwoWayJMSRuntimeCorrelationIDDynamicPrefix();
         Object i5 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixEng();
         Object i6 = new GreeterImplTwoWayJMSRuntimeCorrelationIDStaticPrefixSales();
-        Object i7 = new GreeterImplTwoWayJMSAppCorrelationIDEng();
-        Object i8 = new GreeterImplTwoWayJMSAppCorrelationIDSales();
         Object mtom = new JMSMTOMImpl();
         
         Endpoint.publish(null, impleDoc);
@@ -60,8 +58,6 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish("", i4);
         Endpoint.publish("", i5);
         Endpoint.publish("", i6);
-        Endpoint.publish("", i7);
-        Endpoint.publish("", i8);
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
         Binding binding = ep.getBinding();        
         ((SOAPBinding)binding).setMTOMEnabled(true);  

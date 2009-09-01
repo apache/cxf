@@ -183,7 +183,7 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         priceData.setTickerPrice(1.0f);
         priceData.setTickerSymbol("CELTIX");
 
-        assertFalse(check(0, putLastTradedPrice, false, true, priceData));
+        assertTrue(check(0, putLastTradedPrice, false, true, priceData));
         assertFalse(check(1, putLastTradedPrice, false, true, priceData));
         assertTrue(check(2, putLastTradedPrice, false, true, priceData));        
 
