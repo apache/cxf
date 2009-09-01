@@ -20,10 +20,11 @@ package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
 import java.util.Map;
+import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -38,6 +39,8 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.service.Service;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSClientFactoryBean.class);
     
     private String username;
     private String password;
@@ -110,7 +113,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             
             return client;
         } catch (Exception ex) {
-            throw new WebApplicationException();
+            LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
+            throw new RuntimeException(ex);
         }
     }
     
@@ -146,7 +150,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                      proxyImpl);
             }
         } catch (Exception ex) {
-            throw new WebApplicationException();
+            LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
+            throw new RuntimeException(ex);
         }
         
         
