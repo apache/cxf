@@ -375,17 +375,17 @@ public class WSDL2JavaMojo extends AbstractMojo {
                                              URI wsdlURI) {
         List<String> list = new ArrayList<String>();
         if (wsdlOption.getPackagenames() != null) {
-            Iterator it = wsdlOption.getPackagenames().iterator();
+            Iterator<String> it = wsdlOption.getPackagenames().iterator();
             while (it.hasNext()) {
                 list.add("-p");
-                list.add(it.next().toString());
+                list.add(it.next());
             }
         }
         if (wsdlOption.getNamespaceExcludes() != null) {
-            Iterator it = wsdlOption.getNamespaceExcludes().iterator();
+            Iterator<String> it = wsdlOption.getNamespaceExcludes().iterator();
             while (it.hasNext()) {
                 list.add("-nexclude");
-                list.add(it.next().toString());
+                list.add(it.next());
             }
         }
 
@@ -449,7 +449,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             list.add("-noAddressBinding");
         }
         if (wsdlOption.getExtraargs() != null) {
-            Iterator it = wsdlOption.getExtraargs().iterator();
+            Iterator<String> it = wsdlOption.getExtraargs().iterator();
             while (it.hasNext()) {
                 Object value = it.next();
                 if (value == null) {
@@ -489,12 +489,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
     }
 
     private boolean isDefServiceName(WsdlOption wsdlOption) {
-        List args = wsdlOption.extraargs;
+        List<String> args = wsdlOption.extraargs;
         if (args == null) {
             return false;
         }
         for (int i = 0; i < args.size(); i++) {
-            if ("-sn".equalsIgnoreCase((String)args.get(i))) {
+            if ("-sn".equalsIgnoreCase(args.get(i))) {
                 return true;
             }
         }
