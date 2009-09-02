@@ -16,15 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.ws.wssec10.server;
 
-@javax.jws.WebService(
-    targetNamespace = "http://WSSec/wssec10", 
-    serviceName = "PingService", 
-    portName = "MutualCertificate10SignEncryptRsa15TripleDes_IPingService", 
-    endpointInterface = "wssec.wssec10.IPingService",
-    wsdlLocation = "target/test-classes/wsdl_systest_wsspec/wssec10/WsSecurity10.wsdl"
-)                  
-public class MutualCertificate10SignEncryptRsa15TripleDes extends PingServiceBase {
-    // complete
+package org.apache.cxf.systest.ws.policy;
+
+import org.apache.cxf.Bus;
+import org.apache.cxf.ws.policy.PolicyConstants;
+
+public final class PolicyTestUtils {
+
+    private PolicyTestUtils() {
+        // utility class
+    }
+    
+    public static void setPolicyConstants(Bus bus, String policyNs) {
+        PolicyConstants pc = bus.getExtension(PolicyConstants.class);
+        pc.setNamespace(policyNs);
+    }
 }
