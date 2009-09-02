@@ -140,6 +140,7 @@ public class DoMerges {
         System.out.println("Root: " + root);
         p.waitFor();
 
+        List<String> blocks = new ArrayList<String>();
 
         int count = 1;
         for (String ver : verList) {
@@ -188,29 +189,41 @@ public class DoMerges {
                 doCommit();
                 break;
             case 'B':
-                p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "block", "-r", ver}));
-                reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-                line = reader.readLine();
-                while (line != null) {
-                    System.out.println(line);
-                    line = reader.readLine();
-                }
-                if (p.waitFor() != 0) {
-                    System.out.println("ERROR!");
-                    reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-                    line = reader.readLine();
-                    while (line != null) {
-                        System.out.println(line);
-                        line = reader.readLine();
-                    }
-                    System.exit(1);
-                }
-                doCommit();
+                blocks.add(ver);
                 break;
             case 'I':
                 System.out.println("Ignoring");
                 break;
             }
+        }
+
+        if (!blocks.isEmpty()) {
+            StringBuilder ver = new StringBuilder();
+            for (String s : blocks) {
+                if (ver.length() > 0) {
+                    ver.append(',');
+                }
+                ver.append(s);
+            }
+            System.out.println("Blocking " + ver);
+            p = Runtime.getRuntime().exec(getCommandLine(new String[] {"svnmerge.py", "block", "-r", ver.toString()}));
+            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
+            line = reader.readLine();
+            while (line != null) {
+                System.out.println(line);
+                line = reader.readLine();
+            }
+            if (p.waitFor() != 0) {
+                System.out.println("ERROR!");
+                reader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+                line = reader.readLine();
+                while (line != null) {
+                    System.out.println(line);
+                    line = reader.readLine();
+                }
+                System.exit(1);
+            }
+            doCommit();
         }
     }
 
