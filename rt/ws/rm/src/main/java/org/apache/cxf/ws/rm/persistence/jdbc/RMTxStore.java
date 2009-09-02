@@ -74,9 +74,9 @@ public class RMTxStore implements RMStore {
     private static final String CREATE_SRC_SEQUENCES_TABLE_STMT =
         "CREATE TABLE CXF_RM_SRC_SEQUENCES " 
         + "(SEQ_ID VARCHAR(256) NOT NULL, "
-        + "CUR_MSG_NO DECIMAL(31, 0) NOT NULL DEFAULT 1, "
+        + "CUR_MSG_NO DECIMAL(31, 0) DEFAULT 1 NOT NULL, "
         + "LAST_MSG CHAR(1), "
-        + "EXPIRY BIGINT, " 
+        + "EXPIRY DECIMAL(31, 0), "
         + "OFFERING_SEQ_ID VARCHAR(256), "
         + "ENDPOINT_ID VARCHAR(1024), "            
         + "PRIMARY KEY (SEQ_ID))";
@@ -115,6 +115,9 @@ public class RMTxStore implements RMStore {
         + "WHERE ENDPOINT_ID = ?";
     private static final String SELECT_MESSAGES_STMT_STR =
         "SELECT MSG_NO, SEND_TO, CONTENT FROM {0} WHERE SEQ_ID = ?";
+
+    private static final String DERBY_TABLE_EXISTS_STATE = "X0Y32";
+    private static final int ORACLE_TABLE_EXISTS_CODE = 955;
     
     private static final Logger LOG = LogUtils.getL7dLogger(RMTxStore.class);
     
@@ -540,7 +543,7 @@ public class RMTxStore implements RMStore {
         try {
             stmt.executeUpdate(CREATE_SRC_SEQUENCES_TABLE_STMT);
         } catch (SQLException ex) {
-            if (!"X0Y32".equals(ex.getSQLState())) {
+            if (!isTableExistsError(ex)) {
                 throw ex;
             } else {
                 LOG.fine("Table CXF_RM_SRC_SEQUENCES already exists.");
@@ -552,7 +555,7 @@ public class RMTxStore implements RMStore {
         try {
             stmt.executeUpdate(CREATE_DEST_SEQUENCES_TABLE_STMT);
         } catch (SQLException ex) {
-            if (!"X0Y32".equals(ex.getSQLState())) {
+            if (!isTableExistsError(ex)) {
                 throw ex;
             } else {
                 LOG.fine("Table CXF_RM_DEST_SEQUENCES already exists.");
@@ -565,7 +568,7 @@ public class RMTxStore implements RMStore {
             try {
                 stmt.executeUpdate(MessageFormat.format(CREATE_MESSAGES_TABLE_STMT, tableName));
             } catch (SQLException ex) {
-                if (!"X0Y32".equals(ex.getSQLState())) {
+                if (!isTableExistsError(ex)) {
                     throw ex;
                 } else {
                     if (LOG.isLoggable(Level.FINE)) {
@@ -668,6 +671,10 @@ public class RMTxStore implements RMStore {
         }
     }
 
+    private static boolean isTableExistsError(SQLException ex) {
+        return DERBY_TABLE_EXISTS_STATE.equals(ex.getSQLState())
+                || ORACLE_TABLE_EXISTS_CODE == ex.getErrorCode();
+    }
 
 
 }
