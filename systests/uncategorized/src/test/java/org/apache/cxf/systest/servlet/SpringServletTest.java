@@ -22,7 +22,6 @@ import javax.xml.ws.Endpoint;
 
 import org.w3c.dom.Document;
 
-import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
@@ -149,17 +148,17 @@ public class SpringServletTest extends AbstractServletTest {
     }
     
     @Test
-    public void testIgnoreServiceList() throws Exception {
+    public void testGetServiceList() throws Exception {
         ServletUnitClient client = newClient();
         client.setExceptionsThrownOnErrorStatus(true);
         
         WebRequest req = 
             new GetMethodQueryWebRequest(CONTEXT_URL + "/services/");
-        try {
-            client.getResponse(req);
-            fail();
-        } catch (HttpNotFoundException ex) {
-            // expected
-        }
+        WebResponse res = client.getResponse(req);
+        assertEquals(200, res.getResponseCode());
+        assertEquals("text/html", res.getContentType());
+        assertEquals("Here should have no services links ", 0, res.getLinks().length);
+                
     }
+    
 }

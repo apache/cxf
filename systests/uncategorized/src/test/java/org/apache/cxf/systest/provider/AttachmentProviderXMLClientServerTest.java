@@ -61,8 +61,7 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
         connection.getOutputStream().close();
         is.close();
 
-        assertTrue("wrong content type: " + connection.getContentType(),
-                   connection.getContentType().contains("multipart/related"));
+        assertTrue("wrong content type", connection.getContentType().contains("multipart/related"));
         String input = IOUtils.toString(connection.getInputStream());
         
         int idx = input.indexOf("--uuid");
