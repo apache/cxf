@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,8 +28,6 @@ import javax.jws.WebMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -62,30 +59,8 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
     }
     
     public Book getBook(Long id) throws BookNotFoundFault {
-        
         if (books.get(id) == null) {
-            if (id == 0) {
-                try {
-                    OutputStream os = jaxrsContext.getHttpServletResponse().getOutputStream();
-                    JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
-                    Marshaller m = c.createMarshaller();
-                    m.marshal(books.get(123L), os);
-                    os.flush();
-                    return null;
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    throw new RuntimeException();
-                }
-            }
-            int returnCode = 404;
-            if (id == 321) {
-                returnCode = 525;
-            } else if (id == 322) {
-                BookNotFoundDetails details = new BookNotFoundDetails();
-                details.setId(id);
-                throw new BookNotFoundFault(details);
-            }
-            Response r = Response.status(returnCode).header("BOOK-HEADER", 
+            Response r = Response.status(404).header("BOOK-HEADER", 
                 "No Book with id " + id + " is available").build();
             throw new WebApplicationException(r);
         }

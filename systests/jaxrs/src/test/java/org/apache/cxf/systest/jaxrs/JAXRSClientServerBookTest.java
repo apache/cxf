@@ -23,10 +23,7 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 import javax.ws.rs.core.Response;
 
@@ -42,12 +39,9 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.xml.XMLSource;
-import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
@@ -58,82 +52,11 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServer.class));
     }
     
-    
-    @Test
-    public void testPropogateException() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore/propogateexception",
-                      "", "application/xml", 500);
-    }
-    
-    @Test
-    public void testPropogateException2() throws Exception {
-        String data = "<ns1:XMLFault xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
-            + "<ns1:faultstring xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
-            + "org.apache.cxf.systest.jaxrs.BookNotFoundFault: Book Exception</ns1:faultstring>"
-            + "</ns1:XMLFault>";
-        getAndCompare("http://localhost:9080/bookstore/propogateexception2",
-                      data, "application/xml", 500);
-    }
-    
     @Test
     public void testWebApplicationException() throws Exception {
         getAndCompare("http://localhost:9080/bookstore/webappexception",
                       "This is a WebApplicationException",
                       "application/xml", 500);
-    }
-    
-    @Test 
-    public void testAddBookProxyResponse() {
-        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
-        Book b = new Book("CXF rocks", 123L);
-        Response r = store.addBook(b);
-        assertNotNull(r);
-        InputStream is = (InputStream)r.getEntity();
-        assertNotNull(is);
-        XMLSource source = new XMLSource(is);
-        source.setBuffering(true);
-        assertEquals(124L, Long.parseLong(source.getValue("Book/id")));
-        assertEquals("CXF rocks", source.getValue("Book/name"));
-    }
-    
-    @Test 
-    public void testGetBookCollection() throws Exception {
-        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
-        Book b1 = new Book("CXF in Action", 123L);
-        Book b2 = new Book("CXF Rocks", 124L);
-        List<Book> books = new ArrayList<Book>();
-        books.add(b1);
-        books.add(b2);
-        List<Book> books2 = store.getBookCollection(books);
-        assertNotNull(books2);
-        assertNotSame(books, books2);
-        assertEquals(2, books2.size());
-        Book b11 = books.get(0);
-        assertEquals(123L, b11.getId());
-        assertEquals("CXF in Action", b11.getName());
-        Book b22 = books.get(1);
-        assertEquals(124L, b22.getId());
-        assertEquals("CXF Rocks", b22.getName());
-    }
-    
-    @Test 
-    public void testGetBookArray() throws Exception {
-        BookStore store = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
-        Book b1 = new Book("CXF in Action", 123L);
-        Book b2 = new Book("CXF Rocks", 124L);
-        Book[] books = new Book[2];
-        books[0] = b1;
-        books[1] = b2;
-        Book[] books2 = store.getBookArray(books);
-        assertNotNull(books2);
-        assertNotSame(books, books2);
-        assertEquals(2, books2.length);
-        Book b11 = books2[0];
-        assertEquals(123L, b11.getId());
-        assertEquals("CXF in Action", b11.getName());
-        Book b22 = books2[1];
-        assertEquals(124L, b22.getId());
-        assertEquals("CXF Rocks", b22.getName());
     }
     
     @Test
@@ -144,72 +67,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testHeadBookByURL() throws Exception {
-        WebClient wc = 
-            WebClient.create("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123");
-        Response response = wc.head();
-        assertTrue(response.getMetadata().size() != 0);
-        assertEquals(0, ((InputStream)response.getEntity()).available());
-    }
-    
-    @Test
-    public void testWebClientUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider provider = new XSLTJaxbProvider();
-        provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook.xsl");
-        WebClient wc = WebClient.create("http://localhost:9080/bookstore/books/wrapper",
-                             Collections.singletonList(provider));
-        wc.path("{id}", 123);
-        Book book = wc.get(Book.class);
-        assertNotNull(book);
-        assertEquals(123L, book.getId());
-        
-    }
-    
-    @Test
-    @Ignore
-    // uncomment once I can figure out how to set for this test only
-    // com.sun.xml.bind.v2.bytecode.ClassTailor.noOptimize - JAXB is a pain
-    public void testProxyUnwrapBookWithXslt() throws Exception {
-        XSLTJaxbProvider provider = new XSLTJaxbProvider();
-        provider.setInTemplate("classpath:/org/apache/cxf/systest/jaxrs/resources/unwrapbook2.xsl");
-        BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class,
-                             Collections.singletonList(provider));
-        Book book = bs.getWrappedBook2(123L);
-        assertNotNull(book);
-        assertEquals(123L, book.getId());
-        
-    }
-    
-    @Test
-    public void testOptions() throws Exception {
-        WebClient wc = 
-            WebClient.create("http://localhost:9080/bookstore/bookurl/http%3A%2F%2Ftest.com%2Frss%2F123");
-        Response response = wc.options();
-        List<Object> values = response.getMetadata().get("Allow");
-        assertNotNull(values);
-        assertTrue(values.contains("POST") && values.contains("GET")
-                   && values.contains("DELETE") && values.contains("PUT"));
-        assertEquals(0, ((InputStream)response.getEntity()).available());
-    }
-    
-    @Test
     public void testGetBookByEncodedQuery() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/bookquery?"
                                + "urlid=http%3A%2F%2Ftest.com%2Frss%2F123",
-                               "resources/expected_get_book123.txt",
-                               "application/xml", 200);
-    }
-    
-    @Test
-    public void testGetGenericBook() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/bookstore/genericbooks/123",
-                               "resources/expected_get_book123.txt",
-                               "application/xml", 200);
-    }
-    
-    @Test
-    public void testGetGenericResponseBook() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/bookstore/genericresponse/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
     }
@@ -339,7 +199,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBookExists() throws Exception {
         checkBook("http://localhost:9080/bookstore/books/check/123", true);
-        checkBook("http://localhost:9080/bookstore/books/check/125", false);  
+        checkBook("http://localhost:9080/bookstore/books/check/124", false);  
         
     }
     
@@ -375,7 +235,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testGetBook123WebClient() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
         Book b = bs.getBook("123");
-        assertEquals(b.getId(), 123);
+        assertEquals(b.getId(), 123L);
     }
     
     @Test
@@ -495,13 +355,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBookByHeaderPerRequest() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/bookstore2/bookheaders",
-                               "resources/expected_get_book123.txt",
-                               "application/xml;q=0.5,text/xml", "text/xml", 200);
-    }
-    
-    @Test
     public void testGetBookByHeaderDefault() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/bookheaders2",
                                "resources/expected_get_book123.txt",
@@ -550,14 +403,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetChapterEncodingDefault() throws Exception {
-        
-        getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/badencoding/1",
-                               "resources/expected_get_chapter1_utf.txt",
-                               "application/xml", "application/xml;charset=UTF-8", 200);
-    }
-    
-    @Test
     public void testGetChapterChapter() throws Exception {
         
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse",
@@ -569,19 +414,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetChapterWithParentIds() throws Exception {
-        
-        getAndCompareAsStrings(
-            "http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse2/ids",
-            "resources/expected_get_chapter1.txt",
-            "application/xml", "application/xml;charset=iso-8859-1", 200);
-    }
-    
-    @Test
     public void testGetBook123ReturnString() throws Exception {
         getAndCompareAsStrings("http://localhost:9080/bookstore/booknames/123",
                                "resources/expected_get_book123_returnstring.txt",
                                "text/plain", 200);
+    }
+    
+    @Test
+    public void testGetBookNotFound() throws Exception {
+        
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/126",
+                               "resources/expected_get_book_notfound.txt",
+                               "application/xml", "text/xml; charset=utf-8", 500);
     }
     
     @Test
@@ -989,10 +833,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                          expectedValue, content);
             if (expectedStatus == 200) {
                 assertEquals("123", get.getResponseHeader("BookId").getValue());
-                assertNotNull(get.getResponseHeader("Date"));
-            }
-            if (expectedStatus == 405) {
-                assertNotNull(get.getResponseHeader("Allow"));
             }
             if (expectedContentType != null) {
                 Header ct = get.getResponseHeader("Content-Type");

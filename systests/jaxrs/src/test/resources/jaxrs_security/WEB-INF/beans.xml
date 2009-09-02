@@ -51,18 +51,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:providers>
         <bean class="org.apache.cxf.systest.jaxrs.security.SecurityExceptionMapper"/>
     </jaxrs:providers>		   
-    <jaxrs:invoker>
-        <bean class="org.apache.cxf.systest.jaxrs.CustomJAXRSInvoker"/> 
-    </jaxrs:invoker>
-    
   </jaxrs:server>
 
   <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore">
      <property name="bookStore" ref="bookstore2"/>
-     <lookup-method name="getSecureBook" bean="subResource" />
   </bean>
-  
-  <bean id="subResource" class="org.apache.cxf.systest.jaxrs.security.SecureBook"/>  
   
   <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.security.SecureBookStore"/>
 
@@ -75,7 +68,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <security:authentication-provider>
     <security:user-service>
       <security:user name="bob" password="bobspassword" authorities="ROLE_USER" />
-      <security:user name="baddy" password="baddyspassword" authorities="ROLE_USER" />
       <security:user name="foo" password="bar" authorities="ROLE_USER, ROLE_ADMIN" />
       <security:user name="baz" password="baz" authorities="ROLE_BAZ" />
     </security:user-service>

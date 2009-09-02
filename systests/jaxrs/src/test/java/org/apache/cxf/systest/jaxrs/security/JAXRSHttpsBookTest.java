@@ -34,8 +34,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
 
     private static final String CLIENT_CONFIG_FILE =
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https.xml";
-    private static final String CLIENT_CONFIG_FILE2 =
-        "org/apache/cxf/systest/jaxrs/security/jaxrs-https-url.xml";
         
     @BeforeClass
     public static void startServers() throws Exception {
@@ -55,20 +53,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
     }
-    
-    @Test
-    public void testGetBook123ProxyWithURLConduitId() throws Exception {
-        
-        BookStore bs = JAXRSClientFactory.create("https://localhost:9095", BookStore.class, 
-                                                 CLIENT_CONFIG_FILE2);
-        // just to verify the interface call goes through CGLIB proxy too
-        assertEquals("https://localhost:9095", WebClient.client(bs).getBaseURI().toString());
-        Book b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
-        b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
-    }
-    
     
     @Test
     public void testGetBook123ProxyToWebClient() throws Exception {
@@ -105,18 +89,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     public void testGetBook123WebClient() throws Exception {
         
         WebClient client = WebClient.create("https://localhost:9095", CLIENT_CONFIG_FILE);
-        assertEquals("https://localhost:9095", client.getBaseURI().toString());
-        
-        client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
-        Book b = client.get(Book.class);
-        assertEquals(123, b.getId());
-        
-    }
-    
-    @Test
-    public void testGetBook123WebClientWithURLConduitId() throws Exception {
-        
-        WebClient client = WebClient.create("https://localhost:9095", CLIENT_CONFIG_FILE2);
         assertEquals("https://localhost:9095", client.getBaseURI().toString());
         
         client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);

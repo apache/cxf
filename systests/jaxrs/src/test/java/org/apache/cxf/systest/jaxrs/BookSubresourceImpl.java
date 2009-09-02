@@ -19,6 +19,10 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.cxf.customer.book.BookNotFoundFault;
+
 public class BookSubresourceImpl implements BookSubresource {
 
     private Long id;
@@ -43,45 +47,21 @@ public class BookSubresourceImpl implements BookSubresource {
         return b;
     }
 
-    public Book getTheBook2(String n1, String n2, String n3, String n33, 
-                            String n4, String n5, String n6) 
+    public Book getTheBook2(String n1, String n2, String n3, String n4, String n5, String n6) 
         throws BookNotFoundFault {
         
         Book b = new Book();
         b.setId(id); 
-        b.setName(n1 + n2 + n3 + n33 + n4 + n5 + n6);
+        b.setName(n1 + n2 + n3 + n4 + n5 + n6);
         return b;
     }
     
-    public Book getTheBook3(String sid, String name, Integer nameid) throws BookNotFoundFault {
+    public Book getTheBook3(MultivaluedMap<String, String> form) throws BookNotFoundFault {
         Book b = new Book();
         
-        b.setId(Long.valueOf(sid)); 
-        b.setName(name + nameid.toString());
+        b.setId(Long.valueOf(form.getFirst("id"))); 
+        b.setName(form.getFirst("name"));
         return b;
-    }
-    
-    public Book getTheBook4(Book bookPath, Book bookQuery, Book bookMatrix) throws BookNotFoundFault {
-        if (bookPath == null || bookQuery == null || bookMatrix == null) {
-            throw new RuntimeException();
-        }
-        long id1 = bookPath.getId();
-        long id2 = bookQuery.getId();
-        long id3 = bookMatrix.getId();
-        if (id1 != 139L || id1 != id2 || id1 != id3 || id1 != id.longValue()) {
-            throw new RuntimeException();
-        }
-        String name1 = bookPath.getName();
-        String name2 = bookQuery.getName();
-        String name3 = bookMatrix.getName();
-        if (!"CXF Rocks".equals(name1) || !name1.equals(name2) || !name1.equals(name3)) {
-            throw new RuntimeException();
-        }
-        return bookPath;
-    }
-
-    public Book getTheBookNoProduces() throws BookNotFoundFault {
-        return getTheBook();
     }
 
 }

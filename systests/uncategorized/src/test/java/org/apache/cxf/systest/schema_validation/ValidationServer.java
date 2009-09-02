@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.schema_validation;
 
+import java.net.URL;
 
 import javax.xml.ws.Endpoint;
 
@@ -26,7 +27,14 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ValidationServer extends AbstractBusTestServerBase {
 
+    private String oldConfig;
+
     public ValidationServer() {
+        oldConfig = System.getProperty("cxf.config.file.url");
+        URL url = getClass().getResource("cxf-config.xml");
+        if (url != null) {
+            System.setProperty("cxf.config.file.url", url.toString());
+        }
     }
 
     protected void run() {
@@ -35,7 +43,12 @@ public class ValidationServer extends AbstractBusTestServerBase {
         Endpoint.publish(address, implementor);
     }
 
-
+    public boolean stopInProcess() throws Exception {
+        if (oldConfig != null) {
+            System.setProperty("cxf.config.file.url", oldConfig);
+        }
+        return super.stopInProcess();
+    }
 
     public static void main(String[] args) {
         try {

@@ -20,24 +20,17 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
-import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
@@ -55,17 +48,10 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             sf.setResourceClasses(BookStore.class);
             sf.setResourceProvider(BookStore.class,
                                    new SingletonResourceProvider(new BookStore()));
-            JAXBElementProvider p1 = new JAXBElementProvider();
-            p1.setEnableBuffering(true);
-            p1.setEnableStreaming(true);
-            
-            JAXBElementProvider p2 = new CustomJaxbProvider();
-            p2.setProduceMediaTypes(Collections.singletonList("text/xml"));
-            
-            List<Object> providers = new ArrayList<Object>();
-            providers.add(p1);
-            providers.add(p2);
-            sf.setProviders(providers);
+            JAXBElementProvider p = new JAXBElementProvider();
+            p.setEnableBuffering(true);
+            p.setEnableStreaming(true);
+            sf.setProvider(p);
             sf.setAddress("http://localhost:9080/");
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("org.apache.cxf.serviceloader-context", "true");
@@ -99,12 +85,6 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
                       "application/xml", 200);
     }
     
-    @Test
-    public void testGetBookUsingStaxWriter() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore/books/123",
-                      "text/xml", 200);
-    }
-    
     private void getAndCompare(String address, 
                                String acceptType,
                                int expectedStatus) throws Exception {
@@ -126,17 +106,5 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
         return (Book)u.unmarshal(is);
-    }
-    
-    @Ignore
-    public static class CustomJaxbProvider extends JAXBElementProvider {
-        @Override
-        protected XMLStreamWriter getStreamWriter(Object obj, OutputStream os, MediaType mt) {
-            if (mt.equals(MediaType.TEXT_XML_TYPE)) {
-                return new CachingXmlEventWriter();
-            } else {
-                throw new RuntimeException();
-            }
-        }
     }
 }

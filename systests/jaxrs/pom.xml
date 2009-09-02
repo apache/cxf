@@ -21,19 +21,16 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-systests-jaxrs</artifactId>
     <name>Apache CXF JAX-RS System Tests</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/systests/jaxrs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests/jaxrs</developerConnection>
-    </scm>
+
     <build>
         <plugins>
             <plugin>
@@ -215,12 +212,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-sdo</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>

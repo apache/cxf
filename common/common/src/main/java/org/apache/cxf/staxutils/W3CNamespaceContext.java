@@ -32,7 +32,12 @@ import org.w3c.dom.Node;
 
 public class W3CNamespaceContext implements NamespaceContext {
     private Element currentNode;
-
+    
+    public W3CNamespaceContext() {
+    }
+    public W3CNamespaceContext(Element el) {
+        currentNode = el;
+    }
     public String getNamespaceURI(String prefix) {
         String name = prefix;
         if (name.length() == 0) {

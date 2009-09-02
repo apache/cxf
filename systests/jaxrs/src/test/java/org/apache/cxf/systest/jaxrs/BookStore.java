@@ -28,10 +28,9 @@ import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -41,11 +40,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -60,7 +58,6 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.helpers.XMLUtils;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
 public class BookStore {
@@ -91,21 +88,8 @@ public class BookStore {
     }
     
     @GET
-    @Path("propogateexception")
-    public Book propogateException() throws BookNotFoundFault {
-        throw new BookNotFoundFault("Book Exception");
-    }
-    
-    @GET
-    @Path("propogateexception2")
-    public Book propogateException2() throws BookNotFoundFault {
-        PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propogate.exception", Boolean.FALSE);
-        throw new BookNotFoundFault("Book Exception");
-    }
-    
-    @GET
     @Path("books/check/{id}")
-    @Produces("text/plain")
+    @ProduceMime("text/plain")
     public boolean checkBook(@PathParam("id") Long id) {
         return books.containsKey(id);
     }
@@ -131,7 +115,7 @@ public class BookStore {
     
     @POST
     @Path("/unsupportedcontenttype")
-    @Consumes("application/xml")
+    @ConsumeMime("application/xml")
     public String unsupportedContentType() {
         throw new IllegalStateException("This op is not expected to be invoked");
     }
@@ -142,29 +126,7 @@ public class BookStore {
         String url2 = new URL(urlValue).toString();
         int index = url2.lastIndexOf('/');
         return doGetBook(url2.substring(index + 1));
-    }
-    
-    @POST
-    @Path("/collections")
-    @Produces("application/xml")
-    @Consumes("application/xml")
-    public List<Book> getBookCollection(List<Book> bs) throws Exception {
-        if (bs == null || bs.size() != 2) {
-            throw new RuntimeException();
-        }
-        return bs;
-    }
-    
-    @POST
-    @Path("/array")
-    @Produces("application/xml")
-    @Consumes("application/xml")
-    public Book[] getBookArray(Book[] bs) throws Exception {
-        if (bs == null || bs.length != 2) {
-            throw new RuntimeException();
-        }
-        return bs;
-    }
+    } 
     
     @GET
     @Path("/segment/{pathsegment}/")
@@ -204,10 +166,10 @@ public class BookStore {
             || !MediaType.APPLICATION_XML_TYPE.isCompatible(types.get(1))) {
             throw new WebApplicationException();
         }
-        List<Locale> locales = httpHeaders.getAcceptableLanguages();
+        List<String> locales = httpHeaders.getAcceptableLanguages();
         if (locales.size() != 2 
-            || !"en".equals(locales.get(0).getLanguage())
-            || !"da".equals(locales.get(1).getLanguage())) {
+            || !"en".equals(locales.get(0))
+            || !"da".equals(locales.get(1))) {
             throw new WebApplicationException();
         }
         
@@ -241,7 +203,7 @@ public class BookStore {
 
     @GET
     @Path("/securebooks/{bookId}/")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public Book getSecureBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         if (!securityContext.isSecure()) {
             throw new WebApplicationException(Response.status(403).entity("Unsecure link").build());
@@ -250,50 +212,10 @@ public class BookStore {
     }
     
     @GET
-    @Path("/genericbooks/{bookId}/")
-    @Produces("application/xml")
-    public GenericEntity<GenericHandler<Book>> getGenericBook(@PathParam("bookId") String id) 
-        throws BookNotFoundFault {
-        return new GenericEntity<GenericHandler<Book>>(new GenericHandler<Book>(doGetBook(id))) { };
-    }
-    
-    @GET
-    @Path("/genericresponse/{bookId}/")
-    @Produces("application/xml")
-    public Response getGenericResponseBook(@PathParam("bookId") String id) 
-        throws BookNotFoundFault {
-        return Response.ok(getGenericBook(id)).build();
-    }
-    
-    @GET
     @Path("/books/{bookId}/")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
-    }
-    
-    @GET
-    @Path("/books/{bookId}/")
-    @Produces("text/xml")
-    public Book getBookTextXml(@PathParam("bookId") String id) throws BookNotFoundFault {
-        return doGetBook(id);
-    }
-    
-    @GET
-    @Path("/books/wrapper/{bookId}/")
-    @Produces("application/xml")
-    public BookWrapper getWrappedBook(@PathParam("bookId") Long id) throws BookNotFoundFault {
-        BookWrapper bw = new BookWrapper();
-        Book b = new Book("CXF in Action", 99999L);
-        bw.setBook(b);
-        return bw;
-    }
-    
-    @GET
-    @Path("/books/wrapper2/{bookId}/")
-    @Produces("application/xml")
-    public Book getWrappedBook2(@PathParam("bookId") Long id) throws BookNotFoundFault {
-        return new Book("CXF in Action", 99999L);
     }
     
     @GET
@@ -347,7 +269,7 @@ public class BookStore {
     
     @GET
     @Path("/books/{bookId}/")
-    @Produces("application/json;q=0.9")
+    @ProduceMime("application/json;q=0.9")
     public Book getBookAsJSON() throws BookNotFoundFault {
         return doGetBook(currentBookId);
     }
@@ -355,21 +277,21 @@ public class BookStore {
     
     @GET
     @Path("/books/buffer")
-    @Produces("application/bar")
+    @ProduceMime("application/bar")
     public InputStream getBufferedBook() {
         return getClass().getResourceAsStream("resources/expected_get_book123.txt");
     }
     
     @GET
     @Path("/books/fail-early")
-    @Produces("application/bar")
+    @ProduceMime("application/bar")
     public StreamingOutput failEarlyInWrite() {
         return new StreamingOutputImpl(true);
     }
     
     @GET
     @Path("/books/fail-late")
-    @Produces("application/bar")
+    @ProduceMime("application/bar")
     public StreamingOutput writeToStreamAndFail() {
         return new StreamingOutputImpl(false);
     }
@@ -404,7 +326,7 @@ public class BookStore {
     
     @GET
     @Path("/booknames/{bookId}/")
-    @Produces("text/*")
+    @ProduceMime("text/*")
     public String getBookName(@PathParam("bookId") int id) throws BookNotFoundFault {
         Book book = books.get(new Long(id));
         if (book != null) {
@@ -418,17 +340,10 @@ public class BookStore {
 
     @POST
     @Path("/books")
-    @Produces("text/xml")
-    @Consumes("application/xml")
+    @ProduceMime("text/xml")
+    @ConsumeMime("application/xml")
     public Response addBook(Book book) {
-        String ct1 = httpHeaders.getMediaType().toString();
-        String ct2 = httpHeaders.getRequestHeader("Content-Type").get(0);
-        String ct3 = httpHeaders.getRequestHeaders().getFirst("Content-Type");
-        if (!("application/xml".equals(ct1) && ct1.equals(ct2) && ct1.equals(ct3))) {
-            throw new RuntimeException("Unexpected content type");
-        }
-        
-        book.setId(bookId + 1);
+        book.setId(++bookId);
         books.put(book.getId(), book);
 
         return Response.ok(book).build();
@@ -436,8 +351,8 @@ public class BookStore {
     
     @POST
     @Path("/booksinfo")
-    @Produces("text/xml")
-    @Consumes("application/xml")
+    @ProduceMime("text/xml")
+    @ConsumeMime("application/xml")
     public Response addBook(@XmlJavaTypeAdapter(BookInfoAdapter.class) 
                             BookInfo bookInfo) {
         return Response.ok(bookInfo.asBook()).build();
@@ -445,8 +360,8 @@ public class BookStore {
 
     @POST
     @Path("/binarybooks")
-    @Produces("text/xml")
-    @Consumes("application/octet-stream")
+    @ProduceMime("text/xml")
+    @ConsumeMime("application/octet-stream")
     public Response addBinaryBook(long[] book) {
         return Response.ok(book).build();
     }
@@ -494,7 +409,7 @@ public class BookStore {
     
     @PUT
     @Path("/bookswithjson/")
-    @Consumes("application/json")
+    @ConsumeMime("application/json")
     public Response updateBookJSON(Book book) {
         Book b = books.get(book.getId());
 
@@ -544,8 +459,8 @@ public class BookStore {
 
     @POST
     @Path("/booksplain")
-    @Consumes("text/plain")
-    @Produces("text/plain")
+    @ConsumeMime("text/plain")
+    @ProduceMime("text/plain")
     public Long echoBookId(long theBookId) {
         return new Long(theBookId);
     }
@@ -560,7 +475,7 @@ public class BookStore {
 
     @GET
     @Path("/cdwithmultitypes/{CDId}/")
-    @Produces({"application/xml", "application/bar+xml", "application/json" }) 
+    @ProduceMime({"application/xml", "application/bar+xml", "application/json" }) 
     public CD getCDWithMultiContentTypes(@PathParam("CDId") String id) {
         CD cd = cds.get(Long.parseLong(id));
 

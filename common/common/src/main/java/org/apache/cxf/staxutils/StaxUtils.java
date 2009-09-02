@@ -54,6 +54,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
@@ -99,7 +100,14 @@ public final class StaxUtils {
     
     private StaxUtils() {
     }
-    
+
+    /**
+     * CXF works with multiple STaX parsers. When we can't find any other way to work 
+     * against the different parsers, this can be used to condition code. Note: if you've got
+     * Woodstox in the class path without being the default provider, this will return
+     * the wrong answer.
+     * @return true if Woodstox is in the classpath. 
+     */
     public static boolean isWoodstox() {
         try {
             ClassLoaderUtils.loadClass("org.codehaus.stax2.XMLStreamReader2", StaxUtils.class);
@@ -108,7 +116,7 @@ public final class StaxUtils {
         }
         return true;
     }
-
+    
     /**
      * Return a cached, namespace-aware, factory.
      * @return
@@ -677,6 +685,15 @@ public final class StaxUtils {
         case Node.DOCUMENT_NODE:
             writeDocument((Document)n, writer, repairing);
             break;
+        case Node.DOCUMENT_FRAGMENT_NODE: {
+            DocumentFragment frag = (DocumentFragment)n;
+            Node child = frag.getFirstChild();
+            while (child != null) {
+                writeNode(child, writer, repairing);
+                child = child.getNextSibling();
+            }
+            break;
+        }
         default:
             throw new IllegalStateException("Found type: " + n.getClass().getName());
         }        
@@ -877,7 +894,6 @@ public final class StaxUtils {
             returnXMLInputFactory(factory);
         }
     }
-
     public static XMLStreamReader createXMLStreamReader(String systemId, InputStream in) {
         XMLInputFactory factory = getXMLInputFactory();
         try {
@@ -888,7 +904,6 @@ public final class StaxUtils {
             returnXMLInputFactory(factory);
         }
     }
-
     
     public static XMLStreamReader createXMLStreamReader(Element el) {
         return new W3CDOMStreamReader(el);

@@ -35,7 +35,6 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BadgerFishProvider"/>
             <ref bean="exceptionMapper"/>
-            <ref bean="exceptionMapper2"/>
         </jaxrs:providers>
     </jaxrs:server>
     <bean id="bookstore" scope="prototype" class="org.apache.cxf.systest.jaxrs.BookStore"/>
@@ -43,5 +42,4 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <bean id="exceptionMapper" class="org.apache.cxf.systest.jaxrs.BookExceptionMapper">
         <property name="toHandle" value="true"/>
     </bean>   
-    <bean id="exceptionMapper2" class="org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper"/>
 </beans>

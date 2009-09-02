@@ -27,11 +27,10 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
@@ -57,7 +56,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/stream")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromStream(StreamSource source) throws Exception {
         JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
         Unmarshaller u = c.createUnmarshaller();
@@ -68,8 +67,8 @@ public class MultipartStore {
     
     @POST
     @Path("/books/form")
-    @Consumes("multipart/form-data")
-    @Produces("text/xml")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
     public Response addBookFromForm(MultivaluedMap<String, String> data) throws Exception {
         Book b = new Book();
         b.setId(Long.valueOf(data.getFirst("id")));
@@ -79,8 +78,8 @@ public class MultipartStore {
     
     @POST
     @Path("/books/formbody")
-    @Consumes("multipart/form-data")
-    @Produces("text/xml")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
     public Response addBookFromFormBody(MultipartBody body) throws Exception {
         MultivaluedMap<String, String> data = AttachmentUtils.populateFormMap(context);
         Book b = new Book();
@@ -91,50 +90,31 @@ public class MultipartStore {
     
     @POST
     @Path("/books/formbody2")
-    @Consumes("multipart/form-data")
-    @Produces("text/xml")
+    @ConsumeMime("multipart/form-data")
+    @ProduceMime("text/xml")
     public Response addBookFromFormBody2() throws Exception {
         return addBookFromFormBody(AttachmentUtils.getMultipartBody(context));
     }
     
     
     @POST
-    @Path("/books/formparam")
-    @Produces("text/xml")
-    public Response addBookFromFormParam(@FormParam("name") String title, 
-                                         @FormParam("id") Long id) throws Exception {
-        Book b = new Book();
-        b.setId(id);
-        b.setName(title);
-        return Response.ok(b).build();
-    }
-    
-    @POST
-    @Path("/books/formparambean")
-    @Produces("text/xml")
-    public Response addBookFromFormParam(@FormParam("") Book b) throws Exception {
-        return Response.ok(b).build();
-    }
-    
-    
-    @POST
     @Path("/books/istream")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromInputStream(InputStream is) throws Exception {
         return readBookFromInputStream(is);
     }
     
     @POST
     @Path("/books/dsource")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromDataSource(DataSource ds) throws Exception {
         return readBookFromInputStream(ds.getInputStream());
     }
     
     @POST
     @Path("/books/jaxb2")
-    @Consumes("multipart/related;type=\"text/xml\"")
-    @Produces("text/xml")
+    @ConsumeMime("multipart/related;type=\"text/xml\"")
+    @ProduceMime("text/xml")
     public Response addBookParts(@Multipart("rootPart") Book b1,
                                  @Multipart("book2") Book b2) 
         throws Exception {
@@ -150,7 +130,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/jaxbjson")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookJaxbJson(
         @Multipart(value = "rootPart", type = "text/xml") Book2 b1,
         @Multipart(value = "book2", type = "application/json") Book b2) 
@@ -165,7 +145,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/dsource2")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromDataSource2(@Multipart("rootPart") DataSource ds1,
                                            @Multipart("book2") DataSource ds2) 
         throws Exception {
@@ -184,7 +164,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/listattachments")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromListOfAttachments(List<Attachment> atts)  
         throws Exception {
         Response r1 = readBookFromInputStream(atts.get(0).getDataHandler().getInputStream());
@@ -202,7 +182,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/body")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromListOfAttachments(MultipartBody body)  
         throws Exception {
         return addBookFromListOfAttachments(body.getAllAttachments());
@@ -210,7 +190,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/lististreams")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromListOfStreams(List<InputStream> atts)  
         throws Exception {
         Response r1 = readBookFromInputStream(atts.get(0));
@@ -228,21 +208,21 @@ public class MultipartStore {
     
     @POST
     @Path("/books/dhandler")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromDataHandler(DataHandler dh) throws Exception {
         return readBookFromInputStream(dh.getInputStream());
     }
     
     @POST
     @Path("/books/attachment")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromAttachment(Attachment a) throws Exception {
         return readBookFromInputStream(a.getDataHandler().getInputStream());
     }
     
     @POST
     @Path("/books/mchandlers")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromMessageContext() throws Exception {
         Map<String, Attachment> handlers = AttachmentUtils.getAttachmentsMap(context);
         for (Map.Entry<String, Attachment> entry : handlers.entrySet()) {
@@ -255,7 +235,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/attachments")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookFromAttachments() throws Exception {
         Collection<Attachment> handlers = AttachmentUtils.getChildAttachments(context);
         for (Attachment a : handlers) {
@@ -268,7 +248,7 @@ public class MultipartStore {
     
     @POST
     @Path("/books/jaxb")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBook(Book b) throws Exception {
         b.setId(124);
         return Response.ok(b).build();
@@ -276,15 +256,15 @@ public class MultipartStore {
     
     @POST
     @Path("/books/mismatch1")
-    @Consumes("multipart/related;type=\"bar/foo\"")
-    @Produces("text/xml")
+    @ConsumeMime("multipart/related;type=\"bar/foo\"")
+    @ProduceMime("text/xml")
     public Response addBookMismatched(Book b) {
         throw new WebApplicationException();
     }
     
     @POST
     @Path("/books/mismatch2")
-    @Produces("text/xml")
+    @ProduceMime("text/xml")
     public Response addBookMismatched2(@Multipart(value = "rootPart", type = "f/b") Book b) {
         throw new WebApplicationException();
     }

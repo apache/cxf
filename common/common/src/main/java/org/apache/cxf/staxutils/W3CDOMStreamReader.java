@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 import org.w3c.dom.Attr;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -54,8 +55,20 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         this.document = element.getOwnerDocument();
     }
     public W3CDOMStreamReader(Document doc) {
-        super(new ElementFrame<Node, Node>(doc));
+        super(new ElementFrame<Node, Node>(doc, false) {
+            public boolean isDocument() {
+                return true;
+            }
+        });
         this.document = doc;
+    }
+    public W3CDOMStreamReader(DocumentFragment docfrag) {
+        super(new ElementFrame<Node, Node>(docfrag, true) {
+            public boolean isDocumentFragment() {
+                return true;
+            }
+        });
+        this.document = docfrag.getOwnerDocument();
     }
 
     /**

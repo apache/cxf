@@ -24,12 +24,11 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
-import java.util.Locale;
 import java.util.Map;
 import java.util.WeakHashMap;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -50,8 +49,8 @@ import javax.xml.stream.XMLStreamWriter;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLInputFactory;
 import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
 
-@Produces("application/json")
-@Consumes("application/json")
+@ProduceMime("application/json")
+@ConsumeMime("application/json")
 @Provider
 public final class BadgerFishProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object>  {
@@ -61,15 +60,15 @@ public final class BadgerFishProvider
     @Context
     private HttpHeaders requestHeaders;  
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
     
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return type.getAnnotation(XmlRootElement.class) != null;
     }
 
-    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType m) {
+    public long getSize(Object o) {
         return -1;
     }
     
@@ -96,7 +95,7 @@ public final class BadgerFishProvider
     public void writeTo(Object obj, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) {
         try {
-            if (!new Locale("badgerFishLanguage").equals(requestHeaders.getLanguage())) {
+            if (!"badger-fish-language".equals(requestHeaders.getLanguage())) {
                 throw new RuntimeException();
             }
             

@@ -37,7 +37,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(MultipartServer.class));
+                   launchServer(MultipartServer.class, true));
     }
     
     @Test
@@ -106,11 +106,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
-    @Test
-    public void testAddBookFormParam() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparam";
-        doAddBook("multipart/form-data", address, "attachmentForm", 200);               
-    }
     
     @Test
     public void testAddBookFormBody() throws Exception {
@@ -124,12 +119,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
-    @Test
-    public void testAddBookFormParamBean() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparambean";
-        doAddBook("multipart/form-data", address, "attachmentForm", 200);               
-    }
-    
+   
     @Test
     public void testAddBookAsJAXB2() throws Exception {
         String address = "http://localhost:9085/bookstore/books/jaxb2";

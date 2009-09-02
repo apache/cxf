@@ -24,10 +24,8 @@ import java.net.URL;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 
-import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.schema_validation.SchemaValidation;
 import org.apache.schema_validation.SchemaValidationService;
@@ -45,7 +43,12 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
 
     @BeforeClass
     public static void startservers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(ValidationServer.class, true));
+        // set up configuration to enable schema validation
+        URL url = ValidationClientServerTest.class.getResource("cxf-config.xml");
+        assertNotNull("cannot find test resource", url);
+        defaultConfigFileName = url.toString();
+
+        assertTrue("server did not launch correctly", launchServer(ValidationServer.class));
     }
 
     // TODO : Change this test so that we test the combinations of
@@ -53,6 +56,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
     // Only tests client side validation enabled/server side disabled.
     @Test
     public void testSchemaValidation() throws Exception {
+        System.setProperty("cxf.config.file.url", getClass().getResource("cxf-config.xml").toString());
         URL wsdl = getClass().getResource("/wsdl/schema_validation.wsdl");
         assertNotNull(wsdl);
 
@@ -60,8 +64,6 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         assertNotNull(service);
 
         SchemaValidation validation = service.getPort(portName, SchemaValidation.class);
-        ((BindingProvider)validation).getRequestContext()
-            .put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
 
         ComplexStruct complexStruct = new ComplexStruct();
         complexStruct.setElem1("one");
@@ -72,7 +74,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         try {
             /*boolean result =*/
             validation.setComplexStruct(complexStruct);
-            fail("Set ComplexStruct should have thrown ProtocolException");
+            fail("Set ComplexStruct hould have thrown ProtocolException");
         } catch (WebServiceException e) {
             String expected = "'{\"http://apache.org/schema_validation/types\":elem2}' is expected.";
             assertTrue(e.getMessage(), e.getMessage().indexOf(expected) != -1);
@@ -88,13 +90,11 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         try {
             /*boolean result =*/
             validation.setOccuringStruct(occuringStruct);
-            fail("Set OccuringStruct should have thrown ProtocolException");
+            fail("Set OccuringStruct hould have thrown ProtocolException");
         } catch (WebServiceException e) {
             String expected = "'{\"http://apache.org/schema_validation/types\":varFloat}' is expected.";
             assertTrue(e.getMessage().indexOf(expected) != -1);
         }
-        ((BindingProvider)validation).getRequestContext()
-            .put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);
 
         try {
             // The server will attempt to return an invalid ComplexStruct
@@ -109,8 +109,6 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
                        e.getMessage().indexOf(expected) != -1);
         }
 
-        ((BindingProvider)validation).getRequestContext()
-            .put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
         try {
             // The server will attempt to return an invalid OccuringStruct
             // When validation is disabled on the server side, we'll get the
