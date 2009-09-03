@@ -53,6 +53,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
+import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.JmsUtils;
 
@@ -76,9 +77,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     private String conduitId;
     private AtomicLong messageCount;
     private JMSBusLifeCycleListener listener;
+    private Bus bus;
 
-    public JMSConduit(EndpointInfo endpointInfo, EndpointReferenceType target, JMSConfiguration jmsConfig) {
+    public JMSConduit(EndpointInfo endpointInfo, 
+                      EndpointReferenceType target, 
+                      JMSConfiguration jmsConfig,
+                      Bus b) {
         super(target);
+        bus = b;
         this.jmsConfig = jmsConfig;
         this.endpointInfo = endpointInfo;
         correlationMap = new ConcurrentHashMap<String, Exchange>();
@@ -99,6 +105,29 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         boolean isTextPayload = JMSConstants.TEXT_MESSAGE_TYPE.equals(jmsConfig.getMessageType());
         JMSOutputStream out = new JMSOutputStream(this, message.getExchange(), isTextPayload);
         message.setContent(OutputStream.class, out);
+    }
+    
+    private synchronized AbstractMessageListenerContainer getJMSListener() {
+        if (jmsListener == null) {
+            jmsListener = JMSFactory.createJmsListener(jmsConfig, this, 
+                                                       jmsConfig.getReplyDestination(), 
+                                                       conduitId, 
+                                                       false);
+            addBusListener();
+        }
+        return jmsListener;
+    }
+    private synchronized AbstractMessageListenerContainer getAllListener() {
+        if (allListener == null) {
+            allListener = JMSFactory.createJmsListener(jmsConfig, 
+                                                       this, 
+                                                       jmsConfig.getReplyDestination(), 
+                                                       null, 
+                                                       true);
+            addBusListener();
+        }
+        
+        return allListener;
     }
 
     /**
@@ -130,27 +159,12 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
         final JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, headers);
         String userCID = headers != null ? headers.getJMSCorrelationID() : null;
-        DefaultMessageListenerContainer jmsList = jmsListener;
+        AbstractMessageListenerContainer jmsList = jmsListener;
         if (!exchange.isOneWay()) {
             if (userCID == null || !jmsConfig.isUseConduitIdSelector()) { 
-                if (jmsListener == null) {
-                    jmsListener = JMSFactory.createJmsListener(jmsConfig, this, 
-                                                               jmsConfig.getReplyDestination(), 
-                                                               conduitId, 
-                                                               false);
-                    addBusListener(exchange.get(Bus.class));
-                }
-                jmsList = jmsListener;
+                jmsList = getJMSListener();
             } else {
-                if (allListener == null) {
-                    allListener = JMSFactory.createJmsListener(jmsConfig, 
-                                                               this, 
-                                                               jmsConfig.getReplyDestination(), 
-                                                               null, 
-                                                               true);
-                    addBusListener(exchange.get(Bus.class));
-                }
-                jmsList = allListener;
+                jmsList = getAllListener();
             }
         }
         
@@ -245,7 +259,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             }
         }
     }
-    private synchronized void addBusListener(Bus bus) {
+    private synchronized void addBusListener() {
         if (listener == null && bus != null) {
             BusLifeCycleManager blcm = bus.getExtension(BusLifeCycleManager.class);
             if (blcm != null) {
