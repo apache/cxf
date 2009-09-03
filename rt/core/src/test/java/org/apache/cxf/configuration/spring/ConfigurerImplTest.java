@@ -21,6 +21,7 @@ package org.apache.cxf.configuration.spring;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Set;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.DatatypeConverterInterface;
@@ -31,6 +32,11 @@ import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.configuration.Configurable;
 import org.junit.Assert;
 import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+
 
 
 
@@ -211,6 +217,23 @@ public class ConfigurerImplTest extends Assert {
         assertEquals("b", configurer.getBeanName(beanInstance));
         beanInstance = this;
         assertNull(configurer.getBeanName(beanInstance));
+    }
+    
+    @Test
+    public void testAddApplicationContext() {
+        ConfigurableApplicationContext context1 =
+            new ClassPathXmlApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml");
+        ConfigurerImpl configurer = new ConfigurerImpl();
+        configurer.setApplicationContext(context1);
+        // Just to simulate the OSGi's uninstall command
+        context1.close();
+        
+        ConfigurableApplicationContext context2 =
+            new ClassPathXmlApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml");
+        configurer.addApplicationContext(context2);
+        Set<ApplicationContext> contexts = configurer.getAppContexts();
+        assertEquals("The Context's size is wrong", 1, contexts.size());
+        assertTrue("The conetxts' contains a wrong application context", contexts.contains(context2));
     }
     
     final class SimpleBean implements Configurable {
