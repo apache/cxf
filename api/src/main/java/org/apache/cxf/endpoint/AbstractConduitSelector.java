@@ -61,7 +61,7 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
      * 
      * @param message the current Message
      */
-    protected Conduit getSelectedConduit(Message message) {
+    protected synchronized Conduit getSelectedConduit(Message message) {
         if (selectedConduit == null) {
             Exchange exchange = message.getExchange();
             EndpointInfo ei = endpoint.getEndpointInfo();
