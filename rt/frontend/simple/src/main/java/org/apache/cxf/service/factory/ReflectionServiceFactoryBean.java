@@ -650,10 +650,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             : CastUtils.cast(op.getParameterOrdering(), String.class))) {
             bindOperation(o, method);
             o.setProperty(ReflectionServiceFactoryBean.METHOD, method);
+            sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
         } else {
             LOG.log(Level.WARNING, "NO_METHOD_FOR_OP", o.getName());
         }
-        sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
     }
     
     /**

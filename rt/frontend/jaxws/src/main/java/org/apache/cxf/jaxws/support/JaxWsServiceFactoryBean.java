@@ -65,6 +65,7 @@ import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.FactoryBeanListener;
+import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -199,13 +200,15 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         o.setProperty(METHOD, method);
         initializeWrapping(o, method);
 
-        bindOperation(o, method);
-
         // rpc out-message-part-info class mapping
         Operation op = (Operation)o.getProperty(WSDLServiceBuilder.WSDL_OPERATION);
 
         initializeClassInfo(o, method, op == null ? null
             : CastUtils.cast(op.getParameterOrdering(), String.class));
+
+        bindOperation(o, method);
+
+        sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
     }
     
     protected void bindOperation(OperationInfo op, Method method) {
