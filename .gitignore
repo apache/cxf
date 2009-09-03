@@ -1,0 +1,8 @@
+.checkstyle
+.classpath
+.pmd
+.project
+.ruleset
+.settings/
+target/
+velocity.log
