@@ -223,16 +223,19 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     public final void addApplicationContext(ApplicationContext ac) {
         if (!appContexts.contains(ac)) {
             appContexts.add(ac);
-            
+            List<ApplicationContext> inactiveApplicationContexts = new ArrayList<ApplicationContext>();
             Iterator<ApplicationContext> it = appContexts.iterator();
             while (it.hasNext()) {
                 ApplicationContext c = it.next();
                 if (c instanceof ConfigurableApplicationContext
                     && !((ConfigurableApplicationContext)c).isActive()) {
-                    it.remove();
+                    inactiveApplicationContexts.add(c);
                 }
             }
-            
+            // Remove the inactive application context here can avoid the UnsupportedOperationException
+            for (ApplicationContext context : inactiveApplicationContexts) {
+                appContexts.remove(context);
+            }
             initWildcardDefinitionMap();
         }
     }
@@ -244,5 +247,9 @@ public class ConfigurerImpl extends BeanConfigurerSupport
 
     public Class<?> getRegistrationType() {
         return Configurer.class;
+    }
+    
+    protected Set<ApplicationContext> getAppContexts() {
+        return appContexts;
     }
 }
