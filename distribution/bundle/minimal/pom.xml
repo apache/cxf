@@ -125,6 +125,11 @@
             <artifactId>cxf-rt-ws-rm</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+               <groupId>com.sun.xml.fastinfoset</groupId>
+               <artifactId>FastInfoset</artifactId>
+               <optional>true</optional>
+          </dependency>
     </dependencies>
 
     <build>
