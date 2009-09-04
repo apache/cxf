@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.type;
 
+import java.lang.reflect.Type;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -36,7 +37,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
  */
 public abstract class AegisType {
 
-    protected Class typeClass;
+    protected Type typeClass;
     private QName schemaType;
     private TypeMapping typeMapping;
     private boolean abstrct = true;
@@ -99,20 +100,35 @@ public abstract class AegisType {
     }
 
     /**
-     * @return Returns the typeClass.
+     * @return Returns the java type as a Class. If the type is not a 
+     * plain class, return null.
      */
     public Class getTypeClass() {
+        if (typeClass instanceof Class) {
+            return (Class)typeClass;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * @return Return the Java type.
+     */
+    public Type getType() {
         return typeClass;
     }
 
     /**
      * @param typeClass The typeClass to set.
      */
-    public void setTypeClass(Class typeClass) {
+    public void setTypeClass(Type typeClass) {
         this.typeClass = typeClass;
 
-        if (typeClass.isPrimitive()) {
-            setNillable(false);
+        if (typeClass instanceof Class) {
+            Class<?> plainClass = (Class<?>) typeClass;
+            if (plainClass.isPrimitive()) {
+                setNillable(false);
+            }
         }
     }
 
@@ -243,8 +259,13 @@ public abstract class AegisType {
     public String toString() {
         StringBuffer sb = new StringBuffer(getClass().getName());
         sb.append("[class=");
-        Class c = getTypeClass();
-        sb.append((c == null) ? "<null>" : c.getName());
+        Type c = getTypeClass();
+        if (c instanceof Class) {
+            Class<?> plainClass = (Class<?>)c;
+            sb.append(plainClass.getName());
+        } else {
+            sb.append("<generic or null>");
+        }
         sb.append(",\nQName=");
         QName q = getSchemaType();
         sb.append((q == null) ? "<null>" : q.toString());

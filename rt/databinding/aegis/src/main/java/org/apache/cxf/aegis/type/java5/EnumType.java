@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
+import java.lang.reflect.Type;
+
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AegisType;
@@ -46,9 +48,14 @@ public class EnumType extends AegisType {
     }
 
     @Override
-    public void setTypeClass(Class typeClass) {
-        if (!typeClass.isEnum()) {
-            throw new DatabindingException("AegisType class must be an enum.");
+    public void setTypeClass(Type typeClass) {
+        if (!(typeClass instanceof Class)) {
+            throw new DatabindingException("Aegis cannot map generic Enums.");
+        }
+        
+        Class<?> plainClass = (Class<?>)typeClass;
+        if (!plainClass.isEnum()) {
+            throw new DatabindingException("EnumType must map an enum.");
         }
 
         super.setTypeClass(typeClass);

@@ -25,6 +25,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -88,8 +89,10 @@ public class BeanType extends AegisType {
     }
 
     private void initTypeClass() {
-        this.isInterface = typeClass.isInterface();
-        isException = Exception.class.isAssignableFrom(typeClass);
+        // throw if someone tries to set up a generic bean.
+        Class<?> plainClass = (Class<?>) typeClass;
+        this.isInterface = plainClass.isInterface();
+        isException = Exception.class.isAssignableFrom(plainClass);
     }
 
     /**
@@ -478,7 +481,7 @@ public class BeanType extends AegisType {
      * {@inheritDoc}
      */
     @Override
-    public void setTypeClass(Class typeClass) {
+    public void setTypeClass(Type typeClass) {
         super.setTypeClass(typeClass);
 
         initTypeClass();
