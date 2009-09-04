@@ -193,7 +193,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 return paramType; // take our chances.
             }
         } else {
-            throw new DatabindingException("Type " + genericType + " is not a generic.");
+            return null;
         }
     }
 

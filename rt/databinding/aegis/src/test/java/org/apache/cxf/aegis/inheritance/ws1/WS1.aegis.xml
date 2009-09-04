@@ -1,4 +1,4 @@
-/**
+<!-- 
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements. See the NOTICE file
  * distributed with this work for additional information
@@ -15,28 +15,12 @@
  * KIND, either express or implied. See the License for the
  * specific language governing permissions and limitations
  * under the License.
- */
-package org.apache.cxf.aegis.inheritance.ws1;
-
-import java.util.Map;
-
-public interface WS1 {
-    BeanA getBeanA();
-
-    BeanB getBeanB();
-
-    BeanA getBean(String id);
-
-    BeanA[] listBeans();
-
-    RootBean getRootBean(String id);
-
-    RootBean[] listRootBeans();
-
-    ResultBean getResultBean();
-
-    Map echoMap(Map beans);
-    Map echoRawMap(Map rawMap);
-
-    void throwException(boolean extendedOne) throws WS1Exception;
-}
+ * -->
+<mappings xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<mapping>
+	<method name="echoMap">
+      <return-type keyType="java.lang.String" valueType="java.lang.String" />
+      <parameter index="0" keyType="java.lang.String" valueType="java.lang.String" />
+    </method>
+	</mapping>
+</mappings> 
