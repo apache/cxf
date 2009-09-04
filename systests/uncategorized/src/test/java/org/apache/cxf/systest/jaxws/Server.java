@@ -51,6 +51,10 @@ public class Server extends AbstractBusTestServerBase {
         address = "http://localhost:9000/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
+        implementor = new RefGreeterImpl();
+        address = "http://localhost:9000/SoapContext/SoapPort2";
+        Endpoint.publish(address, implementor);
+        
         //publish port with soap12 binding
         address = "http://localhost:9009/SoapContext/SoapPort";
 
@@ -68,6 +72,7 @@ public class Server extends AbstractBusTestServerBase {
         address = "http://localhost:9015/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
     }
+    
     @WebService(endpointInterface = "org.apache.hello_world_soap_http.Greeter",
                 targetNamespace = "http://apache.org/hello_world_soap_http")
     public class Greeter12Impl extends BaseGreeterImpl {
@@ -86,7 +91,21 @@ public class Server extends AbstractBusTestServerBase {
         }
     }
     
-    
+    @WebService(serviceName = "SOAPService",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.cxf.hello_world.elrefs.Greeter",
+                targetNamespace = "http://apache.org/hello_world_soap_http",
+                wsdlLocation = "testutils/hello_world_ref.wsdl")
+    public class RefGreeterImpl implements org.apache.cxf.hello_world.elrefs.Greeter {
+        public String greetMe(String requestType) {
+            return "Hello " + requestType;
+        }
+
+        public String sayHi() {
+            return "hi";
+        }
+    }
+
     @WebService(serviceName = "SOAPServiceBogusAddressTest",
                 portName = "SoapPort",
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter",

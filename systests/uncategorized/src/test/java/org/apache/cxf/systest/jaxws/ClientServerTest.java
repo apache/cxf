@@ -103,7 +103,13 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
-
+    @Test
+    public void testCXF2419() {
+        org.apache.cxf.hello_world.elrefs.SOAPService serv 
+            = new org.apache.cxf.hello_world.elrefs.SOAPService();
+        assertEquals("Hello CXF", serv.getSoapPort().greetMe("CXF"));
+    }
+    
     @Test
     public void testBase64() throws URISyntaxException  {
         URL wsdl = getClass().getResource("/wsdl/others/dynamic_client_base64.wsdl");

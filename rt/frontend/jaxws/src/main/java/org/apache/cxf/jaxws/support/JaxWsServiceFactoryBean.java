@@ -210,13 +210,13 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         o.setProperty(METHOD, method);
         initializeWrapping(o, method);
 
-        bindOperation(o, method);
-
         // rpc out-message-part-info class mapping
         Operation op = (Operation)o.getProperty(WSDLServiceBuilder.WSDL_OPERATION);
 
         initializeClassInfo(o, method, op == null ? null
             : CastUtils.cast(op.getParameterOrdering(), String.class));
+
+        bindOperation(o, method);
     }
     
     protected void bindOperation(OperationInfo op, Method method) {
