@@ -21,6 +21,10 @@ package org.apache.cxf.common.xmlschema;
 
 import java.io.Reader;
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -72,6 +76,9 @@ public class SchemaCollection {
     }
 
     private XmlSchemaCollection schemaCollection;
+    private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema 
+        = new HashMap<XmlSchema, Set<XmlSchemaType>>();
+
 
     public SchemaCollection() {
         this(new XmlSchemaCollection());
@@ -346,7 +353,35 @@ public class SchemaCollection {
         XmlSchemaUtils.addImportIfNeeded(schema, element.getSchemaTypeName());
         // if there's an anonymous type, it might have element refs in it.
         XmlSchemaType schemaType = element.getSchemaType();
-        addCrossImportsType(schema, schemaType);
+        if (!crossImportsAdded(schema, schemaType)) {
+            addCrossImportsType(schema, schemaType);
+        }
+    }
+
+    /**
+     * Determines whether the schema has already received (cross) imports for
+     * the schemaType
+     * @param schema
+     * @param schemaType
+     * @return false if cross imports for schemaType must still be added to schema
+     */
+    private boolean crossImportsAdded(XmlSchema schema, XmlSchemaType schemaType) {
+        boolean result = true;
+        if (schemaType != null) {
+            Set<XmlSchemaType> xmlTypesCheckedForCrossImports;
+            if (!xmlTypesCheckedForCrossImportsPerSchema.containsKey(schema)) {
+                xmlTypesCheckedForCrossImports = new HashSet<XmlSchemaType>();
+                xmlTypesCheckedForCrossImportsPerSchema.put(schema, xmlTypesCheckedForCrossImports);
+            } else {
+                xmlTypesCheckedForCrossImports = xmlTypesCheckedForCrossImportsPerSchema.get(schema);
+            }
+            if (!xmlTypesCheckedForCrossImports.contains(schemaType)) {
+                // cross imports for this schemaType have not yet been added
+                xmlTypesCheckedForCrossImports.add(schemaType);
+                result = false;
+            }
+        }
+        return result;
     }
 
     private void addCrossImportsType(XmlSchema schema, XmlSchemaType schemaType) {
