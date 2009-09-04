@@ -84,8 +84,7 @@ public class LocatorServiceImpl implements LocatorService {
     }
 
     
-    public java.util.List<
-        Endpoint> listEndpoints() {
+    public List<Endpoint> listEndpoints() {
         LOG.info("Executing operation listEndpoints");
         return new ArrayList<Endpoint>();
     }
