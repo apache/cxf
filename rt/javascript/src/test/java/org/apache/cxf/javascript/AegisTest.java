@@ -77,6 +77,7 @@ public class AegisTest extends JavascriptRhinoTest {
         return null;
     }
     
+    @org.junit.Ignore
     @Test
     public void callAcceptAny() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
@@ -97,6 +98,7 @@ public class AegisTest extends JavascriptRhinoTest {
         return null;
     }
     
+    @org.junit.Ignore
     @Test
     public void callAcceptAnyTyped() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
