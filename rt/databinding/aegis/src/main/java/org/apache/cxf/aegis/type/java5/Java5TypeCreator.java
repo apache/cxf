@@ -46,13 +46,12 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         this.annotationReader = annotationReader;
     }
     
-    @SuppressWarnings("unchecked")
     public static Class<? extends AegisType> castToAegisTypeClass(Class<?> c) {
         if (c == null) {
             return null;
         }
         if (AegisType.class.isAssignableFrom(c)) {
-            return (Class<? extends AegisType>)c;
+            return c.asSubclass(AegisType.class);
         } else {
             throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
         }
