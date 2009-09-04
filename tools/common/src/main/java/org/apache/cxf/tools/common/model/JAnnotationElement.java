@@ -119,9 +119,11 @@ public final class JAnnotationElement {
         Enum e = (Enum) obj;
 
         String clzName = e.getClass().getName();
-        
-        imports.add(obj.getClass().getName().replace("$", "."));
-
+        if (clzName.contains("$")) {
+            imports.add(obj.getClass().getName().substring(0, clzName.lastIndexOf("$")));
+        } else {
+            imports.add(obj.getClass().getName());
+        }
         sb.append(clzName.substring(clzName.lastIndexOf(".") + 1).replace("$", "."));
         sb.append(".");
         sb.append(e.name());
