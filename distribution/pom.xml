@@ -273,6 +273,11 @@
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
+             <groupId>com.sun.xml.fastinfoset</groupId>
+             <artifactId>FastInfoset</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>

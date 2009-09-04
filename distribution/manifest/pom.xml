@@ -270,6 +270,10 @@
             <groupId>ant</groupId>
             <artifactId>ant</artifactId>
         </dependency>
+        <dependency>
+             <groupId>com.sun.xml.fastinfoset</groupId>
+             <artifactId>FastInfoset</artifactId>
+        </dependency>
 
     </dependencies>
 
