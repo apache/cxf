@@ -100,15 +100,12 @@ public abstract class AegisType {
     }
 
     /**
-     * @return Returns the java type as a Class. If the type is not a 
-     * plain class, return null.
+     * @return Returns the java type as a Class. 
+     * For a generic, return the raw type. For something
+     * truly exotic, return null.
      */
     public Class getTypeClass() {
-        if (typeClass instanceof Class) {
-            return (Class)typeClass;
-        } else {
-            return null;
-        }
+        return TypeUtil.getTypeRelatedClass(typeClass);
     }
     
     /**

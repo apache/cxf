@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.aegis.type;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -178,9 +180,64 @@ public final class TypeUtil {
         
     }
     
-    
     public static void setAttributeAttributes(QName name, AegisType type, XmlSchema root) {
         String ns = type.getSchemaType().getNamespaceURI();
         XmlSchemaUtils.addImportIfNeeded(root, ns);
+    }
+
+    /**
+     * Utility function to cast a Type to a Class. This throws an unchecked exception if the Type is
+     * not a Class. The idea here is that these Type references should have been checked for 
+     * reasonableness before the point of calls to this function.
+     * @param type Reflection type.
+     * @param throwForNonClass whether to throw (true) or return null (false) if the Type
+     * is not a class.
+     * @return the Class
+     */
+    public static Class<?> getTypeClass(Type type, boolean throwForNonClass) {
+        if (type instanceof Class) {
+            return (Class) type;
+        } else if (throwForNonClass) {
+            throw new RuntimeException("Attempt to derive Class from reflection Type " + type);
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Insist that a Type is a parameterized type of one parameter.
+     * This is used to decompose Holders, for example.
+     * @param type the type
+     * @return the parameter, or null if the type is not what we want.
+     */
+    public static Type getSingleTypeParameter(Type type) {
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            Type[] params = pType.getActualTypeArguments();
+            if (params.length == 1) {
+                return params[0];
+            }
+        }
+        return null;
+    }
+
+    /**
+     * If a Type is a class, return it as a class.
+     * If it is a ParameterizedType, return the raw type as a class.
+     * Otherwise return null.
+     * @param type
+     * @return
+     */
+    public static Class<?> getTypeRelatedClass(Type type) {
+        Class<?> directClass = getTypeClass(type, false);
+        if (directClass != null) {
+            return directClass;
+        }
+        
+        if (type instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) type;
+            return getTypeRelatedClass(pType.getRawType());
+        }
+        return null;
     }
 }

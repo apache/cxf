@@ -20,6 +20,7 @@ package org.apache.cxf.aegis.type;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.BeanType;
@@ -39,9 +40,9 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
         info.setDescription("method " + m.getName() + " parameter " + index);
 
         if (index >= 0) {
-            info.setTypeClass(m.getParameterTypes()[index]);
+            info.setType(m.getParameterTypes()[index]);
         } else {
-            info.setTypeClass(m.getReturnType());
+            info.setType(m.getReturnType());
         }
 
         return info;
@@ -54,8 +55,8 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
 
     @Override
     public AegisType createCollectionType(TypeClassInfo info) {
-        if (info.getGenericType() == null) {
-            throw new DatabindingException("Cannot create mapping for " + info.getTypeClass().getName()
+        if (!(info.getType() instanceof ParameterizedType)) {
+            throw new DatabindingException("Cannot create mapping for " + info.getType() 
                                            + ", unspecified component type for " + info.getDescription());
         }
 
@@ -65,8 +66,16 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     @Override
     public AegisType createDefaultType(TypeClassInfo info) {
         BeanType type = new BeanType();
-        type.setSchemaType(createQName(info.getTypeClass()));
-        type.setTypeClass(info.getTypeClass());
+        /*
+         * As of this point, we refuse to do this for generics in general.
+         * This might be revisited ... it might turn out to 'just work'.
+         */
+        Class<?> typeClass = TypeUtil.getTypeClass(info.getType(), false);
+        if (typeClass == null) {
+            throw new DatabindingException("Unable to map generic type " + info.getType());
+        }
+        type.setSchemaType(createQName(typeClass));
+        type.setTypeClass(typeClass);
         type.setTypeMapping(getTypeMapping());
 
         BeanTypeInfo typeInfo = type.getTypeInfo();

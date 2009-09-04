@@ -21,7 +21,7 @@ package org.apache.cxf.aegis.type;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 
@@ -37,9 +37,6 @@ import org.apache.cxf.aegis.util.ServiceUtils;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
 
-/**
- * @author Hani Suleiman Date: Jun 14, 2005 Time: 11:59:57 PM
- */
 public abstract class AbstractTypeCreator implements TypeCreator {
     public static final String HTTP_CXF_APACHE_ORG_ARRAYS = "http://cxf.apache.org/arrays";
 
@@ -92,33 +89,39 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         return info;
     }
     
-    public TypeClassInfo createBasicClassInfo(Class typeClass) {
+    public TypeClassInfo createBasicClassInfo(Type type) {
         TypeClassInfo info = new TypeClassInfo();
-        info.setDescription("class '" + typeClass.getName() + '\'');
-        info.setTypeClass(typeClass);
+        Class typeClass = TypeUtil.getTypeClass(type, false);
+        if (typeClass != null) {
+            info.setDescription("class '" + typeClass.getName() + "'");
+        } else {
+            info.setDescription("type '" + type + "'");
+        }
+        info.setType(type);
 
         return info;
     }
 
     public AegisType createTypeForClass(TypeClassInfo info) {
-        Class javaType = info.getTypeClass();
+
+        Class javaClass = TypeUtil.getTypeRelatedClass(info.getType());
         AegisType result = null;
         boolean newType = true;
 
         if (info.getAegisTypeClass() != null) {
             result = createUserType(info);
-        } else if (isArray(javaType)) {
+        } else if (isArray(javaClass)) {
             result = createArrayType(info);
-        } else if (isMap(javaType)) {
+        } else if (isMap(javaClass)) {
             result = createMapType(info);
-        }  else if (isHolder(javaType)) {
+        }  else if (isHolder(javaClass)) {
             result = createHolderType(info);
-        } else if (isCollection(javaType)) {
+        } else if (isCollection(javaClass)) {
             result = createCollectionType(info);
-        } else if (isEnum(javaType)) {
+        } else if (isEnum(javaClass)) {
             result = createEnumType(info);
         } else {
-            AegisType type = getTypeMapping().getType(javaType);
+            AegisType type = getTypeMapping().getType(info.getType());
             if (type == null) {
                 if (info.getTypeName() != null) {
                     type = getTypeMapping().getType(info.getTypeName());
@@ -149,15 +152,14 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     }
 
     protected AegisType createHolderType(TypeClassInfo info) {
-        if (info.getGenericType() == null) {
-            throw new UnsupportedOperationException("To use holder types "
-                    + "you must have an XML descriptor declaring the component type.");
+
+        Type heldType = TypeUtil.getSingleTypeParameter(info.getType());
+        if (heldType == null) {
+            throw new UnsupportedOperationException("Invalid holder type " + info.getType());
         }
 
-        Class heldCls = (Class) info.getGenericType();
-        info.setTypeClass(heldCls);
-
-        return createType(heldCls);
+        info.setType(heldType);
+        return createType(heldType);
     }
 
 
@@ -175,18 +177,19 @@ public abstract class AbstractTypeCreator implements TypeCreator {
                 // If the @ annotation or XML file didn't specify a schema type,
                 // but the natural type has a schema type mapping, we use that rather
                 // than create nonsense.
-                if (info.getTypeClass().getPackage().getName().startsWith("java")) {
-                    name = tm.getTypeQName(info.getTypeClass());
+                Class<?> typeClass = TypeUtil.getTypeRelatedClass(info.getType());
+                if (typeClass.getPackage().getName().startsWith("java")) {
+                    name = tm.getTypeQName(typeClass);
                 }
-                // if it's still null, we'll take our lumps, but probably end up wih
+                // if it's still null, we'll take our lumps, but probably end up with
                 // an invalid schema.
                 if (name == null) {
-                    name = createQName(info.getTypeClass());
+                    name = createQName(typeClass);
                 }
             }
 
             type.setSchemaType(name);
-            type.setTypeClass(info.getTypeClass());
+            type.setTypeClass(info.getType());
             type.setTypeMapping(getTypeMapping());
 
             return type;
@@ -202,7 +205,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
     protected AegisType createArrayType(TypeClassInfo info) {
         ArrayType type = new ArrayType();
         type.setTypeMapping(getTypeMapping());
-        type.setTypeClass(info.getTypeClass());
+        type.setTypeClass(info.getType());
         type.setSchemaType(createCollectionQName(info, type.getComponentType()));
 
         if (info.getMinOccurs() != -1) {
@@ -246,7 +249,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
         type.setSchemaType(name);
 
-        type.setTypeClass(info.getTypeClass());
+        type.setTypeClass(info.getType());
 
         if (info.getMinOccurs() != -1) {
             type.setMinOccurs(info.getMinOccurs());
@@ -284,7 +287,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         QName schemaType = createMapQName(info, keyType, valueType);
         MapType type = new MapType(schemaType, keyType, valueType);
         type.setTypeMapping(getTypeMapping());
-        type.setTypeClass(info.getTypeClass());
+        type.setTypeClass(info.getType());
 
         return type;
     }
@@ -405,19 +408,9 @@ public abstract class AbstractTypeCreator implements TypeCreator {
      * @param t the reflected type.
      * @return the type
      */
-    public AegisType createType(java.lang.reflect.Type t) {
+    public AegisType createType(Type t) {
         TypeClassInfo info = new TypeClassInfo();
-        info.setGenericType(t);
-        if (t instanceof ParameterizedType) {
-            ParameterizedType pt = (ParameterizedType) t;
-            java.lang.reflect.Type rawType = pt.getRawType();
-            if (rawType instanceof Class) {
-                info.setTypeClass((Class)rawType);
-            } 
-        } else if (t instanceof Class) {
-            info.setTypeClass((Class)t);
-        }
-        
+        info.setType(t);
         info.setDescription("reflected type " + t.toString());
         return createTypeForClass(info);
         
