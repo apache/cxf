@@ -27,6 +27,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.TypeClassInfo;
@@ -44,6 +45,18 @@ public class Java5TypeCreator extends AbstractTypeCreator {
     public Java5TypeCreator(AnnotationReader annotationReader) {
         this.annotationReader = annotationReader;
     }
+    
+    @SuppressWarnings("unchecked")
+    public static Class<? extends AegisType> castToAegisTypeClass(Class<?> c) {
+        if (c == null) {
+            return null;
+        }
+        if (AegisType.class.isAssignableFrom(c)) {
+            return (Class<? extends AegisType>)c;
+        } else {
+            throw new DatabindingException("Invalid Aegis type annotation to non-type class" + c);
+        }
+    }
 
     @Override
     public TypeClassInfo createClassInfo(Method m, int index) {
@@ -59,7 +72,9 @@ public class Java5TypeCreator extends AbstractTypeCreator {
             }
             info.setTypeClass(m.getParameterTypes()[index]);
 
-            info.setType(annotationReader.getParamType(m, index));
+            Class paramTypeClass = annotationReader.getParamType(m, index);
+
+            info.setAegisTypeClass(castToAegisTypeClass(paramTypeClass));
 
             String paramName = annotationReader.getParamName(m, index);
             if (paramName != null) {
@@ -86,7 +101,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
                 info.setAnnotations(m.getAnnotations());
             }
 
-            info.setType(annotationReader.getReturnType(m));
+            info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getReturnType(m)));
 
             String returnName = annotationReader.getReturnName(m);
             if (returnName != null) {
@@ -104,7 +119,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         TypeClassInfo info = createBasicClassInfo(pd.getPropertyType());
         info.setGenericType(pd.getReadMethod().getGenericReturnType());
         info.setAnnotations(pd.getReadMethod().getAnnotations());
-        info.setType(annotationReader.getType(pd.getReadMethod()));
+        info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getType(pd.getReadMethod())));
 
         return info;
     }

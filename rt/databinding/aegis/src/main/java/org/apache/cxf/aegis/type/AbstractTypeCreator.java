@@ -105,7 +105,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         AegisType result = null;
         boolean newType = true;
 
-        if (info.getType() != null) {
+        if (info.getAegisTypeClass() != null) {
             result = createUserType(info);
         } else if (isArray(javaType)) {
             result = createArrayType(info);
@@ -167,7 +167,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected AegisType createUserType(TypeClassInfo info) {
         try {
-            AegisType type = (AegisType)info.getType().newInstance();
+            AegisType type = info.getAegisTypeClass().newInstance();
 
             QName name = info.getTypeName();
             if (name == null) {
@@ -191,9 +191,11 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
             return type;
         } catch (InstantiationException e) {
-            throw new DatabindingException("Couldn't instantiate type classs " + info.getType().getName(), e);
+            throw new DatabindingException("Couldn't instantiate type classs " 
+                                           + info.getAegisTypeClass().getName(), e);
         } catch (IllegalAccessException e) {
-            throw new DatabindingException("Couldn't access type classs " + info.getType().getName(), e);
+            throw new DatabindingException("Couldn't access type classs " 
+                                           + info.getAegisTypeClass().getName(), e);
         }
     }
 

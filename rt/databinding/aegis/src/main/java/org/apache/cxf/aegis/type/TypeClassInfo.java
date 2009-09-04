@@ -22,11 +22,11 @@ package org.apache.cxf.aegis.type;
 import javax.xml.namespace.QName;
 
 /**
- * Object to carry information for a type, such as that from an XML mapping file.
+ * Object to carry information for a aegisTypeClass, such as that from an XML mapping file.
  * 
  * Note that this class has a misleading name. It is used both for 
- * type information that corresponds to a type, and also for parameters 
- * of methods and elements of beans. When describing a top-level type,
+ * aegisTypeClass information that corresponds to a aegisTypeClass, and also for parameters 
+ * of methods and elements of beans. When describing a top-level aegisTypeClass,
  * minOccurs and maxOccurs are not meaningful. Nillable is only used for
  * parameters. It might be that the code could be deconfused by
  * using the nillable property in here for the non-parameters cases
@@ -49,7 +49,9 @@ public class TypeClassInfo {
     private Object valueType;
     private QName mappedName;
     private QName typeName;
-    private Class type;
+    // a Class reference to the aegis aegisTypeClass, if the app has specified it
+    // via XML or via an annotation.
+    private Class<? extends AegisType> aegisTypeClass;
     private String description;
     private long minOccurs = -1;
     private long maxOccurs = -1;
@@ -109,12 +111,12 @@ public class TypeClassInfo {
         this.typeName = name;
     }
 
-    public Class getType() {
-        return type;
+    public Class<? extends AegisType> getAegisTypeClass() {
+        return aegisTypeClass;
     }
 
-    public void setType(Class type) {
-        this.type = type;
+    public void setAegisTypeClass(Class<? extends AegisType> aegisTypeClass) {
+        this.aegisTypeClass = aegisTypeClass;
     }
 
     public QName getMappedName() {

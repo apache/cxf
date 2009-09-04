@@ -54,6 +54,7 @@ import org.xml.sax.SAXParseException;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.XMLBeanTypeInfo;
+import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -575,7 +576,8 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         String type = DOMUtils.getAttributeValueEmptyNull(parameter, "type");
         if (type != null) {
             try {
-                info.setType(ClassLoaderUtils.loadClass(type, getClass()));
+                Class aegisTypeClass = ClassLoaderUtils.loadClass(type, getClass()); 
+                info.setAegisTypeClass(Java5TypeCreator.castToAegisTypeClass(aegisTypeClass));
             } catch (ClassNotFoundException e) {
                 throw new DatabindingException("Unable to load type class " + type, e);
             }
