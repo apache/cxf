@@ -69,6 +69,11 @@
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+              <groupId>com.sun.xml.fastinfoset</groupId>
+              <artifactId>FastInfoset</artifactId>
+              <optional>true</optional>
+         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>

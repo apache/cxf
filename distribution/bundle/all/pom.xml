@@ -242,6 +242,12 @@
             <artifactId>cxf-rt-javascript</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+               <groupId>com.sun.xml.fastinfoset</groupId>
+               <artifactId>FastInfoset</artifactId>
+               <optional>true</optional>
+          </dependency>
+
     </dependencies>
 
     <build>
