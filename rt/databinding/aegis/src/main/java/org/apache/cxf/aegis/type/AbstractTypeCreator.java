@@ -153,7 +153,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
 
     protected AegisType createHolderType(TypeClassInfo info) {
 
-        Type heldType = TypeUtil.getSingleTypeParameter(info.getType());
+        Type heldType = TypeUtil.getSingleTypeParameter(info.getType(), 0);
         if (heldType == null) {
             throw new UnsupportedOperationException("Invalid holder type " + info.getType());
         }

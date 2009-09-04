@@ -211,11 +211,22 @@ public final class TypeUtil {
      * @return the parameter, or null if the type is not what we want.
      */
     public static Type getSingleTypeParameter(Type type) {
+        return getSingleTypeParameter(type, 0);
+    }
+
+    /**
+     * Insist that a Type is a parameterized type of one parameter.
+     * This is used to decompose Holders, for example.
+     * @param type the type
+     * @param index which parameter
+     * @return the parameter, or null if the type is not what we want.
+     */
+    public static Type getSingleTypeParameter(Type type, int index) {
         if (type instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) type;
             Type[] params = pType.getActualTypeArguments();
-            if (params.length == 1) {
-                return params[0];
+            if (params.length > index) {
+                return params[index];
             }
         }
         return null;

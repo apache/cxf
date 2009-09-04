@@ -476,17 +476,44 @@ public class XMLTypeCreator extends AbstractTypeCreator {
         // we only mess with the generic issues for list and map
         if (Collection.class.isAssignableFrom(relatedClass)) {
             Type componentType = getComponentType(mapping, parameter);
-            Type fullType = ParameterizedTypeFactory.createParameterizedType(relatedClass,
-                                                                             new Type[] {componentType});
-            info.setType(fullType);
+            if (componentType != null) { // there is actually XML config.
+                Type fullType = ParameterizedTypeFactory.createParameterizedType(relatedClass,
+                                                                                 new Type[] {componentType});
+                info.setType(fullType);
+            }
         } else if (Map.class.isAssignableFrom(relatedClass)) {
             Type keyType = getKeyType(mapping, parameter);
-            info.setKeyType(keyType);
+            if (keyType != null) {
+                info.setKeyType(keyType);
+            }
             Type valueType = getValueType(mapping, parameter);
-            info.setValueType(valueType);
-            Type fullType = ParameterizedTypeFactory.createParameterizedType(relatedClass,
-                                                                             new Type[] {keyType, valueType});
-            info.setType(fullType);
+            if (valueType != null) {
+                info.setValueType(valueType);
+            }
+            // if the XML only specifies one, we expect the other to come from a full
+            // parameterized type.
+            if (keyType != null || valueType != null) {
+                if (keyType == null || valueType == null) {
+                    if (keyType == null) {
+                        keyType = TypeUtil.getSingleTypeParameter(info.getType(), 0);
+                    }
+                    if (keyType == null) {
+                        keyType = Object.class;
+                    }
+                    if (valueType == null) {
+                        valueType = TypeUtil.getSingleTypeParameter(info.getType(), 1);
+                    }
+                    if (valueType == null) {
+                        valueType = Object.class;
+                    }
+                }
+                Type fullType 
+                    = ParameterizedTypeFactory.createParameterizedType(relatedClass,
+                                                                       new Type[] {keyType, valueType});
+                info.setType(fullType);
+                
+            }
+            
 
         }
         setType(info, parameter);
