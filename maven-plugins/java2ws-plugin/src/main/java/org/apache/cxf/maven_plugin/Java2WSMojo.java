@@ -137,7 +137,7 @@ public class Java2WSMojo extends AbstractMojo {
      * 
      * With this option you can use the maven repository as a Service Repository.
      * 
-     * @parameter default-value="false"
+     * @parameter default-value="true"
      */
     private Boolean attachWsdl;
     
