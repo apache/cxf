@@ -77,6 +77,7 @@ public class ManagedConnectionImpl implements ManagedConnection {
     private boolean isClosed;
     private Bus bus;
     private Object associatedHandle;
+    private Object clientProxy;
     
     public ManagedConnectionImpl(ManagedConnectionFactoryImpl mcf,
             ConnectionRequestInfo connReqInfo, Subject subject) {
@@ -115,6 +116,10 @@ public class ManagedConnectionImpl implements ManagedConnection {
         if (LOG.isLoggable(Level.FINER)) {
             LOG.finer("destroy");
         }
+        
+        Client client = ClientProxy.getClient(clientProxy);
+        client.destroy();
+
         handles.clear();
         isClosed = false;
         bus = null;
@@ -245,31 +250,33 @@ public class ManagedConnectionImpl implements ManagedConnection {
                         createClientProxy(spec), spec));
     }
     
-    private Object createClientProxy(final CXFConnectionSpec spec) {
-        
-        validateConnectionSpec(spec);
-        ClientProxyFactoryBean factory = null;
-
-        if (EndpointUtils.hasWebServiceAnnotation(spec.getServiceClass())) {
-            factory = new JaxWsProxyFactoryBean();
-        } else {
-            factory = new ClientProxyFactoryBean();
+    private synchronized Object createClientProxy(final CXFConnectionSpec spec) {
+        if (clientProxy == null) {
+            validateConnectionSpec(spec);
+            ClientProxyFactoryBean factory = null;
+            
+            if (EndpointUtils.hasWebServiceAnnotation(spec.getServiceClass())) {
+                factory = new JaxWsProxyFactoryBean();
+            } else {
+                factory = new ClientProxyFactoryBean();
+            }
+            
+            factory.setBus(getBus(spec.getBusConfigURL()));
+            factory.setServiceClass(spec.getServiceClass());
+            factory.getServiceFactory().setEndpointName(spec.getEndpointName());
+            factory.getServiceFactory().setServiceName(spec.getServiceName());
+            factory.getServiceFactory().setWsdlURL(spec.getWsdlURL());
+            
+            if (spec.getAddress() != null) {
+                factory.setAddress(spec.getAddress());
+            }
+            
+            configureObject(spec.getEndpointName().toString() + ".jaxws-client.proxyFactory", factory);
+            
+            clientProxy = factory.create();
         }
-              
-        factory.setBus(getBus(spec.getBusConfigURL()));
-        factory.setServiceClass(spec.getServiceClass());
-        factory.getServiceFactory().setEndpointName(spec.getEndpointName());
-        factory.getServiceFactory().setServiceName(spec.getServiceName());
-        factory.getServiceFactory().setWsdlURL(spec.getWsdlURL());
 
-        if (spec.getAddress() != null) {
-            factory.setAddress(spec.getAddress());
-        }
-        
-        configureObject(spec.getEndpointName().toString() + ".jaxws-client.proxyFactory", factory);
-
-        return factory.create();
-
+        return clientProxy;
     }
 
     private void validateConnectionSpec(CXFConnectionSpec spec) {
@@ -404,11 +411,6 @@ public class ManagedConnectionImpl implements ManagedConnection {
                     ConnectionEvent.CONNECTION_CLOSED);
             event.setConnectionHandle(proxy);
             sendEvent(event);
-            
-            ConnectionInvocationHandler ch = 
-                (ConnectionInvocationHandler)Proxy.getInvocationHandler(proxy);            
-            Client client = ClientProxy.getClient(ch.target);
-            client.destroy();
             
             return null;
         }

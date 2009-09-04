@@ -435,6 +435,17 @@ public class JMSConfiguration implements InitializingBean {
     public ConnectionFactory getWrappedConnectionFactory() {
         return wrappedConnectionFactory;
     }
+    
+    public synchronized void destroyWrappedConnectionFactory() {
+        if (wrappedConnectionFactory instanceof SingleConnectionFactory) {
+            ((SingleConnectionFactory)wrappedConnectionFactory).destroy();
+            if (connectionFactory == wrappedConnectionFactory) {
+                connectionFactory = null;
+            }
+            wrappedConnectionFactory = null;
+        }
+    }
+    
     /**
      * Only for tests
      * @return
