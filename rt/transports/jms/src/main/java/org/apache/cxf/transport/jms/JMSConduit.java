@@ -32,7 +32,6 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.jms.ConnectionFactory;
 import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.MessageListener;
@@ -50,7 +49,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
@@ -313,7 +311,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         }
     }
 
-    public void close() {
+    public synchronized void close() {
         if (listener != null) {
             listener.unreg();
             listener = null;
@@ -324,12 +322,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
         if (allListener != null) {
             allListener.shutdown();
         }
-        if (jmsConfig.getWrappedConnectionFactory() != null) {
-            ConnectionFactory f = jmsConfig.getWrappedConnectionFactory();
-            if (f instanceof SingleConnectionFactory) {
-                ((SingleConnectionFactory)f).destroy();
-            }
-        }
+        jmsConfig.destroyWrappedConnectionFactory();
         LOG.log(Level.FINE, "JMSConduit closed ");
     }
 
