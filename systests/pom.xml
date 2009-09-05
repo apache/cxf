@@ -33,7 +33,8 @@
 
     <modules>
         <module>uncategorized</module> 
-        <module>aegis</module>
+	<module>jaxws</module>
+	<module>aegis</module>
         <module>jaxrs</module>
         <module>ws-specs</module>
     </modules>

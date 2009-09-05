@@ -22,7 +22,6 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.systest.jaxws.HelloImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;

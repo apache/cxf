@@ -62,7 +62,6 @@ import org.apache.cxf.jms_greeter.JMSGreeterService2;
 import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.systest.jaxws.Hello;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSConduit;
