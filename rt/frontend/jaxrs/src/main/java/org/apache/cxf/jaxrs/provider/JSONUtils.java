@@ -65,7 +65,7 @@ public final class JSONUtils {
             namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
         }
         Configuration c = new Configuration(namespaceMap);
-        MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
+        MappedNamespaceConvention convention = new PrefixRespectingMappedNamespaceConvention(c);
         AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
                                             convention, 
                                             new OutputStreamWriter(os, UTF8));

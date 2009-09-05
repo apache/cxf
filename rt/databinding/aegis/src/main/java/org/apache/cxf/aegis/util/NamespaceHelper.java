@@ -37,9 +37,6 @@ import org.apache.cxf.helpers.JavaUtils;
 
 /**
  * Namespace utilities.
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- * @author <a href="mailto:poutsma@mac.com">Arjen Poutsma</a>
  */
 public final class NamespaceHelper {
     
@@ -99,14 +96,44 @@ public final class NamespaceHelper {
      */
     public static String getUniquePrefix(XMLStreamWriter writer, String namespaceURI, boolean declare)
         throws XMLStreamException {
-        String prefix = writer.getNamespaceContext().getPrefix(namespaceURI);
+        return getUniquePrefix(writer, namespaceURI, null, declare);
+    }
+    
+    
+    /**
+     * Make a unique prefix.
+     * @param writer target writer.
+     * @param namespaceURI namespace
+     * @param preferred if there's a proposed prefix (e.g. xsi), here it is.
+     * @param declare whether to declare to the stream.
+     * @return the prefix.
+     * @throws XMLStreamException
+     */
+    public static String getUniquePrefix(XMLStreamWriter writer, 
+                                         String namespaceURI, String preferred, boolean declare)
+        throws XMLStreamException {
+        
+        if (preferred != null) {
+            String existing = writer.getNamespaceContext().getNamespaceURI(preferred);
+            if (namespaceURI.equals(existing)) {
+                return preferred;
+            }
+        }
+        String prefix = preferred; 
+        if (prefix == null) {
+            prefix = writer.getNamespaceContext().getPrefix(namespaceURI);
+            if (prefix != null) {
+                declare = false;
+            }
+        }
+        
         if (prefix == null) {
             prefix = getUniquePrefix(writer);
+        }
 
-            if (declare) {
-                writer.setPrefix(prefix, namespaceURI);
-                writer.writeNamespace(prefix, namespaceURI);
-            }
+        if (declare) {
+            writer.setPrefix(prefix, namespaceURI);
+            writer.writeNamespace(prefix, namespaceURI);
         }
 
         return prefix;

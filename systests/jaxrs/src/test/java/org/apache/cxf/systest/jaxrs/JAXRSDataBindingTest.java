@@ -43,7 +43,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookDataBindingServer.class));
+                   launchServer(BookDataBindingServer.class, true));
     }
     
     
@@ -55,10 +55,11 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         assertEquals("CXF in Action", book.getName());
     }
     
+    //@org.junit.Ignore
     @Test
     public void testGetBookAegis() throws Exception {
         WebClient client = WebClient.create("http://localhost:9080/databinding/aegis/bookstore/books/123",
-                                            Collections.singletonList(new AegisElementProvider()));
+                                            Collections.singletonList(new AegisElementProvider<Book>()));
         Book book = client.accept("application/xml").get(Book.class);
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());

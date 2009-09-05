@@ -213,15 +213,17 @@ public final class InjectionUtils {
         
         if (genericType == null) {
             return null;
+        } else if (genericType instanceof Class) {
+            return (Class) genericType;
+        } else if (genericType instanceof ParameterizedType) {
+            ParameterizedType paramType = (ParameterizedType)genericType;
+            Type t = paramType.getRawType();
+            if (t instanceof Class) {
+                return (Class)t;
+            }
         }
-        if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
-            return (Class<?>)genericType;
-        }
-        ParameterizedType paramType = (ParameterizedType)genericType;
-        
-        Type t = paramType.getRawType();
-        
-        return t instanceof Class ? (Class<?>)t : null;
+        // it might be a TypeVariable, or a GenericArray.
+        return null;
     }
     
     

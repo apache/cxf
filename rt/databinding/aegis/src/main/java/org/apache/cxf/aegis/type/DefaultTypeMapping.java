@@ -137,18 +137,14 @@ public class DefaultTypeMapping implements TypeMapping {
      */
     public void register(AegisType type) {
         type.setTypeMapping(this);
-        /*
-         * -- prb@codehaus.org; changing this to only register the type for
-         * actions that it supports, and it could be none.
-         */
-        if (type.getTypeClass() != null) {
-            class2xml.put(type.getTypeClass(), type.getSchemaType());
-            class2Type.put(type.getTypeClass(), type);
+        if (type.getType() != null) {
+            class2xml.put(type.getType(), type.getSchemaType());
+            class2Type.put(type.getType(), type);
         }
         if (type.getSchemaType() != null) {
             xml2Type.put(type.getSchemaType(), type);
         }
-        if (type.getTypeClass() == null && type.getSchemaType() == null) {
+        if (type.getType() == null && type.getSchemaType() == null) {
             LOG.warning("The type " + type.getClass().getName()
                      + " supports neither serialization (non-null TypeClass)"
                      + " nor deserialization (non-null SchemaType).");
@@ -160,8 +156,8 @@ public class DefaultTypeMapping implements TypeMapping {
             nextTM.removeType(type);
         } else {
             xml2Type.remove(type.getSchemaType());
-            class2Type.remove(type.getTypeClass());
-            class2xml.remove(type.getTypeClass());
+            class2Type.remove(type.getType());
+            class2xml.remove(type.getType());
         }
     }
 

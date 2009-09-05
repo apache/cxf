@@ -23,6 +23,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -216,7 +217,20 @@ public final class ProviderFactory {
                 ParameterizedType pt = (ParameterizedType)t;
                 Type[] args = pt.getActualTypeArguments();
                 for (int i = 0; i < args.length; i++) {
-                    Class<?> actualClass = InjectionUtils.getRawType(args[i]);
+                    Type arg = args[i];
+                    if (arg instanceof TypeVariable) {
+                        // give or take wildcards, this implies that the provider is generic, and 
+                        // is willing to take whatever we throw at it. We could, I suppose,
+                        // do wildcard analysis. It would be more correct to look at the bounds
+                        // and check that they are Object or compatible.
+                        if (m != null) {
+                            InjectionUtils.injectContextFields(em.getProvider(), em, m);
+                            InjectionUtils.injectContextMethods(em.getProvider(), em, m);
+                        }
+                        candidates.add(em.getProvider());
+                        return;
+                    }
+                    Class<?> actualClass = InjectionUtils.getRawType(arg);
                     if (actualClass == null) {
                         continue;
                     }
@@ -226,7 +240,7 @@ public final class ProviderFactory {
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
                         }
                         candidates.add(em.getProvider());
-                        break;
+                        return;
                     }
                 }
             }

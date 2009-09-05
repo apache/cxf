@@ -31,11 +31,6 @@ import org.apache.cxf.aegis.xml.AbstractMessageWriter;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.StringUtils;
 
-/**
- * LiteralWriter
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
- */
 public class ElementWriter extends AbstractMessageWriter implements MessageWriter {
     private XMLStreamWriter writer;
 
@@ -152,7 +147,18 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     }
 
     public MessageWriter getElementWriter(QName qname) {
-        return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI(), qname.getPrefix());
+        /*
+         * No one really wants xmlns= in their XML, prefixes are preferred.
+         * If the input qname has no prefix, go ahead and use the constructor that will
+         * generate one.
+         */
+        if ("".equals(qname.getPrefix())) {
+            return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI());
+        } else {
+            return new ElementWriter(writer, qname.getLocalPart(), 
+                                     qname.getNamespaceURI(), 
+                                     qname.getPrefix());
+        }
     }
 
     public String getNamespace() {

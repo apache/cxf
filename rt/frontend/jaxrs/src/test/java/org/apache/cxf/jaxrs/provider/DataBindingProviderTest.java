@@ -22,8 +22,11 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.util.Collections;
+import java.util.InvalidPropertiesFormatException;
+import java.util.Properties;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -53,11 +56,14 @@ public class DataBindingProviderTest extends Assert {
 
     private ClassResourceInfo c;
     private ClassResourceInfo c2;
+    private Properties properties;
     
     @Before
-    public void setUp() {
+    public void setUp() throws InvalidPropertiesFormatException, IOException {
         c = ResourceUtils.createClassResourceInfo(TheBooks.class, TheBooks.class, true, true);
         c2 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
+        properties = new Properties();
+        properties.loadFromXML(getClass().getResourceAsStream("jsonCases.xml"));
     }
     
     @Test
@@ -71,10 +77,7 @@ public class DataBindingProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         p.writeTo(b, Book.class, Book.class,
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        String data = "<ns1:Book xmlns:ns1=\"http://resources.jaxrs.cxf.apache.org\" "
-            + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:Book\">"
-            + "<ns1:id>127</ns1:id><ns1:name>CXF</ns1:name><ns1:state></ns1:state></ns1:Book>";
-        assertEquals(bos.toString(), data);
+        assertEquals(properties.getProperty("testAegisWriteXml"), bos.toString());
     }
     
     @SuppressWarnings("unchecked")

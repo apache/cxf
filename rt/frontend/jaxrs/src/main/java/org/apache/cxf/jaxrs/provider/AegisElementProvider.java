@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.Consumes;
@@ -39,44 +40,68 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisReader;
 import org.apache.cxf.aegis.AegisWriter;
-import org.apache.cxf.aegis.type.TypeUtil;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
-public class AegisElementProvider extends AbstractAegisProvider  {
+public class AegisElementProvider<T> extends AbstractAegisProvider<T>  {
     
-    public Object readFrom(Class<Object> type, Type genericType, Annotation[] annotations, MediaType m, 
+    public T readFrom(Class<T> type, Type genericType, Annotation[] annotations, MediaType m, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
+
+        if (genericType == null) {
+            genericType = type;
+        }
+        
+        if (type == null) {
+            type = messyCastToRawType(genericType);
+        }
+
         AegisContext context = getAegisContext(type, genericType);
+        AegisType typeToRead = context.getTypeMapping().getType(genericType);
+        
         AegisReader<XMLStreamReader> aegisReader = context.createXMLStreamReader();
         try {
-            XMLStreamReader xmlStreamReader = createStreamReader(type, genericType, is);
-            return aegisReader.read(xmlStreamReader);
+            XMLStreamReader xmlStreamReader = createStreamReader(typeToRead, is);
+            return type.cast(aegisReader.read(xmlStreamReader, typeToRead));
         } catch (Exception e) {
             throw new WebApplicationException(e);
         }
     }
 
-    protected XMLStreamReader createStreamReader(Class<?> type, Type genericType, InputStream is) 
+    /* No better solution found yet, since the alternative is to require callers to come up with the Class for
+     * (e.g.) List<foo>, which is pretty messy all by itself. */
+    @SuppressWarnings("unchecked")
+    private Class<T> messyCastToRawType(Type genericType) {
+        if (genericType instanceof Class) {
+            return (Class<T>)genericType;
+        } else if (genericType instanceof ParameterizedType) {
+            ParameterizedType pType = (ParameterizedType) genericType;
+            return (Class<T>)pType.getRawType();
+        } else {
+            return null;
+        }
+    }
+
+    protected XMLStreamReader createStreamReader(AegisType topType, InputStream is) 
         throws Exception {
         return StaxUtils.createXMLStreamReader(is);
     }
     
-    public void writeTo(Object obj, Class<?> type, Type genericType, Annotation[] anns,  
+    public void writeTo(T obj, Class<?> type, Type genericType, Annotation[] anns,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         if (type == null) {
             type = obj.getClass();
         }
+        if (genericType == null) {
+            genericType = type;
+        }
         AegisContext context = getAegisContext(type, genericType);
-        // we need special cases for collection types.
-        // until we clean up mapping management.
-        
-        org.apache.cxf.aegis.type.AegisType aegisType 
-            = TypeUtil.getWriteTypeStandalone(context, obj, genericType);
+        AegisType aegisType = context.getTypeMapping().getType(genericType);
         AegisWriter<XMLStreamWriter> aegisWriter = context.createXMLStreamWriter();
         try {
             XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);

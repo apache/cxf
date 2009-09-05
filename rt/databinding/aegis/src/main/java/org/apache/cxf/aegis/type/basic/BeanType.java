@@ -396,7 +396,6 @@ public class BeanType extends AegisType {
                 cwriter.close();
             }
         }
-       
     }
 
     protected void writeElement(QName name, Object value, 

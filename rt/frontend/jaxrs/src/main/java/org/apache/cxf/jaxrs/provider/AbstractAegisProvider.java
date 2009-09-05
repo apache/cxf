@@ -34,8 +34,8 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 
-public abstract class AbstractAegisProvider 
-    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
+public abstract class AbstractAegisProvider<T> 
+    implements MessageBodyReader<T>, MessageBodyWriter<T> {
     
     private static Map<java.lang.reflect.Type, AegisContext> classContexts      
         = new WeakHashMap<java.lang.reflect.Type, AegisContext>();
@@ -61,7 +61,7 @@ public abstract class AbstractAegisProvider
         return isSupported(type, genericType, annotations);
     }
 
-    public long getSize(Object o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(T o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return -1;
     }
 
