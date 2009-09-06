@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.ListIterator;
 
 import javax.wsdl.extensions.UnknownExtensibilityElement;
-import javax.xml.parsers.DocumentBuilder;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
@@ -62,8 +61,6 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class PolicyAnnotationListener implements FactoryBeanListener {
     private static final String EXTRA_POLICIES = PolicyAnnotationListener.class.getName() + ".EXTRA_POLICIES";
     
-    private static final DocumentBuilder DEFAULT_DOC_BUILDER = DOMUtils.createDocumentBuilder();
-
     public void handleEvent(Event ev, AbstractServiceFactoryBean factory, Object... args) {
         switch (ev) {
         case INTERFACE_CREATED: {
@@ -358,7 +355,7 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
                 }
             }
         }
-        Document doc = DEFAULT_DOC_BUILDER.newDocument();
+        Document doc = DOMUtils.createDocument();
         Element el = doc.createElementNS(ns,
                                          "wsp:" + PolicyConstants.POLICYREFERENCE_ELEM_NAME);
         Attr att = doc.createAttribute("URI");
