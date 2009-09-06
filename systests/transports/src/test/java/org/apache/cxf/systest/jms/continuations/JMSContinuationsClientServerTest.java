@@ -26,8 +26,9 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
 import org.apache.cxf.hello_world_jms.HelloWorldService;
-import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.Before;
 import org.junit.Test;
 

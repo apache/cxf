@@ -63,6 +63,7 @@ import org.apache.cxf.jms_mtom.JMSMTOMPortType;
 import org.apache.cxf.jms_mtom.JMSMTOMService;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSConduit;
 import org.apache.cxf.transport.jms.JMSConstants;

@@ -29,9 +29,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.HTTPGreeterImpl;
 import org.apache.hello_world_doc_lit.JMSGreeterImpl;

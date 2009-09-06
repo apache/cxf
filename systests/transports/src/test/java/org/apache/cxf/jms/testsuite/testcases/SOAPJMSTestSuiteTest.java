@@ -40,8 +40,8 @@ import org.apache.cxf.jms_simple.JMSSimpleService0010;
 import org.apache.cxf.jms_simple.JMSSimpleService0011;
 import org.apache.cxf.jms_simple.JMSSimpleService0012;
 import org.apache.cxf.jms_simple.JMSSimpleService1001;
-import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSConstants;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 
