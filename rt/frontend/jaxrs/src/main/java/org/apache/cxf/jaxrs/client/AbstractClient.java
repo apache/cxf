@@ -352,7 +352,7 @@ public class AbstractClient implements Client {
                 mbw.writeTo(o, cls, type, anns, contentType, headers, os);
                 os.flush();
             } catch (Exception ex) {
-                throw new WebApplicationException();
+                throw new WebApplicationException(ex);
             }
              
         } else {
@@ -395,7 +395,7 @@ public class AbstractClient implements Client {
                 return mbr.readFrom(cls, type, anns, contentType, 
                        new MetadataMap<String, Object>(r.getMetadata(), true, true), inputStream);
             } catch (Exception ex) {
-                throw new WebApplicationException();
+                throw new WebApplicationException(ex);
             }
              
         } else if (cls == Response.class) {

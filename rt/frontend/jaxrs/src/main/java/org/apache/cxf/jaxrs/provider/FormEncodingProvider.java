@@ -47,11 +47,11 @@ import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
-@Produces("application/x-www-form-urlencoded")
+@Produces({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Provider
 public class FormEncodingProvider implements 
-    MessageBodyReader<Object>, MessageBodyWriter<MultivaluedMap<String, String>> {
+    MessageBodyReader<Object>, MessageBodyWriter<Object> {
         
     private FormValidator validator;
     @Context private MessageContext mc;
@@ -72,9 +72,7 @@ public class FormEncodingProvider implements
     
     public boolean isReadable(Class<?> type, Type genericType, 
                               Annotation[] annotations, MediaType mt) {
-        return MultivaluedMap.class.isAssignableFrom(type)
-               || mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
-                  && MultipartBody.class.isAssignableFrom(type);
+        return isSupported(type, genericType, annotations, mt);
     }
 
     public Object readFrom(
@@ -133,7 +131,7 @@ public class FormEncodingProvider implements
         }
     }
 
-    public long getSize(MultivaluedMap<String, String> t, Class<?> type, 
+    public long getSize(Object t, Class<?> type, 
                         Type genericType, Annotation[] annotations, 
                         MediaType mediaType) {
         return -1;
@@ -141,26 +139,43 @@ public class FormEncodingProvider implements
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
                                MediaType mediaType) {
-        return MultivaluedMap.class.isAssignableFrom(type);
+        return isSupported(type, genericType, annotations, mediaType);
     }
 
-    public void writeTo(MultivaluedMap<String, String> map, Class<?> c, Type t, Annotation[] anns, 
+    private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
+                                MediaType mt) {
+        return MultivaluedMap.class.isAssignableFrom(type)
+            || mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
+            && MultipartBody.class.isAssignableFrom(type);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void writeTo(Object obj, Class<?> c, Type t, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
-        boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
-        for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
-            Map.Entry<String, List<String>> entry = it.next();
-            for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
-                String value = entryIterator.next();
-                os.write(entry.getKey().getBytes("UTF-8"));
-                os.write('=');
-                String data = encoded ? value : HttpUtils.urlEncode(value);
-                os.write(data.getBytes("UTF-8"));
-                if (entryIterator.hasNext() || it.hasNext()) {
-                    os.write('&');
+        
+        if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
+            MultipartBody body = (MultipartBody)obj;
+            MultipartProvider provider = new MultipartProvider();
+            provider.setMessageContext(mc);
+            provider.writeTo(body, body.getClass(), body.getClass(), anns, mt, headers, os);
+        } else {
+            MultivaluedMap<String, String> map = (MultivaluedMap<String, String>)obj;
+            boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+            for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
+                Map.Entry<String, List<String>> entry = it.next();
+                for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
+                    String value = entryIterator.next();
+                    os.write(entry.getKey().getBytes("UTF-8"));
+                    os.write('=');
+                    String data = encoded ? value : HttpUtils.urlEncode(value);
+                    os.write(data.getBytes("UTF-8"));
+                    if (entryIterator.hasNext() || it.hasNext()) {
+                        os.write('&');
+                    }
                 }
+    
             }
-
         }
     }
 

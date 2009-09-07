@@ -44,6 +44,9 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Attachment;
 
 public final class AttachmentUtil {
+    
+    public static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
+    
     private static volatile int counter;
     private static final String ATT_UUID = UUID.randomUUID().toString();
     
@@ -99,7 +102,7 @@ public final class AttachmentUtil {
         return "uuid:" + result.toString();
     }
 
-    public static String getAttchmentPartHeader(Attachment att) {
+    public static String getAttachmentPartHeader(Attachment att) {
         StringBuffer buffer = new StringBuffer(200);
         buffer.append(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.CONTENT_TYPE) + ": "
                 + att.getDataHandler().getContentType() + ";\r\n");

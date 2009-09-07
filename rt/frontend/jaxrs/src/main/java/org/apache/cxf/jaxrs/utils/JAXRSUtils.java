@@ -699,7 +699,7 @@ public final class JAXRSUtils {
         if (UriInfo.class.isAssignableFrom(clazz)) {
             o = createUriInfo(contextMessage);
         } else if (HttpHeaders.class.isAssignableFrom(clazz)) {
-            o = new HttpHeadersImpl(contextMessage);
+            o = createHttpHeaders(contextMessage);
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
@@ -724,6 +724,14 @@ public final class JAXRSUtils {
         MultivaluedMap<String, String> templateParams =
             (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
         return new UriInfoImpl(m, templateParams);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private static HttpHeaders createHttpHeaders(Message m) {
+        if (MessageUtils.isRequestor(m)) {
+            m = m.getExchange() != null ? m.getExchange().getOutMessage() : m;
+        }
+        return new HttpHeadersImpl(m);
     }
     
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {

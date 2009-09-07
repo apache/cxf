@@ -56,4 +56,17 @@ public class ContentDisposition {
         return map;
     }
     
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            if (values.get(i).length() == 0) {
+                continue;
+            }
+            sb.append(values.get(i));
+            if (i + 1 < values.size()) {
+                sb.append(';');
+            }
+        }
+        return sb.toString();
+    }
 }

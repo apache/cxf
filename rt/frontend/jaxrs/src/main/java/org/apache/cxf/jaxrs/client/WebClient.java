@@ -21,8 +21,10 @@ package org.apache.cxf.jaxrs.client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +42,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
@@ -200,7 +203,7 @@ public class WebClient extends AbstractClient {
      *         error message if client or server error occured
      */
     public Response invoke(String httpMethod, Object body) {
-        return doInvoke(httpMethod, body, InputStream.class);
+        return doInvoke(httpMethod, body, InputStream.class, InputStream.class);
     }
     
     /**
@@ -260,7 +263,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", values, InputStream.class);
+        return doInvoke("POST", values, InputStream.class, InputStream.class);
     }
     
     /**
@@ -270,7 +273,7 @@ public class WebClient extends AbstractClient {
      */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", form.getData(), InputStream.class);
+        return doInvoke("POST", form.getData(), InputStream.class, InputStream.class);
     }
     
     /**
@@ -283,13 +286,32 @@ public class WebClient extends AbstractClient {
      */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
         
-        Response r = doInvoke(httpMethod, body, responseClass);
+        Response r = doInvoke(httpMethod, body, responseClass, responseClass);
         
         if (r.getStatus() >= 400 && responseClass != null) {
             throw new WebApplicationException(r);
         }
         
         return responseClass.cast(r.getEntity());
+    }
+    
+    /**
+     * Does HTTP invocation and returns a collection of typed objects 
+     * @param httpMethod HTTP method 
+     * @param body request body, can be null
+     * @param memberClass expected type of collection member class
+     * @return typed collection
+     */
+    public <T> Collection<T> invokeAndGetCollection(String httpMethod, Object body, 
+                                                    Class<T> memberClass) {
+        
+        Response r = doInvoke(httpMethod, body, Collection.class, memberClass);
+        
+        if (r.getStatus() >= 400) {
+            throw new WebApplicationException(r);
+        }
+        
+        return CastUtils.cast((Collection)r.getEntity(), memberClass);
     }
     
     /**
@@ -301,6 +323,26 @@ public class WebClient extends AbstractClient {
      */
     public <T> T post(Object body, Class<T> responseClass) {
         return invoke("POST", body, responseClass);
+    }
+    
+    /**
+     * Does HTTP POST invocation and returns a collection of typed objects 
+     * @param body request body, can be null
+     * @param memberClass expected type of collection member class
+     * @return typed collection
+     */
+    public <T> Collection<T> postAndGetCollection(Object body, Class<T> memberClass) {
+        return invokeAndGetCollection("POST", body, memberClass);
+    }
+    
+    /**
+     * Does HTTP GET invocation and returns a collection of typed objects 
+     * @param body request body, can be null
+     * @param memberClass expected type of collection member class
+     * @return typed collection
+     */
+    public <T> Collection<T> getCollection(Class<T> memberClass) {
+        return invokeAndGetCollection("GET", null, memberClass);
     }
     
     /**
@@ -492,7 +534,7 @@ public class WebClient extends AbstractClient {
         return (WebClient)super.reset();
     }
     
-    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
+    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass, Type genericType) {
         
         MultivaluedMap<String, String> headers = getHeaders();
         if (body != null) {
@@ -507,7 +549,7 @@ public class WebClient extends AbstractClient {
         }
         resetResponse();
         try {
-            return doChainedInvocation(httpMethod, headers, body, responseClass);
+            return doChainedInvocation(httpMethod, headers, body, responseClass, genericType);
         } finally {
             clearTemplates();
         }
@@ -515,7 +557,7 @@ public class WebClient extends AbstractClient {
     }
 
     protected Response doChainedInvocation(String httpMethod, 
-        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
+        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass, Type genericType) {
         
         Message m = createMessage(httpMethod, headers, getCurrentURI());
         m.put(URITemplate.TEMPLATE_PARAMETERS, templates);
@@ -533,15 +575,16 @@ public class WebClient extends AbstractClient {
         
         // TODO : this needs to be done in an inbound chain instead
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        return handleResponse(connect, m, responseClass);
+        return handleResponse(connect, m, responseClass, genericType);
     }
     
-    protected Response handleResponse(HttpURLConnection conn, Message outMessage, Class<?> responseClass) {
+    protected Response handleResponse(HttpURLConnection conn, Message outMessage, 
+                                      Class<?> responseClass, Type genericType) {
         try {
             ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange()).clone();
             Response currentResponse = rb.clone().build();
             
-            Object entity = readBody(currentResponse, conn, outMessage, responseClass, responseClass,
+            Object entity = readBody(currentResponse, conn, outMessage, responseClass, genericType,
                                      new Annotation[]{});
             rb.entity(entity);
             

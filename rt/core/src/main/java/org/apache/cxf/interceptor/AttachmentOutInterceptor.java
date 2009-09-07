@@ -20,6 +20,9 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.apache.cxf.attachment.AttachmentSerializer;
@@ -54,7 +57,8 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
             return;
         }
 
-        AttachmentSerializer serializer = new AttachmentSerializer(message);
+        AttachmentSerializer serializer = 
+            new AttachmentSerializer(message, getMultipartType(), getRootHeaders());
         serializer.setXop(mtomEnabled);
         
         try {
@@ -66,6 +70,14 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         
         // Add a final interceptor to write attachements
         message.getInterceptorChain().add(ending);   
+    }
+   
+    protected String getMultipartType() {
+        return "multipart/related";
+    }
+    
+    protected Map<String, List<String>> getRootHeaders() {
+        return Collections.emptyMap();
     }
     
     public class AttachmentOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
@@ -85,4 +97,6 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
         }
 
     }
+    
+    
 }

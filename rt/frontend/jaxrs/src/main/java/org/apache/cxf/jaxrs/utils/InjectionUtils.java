@@ -198,7 +198,7 @@ public final class InjectionUtils {
         }
         if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
             Class<?> cls =  (Class<?>)genericType;
-            return cls.isArray() ? cls.getComponentType() : null;
+            return cls.isArray() ? cls.getComponentType() : cls;
         }
         ParameterizedType paramType = (ParameterizedType)genericType;
         Type[] types = paramType.getActualTypeArguments();

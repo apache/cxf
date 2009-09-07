@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.ext;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -39,10 +40,14 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
+import org.apache.cxf.jaxrs.interceptor.AttachmentOutputInterceptor;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
@@ -120,27 +125,69 @@ public class MessageContextImpl implements MessageContext {
     }
 
     public void put(Object key, Object value) {
+        if (MultipartBody.OUTBOUND_MESSAGE_ATTACHMENTS.equals(key.toString())) {
+            convertToAttachments(value);
+        }
         m.put(key.toString(), value);
     }
 
+    private void convertToAttachments(Object value) {
+        List<?> handlers = (List)value;
+        List<org.apache.cxf.message.Attachment> atts = 
+            new ArrayList<org.apache.cxf.message.Attachment>();
+        
+        for (int i = 1; i < handlers.size(); i++) {
+            Attachment handler = (Attachment)handlers.get(i);
+            AttachmentImpl att = new AttachmentImpl(handler.getContentId(), handler.getDataHandler());
+            for (String key : handler.getHeaders().keySet()) {
+                att.setHeader(key, att.getHeader(key));
+            }
+            att.setXOP(false);
+            atts.add(att);
+        }
+        Message outMessage = getOutMessage();
+        outMessage.setAttachments(atts);
+        outMessage.put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, "true");
+        Attachment root = (Attachment)handlers.get(0);
+        AttachmentOutputInterceptor attInterceptor =          
+            new AttachmentOutputInterceptor(outMessage.get(Message.CONTENT_TYPE).toString(),
+                                            root.getHeaders());
+        
+        outMessage.put(Message.CONTENT_TYPE, root.getContentType().toString());
+        attInterceptor.handleMessage(outMessage);
+    }
+    
+    private Message getOutMessage() {
+        
+        Message message = m.getExchange().getOutMessage();
+        if (message == null) {
+            Endpoint ep = m.getExchange().get(Endpoint.class);
+            message = ep.getBinding().createMessage();
+            m.getExchange().setOutMessage(message);
+        }
+        
+        return message;
+    }
+    
     private MultipartBody createAttachments(String propertyName) {
-        Object o = m.get(propertyName);
+        Message inMessage = m.getExchange().getInMessage();
+        Object o = inMessage.get(propertyName);
         if (o != null) {
             return (MultipartBody)o;
         }
-        new AttachmentInputInterceptor().handleMessage(m);
+        new AttachmentInputInterceptor().handleMessage(inMessage);
         
         List<Attachment> newAttachments = new LinkedList<Attachment>();
         try {
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
-                                     m.getContent(InputStream.class), 
-                                     (InternetHeaders)m.get(InternetHeaders.class.getName())));
+                                     inMessage.getContent(InputStream.class), 
+                                     (InternetHeaders)inMessage.get(InternetHeaders.class.getName())));
             newAttachments.add(first);
         } catch (IOException ex) {
             throw new WebApplicationException(500);
         }
         
-        Collection<org.apache.cxf.message.Attachment> childAttachments = m.getAttachments();
+        Collection<org.apache.cxf.message.Attachment> childAttachments = inMessage.getAttachments();
         if (childAttachments == null) {
             childAttachments = Collections.emptyList();
         }
@@ -149,7 +196,7 @@ public class MessageContextImpl implements MessageContext {
             newAttachments.add(new Attachment(a));
         }
         MultipartBody body = new MultipartBody(newAttachments, getHttpHeaders().getMediaType(), false);
-        m.put(propertyName, body);
+        inMessage.put(propertyName, body);
         return body;
     }
        
