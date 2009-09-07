@@ -44,6 +44,13 @@ public class MultipartBody {
         this(atts, MULTIPART_RELATED_TYPE, outbound);
     }
     
+    public MultipartBody(Attachment att) {
+        atts = new ArrayList<Attachment>();
+        atts.add(att);
+        outbound = true;
+        this.mt = MULTIPART_RELATED_TYPE;
+    }
+    
     public MultipartBody(List<Attachment> atts) {
         this(atts, MULTIPART_RELATED_TYPE, false);
     }

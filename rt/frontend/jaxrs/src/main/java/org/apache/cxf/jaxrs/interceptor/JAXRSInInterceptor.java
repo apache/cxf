@@ -173,6 +173,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
                                             httpMethod, values, requestContentType, acceptContentTypes);
                 message.getExchange().put(OperationResourceInfo.class, ori);
+                message.put(URITemplate.TEMPLATE_PARAMETERS, values);
             } catch (WebApplicationException ex) {
                 if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
                     && "OPTIONS".equalsIgnoreCase(httpMethod)) {

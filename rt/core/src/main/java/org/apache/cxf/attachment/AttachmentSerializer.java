@@ -24,6 +24,11 @@ import java.io.OutputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URLDecoder;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
@@ -31,17 +36,26 @@ import org.apache.cxf.message.Message;
 
 public class AttachmentSerializer {
 
-    private static final String BODY_ATTACHMENT_ID = "root.message@cxf.apache.org";
     private Message message;
     private String bodyBoundary;
     private OutputStream out;
     private String encoding;
+    
+    private String multipartType;
+    private Map<String, List<String>> rootHeaders = Collections.emptyMap();
     private boolean xop = true;
     
     public AttachmentSerializer(Message messageParam) {
         message = messageParam;
     }
 
+    public AttachmentSerializer(Message messageParam, String multipartType, 
+                                Map<String, List<String>> headers) {
+        message = messageParam;
+        this.multipartType = multipartType;
+        this.rootHeaders = headers;
+    }
+    
     /**
      * Serialize the beginning of the attachment which includes the MIME 
      * beginning and headers for the root message.
@@ -73,19 +87,27 @@ public class AttachmentSerializer {
         }        
         
         // Set transport mime type
+        String requestMimeType = multipartType == null ? "multipart/related" : multipartType;
+        
         StringBuilder ct = new StringBuilder();
-        ct.append("multipart/related; ");
-        if (xop) {
-            ct.append("type=\"application/xop+xml\"; ");
-        } else {
-            ct.append("type=\"").append(bodyCt).append("\"; ");
+        ct.append(requestMimeType);
+        if (requestMimeType.indexOf("type=") == -1) {
+            ct.append("; ");
+            if (xop) {
+                ct.append("type=\"application/xop+xml\"");
+            } else {
+                ct.append("type=\"").append(bodyCt).append("\"");
+            }    
         }
+        ct.append("; ");
+        
+        String rootContentId = getHeaderValue("Content-ID", AttachmentUtil.BODY_ATTACHMENT_ID);
         
         ct.append("boundary=\"")
             .append(bodyBoundary)
             .append("\"; ")
             .append("start=\"<")
-            .append(BODY_ATTACHMENT_ID)
+            .append(rootContentId)
             .append(">\"; ")
             .append("start-info=\"")
             .append(bodyCt)
@@ -106,17 +128,38 @@ public class AttachmentSerializer {
         writer.write(bodyBoundary);
         
         StringBuilder mimeBodyCt = new StringBuilder();
-        mimeBodyCt.append("application/xop+xml; charset=")
-            .append(encoding)
-            .append("; type=\"")
-            .append(bodyCt)
-            .append("\";");
+        String bodyType = getHeaderValue("Content-Type", null);
+        if (bodyType == null) {
+            mimeBodyCt.append("application/xop+xml; charset=")
+                .append(encoding)
+                .append("; type=\"")
+                .append(bodyCt)
+                .append("\";");
+        } else {
+            mimeBodyCt.append(bodyType);
+        }
         
-        writeHeaders(mimeBodyCt.toString(), BODY_ATTACHMENT_ID, writer);
+        writeHeaders(mimeBodyCt.toString(), rootContentId, rootHeaders, writer);
         out.write(writer.getBuffer().toString().getBytes(encoding));
     }
 
-    private void writeHeaders(String contentType, String attachmentId, Writer writer) throws IOException {
+    private String getHeaderValue(String name, String defaultValue) {
+        List<String> value = rootHeaders.get(name);
+        if (value == null || value.isEmpty()) {
+            return defaultValue;
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < value.size(); i++) {
+            sb.append(value.get(i));
+            if (i + 1 < value.size()) {
+                sb.append(',');
+            }
+        }
+        return sb.toString();
+    }
+    
+    private static void writeHeaders(String contentType, String attachmentId, 
+                                     Map<String, List<String>> headers, Writer writer) throws IOException {
         writer.write("\r\n");
         writer.write("Content-Type: ");
         writer.write(contentType);
@@ -133,6 +176,24 @@ public class AttachmentSerializer {
             writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
             writer.write(">\r\n");
         }
+        // headers like Content-Disposition need to be serialized
+        for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
+            String name = entry.getKey();
+            if ("Content-Type".equalsIgnoreCase(name) || "Content-ID".equalsIgnoreCase(name)
+                || "Content-Transfer-Encoding".equalsIgnoreCase(name)) {
+                continue;
+            }
+            writer.write(name + ": ");
+            List<String> values = entry.getValue();
+            for (int i = 0; i < values.size(); i++) {
+                writer.write(values.get(i));
+                if (i + 1 < values.size()) {
+                    writer.write(",");
+                }
+            }
+            writer.write("\r\n");
+        }
+        
         writer.write("\r\n");
     }
 
@@ -147,7 +208,21 @@ public class AttachmentSerializer {
                 writer.write("\r\n");
                 writer.write("--");
                 writer.write(bodyBoundary);
-                writeHeaders(a.getDataHandler().getContentType(), a.getId(), writer);
+                
+                Map<String, List<String>> headers = null;
+                Iterator<String> it = a.getHeaderNames();
+                if (it.hasNext()) {
+                    headers = new LinkedHashMap<String, List<String>>();
+                    while (it.hasNext()) {
+                        String key = it.next();
+                        headers.put(key, Collections.singletonList(a.getHeader(key)));
+                    }
+                } else {
+                    headers = Collections.emptyMap();
+                }
+                
+                writeHeaders(a.getDataHandler().getContentType(), a.getId(),
+                             headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
                 
                 a.getDataHandler().writeTo(out);

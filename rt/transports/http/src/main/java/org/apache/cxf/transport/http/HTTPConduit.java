@@ -857,6 +857,9 @@ public class HTTPConduit
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
+            if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
+                continue;
+            }
             if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
                 for (String s : headerList) {
                     connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);

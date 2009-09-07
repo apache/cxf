@@ -20,8 +20,11 @@
 package org.apache.cxf.systest.jaxrs;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -53,6 +56,52 @@ public class MultipartStore {
     private MessageContext context;
     
     public MultipartStore() {
+    }
+    
+    @POST
+    @Path("/books/image")
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public byte[] addBookImage(byte[] image) throws Exception {
+        return image;
+    }
+    
+    @POST
+    @Path("/books/formimage")
+    @Consumes("multipart/form-data")
+    @Produces("multipart/form-data")
+    public MultipartBody addBookFormImage(MultipartBody image) throws Exception {
+        return image;
+    }
+    
+    @POST
+    @Path("/books/jaxbjsonimage")
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public Map<String, Object> addBookJaxbJsonImage(@Multipart("root.message@cxf.apache.org") Book jaxb, 
+                                                    @Multipart("1") Book json, 
+                                                    @Multipart("2") byte[] image) throws Exception {
+        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        objects.put("application/xml", jaxb);
+        objects.put("application/json", json);
+        objects.put("application/octet-stream", new ByteArrayInputStream(image));
+        return objects;
+        
+    }
+    
+    @POST
+    @Path("/books/jaxbimagejson")
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed")
+    public Map<String, Object> addBookJaxbJsonImage2(@Multipart("theroot") Book jaxb, 
+                                                     @Multipart("thejson") Book json, 
+                                                     @Multipart("theimage") byte[] image) throws Exception {
+        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        objects.put("application/xml", jaxb);
+        objects.put("application/json", json);
+        objects.put("application/octet-stream", new ByteArrayInputStream(image));
+        return objects;
+        
     }
     
     @POST
@@ -146,6 +195,16 @@ public class MultipartStore {
         }
         b1.setId(124);
         return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/jaxbonly")
+    @Consumes("multipart/mixed")
+    @Produces("multipart/mixed;type=text/xml")
+    public List<Book> addBooks(List<Book> books) {
+        List<Book> books2 = new ArrayList<Book>();
+        books2.addAll(books);
+        return books2;
     }
     
     @POST

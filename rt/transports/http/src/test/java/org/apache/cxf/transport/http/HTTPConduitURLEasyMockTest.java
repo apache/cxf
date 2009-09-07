@@ -48,6 +48,7 @@ import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -138,6 +139,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         control = EasyMock.createNiceControl();
         HTTPConduit conduit = setUpConduit(true, false, false);
         Message message = new MessageImpl();
+        message.put("Content-Type", "text/xml;charset=utf8");
         setUpHeaders(message);
         conduit.prepare(message);
         verifySentMessage(conduit, message, true);
@@ -564,7 +566,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             connection.setRequestProperty(EasyMock.eq("Authorization"),
                                           EasyMock.eq("Basic Qko6dmFsdWU="));            
             EasyMock.expectLastCall();
-            connection.setRequestProperty(EasyMock.eq("content-type"),
+            connection.setRequestProperty(EasyMock.eq("Content-Type"),
                                           EasyMock.eq("text/xml;charset=utf8"));
             EasyMock.expectLastCall();
             connection.setRequestProperty(EasyMock.eq("Accept"),

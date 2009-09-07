@@ -16,17 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.interceptor;
 
-package org.apache.cxf.jaxrs.ext.multipart;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 
-@Target({ElementType.PARAMETER, ElementType.FIELD, ElementType.METHOD })
-@Retention(RetentionPolicy.RUNTIME)
-public @interface Multipart {
-    String value() default "root";
-    String type() default "*/*";
+public class AttachmentOutputInterceptor extends AttachmentOutInterceptor {
+    
+    private String multipartType;
+    private Map<String, List<String>> rootHeaders;
+    
+    public AttachmentOutputInterceptor(String multipartType, 
+                                       Map<String, List<String>> headers) {
+        this.multipartType = multipartType;
+        this.rootHeaders = headers;
+    }
+    
+    protected String getMultipartType() {
+        return multipartType;
+    }
+    
+    protected Map<String, List<String>> getRootHeaders() {
+        return Collections.unmodifiableMap(rootHeaders);
+    }
+    
 }
