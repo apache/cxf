@@ -71,6 +71,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean ignoreMixedContent; 
     private boolean writeXsiType = true;
     private boolean readXsiType = true;
+    private boolean ignoreNamespaces;
+    
+    public void setIgnoreNamespaces(boolean ignoreNamespaces) {
+        this.ignoreNamespaces = ignoreNamespaces;
+    }
     
     @Context
     public void setMessageContext(MessageContext mc) {
@@ -305,10 +310,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
         QName qname = getQName(actualClass, genericType, actualObject, true);
-        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, writeXsiType, 
-                                             namespaceMap, serializeAsArray, arrayKeys,
-                                             isCollection || dropRootElement);
-        return JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
+             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys,
+             isCollection || dropRootElement);
+        writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
+        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 

@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -39,7 +41,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
 
+import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
@@ -76,17 +81,21 @@ public class FormEncodingProvider implements
     }
 
     public Object readFrom(
-        Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
+        Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType mt, 
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
-           
-            if (MultipartBody.class.isAssignableFrom(clazz)) {
-                return AttachmentUtils.getMultipartBody(mc);
+            if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
+                MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+                if (MultipartBody.class.isAssignableFrom(clazz)) {
+                    return body;
+                } else if (Attachment.class.isAssignableFrom(clazz)) {
+                    return body.getRootAttachment();
+                }  
             }
             
             MultivaluedMap<String, String> params = createMap(clazz);
-            populateMap(params, is, type,
+            populateMap(params, is, mt,
                         AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
             return params;
@@ -138,15 +147,18 @@ public class FormEncodingProvider implements
     }
 
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, 
-                               MediaType mediaType) {
-        return isSupported(type, genericType, annotations, mediaType);
+                               MediaType mt) {
+        return isSupported(type, genericType, annotations, mt)
+            || mt.getType().equalsIgnoreCase("multipart")
+            && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE) && File.class == type;
     }
 
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
                                 MediaType mt) {
         return MultivaluedMap.class.isAssignableFrom(type)
-            || mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
-            && MultipartBody.class.isAssignableFrom(type);
+            || mt.getType().equalsIgnoreCase("multipart") 
+            && mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)
+            && (MultipartBody.class.isAssignableFrom(type) || Attachment.class.isAssignableFrom(type));
     }
     
     @SuppressWarnings("unchecked")
@@ -155,7 +167,12 @@ public class FormEncodingProvider implements
         throws IOException, WebApplicationException {
         
         if (mt.isCompatible(MediaType.MULTIPART_FORM_DATA_TYPE)) {
-            MultipartBody body = (MultipartBody)obj;
+            Object body = obj;
+            if (obj.getClass() == File.class) {
+                File f = (File)obj;
+                ContentDisposition cd = new ContentDisposition("attachment;filename=" + f.getName());
+                body = new Attachment(AttachmentUtil.BODY_ATTACHMENT_ID, new FileInputStream(f), cd);
+            }
             MultipartProvider provider = new MultipartProvider();
             provider.setMessageContext(mc);
             provider.writeTo(body, body.getClass(), body.getClass(), anns, mt, headers, os);

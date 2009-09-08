@@ -54,11 +54,17 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
     private List<String> arrayKeys;
     private boolean serializeAsArray;
     private boolean dropRootElement;
+    private boolean ignoreNamespaces;
+        
     private ConcurrentHashMap<String, String> namespaceMap = new ConcurrentHashMap<String, String>();
 
     public AegisJSONProvider() {
     }
 
+    public void setIgnoreNamespaces(boolean ignoreNamespaces) {
+        this.ignoreNamespaces = ignoreNamespaces;
+    }
+    
     public void setDropRootElement(boolean dropRootElement) {
         this.dropRootElement = dropRootElement;
     }
@@ -117,9 +123,10 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
 
     @Override
     protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
-        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, writeXsiType, namespaceMap,
-                                                              serializeAsArray, arrayKeys, dropRootElement);
-        return writer;
+        
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, 
+             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys, dropRootElement);
+        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }
 
     @Override
@@ -131,5 +138,6 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
         }
         return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
     }
+
 
 }

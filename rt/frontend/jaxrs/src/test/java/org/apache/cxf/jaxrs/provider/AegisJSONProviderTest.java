@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
 import java.util.List;
@@ -147,14 +148,77 @@ public class AegisJSONProviderTest extends Assert {
     
     @Test
     public void testWriteCollection() throws Exception {
-        String json = writeCollection();
+        String json = writeCollection(true, false, null, true, false);
         assertEquals("{\"ns1.ArrayOfAegisTestBean\":{\"@xsi.type\":\"ns1:ArrayOfAegisTestBean\","
-            + "\"ns1.AegisTestBean\":{\"@xsi.type\":\"ns1:AegisTestBean\",\"ns1.boolValue\":true,"
-            + "\"ns1.strValue\":\"hovercraft\"}}}", json);
+            + "\"ns1.AegisTestBean\":[{\"@xsi.type\":\"ns1:AegisTestBean\",\"ns1.boolValue\":true,"
+            + "\"ns1.strValue\":\"hovercraft\"},{\"@xsi.type\":\"ns1:AegisTestBean\","
+            + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft2\"}]}}", json);
     }
     
-    private String writeCollection() throws Exception {
+    @Test
+    public void testWriteCollectionNoXsiType() throws Exception {
+        String json = writeCollection(false, false, null, true, false);
+        assertEquals("{\"ns1.ArrayOfAegisTestBean\":{"
+                     + "\"ns1.AegisTestBean\":[{\"ns1.boolValue\":true,"
+                     + "\"ns1.strValue\":\"hovercraft\"},{"
+                     + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft2\"}]}}", json);
+    }
+    
+    @Test
+    public void testWriteCollectionNoXsiTypeArrayKey() throws Exception {
+        String json = writeCollection(false, false, "ns1.AegisTestBean", true, false);
+        assertEquals("{\"ns1.ArrayOfAegisTestBean\":{"
+            + "\"ns1.AegisTestBean\":[{\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"},"
+            + "{\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft2\"}]}}", json);
+    }
+    
+    @Test
+    public void testWriteCollectionIgnoreNs() throws Exception {
+        String json = writeCollection(false, false, "ns1.AegisTestBean", true, true);
+        assertEquals("{\"ArrayOfAegisTestBean\":{"
+            + "\"AegisTestBean\":[{\"boolValue\":true,\"strValue\":\"hovercraft\"},"
+            + "{\"boolValue\":true,\"strValue\":\"hovercraft2\"}]}}", json);
+    }
+    
+    @Test
+    public void testWriteCollectionNoXsiTypeSingleBeanArrayKey() throws Exception {
+        String json = writeCollection(false, false, "AegisTestBean", false, true);
+        assertEquals("{\"ArrayOfAegisTestBean\":{"
+            + "\"AegisTestBean\":[{\"boolValue\":true,\"strValue\":\"hovercraft\"}"
+            + "]}}", json);
+    }
+    
+    @Test
+    public void testWriteCollectionNoXsiTypeSingleBean() throws Exception {
+        String json = writeCollection(false, false, null, false, false);
+        assertEquals("{\"ns1.ArrayOfAegisTestBean\":{"
+            + "\"ns1.AegisTestBean\":{\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft\"}"
+            + "}}", json);
+    }
+    
+    @Test
+    public void testWriteCollectionNoXsiTypeDropRootElement() throws Exception {
+        String json = writeCollection(false, true, null, true, false);
+        assertEquals("{"
+                     + "\"ns1.AegisTestBean\":[{\"ns1.boolValue\":true,"
+                     + "\"ns1.strValue\":\"hovercraft\"},{"
+                     + "\"ns1.boolValue\":true,\"ns1.strValue\":\"hovercraft2\"}]}", json);
+    }
+    
+    private String writeCollection(boolean writeXsiType, 
+                                   boolean dropRootElement,
+                                   String arrayKey,
+                                   boolean twoBeans,
+                                   boolean ignoreNs) 
+        throws Exception {
         AegisJSONProvider<List<AegisTestBean>> p = new AegisJSONProvider<List<AegisTestBean>>();
+        p.setWriteXsiType(writeXsiType);
+        p.setDropRootElement(dropRootElement);
+        p.setIgnoreNamespaces(ignoreNs);
+        if (arrayKey != null) {
+            p.setSerializeAsArray(true);
+            p.setArrayKeys(Collections.singletonList(arrayKey));
+        }
         AbstractAegisProvider.clearContexts();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         AegisTestBean bean = new AegisTestBean();
@@ -162,6 +226,12 @@ public class AegisJSONProviderTest extends Assert {
         bean.setStrValue("hovercraft");
         List<AegisTestBean> beans = new ArrayList<AegisTestBean>();
         beans.add(bean);
+        if (twoBeans) {
+            AegisTestBean bean2 = new AegisTestBean();
+            bean2.setBoolValue(Boolean.TRUE);
+            bean2.setStrValue("hovercraft2");
+            beans.add(bean2);
+        }
         Method m = CollectionsResource.class.getMethod("getAegisBeans", new Class[] {});
         p.writeTo(beans, m.getReturnType(), m.getGenericReturnType(), AegisTestBean.class
             .getAnnotations(), MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
@@ -172,7 +242,7 @@ public class AegisJSONProviderTest extends Assert {
     
     @Test
     public void testReadCollection() throws Exception {
-        String json = writeCollection();         
+        String json = writeCollection(true, false, null, true, false);         
         byte[] simpleBytes = json.getBytes("utf-8");
         Method m = CollectionsResource.class.getMethod("getAegisBeans", new Class[] {});        
         AegisJSONProvider<List<AegisTestBean>> p = new AegisJSONProvider<List<AegisTestBean>>();
@@ -180,9 +250,12 @@ public class AegisJSONProviderTest extends Assert {
         // is that reasonable?
         List<AegisTestBean> list = p.readFrom(null, m.getGenericReturnType(), null, 
                                               null, null, new ByteArrayInputStream(simpleBytes));
-        assertEquals(1, list.size());
+        assertEquals(2, list.size());
         AegisTestBean bean = list.get(0);
         assertEquals("hovercraft", bean.getStrValue());
+        assertEquals(Boolean.TRUE, bean.getBoolValue());
+        bean = list.get(1);
+        assertEquals("hovercraft2", bean.getStrValue());
         assertEquals(Boolean.TRUE, bean.getBoolValue());
     }
     

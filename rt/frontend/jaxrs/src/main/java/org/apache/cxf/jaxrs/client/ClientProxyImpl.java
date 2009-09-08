@@ -402,7 +402,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                           OperationResourceInfo ori, Object[] params, int bodyIndex, 
                           MultivaluedMap<ParameterType, Parameter> types,
                           List<Object> pathParams) throws Throwable {
-        Message m = createMessage(ori.getHttpMethod(), headers, uri);
+        Message outMessage = createMessage(ori.getHttpMethod(), headers, uri);
         if (pathParams.size() != 0) { 
             List<String> vars = ori.getURITemplate().getVariables();
             MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());
@@ -411,29 +411,29 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                     templatesMap.add(vars.get(i), pathParams.get(i).toString());
                 }
             }
-            m.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
+            outMessage.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
         }
         
         boolean isForm = types.containsKey(ParameterType.FORM);
         if (bodyIndex != -1 || isForm) {
-            m.setContent(OperationResourceInfo.class, ori);
-            m.put("BODY_INDEX", bodyIndex);
+            outMessage.setContent(OperationResourceInfo.class, ori);
+            outMessage.put("BODY_INDEX", bodyIndex);
             Object body = isForm ? handleForm(types, params) : params[bodyIndex];
             MessageContentsList contents = new MessageContentsList(new Object[]{body});
-            m.setContent(List.class, contents);
-            m.getInterceptorChain().add(new BodyWriter());
+            outMessage.setContent(List.class, contents);
+            outMessage.getInterceptorChain().add(new BodyWriter());
         }
         
         // execute chain    
         try {
-            m.getInterceptorChain().doIntercept(m);
+            outMessage.getInterceptorChain().doIntercept(outMessage);
         } catch (Throwable ex) {
             // we'd like a user to get the whole Response anyway if needed
         }
         
         // TODO : this needs to be done in an inbound chain instead
-        HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        return handleResponse(connect, m, ori);
+        HttpURLConnection connect = (HttpURLConnection)outMessage.get(HTTPConduit.KEY_HTTP_CONNECTION);
+        return handleResponse(connect, outMessage, ori);
         
     }
     
@@ -481,31 +481,32 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         
         @SuppressWarnings("unchecked")
-        public void handleMessage(Message m) throws Fault {
+        public void handleMessage(Message outMessage) throws Fault {
             
-            OperationResourceInfo ori = m.getContent(OperationResourceInfo.class);
-            OutputStream os = m.getContent(OutputStream.class);
+            OperationResourceInfo ori = outMessage.getContent(OperationResourceInfo.class);
+            OutputStream os = outMessage.getContent(OutputStream.class);
             if (os == null || ori == null) {
                 return;
             }
-            MessageContentsList objs = MessageContentsList.getContentsList(m);
+            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
             if (objs == null || objs.size() == 0) {
                 return;
             }
-            MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
+            MultivaluedMap<String, String> headers = 
+                (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
             Method method = ori.getMethodToInvoke();
-            int bodyIndex = (Integer)m.get("BODY_INDEX");
+            int bodyIndex = (Integer)outMessage.get("BODY_INDEX");
             Method aMethod = ori.getAnnotatedMethod();
             Annotation[] anns = aMethod == null || bodyIndex == -1 ? new Annotation[0] 
                                                   : aMethod.getParameterAnnotations()[bodyIndex];
             Object body = objs.get(0);
             try {
                 if (bodyIndex != -1) {
-                    writeBody(body, m, body.getClass(), 
+                    writeBody(body, outMessage, body.getClass(), 
                               method.getGenericParameterTypes()[bodyIndex],
                               anns, headers, os);
                 } else {
-                    writeBody(body, m, body.getClass(), body.getClass(), 
+                    writeBody(body, outMessage, body.getClass(), body.getClass(), 
                               anns, headers, os);
                 }
                 os.flush();

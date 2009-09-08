@@ -332,7 +332,7 @@ public class AbstractClient implements Client {
     }
 
     @SuppressWarnings("unchecked")
-    protected void writeBody(Object o, Message m, Class<?> cls, Type type, Annotation[] anns, 
+    protected void writeBody(Object o, Message outMessage, Class<?> cls, Type type, Annotation[] anns, 
         MultivaluedMap<String, String> headers, OutputStream os) {
         
         if (o == null) {
@@ -341,11 +341,11 @@ public class AbstractClient implements Client {
         
         MediaType contentType = MediaType.valueOf(headers.getFirst("Content-Type")); 
         
-        MessageBodyWriter mbw = ProviderFactory.getInstance(m).createMessageBodyWriter(
-            cls, type, anns, contentType, m);
+        MessageBodyWriter mbw = ProviderFactory.getInstance(outMessage).createMessageBodyWriter(
+            cls, type, anns, contentType, outMessage);
         if (mbw == null) {
             mbw = ProviderFactory.getInstance().createMessageBodyWriter(
-                      cls, type, anns, contentType, m);
+                      cls, type, anns, contentType, outMessage);
         }
         if (mbw != null) {
             try {
@@ -362,7 +362,7 @@ public class AbstractClient implements Client {
     }
     
     @SuppressWarnings("unchecked")
-    protected Object readBody(Response r, HttpURLConnection conn, Message inMessage, Class<?> cls, 
+    protected Object readBody(Response r, HttpURLConnection conn, Message outMessage, Class<?> cls, 
                               Type type, Annotation[] anns) {
 
         InputStream inputStream = (InputStream)r.getEntity();
@@ -384,11 +384,11 @@ public class AbstractClient implements Client {
         
         MediaType contentType = getResponseContentType(r);
         
-        MessageBodyReader mbr = ProviderFactory.getInstance(inMessage).createMessageBodyReader(
-            cls, type, anns, contentType, inMessage);
+        MessageBodyReader mbr = ProviderFactory.getInstance(outMessage).createMessageBodyReader(
+            cls, type, anns, contentType, outMessage);
         if (mbr == null) {
             ProviderFactory.getInstance().createMessageBodyReader(
-                cls, type, anns, contentType, inMessage);
+                cls, type, anns, contentType, outMessage);
         }
         if (mbr != null) {
             try {
