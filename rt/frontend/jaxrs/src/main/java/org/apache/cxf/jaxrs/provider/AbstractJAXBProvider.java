@@ -389,26 +389,18 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return unmarshaller;        
     }
     
-    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc, 
-                                          boolean isCollection)
+    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
         throws JAXBException {
         
         Class<?> objClazz = JAXBElement.class.isAssignableFrom(cls) 
                             ? ((JAXBElement)obj).getDeclaredType() : cls;
                             
-        JAXBContext context = isCollection ? getCollectionContext(objClazz) 
-            : getJAXBContext(objClazz, genericType);
+        JAXBContext context = getJAXBContext(objClazz, genericType);
         Marshaller marshaller = context.createMarshaller();
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
         }
         return marshaller;
-    }
-    
-    protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
-        throws JAXBException {
-        
-        return createMarshaller(obj, cls, genericType, enc, false);
     }
     
     protected String getEncoding(MediaType mt, MultivaluedMap<String, Object> headers) {
@@ -535,6 +527,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         @SuppressWarnings("unchecked")
         public <T> Object getCollectionOrArray(Class<T> type, Class<?> origType) {
             List<?> theList = getList();
+            if (theList.size() > 0) {
+                Object first = theList.get(0);
+                if (first instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
+                    List<Object> newList = new ArrayList<Object>(theList.size());
+                    for (Object o : theList) {
+                        newList.add(((JAXBElement)o).getValue());
+                    }
+                    theList = newList;
+                }
+            }
             if (origType.isArray()) {
                 T[] values = (T[])Array.newInstance(type, theList.size());
                 for (int i = 0; i < theList.size(); i++) {

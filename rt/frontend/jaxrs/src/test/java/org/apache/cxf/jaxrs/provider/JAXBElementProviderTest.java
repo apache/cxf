@@ -217,6 +217,31 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteCollectionWithoutXmlRootElement() 
+        throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
+                "{http://superbooks}SuperBook"));
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
+        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> books = 
+            Collections.singletonList(b);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(books, List.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
+                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        String expected = "<ns1:SuperBooks xmlns:ns1=\"http://superbooks\">"
+            + "<ns1:SuperBook xmlns:ns2=\"http://books\" xmlns:ns1=\"http://superbooks\"><id>123</id>"
+            + "<name>CXF in Action</name><superId>124</superId></ns1:SuperBook></ns1:SuperBooks>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    
+    @Test
     public void testWriteWithoutXmlRootElementDerived() throws Exception {
         JAXBElementProvider provider = new JAXBElementProvider();
         provider.setJaxbElementClassMap(Collections.singletonMap(

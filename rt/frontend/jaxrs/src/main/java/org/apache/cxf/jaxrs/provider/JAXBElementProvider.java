@@ -266,6 +266,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected void marshalCollectionMember(Object obj, Class<?> cls, Type genericType, 
                            String enc, OutputStream os, MediaType mt, String ns) throws Exception {
+        obj = convertToJaxbElementIfNeeded(obj, cls, genericType);
+        if (obj instanceof JAXBElement && cls != JAXBElement.class) {
+            cls = JAXBElement.class;
+        }
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
         ms.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.TRUE);
         if (ns.length() > 0) {
