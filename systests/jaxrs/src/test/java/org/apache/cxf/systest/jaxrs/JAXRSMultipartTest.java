@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
@@ -329,7 +330,29 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertTrue(Arrays.equals(image1, image2));
         ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
         assertEquals("attachment;filename=java.jpg", cd2.toString());
-        assertEquals("java.jpg", cd.getParameter("filename"));
+        assertEquals("java.jpg", cd2.getParameter("filename"));
+    }
+    
+    @Test
+    public void testUploadImageFromForm2() throws Exception {
+        File file = 
+            new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg").getFile());
+        String address = "http://localhost:9085/bookstore/books/formimage";
+        WebClient client = WebClient.create(address);
+        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
+        client.type("multipart/form-data").accept("multipart/form-data");
+        
+        MultipartBody body2 = client.post(file, MultipartBody.class);
+        InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
+        byte[] image1 = IOUtils.readBytesFromStream(
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
+        byte[] image2 = IOUtils.readBytesFromStream(is2);
+        assertTrue(Arrays.equals(image1, image2));
+        ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
+        assertEquals("attachment;filename=java.jpg", cd2.toString());
+        assertEquals("java.jpg", cd2.getParameter("filename"));
     }
     
     private void doAddBook(String address, String resourceName, int status) throws Exception {

@@ -612,20 +612,22 @@ public class WebClient extends AbstractClient {
         }
         
         @SuppressWarnings("unchecked")
-        public void handleMessage(Message m) throws Fault {
+        public void handleMessage(Message outMessage) throws Fault {
             
-            OutputStream os = m.getContent(OutputStream.class);
+            OutputStream os = outMessage.getContent(OutputStream.class);
             if (os == null) {
                 return;
             }
-            MessageContentsList objs = MessageContentsList.getContentsList(m);
+            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
             if (objs == null || objs.size() == 0) {
                 return;
             }
-            MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
+            MultivaluedMap<String, String> headers = 
+                (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
             try {
-                writeBody(body, m, body.getClass(), body.getClass(), new Annotation[]{}, headers, os);
+                writeBody(body, outMessage, body.getClass(), body.getClass(), new Annotation[]{}, 
+                          headers, os);
                 os.flush();
             } catch (Exception ex) {
                 throw new Fault(ex);

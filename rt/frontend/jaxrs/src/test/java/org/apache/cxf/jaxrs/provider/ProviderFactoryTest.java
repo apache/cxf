@@ -56,7 +56,6 @@ import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
@@ -247,7 +246,8 @@ public class ProviderFactoryTest extends Assert {
         verifyProvider(byte[].class, BinaryDataProvider.class, "*/*");
         verifyProvider(InputStream.class, BinaryDataProvider.class, "image/png");
         MessageBodyWriter writer = ProviderFactory.getInstance()
-            .createMessageBodyWriter(File.class, null, null, JAXRSUtils.ALL_TYPES, null);
+            .createMessageBodyWriter(File.class, null, null, MediaType.APPLICATION_OCTET_STREAM_TYPE, 
+                                     new MessageImpl());
         assertTrue(BinaryDataProvider.class == writer.getClass());
     }
     

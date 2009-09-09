@@ -49,6 +49,11 @@ public class DataBindingJSONProvider extends DataBindingProvider {
     private boolean readXsiType = true;
     private boolean dropRootElement;
     private boolean ignoreMixedContent; 
+    private boolean ignoreNamespaces;
+    
+    public void setIgnoreNamespaces(boolean ignoreNamespaces) {
+        this.ignoreNamespaces = ignoreNamespaces;
+    }
     
     public void setDropRootElement(boolean dropRootElement) {
         this.dropRootElement = dropRootElement;
@@ -88,9 +93,10 @@ public class DataBindingJSONProvider extends DataBindingProvider {
         } else {
             qname = getQName(InjectionUtils.getActualType(genericType));
         }
-        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, writeXsiType, namespaceMap, 
-                                            serializeAsArray, arrayKeys, dropRootElement);
-        return JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
+             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys, dropRootElement);
+        writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
+        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }
     
     @Override

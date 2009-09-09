@@ -251,8 +251,17 @@ public class MultipartProvider
         } else {
             dh = getHandlerForObject(obj, cls, genericType, anns, mimeType, id);
         }
-        String contentId = id == 0 ? AttachmentUtil.BODY_ATTACHMENT_ID : Integer.toString(id);
+        String contentId = getContentId(anns, id);
+        
         return new Attachment(contentId, dh, new MetadataMap<String, String>());
+    }
+
+    private String getContentId(Annotation[] anns, int id) {
+        Multipart part = AnnotationUtils.getAnnotation(anns, Multipart.class);
+        if (part != null && !"".equals(part.value())) {
+            return part.value();
+        }
+        return id == 0 ? AttachmentUtil.BODY_ATTACHMENT_ID : Integer.toString(id);
     }
     
     @SuppressWarnings("unchecked")
