@@ -289,8 +289,13 @@ public class JSONProvider extends AbstractJAXBProvider  {
         os.write(startTag.getBytes());
         Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
         for (int i = 0; i < arr.length; i++) {
-            Marshaller ms = createMarshaller(actualObject, actualClass, genericType, encoding);
-            marshal(ms, arr[i], actualClass, genericType, encoding, os, true);
+            Object obj = convertToJaxbElementIfNeeded(arr[i], actualClass, genericType);
+            Class<?> cls = actualClass;
+            if (obj instanceof JAXBElement && actualClass != JAXBElement.class) {
+                cls = JAXBElement.class;
+            }
+            Marshaller ms = createMarshaller(obj, cls, genericType, encoding);
+            marshal(ms, obj, cls, genericType, encoding, os, true);
             if (i + 1 < arr.length) {
                 os.write(",".getBytes());
             }

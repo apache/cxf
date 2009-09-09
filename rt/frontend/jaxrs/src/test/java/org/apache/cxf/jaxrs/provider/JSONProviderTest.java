@@ -56,6 +56,27 @@ import org.junit.Test;
 
 public class JSONProviderTest extends Assert {
 
+    @Test
+    public void testWriteCollectionWithoutXmlRootElement() 
+        throws Exception {
+        JSONProvider provider = new JSONProvider();
+        provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
+        provider.setJaxbElementClassMap(Collections.singletonMap(
+                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
+                "{http://superbooks}SuperBook"));
+        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
+            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
+        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> books = 
+            Collections.singletonList(b);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(books, List.class, 
+                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
+                         new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                         new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ns1.SuperBooks\":[{\"id\":123,\"name\":\"CXF in Action\",\"superId\":124}]}";
+        assertEquals(expected, bos.toString());
+    }
     
     @SuppressWarnings("unchecked")
     @Test
