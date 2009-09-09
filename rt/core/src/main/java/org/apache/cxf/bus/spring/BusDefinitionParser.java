@@ -26,6 +26,7 @@ import java.util.Map;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
@@ -33,8 +34,12 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 
 public class BusDefinitionParser extends AbstractBeanDefinitionParser {
 
@@ -76,12 +81,27 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         return id;
     }
     @NoJSR250Annotations
-    public static class BusConfig  {
+    public static class BusConfig implements ApplicationContextAware {
         CXFBusImpl bus;
+        boolean defaultBus;
+        public BusConfig() {
+            bus = (CXFBusImpl)BusFactory.getDefaultBus();
+            defaultBus = true;
+        }
         
         public BusConfig(Bus b) {
             bus = (CXFBusImpl)b;
         }
+        
+        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+            if (defaultBus
+                && applicationContext.getAutowireCapableBeanFactory() instanceof ConfigurableBeanFactory) {
+                ConfigurableBeanFactory bf = (ConfigurableBeanFactory)applicationContext
+                    .getAutowireCapableBeanFactory();
+                bf.registerSingleton("cxf", bus);
+            }
+        }
+        
         public List<Interceptor> getOutFaultInterceptors() {
             return bus.getOutFaultInterceptors();
         }
@@ -128,6 +148,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         public void setProperties(Map<String, Object> s) {
             bus.setProperties(s);
         }
+
 
     }
 }
