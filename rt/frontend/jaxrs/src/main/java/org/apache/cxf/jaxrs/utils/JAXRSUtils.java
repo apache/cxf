@@ -726,7 +726,6 @@ public final class JAXRSUtils {
         return new UriInfoImpl(m, templateParams);
     }
     
-    @SuppressWarnings("unchecked")
     private static HttpHeaders createHttpHeaders(Message m) {
         if (MessageUtils.isRequestor(m)) {
             m = m.getExchange() != null ? m.getExchange().getOutMessage() : m;
