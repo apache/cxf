@@ -55,7 +55,7 @@ public class JMSConfiguration implements InitializingBean {
     private boolean wrapInSingleConnectionFactory = true;
     private TaskExecutor taskExecutor;
     private boolean useJms11 = DEFAULT_USEJMS11;
-    private boolean reconnectOnException = true;
+    private boolean reconnectOnException;
     private boolean messageIdEnabled = true;
     private boolean messageTimestampEnabled = true;
     private boolean pubSubNoLocal;
