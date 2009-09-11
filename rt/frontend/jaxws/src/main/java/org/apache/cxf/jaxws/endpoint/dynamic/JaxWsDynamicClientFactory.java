@@ -46,7 +46,10 @@ public class JaxWsDynamicClientFactory extends DynamicClientFactory {
     protected EndpointImplFactory getEndpointImplFactory() {
         return JaxWsEndpointImplFactory.getSingleton();
     }
-    
+    protected boolean allowWrapperOps() {
+        return true;
+    }
+
     /**
      * Create a new instance using a specific <tt>Bus</tt>.
      * 
