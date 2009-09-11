@@ -44,16 +44,20 @@ public class TypeClassInitializer extends ServiceModelVisitor {
     private static final Logger LOG = LogUtils.getL7dLogger(TypeClassInitializer.class);
     
     S2JJAXBModel model;
+    boolean allowWrapperOperations;
     
-    public TypeClassInitializer(ServiceInfo serviceInfo, S2JJAXBModel model) {
+    public TypeClassInitializer(ServiceInfo serviceInfo, 
+                                S2JJAXBModel model,
+                                boolean allowWr) {
         super(serviceInfo);
         this.model = model;
+        this.allowWrapperOperations = allowWr;
     }
 
     @Override
     public void begin(MessagePartInfo part) {
         OperationInfo op = part.getMessageInfo().getOperation();
-        if (op.isUnwrappedCapable() && !op.isUnwrapped()) {
+        if (!allowWrapperOperations && op.isUnwrappedCapable() && !op.isUnwrapped()) {
             return;
         }
         
@@ -119,6 +123,12 @@ public class TypeClassInitializer extends ServiceModelVisitor {
             while (rootType.isArray()) {
                 rootType = rootType.elementType();
                 arrayCount++;
+            }
+            if (arrayCount == 0
+                && part.isElement()
+                && part.getXmlSchema() instanceof XmlSchemaElement
+                && ((XmlSchemaElement)part.getXmlSchema()).getMaxOccurs() > 1) {
+                arrayCount = 1;
             }
             cls = getClassByName(rootType);
             // bmargulies cannot find a way to ask the JVM to do this without creating 
