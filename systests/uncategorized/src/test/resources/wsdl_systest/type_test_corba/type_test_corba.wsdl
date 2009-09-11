@@ -1,4 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<wsdl:definitions xmlns:x3="http://apache.org/type_test/types3" xmlns:x2="http://apache.org/type_test/types2" xmlns:x1="http://apache.org/type_test/types1" xmlns:xalan="http://xml.apache.org/xslt" xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:itst="http://tests.iona.com/ittests" xmlns:tns="http://apache.org/type_test/doc" xmlns="http://schemas.xmlsoap.org/wsdl/" targetNamespace="http://apache.org/type_test/doc" name="type_test_soap">
-    <wsdl:import namespace="http://apache.org/type_test/doc" location="testutils/type_test/type_test_doclit.wsdl"/>
-</wsdl:definitions>

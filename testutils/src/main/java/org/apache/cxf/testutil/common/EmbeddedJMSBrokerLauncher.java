@@ -16,15 +16,12 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jms;
+package org.apache.cxf.testutil.common;
 
 import java.io.File;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
-import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
-
 
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     
