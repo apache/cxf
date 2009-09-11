@@ -58,6 +58,8 @@ import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder_Service;
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411Result;
+import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411SubClass;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 import org.apache.cxf.tests.inherit.Inherit;
 import org.apache.cxf.tests.inherit.InheritService;
@@ -264,7 +266,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     private void setASM(boolean b) throws Exception {
         Field f = ASMHelper.class.getDeclaredField("oldASM");
         f.setAccessible(true);
-        f.set(null, b);
+        f.set(null, !b);
     }
     
     @Test
@@ -327,6 +329,11 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        CXF2411Result<CXF2411SubClass> o = port.doCXF2411();
+        assertNotNull(o);
+        assertNotNull(o.getContent());
+        Object[] ar = o.getContent(); 
+        assertTrue(ar[0] instanceof CXF2411SubClass);
         Foo foo = new Foo();
         foo.setName("blah");
         assertEquals("blah", port.modifyFoo(foo).getName());

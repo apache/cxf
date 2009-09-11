@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.dispatch;
 
 import java.io.InputStream;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -371,7 +372,7 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             o.get(10, TimeUnit.SECONDS);
             fail("Should have gotten a SocketTimeoutException");
         } catch (ExecutionException ex) {
-            //ignore - expected
+            assertTrue(ex.getCause() instanceof SocketTimeoutException);
         }
 
         later.setRequestType(20000);

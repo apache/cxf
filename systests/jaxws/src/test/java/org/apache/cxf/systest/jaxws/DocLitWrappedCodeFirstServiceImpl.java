@@ -222,5 +222,13 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         }
         return f;
     }
+
+    public CXF2411Result<CXF2411SubClass> doCXF2411() {
+        CXF2411Result<CXF2411SubClass> ret = new CXF2411Result<CXF2411SubClass>();
+        CXF2411SubClass content[] = new CXF2411SubClass[1];
+        content[0] = new CXF2411SubClass();
+        ret.setContent(content);
+        return ret;
+    }
     
 }
