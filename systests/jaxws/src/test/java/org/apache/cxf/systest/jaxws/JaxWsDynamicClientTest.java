@@ -81,5 +81,5 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
         r = (Operation1Response)rparts[0];
         assertEquals(md5(bucketOfBytes), r.getStatus());
     }
-
+    
 }

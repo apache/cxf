@@ -362,13 +362,18 @@ public class DynamicClientFactory {
         // Setup the new classloader!
         Thread.currentThread().setContextClassLoader(cl);
 
-        TypeClassInitializer visitor = new TypeClassInitializer(svcfo, intermediateModel);
+        TypeClassInitializer visitor = new TypeClassInitializer(svcfo, 
+                                                                intermediateModel,
+                                                                allowWrapperOps());
         visitor.walk();
         // delete the classes files
         FileUtils.removeDir(classes);
         return client;
     }
-
+    protected boolean allowWrapperOps() {
+        return false;
+    }
+    
     private void addBindingFiles(List<String> bindingFiles, SchemaCompiler compiler) {
         if (bindingFiles != null) {
             for (String s : bindingFiles) {
