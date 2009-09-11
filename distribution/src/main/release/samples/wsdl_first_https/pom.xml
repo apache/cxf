@@ -137,6 +137,33 @@
            </build>
         </profile>
         <profile>
+            <id>insecure.client.non.spring</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.hw_https.client.ClientNonSpring</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>insecure</argument>
+                                   </arguments>
+                               </configuration>
+                           </execution>
+                       </executions>
+                   </plugin>
+               </plugins>
+           </build>
+        </profile>
+        <profile>
             <id>secure.client</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -152,6 +179,33 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.hw_https.client.Client</mainClass>
+                                    <arguments>
+                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>secure</argument>
+                                   </arguments>
+                               </configuration>
+                           </execution>
+                       </executions>
+                   </plugin>
+               </plugins>
+           </build>
+        </profile>
+        <profile>
+            <id>secure.client.non.spring</id>
+            <build>
+                <defaultGoal>test</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <phase>test</phase>
+                                <goals>
+                                    <goal>java</goal>
+                                </goals>
+                                <configuration>
+                                    <mainClass>demo.hw_https.client.ClientNonSpring</mainClass>
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>secure</argument>
