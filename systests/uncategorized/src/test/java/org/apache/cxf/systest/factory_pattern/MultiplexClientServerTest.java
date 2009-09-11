@@ -32,9 +32,10 @@ import org.apache.cxf.factory_pattern.NumberFactoryService;
 import org.apache.cxf.factory_pattern.NumberService;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
-import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 

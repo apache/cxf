@@ -72,6 +72,11 @@
             <artifactId>cxf-api</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.activemq</groupId>
+            <artifactId>activemq-core</artifactId>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>

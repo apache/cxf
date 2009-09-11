@@ -32,8 +32,9 @@
     </parent>
     <modules>
         <module>uncategorized</module> 
-	<module>jaxws</module>
-	<module>aegis</module>
+        <module>transports</module>
+        <module>jaxws</module>
+        <module>aegis</module>
         <module>jaxrs</module>
         <module>ws-specs</module>
     </modules>

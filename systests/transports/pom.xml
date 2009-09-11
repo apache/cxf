@@ -33,24 +33,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest_transport</testWsdlRoot>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
                     <execution>
@@ -325,14 +307,6 @@
             </exclusions>
         </dependency>
         
-
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-sdo</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-acl</artifactId>

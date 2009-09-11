@@ -44,9 +44,10 @@ import org.apache.cxf.mime.TestMtom;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.systest.jms.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
