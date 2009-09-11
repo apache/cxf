@@ -1,0 +1,24 @@
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/xml
+Content-ID: <attachmentData>
+
+<foo>
+   <bar baz="wibble"/>
+</foo>
+
+------=_Part_4_701508.1145579811786
+Content-Type: application/base64
+Content-ID: <base64>
+
+TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz
+IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg
+dGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu
+dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo
+ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=
+
+------=_Part_4_701508.1145579811786
+Content-Type: text/plain
+Content-ID: <hello>
+
+Hello Attachment
