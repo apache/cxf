@@ -32,6 +32,8 @@ In separate windows:
   mvn -Pserver (starts the server)
   mvn -Psecure.client (runs the client in secure mode, Scenario 2)
   mvn -Pinsecure.client (runs the client in insecure mode, Scenario 1)
+  mvn -Pinsecure.client.non.secure (runs the client in secure mode, Scenario 3)
+  mvn -Psecure.client.non.secure (runs the client in secure mode, Scenario 4)
   mvn clean (removes all generated and compiled classes)
 
 
@@ -51,8 +53,8 @@ files, run "ant clean".
 
 
 The demo illustrates how authentication can be achieved through
-configuration using 2 different scenarios. The non-defaulted security
-policy values are be specified via configuration files.
+configuration using 3 different scenarios. The non-defaulted security
+policy values are be specified via configuration files or programmatically.
 
 Scenario 1:
 
@@ -90,10 +92,10 @@ ciphersuite eventually negotiated during the TLS handshake is acceptable
 to both sides. This may be viewed by adding a -Djavax.net.debug=all 
 argument to the JVM.
 
-But please note that it is not adviseable to store sensitive data such
+But please note that it is not advisable to store sensitive data such
 as passwords stored in a clear text configuration file, unless the
 file is sufficiently protected by OS level permissions. The KeyStores
-may be configured programatically so using user interaction may be
+may be configured programmatically so using user interaction may be
 employed to keep passwords from being stored in configuration files.
 The approach taken here is for demonstration reasons only. 
 
@@ -102,6 +104,33 @@ To run:
 
   ant server
   ant secure.client
+  
+Scenario 3:
+
+A HTTPS listener is started up.  The client does NOT provide the appropriate 
+credentials programmatically and so the invocation on the server fails.
+
+To run:
+
+  ant server
+  ant insecure.client.non.spring  
+  
+Scenario 4: 
+A HTTPS listener is started up. The client's security data
+is in essence the same as for scenario 2, however this time it 
+is provided programmatically in the client code, ClientNonSpring.java. 
+
+But please note that it is not advisable to store sensitive data such
+as passwords stored directly in java code as the code could possibly be 
+disassembled. Typically the password would be obtained at runtime by 
+prompting for the password. 
+The approach taken here is for demonstration reasons only. 
+
+
+To run:
+
+  ant server
+  ant secure.client.non.spring  
 
 Certificates:
 If the certificates are expired for some reason, a shell script in 
