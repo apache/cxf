@@ -158,6 +158,9 @@
                             com.sun.xml.internal.bind.api.*
                         </DynamicImport-Package>
                         <Import-Package>
+                            !org.apache.cxf.*,
+                            !META-INF.cxf,
+                            !schemas*,
                             org.apache.cxf.tools.*;version=${pom.version};resolution:=optional,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
@@ -195,6 +198,7 @@
                             '=schemas.wsdl'
                         </Export-Package>
                         <_failok>true</_failok>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
             </plugin>
