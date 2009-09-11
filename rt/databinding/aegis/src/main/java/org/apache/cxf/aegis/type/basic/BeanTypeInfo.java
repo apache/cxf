@@ -36,6 +36,7 @@ import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
+import org.apache.cxf.common.util.ReflectionUtil;
 
 public class BeanTypeInfo {
     private Map<QName, QName> mappedName2typeName = new HashMap<QName, QName>();
@@ -286,7 +287,14 @@ public class BeanTypeInfo {
         }
 
         if (beanInfo != null) {
-            descriptors = beanInfo.getPropertyDescriptors();
+            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
+            if (propertyDescriptors != null) {
+                // see comments on this function.
+                descriptors = ReflectionUtil.getPropertyDescriptorsAvoidSunBug(getClass(), 
+                                                                               beanInfo, 
+                                                                               beanClass, 
+                                                                               propertyDescriptors);
+            }
         }
 
         if (descriptors == null) {
