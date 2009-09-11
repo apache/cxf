@@ -49,7 +49,6 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
  * have its schema in the WSDL. Can specify whether or not unknown objects
  * should be serialized as a byte stream.
  * 
- * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
 public class ObjectType extends Type {
     private static final QName XSI_TYPE = new QName(SOAPConstants.XSI_NS, "type");
@@ -101,10 +100,11 @@ public class ObjectType extends Type {
             throw new DatabindingException("Missing 'xsi:type' attribute value");
         }
 
-        typeName = typeName.trim();
         Type type = null;
         QName typeQName = null;
+        
         if (typeName != null) {
+            typeName = typeName.trim();
             typeQName = extractQName(reader, typeName);
         } else {
             typeQName = reader.getName();
