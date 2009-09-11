@@ -118,6 +118,8 @@
                             com.ctc.wstx.*
                         </DynamicImport-Package>
                         <Import-Package>
+                            !org.apache.cxf.*,
+                            !META-INF.cxf,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
@@ -148,6 +150,7 @@
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
             </plugin>
