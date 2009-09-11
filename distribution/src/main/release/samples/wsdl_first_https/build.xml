@@ -28,9 +28,23 @@
                 param2="insecure"/>
     </target> 
 
+    <target name="insecure.client.non.spring" description="run demo insecure client, without setting the TLS configuration programmatically" depends="build">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.hw_https.client.ClientNonSpring"
+                param1="${basedir}/wsdl/hello_world.wsdl" 
+                param2="insecure"/>
+    </target> 	
+
     <target name="secure.client" description="run demo secure client" depends="build">
         <property name="param" value=""/>
         <cxfrun classname="demo.hw_https.client.Client"
+                param1="${basedir}/wsdl/hello_world.wsdl" 
+                param2="secure"/>
+    </target>
+	
+	<target name="secure.client.non.spring" description="run demo secure client, setting the TLS configuration programmatically" depends="build">
+        <property name="param" value=""/>
+        <cxfrun classname="demo.hw_https.client.ClientNonSpring"
                 param1="${basedir}/wsdl/hello_world.wsdl" 
                 param2="secure"/>
     </target> 
