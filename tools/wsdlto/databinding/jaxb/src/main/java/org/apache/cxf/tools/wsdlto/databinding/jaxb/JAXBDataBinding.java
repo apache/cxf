@@ -383,10 +383,9 @@ public class JAXBDataBinding implements DataBindingProfile {
                     throw new RuntimeException(e);
                 }
                 Element ele = docs[0].getDocumentElement();
-    
                 ele = removeImportElement(ele);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele);
+                    validateSchema(ele, docs[0].getDocumentURI());
                 }           
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
@@ -431,7 +430,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 Element ele = sci.getElement();
                 ele = removeImportElement(ele);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele);
+                    validateSchema(ele, sci.getSystemId());
                 }           
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
@@ -635,9 +634,9 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     
-    public void validateSchema(Element ele) throws ToolException {
+    public void validateSchema(Element ele, String uri) throws ToolException {
         SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        DOMSource domSrc = new DOMSource(ele);
+        DOMSource domSrc = new DOMSource(ele, uri);
         try {
             schemaFact.newSchema(domSrc);
         } catch (SAXException e) {
