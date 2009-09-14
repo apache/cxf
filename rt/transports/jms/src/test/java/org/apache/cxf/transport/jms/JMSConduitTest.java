@@ -168,6 +168,12 @@ public class JMSConduitTest extends AbstractJMSTester {
                 return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             }
         });
+        
+        // The ibm jdk finalizes conduit (during most runs of this test) and
+        // causes it to fail unless we reference the conduit here after the
+        // jmsTemplate.execute() call.
+        assertNotNull("Conduit is null", conduit);
+
         assertTrue("Message should have been of type BytesMessage ", message instanceof BytesMessage);
     }
 
