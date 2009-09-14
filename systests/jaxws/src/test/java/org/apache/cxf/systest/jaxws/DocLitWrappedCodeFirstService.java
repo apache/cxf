@@ -166,22 +166,4 @@ public interface DocLitWrappedCodeFirstService {
             return dbReves;
         }
     }
-    
-    CXF2411Result<CXF2411SubClass> doCXF2411();
-    
-    public class CXF2411Result<T extends CXF2411Base> {
-        private T[] content;
-        public T[] getContent() {
-            return content;
-        }
-        public void setContent(T[] content) {
-            this.content = content;
-        }
-    }
-
-    public class CXF2411Base {
-    }
-
-    public class CXF2411SubClass extends CXF2411Base {
-    }
 }

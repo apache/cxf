@@ -71,9 +71,6 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         DOMSource response = new DOMSource();
 
         Node n = request.getNode();
-        if (n instanceof Document) {
-            n = ((Document)n).getDocumentElement();
-        }
         if (n.getLocalName().equals(sayHi.getLocalPart())) {
             response.setNode(sayHiResponse);
         } else if (n.getLocalName().equals(greetMe.getLocalPart())) {

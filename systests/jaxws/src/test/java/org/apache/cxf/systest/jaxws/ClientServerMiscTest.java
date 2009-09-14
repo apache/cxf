@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.jaxws;
 
 import java.io.InputStream;
-import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -49,7 +48,6 @@ import org.apache.cxf.anonymous_complex_type.RefSplitNameResponse;
 import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
@@ -58,8 +56,6 @@ import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder_Service;
-import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411Result;
-import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411SubClass;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
 import org.apache.cxf.tests.inherit.Inherit;
 import org.apache.cxf.tests.inherit.InheritService;
@@ -262,52 +258,6 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                                              DocLitWrappedCodeFirstService.class);
         runDocLitTest(port);
     }
-
-    private void setASM(boolean b) throws Exception {
-        Field f = ASMHelper.class.getDeclaredField("oldASM");
-        f.setAccessible(true);
-        f.set(null, !b);
-    }
-    
-    @Test
-    public void testDocLitWrappedCodeFirstServiceNoWsdlNoASM() throws Exception {
-        try {
-            setASM(false);
-            QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
-                                       "DocLitWrappedCodeFirstServicePort");
-            QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
-                                       "DocLitWrappedCodeFirstService");
-            
-            Service service = Service.create(servName);
-            service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, ServerMisc.DOCLIT_CODEFIRST_URL);
-            DocLitWrappedCodeFirstService port = service.getPort(portName,
-                                                                 DocLitWrappedCodeFirstService.class);
-            runDocLitTest(port);
-        } finally {
-            setASM(true);
-        }
-    }
-
-    @Test
-    public void testDocLitWrappedCodeFirstServiceWsdlNoASM() throws Exception {
-        try {
-            setASM(false);
-            QName portName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
-                                       "DocLitWrappedCodeFirstServicePort");
-            QName servName = new QName("http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService", 
-                                       "DocLitWrappedCodeFirstService");
-            
-            Service service = Service.create(new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl"),
-                                             servName);
-            DocLitWrappedCodeFirstService port = service.getPort(portName,
-                                                                 DocLitWrappedCodeFirstService.class);
-            runDocLitTest(port);
-        } finally {
-            setASM(true);
-        }
-    }
-    
-
     
     @Test
     public void testSimpleClientWithWsdl() throws Exception {
@@ -329,24 +279,12 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
-        CXF2411Result<CXF2411SubClass> o = port.doCXF2411();
-        assertNotNull(o);
-        assertNotNull(o.getContent());
-        Object[] ar = o.getContent(); 
-        assertTrue(ar[0] instanceof CXF2411SubClass);
-        Foo foo = new Foo();
-        foo.setName("blah");
-        assertEquals("blah", port.modifyFoo(foo).getName());
-        
-
-        assertEquals("hello", port.outOnly(new Holder<String>(), new Holder<String>()));
-        
         long start = System.currentTimeMillis();
         port.doOneWay();
         assertTrue((System.currentTimeMillis() - start) < 500);
         
         assertEquals("Hello", port.echoStringNotReallyAsync("Hello"));
-
+        
         Set<Foo> fooSet = port.getFooSet();
         assertEquals(2, fooSet.size());
         assertEquals("size: 2", port.doFooList(new ArrayList<Foo>(fooSet)));
@@ -428,12 +366,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         int ints[] = port.echoIntArray(new int[] {1, 2 , 3}, null);
         assertEquals(3, ints.length);
         assertEquals(1, ints[0]);
-
-        if (new ASMHelper().createClassWriter() != null) {
-            //doing the type adapter things and such really 
-            //requires the ASM generated helper classes
-            assertEquals("Val", port.createBar("Val").getName());
-        }
+        assertEquals("Val", port.createBar("Val").getName());
         testExceptionCases(port);
     }
     
@@ -474,26 +407,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
             fail("Expected exception not found");
         } catch (ComplexException ex) {
             assertEquals("Throw user fault -3", ex.getMessage());
-        }    
-        
-        try {
-            Foo foo = new Foo();
-            foo.setNameIgnore("DoNoName");
-            port.modifyFoo(foo);
-            fail("Expected exception not found");
-        } catch (SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("NoName is not a valid name"));
-        }    
-        try {
-            Foo foo = new Foo();
-            foo.setNameIgnore("NoName");
-            port.modifyFoo(foo);
-            fail("Expected exception not found");
-        } catch (SOAPFaultException ex) {
-            assertTrue(ex.getMessage().contains("NoName is not a valid name"));
-        }    
-
-
+        }          
     }
     
     
