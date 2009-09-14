@@ -65,18 +65,19 @@ public class DataBindingProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         p.writeTo(b, Book.class, Book.class,
             new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        String data = "<ns1:Book xmlns:ns1=\"http://resources.jaxrs.cxf.apache.org\" "
-            + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:Book\">"
-            + "<ns1:id>127</ns1:id><ns1:name>CXF</ns1:name><ns1:state></ns1:state></ns1:Book>";
-        assertEquals(bos.toString(), data);
+        doTestAegisRead(bos.toString());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testAegisRead() throws Exception {
         String data = "<ns1:Book xmlns:ns1=\"http://resources.jaxrs.cxf.apache.org\" "
             + "xmlns:ns2=\"http://www.w3.org/2001/XMLSchema-instance\" ns2:type=\"ns1:Book\">"
             + "<ns1:id>127</ns1:id><ns1:name>CXF</ns1:name><ns1:state></ns1:state></ns1:Book>";
+        doTestAegisRead(data);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void doTestAegisRead(String data) throws Exception { 
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         s.put("readXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();

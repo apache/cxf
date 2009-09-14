@@ -626,6 +626,14 @@ public class AegisDatabinding
 
     private Method getMethod(Service s, OperationInfo op) {
         MethodDispatcher md = (MethodDispatcher)s.get(MethodDispatcher.class.getName());
+        // The ibm jdk requires the simple frontend dependency to be
+        // present for the SimpleMethodDispatcher cast below even if
+        // md is null (sun jdk does not).  So, for the jaxrs frontend,
+        // we can exclude the simple frontend from the aegis databinding
+        // dependency as long as this null check is here.
+        if (md == null) {
+            return null;
+        }
         SimpleMethodDispatcher smd = (SimpleMethodDispatcher)md;
         return smd != null ? smd.getPrimaryMethod(op) : null;
     }
