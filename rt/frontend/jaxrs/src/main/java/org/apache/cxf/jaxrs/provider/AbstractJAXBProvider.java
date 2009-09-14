@@ -323,7 +323,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     public JAXBContext getPackageContext(Class<?> type) {
-        if (type == null) {
+        if (type == null || type == JAXBElement.class) {
             return null;
         }
         synchronized (packageContexts) {
