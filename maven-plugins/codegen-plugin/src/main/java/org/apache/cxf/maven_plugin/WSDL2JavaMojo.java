@@ -24,6 +24,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -282,6 +283,42 @@ public class WSDL2JavaMojo extends AbstractMojo {
         downloadRemoteWsdls(effectiveWsdlOptions);
         return effectiveWsdlOptions;
     }
+    
+    @SuppressWarnings("unchecked")
+    public Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact) 
+        throws MojoExecutionException {
+        
+        /**
+         * First try to find the artifact in the reactor projects of the maven session.
+         * So an artifact that is not yet built can be resolved
+         */
+        List<MavenProject> rProjects = mavenSession.getSortedProjects();
+        for (MavenProject rProject : rProjects) {
+            if (artifact.getGroupId().equals(rProject.getGroupId())
+                && artifact.getArtifactId().equals(rProject.getArtifactId()) 
+                && artifact.getVersion().equals(rProject.getVersion())) {
+                Set<Artifact> artifacts = rProject.getArtifacts();
+                for (Artifact pArtifact : artifacts) {
+                    if ("wsdl".equals(artifact.getType())) {
+                        return pArtifact;
+                    }
+                }
+            }
+        }
+        
+        /**
+         * If this did not work resolve the artifact using the artifactResolver
+         */
+        try {
+            artifactResolver.resolve(artifact, remoteRepos, localRepository);
+        } catch (ArtifactResolutionException e) {
+            throw new MojoExecutionException("Error downloading wsdl artifact.", e);
+        } catch (ArtifactNotFoundException e) {
+            throw new MojoExecutionException("Resource can not be found.", e);
+        }
+        
+        return artifact;
+    }
 
     public void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
         List remoteRepos;
@@ -291,20 +328,21 @@ public class WSDL2JavaMojo extends AbstractMojo {
         } catch (InvalidRepositoryException e) {
             throw new MojoExecutionException("Error build repositories for remote wsdls", e);
         }
-        try {
-            for (WsdlOption wsdlOption : effectiveWsdlOptions) {
-                WsdlArtifact wsdlA = wsdlOption.getWsdlArtifact();
-                if (wsdlA != null) {
-                    Artifact artifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA
-                        .getArtifactId(), wsdlA.getVersion(), Artifact.SCOPE_COMPILE, wsdlA.getType());
-                    artifactResolver.resolve(artifact, remoteRepos, localRepository);
-                    wsdlOption.setWsdl(artifact.getFile().getAbsolutePath());
-                }
+        
+        for (WsdlOption wsdlOption : effectiveWsdlOptions) {
+            WsdlArtifact wsdlA = wsdlOption.getWsdlArtifact();
+            if (wsdlA == null) {
+                return;
             }
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading wsdl artifact.", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Resource can not be found.", e);
+            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA
+                                                               .getArtifactId(), wsdlA.getVersion(), 
+                                                               Artifact.SCOPE_COMPILE, wsdlA.getType());
+            wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
+            if (wsdlArtifact != null) {
+                String path = wsdlArtifact.getFile().getAbsolutePath();
+                getLog().info("Resolved WSDL artifact to file " + path);
+                wsdlOption.setWsdl(path);
+            }
         }
     }
 
