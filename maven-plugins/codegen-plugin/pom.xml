@@ -34,6 +34,20 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
+    <repositories>
+        <!--  temporary add the apache snapshot repo so maven-artifact-resolver can be found -->
+        <repository>
+            <id>apache.snapshots</id>
+            <name>Apache Snapshot Repository</name>
+            <url>http://repository.apache.org/snapshots</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+            <releases>
+                <enabled>false</enabled>
+            </releases>
+        </repository>
+    </repositories>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
