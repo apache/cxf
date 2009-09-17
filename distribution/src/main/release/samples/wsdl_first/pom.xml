@@ -26,7 +26,14 @@
         <cxf.version>[2,)</cxf.version>
     </properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
+        <resources>
+            <resource>
+                <directory>wsdl</directory>
+            </resource>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -46,7 +53,10 @@
                         <configuration>
                             <wsdlOptions>
                                 <wsdlOption>
-                                    <wsdl>${basedir}/wsdl/hello_world.wsdl</wsdl>
+                                    <wsdl>${basedir}/wsdl/CustomerService.wsdl</wsdl>
+                                    <bindingFiles>
+                                        <bindingFile>${basedir}/wsdl/binding.xml</bindingFile>
+                                    </bindingFiles>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -57,7 +67,7 @@
                 </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -74,7 +84,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.hw.server.Server</mainClass>
+                                    <mainClass>com.example.customerservice.server.CustomerServiceServer</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
@@ -97,7 +107,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.hw.client.Client</mainClass>
+                                    <mainClass>com.example.customerservice.client.CustomerServiceClient</mainClass>
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                     </arguments>
@@ -119,7 +129,7 @@
                         <enabled>true</enabled>
                     </snapshots>
                 </repository>
-                    <!-- for jaxb-impl -->
+                <!-- for jaxb-impl -->
                 <repository>
                     <id>java.net</id>
                     <url>http://download.java.net/maven/1/</url>
@@ -166,6 +176,11 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.7</version>
         </dependency>
     </dependencies>
 </project>

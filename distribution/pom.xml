@@ -276,6 +276,11 @@
              <groupId>com.sun.xml.fastinfoset</groupId>
              <artifactId>FastInfoset</artifactId>
         </dependency>
+        <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <scope>compile</scope>
+        </dependency>
 
         <dependency>
             <groupId>ant</groupId>

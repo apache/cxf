@@ -120,10 +120,10 @@ located) run the commands, entered on a single command line:
 
 For UNIX (must use forward slashes):
     java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
-         demo.hw.server.Server &
+         com.example.customerservice.server.Server &
 
     java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
-         demo.hw.client.Client ./wsdl/hello_world.wsdl
+         com.example.customerservice.client.Client ./wsdl/hello_world.wsdl
 
 The server process starts in the background.  After running the client,
 use the kill command to terminate the server process.
@@ -131,10 +131,10 @@ use the kill command to terminate the server process.
 For Windows (may use either forward or back slashes):
   start 
     java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
-         demo.hw.server.Server
+         com.example.customerservice.server.Server
 
     java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
-       demo.hw.client.Client .\wsdl\hello_world.wsdl
+       com.example.customerservice.client.Client .\wsdl\hello_world.wsdl
 
 A new command windows opens for the server process.  After running the
 client, terminate the server process by issuing Ctrl-C in its command window.
@@ -167,12 +167,12 @@ Using java, run the client application with the command:
   For UNIX:
     
     java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
-         demo.hw.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
+         com.example.customerservice.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
 
   For Windows:
 
     java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
-       demo.hw.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
+       com.example.customerservice.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
 
 Where # is the TCP/IP port used by the servlet container,
 e.g., 8080.

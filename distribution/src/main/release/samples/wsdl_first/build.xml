@@ -23,38 +23,25 @@
         
     <target name="client" description="run demo client" depends="build">
         <property name="param" value=""/>
-        <cxfrun classname="demo.hw.client.Client"
-            param1="${basedir}/wsdl/hello_world.wsdl" 
-            param2="${op}" 
-            param3="${param}"/>
+        <cxfrun classname="com.example.customerservice.client.CustomerServiceClient"/>
     </target>
     
     <target name="spring.client" description="run demo client which is created from the spring context" depends="build">
         <property name="param" value=""/>
-        <cxfrun classname="demo.hw.client.SpringClient"/>
+        <cxfrun classname="com.example.customerservice.client.CustomerServiceSpringClient"/>
     </target>     
         
     <target name="server" description="run demo server" depends="build">
-        <cxfrun classname="demo.hw.server.Server" 
-            param1="${basedir}/wsdl/hello_world.wsdl"/>
+        <cxfrun classname="com.example.customerservice.server.CustomerServiceServer" />
     </target>
 
     <target name="spring.server" description="run demo server which is created from the spring context" depends="build">
-        <cxfrun classname="demo.hw.server.SpringServer"/>
+        <cxfrun classname="com.example.customerservice.server.CustomerServiceSpringServer"/>
     </target>
 
-
-    <target name="client.get" description="run demo client through HTTP GET" depends="build">
-        <property name="param" value=""/>
-        <cxfrun classname="demo.hw.client.Get"
-            param1="${basedir}/wsdl/hello_world.wsdl" 
-            param2="${op}" 
-            param3="${param}"/>
-    </target>
-        
     <target name="generate.code">
         <echo level="info" message="Generating code using wsdl2java..."/>
-        <wsdl2java file="hello_world.wsdl"/>
+        <wsdl2java file="CustomerService.wsdl" bindingfile="wsdl/binding.xml"/>
     </target>
 
     <property name="cxf.war.file.name" value="helloworld"/>
@@ -64,6 +51,6 @@
 
     <target name="client-servlet" description="run demo client hitting servlet" depends="build">
         <property name="param" value=""/>
-        <cxfrun classname="demo.hw.client.Client" param1="${base.url}/helloworld/services/hello_world?wsdl" param2="${op}" param3="${param}"/>
+        <cxfrun classname="com.example.customerservice.client.Client" param1="${base.url}/helloworld/services/hello_world?wsdl" param2="${op}" param3="${param}"/>
     </target> 
 </project>
