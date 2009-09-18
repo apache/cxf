@@ -797,7 +797,7 @@ public class WSDLServiceBuilder {
                 pi.setTypeQName(part.getTypeName());
                 pi.setElement(false);
                 pi.setXmlSchema(schemas.getTypeByQName(part.getTypeName()));
-            } else {
+            } else if (part.getElementName() != null) {
                 pi.setElementQName(part.getElementName());
                 XmlSchemaElement schemaElement = schemas.getElementByQName(part.getElementName());
                 if (null == schemaElement) {
@@ -810,6 +810,13 @@ public class WSDLServiceBuilder {
                 }
                 pi.setElement(true);
                 pi.setXmlSchema(schemaElement);
+            } else {
+                org.apache.cxf.common.i18n.Message errorMessage = 
+                    new org.apache.cxf.common.i18n.Message("PART_NO_NAME_NO_TYPE",
+                                                           LOG,
+                                                           part.getName());
+                throw new WSDLRuntimeException(errorMessage);
+                
             }
         }
     }
