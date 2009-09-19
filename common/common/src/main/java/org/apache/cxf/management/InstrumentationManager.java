@@ -91,4 +91,7 @@ public interface InstrumentationManager {
      */
     MBeanServer getMBeanServer();
 
+    String getPersistentBusId();
+    
+    void setPersistentBusId(String id);
 }

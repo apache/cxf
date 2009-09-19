@@ -54,15 +54,27 @@ public class ManagedBusTest extends Assert {
         
         bus.shutdown(true);
     }
-    
+        
     @Test
-    public void testManagedBusWithConfig() throws Exception {
+    public void testManagedBusWithTransientId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/management/managed-spring.xml", true);
+        doManagedBusTest(bus, bus.getId(), "cxf_managed_bus_test", 9916);
+    }
+    
+    @Test
+    public void testManagedBusWithPersistentId() throws Exception {
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/systest/management/persistent-id.xml", true);
+        doManagedBusTest(bus, "cxf_managed_bus_test", bus.getId(), 9917);
+    }
+    
+    private void doManagedBusTest(Bus bus, String expect, String reject, int port) throws Exception {
         InstrumentationManager im = bus.getExtension(InstrumentationManager.class);
         assertNotNull(im);
         InstrumentationManagerImpl imi = (InstrumentationManagerImpl)im;
-        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9916/jmxrmi", imi.getJMXServiceURL());
+        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:" + port + "/jmxrmi",
+                     imi.getJMXServiceURL());
         assertTrue(imi.isEnabled());
         assertNotNull(imi.getMBeanServer());
 
@@ -75,6 +87,10 @@ public class ManagedBusTest extends Assert {
         StringBuilder b = new StringBuilder();
         for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
             b.append(o.toString());
+            assertTrue("expected " + expect + " in object name: " + o,
+                       o.toString().indexOf("bus.id=" + expect + ",") != -1);
+            assertTrue("unexpected " + reject + " in object name: " + o,
+                       o.toString().indexOf("bus.id=" + reject + ",") == -1);
             b.append("\n");
         }
         assertEquals("Size is wrong: " + b.toString(), 1, s.size());
@@ -88,6 +104,10 @@ public class ManagedBusTest extends Assert {
         b = new StringBuilder();
         for (ObjectName o : CastUtils.cast(s, ObjectName.class)) {
             b.append(o.toString());
+            assertTrue("expected " + expect + " in object name: " + o,
+                       o.toString().indexOf("bus.id=" + expect + ",") != -1);
+            assertTrue("unexpected " + reject + " in object name: " + o,
+                       o.toString().indexOf("bus.id=" + reject + ",") == -1);
             b.append("\n");
         }
         assertEquals("Size is wrong: " + b.toString(), 2, s.size());
