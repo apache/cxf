@@ -39,10 +39,10 @@ final class DelegatingInputStream extends InputStream {
     @Override
     public void close() throws IOException {
         is.close();
-        isClosed = true;
         if (!isClosed) {
             deserializer.markClosed(this);
         }
+        isClosed = true;
     }
 
     public boolean isClosed() {

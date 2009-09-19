@@ -51,21 +51,9 @@ import org.apache.cxf.phase.Phase;
  */
 public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    /**
-     * Key under which we store the original input stream on the message, for
-     * use by the ending interceptor.
-     */
-    public static final String ORIGINAL_INPUT_STREAM_KEY = GZIPInInterceptor.class.getName()
-                                                           + ".originalInputStream";
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(GZIPInInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(GZIPInInterceptor.class);
-
-    /**
-     * Ending interceptor that restores the original input stream on the message
-     * when we have finished unzipping it.
-     */
-    private GZIPInEndingInterceptor ending = new GZIPInEndingInterceptor();
 
     public GZIPInInterceptor() {
         super(Phase.RECEIVE);
@@ -84,11 +72,7 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                 && (contentEncoding.contains("gzip") || contentEncoding.contains("x-gzip"))) {
                 try {
                     LOG.fine("Uncompressing response");
-                    // remember the original input stream, the ending
-                    // interceptor
-                    // will use it later
                     InputStream is = message.getContent(InputStream.class);
-                    message.put(ORIGINAL_INPUT_STREAM_KEY, is);
 
                     // wrap an unzipping stream around the original one
                     GZIPInputStream zipInput = new GZIPInputStream(is);
@@ -101,9 +85,6 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                             break;
                         }
                     }
-
-                    // add the ending interceptor
-                    message.getInterceptorChain().add(ending);
                 } catch (IOException ex) {
                     throw new Fault(new org.apache.cxf.common.i18n.Message("COULD_NOT_UNZIP", BUNDLE), ex);
                 }
@@ -111,21 +92,4 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    /**
-     * Ending interceptor to restore the original input stream after processing,
-     * so as not to interfere with streaming HTTP.
-     */
-    public class GZIPInEndingInterceptor extends AbstractPhaseInterceptor<Message> {
-        public GZIPInEndingInterceptor() {
-            super(Phase.POST_INVOKE);
-        }
-
-        /**
-         * Restores the original input stream for the message.
-         */
-        public void handleMessage(Message message) throws Fault {
-            InputStream originalIn = (InputStream)message.get(ORIGINAL_INPUT_STREAM_KEY);
-            message.setContent(InputStream.class, originalIn);
-        }
-    }
 }
