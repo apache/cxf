@@ -65,6 +65,8 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     private MBeanServer mbs;
     private Set<ObjectName> busMBeans = new HashSet<ObjectName>();
     private boolean connectFailed;
+    private String persistentBusId;
+    
     /**
      * For backward compatibility, {@link #createMBServerConnectorFactory} is <code>true</code> by default.
      */
@@ -164,7 +166,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         }
         //Try to register as a Standard MBean
         try {
-            registerMBeanWithServer(obj, name, forceRegistration);           
+            registerMBeanWithServer(obj, persist(name), forceRegistration);           
         } catch (NotCompliantMBeanException e) {        
             //If this is not a "normal" MBean, then try to deploy it using JMX annotations
             ModelMBeanAssembler assembler = new ModelMBeanAssembler();
@@ -189,7 +191,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
     
     public void unregister(ManagedComponent component) throws JMException {
         ObjectName name = component.getObjectName();
-        unregister(name);
+        unregister(persist(name));
     }
     
     public void unregister(ObjectName name) throws JMException {  
@@ -255,7 +257,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
         } catch (InvalidTargetObjectTypeException itotex) {
             throw new JMException(itotex.getMessage());
         }
-        registerMBeanWithServer(rtMBean, name, forceRegistration);
+        registerMBeanWithServer(rtMBean, persist(name), forceRegistration);
     }
 
     private void registerMBeanWithServer(Object obj, ObjectName name, boolean forceRegistration) 
@@ -276,7 +278,42 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
             busMBeans.add(name);
         }
     }
-    
 
+    public String getPersistentBusId() {
+        return persistentBusId;
+    }
+
+    public void setPersistentBusId(String id) {
+        persistentBusId = sanitize(id);
+    }
+    
+    private ObjectName persist(ObjectName original) throws JMException {
+        ObjectName persisted = original;
+        if (!(persistentBusId == null 
+              || "".equals(persistentBusId) 
+              || persistentBusId.startsWith("${"))) {
+            String originalStr = original.toString();
+            if (originalStr.indexOf(ManagementConstants.BUS_ID_PROP) != -1) {
+                String persistedStr = 
+                    originalStr.replaceFirst(ManagementConstants.BUS_ID_PROP + "=" + bus.getId(), 
+                                             ManagementConstants.BUS_ID_PROP + "=" + persistentBusId);
+                persisted = new ObjectName(persistedStr);
+            }
+        }
+        return persisted;
+    }
+    
+    private String sanitize(String in) {
+        String result = null;
+        if (in != null) {
+            result = in.replace(':', '_');
+            result = result.replace('/', '_');
+            result = result.replace('\\', '_');
+            result = result.replace('?', '_');
+            result = result.replace('=', '_');
+            result = result.replace(',', '_');
+        }
+        return result;
+    }
 }
 
