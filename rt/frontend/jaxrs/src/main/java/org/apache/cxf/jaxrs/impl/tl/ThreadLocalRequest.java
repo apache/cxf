@@ -50,4 +50,8 @@ public class ThreadLocalRequest extends AbstractThreadLocalProxy<Request>
         return get().getMethod();
     }
 
+    public ResponseBuilder evaluatePreconditions() {
+        return get().evaluatePreconditions();
+    }
+
 }

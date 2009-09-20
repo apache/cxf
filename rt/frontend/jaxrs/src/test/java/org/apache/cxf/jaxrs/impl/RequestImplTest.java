@@ -24,12 +24,14 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.ws.rs.core.EntityTag;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -76,12 +78,23 @@ public class RequestImplTest extends Assert {
     
     
     @Test
-    public void testStrictEtags() {
+    public void testStrictEtagsPreconditionMet() {
         metadata.putSingle("If-Match", new EntityTag("123").toString());
         
         ResponseBuilder rb = 
             new RequestImpl(m).evaluatePreconditions(new EntityTag("123"));
         assertNull("Precondition must be met", rb);
+    }
+    
+    @Test
+    public void testStrictEtagsPreconditionNotMet() {
+        metadata.putSingle("If-Match", new EntityTag("123", true).toString());
+        
+        
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(new EntityTag("123"));
+        assertEquals("Precondition must not be met, strict comparison is required", 
+                     412, rb.build().getStatus());
     }
     
     @Test
@@ -94,6 +107,36 @@ public class RequestImplTest extends Assert {
     }
     
     @Test
+    public void testStarEtagsIfNotMatch() {
+        metadata.putSingle(HttpHeaders.IF_NONE_MATCH, "*");
+        
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(new EntityTag("123"));
+        assertEquals("Precondition must not be met", 
+                     304, rb.build().getStatus());
+    }
+    
+    @Test
+    public void testEtagsIfNotMatch() {
+        metadata.putSingle(HttpHeaders.IF_NONE_MATCH, "\"123\"");
+        
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(new EntityTag("123"));
+        assertEquals("Precondition must not be met", 
+                     304, rb.build().getStatus());
+    }
+    
+    @Test
+    public void testStarEtagsIfNotMatchPut() {
+        metadata.putSingle(HttpHeaders.IF_NONE_MATCH, "*");
+        m.put(Message.HTTP_REQUEST_METHOD, "PUT");
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(new EntityTag("123"));
+        assertEquals("Precondition must not be met", 
+                     412, rb.build().getStatus());
+    }
+    
+    @Test
     public void testBeforeDate() throws Exception {
         metadata.putSingle("If-Modified-Since", "Tue, 21 Oct 2008 14:00:00 GMT");
         Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
@@ -102,6 +145,17 @@ public class RequestImplTest extends Assert {
         ResponseBuilder rb = 
             new RequestImpl(m).evaluatePreconditions(serverDate);
         assertNull("Precondition must be met", rb);
+    }
+    
+    @Test
+    public void testBeforeDateIfNotModified() throws Exception {
+        metadata.putSingle(HttpHeaders.IF_UNMODIFIED_SINCE, "Mon, 20 Oct 2008 14:00:00 GMT");
+        Date serverDate = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz", Locale.ENGLISH)
+            .parse("Tue, 21 Oct 2008 14:00:00 GMT");
+        
+        ResponseBuilder rb = 
+            new RequestImpl(m).evaluatePreconditions(serverDate);
+        assertEquals("Precondition must not be met", 412, rb.build().getStatus());
     }
     
     @Test
