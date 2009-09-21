@@ -104,12 +104,7 @@ public class ASMHelper {
             StringBuilder a = new StringBuilder(getClassCode(pt.getRawType()));
             a.setLength(a.length() - 1);
             a.append('<');
-            boolean first = true;
             for (Type t : pt.getActualTypeArguments()) {
-                if (!first) {
-                    a.append(" ,");
-                }
-                first = false;
                 a.append(getClassCode(t));  
             }
             a.append(">;");
