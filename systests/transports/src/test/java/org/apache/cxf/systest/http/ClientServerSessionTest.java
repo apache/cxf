@@ -139,18 +139,30 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPublishOnBusyPort() {
+        boolean isWindows = System.getProperty("os.name").startsWith("Windows");
+        
         GreeterSessionImpl implementor = new GreeterSessionImpl();
         String address = "http://localhost:9020/SoapContext/GreeterPort";
         try {
             Endpoint.publish(address, implementor);
-            fail("Should have failed to publish as the port is busy");
+            if (!isWindows) {
+                fail("Should have failed to publish as the port is busy");
+            } else {
+                System.err.println("Should have failed to publish as the port is busy, but certains "
+                                   + "of Windows allow this.");
+            }
         } catch (WebServiceException ex) {
             //ignore            
         }
         try {
             //CXF-1589
             Endpoint.publish(address, implementor);
-            fail("Should have failed to publish as the port is busy");
+            if (!isWindows) {
+                fail("Should have failed to publish as the port is busy");
+            } else {
+                System.err.println("Should have failed to publish as the port is busy, but certains "
+                                   + "of Windows allow this.");
+            }
         } catch (WebServiceException ex) {
             //ignore
         }
