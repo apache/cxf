@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:ct="http://cxf.apache.org/configuration/types"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:jaxws="http://cxf.apache.org/jaxws"    
+    xsi:schemaLocation="
+http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+    
+ <import resource="classpath:META-INF/cxf/cxf.xml" />
+ <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
+ <import resource="classpath:META-INF/cxf/cxf-extension-jms.xml" />
+ 
+ <jaxws:endpoint implementor="#transactionalImplementor" 
+ 	implementorClass="org.apache.hello_world_doc_lit.Greeter"
+ 	wsdlLocation="testutils/hello_world_doc_lit.wsdl"
+ 	serviceName="s:SOAPService2" 
+    endpointName="s:SoapPort2"
+    xmlns:s= "http://apache.org/hello_world_doc_lit" />
+    
+    <jms:destination name="{http://apache.org/hello_world_doc_lit}SoapPort2.jms-destination">      
+      <jms:jmsConfig-ref>jmsConf</jms:jmsConfig-ref>
+    </jms:destination>
+    
+  
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+  	p:brokerURL="tcp://localhost:61500"
+  />
+  
+  <bean id="singleConnectionFactory"
+    class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+    <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+  </bean>
+  
+  <bean id="jmsTransactionManager" class="org.springframework.jms.connection.JmsTransactionManager">
+     <property name="connectionFactory" ref="singleConnectionFactory"/>
+  </bean>
+  
+  <bean id="implementor" class="org.apache.cxf.systest.jms.tx.GreeterImplWithTransaction"/>
+  
+  <bean id="transactionalImplementor"
+     class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+  	<property name="transactionManager" ref="jmsTransactionManager" />
+  	<property name="target" ref="implementor" />
+  	<property name="transactionAttributes">
+  	  <props>
+  	  	<prop key="greetMe">PROPAGATION_REQUIRED</prop>
+  	  	<!-- Commit if pingMe throw PingMeFault -->
+  	  	<prop key="pingMe">PROPAGATION_REQUIRED,+PingMeFault</prop>  	  	
+  	  </props>
+    </property>
+  </bean>  
+  
+  <bean id="jmsConf" class="org.apache.cxf.transport.jms.JMSConfiguration"
+  	p:connectionFactory-ref="singleConnectionFactory"
+  	p:sessionTransacted="true"
+  	p:transactionManager-ref="jmsTransactionManager"  	
+  	p:usingEndpointInfo="true"
+  />
+
+</beans>
