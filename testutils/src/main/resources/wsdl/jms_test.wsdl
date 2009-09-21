@@ -457,7 +457,7 @@
             <jms:address
                 jndiConnectionFactoryName="ConnectionFactory" 
                 jndiDestinationName="dynamicQueues/test.jmstransport.binary"
-                jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary.reply">
+                jndiReplyDestinationName="dynamicQueues/test.jmstransport.binary">
                 <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
                 <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
             </jms:address>
