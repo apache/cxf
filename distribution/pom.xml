@@ -265,21 +265,12 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>commons-httpclient</groupId>
-            <artifactId>commons-httpclient</artifactId>
-        </dependency>
-        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
         <dependency>
              <groupId>com.sun.xml.fastinfoset</groupId>
              <artifactId>FastInfoset</artifactId>
-        </dependency>
-        <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <scope>compile</scope>
         </dependency>
 
         <dependency>
@@ -329,27 +320,42 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-integration-jbi</artifactId>
                                     <version>${pom.version}</version>
+                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-integration-jca</artifactId>
                                     <version>${pom.version}</version>
+                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-rt-bindings-jbi</artifactId>
                                     <version>${pom.version}</version>
+                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-rt-transports-jbi</artifactId>
                                     <version>${pom.version}</version>
+                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>junit</groupId>
+                                    <artifactId>junit</artifactId>
+                                    <version>4.4</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>commons-httpclient</groupId>
+                                    <artifactId>commons-httpclient</artifactId>
+                                    <version>3.1</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
