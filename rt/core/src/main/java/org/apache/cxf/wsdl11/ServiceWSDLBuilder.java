@@ -468,6 +468,7 @@ public class ServiceWSDLBuilder {
             addDocumentation(portType, intf.getDocumentation());
             addNamespace(intf.getName().getNamespaceURI(), def);
             addExtensibilityElements(portType, getWSDL11Extensors(intf));
+            addExtensibilityAttributes(portType, intf.getExtensionAttributes());
             portType.setUndefined(false);
             buildPortTypeOperation(portType, intf.getOperations(), def);
         }
