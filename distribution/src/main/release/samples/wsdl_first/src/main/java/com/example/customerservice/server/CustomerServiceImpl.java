@@ -34,6 +34,11 @@ import com.example.customerservice.NoSuchCustomer;
 import com.example.customerservice.NoSuchCustomerException;
 
 public class CustomerServiceImpl implements CustomerService {
+    
+    /**
+     * The WebServiceContext can be used to retrieve special attributes like the 
+     * user principal. Normally it is not needed
+     */
     @Resource
     WebServiceContext wsContext;
 
@@ -63,8 +68,13 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     public void updateCustomer(Customer customer) {
-        // TODO Auto-generated method stub
-
+        System.out.println("update request was received");
+        try {
+            Thread.sleep(10000);
+        } catch (InterruptedException e) {
+            // Nothing to do here
+        }
+        System.out.println("Customer was updated");
     }
 
 }

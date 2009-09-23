@@ -61,6 +61,14 @@ public final class CustomerServiceTester {
             Assert.assertEquals("None", e.getFaultInfo().getCustomerName());
             System.out.println("NoSuchCustomer exception was received as expected");
         }
+        
+        // The implementation of updateCustomer is set to sleep for some seconds. 
+        // Still this method should return instantly as the method is declared
+        // as a one way method in the WSDL
+        Customer customer = new Customer();
+        customer.setName("Smith");
+        customerService.updateCustomer(customer);
+        
         System.out.println("All calls were succesful");
     }
 
