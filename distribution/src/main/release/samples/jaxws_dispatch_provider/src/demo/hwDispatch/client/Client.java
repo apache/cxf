@@ -127,7 +127,7 @@ public final class Client {
 
     private static Element fetchElementByName(Node parent, String name) {
         if (parent instanceof Element && ((Element)parent).getLocalName().equals(name)) {
-            return parent;
+            return (Element)parent;
         }
         Element ret = null;        
         Node node = parent.getFirstChild();
