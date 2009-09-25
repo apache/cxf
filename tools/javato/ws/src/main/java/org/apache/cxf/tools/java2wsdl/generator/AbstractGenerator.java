@@ -77,7 +77,7 @@ public abstract class AbstractGenerator<T> {
             return null;
         }
         File parentDir = new File(parent);
-        if (parentDir.isDirectory() && !parentDir.exists()) {
+        if (!parentDir.exists()) {
             parentDir.mkdirs();
         }
         return parentDir;

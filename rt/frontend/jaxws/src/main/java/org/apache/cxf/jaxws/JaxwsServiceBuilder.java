@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxws;
 
 import java.io.File;
+import java.net.URI;
 
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.frontend.AbstractServiceFactory;
@@ -53,7 +54,23 @@ public class JaxwsServiceBuilder extends AbstractServiceFactory {
         JaxWsImplementorInfo jaxwsImpl = serviceFactory.getJaxWsImplementorInfo();
         String wsdlLocation = jaxwsImpl.getWsdlLocation();
         if (!StringUtils.isEmpty(wsdlLocation)) {
-            return new File(wsdlLocation);
+            try {
+                URI uri = new URI(wsdlLocation);
+                if ("file".equals(uri.getScheme()) 
+                    || StringUtils.isEmpty(uri.getScheme())) {
+                    File f = new File(uri);
+                    if (f.exists()) {
+                        return f;
+                    }
+                }
+            } catch (Exception e) {
+                //ignore
+            }
+            
+            File f = new File(wsdlLocation);
+            if (f.exists()) {
+                return f;
+            }
         }
         return super.getOutputFile();
     }
