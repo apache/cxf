@@ -337,18 +337,22 @@ public final class StaxUtils {
     public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
         if (source instanceof SAXSource) {
             InputSource src = ((SAXSource)source).getInputSource();
-            if (src.getByteStream() == null && src.getCharacterStream() == null
-                && src.getSystemId() == null && src.getPublicId() == null
+            if (src.getSystemId() == null && src.getPublicId() == null
                 && ((SAXSource)source).getXMLReader() != null) {
-                //OK - reader is OK.  We'll dump that out
+                
+                //OK - reader is OK.  We'll use that out
                 StreamWriterContentHandler ch = new StreamWriterContentHandler(writer);
                 XMLReader reader = ((SAXSource)source).getXMLReader();
                 reader.setContentHandler(ch);
                 try {
+                    try {
+                        reader.setFeature("http://xml.org/sax/features/namespaces", true);
+                    } catch (Throwable t) {
+                        //ignore
+                    }
                     reader.parse(((SAXSource)source).getInputSource());
                     return;
                 } catch (Exception e) {
-                    e.printStackTrace();
                     throw new XMLStreamException(e);
                 }
             }
