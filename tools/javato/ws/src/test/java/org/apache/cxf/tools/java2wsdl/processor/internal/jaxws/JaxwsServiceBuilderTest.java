@@ -34,8 +34,6 @@ import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
-import org.apache.cxf.tools.fortest.classnoanno.docbare.Stock;
-import org.apache.cxf.tools.fortest.withannotation.doc.Hello;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WSDL11Generator;
 import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -65,16 +63,6 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
     @After
     public void tearDown() {
         super.tearDown();
-    }
-
-    @Test
-    public void testGetOutputFile() {
-        builder.setServiceClass(Stock.class);
-        assertNull(builder.getOutputFile());
-        builder.setServiceClass(Hello.class);
-        assertNotNull(builder.getOutputFile());
-        File expected = new File("file:///c:/tmp.wsdl");
-        assertTrue(expected.equals(builder.getOutputFile()));
     }
 
     @Test
