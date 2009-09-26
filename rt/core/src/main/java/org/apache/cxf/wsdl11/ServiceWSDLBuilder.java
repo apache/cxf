@@ -466,6 +466,7 @@ public class ServiceWSDLBuilder {
             portType = def.createPortType();
             portType.setQName(intf.getName());
             addNamespace(intf.getName().getNamespaceURI(), def);
+            addExtensibilityAttributes(portType, intf.getExtensionAttributes());
             portType.setUndefined(false);
             buildPortTypeOperation(portType, intf.getOperations(), def);
         }
