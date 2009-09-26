@@ -210,7 +210,11 @@ public class StreamWriterContentHandler implements ContentHandler {
                 int attCount = atts.getLength();
                 for (int i = 0; i < attCount; i++) {
                     if (StringUtils.isEmpty(atts.getURI(i))) {
-                        writer.writeAttribute(atts.getLocalName(i),
+                        String s = atts.getLocalName(i);
+                        if (StringUtils.isEmpty(s)) {
+                            s = atts.getQName(i);
+                        }
+                        writer.writeAttribute(s,
                                               atts.getValue(i));
                     } else {
                         writer.writeAttribute(atts.getURI(i),
