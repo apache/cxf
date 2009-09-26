@@ -60,6 +60,7 @@ public class AttachmentDeserializer {
     private PushbackInputStream stream;
     private int createCount; 
     private int closedCount;
+    private boolean closed;
 
     private byte boundary[];
 
@@ -179,6 +180,9 @@ public class AttachmentDeserializer {
     public AttachmentImpl readNext() throws IOException {
         // Cache any mime parts that are currently being streamed
         cacheStreamedAttachments();
+        if (closed) {
+            return null;
+        }
 
         int v = stream.read();
         if (v == -1) {
@@ -208,8 +212,9 @@ public class AttachmentDeserializer {
         for (Attachment a : attachments.getLoadedAttachments()) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
-                if (((AttachmentDataSource)s).getDelegatingInputStream() != null) {
-                    cache(((AttachmentDataSource)s).getDelegatingInputStream(), false);
+                AttachmentDataSource ads = (AttachmentDataSource)s;
+                if (!ads.isCached()) {
+                    ads.cache();
                 }
             } else {
                 cache((DelegatingInputStream) s.getInputStream(), false);
@@ -302,7 +307,12 @@ public class AttachmentDeserializer {
     public void markClosed(DelegatingInputStream delegatingInputStream) throws IOException {
         closedCount++;
         if (closedCount == createCount && !attachments.hasNext()) {
+            int x = stream.read();
+            while (x != -1) {
+                x = stream.read();
+            }
             stream.close();
+            closed = true;
         }
     }
 }

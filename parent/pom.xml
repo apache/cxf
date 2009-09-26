@@ -52,7 +52,7 @@
         <jaxb.version>2.1</jaxb.version>
         <jaxb.impl.version>2.1.9</jaxb.impl.version>
         <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
-        <jetty.version>6.1.19</jetty.version>
+        <jetty.version>6.1.21</jetty.version>
         <saaj.version>1.3</saaj.version>
         <spring.version>2.0.8</spring.version>
         <spring.mock>spring-mock</spring.mock>

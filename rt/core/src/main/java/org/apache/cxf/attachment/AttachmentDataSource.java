@@ -33,23 +33,11 @@ public class AttachmentDataSource implements DataSource {
     private final String ct;    
     private CachedOutputStream cache;
     private InputStream ins;
-    private DelegatingInputStream delegating;
+    private DelegatingInputStream delegate;
     
     public AttachmentDataSource(String ctParam, InputStream inParam) throws IOException {
         this.ct = ctParam;        
         ins = inParam;
-        if (ins instanceof DelegatingInputStream) {
-            delegating = (DelegatingInputStream)ins;
-        }
-    }
-    public AttachmentDataSource(String ctParam, 
-                                InputStream inParam,
-                                InputStream delegate) throws IOException {
-        this.ct = ctParam;        
-        ins = inParam;
-        if (delegate instanceof DelegatingInputStream) {
-            delegating = (DelegatingInputStream)delegate;
-        }
     }
 
     public boolean isCached() {
@@ -62,8 +50,8 @@ public class AttachmentDataSource implements DataSource {
             cache.lockOutputStream();  
             ins.close();
             ins = null;
-            if (delegating != null) {
-                delegating.setInputStream(cache.getInputStream());
+            if (delegate != null) {
+                delegate.setInputStream(cache.getInputStream());
             }
         }
     }
@@ -78,15 +66,16 @@ public class AttachmentDataSource implements DataSource {
     public String getContentType() {
         return ct;
     }
-    public DelegatingInputStream getDelegatingInputStream() {
-        return delegating;
-    }
+
     public InputStream getInputStream() {
         try {
             if (cache != null) {
                 return cache.getInputStream();
             }
-            return ins;
+            if (delegate == null) {
+                delegate = new DelegatingInputStream(ins);
+            }
+            return delegate;
         } catch (IOException e) {
             return null;
         }
