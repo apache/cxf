@@ -60,7 +60,11 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
     public void testFallbackThreadPoolConfig() throws Exception { 
         Runnable r = new Runnable() {
             public void run() {
-                greeter.greetMeLater(5 * 1000);
+                try {
+                    greeter.greetMeLater(5 * 1000);
+                } catch (Throwable t) {
+                    //ignore
+                }
             }
         };
         Thread[] invokers = new Thread[5];
