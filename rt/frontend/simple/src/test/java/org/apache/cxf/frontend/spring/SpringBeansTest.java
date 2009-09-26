@@ -27,6 +27,7 @@ import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.NullConduitSelector;
 import org.apache.cxf.frontend.ClientProxy;
@@ -81,6 +82,7 @@ public class SpringBeansTest extends Assert {
 
     @Test
     public void testClients() throws Exception {
+        AbstractFactoryBeanDefinitionParser.setFactoriesAreAbstract(false);
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/frontend/spring/clients.xml"});
 

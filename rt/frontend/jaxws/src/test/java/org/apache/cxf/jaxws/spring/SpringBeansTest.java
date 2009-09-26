@@ -37,6 +37,7 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
@@ -264,9 +265,13 @@ public class SpringBeansTest extends Assert {
 
     @Test
     public void testClients() throws Exception {
+        AbstractFactoryBeanDefinitionParser.setFactoriesAreAbstract(false);
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
 
+        ClientHolderBean greeters = (ClientHolderBean)ctx.getBean("greeters");
+        assertEquals(3, greeters.greeterCount());
+        
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
 
