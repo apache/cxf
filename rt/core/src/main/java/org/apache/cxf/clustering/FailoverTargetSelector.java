@@ -195,7 +195,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * Check if the exchange is suitable for a failover.
      * 
      * @param exchange the current Exchange
-     * @return boolean true iff a failover should be attempted
+     * @return boolean true if a failover should be attempted
      */
     private boolean requiresFailover(Exchange exchange) {
         Message outMessage = exchange.getOutMessage();
@@ -249,7 +249,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             requestContext.put(Message.ENDPOINT_ADDRESS,
                                getEndpoint().getEndpointInfo().getAddress());
             requestContext.put("javax.xml.ws.service.endpoint.address",
-                               getEndpoint().getEndpointInfo().getAddress());            
+                               getEndpoint().getEndpointInfo().getAddress());
         }
     }
             
