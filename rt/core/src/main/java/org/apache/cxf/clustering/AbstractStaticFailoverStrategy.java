@@ -49,6 +49,17 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      * @return a List of alternate endpoints if available
      */
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
+        return getEndpoints(exchange, false);
+    }
+    
+    /**
+     * Get the endpoints for this invocation.
+     * 
+     * @param exchange the current Exchange
+     * @param acceptCandidatesWithSameAddress true to accept candidates with the same address
+     * @return a List of alternate endpoints if available
+     */
+    protected List<Endpoint> getEndpoints(Exchange exchange, boolean acceptCandidatesWithSameAddress) {
         Endpoint endpoint = exchange.get(Endpoint.class);
         Collection<ServiceInfo> services = endpoint.getService().getServiceInfos();
         QName currentBinding = endpoint.getBinding().getBindingInfo().getName();
@@ -58,7 +69,7 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
             for (EndpointInfo candidate : candidates) {
                 QName candidateBinding = candidate.getBinding().getName();
                 if (candidateBinding.equals(currentBinding)) {
-                    if (!candidate.getAddress().equals(
+                    if (acceptCandidatesWithSameAddress || !candidate.getAddress().equals(
                              endpoint.getEndpointInfo().getAddress())) {
                         Endpoint alternate =
                             endpoint.getService().getEndpoints().get(candidate.getName());
