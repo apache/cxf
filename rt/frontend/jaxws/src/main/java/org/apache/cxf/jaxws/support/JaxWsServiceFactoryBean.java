@@ -280,6 +280,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             }
                             for (MessagePartInfo inf : o.getInput().getMessageParts()) {
                                 inf.setTypeClass(c);
+                                break;
                             }
                         }
                         if (o.getOutput() != null) {
@@ -291,6 +292,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             }
                             for (MessagePartInfo inf : o.getOutput().getMessageParts()) {
                                 inf.setTypeClass(c);
+                                break;
                             }
                         }
                         getMethodDispatcher().bind(o, invoke);
