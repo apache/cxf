@@ -57,6 +57,11 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>cxf-rt-transports-http-osgi</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
@@ -146,6 +151,7 @@
                         </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
+                            '=META-INF.cxf.osgi',
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>

@@ -66,6 +66,11 @@
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${pom.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${pom.groupId}</groupId>
+            <artifactId>cxf-rt-transports-http-osgi</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
@@ -193,6 +198,7 @@
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
                             '=META-INF.cxf',
+                            '=META-INF.cxf.osgi',
                             '=schemas',
                             '=schemas.configuration',
                             '=schemas.wsdl'
