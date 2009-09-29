@@ -236,6 +236,23 @@
                                         </xslt>
                                         <copy file="${full.eclipse.workspace}/.metadata/.plugins/com.atlassw.tools.eclipse.checkstyle/checkstyle-config.xml.new" tofile="${full.eclipse.workspace}/.metadata/.plugins/com.atlassw.tools.eclipse.checkstyle/checkstyle-config.xml" overwrite="yes" />
 
+                                        <!-- Add checkstyle config for 5.0 plugin -->
+                                        <copy file="${basedir}/etc/eclipse/template.checkstyle-config.xml" tofile="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml" overwrite="no">
+                                            <filterset>
+                                                <filter token="CHECKSTYLE_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle.xml" />
+                                                <filter token="CHECKSTYLE_CORBA_CONFIG_FILE" value="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
+                                                <filter token="APACHE_HEADER_FILE" value="${full.eclipse.workspace}/apache-header.txt" />
+                                            </filterset>
+                                        </copy>
+
+                                        <xslt style="${basedir}/etc/eclipse/addcheckstyle.xsl" in="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml" out="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml.new">
+                                            <param name="checkstyleconfig" expression="${full.eclipse.workspace}/cxf-checkstyle.xml" />
+                                            <param name="checkstyleconfigcorba" expression="${full.eclipse.workspace}/cxf-checkstyle-corba.xml" />
+                                        </xslt>
+                                        <copy file="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml.new" tofile="${full.eclipse.workspace}/.metadata/.plugins/net.sf.eclipsecs.core/checkstyle-config.xml" overwrite="yes" />
+
+
+
 
                                         <!-- Add warning flags that we want -->
                                         <propertyfile file="${full.eclipse.workspace}/.metadata/.plugins/org.eclipse.core.runtime/.settings/org.eclipse.jdt.core.prefs">
