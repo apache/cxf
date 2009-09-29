@@ -26,7 +26,7 @@
     xsi:schemaLocation="http://cxf.apache.org/core
         http://cxf.apache.org/schemas/core.xsd
         http://www.springframework.org/schema/beans
-        http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://www.springframework.org/schema/beans/spring-beans.xsd
         http://cxf.apache.org/jaxws                                     
         http://cxf.apache.org/schemas/jaxws.xsd">
     
