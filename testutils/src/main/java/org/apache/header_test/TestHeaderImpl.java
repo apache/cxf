@@ -137,4 +137,8 @@ public class TestHeaderImpl implements TestHeader {
         return ss;
     }
 
+    public String testHeader7() {
+        return "Hello";
+    }
+
 }
