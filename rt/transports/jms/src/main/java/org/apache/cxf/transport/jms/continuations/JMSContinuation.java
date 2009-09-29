@@ -164,10 +164,10 @@ public class JMSContinuation implements Continuation {
             modifyList(remove);
             if (continuations.size() >= jmsConfig.getMaxSuspendedContinuations()) {
                 jmsListener.stop();
-            } else {
-                if (!jmsListener.isRunning()) {
-                    jmsListener.start();
-                }
+            } else if (!jmsListener.isRunning()
+                && (jmsConfig.getReconnectSuspendedContinuations() < 0
+                    || continuations.size() <= jmsConfig.getReconnectSuspendedContinuations())) {
+                jmsListener.start();
             }
         }
 
