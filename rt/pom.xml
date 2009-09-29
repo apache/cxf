@@ -45,6 +45,7 @@
         <module>frontend/js</module>
         <module>transports/http</module>
         <module>transports/http-jetty</module>
+        <module>transports/http-osgi</module>
         <module>transports/jms</module>
         <module>transports/jbi</module>
         <module>ws/policy</module>

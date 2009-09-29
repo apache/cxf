@@ -39,6 +39,16 @@
             <artifactId>org.osgi.compendium</artifactId>
             <version>1.2.0</version>
             <scope>provided</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>javax.servlet</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.felix</groupId>
+                    <artifactId>org.osgi.foundation</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -46,20 +56,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-annotation_1.0_spec</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>
@@ -96,7 +95,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.servicemix.cxf.transport.http_osgi,
+                            org.apache.cxf.transport.http_osgi,
                             '=META-INF.cxf.osgi'
                         </Export-Package>
                         <_failok>true</_failok>

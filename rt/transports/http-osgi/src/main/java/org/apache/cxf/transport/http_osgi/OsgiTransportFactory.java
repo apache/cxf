@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.servicemix.cxf.transport.http_osgi;
+package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
 import java.net.URI;
@@ -24,7 +24,6 @@ import java.net.URI;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 
 public class OsgiTransportFactory extends AbstractHTTPTransportFactory implements DestinationFactory {
@@ -35,24 +34,6 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         this.registry = registry;
     }
 
-    public void init() {
-        if (bus == null) {
-            throw new IllegalStateException("bus should not be null");
-        }
-        if (registry == null) {
-            throw new IllegalStateException("registry should not be null");
-        }
-        if (activationNamespaces == null) {
-            activationNamespaces = getTransportIds();
-        }
-        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        if (dfm != null && activationNamespaces != null) {
-            for (String ns : activationNamespaces) {
-                dfm.registerDestinationFactory(ns, this);
-            }
-        }
-    }
-
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         if (URI.create(endpointInfo.getAddress()).isAbsolute()) {
             throw new IllegalStateException("Endpoint address should be a relative URI "
@@ -61,7 +42,7 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         OsgiDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
             String path = OsgiDestinationRegistry.getTrimmedPath(endpointInfo.getAddress());
-            d = new OsgiDestination(getBus(), null, endpointInfo, registry, path);
+            d = new OsgiDestination(getBus(), endpointInfo, registry, path);
             registry.addDestination(path, d);
         }
         return d;
