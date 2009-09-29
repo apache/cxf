@@ -24,9 +24,9 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="destinationRegistry" class="org.apache.servicemix.cxf.transport.http_osgi.OsgiDestinationRegistry" />
+    <bean id="destinationRegistry" class="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistry" />
 
-    <bean id="osgiServlet" class="org.apache.servicemix.cxf.transport.http_osgi.SpringOsgiServlet">
+    <bean id="osgiServlet" class="org.apache.cxf.transport.http_osgi.SpringOsgiServlet">
         <constructor-arg ref="destinationRegistry"/>
     </bean>
 
@@ -37,7 +37,7 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
         </osgi:service-properties>
     </osgi:service>
 
-    <osgi:service ref="destinationRegistry" interface="org.apache.servicemix.cxf.transport.http_osgi.OsgiDestinationRegistryIntf">
+    <osgi:service ref="destinationRegistry" interface="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistryIntf">
     </osgi:service>
 
 </beans>

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.servicemix.cxf.transport.http_osgi;
+package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
 import java.util.logging.Level;
@@ -27,7 +27,6 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -52,13 +51,12 @@ public class OsgiDestination extends AbstractHTTPDestination {
      * @throws IOException
      */
     public OsgiDestination(Bus b,
-                           ConduitInitiator ci,
                            EndpointInfo ei,
                            OsgiDestinationRegistryIntf fact,
                            String p)
         throws IOException {
         // would add the default port to the address
-        super(b, ci, ei, false);
+        super(b, ei, false);
         factory = fact;
         path = p;
     }

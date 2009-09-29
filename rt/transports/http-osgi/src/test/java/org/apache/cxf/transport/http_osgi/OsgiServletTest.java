@@ -17,11 +17,12 @@
  * under the License.
  */
 
-package org.apache.servicemix.cxf.transport.http_osgi;
+package org.apache.cxf.transport.http_osgi;
 
 import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -47,6 +48,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.http.AddressType;
 
+import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
 import org.junit.After;
@@ -54,7 +56,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.*;
 
 public class OsgiServletTest extends Assert {
 
@@ -92,7 +93,7 @@ public class OsgiServletTest extends Assert {
 
     @Before
     public void setUp() {
-        control = createNiceControl();
+        control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         registry = control.createMock(OsgiDestinationRegistryIntf.class);
         destination = control.createMock(OsgiDestination.class);
@@ -215,63 +216,63 @@ public class OsgiServletTest extends Assert {
     private void setUpRequest(String requestURI,
                               String path,
                               int destinationCount) throws Exception {
-        expect(request.getRequestURI()).andReturn(requestURI).anyTimes();
+        EasyMock.expect(request.getRequestURI()).andReturn(requestURI).anyTimes();
         StringBuffer url = new StringBuffer(ROOT + requestURI);
-        expect(request.getRequestURL()).andReturn(url).anyTimes();
-        expect(request.getQueryString()).andReturn(QUERY).anyTimes();
-        expect(destination.getEndpointInfo()).andReturn(endpoint).anyTimes();
-        expect(destination.getBus()).andReturn(bus).anyTimes();
+        EasyMock.expect(request.getRequestURL()).andReturn(url).anyTimes();
+        EasyMock.expect(request.getQueryString()).andReturn(QUERY).anyTimes();
+        EasyMock.expect(destination.getEndpointInfo()).andReturn(endpoint).anyTimes();
+        EasyMock.expect(destination.getBus()).andReturn(bus).anyTimes();
 
-        expect(request.getPathInfo()).andReturn(path != null 
+        EasyMock.expect(request.getPathInfo()).andReturn(path != null 
                                                 ? path
                                                 : ADDRESS).anyTimes();
         if (path != null) {
-            expect(registry.getDestinationForPath(path)).andReturn(destination);
+            EasyMock.expect(registry.getDestinationForPath(path)).andReturn(destination);
         }
 
         if (destinationCount == -1) {
-            expect(registry.getDestinationsPaths()).andReturn(paths).anyTimes();
+            EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths).anyTimes();
         } else if (destinationCount >= 0) {
-            expect(registry.getDestinationsPaths()).andReturn(paths);
+            EasyMock.expect(registry.getDestinationsPaths()).andReturn(paths);
             List<OsgiDestination> destinations =
                 new ArrayList<OsgiDestination>();
             for (int i = 0; i < destinationCount; i++) {
                 destinations.add(destination);
             }
-            expect(registry.getDestinations()).andReturn(destinations);
+            EasyMock.expect(registry.getDestinations()).andReturn(destinations);
         }
     }
 
     private void setUpMessage() throws Exception {
         ServletInputStream sis = control.createMock(ServletInputStream.class);
-        expect(request.getInputStream()).andReturn(sis);
-        message.setContent(eq(InputStream.class), same(sis));
-        expectLastCall();
+        EasyMock.expect(request.getInputStream()).andReturn(sis);
+        message.setContent(EasyMock.eq(InputStream.class), EasyMock.same(sis));
+        EasyMock.expectLastCall();
         setUpProperty(AbstractHTTPDestination.HTTP_REQUEST, request);
         setUpProperty(AbstractHTTPDestination.HTTP_RESPONSE, response);
         setUpProperty(AbstractHTTPDestination.HTTP_CONTEXT, context);
         setUpProperty(AbstractHTTPDestination.HTTP_CONFIG, config);
-        expect(request.getMethod()).andReturn(VERB);
+        EasyMock.expect(request.getMethod()).andReturn(VERB);
         setUpProperty(Message.HTTP_REQUEST_METHOD, VERB);
         setUpProperty(Message.REQUEST_URI, URI);
         setUpProperty(Message.QUERY_STRING, QUERY);
-        expect(request.getContentType()).andReturn(XML);
+        EasyMock.expect(request.getContentType()).andReturn(XML);
         setUpProperty(Message.CONTENT_TYPE, XML);
-        expect(request.getHeader("Accept")).andReturn(XML);
+        EasyMock.expect(request.getHeader("Accept")).andReturn(XML);
         setUpProperty(Message.ACCEPT_CONTENT_TYPE, XML);
         destination.getAddress();
-        expectLastCall().andReturn(EndpointReferenceUtils.getEndpointReference(PATH));
+        EasyMock.expectLastCall().andReturn(EndpointReferenceUtils.getEndpointReference(PATH));
         setUpProperty(Message.BASE_PATH, PATH);
-        message.put(eq(SecurityContext.class), isA(SecurityContext.class));
-        expect(request.getCharacterEncoding()).andReturn(ENCODING);
+        message.put(EasyMock.eq(SecurityContext.class), EasyMock.isA(SecurityContext.class));
+        EasyMock.expect(request.getCharacterEncoding()).andReturn(ENCODING);
         setUpProperty(Message.ENCODING, ENCODING);
-        exchange.setSession(isA(HTTPSession.class));
-        expectLastCall();
+        exchange.setSession(EasyMock.isA(HTTPSession.class));
+        EasyMock.expectLastCall();
     }
 
     private void setUpProperty(String name, Object value) {
-        message.put(eq(name), same(value));
-        expectLastCall().andReturn(null).anyTimes();
+        message.put(EasyMock.eq(name), EasyMock.same(value));
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
     }
 
     private void setUpResponse(int status, 
@@ -279,18 +280,18 @@ public class OsgiServletTest extends Assert {
                                String ... responseMsgs) throws Exception {
         if (status != 0) {
             response.setStatus(status);
-            expectLastCall();
+            EasyMock.expectLastCall();
         }
         if (responseType != null) {
             response.setContentType(responseType);
-            expectLastCall();
+            EasyMock.expectLastCall();
         }
         if (responseMsgs != null) {
             PrintWriter writer = control.createMock(PrintWriter.class);
-            expect(response.getWriter()).andReturn(writer).anyTimes();
+            EasyMock.expect(response.getWriter()).andReturn(writer).anyTimes();
             for (String msg : responseMsgs) { 
                 writer.write(msg);
-                expectLastCall();
+                EasyMock.expectLastCall();
             }
         }
     }
@@ -298,32 +299,33 @@ public class OsgiServletTest extends Assert {
     private void setUpQuery() throws Exception {
         QueryHandlerRegistry qrh = 
             control.createMock(QueryHandlerRegistry.class);
-        expect(bus.getExtension(QueryHandlerRegistry.class)).andReturn(qrh).anyTimes();
+        EasyMock.expect(bus.getExtension(QueryHandlerRegistry.class)).andReturn(qrh).anyTimes();
         QueryHandler qh = control.createMock(QueryHandler.class);
         List<QueryHandler> handlers = new ArrayList<QueryHandler>();
         handlers.add(qh);
-        expect(qrh.getHandlers()).andReturn(handlers);
+        EasyMock.expect(qrh.getHandlers()).andReturn(handlers);
         String base = ROOT + URI + "?" + QUERY;
-        expect(qh.isRecognizedQuery(eq(base),
-                                    eq(PATH),
-                                    same(endpoint))).andReturn(Boolean.TRUE);
-        expect(qh.getResponseContentType(eq(base), eq(PATH))).andReturn(XML);
+        EasyMock.expect(qh.isRecognizedQuery(EasyMock.eq(base),
+                                             EasyMock.eq(PATH),
+                                             EasyMock.same(endpoint))).andReturn(Boolean.TRUE);
+        EasyMock.expect(qh.getResponseContentType(EasyMock.eq(base),
+                                                  EasyMock.eq(PATH))).andReturn(XML);
         ServletOutputStream sos = control.createMock(ServletOutputStream.class);
-        expect(response.getOutputStream()).andReturn(sos);
-        qh.writeResponse(eq(base), eq(PATH), same(endpoint), same(sos)); 
-        expectLastCall();
+        EasyMock.expect(response.getOutputStream()).andReturn(sos);
+        qh.writeResponse(EasyMock.eq(base), EasyMock.eq(PATH), EasyMock.same(endpoint), EasyMock.same(sos)); 
+        EasyMock.expectLastCall();
         sos.flush();
-        expectLastCall();
+        EasyMock.expectLastCall();
     }
 
     private void setUpRestful() {
         paths.add(ADDRESS);
-        expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
-        expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination).times(2);
-        expect(destination.getMessageObserver()).andReturn(observer);
+        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
+        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination).times(2);
+        EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
         endpoint.addExtensor(extensor);
-        extensor.setLocation(eq(ROOT + "/cxf/Soap" + ADDRESS));
-        expectLastCall();
+        extensor.setLocation(EasyMock.eq(ROOT + "/cxf/Soap" + ADDRESS));
+        EasyMock.expectLastCall();
     }
 
     private OsgiServlet setUpServlet() { 

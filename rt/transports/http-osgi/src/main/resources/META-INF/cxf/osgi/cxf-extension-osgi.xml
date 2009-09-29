@@ -24,8 +24,8 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
 
-    <bean id="org.apache.servicemix.cxf.transport.http_osgi.OsgiTransportFactory"
-          class="org.apache.servicemix.cxf.transport.http_osgi.OsgiTransportFactory"
+    <bean id="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
+          class="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
           init-method="init">
 
         <property name="bus" ref="cxf"/>
@@ -43,6 +43,6 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
     </bean>
 
     <osgi:reference id="osgiDestinationRegistry"
-                    interface="org.apache.servicemix.cxf.transport.http_osgi.OsgiDestinationRegistryIntf" />
+                    interface="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistryIntf" />
 
 </beans>

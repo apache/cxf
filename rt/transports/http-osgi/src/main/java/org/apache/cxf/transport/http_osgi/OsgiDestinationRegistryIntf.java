@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.servicemix.cxf.transport.http_osgi;
+package org.apache.cxf.transport.http_osgi;
 
 import java.util.Collection;
 import java.util.Set;

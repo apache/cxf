@@ -17,16 +17,15 @@
  * under the License.
  */
 
-package org.apache.servicemix.cxf.transport.http_osgi;
+package org.apache.cxf.transport.http_osgi;
 
-import java.util.Arrays;
-import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactoryManager;
 
+import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
 import org.junit.After;
@@ -34,32 +33,21 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.easymock.classextension.EasyMock.*;
-
-
 public class OsgiTransportFactoryTest extends Assert {
-
-    private static final List<String> TRANSPORT_IDS = (List<String>) 
-        Arrays.asList("http://cxf.apache.org/bindings/xformat",
-                      "http://schemas.xmlsoap.org/soap/http",
-                      "http://schemas.xmlsoap.org/wsdl/http/",
-                      "http://schemas.xmlsoap.org/wsdl/soap/http",
-                      "http://www.w3.org/2003/05/soap/bindings/HTTP/",
-                      "http://cxf.apache.org/transports/http/configuration");
 
     private IMocksControl control; 
     private OsgiTransportFactory factory;
     private Bus bus;
-    private DestinationFactoryManager dfm;
     private OsgiDestinationRegistryIntf registry;
 
     @Before
     public void setUp() {
-        control = createNiceControl();
+        control = EasyMock.createNiceControl();
         factory = new OsgiTransportFactory();
         registry = control.createMock(OsgiDestinationRegistryIntf.class);
         bus = control.createMock(Bus.class);
-        dfm = control.createMock(DestinationFactoryManager.class);
+        bus.getExtension(DestinationFactoryManager.class);
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
     }
 
     @After
@@ -67,45 +55,16 @@ public class OsgiTransportFactoryTest extends Assert {
         factory = null;
         registry = null;
         bus = null;
-        dfm = null;
     }
 
-    @Test
-    public void testInit() throws Exception {
-        try {
-            factory.init();
-            fail("expected  IllegalStateException on null bus");
-        } catch (IllegalStateException ise) {
-            // expected
-        }
-        factory.setBus(bus);
-
-        try {
-            factory.init();
-            fail("expected  IllegalStateException on null registry");
-        } catch (IllegalStateException ise) {
-            // expected
-        }
-        factory.setRegistry(registry);
-        
-        bus.getExtension(DestinationFactoryManager.class);
-        expectLastCall().andReturn(dfm);
-        factory.setTransportIds(TRANSPORT_IDS);
-        for (String ns : TRANSPORT_IDS) {
-            dfm.registerDestinationFactory(ns, factory);
-            expectLastCall();
-        }
-        control.replay();
-
-        factory.init();
-
-        control.verify();
-    }
     
     @Test
     public void testGetDestination() throws Exception {
-        factory.setBus(bus);
+        registry.addDestination(EasyMock.eq("/snafu"), EasyMock.isA(OsgiDestination.class));
+        control.replay();
+        
         factory.setRegistry(registry);
+        factory.setBus(bus);
 
         EndpointInfo endpoint = new EndpointInfo();
         endpoint.setAddress("http://bar/snafu");
@@ -117,9 +76,6 @@ public class OsgiTransportFactoryTest extends Assert {
         }
  
         endpoint.setAddress("snafu");
-        registry.addDestination(eq("/snafu"), isA(OsgiDestination.class));
-
-        control.replay();
 
         Destination d = factory.getDestination(endpoint);
         assertNotNull(d);
