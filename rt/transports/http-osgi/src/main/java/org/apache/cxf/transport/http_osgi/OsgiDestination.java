@@ -56,7 +56,7 @@ public class OsgiDestination extends AbstractHTTPDestination {
                            String p)
         throws IOException {
         // would add the default port to the address
-        super(b, ei, false);
+        super(b, null, ei, false);
         factory = fact;
         path = p;
     }
