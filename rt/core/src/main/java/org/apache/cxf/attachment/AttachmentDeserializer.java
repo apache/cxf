@@ -34,6 +34,8 @@ import javax.activation.DataSource;
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetHeaders;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
@@ -120,7 +122,15 @@ public class AttachmentDeserializer {
             }
 
             try {
-                message.put(InternetHeaders.class.getName(), new InternetHeaders(stream));
+                InternetHeaders ih = new InternetHeaders(stream);
+                message.put(InternetHeaders.class.getName(), ih);
+                String val = ih.getHeader("Content-Type", "; ");
+                if (!StringUtils.isEmpty(val)) {
+                    String cs = HttpHeaderHelper.findCharset(val);
+                    if (!StringUtils.isEmpty(cs)) {
+                        message.put(Message.ENCODING, HttpHeaderHelper.mapCharset(cs));
+                    }
+                }
             } catch (MessagingException e) {
                 throw new RuntimeException(e);
             }
