@@ -234,7 +234,16 @@ public class HeaderClientServerTest extends AbstractJaxWsTest {
             // fail("No exception should happen in testHeader4");
         }
     }
-
+    @Test
+    public void testHeader7() {
+        URL wsdl = getClass().getResource("/wsdl/soapheader.wsdl");
+        assertNotNull(wsdl);
+        
+        SOAPHeaderService service = new SOAPHeaderService(wsdl, serviceName);
+        assertNotNull(service);
+        TestHeader proxy = service.getPort(portName, TestHeader.class);
+        assertEquals("Hello", proxy.testHeader7());
+    }
     @Test
     public void testRPCInHeader() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/soapheader_rpc.wsdl");

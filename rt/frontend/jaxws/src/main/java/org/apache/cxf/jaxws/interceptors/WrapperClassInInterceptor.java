@@ -135,6 +135,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 newParams = new MessageContentsList(helper.getWrapperParts(wrappedObject));
                 
                 List<Integer> removes = null;
+                int count = 0;
                 for (MessagePartInfo part : messageInfo.getMessageParts()) {
                     if (Boolean.TRUE.equals(part.getProperty(ReflectionServiceFactoryBean.HEADER))) {
                         MessagePartInfo mpi = wrappedMessageInfo.getMessagePart(part.getName());
@@ -147,14 +148,19 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                             }
                             removes.add(mpi.getIndex());
                         }
+                    } else {
+                        ++count;
                     }
                 }
-                if (removes != null) {
+                if (count == 0) {
+                    newParams.clear();
+                } else if (removes != null) {
                     Collections.sort(removes, Collections.reverseOrder());
                     for (Integer i : removes) {
                         newParams.remove(i.intValue());
                     }
                 }
+                
             } catch (Exception e) {
                 throw new Fault(e);
             }
