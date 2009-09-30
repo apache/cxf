@@ -117,7 +117,7 @@ public class HttpsTokenInterceptorProvider extends AbstractPolicyInterceptorProv
                                     || info.getLocalCertificates().length == 0) {
                                     throw new UntrustedURLConnectionIOException(
                                         "RequireClientCertificate is set, "
-                                        + "but no local certificates we negotiated.  Is"
+                                        + "but no local certificates were negotiated.  Is"
                                         + " the server set to ask for client authorization?");
                                 }
                             }

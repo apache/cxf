@@ -69,6 +69,6 @@ public class ToStringPlugin extends Plugin {
     public int parseArgument(Options opt, String[] args, int index) 
         throws BadCommandLineException, IOException {
         
-        return impl.parseArgument(opt, args, index);
+        return impl.parseArgument(opt, args, index, this);
     }
 }
