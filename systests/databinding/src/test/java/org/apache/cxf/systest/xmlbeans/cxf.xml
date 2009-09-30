@@ -39,7 +39,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     </jaxws:client>
 
     <jaxws:endpoint name="{http://apache.org/hello_world_soap_http/xmlbeans}SoapPort"
-        wsdlLocation="wsdl_systest/xmlbeans/hello_world.wsdl"
+        wsdlLocation="wsdl_systest_databinding/xmlbeans/hello_world.wsdl"
         createdFromAPI="true">
         <jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
