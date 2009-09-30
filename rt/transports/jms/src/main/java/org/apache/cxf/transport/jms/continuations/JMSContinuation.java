@@ -169,7 +169,7 @@ public class JMSContinuation implements Continuation {
                 if (limit < 0 || limit > 100) {
                     limit = 70;
                 }
-                limit = (limit * jmsConfig.getReconnectPercentOfMax()) / 100; 
+                limit = (limit * jmsConfig.getMaxSuspendedContinuations()) / 100; 
             
                 if (continuations.size() <= limit) {
                     jmsListener.start();
