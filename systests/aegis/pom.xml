@@ -25,7 +25,7 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
+    <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-aegis</artifactId>
     <name>Apache CXF Aegis System Tests</name>
     <version>2.2.4-SNAPSHOT</version>
