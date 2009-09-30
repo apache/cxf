@@ -35,7 +35,7 @@
         <module>uncategorized</module> 
         <module>transports</module>
         <module>jaxws</module>
-        <module>aegis</module>
+        <module>databinding</module>
         <module>jaxrs</module>
         <module>ws-specs</module>
     </modules>
