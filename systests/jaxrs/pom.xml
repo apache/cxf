@@ -25,7 +25,7 @@
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
+    <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-jaxrs</artifactId>
     <name>Apache CXF JAX-RS System Tests</name>
     <version>2.1.7-SNAPSHOT</version>
