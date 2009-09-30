@@ -70,7 +70,7 @@ public class JMSConfiguration implements InitializingBean {
     private int maxConcurrentConsumers = 1;
     private int maxConcurrentTasks = 10;
     private int maxSuspendedContinuations = DEFAULT_VALUE;
-    private int reconnectSuspendedContinuations = DEFAULT_VALUE;
+    private int reconnectPercentOfMax = 70;
 
     private volatile String messageSelector;
     private boolean subscriptionDurable;
@@ -336,12 +336,12 @@ public class JMSConfiguration implements InitializingBean {
         this.maxSuspendedContinuations = maxSuspendedContinuations;
     }
     
-    public int getReconnectSuspendedContinuations() {
-        return reconnectSuspendedContinuations;
+    public int getReconnectPercentOfMax() {
+        return reconnectPercentOfMax;
     }
 
-    public void setReconnectSuspendedContinuations(int reconnectSuspendedContinuations) {
-        this.reconnectSuspendedContinuations = reconnectSuspendedContinuations;
+    public void setReconnectPercentOfMax(int reconnectPercentOfMax) {
+        this.reconnectPercentOfMax = reconnectPercentOfMax;
     }
 
     public TaskExecutor getTaskExecutor() {
