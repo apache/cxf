@@ -33,70 +33,18 @@
 
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-resources-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>copy-test-resources</id>
-                        <phase>process-test-sources</phase>
-                        <goals>
-                            <goal>copy-resources</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${basedir}/target/test-classes/schemaorg_apache_xmlbeans</outputDirectory>
-                            <resources>
-                                <resource>
-                                    <directory>${basedir}/target/generated/src/test/java/schemaorg_apache_xmlbeans</directory>
-                                    <includes>
-                                        <include>**/*.xsb</include>
-                                        <include>**/*.class</include>
-                                    </includes>
-                                </resource>
-                            </resources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-	
-        
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>build-helper-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>add-test-source</id>
-                        <phase>generate-test-sources</phase>
-                        <goals>
-                            <goal>add-test-source</goal>
-                        </goals>
-                        <configuration>
-                            <sources>
-                                <source>${basedir}/src/test/generated</source>
-                            </sources>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest</testWsdlRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest/xmlbeans/hello_world.wsdl</wsdl>
-                                    <extraargs>
-                                        <extraarg>-db</extraarg>
-                                        <extraarg>xmlbeans</extraarg>
-                                    </extraargs>
-                                </wsdlOption>
+            <plugin>                                                                                                          
+                <groupId>org.apache.cxf</groupId>                                                                             
+                <artifactId>cxf-codegen-plugin</artifactId>                                                                   
+                <version>${project.version}</version>                                                                         
+                <executions>                                                                                                  
+                    <execution>                                                                                               
+                        <id>generate-test-sources</id>                                                                        
+                        <phase>generate-test-sources</phase>                                                                  
+                        <configuration>                                                                                       
+                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>                        
+                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest</testWsdlRoot>                           
+                            <wsdlOptions>                                                                                     
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest/hello_world_corba.wsdl</wsdl>
                                 </wsdlOption>
@@ -108,6 +56,7 @@
                     </execution>
                 </executions>
             </plugin>
+
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-corbatools-maven-plugin</artifactId>
@@ -200,11 +149,6 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

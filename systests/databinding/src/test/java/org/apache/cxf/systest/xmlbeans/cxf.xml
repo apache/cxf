@@ -22,7 +22,7 @@
       xmlns:jaxws="http://cxf.apache.org/jaxws"
       xmlns:cxf="http://cxf.apache.org/core"
       xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
@@ -33,19 +33,20 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <!-- jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties-->
-        <jaxws:dataBinding>
+        <!-- jaxws:dataBinding>
         	<bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding"/>
-        </jaxws:dataBinding>
+        </jaxws:dataBinding-->
     </jaxws:client>
 
     <jaxws:endpoint name="{http://apache.org/hello_world_soap_http/xmlbeans}SoapPort"
+        wsdlLocation="wsdl_systest_databinding/xmlbeans/hello_world.wsdl"
         createdFromAPI="true">
         <jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties>
-        <jaxws:dataBinding>
+        <!-- jaxws:dataBinding>
         	<bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding"/>
-        </jaxws:dataBinding>
+        </jaxws:dataBinding-->
     </jaxws:endpoint>
 
 </beans>
