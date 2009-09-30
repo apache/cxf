@@ -159,7 +159,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>spring-tx</artifactId>
+            <artifactId>spring-dao</artifactId>
             <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
