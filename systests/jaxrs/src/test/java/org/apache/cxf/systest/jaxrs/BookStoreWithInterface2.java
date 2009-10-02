@@ -38,32 +38,28 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import javax.servlet.ServletContext;
+import javax.ws.rs.core.Context;
 
 
+public class BookStoreWithInterface2 extends BookStoreStorage implements BookInterface {
 
-
-public class BookStoreWithInterface extends BookStoreStorage 
-    implements BookInterface, LifecycleInterface {
-
-    private boolean postConstructCalled;
+    private ServletContext servletContext; 
     
-    public BookStoreWithInterface() {
+    public BookStoreWithInterface2() {
         Book book = new Book();
         book.setId(bookId);
         book.setName("CXF in Action");
         books.put(book.getId(), book);
     }
     
-    public void postConstruct() {
-        postConstructCalled = true;
-    }
-    
-    public void preDestroy() {
-        System.out.println("PreDestroy called");
+    public BookStoreWithInterface2(@Context ServletContext scontext) {
+        this();
+        this.servletContext = scontext;
     }
     
     public Book getThatBook(Long id, String s) throws BookNotFoundFault {
-        if (!postConstructCalled) {
+        if (servletContext == null) {
             throw new RuntimeException();
         }
         if (!id.toString().equals(s)) {
@@ -73,7 +69,7 @@ public class BookStoreWithInterface extends BookStoreStorage
     }
     
     public Book getThatBook(Long id) throws BookNotFoundFault {
-        if (!postConstructCalled) {
+        if (servletContext == null) {
             throw new RuntimeException();
         }
         return doGetBook(id);
@@ -92,6 +88,9 @@ public class BookStoreWithInterface extends BookStoreStorage
     }
 
     public Book getThatBook() throws BookNotFoundFault {
+        if (servletContext == null) {
+            throw new RuntimeException();
+        }
         return books.get(123L);
     }
 

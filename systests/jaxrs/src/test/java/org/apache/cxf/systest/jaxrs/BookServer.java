@@ -49,7 +49,7 @@ public class BookServer extends AbstractBusTestServerBase {
         ints.add(new CustomOutInterceptor());
         sf.setOutInterceptors(ints);
         sf.setResourceProvider(BookStore.class,
-                               new SingletonResourceProvider(new BookStore()));
+                               new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:9080/");
 
         sf.create();        

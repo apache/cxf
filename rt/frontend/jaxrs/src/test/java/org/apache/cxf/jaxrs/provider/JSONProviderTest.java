@@ -448,7 +448,6 @@ public class JSONProviderTest extends Assert {
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
         
         String s = os.toString();
-        System.out.println(s);
         assertEquals(
             "{\"post\":{\"title\":\"post\",\"comments\":[{\"title\":\"comment1\"},"
             + "{\"title\":\"comment2\"}]}}",
@@ -477,6 +476,7 @@ public class JSONProviderTest extends Assert {
             s);
     }
     
+        
     private TagVO createTag(String name, String group) {
         return new TagVO(name, group);
     }
@@ -536,5 +536,6 @@ public class JSONProviderTest extends Assert {
         }
     }
 
+    
 
 }

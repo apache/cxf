@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +31,7 @@ import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -136,7 +138,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         extensionMappings = extMaps;
     }
     
-    public List<Class> getResourceClasses() {
+    public List<Class<?>> getResourceClasses() {
         return serviceFactory.getResourceClasses();
     }
     
@@ -168,6 +170,19 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
     public void setResourceProvider(Class c, ResourceProvider rp) {
         resourceProviders.put(c, rp);
+    }
+    
+    public void setResourceProvider(ResourceProvider rp) {
+        setResourceProviders(CastUtils.cast(Collections.singletonList(rp), ResourceProvider.class));
+    }
+    
+    
+    public void setResourceProviders(List<ResourceProvider> rps) {
+        for (ResourceProvider rp : rps) {
+            Class<?> c = rp.getResourceClass();
+            setServiceClass(c);
+            resourceProviders.put(c, rp);
+        }
     }
 
     public void setInvoker(Invoker invoker) {

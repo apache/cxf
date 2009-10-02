@@ -39,6 +39,7 @@ import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.TreeMap;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -100,7 +101,8 @@ public final class JAXRSUtils {
     public static final String RELATIVE_PATH = "relative.path";
     public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
     public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
-    
+    public static final String ROOT_INSTANCE = "service.root.instance";
+    public static final String ROOT_PROVIDER = "service.root.provider";
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
@@ -218,6 +220,9 @@ public final class JAXRSUtils {
                                                  String path, 
                                                  MultivaluedMap<String, String> values) {
         
+        LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
+                                                        BUNDLE, 
+                                                        path).toString());
         if (resources.size() == 1) { 
             return resources.get(0).getURITemplate().match(path, values)
                    ? resources.get(0) : null;
@@ -227,10 +232,20 @@ public final class JAXRSUtils {
             new TreeMap<ClassResourceInfo, MultivaluedMap<String, String>>(
                 new ClassResourceInfoComparator());
         
-        for (ClassResourceInfo resource : resources) {
+        for (ClassResourceInfo cri : resources) {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-            if (resource.getURITemplate().match(path, map)) {
-                candidateList.put(resource, map);
+            if (cri.getURITemplate().match(path, map)) {
+                candidateList.put(cri, map);
+                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY", 
+                                                                BUNDLE, 
+                                                                cri.getServiceClass().getName(),
+                                                                path, 
+                                                                cri.getURITemplate().getValue()).toString());
+            } else {
+                LOG.fine(new org.apache.cxf.common.i18n.Message("NO_CRI_MATCH", 
+                                                                BUNDLE, 
+                                                                path,
+                                                                cri.getServiceClass().getName()).toString());
             }
         }
         
@@ -238,7 +253,12 @@ public final class JAXRSUtils {
             Map.Entry<ClassResourceInfo, MultivaluedMap<String, String>> firstEntry = 
                 candidateList.entrySet().iterator().next();
             values.putAll(firstEntry.getValue());
-            return firstEntry.getKey();
+            ClassResourceInfo cri = firstEntry.getKey();
+            LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
+                                                         BUNDLE, 
+                                                         cri.getServiceClass().getName(),
+                                                         path, cri.getURITemplate().getValue()).toString());
+            return cri;
         }
         
         return null;
@@ -261,6 +281,14 @@ public final class JAXRSUtils {
                                                          String requestContentType, 
                                                          List<MediaType> acceptContentTypes,
                                                          boolean logNow) {
+        if (LOG.isLoggable(Level.FINE)) {
+            org.apache.cxf.common.i18n.Message msg = 
+                new org.apache.cxf.common.i18n.Message("START_OPER_MATCH", 
+                                                       BUNDLE,
+                                                       resource.getServiceClass().getName());
+            LOG.fine(msg.toString());
+            
+        }
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
                 new OperationResourceInfoComparator());
@@ -278,8 +306,10 @@ public final class JAXRSUtils {
                 URITemplate uriTemplate = ori.getURITemplate();
                 MultivaluedMap<String, String> map = new MetadataMap<String, String>(values);
                 if (uriTemplate != null && uriTemplate.match(path, map)) {
+                    boolean added = false;
                     if (ori.isSubResourceLocator()) {
                         candidateList.put(ori, map);
+                        added = true;
                     } else {
                         String finalGroup = map.getFirst(URITemplate.FINAL_MATCH_GROUP);
                         if (finalGroup == null || StringUtils.isEmpty(finalGroup)
@@ -290,14 +320,25 @@ public final class JAXRSUtils {
                             boolean pMatched = matchProduceTypes(acceptType, ori);
                             if (mMatched && cMatched && pMatched) {
                                 subresourcesOnly = false;
-                                candidateList.put(ori, map);    
+                                candidateList.put(ori, map);
+                                added = true;
                             } else {
                                 methodMatched = mMatched ? methodMatched + 1 : methodMatched;
                                 produceMatched = pMatched ? produceMatched + 1 : produceMatched;
                                 consumeMatched = cMatched ? consumeMatched + 1 : consumeMatched;
+                                logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                             }
+                        } else {
+                            logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                         }
                     }
+                    if (added && LOG.isLoggable(Level.FINE)) {
+                        LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
+                                  BUNDLE, 
+                                  ori.getMethodToInvoke().getName()).toString());
+                    }
+                } else {
+                    logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                 }
             }
             if (!candidateList.isEmpty() && !subresourcesOnly) {
@@ -315,6 +356,9 @@ public final class JAXRSUtils {
                          BUNDLE, resource.getServiceClass().getName(), 
                          ori.getMethodToInvoke().getName()).toString());
             }
+            LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
+                           BUNDLE, ori.getMethodToInvoke().getName(), 
+                           resource.getServiceClass().getName()).toString());
             return ori;
         }
         
@@ -323,8 +367,9 @@ public final class JAXRSUtils {
         String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
-                                                   BUNDLE, 
+                                                   BUNDLE,
                                                    path,
+                                                   httpMethod,
                                                    requestType.toString(),
                                                    convertTypesToString(acceptContentTypes));
         if (!"OPTIONS".equalsIgnoreCase(httpMethod) && logNow) {
@@ -334,6 +379,26 @@ public final class JAXRSUtils {
         throw new WebApplicationException(rb.build());
         
     }    
+    
+    private static void logNoMatchMessage(OperationResourceInfo ori, 
+        String path, String httpMethod, MediaType requestType, List<MediaType> acceptContentTypes) {
+        if (!LOG.isLoggable(Level.FINE)) {
+            return;
+        }
+        org.apache.cxf.common.i18n.Message errorMsg = 
+            new org.apache.cxf.common.i18n.Message("OPER_NO_MATCH", 
+                                                   BUNDLE,
+                                                   ori.getMethodToInvoke().getName(),
+                                                   path,
+                                                   ori.getURITemplate().getValue(),
+                                                   httpMethod,
+                                                   ori.getHttpMethod(),
+                                                   requestType.toString(),
+                                                   convertTypesToString(ori.getConsumeTypes()),
+                                                   convertTypesToString(acceptContentTypes),
+                                                   convertTypesToString(ori.getProduceTypes()));
+        LOG.fine(errorMsg.toString());
+    }
 
     public static ResponseBuilder createResponseBuilder(ClassResourceInfo cri, int status, boolean addAllow) {
         ResponseBuilder rb = Response.status(status);
@@ -622,8 +687,18 @@ public final class JAXRSUtils {
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
                 FormUtils.populateMapFromString(params, (String)body, decode, request);
             } else {
-                MultipartBody body = AttachmentUtils.getMultipartBody(mc);
-                FormUtils.populateMapFromMultipart(params, body, decode);
+                if (mt != null && "multipart".equalsIgnoreCase(mt.getType()) 
+                    && MediaType.MULTIPART_FORM_DATA_TYPE.isCompatible(mt)) {
+                    MultipartBody body = AttachmentUtils.getMultipartBody(mc);
+                    FormUtils.populateMapFromMultipart(params, body, decode);
+                } else {
+                    org.apache.cxf.common.i18n.Message errorMsg = 
+                        new org.apache.cxf.common.i18n.Message("WRONG_FORM_MEDIA_TYPE", 
+                                                               BUNDLE, 
+                                                               mt == null ? "*/*" : mt.toString());
+                    LOG.warning(errorMsg.toString());
+                    throw new WebApplicationException(415);
+                }
             }
         }
         

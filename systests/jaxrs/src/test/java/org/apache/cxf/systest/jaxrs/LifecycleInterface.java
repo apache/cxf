@@ -16,15 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.systest.jaxrs;
 
-package org.apache.cxf.jaxrs.lifecycle;
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 
-import org.apache.cxf.message.Message;
-
-public interface ResourceProvider {
-
-    Object getInstance(Message m);
-    void releaseInstance(Message m, Object o);
-    Class<?> getResourceClass();
-    boolean isSingleton();
+public interface LifecycleInterface {
+    @PostConstruct
+    void postConstruct();
+    @PreDestroy
+    void preDestroy();
 }

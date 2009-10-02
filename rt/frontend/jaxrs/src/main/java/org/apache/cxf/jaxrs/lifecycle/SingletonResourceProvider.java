@@ -19,13 +19,24 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
+import org.apache.cxf.common.util.ClassHelper;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Message;
 
 public class SingletonResourceProvider implements ResourceProvider {
     private Object resourceInstance;
     
-    public SingletonResourceProvider(Object o) { 
+    public SingletonResourceProvider(Object o, boolean callPostConstruct) {
         resourceInstance = o;
+        if (callPostConstruct) {
+            InjectionUtils.invokeLifeCycleMethod(o, 
+                ResourceUtils.findPostConstructMethod(ClassHelper.getRealClass(o)));
+        }
+    }
+    
+    public SingletonResourceProvider(Object o) { 
+        this(o, false);
     }
     
     public boolean isSingleton() {
@@ -36,7 +47,12 @@ public class SingletonResourceProvider implements ResourceProvider {
         return resourceInstance;
     }
     
-    public Object getInstance() {
-        return resourceInstance;
+    public void releaseInstance(Message m, Object o) {
+        // TODO Auto-generated method stub
     }
+    
+    public Class<?> getResourceClass() {
+        return ClassHelper.getRealClass(resourceInstance);
+    }
+    
 }

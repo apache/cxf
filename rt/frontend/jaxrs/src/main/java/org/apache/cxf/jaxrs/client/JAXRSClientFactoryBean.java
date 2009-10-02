@@ -128,11 +128,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
     public Client createWithValues(Object... varValues) {
         checkResources(false);
-        
+        ClassResourceInfo cri = null;
         try {
             Endpoint ep = createEndpoint();
             URI baseURI = URI.create(getAddress());
-            ClassResourceInfo cri = serviceFactory.getClassResourceInfo().get(0);
+            cri = serviceFactory.getClassResourceInfo().get(0);
             boolean isRoot = cri.getURITemplate() != null;
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders,
                                                             varValues);
@@ -149,6 +149,16 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
                                                                 InvocationHandlerAware.class}, 
                                      proxyImpl);
             }
+        } catch (IllegalArgumentException ex) {
+            String message = ex.getLocalizedMessage();
+            if (cri != null) {
+                String expected = cri.getServiceClass().getSimpleName();
+                if ((expected + " is not an interface").equals(message)) {
+                    message += "; make sure CGLIB is on the classpath";
+                }
+            }
+            LOG.severe(ex.getClass().getName() + " : " + message);
+            throw ex;
         } catch (Exception ex) {
             LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
             throw new RuntimeException(ex);

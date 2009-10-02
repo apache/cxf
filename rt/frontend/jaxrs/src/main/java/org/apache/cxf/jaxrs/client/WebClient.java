@@ -331,7 +331,7 @@ public class WebClient extends AbstractClient {
      * @param memberClass expected type of collection member class
      * @return typed collection
      */
-    public <T> Collection<T> postAndGetCollection(Object body, Class<T> memberClass) {
+    public <T> Collection<? extends T> postAndGetCollection(Object body, Class<T> memberClass) {
         return invokeAndGetCollection("POST", body, memberClass);
     }
     
@@ -341,7 +341,7 @@ public class WebClient extends AbstractClient {
      * @param memberClass expected type of collection member class
      * @return typed collection
      */
-    public <T> Collection<T> getCollection(Class<T> memberClass) {
+    public <T> Collection<? extends T> getCollection(Class<T> memberClass) {
         return invokeAndGetCollection("GET", null, memberClass);
     }
     
