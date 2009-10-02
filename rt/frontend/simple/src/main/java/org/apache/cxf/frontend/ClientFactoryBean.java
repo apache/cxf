@@ -75,11 +75,11 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     protected void applyExtraClass() {
-        DataBinding dataBinding = getServiceFactory().getDataBinding();
-        if (dataBinding instanceof JAXBDataBinding) {
-            Map props = this.getProperties();
-            if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-                Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
+        Map props = this.getProperties();
+        if (props != null && props.get("jaxb.additionalContextClasses") != null) {
+            Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
+            DataBinding dataBinding = getServiceFactory().getDataBinding();
+            if (dataBinding instanceof JAXBDataBinding) {
                 ((JAXBDataBinding)dataBinding).setExtraClass(extraClass);
             }
         }

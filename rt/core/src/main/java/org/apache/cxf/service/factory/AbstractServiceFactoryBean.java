@@ -54,7 +54,10 @@ public abstract class AbstractServiceFactoryBean {
     }
 
     public DataBinding getDataBinding() {
-        if (dataBinding == null) {
+        return getDataBinding(true);
+    }
+    public DataBinding getDataBinding(boolean create) {
+        if (dataBinding == null && create) {
             dataBinding = createDefaultDataBinding();
         }
         return dataBinding;

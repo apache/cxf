@@ -217,6 +217,7 @@ public final class ToolConstants {
     // Tools framework
     public static final String FRONTEND_PLUGIN = "frontend";
     public static final String DATABINDING_PLUGIN = "databinding";
+    public static final String RUNTIME_DATABINDING_CLASS = "databinding-class";
 
     public static final String CFG_WSDL_VERSION = "wsdlversion";
 

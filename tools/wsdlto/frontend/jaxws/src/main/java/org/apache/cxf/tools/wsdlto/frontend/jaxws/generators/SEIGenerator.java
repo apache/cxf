@@ -23,12 +23,14 @@ import java.util.Map;
 
 import javax.jws.HandlerChain;
 
+import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.JAnnotation;
+import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.util.ClassCollector;
@@ -103,6 +105,15 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
                         intf.addImport("javax.jws.HandlerChain");
                     }
                 }
+            }
+            if (penv.containsKey(ToolConstants.RUNTIME_DATABINDING_CLASS)) {
+                JAnnotation ann = new JAnnotation(DataBinding.class);
+                JAnnotationElement el 
+                    = new JAnnotationElement(null,
+                                             penv.get(ToolConstants.RUNTIME_DATABINDING_CLASS),
+                                             true);
+                ann.addElement(el);
+                intf.addAnnotation(ann);
             }
             clearAttributes();
             setAttributes("intf", intf);

@@ -83,6 +83,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.ServiceModelSchemaValidator;
@@ -185,6 +186,22 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     
      
     protected DataBinding createDefaultDataBinding() {
+        if (getServiceClass() != null) {
+            org.apache.cxf.annotations.DataBinding db 
+                = getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
+            if (db != null) {
+                try {
+                    if (!StringUtils.isEmpty(db.ref())) {
+                        return getBus().getExtension(ResourceManager.class).resolveResource(db.ref(),
+                                                                                            db.value());
+                    }
+                    return db.value().newInstance();
+                } catch (Exception e) {
+                    LOG.log(Level.WARNING, "Could not create databinding " 
+                            + db.value().getName(), e);
+                }
+            }
+        }
         return new JAXBDataBinding(getQualifyWrapperSchema());
     }
     
