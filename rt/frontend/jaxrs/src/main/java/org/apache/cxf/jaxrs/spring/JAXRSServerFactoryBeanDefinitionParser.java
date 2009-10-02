@@ -68,7 +68,6 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         }
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void mapElement(ParserContext ctx, BeanDefinitionBuilder bean, Element el, String name) {
         if ("properties".equals(name) 
