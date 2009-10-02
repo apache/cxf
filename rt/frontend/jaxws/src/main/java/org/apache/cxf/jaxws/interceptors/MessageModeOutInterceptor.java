@@ -43,7 +43,9 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
@@ -117,6 +119,25 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     }
                     
                 });
+            } else if (!ct.toLowerCase().contains("xml")) {
+                //not XML based, need to stream out directly.  This is a bit tricky as
+                //we don't want the stax stuff triggering and such
+                OutputStream out = message.getContent(OutputStream.class);
+                message.put(Message.CONTENT_TYPE, ct);
+                try {
+                    InputStream in = ds.getInputStream();
+                    IOUtils.copy(in, out);
+                    in.close();
+                    out.flush();
+                    out.close();
+                } catch (IOException e) {
+                    throw new Fault(e);
+                }
+                list.remove(0);
+                out = new CachedOutputStream();
+                message.setContent(OutputStream.class, out);
+                XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+                message.setContent(XMLStreamWriter.class, writer);
             }
         }
         
