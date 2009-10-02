@@ -61,7 +61,7 @@ public class ToStringPlugin {
             +  "  -Xts:style:simple    : Have toString produce single line terse output\n";
     }
 
-    public int parseArgument(Options opt, String[] args, int index) 
+    public int parseArgument(Options opt, String[] args, int index, com.sun.tools.xjc.Plugin plugin) 
         throws BadCommandLineException, IOException {
         int ret = 0;
         if (args[index].equals("-Xts:style:multiline")) {
@@ -70,6 +70,9 @@ public class ToStringPlugin {
         } else if (args[index].equals("-Xts:style:simple")) {
             styleFieldName = "SIMPLE_STYLE";
             ret = 1;
+        }
+        if (!opt.activePlugins.contains(plugin)) {
+            opt.activePlugins.add(plugin);
         }
         return ret;
     }
