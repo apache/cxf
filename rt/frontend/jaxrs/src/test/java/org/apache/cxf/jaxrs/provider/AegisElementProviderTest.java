@@ -113,7 +113,6 @@ public class AegisElementProviderTest extends Assert {
         writer.writeTo(testMap, testMap.getClass(), mapType, null, null, null, os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
-        System.out.println(xml);        
         MessageBodyReader<Object> reader = new AegisElementProvider();         
         byte[] simpleBytes = xml.getBytes("utf-8");
         

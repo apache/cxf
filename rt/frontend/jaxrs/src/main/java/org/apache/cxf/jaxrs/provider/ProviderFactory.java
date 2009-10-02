@@ -258,18 +258,17 @@ public final class ProviderFactory {
     
     
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
+        List<ProviderInfo<RequestHandler>> handlers = null;
         if (requestHandlers.size() == 0) {
-            return Collections.unmodifiableList(SHARED_FACTORY.requestHandlers);
+            handlers = SHARED_FACTORY.requestHandlers;
         } else {
-            List<ProviderInfo<RequestHandler>> handlers = 
-                new ArrayList<ProviderInfo<RequestHandler>>(SHARED_FACTORY.requestHandlers);
+            handlers = new ArrayList<ProviderInfo<RequestHandler>>(SHARED_FACTORY.requestHandlers);
             handlers.addAll(requestHandlers);
-            return handlers;
         }
+        return Collections.unmodifiableList(handlers);
     }
     
     public List<ProviderInfo<ResponseHandler>> getResponseHandlers() {
-        
         return Collections.unmodifiableList(responseHandlers);
     }
 

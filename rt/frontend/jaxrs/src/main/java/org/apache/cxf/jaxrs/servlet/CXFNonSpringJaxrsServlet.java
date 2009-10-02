@@ -54,6 +54,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
     private static final String SERVICE_SCOPE_PARAM = "jaxrs.scope";
+    private static final String SCHEMAS_PARAM = "jaxrs.schemaLocations";
     private static final String SERVICE_SCOPE_SINGLETON = "singleton";
     private static final String SERVICE_SCOPE_REQUEST = "prototype";
     
@@ -81,6 +82,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             bean.setModelRef(modelRef.trim());
         }
         
+        setSchemasLocations(bean, servletConfig);
+        
         List<Class> resourceClasses = getServiceClasses(servletConfig, modelRef != null);
         Map<Class, ResourceProvider> resourceProviders = 
             getResourceProviders(servletConfig, resourceClasses);
@@ -95,6 +98,24 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         bean.create();
     }
 
+    protected void setSchemasLocations(JAXRSServerFactoryBean bean, ServletConfig servletConfig) {
+        String schemas = servletConfig.getInitParameter(SCHEMAS_PARAM);
+        if (schemas == null) {
+            return;
+        }
+        String[] locations = schemas.split(" ");
+        List<String> list = new ArrayList<String>();
+        for (String loc : locations) {
+            String theLoc = loc.trim();
+            if (theLoc.length() != 0) {
+                list.add(theLoc);
+            }
+        }
+        if (list.size() > 0) {
+            bean.setSchemaLocations(list);
+        }
+    }
+    
     protected List<Class> getServiceClasses(ServletConfig servletConfig,
                                             boolean modelAvailable) throws ServletException {
         String serviceBeans = servletConfig.getInitParameter(SERVICE_CLASSES_PARAM);
@@ -107,8 +128,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String[] classNames = serviceBeans.split(" ");
         List<Class> resourceClasses = new ArrayList<Class>();
         for (String cName : classNames) {
-            if (cName.length() != 0) {
-                Class<?> cls = loadClass(cName);
+            String theName = cName.trim();
+            if (theName.length() != 0) {
+                Class<?> cls = loadClass(theName);
                 resourceClasses.add(cls);
             }
         }
@@ -126,8 +148,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         String[] classNames = providersList.split(" ");
         List<Object> providers = new ArrayList<Object>();
         for (String cName : classNames) {
-            if (cName.length() != 0) {
-                Class<?> cls = loadClass(cName);
+            String theName = cName.trim();
+            if (theName.length() != 0) {
+                Class<?> cls = loadClass(theName);
                 providers.add(createSingletonInstance(cls, servletConfig));
             }
         }
@@ -146,7 +169,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         for (Class c : resourceClasses) {
             map.put(c, isPrototype ? new PerRequestResourceProvider(c)
                                    : new SingletonResourceProvider(
-                                         createSingletonInstance(c, servletConfig)));
+                                         createSingletonInstance(c, servletConfig), true));
         }
         return map;
     }    
@@ -240,7 +263,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     
     private Class<?> loadClass(String cName, String classType) throws ServletException {
         try {
-            return ClassLoaderUtils.loadClass(cName.trim(), CXFNonSpringJaxrsServlet.class);
+            return ClassLoaderUtils.loadClass(cName, CXFNonSpringJaxrsServlet.class);
         } catch (ClassNotFoundException ex) {
             throw new ServletException("No " + classType + " class " + cName.trim() + " can be found", ex); 
         }

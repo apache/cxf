@@ -35,6 +35,9 @@ public class PerRequestResourceProviderTest extends Assert {
         Customer c = (Customer)rp.getInstance(message);
         assertNotNull(c.getUriInfo());
         assertEquals("aValue", c.getQueryParam());
+        assertTrue(c.isPostConstuctCalled());
+        rp.releaseInstance(message, c);
+        assertTrue(c.isPreDestroyCalled());
     }
 }
 

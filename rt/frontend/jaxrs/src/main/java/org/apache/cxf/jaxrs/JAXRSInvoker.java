@@ -38,6 +38,7 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -57,6 +58,8 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
     private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
+    private static final String SERVICE_OBJECT_SCOPE = "org.apache.cxf.service.scope";
+    private static final String REQUEST_SCOPE = "request";    
     
     public JAXRSInvoker() {
     }
@@ -73,8 +76,18 @@ public class JAXRSInvoker extends AbstractInvoker {
             //      in the out interceptor instead of dealing with the contents list ?
             return new MessageContentsList(response);
         }
-        
-        return invoke(exchange, request, getServiceObject(exchange));
+        ResourceProvider provider = getResourceProvider(exchange);
+        Object serviceObject = getServiceObject(exchange);
+        try {
+            return invoke(exchange, request, serviceObject);
+        } finally {
+            if (!isServiceObjectRequestScope(exchange.getInMessage())) {
+                provider.releaseInstance(exchange.getInMessage(), serviceObject);
+            } else {
+                exchange.put(JAXRSUtils.ROOT_INSTANCE, serviceObject);
+                exchange.put(JAXRSUtils.ROOT_PROVIDER, provider);
+            }
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -206,6 +219,17 @@ public class JAXRSInvoker extends AbstractInvoker {
     private boolean setServiceLoaderAsContextLoader(Message inMessage) {
         Object en = inMessage.getContextualProperty(SERVICE_LOADER_AS_CONTEXT);
         return Boolean.TRUE.equals(en) || "true".equals(en);
+    }
+    
+    private boolean isServiceObjectRequestScope(Message inMessage) {
+        Object scope = inMessage.getContextualProperty(SERVICE_OBJECT_SCOPE);
+        return REQUEST_SCOPE.equals(scope);
+    }
+    
+    private ResourceProvider getResourceProvider(Exchange exchange) {
+        OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
+        ClassResourceInfo cri = ori.getClassResourceInfo();
+        return cri.getResourceProvider();
     }
     
     public Object getServiceObject(Exchange exchange) {

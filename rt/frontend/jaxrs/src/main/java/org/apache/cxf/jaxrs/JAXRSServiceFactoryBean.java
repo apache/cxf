@@ -100,8 +100,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         this.invoker = invoker;
     }
 
-    public List<Class> getResourceClasses() {
-        List<Class> resourceClasses = new ArrayList<Class>();
+    public List<Class<?>> getResourceClasses() {
+        List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
         for (ClassResourceInfo cri : classResourceInfos) {
             resourceClasses.add(cri.getResourceClass());
         }

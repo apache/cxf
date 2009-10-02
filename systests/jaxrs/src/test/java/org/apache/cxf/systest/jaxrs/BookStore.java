@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -80,6 +82,16 @@ public class BookStore {
     
     public BookStore() {
         init();
+    }
+    
+    @PostConstruct
+    public void postConstruct() {
+        System.out.println("PostConstruct called");
+    }
+    
+    @PreDestroy
+    public void preDestroy() {
+        System.out.println("PreDestroy called");
     }
     
     @GET

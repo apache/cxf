@@ -23,6 +23,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -111,6 +113,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     private String b;
     private String name;
     
+    private boolean postConstuctCalled;
+    private boolean preDestroyCalled;
+    
     public Customer() {
         
     }
@@ -123,6 +128,24 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                     @QueryParam("a") String queryParam) {
         uriInfo = info;
         this.queryParam = queryParam;
+    }
+    
+    @PostConstruct
+    public void postConstruct() {
+        postConstuctCalled = true;
+    }
+    
+    public boolean isPostConstuctCalled() {
+        return postConstuctCalled;
+    }
+    
+    @PreDestroy
+    public void preDestroy() {
+        preDestroyCalled = true;
+    }
+    
+    public boolean isPreDestroyCalled() {
+        return preDestroyCalled;
     }
     
     public String getName() {

@@ -37,6 +37,8 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
@@ -47,6 +49,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
@@ -68,6 +71,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.model.UserOperation;
 import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 
 public final class ResourceUtils {
@@ -78,6 +82,50 @@ public final class ResourceUtils {
     
     private ResourceUtils() {
         
+    }
+    
+    public static Method findPostConstructMethod(Class<?> c) {
+        if (Object.class == c || null == c) {
+            return null;
+        }
+        for (Method m : c.getDeclaredMethods()) {
+            if (m.getAnnotation(PostConstruct.class) != null) {
+                return m;
+            }
+        }
+        Method m = findPostConstructMethod(c.getSuperclass());
+        if (m != null) {
+            return m;
+        }
+        for (Class<?> i : c.getInterfaces()) {
+            m = findPostConstructMethod(i);
+            if (m != null) {
+                return m;
+            }
+        }
+        return null;
+    }
+    
+    public static Method findPreDestroyMethod(Class<?> c) {
+        if (Object.class == c || null == c) {
+            return null;
+        }
+        for (Method m : c.getDeclaredMethods()) {
+            if (m.getAnnotation(PreDestroy.class) != null) {
+                return m;
+            }
+        }
+        Method m = findPreDestroyMethod(c.getSuperclass());
+        if (m != null) {
+            return m;
+        }
+        for (Class<?> i : c.getInterfaces()) {
+            m = findPreDestroyMethod(i);
+            if (m != null) {
+                return m;
+            }
+        }
+        return null;
     }
     
     public static ClassResourceInfo createClassResourceInfo(
@@ -448,4 +496,23 @@ public final class ResourceUtils {
         return op;
     }
     
+    @SuppressWarnings("unchecked")
+    public static Object[] createConstructorArguments(Constructor c, Message m) {
+        Class<?>[] params = c.getParameterTypes();
+        Annotation[][] anns = c.getParameterAnnotations();
+        Type[] genericTypes = c.getGenericParameterTypes();
+        MultivaluedMap<String, String> templateValues = m == null ? null
+            : (MultivaluedMap)m.get(URITemplate.TEMPLATE_PARAMETERS);
+        Object[] values = new Object[params.length];
+        for (int i = 0; i < params.length; i++) {
+            if (AnnotationUtils.isContextClass(params[i])) {
+                values[i] = JAXRSUtils.createContextValue(m, genericTypes[i], params[i]);
+            } else {
+                Parameter p = ResourceUtils.getParameter(i, anns[i]);
+                values[i] = JAXRSUtils.createHttpParameterValue(
+                                p, params[i], genericTypes[i], m, templateValues, null);
+            }
+        }
+        return values;
+    }
 }

@@ -92,6 +92,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private String collectionWrapperName;
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames;
+    private Map<String, Object> cProperties;
+    
+    public void setContextProperties(Map<String, Object> contextProperties) {
+        cProperties = contextProperties;
+    }
     
     public void setUnmarshallAsJaxbElement(boolean value) {
         unmarshalAsJaxbElement = value;
@@ -161,7 +166,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                 collectionContextClasses.add(CollectionWrapper.class);
                 collectionContextClasses.add(type);
             }
-            collectionContext = JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}));
+            collectionContext = JAXBContext.newInstance(collectionContextClasses.toArray(new Class[]{}), 
+                                                        cProperties);
             return collectionContext;
         }
     }
@@ -315,7 +321,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         synchronized (classContexts) {
             JAXBContext context = classContexts.get(type);
             if (context == null) {
-                context = JAXBContext.newInstance(new Class[]{type});
+                context = JAXBContext.newInstance(new Class[]{type}, cProperties);
                 classContexts.put(type, context);
             }
             return context;
@@ -331,7 +337,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    context = JAXBContext.newInstance(packageName, type.getClassLoader());
+                    context = JAXBContext.newInstance(packageName, type.getClassLoader(), cProperties);
                     packageContexts.put(packageName, context);
                 } catch (JAXBException ex) {
                     LOG.fine("Error creating a JAXBContext using ObjectFactory : " 
@@ -351,7 +357,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)
             || (type != genericType && objectFactoryForType(genericType))
-            || adapterAvailable(type, anns);
+            || adapterAvailable(type, anns)
+            || type.getResource("jaxb.index") != null;
     
     }
     

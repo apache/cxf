@@ -47,6 +47,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -75,6 +76,16 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             processResponse(message);
         } finally {
+            Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
+            Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
+            if (rootInstance != null && rootProvider != null) {
+                try {
+                    ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
+                } catch (Throwable tex) {
+                    LOG.warning("Exception occurred during releasing the service instance, "
+                                + tex.getMessage());
+                }
+            }
             ProviderFactory.getInstance(message).clearThreadLocalProxies();
             ClassResourceInfo cri =
                 (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
@@ -113,6 +124,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             List<ProviderInfo<ResponseHandler>> handlers = 
                 ProviderFactory.getInstance(message).getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
+                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
+                                                   message.getExchange().getInMessage());
+                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
+                                                   message.getExchange().getInMessage());
                 Response r = rh.getProvider().handleResponse(message, ori, response);
                 if (r != null) {
                     response = r;

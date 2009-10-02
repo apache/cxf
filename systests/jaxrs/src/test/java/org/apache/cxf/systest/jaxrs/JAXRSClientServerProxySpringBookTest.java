@@ -64,6 +64,32 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     }
     
     @Test
+    public void testGetThatBookSingleton() throws Exception {
+        getBook("http://localhost:9080/test/4/bookstore/books/123");
+        getBook("http://localhost:9080/test/4/bookstore/books/123");
+    }
+    
+    @Test
+    public void testGetThatBookInterfaceSingleton() throws Exception {
+        getBook("http://localhost:9080/test/4/bookstorestorage/thosebooks/123");
+    }
+    
+    @Test
+    public void testGetThatBookPrototype() throws Exception {
+        getBook("http://localhost:9080/test/5/bookstore/books/123");
+    }
+    
+    @Test
+    public void testGetThatBookInterfacePrototype() throws Exception {
+        getBook("http://localhost:9080/test/5/bookstorestorage/thosebooks/123");
+    }
+    
+    @Test
+    public void testGetThatBookInterface2Prototype() throws Exception {
+        getBook("http://localhost:9080/test/6/bookstorestorage/thosebooks/123");
+    }
+    
+    @Test
     public void testGetThatBook123UserResource() throws Exception {
         getBook("http://localhost:9080/test/2/bookstore/books/123");
     }

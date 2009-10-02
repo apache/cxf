@@ -872,4 +872,21 @@ public final class InjectionUtils {
             return HttpUtils.urlDecode(value);
         }
     }
+    
+    public static void invokeLifeCycleMethod(Object instance, Method method) {
+        if (method != null) {
+            method = InjectionUtils.checkProxy(method, instance);
+            try {
+                method.invoke(instance, new Object[]{});
+            } catch (InvocationTargetException ex) {
+                String msg = "Method " + method.getName() + " can not be invoked"
+                    + " due to InvocationTargetException";
+                throw new WebApplicationException(Response.serverError().entity(msg).build());
+            } catch (IllegalAccessException ex) {
+                String msg = "Method " + method.getName() + " can not be invoked"
+                    + " due to IllegalAccessException";
+                throw new WebApplicationException(Response.serverError().entity(msg).build());
+            } 
+        }
+    }
 }

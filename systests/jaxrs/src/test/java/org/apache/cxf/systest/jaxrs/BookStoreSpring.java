@@ -23,6 +23,8 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.MatrixParam;
@@ -44,10 +46,22 @@ public class BookStoreSpring {
     private Long mainId = 123L;
     @Context
     private UriInfo ui;    
+    private boolean postConstructCalled;
     
     public BookStoreSpring() {
         init();
         System.out.println("----books: " + books.size());
+    }
+    
+    
+    @PostConstruct
+    public void postConstruct() {
+        postConstructCalled = true;
+    }
+    
+    @PreDestroy
+    public void preDestroy() {
+        System.out.println("PreDestroy called");
     }
     
     @GET
@@ -81,7 +95,9 @@ public class BookStoreSpring {
     @GET
     @Path("/booksquery")
     public Book getBookByQuery(@QueryParam("id") String id) {
-        
+        if (!postConstructCalled) {
+            throw new RuntimeException();
+        }
         String[] values = id.split("\\+");
         StringBuilder b = new StringBuilder();
         b.append(values[0]).append(values[1]);        
@@ -116,7 +132,7 @@ public class BookStoreSpring {
     }
     
     @PUT
-    @Path("books/convert2")
+    @Path("books/convert2/{id}")
     @Consumes({"application/xml", "application/json", "application/jettison" })
     @Produces("application/xml")
     public Book convertBook2(Book2 book) {

@@ -57,6 +57,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.index.TestBean;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.SuperBook;
@@ -80,6 +81,12 @@ public class JAXBElementProviderTest extends Assert {
     @Test
     public void testIsWriteableSet() throws Exception {
         testIsWriteableCollection("getBookSet");
+    }
+    
+    @Test
+    public void testIsSupportedWithJaxbIndex() {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        assertTrue(provider.isSupported(TestBean.class, TestBean.class, new Annotation[]{}));
     }
     
     @Test
@@ -613,5 +620,4 @@ public class JAXBElementProviderTest extends Assert {
         }
         
     }
-    
 }

@@ -16,15 +16,8 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.cxf.jaxrs.provider.index;
 
-package org.apache.cxf.jaxrs.lifecycle;
+public class TestBean {
 
-import org.apache.cxf.message.Message;
-
-public interface ResourceProvider {
-
-    Object getInstance(Message m);
-    void releaseInstance(Message m, Object o);
-    Class<?> getResourceClass();
-    boolean isSingleton();
 }
