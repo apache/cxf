@@ -41,14 +41,6 @@ public class JaxwsServiceBuilder extends AbstractServiceFactory {
         setServiceFactory(serviceFactory);
         setBindingConfig(new JaxWsSoapBindingConfiguration(serviceFactory));
     }
-
-    @Override
-    public void validate() {
-        Class clz = getServiceClass();
-        if (java.rmi.Remote.class.isAssignableFrom(clz)) {
-            throw new RuntimeException("JAXWS SEIs may not implement the java.rmi.Remote interface.");
-        }
-    }
     
     public File getOutputFile() {
         JaxWsImplementorInfo jaxwsImpl = serviceFactory.getJaxWsImplementorInfo();
