@@ -117,6 +117,15 @@ public final class MessageUtils {
         return false;
     }
     
+    
+    public static boolean getContextualBoolean(Message m, String key, boolean defaultValue) {
+        Object o = m.getContextualProperty(key);
+        if (o != null) {
+            return isTrue(o);
+        }
+        return defaultValue;
+    }
+    
     /**
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */

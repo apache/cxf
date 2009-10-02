@@ -37,6 +37,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -89,9 +90,8 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         }
         dataReader.setAttachments(message.getAttachments());
         dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().get(Endpoint.class));
-        setSchemaInMessage(service, message, dataReader);
-
-        
+        dataReader.setProperty(Message.class.getName(), message);
+        setSchemaInMessage(service, message, dataReader);   
         return dataReader;
     }
 
@@ -104,8 +104,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     }
 
     private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
-        Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
-        if (Boolean.TRUE.equals(en) || "true".equals(en)) {
+        if (MessageUtils.getContextualBoolean(message, Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE)) {
             //all serviceInfos have the same schemas
             Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
             reader.setSchema(schema);
