@@ -363,17 +363,6 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     }
 
     @Test
-    public void testWrongInterface() throws Exception {
-        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.java2wsdl.processor.Hello");
-        processor.setEnvironment(env);
-        try {
-            processor.process();
-        } catch (RuntimeException e) {
-            assertEquals("JAXWS SEIs may not implement the java.rmi.Remote interface.", e.getMessage());
-        }
-    }
-
-    @Test
     public void testDateAdapter() throws Exception {
         env.put(ToolConstants.CFG_CLASSNAME, "org.apache.cxf.tools.fortest.date.EchoDate");
         env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/echo_date.wsdl");
