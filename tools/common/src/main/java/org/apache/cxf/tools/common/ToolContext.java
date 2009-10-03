@@ -198,6 +198,9 @@ public class ToolContext {
     }
 
     public String mapPackageName(String ns) {
+        if (ns == null) {
+            ns = "";
+        }
         if (hasNamespace(ns)) {
             return mapNamespaceToPackageName(ns);
         } else {
