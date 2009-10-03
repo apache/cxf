@@ -119,6 +119,11 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
+            <groupId>${pom.groupId}.xjcplugins</groupId>
+            <artifactId>cxf-xjc-boolean</artifactId>
+            <version>${pom.version}</version>
+        </dependency>
+        <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${pom.version}</version>

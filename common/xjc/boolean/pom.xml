@@ -18,34 +18,40 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf</groupId>
-    <artifactId>cxf-xjc</artifactId>
-    <packaging>pom</packaging>
+    <groupId>org.apache.cxf.xjcplugins</groupId>
+    <artifactId>cxf-xjc-boolean</artifactId>
+    <packaging>jar</packaging>
     <version>2.2.4-SNAPSHOT</version>
-    <name>Apache CXF XJC Plugins</name>
+    <name>Apache CXF XJC Boolean Getter Plugin</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
         <version>2.2.4-SNAPSHOT</version>
-        <relativePath>../../parent/pom.xml</relativePath>
+        <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
-    <modules>
-        <module>dv</module>
-        <module>ts</module>
-	<module>boolean</module>
-	<module>bug671</module>
-	<module>boolean-test</module>
-        <module>dv-test</module>
-        <module>ts-test</module>
-    </modules>
+    <properties>
+        <maven.test.skip>true</maven.test.skip>
+    </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-common-utilities</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-xjc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.xml.bind</groupId>
+            <artifactId>jaxb-impl</artifactId>
+        </dependency>
+        
+    </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc</developerConnection>
-    </scm>
 
 </project>
