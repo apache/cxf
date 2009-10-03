@@ -36,6 +36,7 @@ public final class InterfaceMapper {
     public JavaInterface map(InterfaceInfo interfaceInfo) {
         JavaInterface intf = new JavaInterface();
         String namespace = interfaceInfo.getName().getNamespaceURI();
+
         String packageName = ProcessorUtil.parsePackageName(namespace, context.mapPackageName(namespace));
         
         String loc = (String)context.get(ToolConstants.CFG_WSDLLOCATION);
