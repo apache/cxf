@@ -57,8 +57,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-           <groupId>commons-lang</groupId>
-           <artifactId>commons-lang</artifactId>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
         </dependency>
     </dependencies>
 
@@ -84,6 +84,26 @@
                 </configuration>
 
                 <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>${jaxb.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-impl</artifactId>
+                        <version>${jaxb.impl.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>com.sun.xml.bind</groupId>
+                        <artifactId>jaxb-xjc</artifactId>
+                        <version>${jaxb.xjc.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf.xjcplugins</groupId>
+                        <artifactId>cxf-xjc-boolean</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
                     <dependency>
                         <groupId>org.apache.cxf</groupId>
                         <artifactId>cxf-xjc-dv</artifactId>
