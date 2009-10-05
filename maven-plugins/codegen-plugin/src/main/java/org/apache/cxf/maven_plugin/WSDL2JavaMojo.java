@@ -299,7 +299,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 && artifact.getVersion().equals(rProject.getVersion())) {
                 Set<Artifact> artifacts = rProject.getArtifacts();
                 for (Artifact pArtifact : artifacts) {
-                    if ("wsdl".equals(artifact.getType())) {
+                    if ("wsdl".equals(pArtifact.getType())) {
                         return pArtifact;
                     }
                 }
