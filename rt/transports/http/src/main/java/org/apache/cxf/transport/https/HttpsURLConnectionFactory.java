@@ -90,10 +90,6 @@ public final class HttpsURLConnectionFactory
      * Cache the last SSLContext to avoid recreation
      */
     SSLSocketFactory socketFactory;
-
-    private Class deprecatedSunHttpsURLConnectionClass;
-
-    private Class deprecatedSunHostnameVerifierClass;
     
     /**
      * This constructor initialized the factory with the configured TLS
@@ -232,11 +228,11 @@ public final class HttpsURLConnectionFactory
             }
             conn.setSSLSocketFactory(socketFactory);
         } else {
-            // handle the deprecated sun case
+            // handle the deprecated sun case and other possible hidden API's 
+            // that are similar to the Sun cases
             try {
-                Class<?> connectionClass = getDeprecatedSunHttpsURLConnectionClass();
-                Class<?> verifierClass = getDeprecatedSunHostnameVerifierClass();
-                Method setHostnameVerifier = connectionClass.getMethod("setHostnameVerifier", verifierClass);
+                Method method = connection.getClass().getMethod("getHostnameVerifier");
+                
                 InvocationHandler handler = new InvocationHandler() {
                     public Object invoke(Object proxy, 
                                          Method method, 
@@ -245,31 +241,25 @@ public final class HttpsURLConnectionFactory
                     }
                 };
                 Object proxy = java.lang.reflect.Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                                                                          new Class[] {verifierClass},
-                                                                          handler);
-                setHostnameVerifier.invoke(connectionClass.cast(connection), verifierClass.cast(proxy));
-                Method setSSLSocketFactory = connectionClass.getMethod("setSSLSocketFactory", 
-                                                                       SSLSocketFactory.class);
-                setSSLSocketFactory.invoke(connectionClass.cast(connection), socketFactory);
+                                                                        new Class[] {method.getReturnType()},
+                                                                        handler);
+
+                method = connection.getClass().getMethod("setHostnameVerifier", method.getReturnType());
+                method.invoke(connection, proxy);
             } catch (Exception ex) {
+                //Ignore this one, we're just setting it to a completely stupid verifier anyway
+                //that is pretty pointless.
+            }
+            try {
+                Method setSSLSocketFactory = connection.getClass().getMethod("setSSLSocketFactory", 
+                                                                             SSLSocketFactory.class);
+                setSSLSocketFactory.invoke(connection, socketFactory);
+            } catch (Exception ex) {
+                //if we cannot set the SSLSocketFactor, we're in serious trouble.
                 throw new IllegalArgumentException("Error decorating connection class " 
                         + connection.getClass().getName(), ex);
             }
         }
-    }
-
-    private Class getDeprecatedSunHttpsURLConnectionClass() throws ClassNotFoundException {
-        if (deprecatedSunHttpsURLConnectionClass == null) {
-            deprecatedSunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection");
-        }
-        return deprecatedSunHttpsURLConnectionClass;
-    }
-
-    private Class getDeprecatedSunHostnameVerifierClass() throws ClassNotFoundException {
-        if (deprecatedSunHostnameVerifierClass == null) {
-            deprecatedSunHostnameVerifierClass = Class.forName("com.sun.net.ssl.HostnameVerifier");
-        }
-        return deprecatedSunHostnameVerifierClass;
     }
 
     /*
