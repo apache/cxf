@@ -68,7 +68,6 @@ public class JMSConfiguration implements InitializingBean {
     
     private int concurrentConsumers = 1;
     private int maxConcurrentConsumers = 1;
-    private int maxConcurrentTasks = 10;
     private int maxSuspendedContinuations = DEFAULT_VALUE;
     private int reconnectPercentOfMax = 70;
 
@@ -364,14 +363,6 @@ public class JMSConfiguration implements InitializingBean {
     }
     public boolean isSetUseConduitIdSelector() {
         return useConduitIdSelector != null;
-    }
-    
-    public int getMaxConcurrentTasks() {
-        return maxConcurrentTasks;
-    }
-
-    public void setMaxConcurrentTasks(int maxConcurrentTasks) {
-        this.maxConcurrentTasks = maxConcurrentTasks;
     }
 
     public void setJndiTemplate(JndiTemplate jndiTemplate) {
