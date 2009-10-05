@@ -111,8 +111,5 @@ public class ServletDestination extends AbstractHTTPDestination {
     public MessageObserver getMessageObserver() {
         return this.incomingObserver;
     }
-
-    public EndpointInfo getEndpointInfo() {
-        return endpointInfo;
-    }
+    
 }

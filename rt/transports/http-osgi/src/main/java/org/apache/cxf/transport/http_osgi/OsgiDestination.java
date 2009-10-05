@@ -97,7 +97,4 @@ public class OsgiDestination extends AbstractHTTPDestination {
         return this.incomingObserver;
     }
 
-    public EndpointInfo getEndpointInfo() {
-        return endpointInfo;
-    }
 }

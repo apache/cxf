@@ -43,7 +43,6 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.cxf.transport.servlet.ServletDestination;
 
 public final class HttpUtils {
     
@@ -166,8 +165,8 @@ public final class HttpUtils {
         String address = null;
         Destination d = m.getExchange().getDestination();
         if (d != null) {
-            if (d instanceof ServletDestination) {
-                address = ((ServletDestination)d).getEndpointInfo().getAddress();
+            if (d instanceof AbstractHTTPDestination) {
+                address = ((AbstractHTTPDestination)d).getEndpointInfo().getAddress();
             } else {
                 address = d.getAddress().getAddress().getValue();
             }
