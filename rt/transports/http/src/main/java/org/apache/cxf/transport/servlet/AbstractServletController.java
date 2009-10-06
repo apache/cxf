@@ -32,15 +32,13 @@ public abstract class AbstractServletController {
     protected String forcedBaseAddress;
     protected String serviceListStyleSheet;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
-    protected ServletConfig servletConfig;
     
     protected AbstractServletController() {
         
     }
     
     protected AbstractServletController(ServletConfig config) {
-        this.servletConfig = config;
-        init();
+        init(config);
     }
     
     public void setHideServiceList(boolean generate) {
@@ -61,7 +59,7 @@ public abstract class AbstractServletController {
         this.serviceListStyleSheet = serviceListStyleSheet;
     }
     
-    private void init() {
+    private void init(ServletConfig servletConfig) {
         if (servletConfig == null) {
             return;
         }

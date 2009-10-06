@@ -281,9 +281,8 @@ public class OsgiServletController extends AbstractServletController {
             inMessage.setContent(InputStream.class, request.getInputStream());
             inMessage.put(AbstractHTTPDestination.HTTP_REQUEST, request);
             inMessage.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
-            inMessage.put(AbstractHTTPDestination.HTTP_CONTEXT, 
-                          servletConfig == null ? null : servletConfig.getServletContext());
-            inMessage.put(AbstractHTTPDestination.HTTP_CONFIG, servletConfig);
+            inMessage.put(AbstractHTTPDestination.HTTP_CONTEXT, servlet.getServletContext());
+            inMessage.put(AbstractHTTPDestination.HTTP_CONFIG, servlet.getServletConfig());
             inMessage.put(Message.HTTP_REQUEST_METHOD, request.getMethod());
             inMessage.put(Message.REQUEST_URI, request.getRequestURI());
             inMessage.put(Message.PATH_INFO, request.getPathInfo());
