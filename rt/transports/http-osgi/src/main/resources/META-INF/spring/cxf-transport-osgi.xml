@@ -20,9 +20,27 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:osgi="http://www.springframework.org/schema/osgi"
+       xmlns:osgix="http://www.springframework.org/schema/osgi-compendium"
+       xmlns:ctx="http://www.springframework.org/schema/context"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd">
+http://www.springframework.org/schema/osgi  http://www.springframework.org/schema/osgi/spring-osgi.xsd
+http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
+http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+    
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="ignoreUnresolvablePlaceholders" value="true"/>
+        <property name="ignoreResourceNotFound" value="true" />
+        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
+        <property name="location" value="file:/${karaf.base}/etc/org.apache.cxf.osgi.cfg"/>
+    </bean>
+
+    <osgix:cm-properties id="cxfOsgiProps" persistent-id="org.apache.cxf.osgi">
+        <prop key="org.apache.cxf.servlet.context">/cxf</prop>
+        <prop key="org.apache.cxf.servlet.name">cxf-servlet-osgi-transport</prop>
+    </osgix:cm-properties>
+
+    <ctx:property-placeholder properties-ref="cxfOsgiProps"/>
 
     <bean id="destinationRegistry" class="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistry" />
 
@@ -32,8 +50,8 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
 
     <osgi:service ref="osgiServlet" interface="javax.servlet.Servlet">
         <osgi:service-properties>
-            <entry key="alias" value="/cxf" />
-            <entry key="servlet-name" value="cxf-transport-osgi-servlet"/>
+            <entry key="alias" value="${org.apache.cxf.servlet.context}" />
+            <entry key="servlet-name" value="${org.apache.cxf.servlet.name}"/>
         </osgi:service-properties>
     </osgi:service>
 
@@ -41,3 +59,4 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
     </osgi:service>
 
 </beans>
+
