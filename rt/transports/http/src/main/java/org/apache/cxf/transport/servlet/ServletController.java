@@ -66,6 +66,7 @@ public class ServletController extends AbstractServletController {
         this.servletConfig = config;
         this.servletContext = context;
         this.bus = b;
+        init();
     }
     
     ServletController() {
@@ -398,6 +399,10 @@ public class ServletController extends AbstractServletController {
             }
         }
 
+    }
+    
+    private void init() {
+        transport.setServletController(this);
     }
     
 }
