@@ -103,12 +103,11 @@ public class ServletController extends AbstractServletController {
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         try {
             EndpointInfo ei = new EndpointInfo();
+            
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-
             ei.setAddress(address);
             
             ServletDestination d = getDestination(ei.getAddress());
-            
             if (d == null) {
                 if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
                     || request.getRequestURI().endsWith(serviceListRelativePath + "/")
@@ -182,7 +181,7 @@ public class ServletController extends AbstractServletController {
     }
     
     protected ServletDestination getDestination(String address) {
-        return (ServletDestination)transport.getDestinationForPath(address);
+        return (ServletDestination)transport.getDestinationForPath(address, true);
     }
     
     protected ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        

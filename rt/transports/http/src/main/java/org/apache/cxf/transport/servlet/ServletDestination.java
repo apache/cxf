@@ -104,7 +104,11 @@ public class ServletDestination extends AbstractHTTPDestination {
     
     @Override
     public void shutdown() {
-        factory.removeDestination(path);
+        try {
+            factory.removeDestination(path);
+        } catch (IOException ex) {
+            //ignore
+        }
         
         super.shutdown();
     }
