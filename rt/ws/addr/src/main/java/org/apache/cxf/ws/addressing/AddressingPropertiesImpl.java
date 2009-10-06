@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
  */
 public class AddressingPropertiesImpl implements AddressingProperties {
     private EndpointReferenceType to;
+    private AttributedURIType toURIType;
     private EndpointReferenceType from;
     private AttributedURIType messageID;
     private EndpointReferenceType replyTo;
@@ -65,17 +66,27 @@ public class AddressingPropertiesImpl implements AddressingProperties {
      * @return To property
      */
     public AttributedURIType getTo() {
-        return null != to ? to.getAddress() : null;
+        if (toURIType == null) {
+            return null != to ? to.getAddress() : null;
+        }
+        return toURIType;
     }
     
     /**
      * Mutator for the <b>To</b> property.
      * @param iri new value for To property
      */
+    public void setTo(AttributedURIType t) {
+        toURIType = t;
+    }
+    /**
+     * Mutator for the <b>To</b> property.
+     * @param iri new value for To property
+     */
     public void setTo(EndpointReferenceType epr) {
         to = epr;
+        toURIType = null;
     }
-
     /**
      * Accessor for the <b>From</b> property.
      * @return current value of From property

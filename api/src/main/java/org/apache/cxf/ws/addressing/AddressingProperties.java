@@ -41,6 +41,12 @@ public interface AddressingProperties extends AddressingType {
      * @param epr new value for To property
      */
     void setTo(EndpointReferenceType epr);
+    
+    /**
+     * Mutator for the <b>To</b> property.
+     * @param epr new value for To property
+     */
+    void setTo(AttributedURIType epr);
 
     /**
      * Accessor for the <b>From</b> property.
