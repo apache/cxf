@@ -30,7 +30,6 @@ import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
 @javax.jws.WebService(portName = "SoapPort", serviceName = "SOAPService", 
                       targetNamespace = "http://apache.org/hello_world_soap_http/xmlbeans", 
                       endpointInterface = "org.apache.hello_world_soap_http.xmlbeans.Greeter")
-                  
 public class GreeterImpl implements Greeter {
 
     private static final Logger LOG = LogUtils.getL7dLogger(GreeterImpl.class);        
