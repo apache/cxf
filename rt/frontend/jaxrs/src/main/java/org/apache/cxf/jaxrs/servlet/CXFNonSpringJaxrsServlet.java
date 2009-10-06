@@ -38,6 +38,7 @@ import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -53,6 +54,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     private static final String SERVICE_ADDRESS_PARAM = "jaxrs.address";
     private static final String SERVICE_CLASSES_PARAM = "jaxrs.serviceClasses";
     private static final String PROVIDERS_PARAM = "jaxrs.providers";
+    private static final String OUT_INTERCEPTORS_PARAM = "jaxrs.outInterceptors";
+    private static final String IN_INTERCEPTORS_PARAM = "jaxrs.inInterceptors";
     private static final String SERVICE_SCOPE_PARAM = "jaxrs.scope";
     private static final String SCHEMAS_PARAM = "jaxrs.schemaLocations";
     private static final String SERVICE_SCOPE_SINGLETON = "singleton";
@@ -83,6 +86,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         
         setSchemasLocations(bean, servletConfig);
+        setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
+        setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
         
         List<Class> resourceClasses = getServiceClasses(servletConfig, modelRef != null);
         Map<Class, ResourceProvider> resourceProviders = 
@@ -113,6 +118,42 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
         if (list.size() > 0) {
             bean.setSchemaLocations(list);
+        }
+    }
+    
+    protected void setInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
+                                   String paramName) {
+        String value  = servletConfig.getInitParameter(paramName);
+        if (value == null) {
+            return;
+        }
+        String[] values = value.split(" ");
+        List<Interceptor> list = new ArrayList<Interceptor>();
+        for (String interceptorVal : values) {
+            String theValue = interceptorVal.trim();
+            if (theValue.length() != 0) {
+                try {
+                    Class<?> intClass = ClassLoaderUtils.loadClass(theValue,
+                                                                   CXFNonSpringJaxrsServlet.class);
+                    list.add((Interceptor)intClass.newInstance());
+                } catch (ClassNotFoundException ex) {
+                    LOG.warning("Interceptor class " + theValue + " can not be found");
+                } catch (InstantiationException ex) {
+                    LOG.warning(theValue + " class can not be instantiated");
+                    ex.printStackTrace();
+                } catch (IllegalAccessException ex) {
+                    LOG.warning("CXF Interceptor can not be instantiated due to IllegalAccessException"); 
+                } catch (ClassCastException ex) {
+                    LOG.warning(theValue + " class does not implement " + Interceptor.class.getName()); 
+                }
+            }
+        }
+        if (list.size() > 0) {
+            if (OUT_INTERCEPTORS_PARAM.equals(paramName)) {
+                bean.setOutInterceptors(list);
+            } else {
+                bean.setInInterceptors(list);
+            }
         }
     }
     
