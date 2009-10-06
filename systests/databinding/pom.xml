@@ -82,6 +82,7 @@
                                     <includes>
                                         <include>**/*.xsb</include>
                                         <include>**/*.class</include>
+                                        <include>**/*.wsdl</include>
                                     </includes>
                                 </resource>
                             </resources>
@@ -103,6 +104,13 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/hello_world.wsdl</wsdl>
+                                    <extraargs>
+                                        <extraarg>-db</extraarg>
+                                        <extraarg>xmlbeans</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl</wsdl>
                                     <extraargs>
                                         <extraarg>-db</extraarg>
                                         <extraarg>xmlbeans</extraarg>

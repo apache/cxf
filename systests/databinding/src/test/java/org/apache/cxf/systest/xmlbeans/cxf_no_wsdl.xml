@@ -47,6 +47,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         	<bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding"/>
         </jaxws:dataBinding>
     </jaxws:endpoint>
-
+    
+    <jaxws:endpoint name="{http://cxf.apache.org/xmlbeans/doc_lit_bare}SoapPort"
+        wsdlLocation="wsdl_systest_databinding/xmlbeans/doc_lit_bare.wsdl"
+        createdFromAPI="true"/>
 </beans>
 

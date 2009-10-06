@@ -21,6 +21,8 @@ package org.apache.cxf.xmlbeans.tools;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.Writer;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -40,6 +42,7 @@ import org.w3c.dom.Document;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -63,6 +66,7 @@ import org.apache.xmlbeans.impl.config.BindingConfigImpl;
 import org.apache.xmlbeans.impl.schema.PathResourceLoader;
 import org.apache.xmlbeans.impl.schema.SchemaTypeLoaderImpl;
 import org.apache.xmlbeans.impl.schema.SchemaTypeSystemCompiler;
+import org.apache.xmlbeans.impl.schema.SchemaTypeSystemImpl;
 import org.apache.xmlbeans.impl.schema.StscState;
 import org.apache.xmlbeans.impl.tool.CodeGenUtil;
 import org.apache.xmlbeans.impl.util.FilerImpl;
@@ -212,6 +216,20 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
                 System.out.println(s);
             }
             */
+            for (Map.Entry<String, String> ent : sourcesToCopyMap.entrySet()) {
+                try {
+                    OutputStream out = filer.createBinaryFile("schema" 
+                                                              + SchemaTypeSystemImpl.METADATA_PACKAGE_GEN
+                                                              + "/src/" + ent.getValue());
+                    URL url = new URL(ent.getKey());
+                    InputStream in = url.openStream();
+                    IOUtils.copy(in, out);
+                    out.close();
+                    in.close();
+                } catch (Exception e) {
+                    //probably not an issue
+                }
+            }
         }
 
         if (!result) {
@@ -237,7 +255,6 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         if (cpResourceLoader != null) {
             cpResourceLoader.close();
         }
-
     }
 
     
@@ -266,6 +283,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             
 
             XmlObject urldoc = loader.parse(url, null, options);
+            state.addSourceUri(wsdlFile, null);
 
             if (urldoc instanceof org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument) {
                 org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument wsdldoc = 

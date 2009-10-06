@@ -24,9 +24,11 @@ import java.util.Map;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class XPathUtils {
     private static final XPathFactory FACTORY = XPathFactory.newInstance();
@@ -55,6 +57,15 @@ public class XPathUtils {
         } catch (Exception e) {
             return null;
         }
+    }
+    public NodeList getValueList(String xpathExpression, Node node) {
+        return (NodeList)getValue(xpathExpression, node, XPathConstants.NODESET);
+    }
+    public String getValueString(String xpathExpression, Node node) {
+        return (String)getValue(xpathExpression, node, XPathConstants.STRING);
+    }
+    public Node getValueNode(String xpathExpression, Node node) {
+        return (Node)getValue(xpathExpression, node, XPathConstants.NODE);
     }
 
     public boolean isExist(String xpathExpression, Node node, QName type) {

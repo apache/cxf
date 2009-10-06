@@ -35,9 +35,11 @@ public class Server extends AbstractBusTestServerBase {
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
         BusFactory.setDefaultBus(bus);
         setBus(bus);
-        Object implementor = new GreeterImpl();
-        String address = "http://localhost:9000/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish("http://localhost:9000/SoapContext/SoapPort",
+                         new GreeterImpl());
+        
+        Endpoint.publish("http://localhost:9000/SOAPDocLitBareService/SoapPort", 
+                         new PutLastTradePriceImpl());
     }
 
     public static void main(String args[]) {
