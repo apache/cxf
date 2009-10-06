@@ -109,7 +109,10 @@ public class JMSOldConfigHolder {
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
             if (sessionPool.isSetHighWaterMark()) {
-                jmsConfig.setMaxConcurrentTasks(sessionPool.getHighWaterMark());
+                jmsConfig.setMaxConcurrentConsumers(sessionPool.getHighWaterMark());
+            }
+            if (sessionPool.isSetLowWaterMark()) {
+                jmsConfig.setConcurrentConsumers(sessionPool.getLowWaterMark());
             }
             long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
                 .getMessageTimeToLive();
@@ -212,4 +215,5 @@ public class JMSOldConfigHolder {
         }
         return env;
     }
+
 }
