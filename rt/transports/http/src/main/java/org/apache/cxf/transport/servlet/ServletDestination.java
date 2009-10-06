@@ -32,7 +32,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
 
@@ -106,10 +105,6 @@ public class ServletDestination extends AbstractHTTPDestination {
         factory.removeDestination(path);
         
         super.shutdown();
-    }
-    
-    public MessageObserver getMessageObserver() {
-        return this.incomingObserver;
     }
     
 }

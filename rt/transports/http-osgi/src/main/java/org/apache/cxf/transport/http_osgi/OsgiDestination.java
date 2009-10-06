@@ -22,12 +22,10 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 
@@ -91,10 +89,6 @@ public class OsgiDestination extends AbstractHTTPDestination {
     public void shutdown() {
         factory.removeDestination(path);
         super.shutdown();
-    }
-
-    public MessageObserver getMessageObserver() {
-        return this.incomingObserver;
     }
 
 }
