@@ -115,11 +115,10 @@ public class ServletController {
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         try {
             EndpointInfo ei = new EndpointInfo();
-            String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-
-            ei.setAddress(address);
-            ServletDestination d = (ServletDestination)transport.getDestinationForPath(ei.getAddress());
             
+            String address = request.getPathInfo() == null ? "" : request.getPathInfo();
+            ei.setAddress(address);
+            ServletDestination d = getDestination(ei.getAddress());
             if (d == null) {
                 if (request.getRequestURI().endsWith("/services")
                     || request.getRequestURI().endsWith("/services/")
@@ -186,8 +185,11 @@ public class ServletController {
         }
     }
     
-    private ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
-        
+    protected ServletDestination getDestination(String address) {
+        return (ServletDestination)transport.getDestinationForPath(address, true);
+    }
+    
+    protected ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
         String address = request.getPathInfo() == null ? "" : request.getPathInfo();
         
         int len = -1;
