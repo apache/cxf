@@ -28,6 +28,7 @@ import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +41,8 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
@@ -47,7 +50,6 @@ import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.http.AddressType;
-
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
@@ -68,14 +70,11 @@ public class OsgiServletTest extends Assert {
     private static final String QUERY = "wsdl";
     private static final String VERB = "POST";
     private static final String TEXT = "text/html";
+    private static final String TEXT_LIST = "text/html; charset=UTF-8";
     private static final String XML = "text/xml";
     private static final String ENCODING = "UTF-8";
     private static final String NO_SERVICE = 
         "<html><body>No service was found.</body></html>";
-    private static final String HEADER = "<html><body>";
-    private static final String SERVICE = "<p> <a href=\"" + ADDRESS + "?wsdl\">";
-    private static final String NAME = QNAME.toString() + "</a> </p>";
-    private static final String FOOTER = "</body></html>";
     private IMocksControl control; 
     private Bus bus;
     private OsgiDestinationRegistryIntf registry;
@@ -108,6 +107,10 @@ public class OsgiServletTest extends Assert {
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
         endpoint.setName(QNAME);
+        ServiceInfo service = new ServiceInfo();
+        service.setInterface(new InterfaceInfo(service, QNAME));
+        endpoint.setService(service);
+        
         paths = new TreeSet<String>();
     }
 
@@ -145,7 +148,9 @@ public class OsgiServletTest extends Assert {
     @Test
     public void testInvokeGetServices() throws Exception {
         setUpRequest(SERVICES, null, 1);
-        setUpResponse(0, TEXT, HEADER, SERVICE, NAME, FOOTER);
+        setUpResponse(0, TEXT_LIST, 
+                      "<span class=\"field\">Endpoint address:</span> "
+                      + "<span class=\"value\">" + ADDRESS + "</span>");
 
         control.replay();
 
@@ -159,7 +164,8 @@ public class OsgiServletTest extends Assert {
     @Test
     public void testInvokeGetServicesNoService() throws Exception {
         setUpRequest(SERVICES, null, 0);
-        setUpResponse(0, TEXT, HEADER, FOOTER);
+        setUpResponse(0, TEXT_LIST, 
+                      "<span class=\"heading\">No services have been found.</span>");
 
         control.replay();
 
@@ -329,7 +335,7 @@ public class OsgiServletTest extends Assert {
     }
 
     private OsgiServlet setUpServlet() { 
-        return new OsgiServlet(registry) {
+        OsgiServlet servlet = new OsgiServlet(registry) {
             public ServletContext getServletContext() {
                 return context;
             }
@@ -343,5 +349,11 @@ public class OsgiServletTest extends Assert {
                 return exchange;
             }            
         };
+        try {
+            servlet.init(config);
+        } catch (ServletException ex) {
+            // ignore
+        }
+        return servlet;
     }
 }

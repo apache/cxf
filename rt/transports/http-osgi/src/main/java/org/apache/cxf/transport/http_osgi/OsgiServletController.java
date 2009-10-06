@@ -16,22 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.servlet;
+package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.URL;
+import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -39,54 +36,43 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.HTTPSession;
+import org.apache.cxf.transport.https.SSLUtils;
+import org.apache.cxf.transport.servlet.AbstractServletController;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
 
-public class ServletController extends AbstractServletController {
+public class OsgiServletController extends AbstractServletController {
+    private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
     
-    private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
-    
-    private ServletTransportFactory transport;
-    private ServletContext servletContext;
-    private ServletConfig servletConfig;
-    private Bus bus;
     private String lastBase = "";
-    
-    public ServletController(ServletTransportFactory df,
-                             ServletConfig config,
-                             ServletContext context, 
-                             Bus b) {
-        super(config);
-        this.transport = df;
-        this.servletConfig = config;
-        this.servletContext = context;
-        this.bus = b;
+    private OsgiServlet servlet;
+    public OsgiServletController(OsgiServlet servlet) {
+        super(servlet.getServletConfig());
+        this.servlet = servlet;
     }
-    
-    ServletController() {
-    }
-        
-    String getLastBaseURL() {
-        return lastBase;
-    }
-    
-    protected synchronized void updateDests(HttpServletRequest request) {
+
+    private synchronized void updateDests(HttpServletRequest request) {
         if (disableAddressUpdates) {
             return;
         }
         String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
-                
-        if (base.equals(lastBase)) {
-            return;
-        }
-        Set<String> paths = transport.getDestinationsPaths();
+
+        //if (base.equals(lastBase)) {
+        //    return;
+        //}
+        Set<String> paths = servlet.getTransport().getDestinationsPaths();
         for (String path : paths) {
-            ServletDestination d2 = transport.getDestinationForPath(path);
+            OsgiDestination d2 = servlet.getTransport().getDestinationForPath(path);
             String ad = d2.getEndpointInfo().getAddress();
             if (ad.equals(path)
                 || ad.equals(lastBase + path)) {
@@ -105,27 +91,20 @@ public class ServletController extends AbstractServletController {
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
 
             ei.setAddress(address);
-            
-            ServletDestination d = getDestination(ei.getAddress());
-            
+            OsgiDestination d = 
+                (OsgiDestination)servlet.getTransport().getDestinationForPath(ei.getAddress());
+
             if (d == null) {
                 if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
-                    || request.getRequestURI().endsWith(serviceListRelativePath + "/")
+                    || request.getRequestURI().endsWith(serviceListRelativePath + "/"))
                     || StringUtils.isEmpty(request.getPathInfo())
-                    || "/".equals(request.getPathInfo()))) {
+                    || "/".equals(request.getPathInfo())) {
                     updateDests(request);
-                    
-                    if (request.getParameter("stylesheet") != null) {
-                        renderStyleSheet(request, res);
-                    } else if ("false".equals(request.getParameter("formatted"))) {
-                        generateUnformattedServiceList(request, res);
-                    } else {
-                        generateServiceList(request, res);
-                    }
+                    generateServiceList(request, res);
                 } else {
                     d = checkRestfulRequest(request);
-                    if (d == null || d.getMessageObserver() == null) {                        
-                        LOG.warning("Can't find the request for " 
+                    if (d == null || d.getMessageObserver() == null) {
+                        LOG.warning("Can't find the the request for "
                                     + request.getRequestURL() + "'s Observer ");
                         generateNotFound(request, res);
                     }  else { // the request should be a restful service request
@@ -135,12 +114,13 @@ public class ServletController extends AbstractServletController {
                 }
             } else {
                 ei = d.getEndpointInfo();
-                if (null != request.getQueryString() 
+                Bus bus = d.getBus();
+                if (null != request.getQueryString()
                     && request.getQueryString().length() > 0
-                    && bus.getExtension(QueryHandlerRegistry.class) != null) {                    
-                    
+                    && bus.getExtension(QueryHandlerRegistry.class) != null) {
+
                     String ctxUri = request.getPathInfo();
-                    String baseUri = request.getRequestURL().toString() 
+                    String baseUri = request.getRequestURL().toString()
                         + "?" + request.getQueryString();
                     // update the EndPoint Address with request url
                     if ("GET".equals(request.getMethod())) {
@@ -149,57 +129,42 @@ public class ServletController extends AbstractServletController {
 
                     for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers()) {
                         if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
-                            
+
                             res.setContentType(qh.getResponseContentType(baseUri, ctxUri));
                             OutputStream out = res.getOutputStream();
                             try {
                                 qh.writeResponse(baseUri, ctxUri, ei, out);
+                                out.flush();
+                                return;
                             } catch (Exception e) {
-                                LogUtils.log(LOG, Level.WARNING,
-                                             qh.getClass().getName() 
-                                             + " Exception caught writing response.",
-                                             e);
-                                throw new ServletException(e);                                
+                                LOG.warning(qh.getClass().getName()
+                                    + " Exception caught writing response: "
+                                    + e.getMessage());
+                                throw new ServletException(e);
                             }
-                            out.flush();
-                            return;
-                        }   
+                        }
                     }
-                }
-                
+                } 
                 invokeDestination(request, res, d);
-            }
-        } catch (Fault ex) {
-            if (ex.getCause() instanceof RuntimeException) {
-                throw (RuntimeException)ex.getCause(); 
-            } else {
-                throw new ServletException(ex.getCause());
+                
             }
         } catch (IOException e) {
             throw new ServletException(e);
-        } 
+        }
     }
-    
-    protected ServletDestination getDestination(String address) {
-        return (ServletDestination)transport.getDestinationForPath(address);
-    }
-    
-    protected ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
-        
+
+    private OsgiDestination checkRestfulRequest(HttpServletRequest request) throws IOException {
+
         String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-        
-        int len = -1;
-        ServletDestination ret = null;
-        for (String path : transport.getDestinationsPaths()) {           
-            if (address.startsWith(path)
-                && path.length() > len) {
-                ret = transport.getDestinationForPath(path);
-                len = path.length();
+
+        for (String path : servlet.getTransport().getDestinationsPaths()) {
+            if (address.startsWith(path)) {
+                return servlet.getTransport().getDestinationForPath(path);
             }
         }
-        return ret; 
+        return null;
     }
-    
+
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
         throws IOException {        
         response.setContentType("text/html; charset=UTF-8");        
@@ -220,7 +185,7 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("<title>CXF - Service list</title>");
         response.getWriter().write("</head><body>");
         
-        List<ServletDestination> destinations = getServletDestinations();
+        Collection<OsgiDestination> destinations = servlet.getTransport().getDestinations();
             
         if (destinations.size() > 0) {
             writeSOAPEndpoints(response, destinations);
@@ -232,12 +197,12 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("</body></html>");
     }
 
-    private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+    private void writeSOAPEndpoints(HttpServletResponse response, Collection<OsgiDestination> destinations)
         throws IOException {
         response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (ServletDestination sd : destinations) {
+        for (OsgiDestination sd : destinations) {
             if (null != sd.getEndpointInfo().getName() 
                 && null != sd.getEndpointInfo().getInterface()) {
                 response.getWriter().write("<tr><td>");
@@ -266,11 +231,11 @@ public class ServletController extends AbstractServletController {
     }
     
     
-    private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+    private void writeRESTfulEndpoints(HttpServletResponse response, Collection<OsgiDestination> destinations)
         throws IOException {
         
-        List<ServletDestination> restfulDests = new ArrayList<ServletDestination>();
-        for (ServletDestination sd : destinations) {
+        List<OsgiDestination> restfulDests = new ArrayList<OsgiDestination>();
+        for (OsgiDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
             if (null == sd.getEndpointInfo().getInterface()) {
                 restfulDests.add(sd);
@@ -283,7 +248,7 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("<span class=\"heading\">Available RESTful services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (ServletDestination sd : destinations) {
+        for (OsgiDestination sd : destinations) {
             if (null == sd.getEndpointInfo().getInterface()) {
                 response.getWriter().write("<tr><td>");
                 String address = sd.getEndpointInfo().getAddress();
@@ -298,106 +263,71 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("</table>");
     }
     
-    private void renderStyleSheet(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        response.setContentType("text/css; charset=UTF-8");
-
-        URL url = this.getClass().getResource("servicelist.css");
-        if (url != null) {
-            IOUtils.copy(url.openStream(), response.getOutputStream());
-        }
-    }
-
-    private List<ServletDestination> getServletDestinations() {
-        List<ServletDestination> destinations = new LinkedList<ServletDestination>(
-                transport.getDestinations());
-        Collections.sort(destinations, new Comparator<ServletDestination>() {
-            public int compare(ServletDestination o1, ServletDestination o2) {
-                if (o1.getEndpointInfo().getInterface() == null) {
-                    return -1;
-                }
-                if (o2.getEndpointInfo().getInterface() == null) {
-                    return 1;
-                }
-                return o1.getEndpointInfo().getInterface().getName()
-                        .getLocalPart().compareTo(
-                                o2.getEndpointInfo().getInterface().getName()
-                                        .getLocalPart());
-            }
-        });
-
-        return destinations;
-    }
-
-    protected void generateUnformattedServiceList(HttpServletRequest request,
-            HttpServletResponse response) throws IOException {
-        response.setContentType("text/plain; charset=UTF-8");
-
-        List<ServletDestination> destinations = getServletDestinations();
-        if (destinations.size() > 0) {
-            writeUnformattedSOAPEndpoints(response, destinations, request.getParameter("wsdlList"));
-            writeUnformattedRESTfulEndpoints(response, destinations);
-        } else {
-            response.getWriter().write("No services have been found.");
-        }
-    }
-    
-    private void writeUnformattedSOAPEndpoints(HttpServletResponse response,
-                                               List<ServletDestination> destinations,
-                                               Object renderParam) 
-        throws IOException {
-        boolean renderWsdlList = "true".equals(renderParam);
-        
-        for (ServletDestination sd : destinations) {
-            
-            if (null != sd.getEndpointInfo().getInterface()) {
-            
-                String address = sd.getEndpointInfo().getAddress();
-                response.getWriter().write(address);
-                
-                if (renderWsdlList) {
-                    response.getWriter().write("?wsdl");
-                }
-                response.getWriter().write('\n');
-            }
-        }
-        response.getWriter().write('\n');
-    }
-    
-    private void writeUnformattedRESTfulEndpoints(HttpServletResponse response,
-                                                  List<ServletDestination> destinations) 
-        throws IOException {
-        for (ServletDestination sd : destinations) {
-            if (null == sd.getEndpointInfo().getInterface()) {
-                String address = sd.getEndpointInfo().getAddress();
-                response.getWriter().write(address + "?_wadl&_type=xml");
-                response.getWriter().write('\n');
-            }
-        }
-    }
-    
     protected void generateNotFound(HttpServletRequest request, HttpServletResponse res) throws IOException {
         res.setStatus(404);
         res.setContentType("text/html");
         res.getWriter().write("<html><body>No service was found.</body></html>");
     }
 
-    public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
-                                  ServletDestination d) throws ServletException {
+    public void invokeDestination(final HttpServletRequest request, 
+                                  HttpServletResponse response, 
+                                  OsgiDestination d) throws ServletException {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Service http request on thread: " + Thread.currentThread());
         }
 
         try {
-            d.invoke(servletConfig, servletContext, request, response);
+            MessageImpl inMessage = servlet.createInMessage();
+            inMessage.setContent(InputStream.class, request.getInputStream());
+            inMessage.put(AbstractHTTPDestination.HTTP_REQUEST, request);
+            inMessage.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
+            inMessage.put(AbstractHTTPDestination.HTTP_CONTEXT, 
+                          servletConfig == null ? null : servletConfig.getServletContext());
+            inMessage.put(AbstractHTTPDestination.HTTP_CONFIG, servletConfig);
+            inMessage.put(Message.HTTP_REQUEST_METHOD, request.getMethod());
+            inMessage.put(Message.REQUEST_URI, request.getRequestURI());
+            inMessage.put(Message.PATH_INFO, request.getPathInfo());
+            inMessage.put(Message.QUERY_STRING, request.getQueryString());
+            inMessage.put(Message.CONTENT_TYPE, request.getContentType());
+            inMessage.put(Message.ACCEPT_CONTENT_TYPE, request.getHeader("Accept"));
+            inMessage.put(Message.BASE_PATH, d.getAddress().getAddress().getValue());
+            inMessage.put(SecurityContext.class, new SecurityContext() {
+                public Principal getUserPrincipal() {
+                    return request.getUserPrincipal();
+                }
+                public boolean isUserInRole(String role) {
+                    return request.isUserInRole(role);
+                }
+            });
+
+            // work around a bug with Jetty which results in the character
+            // encoding not being trimmed correctly.
+            String enc = request.getCharacterEncoding();
+            if (enc != null && enc.endsWith("\"")) {
+                enc = enc.substring(0, enc.length() - 1);
+            }
+
+            String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
+            if (normalizedEncoding == null) {
+                String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
+                                                                  LOG, enc).toString();
+                LOG.log(Level.WARNING, m);
+                throw new IOException(m);
+            }
+
+            inMessage.put(Message.ENCODING, normalizedEncoding);
+            SSLUtils.propogateSecureSession(request, inMessage);
+
+            ExchangeImpl exchange = servlet.createExchange();
+            exchange.setInMessage(inMessage);
+            exchange.setSession(new HTTPSession(request));
+
+            d.doMessage(inMessage);
         } catch (IOException e) {
             throw new ServletException(e);
-        } finally {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
-            }
         }
 
     }
+
     
 }

@@ -47,5 +47,9 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         }
         return d;
     }
+    
+    public void init() {
+        
+    }
 
 }
