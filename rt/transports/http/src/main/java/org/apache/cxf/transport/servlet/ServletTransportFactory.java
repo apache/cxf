@@ -21,6 +21,7 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,6 +44,8 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
     
     private Map<String, ServletDestination> destinations = 
+        new ConcurrentHashMap<String, ServletDestination>();
+    private Map<String, ServletDestination> decodedDestinations = 
         new ConcurrentHashMap<String, ServletDestination>();
     
     private ServletController controller;
@@ -72,8 +75,9 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         super.setBus(b);
     }
     
-    public void removeDestination(String path) {
+    public void removeDestination(String path) throws IOException {
         destinations.remove(path);
+        decodedDestinations.remove(URLDecoder.decode(path, "ISO-8859-1"));
     }
     
     public Destination getDestination(EndpointInfo endpointInfo)
@@ -83,6 +87,7 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
             String path = getTrimmedPath(endpointInfo.getAddress());
             d = new ServletDestination(getBus(), endpointInfo, this, path);
             destinations.put(path, d);
+            decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), d);
             
             if (controller != null
                 && !StringUtils.isEmpty(controller.getLastBaseURL())) {
@@ -102,8 +107,16 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     }
     
     public ServletDestination getDestinationForPath(String path) {
+        return getDestinationForPath(path, false);
+    }
+    public ServletDestination getDestinationForPath(String path, boolean tryDecoding) {
         // to use the url context match  
-        return destinations.get(getTrimmedPath(path));
+        String m = getTrimmedPath(path);
+        ServletDestination s = destinations.get(m);
+        if (s == null) {
+            s = decodedDestinations.get(m);
+        }
+        return s;
     }
 
     static String getTrimmedPath(String path) {
