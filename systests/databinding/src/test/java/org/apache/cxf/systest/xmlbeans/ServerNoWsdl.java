@@ -38,6 +38,9 @@ public class ServerNoWsdl extends AbstractBusTestServerBase {
         Object implementor = new GreeterImpl();
         String address = "http://localhost:9010/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
+        
+        implementor = new PutLastTradePriceImpl();
+        Endpoint.publish("http://localhost:9010/SOAPDocLitBareService/SoapPort", implementor);
     }
 
     public static void main(String args[]) {

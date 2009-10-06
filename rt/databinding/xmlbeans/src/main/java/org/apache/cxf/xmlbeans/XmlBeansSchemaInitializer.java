@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -36,15 +37,18 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 
 
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -118,36 +122,61 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         }
     }
 
+    XmlSchema addSchemaElement(SchemaTypeSystem sts, Document doc, 
+                          Element elem, String file) throws URISyntaxException {
+        doc.appendChild(elem);
+        
+        elem = DOMUtils.getFirstElement(elem);
+        while (elem != null) {
+            if (elem.getLocalName().equals("import")) {
+                URI uri = new URI(file);
+                String loc = elem.getAttribute("schemaLocation");
+                if (!StringUtils.isEmpty(loc)) {
+                    URI locUri = uri.resolve(loc);
+                    String newLoc = locUri.toString();
+                    getSchema(sts, newLoc);
+                }
+            }                 
+            elem = DOMUtils.getNextElement(elem);
+        }
+        XmlSchema schema = dataBinding.addSchemaDocument(serviceInfo,
+                                                         schemas, 
+                                                         doc, 
+                                                         file);
+        doc.removeChild(doc.getDocumentElement());
+        schemaMap.put(file, schema);
+
+        return schema;
+    }
     XmlSchema getSchema(SchemaTypeSystem sts, String file) {
         if (schemaMap.containsKey(file)) {
             return schemaMap.get(file);
         }
         InputStream ins = sts.getSourceAsStream(file);
+        if (ins == null) {
+            return null;
+        }
         try {
             //temporary marker to make sure recursive imports don't blow up
             schemaMap.put(file, null);
 
             Document doc = XMLUtils.parse(ins);
-            Element elem = DOMUtils.getFirstElement(doc.getDocumentElement());
-            while (elem != null) {
-                if (elem.getLocalName().equals("import")) {
-                    URI uri = new URI(file);
-                    String loc = elem.getAttribute("schemaLocation");
-                    if (!StringUtils.isEmpty(loc)) {
-                        URI locUri = uri.resolve(loc);
-                        String newLoc = locUri.toString();
-                        getSchema(sts, newLoc);
-                    }
-                }                 
-                elem = DOMUtils.getNextElement(elem);
+            Element elem = doc.getDocumentElement();
+            doc.removeChild(elem);
+            
+            if ("schema".equals(elem.getLocalName())
+                && "http://www.w3.org/2001/XMLSchema".equals(elem.getNamespaceURI())) {
+                return addSchemaElement(sts, doc, elem, file);
             }
-                
-            XmlSchema schema = dataBinding.addSchemaDocument(serviceInfo,
-                                                             schemas, 
-                                                             doc, 
-                                                             file);
-            schemaMap.put(file, schema);
-            return schema;
+            Map<String, String> ns = new HashMap<String, String>();
+            ns.put("wsdl", WSDLConstants.NS_WSDL11);
+            ns.put("xsd", WSDLConstants.NS_SCHEMA_XSD);
+            XPathUtils xpath = new XPathUtils(ns);
+            NodeList list = xpath.getValueList("/wsdl:definitions/wsdl:types/xsd:schema", elem);
+            for (int x = 0; x < list.getLength(); x++) {
+                addSchemaElement(sts, doc, (Element)list.item(x), file + "#1");
+            }
+            return null;
         } catch (Exception e) {
             throw new RuntimeException("Failed to find schema for: " + file, e);
         }
@@ -201,26 +230,40 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             SchemaTypeSystem sts = st.getTypeSystem();
             schemas.getXmlSchemaCollection().setSchemaResolver(new XMLSchemaResolver(sts));
             String sourceName = st.getSourceName();
-            if (sourceName.endsWith("wsdl")) {
-                return;
-            }
             XmlSchema schema = getSchema(sts, sourceName);
-
-            if (st.isDocumentType()) {
-                XmlSchemaElement sct = schema.getElementByName(st.getDocumentElementName());
-                part.setXmlSchema(sct);
-                part.setElement(true);
-                part.setElementQName(st.getDocumentElementName());
-                part.setConcreteName(st.getDocumentElementName());
-            } else if (st.getComponentType() == SchemaType.ELEMENT) {
-                XmlSchemaElement sct = schema.getElementByName(st.getName());
-                part.setXmlSchema(sct);
-                part.setElement(true);
+            if (schema != null) {
+                if (st.isDocumentType()) {
+                    XmlSchemaElement sct = schema.getElementByName(st.getDocumentElementName());
+                    part.setXmlSchema(sct);
+                    part.setElement(true);
+                    part.setElementQName(st.getDocumentElementName());
+                    part.setConcreteName(st.getDocumentElementName());
+                } else if (st.getComponentType() == SchemaType.ELEMENT) {
+                    XmlSchemaElement sct = schema.getElementByName(st.getName());
+                    part.setXmlSchema(sct);
+                    part.setElement(true);
+                } else {
+                    XmlSchemaType sct = schema.getTypeByName(st.getName());
+                    part.setTypeQName(st.getName());
+                    part.setXmlSchema(sct);
+                    part.setElement(false);
+                }
             } else {
-                XmlSchemaType sct = schema.getTypeByName(st.getName());
-                part.setTypeQName(st.getName());
-                part.setXmlSchema(sct);
-                part.setElement(false);
+                if (st.isDocumentType()) {
+                    part.setElement(true);
+                    part.setElementQName(st.getDocumentElementName());
+                    part.setConcreteName(st.getDocumentElementName());
+                    part.setXmlSchema(schemas.getElementByQName(st.getDocumentElementName()));
+                } else if (st.getComponentType() == SchemaType.ELEMENT) {
+                    part.setElement(true);
+                    part.setElementQName(st.getName());
+                    part.setConcreteName(st.getName());
+                    part.setXmlSchema(schemas.getElementByQName(st.getName()));
+                } else {
+                    part.setTypeQName(st.getName());
+                    part.setElement(false);
+                    part.setXmlSchema(schemas.getTypeByQName(st.getName()));
+                }
             }
         } catch (RuntimeException ex) {
             throw ex;
