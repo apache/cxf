@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxws;
 
+import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -130,7 +131,9 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                     throw ex.fillInStackTrace();
                 }
             }
-            
+            if (ex instanceof Fault && ex.getCause() instanceof IOException) {
+                throw new WebServiceException(ex.getMessage(), ex.getCause());
+            }
             if (getBinding() instanceof HTTPBinding) {
                 HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
                 exception.initCause(ex);
