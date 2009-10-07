@@ -28,19 +28,12 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
 http://www.springframework.org/schema/osgi-compendium http://www.springframework.org/schema/osgi-compendium/spring-osgi-compendium.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
     
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
-        <property name="ignoreUnresolvablePlaceholders" value="true"/>
-        <property name="ignoreResourceNotFound" value="true" />
-        <property name="systemPropertiesModeName" value="SYSTEM_PROPERTIES_MODE_OVERRIDE"/>
-        <property name="location" value="file:/${karaf.base}/etc/org.apache.cxf.osgi.cfg"/>
-    </bean>
-
-    <osgix:cm-properties id="cxfOsgiProps" persistent-id="org.apache.cxf.osgi">
+    <osgix:cm-properties id="cxfOsgiProperties" persistent-id="org.apache.cxf.osgi">
         <prop key="org.apache.cxf.servlet.context">/cxf</prop>
-        <prop key="org.apache.cxf.servlet.name">cxf-servlet-osgi-transport</prop>
+        <prop key="org.apache.cxf.servlet.name">cxf-osgi-transport-servlet</prop>
     </osgix:cm-properties>
 
-    <ctx:property-placeholder properties-ref="cxfOsgiProps"/>
+    <ctx:property-placeholder properties-ref="cxfOsgiProperties"/>
 
     <bean id="destinationRegistry" class="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistry" />
 
