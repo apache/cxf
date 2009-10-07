@@ -27,7 +27,7 @@ import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
-import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.ws.WebServiceException;
 
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.jaxws.JaxWsClientProxy;
@@ -72,7 +72,7 @@ public class JaxWsClientThreadTest extends AbstractCXFTest {
                                      .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY));
                         try {
                             greeter.greetMe("Hi");
-                        } catch (SOAPFaultException expected) {
+                        } catch (WebServiceException expected) {
                             //expected.getCause().printStackTrace();
                             MalformedURLException mue = (MalformedURLException)expected
                                 .getCause();
