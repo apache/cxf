@@ -58,9 +58,4 @@
                      
     </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/wsdl-validator-plugin</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/wsdl-validator-plugin</developerConnection>
-    </scm>
-
 </project>

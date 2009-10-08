@@ -53,9 +53,4 @@
     </dependencies>
 
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv</developerConnection>
-    </scm>
-
 </project>

@@ -175,10 +175,6 @@
         </dependency>
     </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/ws/security</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/ws/security</developerConnection>
-    </scm>
 
     <profiles>
         <profile>

@@ -89,9 +89,4 @@
                      
     </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/java2ws-plugin</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/maven-plugins/java2ws-plugin</developerConnection>
-    </scm>
-
 </project>

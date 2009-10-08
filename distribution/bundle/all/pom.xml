@@ -430,9 +430,4 @@
             </build>
         </profile>
     </profiles>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</developerConnection>
-    </scm>
-
 </project>
