@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
 import javax.ws.rs.core.Cookie;
@@ -58,14 +57,11 @@ public class HttpHeadersImplTest extends Assert {
         HttpHeaders h = new HttpHeadersImpl(m);
         MultivaluedMap<String, String> hs = h.getRequestHeaders();
         List<String> acceptValues = hs.get("Accept");
-        assertEquals(3, acceptValues.size());
-        assertEquals("text/bar;q=0.6", acceptValues.get(0));
-        assertEquals("text/*;q=1", acceptValues.get(1));
-        assertEquals("application/xml", acceptValues.get(2));
+        assertEquals("text/*;q=1", acceptValues.get(0));
+        assertEquals("application/xml", acceptValues.get(1));
         assertEquals(hs.getFirst("Content-Type"), "*/*");
     }
-    
-    @Test
+
     public void testMediaType() throws Exception {
         
         Message m = control.createMock(Message.class);
@@ -77,21 +73,6 @@ public class HttpHeadersImplTest extends Assert {
     }
     
     @Test
-    public void testGetMediaTypes() throws Exception {
-        
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        EasyMock.expectLastCall().andReturn(createHeaders());
-        control.replay();
-        HttpHeaders h = new HttpHeadersImpl(m);
-        List<MediaType> acceptValues = h.getAcceptableMediaTypes();
-        assertEquals(3, acceptValues.size());
-        assertEquals("text/*;q=1", acceptValues.get(0).toString());
-        assertEquals("application/xml", acceptValues.get(1).toString());
-        assertEquals("text/bar;q=0.6", acceptValues.get(2).toString());
-    }
-    
-    @Test
     public void testGetHeader() throws Exception {
         
         Message m = control.createMock(Message.class);
@@ -100,17 +81,13 @@ public class HttpHeadersImplTest extends Assert {
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
         List<String> acceptValues = h.getRequestHeader("Accept");
-        assertEquals(3, acceptValues.size());
-        assertEquals("text/bar;q=0.6", acceptValues.get(0));
-        assertEquals("text/*;q=1", acceptValues.get(1));
-        assertEquals("application/xml", acceptValues.get(2));
+        assertEquals(2, acceptValues.size());
+        assertEquals("text/*;q=1", acceptValues.get(0));
+        assertEquals("application/xml", acceptValues.get(1));
         List<String> contentValues = h.getRequestHeader("Content-Type");
         assertEquals(1, contentValues.size());
         assertEquals("*/*", contentValues.get(0));
         
-        List<String> dateValues = h.getRequestHeader("Date");
-        assertEquals(1, dateValues.size());
-        assertEquals("Tue, 21 Oct 2008 17:00:00 GMT", dateValues.get(0));
     }
     
     @Test
@@ -124,18 +101,7 @@ public class HttpHeadersImplTest extends Assert {
         assertNull(h.getLanguage());
     }
     
-    @Test
-    public void testGetLanguage() throws Exception {
         
-        Message m = control.createMock(Message.class);
-        m.get(Message.PROTOCOL_HEADERS);
-        MetadataMap<String, String> headers = createHeaders();
-        headers.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en-US");
-        EasyMock.expectLastCall().andReturn(headers);
-        control.replay();
-        HttpHeaders h = new HttpHeadersImpl(m);
-        assertEquals("en_US", h.getLanguage().toString());
-    }
     
     @Test
     public void testSingleAcceptableLanguages() throws Exception {
@@ -147,9 +113,9 @@ public class HttpHeadersImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(headers);
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        List<Locale> languages = h.getAcceptableLanguages();
+        List<String> languages = h.getAcceptableLanguages();
         assertEquals(1, languages.size());
-        assertEquals(new Locale("en"), languages.get(0));
+        assertEquals("en", languages.get(0));
     }
     
     @Test
@@ -177,19 +143,18 @@ public class HttpHeadersImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(headers);
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        List<Locale> languages = h.getAcceptableLanguages();
+        List<String> languages = h.getAcceptableLanguages();
         assertEquals(3, languages.size());
-        assertEquals(new Locale("da"), languages.get(0));
-        assertEquals(new Locale("en", "GB"), languages.get(1));
-        assertEquals(new Locale("en"), languages.get(2));
+        assertEquals("da", languages.get(0));
+        assertEquals("en-gb", languages.get(1));
+        assertEquals("en", languages.get(2));
     }
     
         
     private MetadataMap<String, String> createHeaders() {
         MetadataMap<String, String> hs = new MetadataMap<String, String>();
-        hs.putSingle("Accept", "text/bar;q=0.6,text/*;q=1,application/xml");
+        hs.putSingle("Accept", "text/*;q=1,application/xml");
         hs.putSingle("Content-Type", "*/*");
-        hs.putSingle("Date", "Tue, 21 Oct 2008 17:00:00 GMT");
         return hs;
     }
     
@@ -212,7 +177,7 @@ public class HttpHeadersImplTest extends Assert {
         EasyMock.expectLastCall().andReturn(headers);
         control.replay();
         HttpHeaders h = new HttpHeadersImpl(m);
-        List<Locale> languages = h.getAcceptableLanguages();
+        List<String> languages = h.getAcceptableLanguages();
         assertEquals(3, languages.size());
         languages.clear();
         languages = h.getAcceptableLanguages();

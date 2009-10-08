@@ -79,14 +79,14 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix;
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         } else {
             prefix = writerPrefix;
@@ -121,12 +121,10 @@ public class ContentEncryptedElements extends AbstractSecurityAssertion {
         writer.writeEndElement();
     }
 
-    public QName getRealName() {
-        return SP12Constants.CONTENT_ENCRYPTED_ELEMENTS;
-    }
     public QName getName() {
         return SP12Constants.CONTENT_ENCRYPTED_ELEMENTS;
     }
+
     public PolicyComponent normalize() {
         return this;
     }

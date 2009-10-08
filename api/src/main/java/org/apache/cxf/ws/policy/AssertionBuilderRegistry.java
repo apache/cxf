@@ -30,14 +30,6 @@ import org.apache.cxf.extension.Registry;
  */
 public interface AssertionBuilderRegistry extends Registry<QName, AssertionBuilder> {
     
-    
-    /**
-     * Register the builder for all qnames from the builders
-     * getKnownElements call.
-     * @param builder the builder to register 
-     */
-    void register(AssertionBuilder builder);
-    
     /**
      * Returns an assertion that is built using the specified xml element.
      * 

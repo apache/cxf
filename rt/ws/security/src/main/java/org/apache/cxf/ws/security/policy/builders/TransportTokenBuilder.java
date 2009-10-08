@@ -30,10 +30,11 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.cxf.ws.security.policy.model.Token;
+import org.apache.cxf.ws.security.policy.model.HttpsToken;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
 import org.apache.neethi.Policy;
 
@@ -62,7 +63,7 @@ public class TransportTokenBuilder implements AssertionBuilder {
         policy = (Policy)policy.normalize(false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-            transportToken.setToken((Token)(((List)iterator.next()).get(0)));
+            processAlternative((List)iterator.next(), transportToken);
             break; // since there should be only one alternative
         }
 
@@ -72,6 +73,44 @@ public class TransportTokenBuilder implements AssertionBuilder {
     public List<QName> getKnownElements() {
         return KNOWN_ELEMENTS;
     }
+
+    private void processAlternative(List assertions, TransportToken parent) {
+
+        for (Iterator iterator = assertions.iterator(); iterator.hasNext();) {
+            XmlPrimitiveAssertion primtive = (XmlPrimitiveAssertion)iterator.next();
+            QName qname = primtive.getName();
+
+            if (SP11Constants.HTTPS_TOKEN.equals(qname)) {
+                HttpsToken httpsToken = new HttpsToken(SP11Constants.INSTANCE);
+                String attr = DOMUtils.getAttribute(primtive.getValue(),
+                                                    SPConstants.REQUIRE_CLIENT_CERTIFICATE);
+                if (attr != null) {
+                    httpsToken.setRequireClientCertificate("true".equals(attr));
+                }
+                parent.setToken(httpsToken);
+            } else if (SP12Constants.HTTPS_TOKEN.equals(qname)) {
+                HttpsToken httpsToken = new HttpsToken(SP12Constants.INSTANCE);
+                                 
+                Element element = DOMUtils.getFirstChildWithName(primtive.getValue(), SPConstants.POLICY);
+                 
+                if (element != null) {
+                    Element child = DOMUtils.getFirstElement(element);
+                    if (child != null) {
+                        if (SP12Constants.HTTP_BASIC_AUTHENTICATION.equals(DOMUtils.getElementQName(child))) {
+                            httpsToken.setHttpBasicAuthentication(true);
+                        } else if (SP12Constants.HTTP_DIGEST_AUTHENTICATION
+                                .equals(DOMUtils.getElementQName(child))) {
+                            httpsToken.setHttpDigestAuthentication(true);
+                        } else if (SP12Constants.REQUIRE_CLIENT_CERTIFICATE
+                                .equals(DOMUtils.getElementQName(child))) {
+                            httpsToken.setRequireClientCertificate(true);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
         // TODO Auto-generated method stub

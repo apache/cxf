@@ -41,7 +41,6 @@ import org.apache.cxf.binding.soap.TestBase;
 import org.apache.cxf.binding.soap.TestUtil;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.junit.Before;
@@ -51,7 +50,6 @@ import org.junit.Test;
 public class SAAJInInterceptorTest extends TestBase {
 
     private ReadHeadersInterceptor rhi;
-    private StartBodyInterceptor sbi;
     private StaxInInterceptor staxIntc = new StaxInInterceptor();
     private SAAJInInterceptor saajIntc;
 
@@ -61,8 +59,6 @@ public class SAAJInInterceptorTest extends TestBase {
 
         rhi = new ReadHeadersInterceptor(BusFactory.getDefaultBus(), "phase1");
         chain.add(rhi);
-        sbi = new StartBodyInterceptor("phase1.5");
-        chain.add(sbi);
 
         saajIntc = new SAAJInInterceptor("phase2");
         chain.add(saajIntc);
@@ -80,7 +76,6 @@ public class SAAJInInterceptorTest extends TestBase {
 
         staxIntc.handleMessage(soapMessage);
         rhi.handleMessage(soapMessage);
-        sbi.handleMessage(soapMessage);
         saajIntc.handleMessage(soapMessage);
 
         // check the xmlReader should be placed on the first entry of the body
@@ -113,7 +108,6 @@ public class SAAJInInterceptorTest extends TestBase {
 
         staxIntc.handleMessage(soapMessage);
         rhi.handleMessage(soapMessage);
-        sbi.handleMessage(soapMessage);
 
         // check the xmlReader should be placed on the first entry of the body
         // element

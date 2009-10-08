@@ -25,7 +25,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import javax.annotation.Resource;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -34,8 +33,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.DOMUtils;
@@ -55,28 +52,10 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     protected int mtomThreshold;
-    private Bus bus;
+    
     private Collection<DOMSource> schemas;
     private Map<String, String> namespaceMap;
     private boolean hackAroundEmptyNamespaceIssue;
-
-    protected Bus getBus() {
-        if (bus == null) {
-            return BusFactory.getDefaultBus();
-        }
-        return bus;
-    }
-
-    /**
-     * This call is used to set the bus. It should only be called once.
-     * 
-     * @param bus
-     */
-    @Resource(name = "cxf")
-    public void setBus(Bus bus) {
-        assert this.bus == null || this.bus == bus;
-        this.bus = bus;
-    }
 
     public Collection<DOMSource> getSchemas() {
         return schemas;
@@ -90,7 +69,6 @@ public abstract class AbstractDataBinding implements DataBinding {
                                        String systemId) {
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
         boolean copied = false;
-
         if (StringUtils.isEmpty(ns)) {
             if (DOMUtils.getFirstElement(d.getDocumentElement()) == null) {
                 hackAroundEmptyNamespaceIssue = true;
@@ -129,7 +107,6 @@ public abstract class AbstractDataBinding implements DataBinding {
             }
             n = n.getNextSibling();
         }
-        
         if (patchRequired) {
             if (!copied) {
                 d = copy(d);

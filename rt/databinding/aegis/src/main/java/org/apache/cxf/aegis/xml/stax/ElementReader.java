@@ -43,14 +43,23 @@ public class ElementReader extends AbstractMessageReader implements MessageReade
     private static final Pattern QNAME_PATTERN = Pattern.compile("([^:]+):([^:]+)");
 
     private DepthXMLStreamReader root;
+
     private String value;
+
     private String localName;
+
     private QName name;
+
     private QName xsiType;
+
     private boolean hasCheckedChildren;
+
     private boolean hasChildren;
+
     private String namespace;
+
     private int depth;
+
     private int currentAttribute;
 
     /**
@@ -109,6 +118,9 @@ public class ElementReader extends AbstractMessageReader implements MessageReade
         }
     }
 
+    /**
+     * @see org.codehaus.xfire.aegis.MessageReader#getValue()
+     */
     public String getValue() {
         if (value == null) {
             try {

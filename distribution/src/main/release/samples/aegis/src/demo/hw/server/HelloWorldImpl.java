@@ -18,13 +18,6 @@
  */
 package demo.hw.server;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-
 public class HelloWorldImpl implements HelloWorld {
 
     public String sayHi(String text) {
@@ -32,20 +25,5 @@ public class HelloWorldImpl implements HelloWorld {
         return "Hello " + text;
     }
 
-    public Document getADocument() {
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db;
-        try {
-            db = dbf.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        }
-        Document doc = db.newDocument();
-        Element carrot = doc.createElement("carrot");
-        doc.appendChild(carrot);
-        carrot.appendChild(doc.createTextNode("Carrots are roots"));
-
-        return doc;
-    }
 }
 

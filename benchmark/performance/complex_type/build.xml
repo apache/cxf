@@ -17,44 +17,43 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<!-- See README file in parent directory for information on running performance tests -->
 <project name="test.complex_type" default="build" basedir=".">
 
-	<import file="../etc/common_build.xml" />
+  <import file="../etc/common_build.xml"/>    
 
-	<property name="wsdl.dir" location="${basedir}/wsdl" />
-	<property name="wsdl.file" value="complex_type.wsdl" />
+  <property name="wsdl.dir" location="${basedir}/wsdl"/>
+  <property name="wsdl.file" value="complex_type.wsdl"/>
 
-	<target name="generate.code">
-		<echo level="info" message="Generating code using wsdl2java..." />
-		<wsdl2java file="complex_type.wsdl" />
-	</target>
+  <target name="client" description="run complex_type client" depends="build">
+    <property name="param" value=""/>
+    <property name="pipe" value=""/>
 
-	<property name="cxf.war.file.name" value="complex_type" />
-	<target name="war" depends="build">
-		<cxfwar wsdl="complex_type.wsdl" filename="${cxf.war.file.name}.war" />
-	</target>
-
-	<target name="client-servlet" description="run demo client hitting servlet" depends="build">
-		<property name="param" value="" />
-		<cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline="-WSDL ${base.url}/complex_type/services/complex_type?wsdl " />
-	</target>
-
-	<!-- client and server tasks below easier to run from script files in bin/ subdirectory
-	     alternatively provide -Dxxxx=yyy options at command line for params listed below. -->
-	<target name="client" description="run complex_type client" depends="build">
-		<property name="param" value="" />
-		<property name="pipe" value="" />
-
-		<cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline="-WSDL http://${cxf.host.name}:${cxf.port.name}/performance/complex_type/SoapPort?wsdl -Amount ${cxf.running.time}
+    <cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline="-WSDL http://${cxf.host.name}:${cxf.port.name}/performance/complex_type/SoapPort?wsdl 												 	 -Amount ${cxf.running.time}
 													 -BasedOn ${cxf.basedon}
 													 -Operation ${cxf.operation}
 													 -PacketSize ${cxf.packet.size}
-													 -Threads ${cxf.threads} ${pipe}" />
-	</target>
+													 -Threads ${cxf.threads} ${pipe}"/>
+  </target> 
 
-	<target name="server" description="run complex_type server" depends="build">
-		<cxf.server.run classname="org.apache.cxf.performance.complex_type.server.Server" argline="-WSDL ${basedir}/wsdl/${wsdl.file}" />
-	</target>
+  <target name="server" description="run complex_type server" depends="build">
+    <cxf.server.run classname="org.apache.cxf.performance.complex_type.server.Server" argline="-WSDL ${basedir}/wsdl/${wsdl.file}"/>
+  </target>
+
+    <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="complex_type.wsdl"/>
+   </target>
+
+   <property name="cxf.war.file.name" value="complex_type"/>
+    <target name="war" depends="build">
+        <cxfwar wsdl="complex_type.wsdl" filename="${cxf.war.file.name}.war"/>
+    </target>
+
+    <target name="client-servlet" description="run demo client hitting servlet" depends="build">
+        <property name="param" value=""/>         
+        <cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline=
+            "-WSDL ${base.url}/complex_type/services/complex_type?wsdl " />
+    </target>
+
 
 </project>

@@ -28,12 +28,11 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
- * A Rhino wrapper around org.w3c.dom.Node. Not comprehensive, but enough to test CXF JavaScript.
+ * A Rhino wrapper around org.w3c.dom.Node. Not comprehensive, but enough to test CXF JavaScript. 
  */
 public class JsSimpleDomNode extends ScriptableObject {
     private Node wrappedNode;
@@ -49,7 +48,7 @@ public class JsSimpleDomNode extends ScriptableObject {
      */
     public JsSimpleDomNode() {
     }
-
+    
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsSimpleDomNode.class);
@@ -61,85 +60,85 @@ public class JsSimpleDomNode extends ScriptableObject {
             throw new RuntimeException(e);
         }
     }
-
+    
     @Override
     public String getClassName() {
         return "Node";
     }
-
+    
     public Node getWrappedNode() {
         return wrappedNode;
     }
-
-    // CHECKSTYLE:OFF
+    
+    //CHECKSTYLE:OFF
     public String jsGet_localName() {
-        return wrappedNode.getLocalName();
+        return wrappedNode.getLocalName();       
     }
-
+    
     public String jsGet_namespaceURI() {
         return wrappedNode.getNamespaceURI();
     }
-
+    
     public Object jsGet_firstChild() {
         establishChildren();
         if (children.size() > 0)
             return children.get(0);
-        else
+        else 
             return null;
     }
 
     public Object jsGet_nextSibling() {
-        return nextSibling;
+        return nextSibling; 
     }
 
     public Object jsGet_previousSibling() {
-        return previousSibling;
+        return previousSibling; 
     }
-
+    
     public Object jsGet_parentNode() {
         // risk errors in object equality ...
         return wrapNode(this, wrappedNode.getParentNode());
     }
-
+    
     public int jsGet_nodeType() {
         return wrappedNode.getNodeType();
     }
-
+    
     public String jsGet_nodeValue() {
         return wrappedNode.getNodeValue();
     }
-
+    
     public String jsGet_nodeName() {
         return wrappedNode.getNodeName();
     }
-
+    
     // in a more complete version of this, we'd use a different object type to wrap documents.
     public Object jsGet_documentElement() {
-        if (9 /* Document */!= wrappedNode.getNodeType()) {
+        if(9 /* Document */ != wrappedNode.getNodeType()) {
             return null;
         } else {
             establishChildren();
             return children.get(0); // it is, after all, just a convenience feature.
         }
     }
-
+    
     public Object[] jsGet_childNodes() {
         establishChildren();
         return children.toArray();
     }
-
+    
     public Object jsGet_attributes() {
         establishAttributes();
         return attributes;
     }
-
+    
     public String jsFunction_getAttributeNS(String namespaceURI, String localName) {
         NamedNodeMap attributes = wrappedNode.getAttributes();
         Node attrNode = attributes.getNamedItemNS(namespaceURI, localName);
-        if (attrNode == null) {
+        if(attrNode == null) {
             return null;
         } else {
-            Attr attribute = (Attr)attrNode;
+            Attr attribute = (Attr) attrNode;
             return attribute.getValue();
         }
     }
@@ -147,40 +146,32 @@ public class JsSimpleDomNode extends ScriptableObject {
     public String jsFunction_getAttribute(String localName) {
         NamedNodeMap attributes = wrappedNode.getAttributes();
         Node attrNode = attributes.getNamedItem(localName);
-        if (attrNode == null) {
+        if(attrNode == null) {
             return null;
         } else {
-            Attr attribute = (Attr)attrNode;
+            Attr attribute = (Attr) attrNode;
             return attribute.getValue();
         }
     }
 
-    // CHECKSTYLE:ON
-
+    //CHECKSTYLE:ON
+    
     public static JsSimpleDomNode wrapNode(Scriptable scope, Node node) {
         if (node == null) {
             return null;
         }
-
-        Context cx = ContextFactory.getGlobal().enterContext();
-        try {
-            JsSimpleDomNode newObject = (JsSimpleDomNode)cx.newObject(scope, "Node");
-            newObject.initialize(node, null);
-            return newObject;
-        } finally {
-            Context.exit();
-        }
+        
+        Context cx = Context.enter();
+        JsSimpleDomNode newObject = (JsSimpleDomNode)cx.newObject(scope, "Node");
+        newObject.initialize(node, null);
+        return newObject;
     }
-
+    
     private JsSimpleDomNode newObject(Node node, JsSimpleDomNode prev) {
-        Context cx = ContextFactory.getGlobal().enterContext();
-        try {
-            JsSimpleDomNode newObject = (JsSimpleDomNode)cx.newObject(getParentScope(), "Node");
-            newObject.initialize(node, prev);
-            return newObject;
-        } finally {
-            Context.exit();
-        }
+        Context cx = Context.enter();
+        JsSimpleDomNode newObject = (JsSimpleDomNode)cx.newObject(getParentScope(), "Node");
+        newObject.initialize(node, prev);
+        return newObject;
     }
 
     private void establishChildren() {
@@ -192,12 +183,12 @@ public class JsSimpleDomNode extends ScriptableObject {
                 while (node != null) {
                     JsSimpleDomNode prev = null;
                     if (x > 0) {
-                        prev = (JsSimpleDomNode)children.get(x - 1);
+                        prev = (JsSimpleDomNode)children.get(x - 1); 
                     }
                     children.add(x, newObject(node, prev));
                     if (x > 0) {
                         children.get(x - 1).setNext(children.get(x));
-                    }
+                    }                    
                     node = node.getNextSibling();
                     x++;
                 }
@@ -207,7 +198,7 @@ public class JsSimpleDomNode extends ScriptableObject {
             childrenWrapped = true;
         }
     }
-
+    
     private void establishAttributes() {
         if (!attributesWrapped) {
             NamedNodeMap nodeAttributes = wrappedNode.getAttributes();
@@ -216,15 +207,16 @@ public class JsSimpleDomNode extends ScriptableObject {
         }
     }
 
-    // rhino won't let us use a constructor.
+    //rhino won't let us use a constructor.
     void initialize(Node node, JsSimpleDomNode prev) {
         wrappedNode = node;
         childrenWrapped = false;
         previousSibling = prev;
     }
-
-    void setNext(JsSimpleDomNode next) {
+    
+    void setNext(JsSimpleDomNode next)  {
         nextSibling = next;
     }
+
 
 }

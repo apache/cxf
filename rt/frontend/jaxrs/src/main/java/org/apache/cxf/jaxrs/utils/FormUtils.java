@@ -23,11 +23,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
-import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -45,20 +42,6 @@ public final class FormUtils {
         
     }
     
-    public static void addPropertyToForm(MultivaluedMap<String, Object> map, String name, Object value) {
-        if (!"".equals(name)) {
-            map.add(name, value);
-        } else {
-            MultivaluedMap<String, Object> values = 
-                InjectionUtils.extractValuesFromBean(value, "");
-            for (Map.Entry<String, List<Object>> entry : values.entrySet()) {
-                for (Object v : entry.getValue()) {
-                    map.add(entry.getKey(), v.toString());
-                }
-            }
-        }
-    }
-    
     public static String readBody(InputStream is) {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -70,8 +53,7 @@ public final class FormUtils {
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params, 
-                                             String postBody, boolean decode,
-                                             HttpServletRequest request) {
+                                             String postBody, boolean decode) {
         if (!StringUtils.isEmpty(postBody)) {
             List<String> parts = Arrays.asList(postBody.split("&"));
             for (String part : parts) {
@@ -87,12 +69,6 @@ public final class FormUtils {
                 } else {
                     params.add(keyValue[0], "");
                 }
-            }
-        } else if (request != null) {
-            for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
-                String paramName = en.nextElement().toString();
-                String[] values = request.getParameterValues(paramName);
-                params.put(paramName, Arrays.asList(values));
             }
         }
     }

@@ -18,21 +18,17 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
-import java.lang.reflect.Type;
-
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
-import org.apache.ws.commons.schema.XmlSchemaSimpleType;
-import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
+import org.apache.cxf.common.util.SOAPConstants;
+import org.jdom.Attribute;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
-public class EnumType extends AegisType {
+public class EnumType extends Type {
     @SuppressWarnings("unchecked")
     @Override
     public Object readObject(MessageReader reader, Context context) {
@@ -48,37 +44,32 @@ public class EnumType extends AegisType {
     }
 
     @Override
-    public void setTypeClass(Type typeClass) {
-        if (!(typeClass instanceof Class)) {
-            throw new DatabindingException("Aegis cannot map generic Enums.");
-        }
-        
-        Class<?> plainClass = (Class<?>)typeClass;
-        if (!plainClass.isEnum()) {
-            throw new DatabindingException("EnumType must map an enum.");
+    public void setTypeClass(Class typeClass) {
+        if (!typeClass.isEnum()) {
+            throw new DatabindingException("Type class must be an enum.");
         }
 
         super.setTypeClass(typeClass);
     }
 
     @Override
-    public void writeSchema(XmlSchema root) {
-        
-        XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root);
-        simple.setName(getSchemaType().getLocalPart());
-        root.addType(simple);
-        root.getItems().add(simple);
-        XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
-        restriction.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
-        simple.setContent(restriction);
+    public void writeSchema(Element root) {
+        Namespace xsd = Namespace.getNamespace(SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+
+        Element simple = new Element("simpleType", xsd);
+        simple.setAttribute(new Attribute("name", getSchemaType().getLocalPart()));
+        root.addContent(simple);
+
+        Element restriction = new Element("restriction", xsd);
+        restriction.setAttribute(new Attribute("base", SOAPConstants.XSD_PREFIX + ":string"));
+        simple.addContent(restriction);
 
         Object[] constants = getTypeClass().getEnumConstants();
 
-        XmlSchemaObjectCollection facets = restriction.getFacets();
         for (Object constant : constants) {
-            XmlSchemaEnumerationFacet f = new XmlSchemaEnumerationFacet();
-            f.setValue(((Enum)constant).name());
-            facets.add(f);
+            Element enumeration = new Element("enumeration", xsd);
+            enumeration.setAttribute(new Attribute("value", ((Enum)constant).name()));
+            restriction.addContent(enumeration);
         }
     }
 

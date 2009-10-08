@@ -24,115 +24,106 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd">
 
-	<!--  For Testing using the Swing commons processor, uncomment one of:--> 
-	<!-- 
-		<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
-		<context:annotation-config/>
+	<!--  For Testing using the Swing commons processor, uncomment one of: 
+	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
+	<context:annotation-config/>
 	-->
     <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
-    <bean id="org.apache.cxf.bus.spring.BusApplicationListener" 
-    	class="org.apache.cxf.bus.spring.BusApplicationListener"/>
-    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" 
-    	class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
-    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" 
-    	class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
-    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" 
-    	class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.BusApplicationListener" class="org.apache.cxf.bus.spring.BusApplicationListener"/>
+    <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
+    <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    
+    <bean id="org.apache.cxf.bus.spring.BusExtensionPostProcessor" class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
     
-    <bean id="org.apache.cxf.resource.ResourceManager" 
-    	class="org.apache.cxf.bus.resource.ResourceManagerImpl" 
-    	lazy-init="true">
-    	<constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.resource.ResourceManager" class="org.apache.cxf.bus.resource.ResourceManagerImpl">
+       <property name="resolvers">
+            <list>
+                <bean class="org.apache.cxf.resource.ClasspathResolver"/>
+                <bean class="org.apache.cxf.resource.ClassLoaderResolver"/>
+                <bean class="org.apache.cxf.bus.spring.BusApplicationContextResourceResolver"/>
+            </list>
+       </property>
+       <property name="bus" ref="cxf"/>
     </bean>
-
     <bean id="org.apache.cxf.configuration.Configurer" 
-    	class="org.apache.cxf.configuration.spring.ConfigurerImpl" 
-    	lazy-init="true"/>
+    	class="org.apache.cxf.configuration.spring.ConfigurerImpl">
+    </bean>    
         
-    <bean id="org.apache.cxf.binding.BindingFactoryManager"
-     	class="org.apache.cxf.binding.BindingFactoryManagerImpl"
-     	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.binding.BindingFactoryManager" class="org.apache.cxf.binding.BindingFactoryManagerImpl">
+        <property name="mapProvider">
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.binding.BindingFactory"/>
+              <property name="idsProperty" value="activationNamespaces"/>
+            </bean>
+        </property>
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.transport.DestinationFactoryManager"
-    	class="org.apache.cxf.transport.DestinationFactoryManagerImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.transport.DestinationFactoryManager" class="org.apache.cxf.transport.DestinationFactoryManagerImpl">
+        <property name="mapProvider">
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.transport.DestinationFactory"/>
+              <property name="idsProperty" value="transportIds"/>
+            </bean>
+        </property>
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.transport.ConduitInitiatorManager" 
-    	class="org.apache.cxf.transport.ConduitInitiatorManagerImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.transport.ConduitInitiatorManager" class="org.apache.cxf.transport.ConduitInitiatorManagerImpl">
+        <property name="mapProvider">
+            <bean class="org.apache.cxf.configuration.spring.SpringBeanMap">
+              <property name="type" value="org.apache.cxf.transport.ConduitInitiator"/>
+              <property name="idsProperty" value="transportIds"/>
+            </bean>
+        </property>
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.wsdl.WSDLManager" 
-    	class="org.apache.cxf.wsdl11.WSDLManagerImpl" 
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.wsdl.WSDLManager" class="org.apache.cxf.wsdl11.WSDLManagerImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.phase.PhaseManager" 
-    	class="org.apache.cxf.phase.PhaseManagerImpl" 
-    	lazy-init="true"/>
-    
-    <bean id="org.apache.cxf.workqueue.WorkQueueManager" 
-    	class="org.apache.cxf.workqueue.WorkQueueManagerImpl"
-		lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.phase.PhaseManager" class="org.apache.cxf.phase.PhaseManagerImpl">
+        
     </bean>
     
-    <bean id="org.apache.cxf.buslifecycle.BusLifeCycleManager" 
-    	class="org.apache.cxf.buslifecycle.CXFBusLifeCycleManager"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.workqueue.WorkQueueManager" class="org.apache.cxf.workqueue.WorkQueueManagerImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.endpoint.ServerRegistry" 
-    	class="org.apache.cxf.endpoint.ServerRegistryImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.buslifecycle.BusLifeCycleManager" class="org.apache.cxf.buslifecycle.CXFBusLifeCycleManager">
+        <property name="bus" ref="cxf"/>
+    </bean>
+    
+    <bean id="org.apache.cxf.endpoint.ServerRegistry" class="org.apache.cxf.endpoint.ServerRegistryImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
 
-    <bean id="org.apache.cxf.endpoint.ServerLifeCycleManager"
-    	class="org.apache.cxf.endpoint.ServerLifeCycleManagerImpl"
-    	lazy-init="true"/>
-    <bean id="org.apache.cxf.endpoint.ClientLifeCycleManager"
-    	class="org.apache.cxf.endpoint.ClientLifeCycleManagerImpl"
-    	lazy-init="true"/>
+    <bean id="org.apache.cxf.endpoint.ServerLifeCycleManager" class="org.apache.cxf.endpoint.ServerLifeCycleManagerImpl"/>
+    <bean id="org.apache.cxf.endpoint.ClientLifeCycleManager" class="org.apache.cxf.endpoint.ClientLifeCycleManagerImpl"/>
         
 
-    <bean id="org.apache.cxf.transports.http.QueryHandlerRegistry" 
-    	class="org.apache.cxf.transport.http.QueryHandlerRegistryImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.transports.http.QueryHandlerRegistry" class="org.apache.cxf.transport.http.QueryHandlerRegistryImpl">
+        <property name="bus" ref="cxf"/>
+        <property name="queryHandlers">
+        	<list>
+        		<bean class="org.apache.cxf.transport.http.WSDLQueryHandler">
+			        <property name="bus" ref="cxf"/>
+        		</bean>	
+        	</list>
+        </property>
     </bean>
 
-    <bean id="org.apache.cxf.endpoint.EndpointResolverRegistry" 
-    	class="org.apache.cxf.endpoint.EndpointResolverRegistryImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.endpoint.EndpointResolverRegistry" class="org.apache.cxf.endpoint.EndpointResolverRegistryImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
-    <bean id="org.apache.cxf.headers.HeaderManager" 
-    	class="org.apache.cxf.headers.HeaderManagerImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.headers.HeaderManager" class="org.apache.cxf.headers.HeaderManagerImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
-    <bean id="org.apache.cxf.catalog.OASISCatalogManager" 
-    	class="org.apache.cxf.catalog.OASISCatalogManager"  
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.catalog.OASISCatalogManager" class="org.apache.cxf.catalog.OASISCatalogManager">
+        <property name="bus" ref="cxf"/>
     </bean>
-    <bean id="org.apache.cxf.service.factory.FactoryBeanListenerManager"
-    	class="org.apache.cxf.service.factory.FactoryBeanListenerManager"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
-    </bean>
-    
-    <bean id="org.apache.cxf.endpoint.ServiceContractResolverRegistry" 
-    	class="org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl"
-    	lazy-init="true">
-        <constructor-arg ref="cxf"/>
+
+    <bean id="org.apache.cxf.endpoint.ServiceContractResolverRegistry" class="org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl">
+        <property name="bus" ref="cxf"/>
     </bean>
 </beans>

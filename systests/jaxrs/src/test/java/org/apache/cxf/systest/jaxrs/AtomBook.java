@@ -20,7 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import javax.ws.rs.GET;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 
 import org.apache.abdera.model.Entry;
 
@@ -35,7 +35,7 @@ public class AtomBook {
     
     
     @GET
-    @Produces("application/atom+xml")
+    @ProduceMime("application/atom+xml")
     public Entry getAsEntry() {
         try {
             return AtomUtils.createBookEntry(book);

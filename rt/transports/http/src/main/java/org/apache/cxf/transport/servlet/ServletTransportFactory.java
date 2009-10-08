@@ -30,6 +30,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
@@ -37,6 +38,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 import org.apache.cxf.wsdl.http.AddressType;
 
@@ -75,6 +77,22 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         super.setBus(b);
     }
     
+    @PostConstruct
+    public void register() {
+        if (null == bus) {
+            return;
+        }
+        if (activationNamespaces == null) {
+            activationNamespaces = getTransportIds();
+        }
+        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
+        if (null != dfm && null != activationNamespaces) {
+            for (String ns : activationNamespaces) {
+                dfm.registerDestinationFactory(ns, this);
+            }
+        }
+    }
+    
     public void removeDestination(String path) throws IOException {
         destinations.remove(path);
         decodedDestinations.remove(URLDecoder.decode(path, "ISO-8859-1"));
@@ -85,7 +103,7 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         ServletDestination d = getDestinationForPath(endpointInfo.getAddress());
         if (d == null) { 
             String path = getTrimmedPath(endpointInfo.getAddress());
-            d = new ServletDestination(getBus(), endpointInfo, this, path);
+            d = new ServletDestination(getBus(), this, endpointInfo, this, path);
             destinations.put(path, d);
             decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), d);
             

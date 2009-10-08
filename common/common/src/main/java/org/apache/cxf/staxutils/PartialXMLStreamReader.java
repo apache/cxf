@@ -23,11 +23,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-/**
- * Read from a StaX reader, stopping when the next element is a specified element.
- * For example, this can be used to read all of the Header of a soap message into a DOM
- * document stopping on contact with the body element.
- */
 public class PartialXMLStreamReader extends DepthXMLStreamReader {
     private QName endTag;
     private boolean foundEnd;

@@ -35,8 +35,6 @@ public final class WSDLConstants {
     public static final String NS_SCHEMA_XSD = "http://www.w3.org/2001/XMLSchema";
 
     public static final QName QNAME_SCHEMA = new QName(NS_SCHEMA_XSD, "schema");
-    public static final QName QNAME_SCHEMA_IMPORT = new QName(NS_SCHEMA_XSD, "import");
-    public static final QName QNAME_SCHEMA_INCLUDE = new QName(NS_SCHEMA_XSD, "include");
 
     // XML Schema instance
     public static final String NP_SCHEMA_XSI = "xsi";

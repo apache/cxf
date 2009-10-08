@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -42,17 +43,18 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 public class UriBuilderImpl extends UriBuilder {
-
+    
+    
+    private boolean encode;
     private String scheme;
     private String userInfo;
     private int port;
     private String host;
-    private List<PathSegment> paths = new ArrayList<PathSegment>();
+    private List<PathSegment> paths;
     private String fragment;
-    private String schemeSpecificPart; 
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
     private MultivaluedMap<String, String> matrix = new MetadataMap<String, String>();
-    
+
     /**
      * Creates builder with empty URI.
      */
@@ -70,8 +72,23 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
+    public URI build() throws UriBuilderException {
+        return build(new Object[]{});
+    }
+
+    @Override
+    public URI build(Map<String, Object> map) throws IllegalArgumentException, UriBuilderException {
+        return buildFromMap(map);
+    }
+
+    @Override
     public URI build(Object... values) throws IllegalArgumentException, UriBuilderException {
-        return doBuild(false, values);
+        if (encode) {
+            for (int i = 0; i < values.length; i++) {
+                values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
+            }
+        }
+        return doBuild(encode, values);
     }
 
     private URI doBuild(boolean fromEncoded, Object... values) {
@@ -92,38 +109,27 @@ public class UriBuilderImpl extends UriBuilder {
         // again if fromEncoded is set
         if (fromEncoded) {
             StringBuilder b = new StringBuilder();
-            b.append(scheme).append(":");
-            if (!isSchemeOpaque()) {
-                b.append("//");
-                if (userInfo != null) {
-                    b.append(userInfo).append('@');
-                }
-                b.append(host);
-                if (port != -1) {
-                    b.append(':').append(port);    
-                }
-                if (thePath != null && thePath.length() > 0) {
-                    b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
-                }
-                if (theQuery != null && theQuery.length() != 0) {
-                    b.append('?').append(theQuery);
-                }
-            } else {
-                b.append(schemeSpecificPart);
+            b.append(scheme).append("://");
+            if (userInfo != null) {
+                b.append(userInfo).append('@');
+            }
+            b.append(host);
+            if (port != -1) {
+                b.append(':').append(port);    
+            }
+            if (thePath != null && thePath.length() > 0) {
+                b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
+            }
+            if (theQuery != null && theQuery.length() != 0) {
+                b.append('?').append(theQuery);
             }
             if (fragment != null) {
                 b.append('#').append(fragment);
             }
             return new URI(b.toString());
-        } else if (!isSchemeOpaque()) {
-            return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
         } else {
-            return new URI(scheme, schemeSpecificPart, fragment);
+            return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
         }
-    }
-    
-    private boolean isSchemeOpaque() {
-        return schemeSpecificPart != null;
     }
     
     private String substituteVarargs(String path, Object... values) {
@@ -144,27 +150,20 @@ public class UriBuilderImpl extends UriBuilder {
         return templ.substitute(varValueMap);
     }
 
-    @Override
-    public URI buildFromEncoded(Object... values) throws IllegalArgumentException, UriBuilderException {
-        // Problem: multi-arg URI c-tor always forces encoding, operation contract would be broken;
-        // use os single-arg URI c-tor requires unnecessary concatenate-parse roundtrip.
-        // While decoding back given values and passing as non-decoded to regular build() method
-        // is promising unfortunatley it causes the loss of encoded reserved values such as +,
-        // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
-        // ' ' or would break the contract in when query parameters are expected to have %2B 
-        
-        for (int i = 0; i < values.length; i++) {
-            values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
-        }
-        return doBuild(true, values);
-    }
-
-    @Override
-    public URI buildFromMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
+    private URI buildFromMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
         UriBuilderException {
-        return doBuildFromMap(map, false);
+        if (encode) {
+            Map<String, String> decodedMap = new HashMap<String, String>(map.size());
+            for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
+                decodedMap.put(entry.getKey(), 
+                               HttpUtils.encodePartiallyEncoded(entry.getValue().toString(), false));
+            }
+            return doBuildFromMap(decodedMap, encode);
+        } else {
+            return doBuildFromMap(map, encode);
+        }
     }
-
+    
     private URI doBuildFromMap(Map<String, ? extends Object> map, boolean fromEncoded) 
         throws IllegalArgumentException, UriBuilderException {
         try {
@@ -187,18 +186,6 @@ public class UriBuilderImpl extends UriBuilder {
         return templ.substitute(varValueMap);
     }
 
-    @Override
-    public URI buildFromEncodedMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
-        UriBuilderException {
-        // see buildFromEncoded() comment
-        Map<String, String> decodedMap = new HashMap<String, String>(map.size());
-        for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
-            decodedMap.put(entry.getKey(), 
-                           HttpUtils.encodePartiallyEncoded(entry.getValue().toString(), false));
-        }
-        return doBuildFromMap(decodedMap, true);
-    }
-
     // CHECKSTYLE:OFF
     @Override
     public UriBuilder clone() {
@@ -211,11 +198,17 @@ public class UriBuilderImpl extends UriBuilder {
         builder.fragment = fragment;
         builder.query = new MetadataMap<String, String>(query);
         builder.matrix = new MetadataMap<String, String>(matrix);
-        builder.schemeSpecificPart = schemeSpecificPart; 
+        builder.encode = encode;
         return builder;
     }
 
     // CHECKSTYLE:ON
+
+    @Override
+    public UriBuilder encode(boolean enable) {
+        this.encode = enable;
+        return this;
+    }
 
     @Override
     public UriBuilder fragment(String theFragment) throws IllegalArgumentException {
@@ -230,18 +223,68 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     @Override
+    public UriBuilder matrixParam(String name, String value) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        if (value != null) {
+            matrix.add(name, value);
+        } else {
+            matrix.remove(name);
+        }
+        return this;
+    }
+
+    @Override
+    public UriBuilder path(String... segments) throws IllegalArgumentException {
+        
+        if (paths == null) {
+            paths = new ArrayList<PathSegment>();
+        }
+        for (String seg : segments) {
+            paths.addAll(JAXRSUtils.getPathSegments(seg, false));
+        }
+        matrix.clear();
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();        
+        }
+        
+        return this;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
     public UriBuilder path(Class resource) throws IllegalArgumentException {
         if (resource == null) {
             throw new IllegalArgumentException("resource is null");
         }
-        Class<?> cls = resource;
-        Path ann = cls.getAnnotation(Path.class);
+        Annotation ann = resource.getAnnotation(Path.class);
         if (ann == null) {
             throw new IllegalArgumentException("Class '" + resource.getCanonicalName()
                                                + "' is not annotated with Path");
         }
         // path(String) decomposes multi-segment path when necessary
-        return path(ann.value());
+        return path(((Path)ann).value());
+    }
+
+    @Override
+    public UriBuilder path(Method... methods) throws IllegalArgumentException {
+        if (methods == null) {
+            throw new IllegalArgumentException("methods is null");
+        }
+        for (Method method : methods) {
+            if (method == null) {
+                throw new IllegalArgumentException("method is null");
+            }
+            Annotation ann = method.getAnnotation(Path.class);
+            if (ann == null) {
+                throw new IllegalArgumentException("Method '" + method.getClass().getCanonicalName() + "."
+                                                   + method.getName() + "' is not annotated with Path");
+            }
+            // path(String) decomposes multi-segment path when necessary
+            path(((Path)ann).value());
+        }
+        return this;
     }
 
     @Override
@@ -252,10 +295,10 @@ public class UriBuilderImpl extends UriBuilder {
         if (method == null) {
             throw new IllegalArgumentException("method is null");
         }
-        Path foundAnn = null;
+        Annotation foundAnn = null;
         for (Method meth : resource.getMethods()) {
             if (meth.getName().equals(method)) {
-                Path ann = meth.getAnnotation(Path.class);
+                Annotation ann = meth.getAnnotation(Path.class);
                 if (foundAnn != null && ann != null) {
                     throw new IllegalArgumentException("Multiple Path annotations for '" + method
                                                        + "' overloaded method");
@@ -267,46 +310,50 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException("No Path annotation for '" + method + "' method");
         }
         // path(String) decomposes multi-segment path when necessary
-        return path(foundAnn.value());
-    }
-
-    @Override
-    public UriBuilder path(Method method) throws IllegalArgumentException {
-        if (method == null) {
-            throw new IllegalArgumentException("method is null");
-        }
-        Path ann = method.getAnnotation(Path.class);
-        if (ann == null) {
-            throw new IllegalArgumentException("Method '" + method.getClass().getCanonicalName() + "."
-                                               + method.getName() + "' is not annotated with Path");
-        }
-        // path(String) decomposes multi-segment path when necessary
-        return path(ann.value());
-    }
-
-    @Override
-    public UriBuilder path(String path) throws IllegalArgumentException {
-        
-        if (path == null) {
-            throw new IllegalArgumentException("path is null");
-        }
-        
-        List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
-        if (!paths.isEmpty() && !matrix.isEmpty()) {
-            PathSegment ps = paths.remove(paths.size() - 1);
-            paths.add(replacePathSegment(ps));
-        }
-        paths.addAll(segments);
-        matrix.clear();
-        if (!paths.isEmpty()) {
-            matrix = paths.get(paths.size() - 1).getMatrixParameters();        
-        }
-        return this;
+        return path(((Path)foundAnn).value());
     }
 
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
         this.port = thePort;
+        return this;
+    }
+
+    @Override
+    public UriBuilder queryParam(String name, String value) throws IllegalArgumentException {
+        if (name == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        if (value != null) {
+            query.add(name, value);
+        } else {
+            query.remove(name);
+        }
+        return this;
+    }
+
+    public UriBuilder replaceMatrixParams(String m) throws IllegalArgumentException {
+        if (m == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        MultivaluedMap<String, String> values = JAXRSUtils.getStructuredParams(m, ";", true);
+        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+            matrix.put(entry.getKey(), entry.getValue());
+        }
+        
+        return this;
+    }
+
+    @Override
+    public UriBuilder replaceQueryParams(String q) throws IllegalArgumentException {
+        if (q == null) {
+            throw new IllegalArgumentException("name is null");
+        }
+        MultivaluedMap<String, String> values = JAXRSUtils.getStructuredParams(q, "&", true);
+        for (Map.Entry<String, List<String>> entry : values.entrySet()) {
+            query.put(entry.getKey(), entry.getValue());
+        }
+        
         return this;
     }
 
@@ -324,7 +371,7 @@ public class UriBuilderImpl extends UriBuilder {
             if (scheme == null) {
                 scheme = "http";
             }
-            URI uri = new URI(scheme, ssp, fragment);
+            URI uri = new URI(scheme + "://" + ssp);
             setUriParts(uri);
         } catch (URISyntaxException e) {
             throw new IllegalArgumentException("Wrong syntax of scheme-specific part", e);
@@ -343,28 +390,41 @@ public class UriBuilderImpl extends UriBuilder {
         this.userInfo = ui;
         return this;
     }
+    
+    @Override
+    public boolean isEncode() {
+        throw new UnsupportedOperationException("Not implemented :/");        
+    }
+  
+    @Override
+    public UriBuilder extension(String arg0) {
+        throw new UnsupportedOperationException("Not implemented :/");
+    }
+    
+    @Override
+    public UriBuilder replacePath(String... path) throws IllegalArgumentException {
+        for (String p : path) {
+            paths = JAXRSUtils.getPathSegments(p, false);
+        }
+        if (!paths.isEmpty()) {
+            matrix = paths.get(paths.size() - 1).getMatrixParameters();
+        } else {
+            matrix.clear();
+        }
+        return this;
+    }
 
     private void setUriParts(URI uri) {
         if (uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
         scheme = uri.getScheme();
-        if (!uri.isOpaque()) {
-            port = uri.getPort();
-            host = uri.getHost();
-            String rawPath = uri.getRawPath();
-            if (rawPath != null) {
-                setPathAndMatrix(uri.getRawPath());
-            }
-            String rawQuery = uri.getRawQuery();
-            if (rawQuery != null) {
-                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false);
-            }
-            userInfo = uri.getUserInfo();
-        } else {
-            schemeSpecificPart = uri.getSchemeSpecificPart();
-        }
+        port = uri.getPort();
+        host = uri.getHost();
+        setPathAndMatrix(uri.getRawPath());
         fragment = uri.getFragment();
+        query = JAXRSUtils.getStructuredParams(uri.getRawQuery(), "&", false);
+        userInfo = uri.getUserInfo();
     }
 
     private void setPathAndMatrix(String path) {
@@ -401,111 +461,6 @@ public class UriBuilderImpl extends UriBuilder {
         return buildParams(query, '&', fromEncoded);
     }
 
-    @Override
-    public UriBuilder matrixParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        List<String> list = matrix.get(name);
-        if (list == null) {
-            matrix.put(name, toStringList(values));
-        } else {
-            list.addAll(toStringList(values));
-        }
-        return this;
-    }
-
-    @Override
-    public UriBuilder queryParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        List<String> list = query.get(name);
-        if (list == null) {
-            query.put(name, toStringList(values));
-        } else {
-            list.addAll(toStringList(values));
-        }
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceMatrix(String matrixValues) throws IllegalArgumentException {
-        this.matrix = JAXRSUtils.getStructuredParams(matrixValues, ";", true);
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceMatrixParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        if (values != null && values.length >= 1 && values[0] != null) {
-            matrix.put(name, toStringList(values));
-        } else {
-            matrix.remove(name);
-        }
-        return this;
-    }
-
-    @Override
-    public UriBuilder replacePath(String path) {
-        if (path == null) {
-            paths.clear();
-            matrix.clear();
-        } else {
-            setPathAndMatrix(path);
-        }
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", true);
-        return this;
-    }
-
-    @Override
-    public UriBuilder replaceQueryParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
-        }
-        if (values != null && values.length >= 1 && values[0] != null) {
-            query.put(name, toStringList(values));
-        } else {
-            query.remove(name);
-        }
-        return this;
-    }
-
-    @Override
-    public UriBuilder segment(String... segments) throws IllegalArgumentException {
-        for (String segment : segments) {
-            path(segment);
-        }
-        return this;
-    }
-
-    /**
-     * Query or matrix params convertion from object values vararg to list of strings. No encoding is
-     * provided.
-     * 
-     * @param values entry vararg values
-     * @return list of strings
-     * @throws IllegalArgumentException when one of values is null
-     */
-    private List<String> toStringList(Object... values) throws IllegalArgumentException {
-        List<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; i++) {
-            Object value = values[i];
-            if (value == null) {
-                throw new IllegalArgumentException("Null value on " + i + " position");
-            }
-            list.add(value.toString());
-        }
-        return list;
-    }
-
     /**
      * Builds param string for query part or matrix part of URI.
      * 
@@ -525,10 +480,7 @@ public class UriBuilderImpl extends UriBuilder {
                 if (fromEncoded) {
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
                 }
-                b.append(entry.getKey());
-                if (val.length() != 0) {
-                    b.append('=').append(val);
-                }
+                b.append(entry.getKey()).append('=').append(val);
                 if (sit.hasNext() || it.hasNext()) {
                     b.append(separator);
                 }
@@ -549,12 +501,5 @@ public class UriBuilderImpl extends UriBuilder {
             sb.append(';');
             sb.append(buildParams(map, ';', fromEncoded));
         }
-    }
-    
-    private PathSegment replacePathSegment(PathSegment ps) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(ps.getPath());
-        buildMatrix(sb, matrix, false);
-        return new PathSegmentImpl(sb.toString());
     }
 }

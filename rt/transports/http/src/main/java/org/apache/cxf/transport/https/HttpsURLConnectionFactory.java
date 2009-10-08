@@ -35,7 +35,6 @@ import javax.imageio.IIOException;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
@@ -90,6 +89,10 @@ public final class HttpsURLConnectionFactory
      * Cache the last SSLContext to avoid recreation
      */
     SSLSocketFactory socketFactory;
+
+    private Class deprecatedSunHttpsURLConnectionClass;
+
+    private Class deprecatedSunHostnameVerifierClass;
     
     /**
      * This constructor initialized the factory with the configured TLS
@@ -144,6 +147,8 @@ public final class HttpsURLConnectionFactory
                     throw new IIOException("Error while initializing secure socket", ex);
                 }
             }
+        } else {
+            assert false;
         }
 
         return connection;
@@ -182,27 +187,9 @@ public final class HttpsURLConnectionFactory
                       ? SSLContext.getInstance(protocol)
                       : SSLContext.getInstance(protocol, provider);
             
-                      
-
-            TrustManager[] trustAllCerts = tlsClientParameters.getTrustManagers();
-            /*
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                new javax.net.ssl.X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-                    public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                    public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-            };
-            */         
             ctx.init(
-                tlsClientParameters.getKeyManagers(),
-                trustAllCerts, 
+                tlsClientParameters.getKeyManagers(), 
+                tlsClientParameters.getTrustManagers(), 
                 tlsClientParameters.getSecureRandom());
             
             // The "false" argument means opposite of exclude.
@@ -228,11 +215,11 @@ public final class HttpsURLConnectionFactory
             }
             conn.setSSLSocketFactory(socketFactory);
         } else {
-            // handle the deprecated sun case and other possible hidden API's 
-            // that are similar to the Sun cases
+            // handle the deprecated sun case
             try {
-                Method method = connection.getClass().getMethod("getHostnameVerifier");
-                
+                Class<?> connectionClass = getDeprecatedSunHttpsURLConnectionClass();
+                Class<?> verifierClass = getDeprecatedSunHostnameVerifierClass();
+                Method setHostnameVerifier = connectionClass.getMethod("setHostnameVerifier", verifierClass);
                 InvocationHandler handler = new InvocationHandler() {
                     public Object invoke(Object proxy, 
                                          Method method, 
@@ -241,25 +228,31 @@ public final class HttpsURLConnectionFactory
                     }
                 };
                 Object proxy = java.lang.reflect.Proxy.newProxyInstance(this.getClass().getClassLoader(),
-                                                                        new Class[] {method.getReturnType()},
-                                                                        handler);
-
-                method = connection.getClass().getMethod("setHostnameVerifier", method.getReturnType());
-                method.invoke(connection, proxy);
+                                                                          new Class[] {verifierClass},
+                                                                          handler);
+                setHostnameVerifier.invoke(connectionClass.cast(connection), verifierClass.cast(proxy));
+                Method setSSLSocketFactory = connectionClass.getMethod("setSSLSocketFactory", 
+                                                                       SSLSocketFactory.class);
+                setSSLSocketFactory.invoke(connectionClass.cast(connection), socketFactory);
             } catch (Exception ex) {
-                //Ignore this one, we're just setting it to a completely stupid verifier anyway
-                //that is pretty pointless.
-            }
-            try {
-                Method setSSLSocketFactory = connection.getClass().getMethod("setSSLSocketFactory", 
-                                                                             SSLSocketFactory.class);
-                setSSLSocketFactory.invoke(connection, socketFactory);
-            } catch (Exception ex) {
-                //if we cannot set the SSLSocketFactor, we're in serious trouble.
                 throw new IllegalArgumentException("Error decorating connection class " 
                         + connection.getClass().getName(), ex);
             }
         }
+    }
+
+    private Class getDeprecatedSunHttpsURLConnectionClass() throws ClassNotFoundException {
+        if (deprecatedSunHttpsURLConnectionClass == null) {
+            deprecatedSunHttpsURLConnectionClass = Class.forName("com.sun.net.ssl.HttpsURLConnection");
+        }
+        return deprecatedSunHttpsURLConnectionClass;
+    }
+
+    private Class getDeprecatedSunHostnameVerifierClass() throws ClassNotFoundException {
+        if (deprecatedSunHostnameVerifierClass == null) {
+            deprecatedSunHostnameVerifierClass = Class.forName("com.sun.net.ssl.HostnameVerifier");
+        }
+        return deprecatedSunHostnameVerifierClass;
     }
 
     /*

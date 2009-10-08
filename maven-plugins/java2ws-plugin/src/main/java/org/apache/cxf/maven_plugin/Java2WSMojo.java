@@ -30,7 +30,6 @@ import org.apache.cxf.tools.java2ws.JavaToWS;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.MavenProjectHelper;
 
 /**
  * @goal java2ws
@@ -92,14 +91,6 @@ public class Java2WSMojo extends AbstractMojo {
     private MavenProject project;
 
     /**
-     * Maven ProjectHelper.
-     * 
-     * @component
-     * @readonly
-     */
-    private MavenProjectHelper projectHelper;    
-
-    /**
      * @parameter
      */
     private String argline;
@@ -130,16 +121,6 @@ public class Java2WSMojo extends AbstractMojo {
      */
     private Boolean genWrapperbean;
     
-    /**
-     * Attach the generated wsdl file to the list of files to be deployed
-     * on install. This means the wsdl file will be copied to the repository
-     * with groupId, artifactId and version of the project and type "wsdl".
-     * 
-     * With this option you can use the maven repository as a Service Repository.
-     * 
-     * @parameter default-value="true"
-     */
-    private Boolean attachWsdl;
     
     public void execute() throws MojoExecutionException {
         StringBuffer buf = new StringBuffer();
@@ -266,13 +247,6 @@ public class Java2WSMojo extends AbstractMojo {
         } catch (Throwable e) {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
-        }
-
-        // Attach the generated wsdl file to the artifacts that get deployed
-        // with the enclosing project
-        if (attachWsdl && outputFile != null) {
-            File wsdlFile = new File(outputFile);
-            projectHelper.attachArtifact(project, "wsdl", wsdlFile);
         }
     }
        

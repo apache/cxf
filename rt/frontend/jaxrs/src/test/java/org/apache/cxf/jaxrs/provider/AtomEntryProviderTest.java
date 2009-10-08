@@ -23,8 +23,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.abdera.model.Entry;
@@ -71,26 +71,26 @@ public class AtomEntryProviderTest extends Assert {
     
     @Test
     public void testWriteable() {
-        assertTrue(afd.isWriteable(Entry.class, null, null, null));
-        assertTrue(afd.isWriteable(FOMEntry.class, null, null, null));
-        assertFalse(afd.isWriteable(Feed.class, null, null, null));
+        assertTrue(afd.isWriteable(Entry.class, null, null));
+        assertTrue(afd.isWriteable(FOMEntry.class, null, null));
+        assertFalse(afd.isWriteable(Feed.class, null, null));
     }
     
     @Test
     public void testReadable() {
-        assertTrue(afd.isReadable(Entry.class, null, null, null));
-        assertTrue(afd.isReadable(FOMEntry.class, null, null, null));
-        assertFalse(afd.isReadable(Feed.class, null, null, null));
+        assertTrue(afd.isReadable(Entry.class, null, null));
+        assertTrue(afd.isReadable(FOMEntry.class, null, null));
+        assertFalse(afd.isReadable(Feed.class, null, null));
     }
     
     @Test
     public void testAnnotations() {
-        String[] values = afd.getClass().getAnnotation(Produces.class).value();
+        String[] values = afd.getClass().getAnnotation(ProduceMime.class).value();
         assertEquals("3 types can be produced", 3, values.length);
         assertTrue("application/atom+xml".equals(values[0])
                    && "application/atom+xml;type=entry".equals(values[1])
                    && "application/json".equals(values[2]));
-        values = afd.getClass().getAnnotation(Consumes.class).value();
+        values = afd.getClass().getAnnotation(ConsumeMime.class).value();
         assertEquals("2 types can be consumed", 2, values.length);
         assertTrue("application/atom+xml".equals(values[0])
                    && "application/atom+xml;type=entry".equals(values[1]));

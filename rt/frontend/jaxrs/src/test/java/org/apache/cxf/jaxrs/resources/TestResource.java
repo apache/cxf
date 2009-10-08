@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 
 @Path("/{a}/{b}/{c}/d")
 public class TestResource {
@@ -37,13 +37,13 @@ public class TestResource {
     
     @Path("/resource")
     @GET
-    @Produces("application/json")
+    @ProduceMime("application/json")
     public String resourceMethod() {
         return "";
     }
     
     @GET
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     @Path("/resource1")
     public TestResource xmlResource() {
         return this;
@@ -51,21 +51,21 @@ public class TestResource {
     
     @Path("/resource1")
     @GET
-    @Produces("application/json")
+    @ProduceMime("application/json")
     public String jsonResource() {
         return "";
     }
     
     @GET
     @Path("/")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public String listMethod() {
         return "This is a list method";
     }
     
     @GET
     @Path("/{e}")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public String readMethod() {
         return "This is a list method";
     }
@@ -77,29 +77,29 @@ public class TestResource {
     }
     
     @GET
-    @Path(value = "/{e}")
-    @Produces("application/json")
+    @Path(value = "/{e}", limited = false)
+    @ProduceMime("application/json")
     public String unlimitedPath() {
         return "This is a list method";
     }
     
     @GET
     @Path("/{e}/bar/baz/baz")
-    @Produces("application/json")
+    @ProduceMime("application/json")
     public String readMethod2() {
         return "This is a list method";
     }
     
     @GET
     @Path("{id:custom}")
-    @Produces("application/bar")
+    @ProduceMime("application/bar")
     public String readBar() {
         return "This is a bar method";
     }
     
     @GET
     @Path("{id:custom}")
-    @Produces("application/foo")
+    @ProduceMime("application/foo")
     public String readFoo() {
         return "This is a foo method";
     }

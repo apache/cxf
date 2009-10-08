@@ -27,7 +27,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 /**
  * Represents an invocation context
@@ -36,16 +36,13 @@ import javax.ws.rs.ext.Providers;
 public interface MessageContext {
     
     Object get(Object key);
-    Object getContextualProperty(Object key);
-    <T> T getContent(Class<T> format);
-    
     void put(Object key, Object value);
     
     UriInfo getUriInfo();
     Request getRequest();
     HttpHeaders getHttpHeaders();
     SecurityContext getSecurityContext();
-    Providers getProviders();
+    MessageBodyWorkers getProviders();
     
     HttpServletRequest getHttpServletRequest(); 
     HttpServletResponse getHttpServletResponse();

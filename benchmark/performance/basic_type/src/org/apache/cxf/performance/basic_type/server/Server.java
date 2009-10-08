@@ -42,7 +42,7 @@ public class Server implements Runnable {
     
     public void run() {
         System.out.println("running server");
-        System.out.println("READY");
+        System.out.println(" READY ");
         
     }
     

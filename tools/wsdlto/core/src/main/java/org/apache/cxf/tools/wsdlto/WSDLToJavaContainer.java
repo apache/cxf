@@ -27,6 +27,7 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -40,14 +41,16 @@ import java.util.logging.Logger;
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.AbstractCXFToolContainer;
 import org.apache.cxf.tools.common.ClassNameProcessor;
@@ -198,9 +201,26 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         
         Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
 
-        ServiceInfo service0 = serviceList.get(0);
-        SchemaCollection schemaCollection = service0.getXmlSchemaCollection();
-        context.put(ToolConstants.XML_SCHEMA_COLLECTION, schemaCollection);
+        @SuppressWarnings("unchecked")
+        Map<String, Element> schemas = (Map<String, Element>)serviceList.get(0)
+            .getProperty(WSDLServiceBuilder.WSDL_SCHEMA_ELEMENT_LIST);
+        if (schemas == null) {
+            schemas = new java.util.HashMap<String, Element>();
+            ServiceInfo serviceInfo = serviceList.get(0);
+            for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() == null) {
+                    String sysId = schemaInfo.getElement().getAttribute("targetNamespce");
+                    if (sysId == null) {
+                        sysId = serviceInfo.getTargetNamespace();
+                    }
+                    schemas.put(sysId, schemaInfo.getElement());
+                }
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() != null) {
+                    schemas.put(schemaInfo.getSystemId(), schemaInfo.getElement());
+                }
+            }
+        }
+        context.put(ToolConstants.SCHEMA_MAP, schemas);
         
         context.put(ToolConstants.PORTTYPE_MAP, interfaces);
         context.put(ClassCollector.class, new ClassCollector());

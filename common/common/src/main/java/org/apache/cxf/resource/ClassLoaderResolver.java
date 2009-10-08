@@ -20,12 +20,8 @@
 package org.apache.cxf.resource;
 
 import java.io.InputStream;
-
 import java.net.URL;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-
-@NoJSR250Annotations
 public class ClassLoaderResolver implements ResourceResolver {
 
     private final ClassLoader loader; 

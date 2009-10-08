@@ -21,12 +21,14 @@ package org.apache.cxf.ws.policy.attachment;
 
 import java.util.ResourceBundle;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.ws.policy.PolicyEngineImpl;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.PolicyProvider;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
@@ -51,36 +53,37 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
     }
     
     protected AbstractPolicyProvider(Bus b) {
-        setBus(b);
-    }
-    
-    public final void setBus(Bus b) {
         bus = b;
-        if (null != bus) {
-            setBuilder(bus.getExtension(PolicyBuilder.class));
-            PolicyEngine pe = (PolicyEngine)bus.getExtension(PolicyEngine.class);
-            if (pe != null) {
-                setRegistry(pe.getRegistry());
-                ((PolicyEngineImpl)pe).getPolicyProviders().add(this);
-            }
-        }
     }
     
-    public final void setBuilder(PolicyBuilder b) {
+    public void setBus(Bus b) {
+        bus = b;
+    }
+    
+    public void setBuilder(PolicyBuilder b) {
         builder = b;
     }
     
-    public final void setRegistry(PolicyRegistry r) {
+    public void setRegistry(PolicyRegistry r) {
         registry = r;
     }  
     
+    @PostConstruct
+    public void init() {
+        if (null != bus) {
+            setBuilder(bus.getExtension(PolicyBuilder.class));
+            PolicyEngine pe = (PolicyEngine)bus.getExtension(PolicyEngine.class);
+            setRegistry(pe.getRegistry());
+        }
+    }
     
     protected Policy resolveExternal(PolicyReference ref,  String baseURI) {
+        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder,
+            bus.getExtension(PolicyConstants.class));
         Policy resolved = registry.lookup(ref.getURI());
         if (null != resolved) {
             return resolved;
         }
-        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
         return resolver.resolveReference(ref.getURI());
     }
     

@@ -46,7 +46,6 @@ import org.junit.Before;
  * A basic test case meant for helping users unit test their services.
  * @see TestUtilities
  */
-@org.junit.Ignore
 public class AbstractCXFTest extends Assert {
     
     protected TestUtilities testUtilities;
@@ -117,8 +116,8 @@ public class AbstractCXFTest extends Assert {
      * @param xpath
      * @throws Exception 
      */
-    public void assertValidBoolean(String xpath, Node node) throws Exception {
-        testUtilities.assertValidBoolean(xpath, node);
+    public boolean assertValidBoolean(String xpath, Node node) throws Exception {
+        return testUtilities.assertValidBoolean(xpath, node);
     }
     /**
      * Assert that the following XPath query selects no nodes.

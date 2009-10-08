@@ -63,8 +63,8 @@ public class ColocOutInterceptorTest extends Assert {
 
     public ColocOutInterceptorTest() {
         control.makeThreadSafe(true);
-    }
-    
+    }     
+
     @Before
     public void setUp() throws Exception {
         colocOut = new ColocOutInterceptor();

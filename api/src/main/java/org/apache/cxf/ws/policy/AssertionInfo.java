@@ -49,7 +49,4 @@ public class AssertionInfo {
     public PolicyAssertion getAssertion() {
         return assertion;
     }
-    public String toString() {
-        return assertion.getName() + ":" + asserted;
-    }
 }

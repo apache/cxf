@@ -19,13 +19,8 @@
 
 package org.apache.cxf.transport.http.policy;
 
-import java.util.Collections;
-import java.util.List;
-
 import javax.xml.bind.JAXBException;
-import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.builder.jaxb.JaxbAssertion;
@@ -36,11 +31,8 @@ import org.apache.neethi.PolicyComponent;
 /**
  * 
  */
-@NoJSR250Annotations
 public class HTTPClientAssertionBuilder extends JaxbAssertionBuilder<HTTPClientPolicy> {
-    public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME);
-
+ 
     public HTTPClientAssertionBuilder() throws JAXBException {
         super(HTTPClientPolicy.class, PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME);     
     }

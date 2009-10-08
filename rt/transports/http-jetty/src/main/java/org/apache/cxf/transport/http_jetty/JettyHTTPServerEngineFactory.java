@@ -27,6 +27,7 @@ import java.util.TreeMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
@@ -84,12 +85,15 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     public JettyHTTPServerEngineFactory() {
         // Empty
     }    
-    public JettyHTTPServerEngineFactory(Bus b,
+    public JettyHTTPServerEngineFactory(Bus bus,
                                         Map<String, TLSServerParameters> tls,
                                         Map<String, ThreadingParameters> threading) {
         tlsParametersMap.putAll(tls);
         threadingParametersMap.putAll(threading);
-        setBus(b);
+        this.bus = bus;
+        if (bus != null) {
+            bus.setExtension(this, JettyHTTPServerEngineFactory.class);
+        }
     }    
     
     
@@ -98,20 +102,25 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      * @param bus
      */
     @Resource(name = "cxf")
-    public final void setBus(Bus bus) {
+    public void setBus(Bus bus) {
         assert this.bus == null || this.bus == bus;
         this.bus = bus;
-        if (bus != null) {
-            bus.setExtension(this, JettyHTTPServerEngineFactory.class);
-            lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
-            if (null != lifeCycleManager) {
-                lifeCycleManager.registerLifeCycleListener(this);
-            }        
-        }
     }
     
     public Bus getBus() {
         return bus;
+    }
+    
+    
+    @PostConstruct
+    public void registerWithBus() {
+        if (bus != null) {
+            bus.setExtension(this, JettyHTTPServerEngineFactory.class);
+        }
+        lifeCycleManager = bus.getExtension(BusLifeCycleManager.class);
+        if (null != lifeCycleManager) {
+            lifeCycleManager.registerLifeCycleListener(this);
+        }        
     }
     
     
@@ -248,8 +257,14 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         }
     }
 
+    @PostConstruct
+    public void finalizeConfig() {
+        registerWithBus();
+    }
+
     public void initComplete() {
         // do nothing here
+        
     }
 
     public void postShutdown() {

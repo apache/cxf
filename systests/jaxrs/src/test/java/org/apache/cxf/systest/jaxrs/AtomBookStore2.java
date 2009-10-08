@@ -23,7 +23,7 @@ package org.apache.cxf.systest.jaxrs;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
 
@@ -34,7 +34,7 @@ public class AtomBookStore2 extends AtomBookStore {
     
     @GET
     @Path("/")
-    @Produces({"application/atom+xml", "application/json" })
+    @ProduceMime({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
         
         return super.getBooksAsFeed(uParam);

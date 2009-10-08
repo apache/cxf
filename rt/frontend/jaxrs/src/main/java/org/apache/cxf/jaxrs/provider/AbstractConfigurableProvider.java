@@ -21,25 +21,11 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.util.List;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
-
 public abstract class AbstractConfigurableProvider {
 
     private List<String> consumeMediaTypes;
     private List<String> produceMediaTypes;
     private boolean enableBuffering;
-    private Bus bus;
-    
-    public void setBus(Bus b) {
-        if (bus != null) {
-            bus = b;
-        }
-    }
-    
-    public Bus getBus() {
-        return bus != null ? bus : BusFactory.getThreadDefaultBus();
-    }
     
     public void setConsumeMediaTypes(List<String> types) {
         consumeMediaTypes = types;

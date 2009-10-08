@@ -29,7 +29,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -57,7 +56,6 @@ public class SecureConversationTokenBuilder implements AssertionBuilder {
         
         
         SecureConversationToken conversationToken = new SecureConversationToken(consts);
-        conversationToken.setOptional(PolicyConstants.isOptional(element));
 
         String attribute = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (attribute == null) {
@@ -69,55 +67,47 @@ public class SecureConversationTokenBuilder implements AssertionBuilder {
 
         conversationToken.setInclusion(consts.getInclusionFromAttributeValue(inclusionValue));
 
-        
-        Element elem = DOMUtils.getFirstElement(element);
-        while (elem != null) {
-            QName qn = DOMUtils.getElementQName(elem);
-            if (PolicyConstants.isPolicyElem(qn)) {
-                if (DOMUtils.getFirstChildWithName(elem, 
-                                                   consts.getNamespace(),
-                                                   SPConstants.REQUIRE_DERIVED_KEYS) != null) {
-                    conversationToken.setDerivedKeys(true);
-                } else if (DOMUtils.getFirstChildWithName(elem, 
-                                                          SP12Constants
-                                                              .REQUIRE_IMPLIED_DERIVED_KEYS) 
-                                                          != null) {
-                    conversationToken.setImpliedDerivedKeys(true);
-                } else if (DOMUtils.getFirstChildWithName(elem, 
-                                                          SP12Constants
-                                                              .REQUIRE_EXPLICIT_DERIVED_KEYS)
-                                                              != null) {
-                    conversationToken.setExplicitDerivedKeys(true);
-                }
-
-
-                if (DOMUtils.getFirstChildWithName(elem,
-                                                   consts.getNamespace(),
-                                                   SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE) != null) {
-                    conversationToken.setRequireExternalUriRef(true);
-                }
-
-                if (DOMUtils.getFirstChildWithName(elem, 
-                                                   consts.getNamespace(),
-                                                   SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
-                    conversationToken.setSc10SecurityContextToken(true);
-                }
-
-                Element bootstrapPolicyElement = DOMUtils.getFirstChildWithName(elem, 
-                                                                                consts.getNamespace(),
-                                                                                SPConstants.BOOTSTRAP_POLICY);
-                if (bootstrapPolicyElement != null) {
-                    Policy policy = builder.getPolicy(DOMUtils.getFirstElement(bootstrapPolicyElement));
-                    conversationToken.setBootstrapPolicy(policy);
-                }
-
-            } else if (consts.getNamespace().equals(qn.getNamespaceURI())
-                && SPConstants.ISSUER.equals(qn.getLocalPart())) {
-                conversationToken.setIssuerEpr(DOMUtils.getFirstElement(elem));                
-            }
-            elem = DOMUtils.getNextElement(elem);
+        Element issuer = DOMUtils.getFirstChildWithName(element, consts.getNamespace(), SPConstants.ISSUER);
+        if (issuer != null) {
+            conversationToken.setIssuerEpr(DOMUtils.getFirstElement(issuer));
         }
-        
+
+        element = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
+        if (element != null) {
+            if (DOMUtils.getFirstChildWithName(element, 
+                                               consts.getNamespace(),
+                                               SPConstants.REQUIRE_DERIVED_KEYS) != null) {
+                conversationToken.setDerivedKeys(true);
+            } else if (DOMUtils.getFirstChildWithName(element, 
+                                                      SP12Constants.REQUIRE_IMPLIED_DERIVED_KEYS) != null) {
+                conversationToken.setImpliedDerivedKeys(true);
+            } else if (DOMUtils.getFirstChildWithName(element, 
+                                                      SP12Constants.REQUIRE_EXPLICIT_DERIVED_KEYS) != null) {
+                conversationToken.setExplicitDerivedKeys(true);
+            }
+
+
+            if (DOMUtils.getFirstChildWithName(element,
+                                               consts.getNamespace(),
+                                               SPConstants.REQUIRE_EXTERNAL_URI_REFERENCE) != null) {
+                conversationToken.setRequireExternalUriRef(true);
+            }
+
+            if (DOMUtils.getFirstChildWithName(element, 
+                                               consts.getNamespace(),
+                                               SPConstants.SC10_SECURITY_CONTEXT_TOKEN) != null) {
+                conversationToken.setSc10SecurityContextToken(true);
+            }
+
+            Element bootstrapPolicyElement = DOMUtils.getFirstChildWithName(element, 
+                                                                            consts.getNamespace(),
+                                                                            SPConstants.BOOTSTRAP_POLICY);
+            if (bootstrapPolicyElement != null) {
+                Policy policy = builder.getPolicy(DOMUtils.getFirstElement(bootstrapPolicyElement));
+                conversationToken.setBootstrapPolicy(policy);
+            }
+        }
+
         return conversationToken;
     }
 

@@ -24,18 +24,18 @@ import java.util.Date;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.util.date.XsDateFormat;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * AegisType for the Date class which serializes as an xsd:date (no time
+ * Type for the Date class which serializes as an xsd:date (no time
  * information).
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class DateType extends AegisType {
+public class DateType extends Type {
     private static XsDateFormat format = new XsDateFormat();
 
     @Override

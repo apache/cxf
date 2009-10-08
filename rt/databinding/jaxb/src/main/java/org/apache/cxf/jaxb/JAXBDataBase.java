@@ -45,6 +45,7 @@ public abstract class JAXBDataBase {
     protected JAXBContext context; 
     protected Schema schema;
     protected Collection<Attachment> attachments;
+    protected boolean unwrapJAXBElement = true;
     protected Integer mtomThreshold; // null if we should default.
     
     protected JAXBDataBase(JAXBContext ctx) {
@@ -83,6 +84,9 @@ public abstract class JAXBDataBase {
     }
     
     public void setProperty(String prop, Object value) {
+        if (prop.equals(JAXBDataBinding.UNWRAP_JAXB_ELEMENT)) {
+            unwrapJAXBElement = Boolean.TRUE.equals(value);
+        }
     }
     
     protected Annotation[] getJAXBAnnotation(MessagePartInfo mpi) {

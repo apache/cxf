@@ -39,6 +39,6 @@ public class XMLPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
     
     
     public PolicyAssertion build(Element element) {
-        return new XmlPrimitiveAssertion(element);
+        return new XmlPrimitiveAssertion(element, getPolicyConstants());
     }
 }

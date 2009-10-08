@@ -22,10 +22,12 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
-public class InitiatorToken extends TokenWrapper {
+public class InitiatorToken extends AbstractSecurityAssertion implements TokenWrapper {
+
+    private Token initiatorToken;
 
     public InitiatorToken(SPConstants version) {
         super(version);
@@ -35,32 +37,36 @@ public class InitiatorToken extends TokenWrapper {
      * @return Returns the initiatorToken.
      */
     public Token getInitiatorToken() {
-        return getToken();
+        return initiatorToken;
     }
-
 
     /**
      * @param initiatorToken The initiatorToken to set.
      */
     public void setInitiatorToken(Token initiatorToken) {
-        setToken(initiatorToken);
+        this.initiatorToken = initiatorToken;
     }
 
-    public QName getRealName() {
+    public void setToken(Token tok) {
+        this.setInitiatorToken(tok);
+    }
+
+    public QName getName() {
         return constants.getInitiatorToken();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getInitiatorToken();
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

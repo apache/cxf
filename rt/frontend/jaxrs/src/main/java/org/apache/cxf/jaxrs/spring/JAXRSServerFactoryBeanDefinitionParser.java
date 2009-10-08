@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.spring;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -31,9 +30,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
-import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
@@ -46,6 +42,7 @@ import org.springframework.context.ApplicationContextAware;
 
 public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionParser {
     
+
     public JAXRSServerFactoryBeanDefinitionParser() {
         super();
         setBeanClass(SpringJAXRSServerFactoryBean.class);
@@ -53,19 +50,7 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     
     @Override
     protected void mapAttribute(BeanDefinitionBuilder bean, Element e, String name, String val) {
-        if ("beanNames".equals(name)) {
-            String[] values = val.split(" ");
-            List<SpringResourceFactory> tempFactories = new ArrayList<SpringResourceFactory>(values.length);
-            for (String v : values) {
-                String theValue = v.trim();
-                if (theValue.length() > 0) {
-                    tempFactories.add(new SpringResourceFactory(theValue));
-                }
-            }
-            bean.addPropertyValue("tempResourceProviders", tempFactories);
-        } else {
-            mapToProperty(bean, name, val);
-        }
+        mapToProperty(bean, name, val);        
     }
 
     @Override
@@ -86,16 +71,9 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else if ("features".equals(name) || "schemaLocations".equals(name) 
-            || "providers".equals(name) || "serviceBeans".equals(name)
-            || "modelBeans".equals(name)) {
+            || "providers".equals(name) || "serviceBeans".equals(name)) {
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
-        }  else if ("serviceFactories".equals(name)) {
-            List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
-            bean.addPropertyValue("resourceProviders", list);
-        } else if ("model".equals(name)) {
-            List<UserResource> resources = ResourceUtils.getResourcesFromElement(el);
-            bean.addPropertyValue("modelBeans", resources);
         } else {
             setFirstChildAsProperty(el, ctx, bean, name);            
         }        
@@ -132,8 +110,6 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
     
     public static class SpringJAXRSServerFactoryBean extends JAXRSServerFactoryBean implements
         ApplicationContextAware {
-        
-        private List<SpringResourceFactory> tempFactories;
 
         public SpringJAXRSServerFactoryBean() {
             super();
@@ -142,23 +118,8 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
         public SpringJAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
             super(sf);
         }
-        
-        public void setTempResourceProviders(List<SpringResourceFactory> providers) {
-            tempFactories = providers;
-        }
 
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (tempFactories != null) {
-                List<ResourceProvider> factories = new ArrayList<ResourceProvider>(
-                    tempFactories.size());
-                for (int i = 0; i < tempFactories.size(); i++) {
-                    SpringResourceFactory factory = tempFactories.get(i);
-                    factory.setApplicationContext(ctx);
-                    factories.add(factory);
-                }
-                tempFactories.clear();
-                super.setResourceProviders(factories);
-            }
             if (getBus() == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
@@ -166,4 +127,5 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
             }
         }
     }
+
 }

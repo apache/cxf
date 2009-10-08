@@ -20,58 +20,31 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public class RequestPreprocessor {
     
-    private static final String ACCEPT_QUERY = "_type";
-    private static final String METHOD_QUERY = "_method";
-    private static final String METHOD_HEADER = "X-HTTP-Method-Override";
-    
-    
-    private static final Map<String, String> SHORTCUTS;
-    static {
-        SHORTCUTS = new HashMap<String, String>();
-        SHORTCUTS.put("json", "application/json");
-        SHORTCUTS.put("text", "text/*");
-        SHORTCUTS.put("xml", "application/xml");
-        // more to come
-    }
-    
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
     
-    public RequestPreprocessor() {
-        this(null, null);
-    }
-    
+    @SuppressWarnings("unchecked")
     public RequestPreprocessor(Map<Object, Object> languageMappings,
                            Map<Object, Object> extensionMappings) {
-        this.languageMappings =
-            languageMappings == null ? Collections.emptyMap() : languageMappings;
+        this.languageMappings = 
+            languageMappings == null ? Collections.EMPTY_MAP : languageMappings;
         this.extensionMappings = 
-            extensionMappings == null ? Collections.emptyMap() : extensionMappings;
+            extensionMappings == null ? Collections.EMPTY_MAP : extensionMappings;
     }
 
     public String preprocess(Message m, UriInfo u) {
         handleExtensionMappings(m, u);
         handleLanguageMappings(m, u);
-        
-        MultivaluedMap<String, String> queries = u.getQueryParameters();
-        handleTypeQuery(m, queries);
-        handleMethod(m, queries, new HttpHeadersImpl(m));
-        checkMetadataRequest(m);
         return new UriInfoImpl(m, null).getPath();
     }
     
@@ -98,74 +71,27 @@ public class RequestPreprocessor {
         
     }
     
+    private void updateAcceptTypeHeader(Message m, String anotherValue) {
+        m.put(Message.ACCEPT_CONTENT_TYPE, anotherValue);
+    }
+    
     @SuppressWarnings("unchecked")
     private void updateAcceptLanguageHeader(Message m, String anotherValue) {
         List<String> acceptLanguage =
-            ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS)).get(HttpHeaders.ACCEPT_LANGUAGE);
+            ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS)).get("Accept-Language");
         if (acceptLanguage == null) {
             acceptLanguage = new ArrayList<String>(); 
         }
         
         acceptLanguage.add(anotherValue);
         ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS))
-            .put(HttpHeaders.ACCEPT_LANGUAGE, acceptLanguage);
+            .put("Accept-Language", acceptLanguage);
     }
     
     private void updatePath(Message m, String path, String suffix) {
         String newPath = path.substring(0, path.length() - (suffix.length() + 1));
         HttpUtils.updatePath(m, newPath);
+        //m.put(Message.REQUEST_URI, newPath);
     }
     
-    private void handleMethod(Message m, 
-                              MultivaluedMap<String, String> queries,
-                              HttpHeaders headers) {
-        String method = queries.getFirst(METHOD_QUERY);
-        if (method == null) {
-            List<String> values = headers.getRequestHeader(METHOD_HEADER);
-            if (values.size() == 1) {
-                method = values.get(0);
-            }
-        }
-        if (method != null) {
-            m.put(Message.HTTP_REQUEST_METHOD, method);
-        }
-    }
-    
-    private void handleTypeQuery(Message m, MultivaluedMap<String, String> queries) {
-        String type = queries.getFirst(ACCEPT_QUERY);
-        if (type != null) {
-            if (SHORTCUTS.containsKey(type)) {
-                type = SHORTCUTS.get(type);
-            }
-            updateAcceptTypeHeader(m, type);
-        }
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void updateAcceptTypeHeader(Message m, String acceptValue) {
-        m.put(Message.ACCEPT_CONTENT_TYPE, acceptValue);
-        ((Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS))
-        .put(HttpHeaders.ACCEPT, Collections.singletonList(acceptValue));
-    }
-    
-    /*
-     * TODO : looks like QueryHandler is well suited for the purpose of serving
-     * wadl/wsdl2 root requests with URIs which can not be used for selecting
-     * ClassResourceInfo which is where RequestFilters invoked after the resource class
-     * has been selected are handy. Consider implementing this method as part of the QueryHandler,
-     * we will need to save the list of ClassResourceInfos on the EndpointInfo though
-     */
-    public void checkMetadataRequest(Message m) {
-        String query = (String)m.get(Message.QUERY_STRING);
-        if (query != null && query.contains(WadlGenerator.WADL_QUERY)) {
-            String requestURI = (String)m.get(Message.REQUEST_URI);
-            String baseAddress = HttpUtils.getBaseAddress(m);
-            if (baseAddress.equals(requestURI)) {
-                Response r = new WadlGenerator().handleRequest(m, null);
-                if (r != null) {
-                    m.getExchange().put(Response.class, r);
-                }
-            }
-        }
-    }
 }

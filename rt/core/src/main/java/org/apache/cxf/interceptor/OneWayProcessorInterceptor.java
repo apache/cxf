@@ -28,6 +28,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
@@ -51,7 +52,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
     public void handleMessage(Message message) throws Fault {
         
         if (message.getExchange().isOneWay() 
-            && !isRequestor(message)
+            && !MessageUtils.isRequestor(message)
             && message.get(OneWayProcessorInterceptor.class) == null
             && message.getExchange().get(Executor.class) == null) { 
             //one way on server side, fork the rest of this chain onto the

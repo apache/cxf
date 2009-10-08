@@ -23,22 +23,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.CookieParam;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -47,46 +42,29 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 
-public class Customer extends AbstractCustomer implements CustomerInfo {
+public class Customer implements CustomerInfo {
     
     @XmlRootElement(name = "CustomerBean")
     public static class CustomerBean {
         private String a;
         private Long b;
-        private List<String> c;
-        private CustomerBean d;
-        //CHECKSTYLE:OFF
-        public List<CustomerBean> e;
-        //CHECKSTYLE:ON
         public void setA(String aString) {
             this.a = aString;
         }
         public void setB(Long bLong) {
             this.b = bLong;
         }
-        public void setC(List<String> cStringList) {
-            this.c = cStringList;
-        }
-        public void setD(CustomerBean dCustomerBean) {
-            this.d = dCustomerBean;
-        }
         public String getA() {
             return a;
         }
         public Long getB() {
             return b;
-        }
-        public List<String> getC() {
-            return c;
-        }
-        public CustomerBean getD() {
-            return d;
         }
         
     }
@@ -96,7 +74,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @Context private HttpHeaders headers;
     @Context private Request request;
     @Context private SecurityContext sContext;
-    @Context private Providers bodyWorkers;
+    @Context private MessageBodyWorkers bodyWorkers;
     
     @Resource private HttpServletRequest servletRequest;
     @Resource private HttpServletResponse servletResponse;
@@ -112,41 +90,6 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     @QueryParam("b")
     private String b;
     private String name;
-    
-    private boolean postConstuctCalled;
-    private boolean preDestroyCalled;
-    
-    public Customer() {
-        
-    }
-    
-    public Customer(@Context UriInfo info) {
-        uriInfo = info;
-    }
-    
-    public Customer(@Context UriInfo info,
-                    @QueryParam("a") String queryParam) {
-        uriInfo = info;
-        this.queryParam = queryParam;
-    }
-    
-    @PostConstruct
-    public void postConstruct() {
-        postConstuctCalled = true;
-    }
-    
-    public boolean isPostConstuctCalled() {
-        return postConstuctCalled;
-    }
-    
-    @PreDestroy
-    public void preDestroy() {
-        preDestroyCalled = true;
-    }
-    
-    public boolean isPreDestroyCalled() {
-        return preDestroyCalled;
-    }
     
     public String getName() {
         return name;
@@ -166,9 +109,6 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void testPathBean(@PathParam("") CustomerBean cb) {
         
     }
-    public void testFormBean(@FormParam("") CustomerBean cb) {
-        
-    }
     public void testMatrixBean(@MatrixParam("") CustomerBean cb) {
         
     }
@@ -184,7 +124,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     public void setUriInfo(UriInfo ui) {
         uriInfo = ui;
     }
-    
+
     public void setUriInfoContext(UriInfo ui) {
     }
     
@@ -214,7 +154,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         return request;
     }
     
-    public Providers getBodyWorkers() {
+    public MessageBodyWorkers getBodyWorkers() {
         return bodyWorkers;
     }
     
@@ -250,34 +190,34 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         return cr;
     }
 
-    @Produces("text/xml")
-    @Consumes("text/xml")
+    @ProduceMime("text/xml")
+    @ConsumeMime("text/xml")
     public void test() {
         // complete
     }
     
-    @Produces("text/xml")   
+    @ProduceMime("text/xml")   
     public void getItAsXML() {
         // complete
     }
-    @Produces("text/plain")   
+    @ProduceMime("text/plain")   
     public void getItPlain() {
         // complete
     }
     
-    @Produces("text/xml")   
+    @ProduceMime("text/xml")   
     public void testQuery(@QueryParam("query") String queryString, 
                           @QueryParam("query") int queryInt) {
         // complete
     }
     
-    @Produces("text/xml")   
+    @ProduceMime("text/xml")   
     public void testPathSegment(@PathParam("ps") PathSegment ps, 
                                 @PathParam("ps") String path) {
         // complete
     }
     
-    @Produces("text/xml")   
+    @ProduceMime("text/xml")   
     public void testMultipleQuery(@QueryParam("query")  String queryString, 
                                   @QueryParam("query2") String queryString2,
                                   @QueryParam("query3") Long queryString3,
@@ -286,7 +226,7 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         // complete
     }
     
-    @Produces("text/xml")   
+    @ProduceMime("text/xml")   
     public void testMatrixParam(@MatrixParam("p1") String mp1, 
                                 @MatrixParam("p2") String mp2,
                                 @MatrixParam("p3") String mp3,
@@ -308,35 +248,23 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
                                     @QueryParam("p3") CustomerGender gender2) {
         // complete
     }
-    
-    public void testFromValueParam(@QueryParam("p1") Timezone tzone) {
-        // complete
-    }
-    
+
 //  CHECKSTYLE:OFF
     public void testWrongType(@QueryParam("p1") HashMap map) {
         // complete
     }
 //  CHECKSTYLE:ON    
+
     public void testWrongType2(@QueryParam("p1") CustomerGender g) {
         // complete
     }
     
-    public void testFormParam(@FormParam("p1") String fp1, 
-                              @FormParam("p2") List<String> fp2) {
-        // complete
-    }
-    
-    public void testCookieParam(@CookieParam("c1") String c1,
-                                @CookieParam("c2") @DefaultValue("c2Value") String c2) {
-        // complete
-    }
     
     public void testParams(@Context UriInfo info,
                            @Context HttpHeaders hs,
                            @Context Request r,
                            @Context SecurityContext s,
-                           @Context Providers workers,
+                           @Context MessageBodyWorkers workers,
                            @HeaderParam("Foo") String h,
                            @HeaderParam("Foo") List<String> l) {
         // complete

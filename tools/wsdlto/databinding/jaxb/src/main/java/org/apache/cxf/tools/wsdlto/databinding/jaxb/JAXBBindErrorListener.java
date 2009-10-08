@@ -31,33 +31,23 @@ public class JAXBBindErrorListener implements ErrorListener {
     }
 
     public void error(org.xml.sax.SAXParseException exception) {
-        if (exception.getLineNumber() > 0) {
-            throw new ToolException(prefix + exception.getLocalizedMessage() 
-                                    + " at line " + exception.getLineNumber()
-                                    + " column " + exception.getColumnNumber()
-                                    + " of schema " + exception.getSystemId(), exception);
-           
-        }
         throw new ToolException(prefix + exception.getLocalizedMessage(), exception);
 
     }
 
     public void fatalError(org.xml.sax.SAXParseException exception) {
-        throw new ToolException(prefix + exception.getLocalizedMessage()
-                                + " of schema " + exception.getSystemId(), exception);
+        throw new ToolException(prefix + exception.getLocalizedMessage(), exception);
     }
 
     public void info(org.xml.sax.SAXParseException exception) {
         if (this.isVerbose) {
-            System.out.println("JAXB Info: " + exception.toString() 
-                               + " in schema " + exception.getSystemId());
+            System.out.println("JAXB Info: " + exception.toString());
         }
     }
 
     public void warning(org.xml.sax.SAXParseException exception) {
         if (this.isVerbose) {
-            System.err.println("JAXB parsing schema warning " + exception.toString()
-                               + " in schema " + exception.getSystemId());
+            System.err.println("JAXB parsing schema warning " + exception.toString());
         }
     }
 }

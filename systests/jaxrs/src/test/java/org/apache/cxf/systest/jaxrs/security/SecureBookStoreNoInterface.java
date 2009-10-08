@@ -22,12 +22,10 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
@@ -44,19 +42,9 @@ public class SecureBookStoreNoInterface {
         books.put(book.getId(), book);
     }
     
-    @POST
-    @Path("/bookforms")
-    @Secured({"ROLE_USER", "ROLE_ADMIN" })
-    public Book getBookFromFormParams(@FormParam("name") String name, @FormParam("id") long id) {
-        if (name == null || id == 0) {
-            throw new RuntimeException("FormParams are not set");
-        }
-        return new Book(name, id);
-    }
-    
     @GET
     @Path("/thosebooks/{bookId}/{id}")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     @Secured({"ROLE_USER", "ROLE_ADMIN" })
     public Book getThatBook(@PathParam("bookId") Long id, @PathParam("id") String s) {
         if (s == null) {
@@ -67,7 +55,7 @@ public class SecureBookStoreNoInterface {
     
     @GET
     @Path("/thosebooks/{bookId}/")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     @Secured("ROLE_USER")
     public Book getThatBook(@PathParam("bookId") Long id) {
         return books.get(id);
@@ -75,14 +63,9 @@ public class SecureBookStoreNoInterface {
 
     @GET
     @Path("/thosebooks")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     @Secured("ROLE_ADMIN")
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
-    }
-    
-    @Path("/securebook")
-    public SecureBook getSecureBook() throws BookNotFoundFault {
-        return new SecureBook("CXF in Action", 123L);
     }
 }

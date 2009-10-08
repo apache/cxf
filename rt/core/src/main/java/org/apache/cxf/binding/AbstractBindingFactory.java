@@ -21,6 +21,7 @@ package org.apache.cxf.binding;
 
 import java.util.Collection;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingFault;
@@ -46,33 +47,17 @@ import static org.apache.cxf.helpers.CastUtils.cast;
 
 public abstract class AbstractBindingFactory implements BindingFactory, WSDLBindingFactory {
 
+    public static final String DATABINDING_DISABLED = "databinding.disabled";
+
     protected Collection<String> activationNamespaces;
 
     protected Bus bus;
 
-    public AbstractBindingFactory() {
-    }
-    
-    public AbstractBindingFactory(Collection<String> ns) {
-        activationNamespaces = ns;
-    }
-    public AbstractBindingFactory(Bus b) {
-        bus = b;
-        registerWithBindingManager();
-    }
-    
-    public AbstractBindingFactory(Bus b, Collection<String> ns) {
-        activationNamespaces = ns;
-        bus = b;
-        registerWithBindingManager();
-    }
-    
-    private void registerWithBindingManager() {
-        if (bus != null && activationNamespaces != null) {
-            BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);
-            for (String ns : activationNamespaces) {
-                manager.registerBindingFactory(ns, this);
-            }
+    @PostConstruct
+    void registerWithBindingManager() {
+        BindingFactoryManager manager = bus.getExtension(BindingFactoryManager.class);
+        for (String ns : activationNamespaces) {
+            manager.registerBindingFactory(ns, this);
         }
     }
 
@@ -187,19 +172,16 @@ public abstract class AbstractBindingFactory implements BindingFactory, WSDLBind
 
     @Resource
     public void setBus(Bus bus) {
-        if (this.bus != bus) {
-            this.bus = bus;
-            registerWithBindingManager();
-        }
+        this.bus = bus;
     }
 
     public Collection<String> getActivationNamespaces() {
         return activationNamespaces;
     }
 
+    @Resource(name = "activationNamespaces")
     public void setActivationNamespaces(Collection<String> activationNamespaces) {
         this.activationNamespaces = activationNamespaces;
-        registerWithBindingManager();
     }
 
 }

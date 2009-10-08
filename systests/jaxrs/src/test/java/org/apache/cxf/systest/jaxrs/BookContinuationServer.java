@@ -20,7 +20,6 @@
 package org.apache.cxf.systest.jaxrs;
 
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
-import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookContinuationServer extends AbstractBusTestServerBase {
@@ -28,8 +27,7 @@ public class BookContinuationServer extends AbstractBusTestServerBase {
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookContinuationStore.class);
-        sf.setResourceProvider(BookContinuationStore.class,
-                               new SingletonResourceProvider(new BookContinuationStore()));
+        //default lifecycle is per-request, change it to singleton
         sf.setAddress("http://localhost:9080/");
 
         sf.create();        

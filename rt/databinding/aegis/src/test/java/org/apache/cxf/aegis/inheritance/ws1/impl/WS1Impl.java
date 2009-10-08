@@ -121,8 +121,4 @@ public class WS1Impl implements WS1 {
             throw new WS1Exception("WS1 base exception", 10);
         }
     }
-
-    public Map echoRawMap(Map rawMap) {
-        return rawMap;
-    }
 }

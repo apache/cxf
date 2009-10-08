@@ -33,13 +33,15 @@ import java.util.logging.Level;
 
 import javax.wsdl.Definition;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -125,10 +127,28 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
             }
         }
         Map<String, InterfaceInfo> interfaces = new LinkedHashMap<String, InterfaceInfo>();
-        
-        ServiceInfo service0 = serviceList.get(0);
-        SchemaCollection schemaCollection = service0.getXmlSchemaCollection();
-        context.put(ToolConstants.XML_SCHEMA_COLLECTION, schemaCollection);
+
+        Map<String, Element> schemas = (Map<String, Element>)serviceList.get(0)
+            .getProperty(WSDLServiceBuilder.WSDL_SCHEMA_ELEMENT_LIST);
+        if (schemas == null) {
+            schemas = new java.util.HashMap<String, Element>();
+            ServiceInfo serviceInfo = serviceList.get(0);
+            for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() == null) {
+                    String sysId = schemaInfo.getElement().getAttribute("targetNamespce");
+                    if (sysId == null) {
+                        sysId = serviceInfo.getTargetNamespace();
+                    }
+                    if (sysId != null) {
+                        schemas.put(sysId, schemaInfo.getElement());
+                    }
+                }
+                if (schemaInfo.getElement() != null && schemaInfo.getSystemId() != null) {
+                    schemas.put(schemaInfo.getSystemId(), schemaInfo.getElement());
+                }
+            }
+        }
+        context.put(ToolConstants.SCHEMA_MAP, schemas);
         context.put(ToolConstants.PORTTYPE_MAP, interfaces);
         context.put(ClassCollector.class, new ClassCollector());
         WSDLToJavaScriptProcessor processor = new WSDLToJavaScriptProcessor();

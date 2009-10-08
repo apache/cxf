@@ -21,32 +21,29 @@ package org.apache.cxf.aegis.type.mtom;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Node;
-
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.basic.Base64Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.message.Attachment;
-import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.constants.Constants;
+import org.jaxen.JaxenException;
+import org.jaxen.jdom.JDOMXPath;
+import org.jdom.Attribute;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * Base class for MtoM types.
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public abstract class AbstractXOPType extends AegisType {
+public abstract class AbstractXOPType extends Type {
     public static final String XOP_NS = "http://www.w3.org/2004/08/xop/include";
     public static final String XML_MIME_NS = "http://www.w3.org/2005/05/xmlmime";
     public static final String XML_MIME_ATTR_LOCAL_NAME = "expectedContentTypes";
@@ -54,6 +51,18 @@ public abstract class AbstractXOPType extends AegisType {
     public static final QName XML_MIME_CONTENT_TYPE = new QName(XML_MIME_NS, "contentType");
     public static final QName XOP_HREF = new QName("href");
     public static final QName XML_MIME_BASE64 = new QName(XML_MIME_NS, "base64Binary", "xmime");
+    private static JDOMXPath importXmimeXpath;
+    
+    static {
+        try {
+            importXmimeXpath = new JDOMXPath("xsd:import[@namespace='"
+                                             + XML_MIME_NS
+                                             + "']");
+            importXmimeXpath.addNamespace(SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        } catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+    }
     
     private String expectedContentTypes;
     // the base64 type knows how to deal with just plain base64 here, which is essentially always 
@@ -75,11 +84,13 @@ public abstract class AbstractXOPType extends AegisType {
         if (useXmimeBinaryType) {
         //      we use the XMIME type instead of the XSD type to allow for our content type attribute.
             setSchemaType(XML_MIME_BASE64);
-        } else {
-            setSchemaType(XmlSchemaConstants.BASE64BINARY_QNAME);
         }
     }
     
+    public static JDOMXPath getXmimeXpathImport() {
+        return importXmimeXpath;
+    }
+
     /**
      * This is called from base64Type when it recognizes an XOP attachment.
      * @param reader
@@ -197,13 +208,13 @@ public abstract class AbstractXOPType extends AegisType {
     protected abstract byte[] getBytes(Object object);
 
     @Override
-    public void addToSchemaElement(XmlSchemaElement schemaElement) {
+    public void addToSchemaElement(Element schemaElement) {
         if (expectedContentTypes != null) {
-            Map<String, Node> extAttrMap = new HashMap<String, Node>();
-            Attr theAttr = DOMUtils.createDocument().createAttributeNS(XML_MIME_NS, "xmime");
-            theAttr.setNodeValue(expectedContentTypes);
-            extAttrMap.put("xmime", theAttr);
-            schemaElement.addMetaInfo(Constants.MetaDataConstants.EXTERNAL_ATTRIBUTES, extAttrMap);
+            Namespace ns = Namespace.getNamespace("xmime", XML_MIME_NS);
+            Attribute expectedContentTypeAttribute = new Attribute(XML_MIME_ATTR_LOCAL_NAME, 
+                                                                   expectedContentTypes,
+                                                                   ns);
+            schemaElement.setAttribute(expectedContentTypeAttribute);
         }
     }
     

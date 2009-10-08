@@ -27,12 +27,11 @@ import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
-
-import javax.annotation.Resource;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.UncheckedException;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
@@ -43,32 +42,21 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationWithEndpoint;
 import org.apache.cxf.transport.http.UrlUtilities;
-import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
 
-@NoJSR250Annotations(unlessNull = "bus")
 public class JavascriptQueryHandler implements StemMatchingQueryHandler {
     private static final String JS_UTILS_PATH = "/org/apache/cxf/javascript/cxf-utils.js";
+    private static final Logger LOG = LogUtils.getL7dLogger(JavascriptQueryHandler.class);
     private static final Charset UTF8 = Charset.forName("utf-8");
     private static final String NO_UTILS_QUERY_KEY = "nojsutils";
     private static final String CODE_QUERY_KEY = "js";
     private Bus bus;
 
     public JavascriptQueryHandler(Bus b) {
-        setBus(b);
+        bus = b;
+        LOG.finest("Bus " + bus);
     }
-    
-    @Resource
-    public final void setBus(Bus b) {
-        if (bus != b) {
-            bus = b;
-            QueryHandlerRegistry reg = b.getExtension(QueryHandlerRegistry.class);
-            if (reg != null) {
-                reg.registerHandler(this);
-            }
-        }
-    }
-    
+
     public String getResponseContentType(String fullQueryString, String ctx) {
         URI uri = URI.create(fullQueryString);
         Map<String, String> map = UrlUtilities.parseQueryString(uri.getQuery());

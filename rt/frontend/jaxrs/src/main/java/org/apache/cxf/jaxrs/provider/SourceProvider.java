@@ -25,8 +25,8 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -45,19 +45,19 @@ import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
-import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.utils.XMLSource;
 
 @Provider
-@Produces({"application/xml", "application/*+xml", "text/xml" })
-@Consumes({"application/xml", "application/*+xml", "text/xml" })
+@ProduceMime({"application/xml", "application/*+xml", "text/xml" })
+@ConsumeMime({"application/xml", "application/*+xml", "text/xml" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Source.class.isAssignableFrom(type);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return Source.class.isAssignableFrom(type) || XMLSource.class.isAssignableFrom(type);
     }
     
@@ -102,8 +102,7 @@ public class SourceProvider implements
         }
     }
     
-    public long getSize(Source source, Class<?> type, Type genericType, Annotation[] annotations, 
-                        MediaType mt) {
+    public long getSize(Source source) {
         return -1;
     }
 }

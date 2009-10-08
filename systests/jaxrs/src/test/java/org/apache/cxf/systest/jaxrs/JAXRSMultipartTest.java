@@ -19,19 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
-import java.io.File;
 import java.io.InputStream;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.ws.rs.core.MediaType;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.InputStreamRequestEntity;
@@ -39,13 +27,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.multipart.Attachment;
-import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
-import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
-import org.apache.cxf.jaxrs.provider.JSONProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -55,7 +37,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(MultipartServer.class));
+                   launchServer(MultipartServer.class, true));
     }
     
     @Test
@@ -124,11 +106,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
-    @Test
-    public void testAddBookFormParam() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparam";
-        doAddBook("multipart/form-data", address, "attachmentForm", 200);               
-    }
     
     @Test
     public void testAddBookFormBody() throws Exception {
@@ -142,12 +119,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
-    @Test
-    public void testAddBookFormParamBean() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparambean";
-        doAddBook("multipart/form-data", address, "attachmentForm", 200);               
-    }
-    
+   
     @Test
     public void testAddBookAsJAXB2() throws Exception {
         String address = "http://localhost:9085/bookstore/books/jaxb2";
@@ -196,169 +168,10 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         doAddBook(address, "attachmentData", 200);               
     }
     
-    @Test
-    public void testAddBookWebClient() {
-        InputStream is1 = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/add_book.txt");
-        String address = "http://localhost:9085/bookstore/books/jaxb";
-        WebClient client = WebClient.create(address);
-        client.type("multipart/related;type=text/xml").accept("text/xml");
-        Book book = client.post(is1, Book.class);
-        assertEquals("CXF in Action - 2", book.getName());
-    }
-    
-    @Test
-    public void testAddBookJaxbJsonImageWebClient() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbjsonimage";
-        WebClient client = WebClient.create(address);
-        client.type("multipart/mixed").accept("multipart/mixed");
-        
-        Book jaxb = new Book("jaxb", 1L);
-        Book json = new Book("json", 2L);
-        InputStream is1 = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        Map<String, Object> objects = new LinkedHashMap<String, Object>();
-        objects.put(MediaType.APPLICATION_XML, jaxb);
-        objects.put(MediaType.APPLICATION_JSON, json);
-        objects.put(MediaType.APPLICATION_OCTET_STREAM, is1);
-        Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
-        Book jaxb2 = readBookFromInputStream(result.get(0).getDataHandler().getInputStream());
-        assertEquals("jaxb", jaxb2.getName());
-        assertEquals(1L, jaxb2.getId());
-        Book json2 = readJSONBookFromInputStream(result.get(1).getDataHandler().getInputStream());
-        assertEquals("json", json2.getName());
-        assertEquals(2L, json2.getId());
-        InputStream is2 = (InputStream)result.get(2).getDataHandler().getInputStream();
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
-    }
-    
-    @Test
-    public void testAddBookJaxbJsonImageAttachments() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbimagejson";
-        WebClient client = WebClient.create(address);
-        client.type("multipart/mixed").accept("multipart/mixed");
-        
-        Book jaxb = new Book("jaxb", 1L);
-        Book json = new Book("json", 2L);
-        InputStream is1 = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        List<Attachment> objects = new ArrayList<Attachment>();
-        objects.add(new Attachment("theroot", MediaType.APPLICATION_XML, jaxb));
-        objects.add(new Attachment("thejson", MediaType.APPLICATION_JSON, json));
-        objects.add(new Attachment("theimage", MediaType.APPLICATION_OCTET_STREAM, is1));
-        Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
-        List<Attachment> result = new ArrayList<Attachment>(coll);
-        Book jaxb2 = readBookFromInputStream(result.get(0).getDataHandler().getInputStream());
-        assertEquals("jaxb", jaxb2.getName());
-        assertEquals(1L, jaxb2.getId());
-        Book json2 = readJSONBookFromInputStream(result.get(1).getDataHandler().getInputStream());
-        assertEquals("json", json2.getName());
-        assertEquals(2L, json2.getId());
-        InputStream is2 = (InputStream)result.get(2).getDataHandler().getInputStream();
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
-    }
-    
-    @Test
-    public void testAddGetJaxbBooksWebClient() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbonly";
-        WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
-        client.type("multipart/mixed;type=application/xml").accept("multipart/mixed");
-        
-        Book b = new Book("jaxb", 1L);
-        Book b2 = new Book("jaxb2", 2L);
-        List<Book> books = new ArrayList<Book>();
-        books.add(b);
-        books.add(b2);
-        Collection<? extends Book> coll = client.postAndGetCollection(books, Book.class);
-        List<Book> result = new ArrayList<Book>(coll);
-        Book jaxb = result.get(0);
-        assertEquals("jaxb", jaxb.getName());
-        assertEquals(1L, jaxb.getId());
-        Book jaxb2 = result.get(1);
-        assertEquals("jaxb2", jaxb2.getName());
-        assertEquals(2L, jaxb2.getId());
-    }
-    
-    @Test
-    public void testAddGetImageWebClient() throws Exception {
-        InputStream is1 = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        String address = "http://localhost:9085/bookstore/books/image";
-        WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
-        client.type("multipart/mixed").accept("multipart/mixed");
-        InputStream is2 = client.post(is1, InputStream.class);
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
-        
-    }
-    
-    @Test
-    public void testUploadImageFromForm() throws Exception {
-        InputStream is1 = 
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        String address = "http://localhost:9085/bookstore/books/formimage";
-        WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
-        client.type("multipart/form-data").accept("multipart/form-data");
-        
-        ContentDisposition cd = new ContentDisposition("attachment;filename=java.jpg");
-        Attachment att = new Attachment("image", is1, cd);
-        
-        MultipartBody body = new MultipartBody(att);
-        MultipartBody body2 = client.post(body, MultipartBody.class);
-        InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
-        ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
-        assertEquals("attachment;filename=java.jpg", cd2.toString());
-        assertEquals("java.jpg", cd2.getParameter("filename"));
-    }
-    
-    @Test
-    public void testUploadImageFromForm2() throws Exception {
-        File file = 
-            new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg").getFile());
-        String address = "http://localhost:9085/bookstore/books/formimage";
-        WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
-        client.type("multipart/form-data").accept("multipart/form-data");
-        
-        MultipartBody body2 = client.post(file, MultipartBody.class);
-        InputStream is2 = body2.getRootAttachment().getDataHandler().getInputStream();
-        byte[] image1 = IOUtils.readBytesFromStream(
-            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
-        byte[] image2 = IOUtils.readBytesFromStream(is2);
-        assertTrue(Arrays.equals(image1, image2));
-        ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
-        assertEquals("attachment;filename=java.jpg", cd2.toString());
-        assertEquals("java.jpg", cd2.getParameter("filename"));
-    }
-    
     private void doAddBook(String address, String resourceName, int status) throws Exception {
         doAddBook("multipart/related", address, resourceName, status);
     }
-
+    
     private void doAddBook(String type, String address, String resourceName, int status) throws Exception {
         PostMethod post = new PostMethod(address);
         
@@ -392,17 +205,4 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         return bos.getOut().toString();        
     }
 
-    private Book readBookFromInputStream(InputStream is) throws Exception {
-        JAXBContext c = JAXBContext.newInstance(new Class[]{Book.class});
-        Unmarshaller u = c.createUnmarshaller();
-        return (Book)u.unmarshal(is);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private Book readJSONBookFromInputStream(InputStream is) throws Exception {
-        JSONProvider provider = new JSONProvider();
-        return (Book)provider.readFrom((Class)Book.class, Book.class, new Annotation[]{}, 
-                                 MediaType.APPLICATION_JSON_TYPE, null, is);
-        
-    }
 }

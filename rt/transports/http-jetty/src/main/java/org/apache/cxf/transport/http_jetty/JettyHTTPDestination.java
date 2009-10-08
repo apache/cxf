@@ -87,7 +87,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
     ) throws IOException {
         
         //Add the defualt port if the address is missing it
-        super(b, endpointInfo, true);
+        super(b, ci, endpointInfo, true);
         this.transportFactory = ci;
         this.serverEngineFactory = ci.getJettyHTTPServerEngineFactory();
         nurl = new URL(endpointInfo.getAddress());
@@ -313,13 +313,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             }
         } catch (SuspendedInvocationException ex) {
             throw ex.getRuntimeException();
-        } catch (Fault ex) {
-            Throwable cause = ex.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException)cause;
-            } else {
-                throw ex;
-            }
         } catch (RuntimeException ex) {
             throw ex;
         } finally {

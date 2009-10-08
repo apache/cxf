@@ -24,8 +24,7 @@ import java.util.List;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.UriInfo;
@@ -57,7 +56,7 @@ public class Chapter {
     
     @GET
     @Path("/recurse")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public Chapter getItself() {
         return this;
     }
@@ -68,29 +67,18 @@ public class Chapter {
     }
     
     @GET
-    @Produces("application/xml;charset=ISO-8859-1")
+    @ProduceMime("application/xml;charset=ISO-8859-1")
     public Chapter get() {
-        return this;
-    }
-    
-    @GET
-    @Path("/ids")
-    @Produces("application/xml;charset=ISO-8859-1")
-    public Chapter getWithBookId(@PathParam("bookId") int bookId,
-                                 @PathParam("chapterid") int chapterId) {
-        if (bookId != 123 || chapterId != 1) {
-            throw new RuntimeException();
-        }
         return this;
     }
 
     
     @GET
     @Path("/matched-resources")
-    @Produces("text/plain")
+    @ProduceMime("text/plain")
     public String getMatchedResources(@Context UriInfo ui) {
         List<String> list = new ArrayList<String>();
-        for (Object obj : ui.getMatchedResources()) {
+        for (Object obj : ui.getAncestorResources()) {
             list.add(obj.toString());
         }
         return list.toString();
@@ -98,9 +86,9 @@ public class Chapter {
 
     @GET
     @Path("/matched%21uris")
-    @Produces("text/plain")
+    @ProduceMime("text/plain")
     public String getMatchedUris(@Context UriInfo ui, 
                                  @QueryParam("decode") String decode) {
-        return ui.getMatchedURIs(Boolean.parseBoolean(decode)).toString();        
+        return ui.getAncestorResourceURIs(Boolean.parseBoolean(decode)).toString();        
     }
 }

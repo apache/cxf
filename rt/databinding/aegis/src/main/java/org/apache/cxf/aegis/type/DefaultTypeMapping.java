@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.aegis.type;
 
-import java.lang.reflect.Type;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.URI;
@@ -68,22 +67,20 @@ import org.apache.cxf.aegis.type.xml.JDOMElementType;
 import org.apache.cxf.aegis.type.xml.SourceType;
 import org.apache.cxf.aegis.type.xml.XMLStreamReaderType;
 import org.apache.cxf.binding.soap.Soap11;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.util.XMLSchemaQNames;
+import org.jdom.Element;
 
 /**
- * The implementation of the Aegis type map. It maintains a map from
- * Java types {@link java.lang.reflect.Type} and AegisType objects,
- * also indexed by the XML Schema QName of each type.
+ * Contains type mappings for java/qname pairs.
  */
 public class DefaultTypeMapping implements TypeMapping {
     public  static final String DEFAULT_MAPPING_URI = "urn:org.apache.cxf.aegis.types";
     private static final Logger LOG = LogUtils.getL7dLogger(DefaultTypeMapping.class);
-    private Map<Type, AegisType> class2Type;
-    private Map<QName, AegisType> xml2Type;
-    private Map<Type, QName> class2xml;
+    private Map<Class, Type> class2Type;
+    private Map<QName, Type> xml2Type;
+    private Map<Class, QName> class2xml;
     private TypeMapping nextTM;
     private TypeCreator typeCreator;
     private String identifierURI;
@@ -100,12 +97,12 @@ public class DefaultTypeMapping implements TypeMapping {
 
     public DefaultTypeMapping(String identifierURI) {
         this.identifierURI = identifierURI;
-        class2Type = Collections.synchronizedMap(new HashMap<Type, AegisType>());
-        class2xml = Collections.synchronizedMap(new HashMap<Type, QName>());
-        xml2Type = Collections.synchronizedMap(new HashMap<QName, AegisType>());
+        class2Type = Collections.synchronizedMap(new HashMap<Class, Type>());
+        class2xml = Collections.synchronizedMap(new HashMap<Class, QName>());
+        xml2Type = Collections.synchronizedMap(new HashMap<QName, Type>());
     }
 
-    public boolean isRegistered(Type javaType) {
+    public boolean isRegistered(Class javaType) {
         boolean registered = class2Type.containsKey(javaType);
 
         if (!registered && nextTM != null) {
@@ -125,7 +122,7 @@ public class DefaultTypeMapping implements TypeMapping {
         return registered;
     }
 
-    public void register(Type javaType, QName xmlType, AegisType type) {
+    public void register(Class javaType, QName xmlType, Type type) {
         type.setSchemaType(xmlType);
         type.setTypeClass(javaType);
 
@@ -135,34 +132,41 @@ public class DefaultTypeMapping implements TypeMapping {
     /**
      * {@inheritDoc}
      */
-    public void register(AegisType type) {
+    public void register(Type type) {
         type.setTypeMapping(this);
-        if (type.getType() != null) {
-            class2xml.put(type.getType(), type.getSchemaType());
-            class2Type.put(type.getType(), type);
+        /*
+         * -- prb@codehaus.org; changing this to only register the type for
+         * actions that it supports, and it could be none.
+         */
+        if (type.getTypeClass() != null) {
+            class2xml.put(type.getTypeClass(), type.getSchemaType());
+            class2Type.put(type.getTypeClass(), type);
         }
         if (type.getSchemaType() != null) {
             xml2Type.put(type.getSchemaType(), type);
         }
-        if (type.getType() == null && type.getSchemaType() == null) {
+        if (type.getTypeClass() == null && type.getSchemaType() == null) {
             LOG.warning("The type " + type.getClass().getName()
                      + " supports neither serialization (non-null TypeClass)"
                      + " nor deserialization (non-null SchemaType).");
         }
     }
 
-    public void removeType(AegisType type) {
+    public void removeType(Type type) {
         if (!xml2Type.containsKey(type.getSchemaType())) {
             nextTM.removeType(type);
         } else {
             xml2Type.remove(type.getSchemaType());
-            class2Type.remove(type.getType());
-            class2xml.remove(type.getType());
+            class2Type.remove(type.getTypeClass());
+            class2xml.remove(type.getTypeClass());
         }
     }
 
-    public AegisType getType(Type javaType) {
-        AegisType type = class2Type.get(javaType);
+    /**
+     * @see org.apache.cxf.aegis.type.TypeMapping#getType(java.lang.Class)
+     */
+    public Type getType(Class javaType) {
+        Type type = class2Type.get(javaType);
 
         if (type == null && nextTM != null) {
             type = nextTM.getType(javaType);
@@ -171,8 +175,11 @@ public class DefaultTypeMapping implements TypeMapping {
         return type;
     }
 
-    public AegisType getType(QName xmlType) {
-        AegisType type = xml2Type.get(xmlType);
+    /**
+     * @see org.apache.cxf.aegis.type.TypeMapping#getType(javax.xml.namespace.QName)
+     */
+    public Type getType(QName xmlType) {
+        Type type = xml2Type.get(xmlType);
 
         if (type == null && nextTM != null) {
             type = nextTM.getType(xmlType);
@@ -181,7 +188,10 @@ public class DefaultTypeMapping implements TypeMapping {
         return type;
     }
 
-    public QName getTypeQName(Type clazz) {
+    /**
+     * @see org.apache.cxf.aegis.type.TypeMapping#getTypeQName(java.lang.Class)
+     */
+    public QName getTypeQName(Class clazz) {
         QName qname = class2xml.get(clazz);
 
         if (qname == null && nextTM != null) {
@@ -206,7 +216,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     private static void defaultRegister(TypeMapping tm, boolean defaultNillable, Class class1, QName name,
-                                        AegisType type) {
+                                        Type type) {
         if (!defaultNillable) {
             type.setNillable(false);
         }
@@ -215,7 +225,7 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     private static void fillStandardMappings(TypeMapping tm, boolean defaultNillable, 
-                                             boolean enableMtomXmime, boolean enableJDOM) {
+                                             boolean enableMtomXmime) {
         defaultRegister(tm, defaultNillable, BigDecimal.class, XMLSchemaQNames.XSD_DECIMAL,
                         new BigDecimalType());
         defaultRegister(tm, defaultNillable, BigInteger.class, XMLSchemaQNames.XSD_INTEGER,
@@ -225,6 +235,9 @@ public class DefaultTypeMapping implements TypeMapping {
         defaultRegister(tm, defaultNillable, Calendar.class, XMLSchemaQNames.XSD_DATETIME,
                         new CalendarType());
         defaultRegister(tm, defaultNillable, Date.class, XMLSchemaQNames.XSD_DATETIME, new DateTimeType());
+        defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
+        defaultRegister(tm, defaultNillable, Element.class, XMLSchemaQNames.XSD_ANY,
+                        new JDOMElementType());
         defaultRegister(tm, defaultNillable, Float.class, XMLSchemaQNames.XSD_FLOAT, new FloatType());
         defaultRegister(tm, defaultNillable, Double.class, XMLSchemaQNames.XSD_DOUBLE, new DoubleType());
         defaultRegister(tm, defaultNillable, Integer.class, XMLSchemaQNames.XSD_INT, new IntType());
@@ -253,8 +266,8 @@ public class DefaultTypeMapping implements TypeMapping {
 
         defaultRegister(tm, defaultNillable, java.sql.Date.class, XMLSchemaQNames.XSD_DATETIME,
                         new SqlDateType());
-        defaultRegister(tm, defaultNillable, java.sql.Date.class, XMLSchemaQNames.XSD_DATE,
-                        new SqlDateType());
+        defaultRegister(tm, defaultNillable, org.jdom.Document.class, XMLSchemaQNames.XSD_ANY,
+                        new JDOMDocumentType());
         
         QName mtomBase64 = XMLSchemaQNames.XSD_BASE64;
         if (enableMtomXmime) {
@@ -265,56 +278,13 @@ public class DefaultTypeMapping implements TypeMapping {
                         new DataSourceType(enableMtomXmime, null));
         defaultRegister(tm, defaultNillable, DataHandler.class, mtomBase64,
                         new DataHandlerType(enableMtomXmime, null));
-        
-
-        defaultRegister(tm, defaultNillable, Document.class, XMLSchemaQNames.XSD_ANY, new DocumentType());
-        if (enableJDOM) {
-            registerJDOMTypes(tm, defaultNillable);
-        }
-
-    }
-
-    private static void registerJDOMTypes(TypeMapping tm, boolean defaultNillable) {
-        try {
-            Class<?> jdomDocClass = ClassLoaderUtils.loadClass("org.jdom.Document", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomDocClass, XMLSchemaQNames.XSD_ANY,
-                            new JDOMDocumentType());
-
-        } catch (ClassNotFoundException e) {
-            // not available.
-        }
-        
-        try {
-            Class<?> jdomElementClass = 
-                ClassLoaderUtils.loadClass("org.jdom.Element", DefaultTypeMapping.class);
-            defaultRegister(tm, defaultNillable, jdomElementClass, XMLSchemaQNames.XSD_ANY,
-                                new JDOMElementType());
-        } catch (ClassNotFoundException e) {
-            // not available.
-        }
     }
 
     public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
-     boolean enableMtomXmime) {
-        return createSoap11TypeMapping(
-                                       defaultNillable,
-                                       enableMtomXmime,
-                                       false);
-    }
-
-    /**
-     * Create a type mapping object with a stock set of mappings, including the SOAP 1.1 'encoded'
-     * types.
-     * @param defaultNillable whether elements are nillable by default.
-     * @param enableMtomXmime whether to enable XMIME annotations with MTOM.
-     * @param enableJDOM whether to add mappings for JDOM.
-     * @return
-     */
-    public static DefaultTypeMapping createSoap11TypeMapping(boolean defaultNillable, 
-                                                             boolean enableMtomXmime, boolean enableJDOM) {
-        // Create a AegisType Mapping for SOAP 1.1 Encoding
+                                                             boolean enableMtomXmime) {
+        // Create a Type Mapping for SOAP 1.1 Encoding
         DefaultTypeMapping soapTM = new DefaultTypeMapping(Soap11.SOAP_ENCODING_URI);
-        fillStandardMappings(soapTM, defaultNillable, enableMtomXmime, enableJDOM);
+        fillStandardMappings(soapTM, defaultNillable, enableMtomXmime);
 
         defaultRegister(soapTM, defaultNillable, boolean.class, Soap11.ENCODED_BOOLEAN, new BooleanType());
         defaultRegister(soapTM, defaultNillable, char.class, Soap11.ENCODED_CHAR, new CharacterType());
@@ -346,26 +316,10 @@ public class DefaultTypeMapping implements TypeMapping {
     }
 
     public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-      boolean enableMtomXmime) {
-        return createDefaultTypeMapping(
-                                        defaultNillable,
-                                        enableMtomXmime,
-                                        false);
-    }
-
-    /**
-     * Create a set of default type mappings.
-     * @param defaultNillable whether elements are nillable by default.
-     * @param enableMtomXmime whether to enable XMIME annotations on MTOM.
-     * @param enableJDOM whether to map JDOM types.
-     * @return
-     */
-    public static DefaultTypeMapping createDefaultTypeMapping(boolean defaultNillable, 
-                                                              boolean enableMtomXmime, 
-                                                              boolean enableJDOM) {
+                                                              boolean enableMtomXmime) {
         // by convention, the default mapping is against the XML schema URI.
         DefaultTypeMapping tm = new DefaultTypeMapping(SOAPConstants.XSD);
-        fillStandardMappings(tm, defaultNillable, enableMtomXmime, enableJDOM);
+        fillStandardMappings(tm, defaultNillable, enableMtomXmime);
         defaultRegister(tm, defaultNillable, Character.class, 
                         CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                         new CharacterAsStringType());

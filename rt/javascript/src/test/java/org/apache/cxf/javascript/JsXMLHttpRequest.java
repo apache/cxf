@@ -46,12 +46,6 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -61,8 +55,9 @@ import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.jdom.input.DOMBuilder;
+import org.jdom.output.XMLOutputter;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.ScriptableObject;
@@ -331,7 +326,7 @@ public class JsXMLHttpRequest extends ScriptableObject {
             new Thread() {
                 public void run() {
                     try {
-                        Context cx = ContextFactory.getGlobal().enterContext();
+                        Context cx = Context.enter();
                         communicate(cx);
                     } finally {
                         Context.exit();
@@ -383,11 +378,10 @@ public class JsXMLHttpRequest extends ScriptableObject {
                 contentEncoding = "iso-8859-1";
             }
             
-            byte[] responseBytes = baos.toByteArray();
-            
             /* We need all the text in a string, independent of the
              * XML parse. 
              */
+
             Charset contentCharset = Charset.forName(contentEncoding);
             byte[] contentBytes = baos.toByteArray();
             CharBuffer contentChars = 
@@ -395,16 +389,16 @@ public class JsXMLHttpRequest extends ScriptableObject {
             responseText = contentChars.toString();
             LOG.fine(responseText);
             
-            if (responseBytes.length > 0
-                && ("text/xml".equals(contentType)
-                    || "application/xml".equals(contentType) 
-                    || contentType.endsWith("+xml"))) {
+            
+            if ("text/xml".equals(contentType)
+                || "application/xml".equals(contentType) 
+                || contentType.endsWith("+xml")) {
                 
                 try {
                     DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
                     documentBuilderFactory.setNamespaceAware(true);
                     DocumentBuilder builder = documentBuilderFactory.newDocumentBuilder();
-                    ByteArrayInputStream bais = new ByteArrayInputStream(responseBytes);
+                    ByteArrayInputStream bais = new ByteArrayInputStream(contentBytes);
                     InputSource inputSource = new InputSource(bais);
                     inputSource.setEncoding(contentEncoding);
                     Document xmlDoc = builder.parse(inputSource);
@@ -449,18 +443,17 @@ public class JsXMLHttpRequest extends ScriptableObject {
 
     private byte[] domToUtf8(JsSimpleDomNode xml) {
         Node node = xml.getWrappedNode();
+        Document document = (Document)node; // assume that we're given the
         // entire document.
         // if that's an issue, we could code something more complex.
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        StreamResult result = new StreamResult(baos);
-        DOMSource source = new DOMSource(node);
+        org.jdom.Document jDocument = new DOMBuilder().build(document);
+        org.jdom.output.Format format = org.jdom.output.Format.getRawFormat();
+        format.setEncoding("utf-8");
         try {
-            TransformerFactory.newInstance().newTransformer().transform(source, result);
-        } catch (TransformerConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerException e) {
-            throw new RuntimeException(e);
-        } catch (TransformerFactoryConfigurationError e) {
+            new XMLOutputter(format).output(jDocument, baos);
+        } catch (IOException e) {
+            LOG.log(Level.SEVERE, "impossible IO exception serializing XML", e);
             throw new RuntimeException(e);
         }
         return baos.toByteArray();

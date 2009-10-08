@@ -19,8 +19,6 @@
 
 package org.apache.cxf.interceptor;
 
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.ResourceBundle;
@@ -36,23 +34,19 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInterceptor<Message> {
-    public static final String NO_VALIDATE_PARTS = AbstractInDatabindingInterceptor.class.getName() 
-                                                    + ".novalidate-parts";
+
     private static final QName XSD_ANY = new QName("http://www.w3.org/2001/XMLSchema", "anyType", "xsd");
 
     private static final ResourceBundle BUNDLE = BundleUtils
@@ -89,11 +83,12 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         }
         dataReader.setAttachments(message.getAttachments());
         dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().get(Endpoint.class));
-        dataReader.setProperty(Message.class.getName(), message);
-        setSchemaInMessage(service, message, dataReader);   
+        setSchemaInMessage(service, message, dataReader);
+
+        
         return dataReader;
     }
-    
+
     protected DataReader<XMLStreamReader> getDataReader(Message message) {
         return getDataReader(message, XMLStreamReader.class);
     }
@@ -103,13 +98,14 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     }
 
     private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
-        if (MessageUtils.getContextualBoolean(message, Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE)) {
+        Object en = message.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
+        if (Boolean.TRUE.equals(en) || "true".equals(en)) {
             //all serviceInfos have the same schemas
             Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
             reader.setSchema(schema);
         }
     }
-
+    
     protected DepthXMLStreamReader getXMLStreamReader(Message message) {
         XMLStreamReader xr = message.getContent(XMLStreamReader.class);
         if (xr instanceof DepthXMLStreamReader) {
@@ -133,19 +129,17 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
      * @return
      */
     protected MessagePartInfo findMessagePart(Exchange exchange, Collection<OperationInfo> operations,
-                                              QName name, boolean client, int index,
-                                              Message message) {
+                                              QName name, boolean client, int index) {
         Endpoint ep = exchange.get(Endpoint.class);
         MessagePartInfo lastChoice = null;
-        BindingMessageInfo msgInfo = null;
-        BindingOperationInfo boi = null;
         for (Iterator<OperationInfo> itr = operations.iterator(); itr.hasNext();) {
             OperationInfo op = itr.next();
 
-            boi = ep.getEndpointInfo().getBinding().getOperation(op);
+            BindingOperationInfo boi = ep.getEndpointInfo().getBinding().getOperation(op);
             if (boi == null) {
                 continue;
             }
+            BindingMessageInfo msgInfo = null;
             if (client) {
                 msgInfo = boi.getOutput();
             } else {
@@ -181,49 +175,9 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                 itr.remove();
             }
         }
-        if (lastChoice != null) {
-            setMessage(message, boi, client, boi.getBinding().getService(), msgInfo.getMessageInfo());
-        }
         return lastChoice;
     }    
-    protected MessageInfo setMessage(Message message, BindingOperationInfo operation,
-                                   boolean requestor, ServiceInfo si,
-                                   MessageInfo msgInfo) {
-        message.put(MessageInfo.class, msgInfo);
 
-        Exchange ex = message.getExchange();
-        ex.put(BindingOperationInfo.class, operation);
-        ex.put(OperationInfo.class, operation.getOperationInfo());
-        ex.setOneWay(operation.getOperationInfo().isOneWay());
-
-        //Set standard MessageContext properties required by JAX_WS, but not specific to JAX_WS.
-        message.put(Message.WSDL_OPERATION, operation.getName());
-
-        QName serviceQName = si.getName();
-        message.put(Message.WSDL_SERVICE, serviceQName);
-
-        QName interfaceQName = si.getInterface().getName();
-        message.put(Message.WSDL_INTERFACE, interfaceQName);
-
-        EndpointInfo endpointInfo = ex.get(Endpoint.class).getEndpointInfo();
-        QName portQName = endpointInfo.getName();
-        message.put(Message.WSDL_PORT, portQName);
-
-        
-        URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
-        if (wsdlDescription == null) {
-            String address = endpointInfo.getAddress();
-            try {
-                wsdlDescription = new URI(address + "?wsdl");
-            } catch (URISyntaxException e) {
-                //do nothing
-            }
-            endpointInfo.setProperty("URI", wsdlDescription);
-        }
-        message.put(Message.WSDL_DESCRIPTION, wsdlDescription);
-
-        return msgInfo;
-    }
     /**
      * Returns a BindingOperationInfo if the operation is indentified as 
      * a wrapped method,  return null if it is not a wrapped method 

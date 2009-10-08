@@ -85,7 +85,7 @@ public class WebServiceProviderConfiguration extends JaxWsServiceConfiguration {
     
     @Override
     public Boolean isWrapped(Method m) {
-        return Boolean.FALSE;
+        return true;
     }
 }
 

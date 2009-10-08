@@ -27,76 +27,56 @@ import java.util.Set;
 import java.util.WeakHashMap;
 
 import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 
-public abstract class AbstractAegisProvider<T> 
-    implements MessageBodyReader<T>, MessageBodyWriter<T> {
+public abstract class AbstractAegisProvider 
+    implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
-    private static Map<java.lang.reflect.Type, AegisContext> classContexts      
-        = new WeakHashMap<java.lang.reflect.Type, AegisContext>();
+    private static Map<Class<?>, AegisContext> classContexts = new WeakHashMap<Class<?>, AegisContext>();
     
-    protected boolean writeXsiType = true;
-    protected boolean readXsiType = true;
-    @Context 
-    protected ContextResolver<AegisContext> resolver;
+    @Context protected ContextResolver<AegisContext> resolver;
     
-    public void setWriteXsiType(boolean write) {
-        writeXsiType = write;
-    }
-    
-    public void setReadXsiType(boolean read) {
-        readXsiType = read;
-    }
-    
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] anns) {
         return isSupported(type, genericType, anns);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isSupported(type, genericType, annotations);
     }
 
-    public long getSize(T o, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(Object o) {
         return -1;
     }
 
-    protected AegisContext getAegisContext(Class<?> plainClass, Type genericType) {
+    protected AegisContext getAegisContext(Class<?> type, Type genericType) {
         
         if (resolver != null) {
-            /* wierdly, the JAX-RS API keys on Class, not AegisType, so it can't possibly
-             * keep generics straight. Should we ignore the resolver?
-             */
-            AegisContext context = resolver.getContext(plainClass);
+            AegisContext context = resolver.getContext(type);
             // it's up to the resolver to keep its contexts in a map
             if (context != null) {
                 return context;
             }
         }
         
-        if (genericType == null) {
-            genericType = plainClass;
-        }
-        return getClassContext(genericType);
+        return getClassContext(type);
     }
     
-    
-    private AegisContext getClassContext(Type reflectionType) {
+    private AegisContext getClassContext(Class<?> type) {
         synchronized (classContexts) {
-            AegisContext context = classContexts.get(reflectionType);
+            AegisContext context = classContexts.get(type);
             if (context == null) {
                 context = new AegisContext();
-                context.setWriteXsiTypes(writeXsiType); 
-                context.setReadXsiTypes(readXsiType);
-                Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
-                rootClasses.add(reflectionType);
+                context.setWriteXsiTypes(true); // needed, since we know no element/type maps.
+                context.setReadXsiTypes(true);
+                Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+                rootClasses.add(type);
                 context.setRootClasses(rootClasses);
                 context.initialize();
-                classContexts.put(reflectionType, context);
+                classContexts.put(type, context);
             }
             return context;
         }
@@ -111,9 +91,5 @@ public abstract class AbstractAegisProvider<T>
      */
     protected boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations) {
         return true;
-    }
-    
-    static void clearContexts() {
-        classContexts.clear();
     }
 }

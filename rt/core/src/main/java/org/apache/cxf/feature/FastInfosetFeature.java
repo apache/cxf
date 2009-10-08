@@ -19,7 +19,6 @@
 package org.apache.cxf.feature;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -36,7 +35,6 @@ import org.apache.cxf.interceptor.InterceptorProvider;
   ]]>
   </pre>
  */
-@NoJSR250Annotations
 public class FastInfosetFeature extends AbstractFeature {
     
     boolean force;
@@ -66,7 +64,7 @@ public class FastInfosetFeature extends AbstractFeature {
     }
     
     /**
-     * Retrieve the value set with {@link #setForce(int)}.
+     * Retrieve the value set with {@link #setLimit(int)}.
      * @return
      */
     public boolean getForce() {

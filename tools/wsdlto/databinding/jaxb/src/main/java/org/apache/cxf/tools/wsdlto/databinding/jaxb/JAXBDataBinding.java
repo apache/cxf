@@ -18,12 +18,10 @@
  */
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
 import java.lang.reflect.Field;
-import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,9 +36,6 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.SchemaFactory;
 
@@ -70,17 +65,13 @@ import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
 
-import org.apache.cxf.common.WSDLConstants;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.service.model.SchemaInfo;
-import org.apache.cxf.service.model.ServiceInfo;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -90,113 +81,10 @@ import org.apache.cxf.tools.util.JAXBUtils;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.DefaultValueProvider;
 import org.apache.cxf.tools.wsdlto.core.RandomValueProvider;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaSerializer;
-import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerException;
+
+
 
 public class JAXBDataBinding implements DataBindingProfile {
-
-
-    public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
-        boolean isImport;
-        int locIdx = -1;
-        LocationFilterReader(XMLStreamReader read) {
-            super(read);
-        }
-
-        public int next() throws XMLStreamException {
-            int i = super.next();
-            if (i == XMLStreamReader.START_ELEMENT) {
-                QName qn = super.getName();
-                isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
-                if (isImport) {
-                    findLocation();
-                } else {
-                    locIdx = -1;
-                }
-            } else {
-                isImport = false;
-                locIdx = -1;
-            }
-            return i;
-        }
-
-        public int nextTag() throws XMLStreamException {
-            int i = super.nextTag();
-            if (i == XMLStreamReader.START_ELEMENT) {
-                isImport = super.getName().equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
-                if (isImport) {
-                    findLocation();
-                } else {
-                    locIdx = -1;
-                }
-            } else {
-                isImport = false;
-                locIdx = -1;
-            }
-            return i;
-        }
-        private void findLocation() {
-            locIdx = -1;
-            for (int x = super.getAttributeCount(); x > 0; --x) {
-                String nm = super.getAttributeLocalName(x - 1);
-                if ("schemaLocation".equals(nm)) {
-                    locIdx = x - 1;
-                }
-            }
-        }
-        public String getAttributeValue(String namespaceURI, String localName) {
-            return super.getAttributeValue(namespaceURI, localName);
-        }
-    
-        public int getAttributeCount() {
-            int i = super.getAttributeCount();
-            if (locIdx != -1) {
-                --i;
-            }
-            return i;
-        }
-        private int mapIdx(int index) {
-            if (locIdx != -1
-                && index >= locIdx) {
-                ++index;
-            }
-            return index;
-        }
-    
-        public QName getAttributeName(int index) {
-            return super.getAttributeName(mapIdx(index));
-        }
-    
-        public String getAttributePrefix(int index) {
-            return super.getAttributePrefix(mapIdx(index));
-        }
-    
-        public String getAttributeNamespace(int index) {
-            return super.getAttributeNamespace(mapIdx(index));
-        }
-    
-        public String getAttributeLocalName(int index) {
-            return super.getAttributeLocalName(mapIdx(index));
-        }
-    
-        public String getAttributeType(int index) {
-            return super.getAttributeType(mapIdx(index));
-        }
-    
-        public String getAttributeValue(int index) {
-            return super.getAttributeValue(mapIdx(index));
-        }
-    
-        public boolean isAttributeSpecified(int index) {
-            return super.isAttributeSpecified(mapIdx(index));
-        }
-
-        
-
-    }
-
-
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
     
     private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<String>();
@@ -233,14 +121,14 @@ public class JAXBDataBinding implements DataBindingProfile {
         JLDEFAULT_TYPE_MAP.put("java.lang.Float", "float");
         JLDEFAULT_TYPE_MAP.put("java.lang.Double", "double");
         DEFAULT_TYPE_MAP.addAll(JLDEFAULT_TYPE_MAP.keySet());
-    }   
-    
+    }    
+
+
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
         
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         ClassCollector classCollector = context.get(ClassCollector.class);
-        //installResolverIntoSchemaCompiler(schemaCompiler);
         
         ClassNameAllocatorImpl allocator 
             = new ClassNameAllocatorImpl(classCollector,
@@ -252,11 +140,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
-        SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
+        Map<String, Element> schemaLists = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
+
         
         Options opts = null;
         opts = getOptions(schemaCompiler);
-        
         List<String> args = new ArrayList<String>();
         
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
@@ -304,7 +192,9 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
         
-        addSchemas(opts, schemaCompiler, schemas);
+        
+        addSchemas(opts, schemaCompiler, schemaLists);
+
         for (InputSource binding : jaxbBindings) {
             opts.addBindFile(binding);
         }
@@ -327,7 +217,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
         rawJaxbModelGenCode = schemaCompiler.bind();
 
-        addedEnumClassToCollector(schemas, allocator);
+        addedEnumClassToCollector(schemaLists, allocator);
 
         if (context.get(ToolConstants.CFG_DEFAULT_VALUES) != null) {
             String cname = (String)context.get(ToolConstants.CFG_DEFAULT_VALUES);
@@ -348,99 +238,20 @@ public class JAXBDataBinding implements DataBindingProfile {
         initialized = true;
     }
 
-    @SuppressWarnings("unchecked")
-    private void addSchemas(Options opts, 
-                            SchemaCompiler schemaCompiler,
-                            SchemaCollection schemaCollection) {
-        
-        Set<String> ids = new HashSet<String>();
-        List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
-        for (ServiceInfo si : serviceList) {
-            for (SchemaInfo sci : si.getSchemas()) {
-                String key = sci.getSystemId();
-                if (ids.contains(key)) {
-                    continue;
-                }
-                ids.add(key);
-            }
+    private void addSchemas(Options opts, SchemaCompiler schemaCompiler,
+                            Map<String, Element> schemaLists) {
+        for (String key : schemaLists.keySet()) {
+            Element ele = schemaLists.get(key);
+            ele = removeImportElement(ele);
+            if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
+                validateSchema(ele);
+            }           
+            InputSource is = new InputSource((InputStream)null);
+            is.setSystemId(key);
+            is.setPublicId(key);
+            opts.addGrammar(is);
+            schemaCompiler.parseSchema(key, ele);
         }
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
-                continue;
-            }
-            String key = schema.getSourceURI();
-            if (ids.contains(key)) {
-                continue;
-            }
-            
-            if (!key.startsWith("file:")) {
-                XmlSchemaSerializer xser = new XmlSchemaSerializer();
-                xser.setExtReg(schemaCollection.getExtReg());
-                Document[] docs;
-                try {
-                    docs = xser.serializeSchema(schema, false);
-                } catch (XmlSchemaSerializerException e) {
-                    throw new RuntimeException(e);
-                }
-                Element ele = docs[0].getDocumentElement();
-                ele = removeImportElement(ele);
-                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele, docs[0].getDocumentURI());
-                }           
-                InputSource is = new InputSource((InputStream)null);
-                //key = key.replaceFirst("#types[0-9]+$", "");
-                is.setSystemId(key);
-                is.setPublicId(key);
-                opts.addGrammar(is);
-                schemaCompiler.parseSchema(key, ele);
-            }
-        }
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
-                continue;
-            }
-            String key = schema.getSourceURI();
-            if (ids.contains(key)) {
-                continue;
-            }
-            if (key.startsWith("file:")) {
-                try {
-                    FileInputStream fin = new FileInputStream(new File(new URI(key)));
-                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, fin);
-                    reader = new LocationFilterReader(reader);
-                    InputSource is = new InputSource(key);
-                    opts.addGrammar(is);
-                    schemaCompiler.parseSchema(key, reader);
-                    reader.close();
-                } catch (RuntimeException ex) {
-                    throw ex;
-                } catch (Exception ex) {
-                    throw new RuntimeException(ex);
-                }
-            }
-        }
-        ids.clear();
-        for (ServiceInfo si : serviceList) {
-            for (SchemaInfo sci : si.getSchemas()) {
-                String key = sci.getSystemId();
-                if (ids.contains(key)) {
-                    continue;
-                }
-                ids.add(key);
-                Element ele = sci.getElement();
-                ele = removeImportElement(ele);
-                if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele, sci.getSystemId());
-                }           
-                InputSource is = new InputSource((InputStream)null);
-                //key = key.replaceFirst("#types[0-9]+$", "");
-                is.setSystemId(key);
-                is.setPublicId(key);
-                opts.addGrammar(is);
-                schemaCompiler.parseSchema(key, ele);
-            }
-        }
-
     }
     private String getPluginUsageString(Options opts) {
         StringBuffer buf = new StringBuffer();
@@ -461,11 +272,10 @@ public class JAXBDataBinding implements DataBindingProfile {
     // JAXB bug. JAXB ClassNameCollector may not be invoked when generated
     // class is an enum. We need to use this method to add the missed file
     // to classCollector.
-    private void addedEnumClassToCollector(SchemaCollection schemaCollection, 
+    private void addedEnumClassToCollector(Map<String, Element> schemaList, 
                                            ClassNameAllocatorImpl allocator) {
-        //for (Element schemaElement : schemaList.values()) {
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            String targetNamespace = schema.getTargetNamespace();
+        for (Element schemaElement : schemaList.values()) {
+            String targetNamespace = schemaElement.getAttribute("targetNamespace");
             if (StringUtils.isEmpty(targetNamespace)) {
                 continue;
             }
@@ -634,9 +444,9 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     
-    public void validateSchema(Element ele, String uri) throws ToolException {
+    public void validateSchema(Element ele) throws ToolException {
         SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-        DOMSource domSrc = new DOMSource(ele, uri);
+        DOMSource domSrc = new DOMSource(ele);
         try {
             schemaFact.newSchema(domSrc);
         } catch (SAXException e) {

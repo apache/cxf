@@ -20,12 +20,11 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.List;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -127,48 +126,6 @@ public class FormEncodingProviderTest extends Assert {
 
     }
     
-    @Test
-    public void testWriteMultipleValues() throws Exception {
-        MultivaluedMap<String, String> mvMap = new MetadataMap<String, String>();
-        mvMap.add("a", "a1");
-        mvMap.add("a", "a2");
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        ferp.writeTo(mvMap, MultivaluedMap.class, MultivaluedMap.class, 
-                     new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
-                     new MetadataMap<String, Object>(), bos);
-        String result = bos.toString();
-        assertEquals("Wrong value", "a=a1&a=a2", result);  
-    }
-    
-    @Test
-    public void testWriteMultipleValues2() throws Exception {
-        MultivaluedMap<String, String> mvMap = new MetadataMap<String, String>();
-        mvMap.add("a", "a1");
-        mvMap.add("a", "a2");
-        mvMap.add("b", "b1");
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        ferp.writeTo(mvMap, MultivaluedMap.class, MultivaluedMap.class, 
-                     new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
-                     new MetadataMap<String, Object>(), bos);
-        String result = bos.toString();
-        assertEquals("Wrong value", "a=a1&a=a2&b=b1", result);  
-    }
-    
-    @Test
-    public void testWrite() throws Exception {
-        MultivaluedMap<String, String> mvMap = new MetadataMap<String, String>();
-        mvMap.add("a", "a1");
-        mvMap.add("b", "b1");
-        ByteArrayOutputStream bos = new ByteArrayOutputStream(); 
-        ferp.writeTo(mvMap, MultivaluedMap.class, MultivaluedMap.class, 
-                     new Annotation[0], MediaType.APPLICATION_FORM_URLENCODED_TYPE, 
-                     new MetadataMap<String, Object>(), bos);
-        String result = bos.toString();
-        assertEquals("Wrong value", "a=a1&b=b1", result);  
-    }
-    
     @SuppressWarnings("unchecked")
     @Test
     public void testValidation() throws Exception {
@@ -207,12 +164,12 @@ public class FormEncodingProviderTest extends Assert {
 
     @Test
     public void testReadable() {
-        assertTrue(ferp.isReadable(MultivaluedMap.class, null, null, null));
+        assertTrue(ferp.isReadable(MultivaluedMap.class, null, null));
     }
 
     @Test
     public void testAnnotations() {
-        assertEquals("application/x-www-form-urlencoded", ferp.getClass().getAnnotation(Consumes.class)
+        assertEquals("application/x-www-form-urlencoded", ferp.getClass().getAnnotation(ConsumeMime.class)
                      .value()[0]);
     }
 

@@ -25,20 +25,16 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.ProduceMime;
 
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class ClassResourceInfo extends AbstractResourceInfo {
@@ -52,29 +48,9 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     private List<Field> paramFields;
     private List<Method> paramMethods;
     private boolean enableStatic;
-    private boolean createdFromModel; 
-    private String consumesTypes;
-    private String producesTypes;
     
     public ClassResourceInfo(Class<?> theResourceClass) {
         this(theResourceClass, false);
-    }
-    
-    public ClassResourceInfo(ClassResourceInfo cri) {
-        
-        if (cri.isCreatedFromModel() && !InjectionUtils.isConcreteClass(cri.getServiceClass())) {
-            this.root = cri.root;
-            this.serviceClass = cri.serviceClass;
-            this.uriTemplate = cri.uriTemplate;    
-            this.methodDispatcher = new MethodDispatcher(cri.methodDispatcher, this);
-            this.subResources = cri.subResources;
-            this.paramFields = cri.paramFields;
-            this.paramMethods = cri.paramMethods;
-            this.enableStatic = true;
-        } else {
-            throw new IllegalArgumentException();
-        }
-        
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, boolean theRoot) {
@@ -86,7 +62,11 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, boolean theRoot) {
-        this(theResourceClass, theServiceClass, theRoot, false);
+        super(theResourceClass, theServiceClass, theRoot);
+        if (theRoot) {
+            initParamFields();
+            initParamMethods();
+        }
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
@@ -97,25 +77,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
             initParamFields();
             initParamMethods();
         }
-    }
-    
-    public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
-                             boolean theRoot, boolean enableStatic, boolean createdFromModel) {
-        super(theResourceClass, theServiceClass, theRoot);
-        this.enableStatic = enableStatic;
-        if (theRoot) {
-            initParamFields();
-            initParamMethods();
-        }
-        this.createdFromModel = createdFromModel;
-    }
-    
-    public ClassResourceInfo(Class<?> theResourceClass, Class<?> c, 
-                             boolean theRoot, boolean enableStatic,  boolean createdFromModel,
-                             String consumesTypes, String producesTypes) {
-        this(theResourceClass, theResourceClass, theRoot, enableStatic, createdFromModel);
-        this.consumesTypes = consumesTypes;
-        this.producesTypes = producesTypes;
     }
     
     public ClassResourceInfo findResource(Class<?> typedClass, Class<?> instanceClass) {
@@ -141,17 +102,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     public Collection<ClassResourceInfo> getSubResources() {
         return Collections.unmodifiableCollection(subResources.values());
-    }
-    
-    public Set<String> getAllowedMethods() {
-        Set<String> methods = new HashSet<String>();
-        for (OperationResourceInfo o : methodDispatcher.getOperationResourceInfos()) {
-            String method = o.getHttpMethod();
-            if (method != null) {
-                methods.add(method);
-            }
-        }
-        return methods;
     }
     
     private void initParamFields() {
@@ -214,10 +164,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
                                  cri);
     }
     
-    public boolean isCreatedFromModel() {
-        return createdFromModel;
-    }
-    
     public ResourceProvider getResourceProvider() {
         return resourceProvider;
     }
@@ -226,20 +172,12 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         resourceProvider = rp;
     }
     
-    public List<MediaType> getProduceMime() {
-        if (producesTypes != null) {
-            return JAXRSUtils.parseMediaTypes(producesTypes);
-        }
-        return JAXRSUtils.getProduceTypes(
-             (Produces)AnnotationUtils.getClassAnnotation(getServiceClass(), Produces.class));
+    public ProduceMime getProduceMime() {
+        return (ProduceMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ProduceMime.class);
     }
     
-    public List<MediaType> getConsumeMime() {
-        if (consumesTypes != null) {
-            return JAXRSUtils.parseMediaTypes(consumesTypes);
-        }
-        return JAXRSUtils.getConsumeTypes(
-             (Consumes)AnnotationUtils.getClassAnnotation(getServiceClass(), Consumes.class));
+    public ConsumeMime getConsumeMime() {
+        return (ConsumeMime)AnnotationUtils.getClassAnnotation(getServiceClass(), ConsumeMime.class);
     }
     
     public Path getPath() {
@@ -273,6 +211,6 @@ public class ClassResourceInfo extends AbstractResourceInfo {
     
     @Override
     public boolean isSingleton() {
-        return resourceProvider != null && resourceProvider.isSingleton();
+        return resourceProvider instanceof SingletonResourceProvider;
     }
 }

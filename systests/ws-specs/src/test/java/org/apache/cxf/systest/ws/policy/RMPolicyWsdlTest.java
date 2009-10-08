@@ -39,6 +39,7 @@ import org.apache.cxf.systest.ws.util.OutMessageRecorder;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.neethi.All;
@@ -122,6 +123,8 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
     public void testUsingRM() throws Exception {
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("org/apache/cxf/systest/ws/policy/rmwsdl.xml");
+        PolicyTestUtils.setPolicyConstants(bus, 
+                                           PolicyConstants.NAMESPACE_W3_200607);
         BusFactory.setDefaultBus(bus);
         OutMessageRecorder outRecorder = new OutMessageRecorder();
         bus.getOutInterceptors().add(outRecorder);

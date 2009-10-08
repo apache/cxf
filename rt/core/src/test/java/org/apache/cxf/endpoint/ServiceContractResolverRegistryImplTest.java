@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -59,7 +60,22 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
     }
     
     @Test
+    public void testInit() {
+        assertNull("unexpected resolvers list", registry.getResolvers());
+        Bus bus = control.createMock(Bus.class);
+        registry.setBus(bus);
+        bus.setExtension(registry, ServiceContractResolverRegistry.class);
+        control.replay();
+        
+        registry.init();
+        
+        assertNotNull("expected resolvers list", registry.getResolvers());
+        control.verify();
+    }
+
+    @Test
     public void testRegister() {
+        registry.init();
         assertEquals("unexpected resolver count",
                      0,
                      registry.getResolvers().size());
@@ -104,6 +120,7 @@ public class ServiceContractResolverRegistryImplTest extends Assert {
     
     @Test
     public void testGetContactLocation() {
+        registry.init();
         registry.register(resolver1);
         registry.register(resolver2);
         resolver1.getContractLocation(serviceName);

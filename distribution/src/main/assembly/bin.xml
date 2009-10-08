@@ -97,13 +97,6 @@
             </excludes>
         </fileSet>
         <fileSet>
-            <directory>target/sample-libs</directory>
-            <outputDirectory>apache-cxf-${cxf.version}/lib-samples</outputDirectory>
-            <includes>
-                <include>**/*</include>
-            </includes>
-        </fileSet>
-        <fileSet>
             <directory>manifest/target</directory>
             <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
             <includes>

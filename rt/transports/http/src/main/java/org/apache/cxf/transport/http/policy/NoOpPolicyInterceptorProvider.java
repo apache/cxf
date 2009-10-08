@@ -24,7 +24,6 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 
 /**
@@ -33,7 +32,6 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
  * before the HTTPConduit becomes invoved (e.g. via a WSPolicyFeature
  * applied to the <jawx:client> bean).
  */
-@NoJSR250Annotations
 public class NoOpPolicyInterceptorProvider
     extends AbstractPolicyInterceptorProvider {
 

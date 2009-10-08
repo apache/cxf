@@ -22,13 +22,17 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
 public class UsernameToken extends Token {
+
     private boolean useUTProfile10;
+
     private boolean useUTProfile11;
+
     private boolean noPassword;
+
     private boolean hashPassword;
 
     public UsernameToken(SPConstants version) {
@@ -74,17 +78,20 @@ public class UsernameToken extends Token {
     }
 
     public QName getName() {
-        return SP12Constants.INSTANCE.getUserNameToken();
+        return constants.getUserNameToken();
+    }
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        QName name = constants.getUserNameToken();
-        String localname = name.getLocalPart();
-        String namespaceURI = name.getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = name.getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -104,12 +111,11 @@ public class UsernameToken extends Token {
         if (isUseUTProfile10() || isUseUTProfile11()) {
             String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
             if (pPrefix == null) {
-                pPrefix = SPConstants.POLICY.getPrefix();
                 writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
             }
 
             // <wsp:Policy>
-            writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+            writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
                 .getNamespaceURI());
 
             // CHECKME

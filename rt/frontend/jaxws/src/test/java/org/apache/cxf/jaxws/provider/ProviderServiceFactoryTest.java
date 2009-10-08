@@ -23,6 +23,7 @@ import java.net.URL;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
@@ -72,6 +73,8 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         Endpoint endpoint = server.getEndpoint();
         Binding binding = endpoint.getBinding();
         assertTrue(binding instanceof SoapBinding);
+        assertEquals(Boolean.TRUE, endpoint.getEndpointInfo().getBinding()
+            .getProperty(AbstractBindingFactory.DATABINDING_DISABLED));
     }
 
     @Test
@@ -143,6 +146,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         SoapBindingInfo sb = (SoapBindingInfo)endpoint.getEndpointInfo().getBinding();
         assertEquals("document", sb.getStyle());
         assertEquals(false, bean.isWrapped());
+        assertEquals(Boolean.TRUE, sb.getProperty(AbstractBindingFactory.DATABINDING_DISABLED));
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");
@@ -181,6 +185,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         SoapBindingInfo sb = (SoapBindingInfo)endpoint.getEndpointInfo().getBinding();
         assertEquals("document", sb.getStyle());
         assertEquals(false, bean.isWrapped());
+        assertEquals(Boolean.TRUE, sb.getProperty(AbstractBindingFactory.DATABINDING_DISABLED));
 
         assertEquals(1, sb.getOperations().size());
         Node res = invoke(address, LocalTransportFactory.TRANSPORT_ID, "/org/apache/cxf/jaxws/sayHi.xml");

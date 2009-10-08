@@ -42,16 +42,8 @@ public class ClassHelper {
         return o.getClass();
     }
     
-    protected Class getRealClassFromClassInternal(Class cls) {
-        return cls;
-    }
-    
     
     public static Class getRealClass(Object o) {
         return HELPER.getRealClassInternal(o);
-    }
-    
-    public static Class getRealClassFromClass(Class cls) {
-        return HELPER.getRealClassFromClassInternal(cls);
     }
 }

@@ -30,7 +30,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.resource.ObjectTypeResolver;
@@ -52,28 +51,23 @@ public class ExtensionManagerImpl implements ExtensionManager {
     private final Map<Class, Object> activated;
     private final Map<String, Collection<Object>> namespaced = 
         new ConcurrentHashMap<String, Collection<Object>>();
-    private final Bus bus;
 
     public ExtensionManagerImpl(ClassLoader cl, Map<Class, Object> initialExtensions, 
-                                ResourceManager rm, Bus b) {
-        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_COMPAT},
-                 cl, initialExtensions, rm, b);
+                                ResourceManager rm) {
+        this(new String[] {BUS_EXTENSION_RESOURCE, BUS_EXTENSION_RESOURCE_COMPAT}, cl, initialExtensions, rm);
     }
     public ExtensionManagerImpl(String resource, 
                                 ClassLoader cl, 
                                 Map<Class, Object> initialExtensions, 
-                                ResourceManager rm,
-                                Bus b) {
-        this(new String[] {resource}, cl, initialExtensions, rm, b);
+                                ResourceManager rm) {
+        this(new String[] {resource}, cl, initialExtensions, rm);
     }    
     public ExtensionManagerImpl(String resources[], 
                                 ClassLoader cl, 
                                 Map<Class, Object> initialExtensions, 
-                                ResourceManager rm,
-                                Bus b) {
+                                ResourceManager rm) {
 
         loader = cl;
-        bus = b;
         activated = initialExtensions;
         resourceManager = rm;
 
@@ -83,12 +77,7 @@ public class ExtensionManagerImpl implements ExtensionManager {
         resourceManager.addResourceResolver(new ObjectTypeResolver(this));
 
         deferred = new ConcurrentHashMap<String, Collection<Extension>>();
-        load(resources);
-    }
-    public final void load(String resources[]) {
-        if (resources == null) {
-            return;
-        }
+
         try {
             for (String resource : resources) {
                 load(resource);
@@ -161,7 +150,7 @@ public class ExtensionManagerImpl implements ExtensionManager {
             return;
         }
  
-        Object obj = e.load(loader, bus);
+        Object obj = e.load(loader);
         
         Configurer configurer = (Configurer)(activated.get(Configurer.class));
         if (null != configurer) {

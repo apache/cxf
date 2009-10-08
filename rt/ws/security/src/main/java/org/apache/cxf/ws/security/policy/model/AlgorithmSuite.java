@@ -26,11 +26,11 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.WSSPolicyException;
+import org.apache.neethi.PolicyComponent;
 
-public class AlgorithmSuite extends AbstractSecurityAssertion {
+public class AlgorithmSuite extends AbstractConfigurableSecurityAssertion {
     private static final Logger LOG = LogUtils.getL7dLogger(AlgorithmSuite.class);
     
     private String algoSuiteString;
@@ -75,12 +75,6 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
 
     public AlgorithmSuite(SPConstants version) {
         super(version);
-    }
-
-
-
-    public AlgorithmSuite() {
-        super(SP12Constants.INSTANCE);
     }
 
 
@@ -241,21 +235,22 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
     }
 
     public QName getName() {
-        return SP12Constants.INSTANCE.getAlgorithmSuite();
-    }
-    public QName getRealName() {
         return constants.getAlgorithmSuite();
+    }
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException("AlgorithmSuite.normalize() is not supported");
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -263,13 +258,7 @@ public class AlgorithmSuite extends AbstractSecurityAssertion {
         writer.writeNamespace(prefix, namespaceURI);
 
         // <wsp:Policy>
-        String wspPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (wspPrefix == null) {
-            wspPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(wspPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
-        writer.writeStartElement(wspPrefix,
-                                 SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         //

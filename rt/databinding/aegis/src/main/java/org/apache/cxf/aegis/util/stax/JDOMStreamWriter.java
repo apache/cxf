@@ -26,6 +26,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.jdom.Attribute;
 import org.jdom.CDATA;
 import org.jdom.Comment;
@@ -183,7 +184,7 @@ public class JDOMStreamWriter implements XMLStreamWriter {
     }
 
     public String getPrefix(String uri) throws XMLStreamException {
-        return JDOMNamespaceContext.rawGetPrefix(currentNode, uri);
+        return NamespaceHelper.getPrefix(currentNode, uri);
     }
 
     public void setPrefix(String arg0, String arg1) throws XMLStreamException {

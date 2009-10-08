@@ -29,8 +29,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Binding;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.DocumentFragment;
-import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.endpoint.Endpoint;
@@ -42,7 +40,6 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.staxutils.W3CDOMStreamReader;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.MessageObserver;
 
@@ -70,7 +67,7 @@ public class LogicalHandlerOutInterceptor<T extends Message>
             XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
             Document document = XMLUtils.newDocument();
             message.setContent(Node.class, document);
-            W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document.createDocumentFragment());
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter(document);
         
             // Replace stax writer with DomStreamWriter
             message.setContent(XMLStreamWriter.class, writer);        
@@ -115,16 +112,6 @@ public class LogicalHandlerOutInterceptor<T extends Message>
                 origMessage = message.getContent(SOAPMessage.class);
                 message.setContent(XMLStreamReader.class, reader);
                 message.removeContent(SOAPMessage.class);
-            } else if (domWriter.getCurrentFragment() != null) {
-                DocumentFragment frag = domWriter.getCurrentFragment();
-                Node nd = frag.getFirstChild();
-                while (nd != null && !(nd instanceof Element)) {
-                    nd = nd.getNextSibling();
-                }
-                Source source = new DOMSource(nd);
-                message.setContent(Source.class, source);
-                message.setContent(XMLStreamReader.class,
-                                   new W3CDOMStreamReader(domWriter.getCurrentFragment()));
             } else if (domWriter.getDocument().getDocumentElement() != null) {
                 Source source = new DOMSource(domWriter.getDocument());
                 message.setContent(Source.class, source);

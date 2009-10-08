@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriBuilder;
@@ -36,10 +37,10 @@ import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
@@ -48,15 +49,6 @@ public class UriInfoImpl implements UriInfo {
     private Message message;
     private OperationResourceInfoStack stack;
 
-    @SuppressWarnings("unchecked")
-    public UriInfoImpl(Message m) {
-        this.message = m;
-        this.templateParams = (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
-        if (m != null) {
-            this.stack = m.get(OperationResourceInfoStack.class);
-        }
-    }
-    
     public UriInfoImpl(Message m, MultivaluedMap<String, String> templateParams) {
         this.message = m;
         this.templateParams = templateParams;
@@ -126,9 +118,6 @@ public class UriInfoImpl implements UriInfo {
 
     public MultivaluedMap<String, String> getPathParameters(boolean decode) {
         MetadataMap<String, String> values = new MetadataMap<String, String>();
-        if (templateParams == null) {
-            return values;
-        }
         for (Map.Entry<String, List<String>> entry : templateParams.entrySet()) {
             if (entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
                 continue;
@@ -139,7 +128,8 @@ public class UriInfoImpl implements UriInfo {
         return values;
     }
 
-    public List<Object> getMatchedResources() {
+    
+    public List<Object> getAncestorResources() {
         if (stack != null) {
             List<Object> resources = new ArrayList<Object>(stack.size());
             for (MethodInvocationInfo invocation : stack) {
@@ -151,28 +141,29 @@ public class UriInfoImpl implements UriInfo {
         return Collections.emptyList();
     }
 
-    public List<String> getMatchedURIs() {
-        return getMatchedURIs(true);
+    public List<String> getAncestorResourceURIs() {
+        return getAncestorResourceURIs(true);
     }
 
-    public List<String> getMatchedURIs(boolean decode) {
+    public List<String> getAncestorResourceURIs(boolean decode) {
         if (stack != null) {
             List<String> objects = new ArrayList<String>();
             List<String> uris = new ArrayList<String>(stack.size());
             String sum = "";
             for (MethodInvocationInfo invocation : stack) {
                 OperationResourceInfo ori = invocation.getMethodInfo();
-                URITemplate[] paths = {
-                    ori.getClassResourceInfo().getURITemplate(),
-                    ori.getURITemplate()
+                Path[] paths = {
+                    (Path)AnnotationUtils.getClassAnnotation(ori.getClassResourceInfo().getResourceClass(),
+                                                             Path.class),
+                    (Path)AnnotationUtils.getMethodAnnotation(ori.getAnnotatedMethod(), Path.class)
                 };
-                for (URITemplate t : paths) {
-                    if (t != null) {
-                        String v = t.getValue();
+                for (Path p : paths) {
+                    if (p != null) {
+                        String v = p.value();
                         sum += "/" + (decode ? HttpUtils.pathDecode(v) : v);
                     }
                 }
-                UriBuilder ub = UriBuilder.fromPath(sum);
+                UriBuilder ub = UriBuilder.fromPath(sum).encode(decode);
                 objects.addAll(invocation.getTemplateValues());
                 uris.add(ub.build(objects.toArray()).normalize().getPath());
             }
@@ -182,6 +173,17 @@ public class UriInfoImpl implements UriInfo {
         return Collections.emptyList();
     }
 
+
+    public String getPathExtension() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public UriBuilder getPlatonicRequestUriBuilder() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
     private String doGetPath(boolean decode, boolean addSlash) {
         String path = HttpUtils.getPathToMatch(message, addSlash);
         return decode ? HttpUtils.pathDecode(path) : path;
@@ -189,9 +191,6 @@ public class UriInfoImpl implements UriInfo {
 
     private String getAbsolutePathAsString() {
         String address = getBaseUri().toString();
-        if (MessageUtils.isRequestor(message)) {
-            return address;
-        }
         String path = doGetPath(true, false);
         if (path.startsWith("/") && address.endsWith("/")) {
             address = address.substring(0, address.length() - 1);

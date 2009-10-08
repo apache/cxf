@@ -43,19 +43,19 @@ public class BinaryDataProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new BinaryDataProvider();
-        assertTrue(p.isWriteable(byte[].class, null, null, null)
-                   && p.isWriteable(InputStream.class, null, null, null)
-                   && p.isWriteable(File.class, null, null, null)
-                   && !p.isWriteable(int[].class, null, null, null));
+        assertTrue(p.isWriteable(byte[].class, null, null)
+                   && p.isWriteable(InputStream.class, null, null)
+                   && p.isWriteable(File.class, null, null)
+                   && !p.isWriteable(int[].class, null, null));
     }
     
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new BinaryDataProvider();
-        assertTrue(p.isReadable(byte[].class, null, null, null)
-                   && p.isReadable(InputStream.class, null, null, null)
-                   && !p.isReadable(File.class, null, null, null)
-                   && !p.isReadable(int[].class, null, null, null));
+        assertTrue(p.isReadable(byte[].class, null, null)
+                   && p.isReadable(InputStream.class, null, null)
+                   && !p.isReadable(File.class, null, null)
+                   && !p.isReadable(int[].class, null, null));
     }
     
     @SuppressWarnings("unchecked")

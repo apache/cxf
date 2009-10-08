@@ -30,8 +30,8 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.jaxrs.utils.ParameterType;
 
 public class PrimitiveTextProvider 
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
@@ -40,7 +40,7 @@ public class PrimitiveTextProvider
         return InjectionUtils.isPrimitive(type);
     }
     
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isSupported(type);
     }
 
@@ -52,11 +52,11 @@ public class PrimitiveTextProvider
                     ParameterType.REQUEST_BODY, null);
     }
 
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(Object t) {
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isSupported(type);
     }
 

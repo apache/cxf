@@ -22,7 +22,7 @@ package org.apache.cxf.jaxrs.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.core.Application;
+import javax.ws.rs.core.ApplicationConfig;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
@@ -93,7 +93,7 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
 
 
     @Override
-    public <T> T createEndpoint(Application applicationConfig, Class<T> endpointType) 
+    public <T> T createEndpoint(ApplicationConfig applicationConfig, Class<T> endpointType) 
         throws IllegalArgumentException, UnsupportedOperationException {
         throw new UnsupportedOperationException();
     }

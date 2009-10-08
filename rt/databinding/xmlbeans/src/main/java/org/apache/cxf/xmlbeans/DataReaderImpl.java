@@ -34,6 +34,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlObject;
@@ -82,6 +83,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
                     obj = meth.invoke(null, reader, options);                    
                     break;
                 } catch (Exception e) {
+                    e.printStackTrace();
                     throw new Fault(new Message("UNMARSHAL_ERROR", LOG, part.getTypeClass()), e);
                 }
             }
@@ -121,7 +123,8 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
             try {
                 reader.next();
             } catch (XMLStreamException e) {
-                throw new RuntimeException(e);
+                // TODO Auto-generated catch block
+                e.printStackTrace();
             }
         }
         return obj;
@@ -141,4 +144,9 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
     public void setSchema(Schema s) {
         validate = s != null;
     }
+
+    public void setSchema(XmlSchemaCollection validationSchemas) {
+        validate = validationSchemas != null;
+    }
+
 }

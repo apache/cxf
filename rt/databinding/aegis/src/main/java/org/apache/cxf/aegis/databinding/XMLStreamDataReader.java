@@ -24,10 +24,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.validation.Schema;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.AegisXMLStreamDataReader;
-import org.apache.cxf.aegis.type.AegisType;
-import org.apache.cxf.aegis.type.basic.ArrayType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
@@ -37,31 +35,23 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
 
     private AegisDatabinding databinding;
     private AegisXMLStreamDataReader reader;
-    
-    public XMLStreamDataReader(AegisDatabinding databinding, Bus bus) {
+
+    public XMLStreamDataReader(AegisDatabinding databinding) {
         this.databinding = databinding;
         reader = new AegisXMLStreamDataReader(databinding.getAegisContext());
     }
-    
+
     public Object read(MessagePartInfo part, XMLStreamReader input) {
+        Type type = databinding.getType(part);
         try {
-            AegisType type = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
-            if (type == null) {
-                type = databinding.getType(part);
-                return reader.read(input, type); 
-            } else {
-                ArrayType arrayType = (ArrayType) type;
-                return reader.readFlatArray(input, arrayType, part.getConcreteName());
-            }
-     
+            return reader.read(input, type); 
         } catch (Exception e) {
             throw new Fault(e);
         }
     }
 
     public Object read(QName name, XMLStreamReader input, Class typeClass) {
-        MessagePartInfo info = databinding.getPartFromClass(typeClass);
-        return info == null ? read(input) : read(info, input);
+        return read(input);
     }
 
     public Object read(XMLStreamReader input) {
@@ -83,4 +73,5 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
     public void setSchema(Schema s) {
         reader.setSchema(s);
     }
+
 }

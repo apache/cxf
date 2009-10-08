@@ -22,7 +22,7 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xmlns:simple="http://cxf.apache.org/simple"
 	xsi:schemaLocation="
-http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
 http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
 
     <bean id="client" class="demo.spring.HelloWorld" 

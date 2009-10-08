@@ -22,15 +22,13 @@ package org.apache.cxf.transport.http;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
-@NoJSR250Annotations(unlessNull = "bus")
 public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     
     List<QueryHandler> queryHandlers;
@@ -39,42 +37,28 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     
     public QueryHandlerRegistryImpl() {
     }
-    public QueryHandlerRegistryImpl(Bus b) {
-        setBus(b);
-    }
+    
     public QueryHandlerRegistryImpl(Bus b, List<QueryHandler> handlers) {
+        bus = b;
         queryHandlers = new CopyOnWriteArrayList<QueryHandler>(handlers);
-        setBus(b);
     }
     
     public void setQueryHandlers(List<QueryHandler> handlers) {
         this.queryHandlers = new CopyOnWriteArrayList<QueryHandler>(handlers);
     }
-    
-    public Bus getBus() {
-        return bus;
-    }
-    @Resource
-    public final void setBus(Bus b) {
-        bus = b;
+
+    @PostConstruct
+    public void register() {
         if (queryHandlers == null) {
             queryHandlers = new CopyOnWriteArrayList<QueryHandler>();
+            if (bus != null) {
+                WSDLQueryHandler wsdlQueryHandler = new WSDLQueryHandler();
+                wsdlQueryHandler.setBus(bus);
+                queryHandlers.add(wsdlQueryHandler);
+            }
         }
         if (null != bus) {
             bus.setExtension(this, QueryHandlerRegistry.class);
-            
-            WSDLQueryHandler wsdlQueryHandler = new WSDLQueryHandler();
-            wsdlQueryHandler.setBus(bus);
-            queryHandlers.add(wsdlQueryHandler);
-            
-            ConfiguredBeanLocator c = bus.getExtension(ConfiguredBeanLocator.class);
-            if (c != null) {
-                for (QueryHandler handler : c.getBeansOfType(QueryHandler.class)) {
-                    if (!queryHandlers.contains(handler)) {
-                        queryHandlers.add(handler);
-                    }
-                }
-            }
         }
     }
 
@@ -89,7 +73,15 @@ public class QueryHandlerRegistryImpl implements QueryHandlerRegistry {
     public void registerHandler(QueryHandler handler, int position) {
         queryHandlers.add(position, handler);
     }
+    
+    @Resource
+    public void setBus(Bus b) {
+        bus = b;
+    }
 
+    public Bus getBus() {
+        return bus;
+    }
 
 }
 

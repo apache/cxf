@@ -33,16 +33,15 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
  * A Rhino wrapper to define DOMParser.
  */
 public class JsSimpleDomParser extends ScriptableObject {
-
+    
     private DocumentBuilder documentBuilder;
-
+    
     public JsSimpleDomParser() {
         try {
             DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
@@ -53,7 +52,7 @@ public class JsSimpleDomParser extends ScriptableObject {
             throw new RuntimeException(e);
         }
     }
-
+    
     public static void register(ScriptableObject scope) {
         try {
             ScriptableObject.defineClass(scope, JsSimpleDomParser.class);
@@ -70,9 +69,9 @@ public class JsSimpleDomParser extends ScriptableObject {
     public String getClassName() {
         return "DOMParser";
     }
-
-    // CHECKSTYLE:OFF
-
+    
+    //CHECKSTYLE:OFF
+    
     public Object jsFunction_parseFromString(String xml, String mimeType) {
         StringReader reader = new StringReader(xml);
         InputSource inputSource = new InputSource(reader);
@@ -84,17 +83,13 @@ public class JsSimpleDomParser extends ScriptableObject {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-        Context context = ContextFactory.getGlobal().enterContext();
-        try {
-            JsSimpleDomNode domNode = (JsSimpleDomNode)context.newObject(getParentScope(), "Node");
-            domNode.initialize(document, null);
-            return domNode;
-        } finally {
-            Context.exit();
-        }
+        
+        Context context = Context.enter();
+        JsSimpleDomNode domNode = (JsSimpleDomNode)context.newObject(getParentScope(), "Node");
+        domNode.initialize(document, null);
+        return domNode;
     }
 
-    // CHECKSTYLE:ON
+    //CHECKSTYLE:ON
 
 }

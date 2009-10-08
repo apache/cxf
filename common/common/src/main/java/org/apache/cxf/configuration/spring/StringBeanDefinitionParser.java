@@ -26,7 +26,6 @@ import org.springframework.beans.factory.xml.AbstractSingleBeanDefinitionParser;
 
 public class StringBeanDefinitionParser extends AbstractSingleBeanDefinitionParser {
 
-    @SuppressWarnings("deprecation")
     @Override
     protected void doParse(Element element, BeanDefinitionBuilder builder) {
         builder.addConstructorArg(DOMUtils.getRawContent(element));

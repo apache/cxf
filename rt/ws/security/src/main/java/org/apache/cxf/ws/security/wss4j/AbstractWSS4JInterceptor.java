@@ -44,7 +44,7 @@ import org.apache.ws.security.handler.WSHandlerConstants;
 
 public abstract class AbstractWSS4JInterceptor extends WSHandler implements SoapInterceptor, 
     PhaseInterceptor<SoapMessage> {
-
+    
     private static final Set<QName> HEADERS = new HashSet<QName>();
     static {
         HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
@@ -145,13 +145,13 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
     public void setBefore(Set<String> before) {
         this.before = before;
     }
-    
-    protected boolean isRequestor(SoapMessage message) {
+
+
+    protected boolean isRequestor(Message message) {
         return MessageUtils.isRequestor(message);
-    }  
+    }
 
     protected boolean decodeEnableSignatureConfirmation(RequestData reqData) throws WSSecurityException {
-
         String value = getString(WSHandlerConstants.ENABLE_SIGNATURE_CONFIRMATION,
                 reqData.getMsgContext());
 

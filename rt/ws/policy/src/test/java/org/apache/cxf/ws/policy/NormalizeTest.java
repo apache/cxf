@@ -91,6 +91,9 @@ public class NormalizeTest extends Assert {
     
     private Bus createBus(String policyNamespace) {
         Bus bus = control.createMock(Bus.class);
+        PolicyConstants constants = new PolicyConstants();
+        constants.setNamespace(policyNamespace);
+        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(constants).anyTimes();
         control.replay();
         return bus;
     }

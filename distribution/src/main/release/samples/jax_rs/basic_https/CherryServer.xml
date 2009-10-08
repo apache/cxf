@@ -35,7 +35,7 @@
             http://cxf.apache.org/transports/http-jetty/configuration
             http://cxf.apache.org/schemas/configuration/http-jetty.xsd
             http://www.springframework.org/schema/beans
-            http://www.springframework.org/schema/beans/spring-beans.xsd">
+            http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
   <httpj:engine-factory bus="cxf">
    <httpj:engine port="9000">

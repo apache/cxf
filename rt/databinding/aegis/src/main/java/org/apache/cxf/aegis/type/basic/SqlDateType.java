@@ -26,7 +26,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * AegisType for the java.sql.Date class which serializes as an xsd:date (no time
+ * Type for the java.sql.Date class which serializes as an xsd:date (no time
  * information).
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>

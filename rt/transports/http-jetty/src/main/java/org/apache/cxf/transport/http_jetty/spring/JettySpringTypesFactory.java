@@ -34,7 +34,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.helpers.DOMUtils;
@@ -43,7 +42,6 @@ import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIde
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
 
-@NoJSR250Annotations
 public final class JettySpringTypesFactory {
     public JettySpringTypesFactory() {
         

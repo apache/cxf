@@ -22,7 +22,7 @@ import javax.xml.namespace.QName;
 
 public abstract class SPConstants {
     
-    public static final String P_NS = "http://www.w3.org/ns/ws-policy";
+    public static final String P_NS = "http://schemas.xmlsoap.org/ws/2004/09/policy";
 
     public static final String P_PREFIX = "wsp";
 
@@ -37,28 +37,35 @@ public abstract class SPConstants {
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
-    
     public static final String LAYOUT = "Layout";
 
-    public enum Layout {
-        Lax,
-        Strict,
-        LaxTimestampFirst,
-        LaxTimestampLast
-    };
+    /**
+     * Security Header Layout : Strict
+     */
+    public static final String LAYOUT_STRICT = "Strict";
 
+    /**
+     * Security Header Layout : Lax
+     */
+    public static final String LAYOUT_LAX = "Lax";
+
+    /**
+     * Security Header Layout : LaxTimestampFirst
+     */
+    public static final String LAYOUT_LAX_TIMESTAMP_FIRST = "LaxTimestampFirst";
+
+    /**
+     * Security Header Layout : LaxTimestampLast
+     */
+    public static final String LAYOUT_LAX_TIMESTAMP_LAST = "LaxTimestampLast";
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
 
-    
-    public enum ProtectionOrder {
-        EncryptBeforeSigning,
-        SignBeforeEncrypting
-    };
     /**
      * Protection Order : EncryptBeforeSigning
      */
     public static final String ENCRYPT_BEFORE_SIGNING = "EncryptBeforeSigning";
+
     /**
      * Protection Order : SignBeforeEncrypting
      */
@@ -124,7 +131,6 @@ public abstract class SPConstants {
     
     
     public static final String USERNAME_TOKEN = "UsernameToken";
-    public static final String KEYVALUE_TOKEN = "KeyValueToken";
     
     public static final String USERNAME_TOKEN10 = "WssUsernameToken10";
     
@@ -341,7 +347,7 @@ public abstract class SPConstants {
     
     public static final String MUST_SUPPORT_REF_THUMBPRINT = "MustSupportRefThumbprint";
     
-    public static final String MUST_SUPPORT_REF_ENCRYPTED_KEY = "MustSupportRefEncryptedKey";
+    public static final String MUST_SUPPORT_REF_ENCRYPTED_KEY = "MustSupportRefEncryptedkey";
     
     ////////////////////////////////////////////////////////////////////////////////////////////////
     
@@ -433,7 +439,6 @@ public abstract class SPConstants {
     public abstract QName getEncryptedElements();
     public abstract QName getSignedParts();
     public abstract QName getEncryptedParts();
-    public abstract QName getIncludeTimestamp();
     
     public abstract QName getSymmetricBinding();
     public abstract QName getTransportBinding();

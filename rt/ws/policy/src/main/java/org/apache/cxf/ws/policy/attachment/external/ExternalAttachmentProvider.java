@@ -29,11 +29,11 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -53,7 +53,6 @@ import org.springframework.core.io.Resource;
 /**
  * 
  */
-@NoJSR250Annotations
 public class ExternalAttachmentProvider extends AbstractPolicyProvider
     implements PolicyProvider {
     
@@ -158,31 +157,40 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
             throw new PolicyException(ex);
         }
         
-        for (Element ae 
-                : PolicyConstants
-                    .findAllPolicyElementsOfLocalName(doc, 
-                                                      PolicyConstants.POLICYATTACHMENT_ELEM_NAME)) {    
+        PolicyConstants constants = null;
+        if (null != bus) {
+            constants = bus.getExtension(PolicyConstants.class);
+        }
+        if (null == constants) {
+            constants = new PolicyConstants();
+        }
+        NodeList nl = doc.getElementsByTagNameNS(constants.getNamespace(), 
+                                                 constants.getPolicyAttachmentElemName());
+        for (int i = 0; i < nl.getLength(); i++) {
+            
             PolicyAttachment attachment = new PolicyAttachment();
+            
+            Element ae = (Element)nl.item(i);
             
             for (Node nd = ae.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
                 if (Node.ELEMENT_NODE != nd.getNodeType()) {
                     continue;
                 }
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
-                if (PolicyConstants.isAppliesToElem(qn)) {
+                if (constants.getAppliesToElemQName().equals(qn)) {
                     Collection<DomainExpression> des = readDomainExpressions((Element)nd);
                     if (des.isEmpty()) {
                         // forget about this attachment
                         continue;
                     }
                     attachment.setDomainExpressions(des);                    
-                } else if (PolicyConstants.isPolicyElem(qn)) {
+                } else if (constants.getPolicyElemQName().equals(qn)) {
                     Policy p = builder.getPolicy((Element)nd);
                     if (null != attachment.getPolicy()) {
                         p = p.merge(attachment.getPolicy());
                     }
                     attachment.setPolicy(p);
-                } else if (PolicyConstants.isPolicyRefElem(qn)) {
+                } else if (constants.getPolicyReferenceElemQName().equals(qn)) {
                     PolicyReference ref = builder.getPolicyReference((Element)nd);
                     if (null != ref) {   
                         Policy p = resolveReference(ref, doc);
@@ -220,7 +228,8 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
         if (null != resolved) {
             return resolved;
         }
-        ReferenceResolver resolver = new LocalDocumentReferenceResolver(doc, builder);
+        ReferenceResolver resolver = new LocalDocumentReferenceResolver(doc, builder, 
+            bus.getExtension(PolicyConstants.class));
         resolved = resolver.resolveReference(relativeURI);
         if (null != resolved) {
             ref.setURI(absoluteURI);
@@ -249,7 +258,7 @@ public class ExternalAttachmentProvider extends AbstractPolicyProvider
         attachments = a;    
     }
     
-    public Collection<PolicyAttachment> getAttachments() {
+    Collection<PolicyAttachment> getAttachments() {
         return attachments;
     }
     

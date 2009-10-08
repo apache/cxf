@@ -27,7 +27,7 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.ext.Providers;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
 
@@ -54,7 +54,7 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
         return get() != null ? get().getHttpServletResponse() : null;
     }
 
-    public Providers getProviders() {
+    public MessageBodyWorkers getProviders() {
         return get() != null ? get().getProviders() : null;
     }
 
@@ -81,21 +81,12 @@ public class ThreadLocalMessageContext extends AbstractThreadLocalProxy<MessageC
     public void put(Object key, Object value) {
         if (get() != null) {
             get().put(key, value);
-        } else {
-            throw new IllegalStateException("MessageContext is not set");
         }
+        throw new IllegalStateException("MessageContext is not set");
     }
 
     public <T, E> T getResolver(Class<T> resolverClass, Class<E> resolveClazz) {
         return get() != null ? get().getResolver(resolverClass, resolveClazz) : null;
-    }
-
-    public <T> T getContent(Class<T> format) {
-        return get() != null ? get().getContent(format) : null;
-    }
-
-    public Object getContextualProperty(Object key) {
-        return get() != null ? get().getContextualProperty(key) : null;
     }
 
 }

@@ -33,6 +33,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <!-- jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties-->
+        <jaxws:dataBinding>
+        	<bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding"/>
+        </jaxws:dataBinding>
     </jaxws:client>
 
     <jaxws:endpoint name="{http://apache.org/hello_world_soap_http/xmlbeans}SoapPort"
@@ -40,6 +43,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <jaxws:properties>
             <entry key="schema-validation-enabled" value="true" />
         </jaxws:properties>
+        <jaxws:dataBinding>
+        	<bean class="org.apache.cxf.xmlbeans.XmlBeansDataBinding"/>
+        </jaxws:dataBinding>
     </jaxws:endpoint>
     
     <jaxws:endpoint name="{http://cxf.apache.org/xmlbeans/doc_lit_bare}SoapPort"

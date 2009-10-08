@@ -24,12 +24,10 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.StringTokenizer;
-
-import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
@@ -45,7 +43,7 @@ public class ArrayTypeInfo {
     private static final QName SOAP_ARRAY_TYPE = new QName(SOAP_ENCODING_NS_1_1, "arrayType");
     private static final QName SOAP_ARRAY_OFFSET = new QName(SOAP_ENCODING_NS_1_1, "offset");
 
-    private AegisType type;
+    private Type type;
     private QName typeName;
     private int ranks;
     private final List<Integer> dimensions = new ArrayList<Integer>();
@@ -58,8 +56,7 @@ public class ArrayTypeInfo {
     }
 
     public ArrayTypeInfo(MessageReader reader, TypeMapping tm) {
-        this(reader.getXMLStreamReader().getNamespaceContext(),
-             readAttributeValue(reader, SOAP_ARRAY_TYPE), readAttributeValue(reader, SOAP_ARRAY_OFFSET));
+        this(readAttributeValue(reader, SOAP_ARRAY_TYPE), readAttributeValue(reader, SOAP_ARRAY_OFFSET));
 
         // if type is xsd:ur-type replace it with xsd:anyType
         String namespace = reader.getNamespaceForPrefix(typeName.getPrefix());
@@ -88,11 +85,11 @@ public class ArrayTypeInfo {
         }
     }
 
-    public ArrayTypeInfo(NamespaceContext namespaceContext, String arrayTypeValue) {
-        this(namespaceContext, arrayTypeValue, null);
+    public ArrayTypeInfo(String arrayTypeValue) {
+        this(arrayTypeValue, null);
     }
 
-    public ArrayTypeInfo(NamespaceContext namespaceContext, String arrayTypeValue, String offsetString) {
+    public ArrayTypeInfo(String arrayTypeValue, String offsetString) {
         if (arrayTypeValue == null) {
             throw new NullPointerException("arrayTypeValue is null");
         }
@@ -113,8 +110,7 @@ public class ArrayTypeInfo {
             throw new DatabindingException("Invalid ArrayType value " + arrayTypeValue);
         }
         if (tokens.get(1).equals(":")) {
-            typeName = 
-                new QName(namespaceContext.getNamespaceURI(tokens.get(0)), tokens.get(2), tokens.get(0));
+            typeName = new QName("", tokens.get(2), tokens.get(0));
             tokens = tokens.subList(3, tokens.size());
         } else {
             typeName = new QName("", tokens.get(0));
@@ -195,7 +191,7 @@ public class ArrayTypeInfo {
         return typeName;
     }
 
-    public AegisType getType() {
+    public Type getType() {
         return type;
     }
 
@@ -222,11 +218,6 @@ public class ArrayTypeInfo {
 
     public String toString() {
         StringBuilder string = new StringBuilder();
-        
-        // no prefix handed to us by someone else ...
-        if ("".equals(typeName.getPrefix()) && !"".equals(typeName.getNamespaceURI())) {
-            throw new RuntimeException("No prefix provided in QName for " + typeName.getNamespaceURI());
-        }
 
         // typeName: foo:bar
         if (typeName.getPrefix() != null && typeName.getPrefix().length() > 0) {

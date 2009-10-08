@@ -33,15 +33,14 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.common.util.ReflectionUtil;
 
 public class BeanTypeInfo {
     private Map<QName, QName> mappedName2typeName = new HashMap<QName, QName>();
     private Map<QName, String> mappedName2pdName = new HashMap<QName, String>();
-    private Map<QName, AegisType> mappedName2type = new HashMap<QName, AegisType>();
+    private Map<QName, Type> mappedName2type = new HashMap<QName, Type>();
     private Class<?> beanClass;
     private List<QName> attributes = new ArrayList<QName>();
     private List<QName> elements = new ArrayList<QName>();
@@ -56,12 +55,12 @@ public class BeanTypeInfo {
     private boolean qualifyElements = true;
 
     /**
-     * extensibleElements means adding xs:any to WSDL Complex AegisType Definition
+     * extensibleElements means adding xs:any to WSDL Complex Type Definition
      */
     private boolean extensibleElements = true;
 
     /**
-     * extensibleAttributes means adding xs:anyAttribute to WSDL Complex AegisType
+     * extensibleAttributes means adding xs:anyAttribute to WSDL Complex Type
      * Definition
      */
     private boolean extensibleAttributes = true;
@@ -152,9 +151,9 @@ public class BeanTypeInfo {
     /**
      * Get the type class for the field with the specified QName.
      */
-    public AegisType getType(QName name) {
+    public Type getType(QName name) {
         // 1. Try a prexisting mapped type
-        AegisType type = mappedName2type.get(name);
+        Type type = mappedName2type.get(name);
 
         // 2. Try to get the type by its name, if there is one
         if (type == null) {
@@ -213,7 +212,7 @@ public class BeanTypeInfo {
         return true;
     }
 
-    public void mapType(QName name, AegisType type) {
+    public void mapType(QName name, Type type) {
         mappedName2type.put(name, type);
     }
 
@@ -287,14 +286,7 @@ public class BeanTypeInfo {
         }
 
         if (beanInfo != null) {
-            PropertyDescriptor[] propertyDescriptors = beanInfo.getPropertyDescriptors();
-            if (propertyDescriptors != null) {
-                // see comments on this function.
-                descriptors = ReflectionUtil.getPropertyDescriptorsAvoidSunBug(getClass(), 
-                                                                               beanInfo, 
-                                                                               beanClass, 
-                                                                               propertyDescriptors);
-            }
+            descriptors = beanInfo.getPropertyDescriptors();
         }
 
         if (descriptors == null) {
@@ -380,33 +372,15 @@ public class BeanTypeInfo {
      * @return
      */
     public boolean isNillable(QName name) {
-        AegisType type = getType(name);
+        Type type = getType(name);
         if (!type.isNillable()) {
             return false;
         }
         return nillable;
     }
 
-    /**
-     * Return the minOccurs value. When there is no XML file or annotation (the situation
-     * if we are running from the base class here), there is no source for the 
-     * minOccurs parameter except the default, which is supplied from the overall Aegis options.
-     * @param name Element QName
-     * @return
-     */
     public int getMinOccurs(QName name) {
         return minOccurs;
-    }
-    
-    /**
-     * Return the maxOccurs value. When there is no XML file or annotation (the situation
-     * if we are in the base class here), there is no per-element source for this item,
-     * and the value is always 1.
-     * @param name Element QName
-     * @return 1
-     */
-    public int getMaxOccurs(QName name) {
-        return 1;
     }
     
     public long getMinOccurs() {
@@ -425,12 +399,12 @@ public class BeanTypeInfo {
         return mappedName2pdName.get(name);
     }
 
-    public List<QName> getAttributes() {
-        return attributes;
+    public Iterator<QName> getAttributes() {
+        return attributes.iterator();
     }
 
-    public List<QName> getElements() {
-        return elements;
+    public Iterator<QName> getElements() {
+        return elements.iterator();
     }
 
     public boolean isExtensibleElements() {

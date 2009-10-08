@@ -20,9 +20,6 @@
 package org.apache.cxf.binding.soap;
 
 import java.util.ArrayList;
-
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -39,7 +36,6 @@ import javax.wsdl.extensions.mime.MIMEMultipartRelated;
 import javax.wsdl.extensions.mime.MIMEPart;
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
@@ -57,14 +53,11 @@ import org.apache.cxf.binding.soap.interceptor.SoapHeaderInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapHeaderOutFilterInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
-import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
 import org.apache.cxf.binding.soap.model.SoapHeaderInfo;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
@@ -100,18 +93,8 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
-
-@NoJSR250Annotations(unlessNull = { "bus" })
 public class SoapBindingFactory extends AbstractBindingFactory {
-    public static final Collection<String> DEFAULT_NAMESPACES = Arrays.asList(
-        "http://schemas.xmlsoap.org/soap/",
-        "http://schemas.xmlsoap.org/wsdl/soap/",
-        "http://schemas.xmlsoap.org/wsdl/soap12/",
-        "http://schemas.xmlsoap.org/wsdl/soap/http",
-        "http://www.w3.org/2003/05/soap/bindings/HTTP/"
-    );
-    
-    
+
     public static final String SOAP_11_BINDING = "http://schemas.xmlsoap.org/wsdl/soap/";
     public static final String SOAP_12_BINDING = "http://schemas.xmlsoap.org/wsdl/soap12/";
 
@@ -120,13 +103,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
     private boolean mtomEnabled = true;
 
-    public SoapBindingFactory() {
-    }
-    
-    public SoapBindingFactory(Bus b) {
-        super(b, DEFAULT_NAMESPACES);
-    }
-    
     public BindingInfo createBindingInfo(ServiceInfo si, String bindingid, Object conf) {
         SoapBindingConfiguration config;
         if (conf instanceof SoapBindingConfiguration) {
@@ -361,21 +337,9 @@ public class SoapBindingFactory extends AbstractBindingFactory {
                     hasWrapped = true;
                 }
             }
-            
-            if (Boolean.TRUE.equals(binding.getService().getProperty("soap.force.doclit.bare"))) {
-                hasDoc = true;
-                hasRPC = false;
-                parameterStyle = SoapBindingConstants.PARAMETER_STYLE_BARE;
-                bindingStyle = SoapBindingConstants.BINDING_STYLE_DOC;
-            }
             if (hasRPC && hasDoc) {
                 throw new RuntimeException("WSI-BP prohibits RPC and Document style "
                                            + "operations in same service.");
-            }
-            
-            //jms
-            if (sbi.getTransportURI().equals("http://www.w3.org/2008/07/soap/bindings/JMS/")) {
-                sb.getInInterceptors().add(new SoapJMSInInterceptor());
             }
         } else {
             throw new RuntimeException("Can not initialize SoapBinding, BindingInfo is not SoapBindingInfo");
@@ -384,45 +348,47 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         sb.getOutFaultInterceptors().add(new StaxOutInterceptor());
         sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
 
-        sb.getInInterceptors().add(new AttachmentInInterceptor());
-        sb.getInInterceptors().add(new StaxInInterceptor());
-        sb.getInInterceptors().add(new SoapActionInInterceptor());
-        
-        sb.getOutInterceptors().add(new AttachmentOutInterceptor());
-        sb.getOutInterceptors().add(new StaxOutInterceptor());
-        sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());
+        //Do not add any interceptors if it is Provider/Dispatch
+        if (!Boolean.TRUE.equals(binding.getProperty(DATABINDING_DISABLED))) {
+            sb.getInInterceptors().add(new AttachmentInInterceptor());
+            sb.getInInterceptors().add(new StaxInInterceptor());
+            sb.getInInterceptors().add(new SoapActionInInterceptor());
+            
+            sb.getOutInterceptors().add(new AttachmentOutInterceptor());
+            sb.getOutInterceptors().add(new StaxOutInterceptor());
+            sb.getOutInterceptors().add(new SoapHeaderOutFilterInterceptor());
 
-        if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(bindingStyle)) {
-            sb.getInInterceptors().add(new RPCInInterceptor());
-            sb.getOutInterceptors().add(new RPCOutInterceptor());
-        } else if (SoapBindingConstants.BINDING_STYLE_DOC.equalsIgnoreCase(bindingStyle)
-                        && SoapBindingConstants.PARAMETER_STYLE_BARE.equalsIgnoreCase(parameterStyle)) {
-            //sb.getInInterceptors().add(new BareInInterceptor());
-            sb.getInInterceptors().add(new DocLiteralInInterceptor());
-            if (hasWrapped) {
-                sb.getOutInterceptors().add(new WrappedOutInterceptor());                    
+            if (SoapBindingConstants.BINDING_STYLE_RPC.equalsIgnoreCase(bindingStyle)) {
+                sb.getInInterceptors().add(new RPCInInterceptor());
+                sb.getOutInterceptors().add(new RPCOutInterceptor());
+            } else if (SoapBindingConstants.BINDING_STYLE_DOC.equalsIgnoreCase(bindingStyle)
+                            && SoapBindingConstants.PARAMETER_STYLE_BARE.equalsIgnoreCase(parameterStyle)) {
+                //sb.getInInterceptors().add(new BareInInterceptor());
+                sb.getInInterceptors().add(new DocLiteralInInterceptor());
+                if (hasWrapped) {
+                    sb.getOutInterceptors().add(new WrappedOutInterceptor());                    
+                }
+                sb.getOutInterceptors().add(new BareOutInterceptor());
+            } else {
+                //sb.getInInterceptors().add(new WrappedInInterceptor());
+                sb.getInInterceptors().add(new DocLiteralInInterceptor());
+                sb.getOutInterceptors().add(new WrappedOutInterceptor());
+                sb.getOutInterceptors().add(new BareOutInterceptor());
             }
-            sb.getOutInterceptors().add(new BareOutInterceptor());
-        } else {
-            //sb.getInInterceptors().add(new WrappedInInterceptor());
-            sb.getInInterceptors().add(new DocLiteralInInterceptor());
-            sb.getOutInterceptors().add(new WrappedOutInterceptor());
-            sb.getOutInterceptors().add(new BareOutInterceptor());
+            sb.getInInterceptors().add(new SoapHeaderInterceptor());
+
+            sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus(), version));
+            sb.getInInterceptors().add(new CheckFaultInterceptor());
+            sb.getInInterceptors().add(new MustUnderstandInterceptor());
+            sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
+            sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
+            sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
+
+            // REVISIT: The phase interceptor chain seems to freak out if this added
+            // first. Not sure what the deal is at the moment, I suspect the
+            // ordering algorithm needs to be improved
+            sb.getInInterceptors().add(new URIMappingInterceptor());
         }
-        sb.getInInterceptors().add(new SoapHeaderInterceptor());
-
-        sb.getInInterceptors().add(new ReadHeadersInterceptor(getBus(), version));
-        sb.getInInterceptors().add(new StartBodyInterceptor());
-        sb.getInInterceptors().add(new CheckFaultInterceptor());
-        sb.getInInterceptors().add(new MustUnderstandInterceptor());
-        sb.getOutInterceptors().add(new SoapPreProtocolOutInterceptor());
-        sb.getOutInterceptors().add(new SoapOutInterceptor(getBus()));
-        sb.getOutFaultInterceptors().add(new SoapOutInterceptor(getBus()));
-
-        // REVISIT: The phase interceptor chain seems to freak out if this added
-        // first. Not sure what the deal is at the moment, I suspect the
-        // ordering algorithm needs to be improved
-        sb.getInInterceptors().add(new URIMappingInterceptor());
 
         if (version.getVersion() == 1.1) {
             sb.getInFaultInterceptors().add(new Soap11FaultInInterceptor());
@@ -841,7 +807,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             // probably aren't going to use this feature.
             
             newMO.getBindingInterceptors().add(new ReadHeadersInterceptor(getBus(), (SoapVersion)null));
-            newMO.getBindingInterceptors().add(new StartBodyInterceptor());
             newMO.getBindingInterceptors().add(new CheckFaultInterceptor());
 
             // Add in a default selection interceptor

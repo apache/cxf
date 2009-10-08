@@ -1,0 +1,142 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="GreeterService" targetNamespace="http://apache.org/xml_bare" xmlns:tns="http://apache.org/xml_bare" xmlns:ns1="http://apache.org/xml_bare/types" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://apache.org/xml_bare/types" attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://apache.org/xml_bare/types">
+<xs:element name="myComplexStruct" nillable="true" type="tns:myComplexStructType"/>
+<xs:element name="requestType" nillable="true" type="xs:string"/>
+<xs:element name="responseType" nillable="true" type="xs:string"/>
+<xs:complexType name="myComplexStructType">
+<xs:sequence>
+<xs:element form="qualified" name="elem1" type="xs:string"/>
+<xs:element form="qualified" name="elem2" type="xs:string"/>
+<xs:element form="qualified" name="elem3" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:ns0="http://apache.org/xml_bare/types" xmlns:tns="http://apache.org/xml_bare" attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://apache.org/xml_bare">
+<xsd:import namespace="http://apache.org/xml_bare/types"/>
+<xsd:element name="out" nillable="true" type="xsd:string"/>
+<xsd:element name="in" nillable="true" type="ns0:myComplexStructType"/>
+</xsd:schema>
+  </wsdl:types>
+  <wsdl:message name="sendReceiveData">
+    <wsdl:part name="in" element="tns:in">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testMultiParamPart">
+    <wsdl:part name="in2" element="ns1:myComplexStruct">
+    </wsdl:part>
+    <wsdl:part name="in1" element="ns1:requestType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMe">
+    <wsdl:part name="me" element="ns1:requestType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHiResponse">
+    <wsdl:part name="out" element="tns:out">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sendReceiveDataResponse">
+    <wsdl:part name="out" element="tns:out">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testMultiParamPartResponse">
+    <wsdl:part name="out1" element="ns1:responseType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="sayHi">
+  </wsdl:message>
+  <wsdl:message name="greetMeResponse">
+    <wsdl:part name="theResponse" element="ns1:responseType">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Greeter">
+    <wsdl:operation name="sayHi">
+      <wsdl:input name="sayHi" message="tns:sayHi">
+    </wsdl:input>
+      <wsdl:output name="sayHiResponse" message="tns:sayHiResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testMultiParamPart">
+      <wsdl:input name="testMultiParamPart" message="tns:testMultiParamPart">
+    </wsdl:input>
+      <wsdl:output name="testMultiParamPartResponse" message="tns:testMultiParamPartResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <wsdl:input name="greetMe" message="tns:greetMe">
+    </wsdl:input>
+      <wsdl:output name="greetMeResponse" message="tns:greetMeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendReceiveData">
+      <wsdl:input name="sendReceiveData" message="tns:sendReceiveData">
+    </wsdl:input>
+      <wsdl:output name="sendReceiveDataResponse" message="tns:sendReceiveDataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="GreeterServiceSoapBinding" type="tns:Greeter">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="sayHi">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sayHi">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sayHiResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="testMultiParamPart">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="testMultiParamPart">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="testMultiParamPartResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="greetMe">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="sendReceiveData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="sendReceiveData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="sendReceiveDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GreeterService">
+    <wsdl:port name="GreeterPort" binding="tns:GreeterServiceSoapBinding">
+      <soap:address location="http://localhost:9090/GreeterPort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

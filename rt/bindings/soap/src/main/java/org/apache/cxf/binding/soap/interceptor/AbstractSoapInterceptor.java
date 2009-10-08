@@ -49,6 +49,11 @@ public abstract class AbstractSoapInterceptor extends AbstractPhaseInterceptor<S
     }
 
     
+    protected boolean isRequestor(org.apache.cxf.message.Message message) {
+        return Boolean.TRUE.equals(message.containsKey(
+            org.apache.cxf.message.Message.REQUESTOR_ROLE));
+    }  
+    
     public Set<URI> getRoles() {
         return Collections.emptySet();
     }

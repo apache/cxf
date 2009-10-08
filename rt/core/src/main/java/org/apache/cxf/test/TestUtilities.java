@@ -153,8 +153,8 @@ public class TestUtilities {
      * @param xpath
      * @throws Exception
      */
-    public void assertValidBoolean(String xpath, Node node) throws Exception {
-        XPathAssert.assertValidBoolean(xpath, node, namespaces);
+    public boolean assertValidBoolean(String xpath, Node node) throws Exception {
+        return XPathAssert.assertValidBoolean(xpath, node, namespaces);
     }
 
 

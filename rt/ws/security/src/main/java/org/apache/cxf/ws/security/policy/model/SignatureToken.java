@@ -22,10 +22,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class SignatureToken extends TokenWrapper {
+public class SignatureToken extends AbstractSecurityAssertion implements TokenWrapper {
+
+    private Token signatureToken;
 
     public SignatureToken(SPConstants version) {
         super(version);
@@ -35,33 +36,34 @@ public class SignatureToken extends TokenWrapper {
      * @return Returns the signatureToken.
      */
     public Token getSignatureToken() {
-        return getToken();
+        return signatureToken;
     }
+
     /**
      * @param signatureToken The signatureToken to set.
      */
     public void setSignatureToken(Token signatureToken) {
-        setToken(signatureToken);
+        this.signatureToken = signatureToken;
     }
 
-
-    public QName getRealName() {
-        return constants.getSignatureToken();
+    public void setToken(Token tok) {
+        this.setSignatureToken(tok);
     }
+
     public QName getName() {
-        return SP12Constants.INSTANCE.getSignatureToken();
+        return constants.getSignatureToken();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix;
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
 
         } else {
@@ -98,11 +100,11 @@ public class SignatureToken extends TokenWrapper {
             writer.writeNamespace(wspPrefix, wspNamespaceURI);
         }
 
-        if (token == null) {
+        if (signatureToken == null) {
             throw new RuntimeException("EncryptionToken is not set");
         }
 
-        token.serialize(writer);
+        signatureToken.serialize(writer);
 
         // </wsp:Policy>
         writer.writeEndElement();

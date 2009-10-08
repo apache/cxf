@@ -246,7 +246,6 @@ public abstract class AbstractBeanDefinitionParser
         mapElementToJaxbProperty(data, bean, propertyName, c);
     }
     
-    @SuppressWarnings("deprecation")
     protected void mapElementToJaxbProperty(Element data, 
                                             BeanDefinitionBuilder bean, 
                                             String propertyName, 
@@ -307,7 +306,6 @@ public abstract class AbstractBeanDefinitionParser
                                                                  null, method, args));
     }
     
-    @SuppressWarnings("deprecation")
     public AbstractBeanDefinition mapElementToJaxbBean(Element data, 
                                                        Class<?> cls,
                                                       Class<?> factory,

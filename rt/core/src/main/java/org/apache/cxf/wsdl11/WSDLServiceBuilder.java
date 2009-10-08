@@ -22,13 +22,11 @@ package org.apache.cxf.wsdl11;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.wsdl.Binding;
@@ -148,7 +146,7 @@ public class WSDLServiceBuilder {
         description.setName(d.getQName());
         description.setBaseURI(d.getDocumentBaseURI());
         copyExtensors(description, d.getExtensibilityElements());
-        copyExtensionAttributes(description, d);        
+        copyExtensionAttributes(description, d);
 
         List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
         for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
@@ -275,21 +273,6 @@ public class WSDLServiceBuilder {
             description.setBaseURI(def.getDocumentBaseURI());
             copyExtensors(description, def.getExtensibilityElements());
             copyExtensionAttributes(description, def);
-            
-            Set<Definition> done = new HashSet<Definition>();
-            done.add(def);
-            Collection<List<Import>> values = CastUtils.cast(def.getImports().values());
-            for (List<Import> imports : values) {
-                for (Import imp : imports) {
-                    if (!done.contains(imp.getDefinition())) {
-                        done.add(imp.getDefinition());
-                        copyExtensors(description, imp.getExtensibilityElements());
-                        copyExtensionAttributes(description, imp);
-                        copyExtensors(description, imp.getDefinition().getExtensibilityElements());
-                        copyExtensionAttributes(description, imp.getDefinition());
-                    }
-                }
-            }
         }
         for (Port port : cast(serv.getPorts().values(), Port.class)) {
             if (endpointName != null

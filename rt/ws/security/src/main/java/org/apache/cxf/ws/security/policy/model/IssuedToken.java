@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 /**
@@ -103,22 +102,19 @@ public class IssuedToken extends Token {
         this.rstTemplate = rstTemplate;
     }
 
-    public QName getRealName() {
-        return constants.getIssuedToken();
-    }
     public QName getName() {
-        return SP12Constants.INSTANCE.getIssuedToken();
+        return constants.getIssuedToken();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix;
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
 
         } else {

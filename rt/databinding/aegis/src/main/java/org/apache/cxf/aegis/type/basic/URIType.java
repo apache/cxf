@@ -21,16 +21,16 @@ package org.apache.cxf.aegis.type.basic;
 import java.net.URI;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * <code>AegisType</code> for a <code>URI</code>
+ * <code>Type</code> for a <code>URI</code>
  * 
  * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
-public class URIType extends AegisType {
+public class URIType extends Type {
     @Override
     public Object readObject(final MessageReader reader, final Context context) {
         final String value = reader.getValue();

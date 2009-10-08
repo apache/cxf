@@ -25,7 +25,7 @@
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"  >
 
-  <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+  <xsd:import namespace="http://www.springframework.org/schema/beans" schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
   <xsd:import namespace="http://cxf.apache.org/configuration/beans" schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
 
   <xsd:annotation>
@@ -62,7 +62,6 @@
       <xsd:attribute name="ignoreUnknownAssertions" type="xsd:boolean" default="false"/>
       <xsd:attribute name="namespace" type="xsd:string"/>
       <xsd:attribute name="id" type="xsd:string"/>
-      <xsd:attribute name="enabled" type="xsd:boolean"/>
     </xsd:complexType>
   </xsd:element>
   
@@ -105,7 +104,20 @@
     </xsd:complexType>
   </xsd:element>
  
-  <xsd:element name="externalAttachment">
+  <xsd:element name="constants">
+    <xsd:complexType>
+      <xsd:attribute name="namespace" type="xsd:string" default="http://www.w3.org/2006/07/ws-policy">
+        <xsd:annotation>
+          <xsd:documentation>
+              The namespace of the WS-Policy Framework specification. 
+              This attribute can be set to support older versions of the specification.           
+          </xsd:documentation>
+        </xsd:annotation>
+      </xsd:attribute>
+    </xsd:complexType>
+  </xsd:element>
+  
+    <xsd:element name="externalAttachment">
     <xsd:complexType>
       <xsd:complexContent>
         <xsd:extension base="beans:identifiedType">

@@ -28,17 +28,15 @@ import org.apache.cxf.common.util.SOAPConstants;
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public abstract class AbstractMessageWriter implements MessageWriter {
-    
-    private boolean xsiTypeWritten;
-    
+    /**
+     * Create a LiteralWriter but without writing an element name.
+     * 
+     * @param writer
+     */
     public AbstractMessageWriter() {
     }
 
     public void writeXsiType(QName type) {
-        if (xsiTypeWritten) {
-            return;
-        }
-        xsiTypeWritten = true;
 
         /*
          * Do not assume that the prefix supplied with the QName should be used

@@ -88,18 +88,18 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
 
         if (commandDocument.hasParameter("help")) {
             try {
-                out.println(name + " " + getUsage());
-                out.println();
-                out.println("Options: ");
-                out.println();
-                out.println(parser.getFormattedDetailedUsage());
+                System.out.println(name + " " + getUsage());
+                System.out.println();
+                System.out.println("Options: ");
+                System.out.println();
+                System.out.println(parser.getFormattedDetailedUsage());
                 String toolUsage = parser.getToolUsage();
                 if (toolUsage != null) {
-                    out.println(toolUsage);
+                    System.out.println(toolUsage);
                 }
             } catch (Exception ex) {
-                err.println("Error: Could not output detailed usage");
-                err.println();
+                System.err.println("Error: Could not output detailed usage");
+                System.err.println();
             }
         }
         if (commandDocument.hasParameter("version")) {
@@ -149,16 +149,16 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     }
 
     public void outputVersion() {
-        out.println(name + " - " + Version.getCompleteVersionString());
-        out.println();
+        System.out.println(name + " - " + Version.getCompleteVersionString());
+        System.out.println();
     }
 
     public void outputFullCommandLine() {
-        out.print(name);
+        System.out.print(name);
         for (int i = 0; i < getArgument().length; i++) {
-            out.print(" " + getArgument()[i]);
+            System.out.print(" " + getArgument()[i]);
         }
-        out.println();
+        System.out.println();
     }
     
     public String getFileBase(String wsdlUrl) {
@@ -178,12 +178,12 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         if (verbose) {
             outputFullCommandLine();
         }
-        err.println(ex.getMessage());
-        err.println("Usage : " + toolName + " " + ex.getUsage());
+        System.err.println(ex.getMessage());
+        System.err.println("Usage : " + toolName + " " + ex.getUsage());
         if (verbose) {
             outputVersion();
         }
-        err.println();
+        System.err.println();
     }
 
     public String getFileName(String loc) {

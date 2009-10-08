@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
@@ -39,8 +38,7 @@ import org.apache.cxf.transport.Conduit;
  * 
  */
 public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
-    public static final ClientPolicyInFaultInterceptor INSTANCE = new ClientPolicyInFaultInterceptor();
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(ClientPolicyInFaultInterceptor.class);
     
     public ClientPolicyInFaultInterceptor() {
@@ -63,7 +61,6 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         }
         EndpointInfo ei = e.getEndpointInfo();
         
-        Bus bus = exchange.get(Bus.class);
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
@@ -82,13 +79,13 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         LOG.fine("faultInterceptors: " + faultInterceptors);
         for (Interceptor i : faultInterceptors) {
             msg.getInterceptorChain().add(i);
-            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            LOG.log(Level.INFO, "Added interceptor of type {0}", i.getClass().getSimpleName());
         }
         
         // insert assertions of endpoint's fault vocabulary into message
         
         Collection<PolicyAssertion> assertions = ep.getFaultVocabulary();
-        if (null != assertions && !assertions.isEmpty()) {
+        if (null != assertions) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
     }

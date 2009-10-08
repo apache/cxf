@@ -21,16 +21,16 @@ package org.apache.cxf.aegis.type.basic;
 import java.math.BigDecimal;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * <code>AegisType</code> for a <code>BigDecimal</code>
+ * <code>Type</code> for a <code>BigDecimal</code>
  * 
  * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
-public class BigDecimalType extends AegisType {
+public class BigDecimalType extends Type {
     public BigDecimalType() {
         super();
     }

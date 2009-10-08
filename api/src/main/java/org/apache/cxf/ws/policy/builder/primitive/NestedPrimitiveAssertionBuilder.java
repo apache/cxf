@@ -42,7 +42,7 @@ public class NestedPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
     
     @Override
     public PolicyAssertion build(Element elem) {
-        return new NestedPrimitiveAssertion(elem, builder); 
+        return new NestedPrimitiveAssertion(elem, builder, getPolicyConstants()); 
     }
 
     @Override

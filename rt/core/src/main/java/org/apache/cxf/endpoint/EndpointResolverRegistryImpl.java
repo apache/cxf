@@ -19,9 +19,10 @@
 
 package org.apache.cxf.endpoint;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CopyOnWriteArrayList;
 
+import javax.annotation.PostConstruct;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
@@ -41,21 +42,14 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
 
     private Bus bus;
-    private List<EndpointResolver> resolvers 
-        = new CopyOnWriteArrayList<EndpointResolver>();
-    
-    public EndpointResolverRegistryImpl() {
-        
-    }
-    public EndpointResolverRegistryImpl(Bus b) {
-        setBus(b);
-    }
+    private List<EndpointResolver> resolvers;
     
     /**
-     * @param b Bus to encapsulate
-     */ 
-    public final void setBus(Bus b) {
-        bus = b;
+     * Initialize registry, and expose as Bus extension.
+     */
+    @PostConstruct
+    public void init() {
+        resolvers = new ArrayList<EndpointResolver>();
         if (bus != null) {
             bus.setExtension(this, EndpointResolverRegistry.class);
         }
@@ -172,5 +166,10 @@ public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
         return resolvers;
     }
     
-
+    /**
+     * @param b Bus to encapsulate
+     */
+    public void setBus(Bus b) {
+        bus = b;
+    }
 }

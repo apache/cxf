@@ -19,9 +19,12 @@
 
 package org.apache.cxf.jaxb;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -29,6 +32,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -41,16 +45,17 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.Result;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 
@@ -62,7 +67,6 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
-import org.apache.cxf.common.util.CachedClass;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -127,11 +131,27 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     }
     
+    static final class CachedClassOrNull {
+        private WeakReference<Class<?>> cachedClass;
+
+        public CachedClassOrNull(Class<?> cachedClass) {
+            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
+        }
+
+        public Class<?> getCachedClass() {
+            return cachedClass == null ? null : cachedClass.get();
+        }
+
+        public void setCachedClass(Class<?> cachedClass) {
+            this.cachedClass = new WeakReference<Class<?>>(cachedClass);
+        }
+    }
+
     private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE 
         = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
     
-    private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
-        = new CacheMap<Package, CachedClass>();
+    private static final Map<Package, CachedClassOrNull> OBJECT_FACTORY_CACHE
+        = new CacheMap<Package, CachedClassOrNull>();
     
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
     static {
@@ -221,7 +241,6 @@ public class JAXBDataBinding extends AbstractDataBinding
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
     
-    private boolean unwrapJAXBElement = true;
 
     private boolean qualifiedSchemas;
     private Service service;
@@ -290,11 +309,11 @@ public class JAXBDataBinding extends AbstractDataBinding
     public <T> DataReader<T> createReader(Class<T> c) {
         DataReader<T> dr = null;
         if (c == XMLStreamReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this, unwrapJAXBElement);
+            dr = (DataReader<T>)new DataReaderImpl<XMLStreamReader>(this);
         } else if (c == XMLEventReader.class) {
-            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this, unwrapJAXBElement);
+            dr = (DataReader<T>)new DataReaderImpl<XMLEventReader>(this);
         } else if (c == Node.class) {
-            dr = (DataReader<T>)new DataReaderImpl<Node>(this, unwrapJAXBElement);
+            dr = (DataReader<T>)new DataReaderImpl<Node>(this);
         }
 
         return dr;
@@ -328,10 +347,13 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         }
 
-        String tns = getNamespaceToUse();
+        String tns = service.getName().getNamespaceURI();
         CachedContextAndSchemas cachedContextAndSchemas = null;
         JAXBContext ctx = null;
         try {
+            if (service.getServiceInfos().size() > 0) {
+                tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
+            }
             cachedContextAndSchemas = createJAXBContextAndSchemas(contextClasses, tns);
         } catch (JAXBException e1) {
             // load jaxb needed class and try to create jaxb context for more
@@ -434,19 +456,6 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
     }
     
-    private String getNamespaceToUse() {
-        if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
-            return null;    
-        }
-        String tns = null;
-        if (service.getServiceInfos().size() > 0) {
-            tns = service.getServiceInfos().get(0).getInterface().getName().getNamespaceURI();
-        } else {
-            tns = service.getName().getNamespaceURI();
-        }
-        return tns;
-    }
-    
     public void setExtraClass(Class[] userExtraClass) {
         extraClass = userExtraClass;
     }
@@ -457,7 +466,27 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     // default access for tests.
     List<DOMResult> generateJaxbSchemas() throws IOException {
-        return JAXBUtils.generateJaxbSchemas(context, BUILT_IN_SCHEMAS);
+        final List<DOMResult> results = new ArrayList<DOMResult>();
+
+        context.generateSchema(new SchemaOutputResolver() {
+
+            @Override
+            public Result createOutput(String ns, String file) throws IOException {
+                DOMResult result = new DOMResult();
+
+                if (BUILT_IN_SCHEMAS.containsKey(ns)) {
+                    DOMResult dr = BUILT_IN_SCHEMAS.get(ns);
+                    result.setSystemId(dr.getSystemId());
+                    results.add(dr);
+                    return result;
+                }
+                result.setSystemId(file);
+                results.add(result);
+                return result;
+            }
+        });
+
+        return results;
     }
 
     public JAXBContext createJAXBContext(Set<Class<?>> classes) throws JAXBException {
@@ -479,7 +508,7 @@ public class JAXBDataBinding extends AbstractDataBinding
             }
         }
 
-        JAXBUtils.scanPackages(classes, OBJECT_FACTORY_CACHE);
+        scanPackages(classes);
         addWsAddressingTypes(classes);
 
         for (Class<?> clz : classes) {
@@ -527,7 +556,88 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         return cachedContextAndSchemas;
     }
-    
+    private void scanPackages(Set<Class<?>> classes) {
+     // try and read any jaxb.index files that are with the other classes.
+        // This should
+        // allow loading of extra classes (such as subclasses for inheritance
+        // reasons)
+        // that are in the same package. Also check for ObjectFactory classes
+        Map<String, InputStream> packages = new HashMap<String, InputStream>();
+        Map<String, ClassLoader> packageLoaders = new HashMap<String, ClassLoader>();
+        Set<Class<?>> objectFactories = new HashSet<Class<?>>();
+        for (Class<?> jcls : classes) {
+            String pkgName = PackageUtils.getPackageName(jcls);
+            if (!packages.containsKey(pkgName)) {
+                Package pkg = jcls.getPackage();
+                
+                packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
+                packageLoaders.put(pkgName, jcls.getClassLoader());
+                String objectFactoryClassName = pkgName + "." + "ObjectFactory";
+                Class<?> ofactory = null;
+                CachedClassOrNull cachedFactory = null;
+                if (pkg != null) {
+                    synchronized (OBJECT_FACTORY_CACHE) {
+                        cachedFactory = OBJECT_FACTORY_CACHE.get(pkg);
+                    }
+                }
+                if (cachedFactory != null) {
+                    ofactory = cachedFactory.getCachedClass();
+                }
+                if (ofactory == null) {
+                    try {
+                        ofactory = Class.forName(objectFactoryClassName, false, jcls
+                                                 .getClassLoader());
+                        objectFactories.add(ofactory);
+                        addToObjectFactoryCache(pkg, ofactory);
+                    } catch (ClassNotFoundException e) {
+                        addToObjectFactoryCache(pkg, null);
+                    }
+                } else {
+                    objectFactories.add(ofactory);                    
+                }
+            }
+        }
+        for (Map.Entry<String, InputStream> entry : packages.entrySet()) {
+            if (entry.getValue() != null) {
+                try {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(entry.getValue(),
+                                                                                     "UTF-8"));
+                    String pkg = entry.getKey();
+                    ClassLoader loader = packageLoaders.get(pkg);
+                    if (!StringUtils.isEmpty(pkg)) {
+                        pkg += ".";
+                    }
+
+                    String line = reader.readLine();
+                    while (line != null) {
+                        line = line.trim();
+                        if (line.indexOf("#") != -1) {
+                            line = line.substring(0, line.indexOf("#"));
+                        }
+                        if (!StringUtils.isEmpty(line)) {
+                            try {
+                                Class<?> ncls = Class.forName(pkg + line, false, loader);
+                                classes.add(ncls);
+                            } catch (Exception e) {
+                                // ignore
+                            }
+                        }
+                        line = reader.readLine();
+                    }
+                } catch (Exception e) {
+                    // ignore
+                } finally {
+                    try {
+                        entry.getValue().close();
+                    } catch (Exception e) {
+                        // ignore
+                    }
+                }
+            }
+        }
+        classes.addAll(objectFactories);
+    }
+
     private boolean checkObjectFactoryNamespaces(Class<?> clz) {
         for (Method meth : clz.getMethods()) {
             XmlElementDecl decl = meth.getAnnotation(XmlElementDecl.class);
@@ -539,6 +649,16 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
 
         return false;
+    }
+
+    private void addToObjectFactoryCache(Package objectFactoryPkg, Class<?> ofactory) {
+        if (objectFactoryPkg == null) {
+            return;
+        }
+        synchronized (OBJECT_FACTORY_CACHE) {
+            OBJECT_FACTORY_CACHE.put(objectFactoryPkg, 
+                                     new CachedClassOrNull(ofactory));
+        }
     }
 
     private void addWsAddressingTypes(Set<Class<?>> classes) {
@@ -698,14 +818,6 @@ public class JAXBDataBinding extends AbstractDataBinding
     }
 
     
-    public boolean isUnwrapJAXBElement() {
-        return unwrapJAXBElement;
-    }
-
-    public void setUnwrapJAXBElement(boolean unwrapJAXBElement) {
-        this.unwrapJAXBElement = unwrapJAXBElement;
-    }
-
     public static void clearCaches() {
         synchronized (JAXBCONTEXT_CACHE) {
             JAXBCONTEXT_CACHE.clear();
@@ -715,7 +827,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
     }
 
-    public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,
+    public WrapperHelper createWrapperHelper(Class<?> wrapperType, List<String> partNames,
                                              List<String> elTypeNames, List<Class<?>> partClasses) {
         List<Method> getMethods = new ArrayList<Method>(partNames.size());
         List<Method> setMethods = new ArrayList<Method>(partNames.size());

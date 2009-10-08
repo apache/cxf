@@ -19,29 +19,18 @@
 package org.apache.cxf.jaxrs.model;
 
 import java.lang.reflect.Method;
-import java.util.LinkedHashMap;
+
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 public class MethodDispatcher {
     private Map<OperationResourceInfo, Method> oriToMethod = 
-        new LinkedHashMap<OperationResourceInfo, Method>();
+        new ConcurrentHashMap<OperationResourceInfo, Method>();
     private Map<Method, OperationResourceInfo> methodToOri = 
-        new LinkedHashMap<Method, OperationResourceInfo>();
+        new ConcurrentHashMap<Method, OperationResourceInfo>();
 
-    public MethodDispatcher() {
-        
-    }
-    
-    MethodDispatcher(MethodDispatcher md, ClassResourceInfo cri) {
-        for (OperationResourceInfo ori : md.getOperationResourceInfos()) {    
-            OperationResourceInfo clone = new OperationResourceInfo(ori, cri);
-            oriToMethod.put(clone, clone.getMethodToInvoke());
-            methodToOri.put(clone.getMethodToInvoke(), clone);
-        }
-    }
-    
     public void bind(OperationResourceInfo o, Method... methods) {
         Method primary = methods[0];
 

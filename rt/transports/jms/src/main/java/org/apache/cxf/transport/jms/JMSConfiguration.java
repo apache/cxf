@@ -41,7 +41,7 @@ public class JMSConfiguration implements InitializingBean {
      */
     public static final int DEFAULT_VALUE = -1;
     
-    static final boolean DEFAULT_USEJMS11 = true;
+    static final boolean DEFAULT_USEJMS11 = false;
     
     private boolean usingEndpointInfo = true;
     
@@ -81,25 +81,20 @@ public class JMSConfiguration implements InitializingBean {
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private Boolean useConduitIdSelector;
-    private String conduitSelectorPrefix;
+    private String conduitSelectorPrefix = "";
     private boolean autoResolveDestination;
     private long recoveryInterval = DEFAULT_VALUE;
     private int cacheLevel = DEFAULT_VALUE;
     private String cacheLevelName;
-    private Boolean enforceSpec;
+    private boolean enforceSpec = true;
     private boolean acceptMessagesWhileStopping;
 
-    //For jms spec.
-    private String targetService;
-    private String requestURI;
-    
     private ConnectionFactory wrappedConnectionFactory;
     
     private JNDIConfiguration jndiConfig;
     
     public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
-        if (targetDestination == null ||  getOrCreateWrappedConnectionFactory() == null) {
-            System.out.println("targetDestination " + targetDestination);
+        if (targetDestination == null || getOrCreateWrappedConnectionFactory() == null) {
             throw new ConfigurationException(msg);
         }
     }
@@ -222,16 +217,9 @@ public class JMSConfiguration implements InitializingBean {
     }
 
     public String getConduitSelectorPrefix() {
-        if (conduitSelectorPrefix == null) {
-            return "";
-        }
         return conduitSelectorPrefix;
     }
 
-    public boolean isSetConduitSelectorPrefix() {
-        return conduitSelectorPrefix != null;
-    }
-    
     public boolean isSubscriptionDurable() {
         return subscriptionDurable;
     }
@@ -482,35 +470,12 @@ public class JMSConfiguration implements InitializingBean {
         this.durableSubscriptionClientId = durableSubscriptionClientId;
     }
 
-    public void setTargetService(String targetService) {
-        this.targetService = targetService;
-    }
-
-    public String getTargetService() {
-        return targetService;
-    }
-
-    public void setRequestURI(String requestURI) {
-        this.requestURI = requestURI;
-    }
-
-    public String getRequestURI() {
-        return requestURI;
-    }
-    
     public boolean isEnforceSpec() {
-        if (!isSetEnforceSpec()) {
-            return true;
-        }
         return enforceSpec;
     }
 
     public void setEnforceSpec(boolean enforceSpec) {
         this.enforceSpec = enforceSpec;
-    }
-    
-    public boolean isSetEnforceSpec() {
-        return this.enforceSpec != null;
     }
 
     public void setJmsTemplate(JmsTemplate jmsTemplate) {

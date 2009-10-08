@@ -19,11 +19,6 @@
 
 package org.apache.cxf.service.factory;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
@@ -35,25 +30,9 @@ public abstract class AbstractServiceFactoryBean {
     private Bus bus;
     private DataBinding dataBinding;
     private Service service;
-    private List<FactoryBeanListener> listeners = new LinkedList<FactoryBeanListener>();
-    private Map<String, Object> sessionState = new HashMap<String, Object>();
     
     public abstract Service create();
-    
-    /**
-     * Returns a map that is useful for ServiceFactoryBeanListener to store state across 
-     * events during processing.   
-     */
-    public Map<String, Object> getSessionState() {
-        return sessionState;
-    }
-    
-    public void sendEvent(FactoryBeanListener.Event ev, Object ... args) {
-        for (FactoryBeanListener l : listeners) {
-            l.handleEvent(ev, this, args);
-        }
-    }
-    
+
     protected void initializeDefaultInterceptors() {
         service.getInInterceptors().add(new ServiceInvokerInterceptor());
         service.getInInterceptors().add(new OutgoingChainInterceptor());
@@ -61,10 +40,9 @@ public abstract class AbstractServiceFactoryBean {
     }
     
     protected void initializeDataBindings() {
-        getDataBinding().initialize(getService());
+        dataBinding.initialize(getService());
         
-        service.setDataBinding(getDataBinding());
-        sendEvent(FactoryBeanListener.Event.DATABINDING_INITIALIZED, dataBinding);
+        service.setDataBinding(dataBinding);
     }
     
     public Bus getBus() {
@@ -73,17 +51,10 @@ public abstract class AbstractServiceFactoryBean {
 
     public void setBus(Bus bus) {
         this.bus = bus;
-        FactoryBeanListenerManager m = bus.getExtension(FactoryBeanListenerManager.class);
-        if (m != null) {
-            listeners.addAll(m.getListeners());
-        }
     }
 
     public DataBinding getDataBinding() {
-        return getDataBinding(true);
-    }
-    public DataBinding getDataBinding(boolean create) {
-        if (dataBinding == null && create) {
+        if (dataBinding == null) {
             dataBinding = createDefaultDataBinding();
         }
         return dataBinding;

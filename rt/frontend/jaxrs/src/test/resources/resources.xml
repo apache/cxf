@@ -1,9 +1,0 @@
-<model xmlns="http://cxf.apache.org/jaxrs">
- <resource name="java.util.Map" 
-    path="map" produces="application/xml" consumes="application/json">
-    <operation name="putAll" verb="PUT" path="/putAll" 
-       produces="application/json" consumes="application/xml">
-       <param name="map" type="REQUEST_BODY" encoded="true" defaultValue="emptyMap"/>
-    </operation>
- </resource>
-</model>

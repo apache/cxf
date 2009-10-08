@@ -40,6 +40,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     private static final String SMAX_AGE = "s-maxage";
 
     public CacheControl fromString(String c) {
+        boolean isPublic = true;
         boolean isPrivate = false;
         List<String> privateFields = new ArrayList<String>();
         boolean noCache = false;
@@ -69,6 +70,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
             } else if (token.startsWith(PROXY_REVALIDATE)) {
                 proxyRevalidate = true;
             } else if (token.startsWith(PRIVATE)) {
+                isPublic = false;
                 isPrivate = true;
                 addFields(privateFields, token);
             }  else if (token.startsWith(NO_CACHE)) {
@@ -80,6 +82,7 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         CacheControl cc = new CacheControl();
         cc.setMaxAge(maxAge);
         cc.setSMaxAge(sMaxAge);
+        cc.setPublic(isPublic);
         cc.setPrivate(isPrivate);
         cc.getPrivateFields().addAll(privateFields);
         cc.setMustRevalidate(mustRevalidate);

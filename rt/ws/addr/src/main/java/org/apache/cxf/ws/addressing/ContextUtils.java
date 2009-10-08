@@ -31,7 +31,6 @@ import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
@@ -220,7 +219,7 @@ public final class ContextUtils {
                                  boolean isProviderContext) {
         if (maps != null) {
             String mapProperty = getMAPProperty(isRequestor, isProviderContext, isOutbound);
-            LOG.log(Level.FINE,
+            LOG.log(Level.INFO,
                     "associating MAPs with context property {0}",
                     mapProperty);
             message.put(mapProperty, maps);
@@ -261,15 +260,15 @@ public final class ContextUtils {
             ContextUtils.getMAPProperty(isProviderContext, 
                                         isRequestor,
                                         isOutbound);
-        LOG.log(Level.FINE,
+        LOG.log(Level.INFO,
                 "retrieving MAPs from context property {0}",
                 mapProperty);
         AddressingPropertiesImpl maps =
             (AddressingPropertiesImpl)message.get(mapProperty);
         if (maps != null) {
-            LOG.log(Level.FINE, "current MAPs {0}", maps);
+            LOG.log(Level.INFO, "current MAPs {0}", maps);
         } else if (!isProviderContext) {
-            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.FINE, 
+            LogUtils.log(LOG, warnIfMissing ? Level.WARNING : Level.INFO, 
                 "MAPS_RETRIEVAL_FAILURE_MSG");         
         }
         return maps;
@@ -719,15 +718,12 @@ public final class ContextUtils {
                 bindingOpInfo = bindingOpInfo.getUnwrappedOperation();
             }
             if (fault == null) {
-                action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
-                if (action == null) {
-                    SoapOperationInfo soi = 
-                        bindingOpInfo.getExtensor(SoapOperationInfo.class);
-                    if (null != soi) {
-                        action = soi.getAction();
-                    }
-
+                SoapOperationInfo soi = 
+                    bindingOpInfo.getExtensor(SoapOperationInfo.class);
+                if (null != soi) {
+                    action = soi.getAction();
                 }
+
                 if (action == null || "".equals(action)) {
                     MessageInfo msgInfo = 
                         ContextUtils.isRequestor(message)

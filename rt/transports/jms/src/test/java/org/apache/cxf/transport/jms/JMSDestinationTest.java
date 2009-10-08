@@ -84,7 +84,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
                    + " seconds", destMessage != null);
     }
 
-    public JMSDestination setupJMSDestination(boolean send) throws IOException {
+    public JMSDestination setupJMSDestination(boolean send) {
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, false);
         JMSDestination jmsDestination = new JMSDestination(bus, endpointInfo, jmsConfig);
@@ -381,12 +381,13 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     private void verifyJmsHeaderEquality(JMSMessageHeadersType outHeader, JMSMessageHeadersType inHeader) {
-        /*
-         * if (outHeader.getJMSCorrelationID() != null) { // only check if the correlation id was explicitly
-         * set as // otherwise the in header will contain an automatically // generated correlation id
-         * assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
-         * .getJMSCorrelationID(), inHeader.getJMSCorrelationID()); }
-         */
+        if (outHeader.getJMSCorrelationID() != null) {
+            // only check if the correlation id was explicitly set as
+            // otherwise the in header will contain an automatically
+            // generated correlation id
+            assertEquals("The inMessage and outMessage JMS Header's CorrelationID should be equals", outHeader
+                         .getJMSCorrelationID(), inHeader.getJMSCorrelationID());
+        }
         assertEquals("The inMessage and outMessage JMS Header's JMSPriority should be equals", outHeader
             .getJMSPriority(), inHeader.getJMSPriority());
         assertEquals("The inMessage and outMessage JMS Header's JMSDeliveryMode should be equals", outHeader
@@ -449,7 +450,7 @@ public class JMSDestinationTest extends AbstractJMSTester {
     }
 
     @Test
-    public void testProperty() throws Exception {
+    public void testPropertyExclusion() throws Exception {
 
         final String customPropertyName = "THIS_PROPERTY_WILL_NOT_BE_AUTO_COPIED";
 
@@ -505,10 +506,11 @@ public class JMSDestinationTest extends AbstractJMSTester {
 
         JMSMessageHeadersType inHeader = (JMSMessageHeadersType)inMessage
             .get(JMSConstants.JMS_CLIENT_RESPONSE_HEADERS);
-        assertNotNull("The inHeader should not be null", inHeader);
-        assertNotNull("The property should not be null " + inHeader.getProperty());
-        // TODO we need to check the SOAP JMS transport properties here
-        
+
+        assertTrue("property has been excluded, only CONTENT_TYPE should be here", inHeader.getProperty()
+            .size() == 1);
+        assertTrue("property has been excluded, only " + JMSConstants.JMS_CONTENT_TYPE + "should be here",
+                   inHeader.getProperty().get(0).getName().equals(JMSConstants.JMS_CONTENT_TYPE));
         // wait for a while for the jms session recycling
         Thread.sleep(1000);
         conduit.close();

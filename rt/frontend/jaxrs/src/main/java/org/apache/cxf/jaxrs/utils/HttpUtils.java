@@ -33,16 +33,15 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.servlet.ServletDestination;
 
 public final class HttpUtils {
     
@@ -120,14 +119,6 @@ public final class HttpUtils {
         return dateFormat;
     }
     
-    public static boolean isDateRelatedHeader(String headerName) {
-        return HttpHeaders.DATE.equalsIgnoreCase(headerName)
-               || HttpHeaders.IF_MODIFIED_SINCE.equalsIgnoreCase(headerName)
-               || HttpHeaders.IF_UNMODIFIED_SINCE.equalsIgnoreCase(headerName)
-               || HttpHeaders.EXPIRES.equalsIgnoreCase(headerName)
-               || HttpHeaders.LAST_MODIFIED.equalsIgnoreCase(headerName); 
-    }
-    
     public static URI toAbsoluteUri(URI u, Message message) { 
         if (!u.isAbsolute()) {
             HttpServletRequest httpRequest = 
@@ -165,8 +156,8 @@ public final class HttpUtils {
         String address = null;
         Destination d = m.getExchange().getDestination();
         if (d != null) {
-            if (d instanceof AbstractHTTPDestination) {
-                address = ((AbstractHTTPDestination)d).getEndpointInfo().getAddress();
+            if (d instanceof ServletDestination) {
+                address = ((ServletDestination)d).getEndpointInfo().getAddress();
             } else {
                 address = d.getAddress().getAddress().getValue();
             }

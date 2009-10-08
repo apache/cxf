@@ -23,13 +23,13 @@
     <artifactId>cxf-bundle-jaxrs</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF JAX-RS Bundle Jar</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
     </parent>
 
 
@@ -55,11 +55,6 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>cxf-rt-transports-http-osgi</artifactId>
             <version>${pom.version}</version>
         </dependency>
 
@@ -108,6 +103,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -127,7 +123,6 @@
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
-                            com.ctc.wstx.msv*;resolution:=optional,
                             javax.ws.rs*,
                             repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
@@ -151,7 +146,7 @@
                         </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
-                            '=META-INF.cxf.osgi',
+                            org.codehaus.xfire.aegis.type.java5.*,
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>
@@ -162,6 +157,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -225,9 +221,4 @@
     </build>
 
    
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</developerConnection>
-    </scm>
-
 </project>

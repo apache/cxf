@@ -1,70 +1,46 @@
-WSDL First Demo
-===============
+Hello World Demo using Document/Literal Style
+=============================================
 
-This demo shows how to build and call a webservice using a given WSDL (also called Contract First).
-As writing a WSDL by hand is not so easy the following Howto may also be an interesting read:
-http://cxf.apache.org/docs/defining-contract-first-webservices-with-wsdl-generation-from-java.html
+This demo illustrates the use of the JAX-WS APIs to run a simple
+client against a standalone server using SOAP 1.1 over HTTP.
 
-This demo mainly addresses SOAP over HTTP in Document / Literal or Document / Literal wrapped style. 
-For other transports or styles the configuration may look different.
+It also shows how CXF configuration can be used to enable schema validation
+on the client and/or server side: By default the message parameters would not
+be validated, but the presence of the cxf.xml configuration file on
+the classpath, and its content change this default behavior:
+The configuration file specifies that 
 
-The Demo consist of three parts:
+a) if a JAX-WS client proxy is created for port {http://apache.org/hello_world_soap_http}SoapPort
+it should have schema validation enabled.
 
-- Creating the server and client code stubs from the WSDL
-- Service implementation (using JAX-WS or using Spring)
-- Client implementation (using JAX-WS or using Spring)
+b) if a JAX-WS server endpoint is created for port {http://apache.org/hello_world_soap_http}SoapPort
+it should have schema validation enabled.
 
-Code generation
----------------
+The client's second greetMe invocation causes an exception (a marshalling
+error) on the client side, i.e. before the request with the invalid parameter
+goes on the wire.
+After commenting the definition of the <jaxws:client> element in cxf.xml you 
+will notice that the client's second greetMe invocation still throws an exception,
+but that this time the exception is caused by an unmarshalling error on the
+server side.
+Commenting both elements, or renaming/removing the cfg.xml file, and thus
+restoring the default behavior, results in the second greetMe invocation
+not causing an exception.
 
-When using maven the code generation is done using the maven cxf-codegen-plugin
-(see http://cxf.apache.org/docs/maven-cxf-codegen-plugin-wsdl-to-java.html).
-In case ant is used the macro wsdl2java in the common_build.xml builds the code
-(see http://cxf.apache.org/docs/wsdl-to-java.html).
+Please review the README in the samples directory before continuing.
 
-The code generation is tuned using a binding.xml file. In this case the file configures that 
-normal java Date is used for xsd:date and xsd:DateTime. If this is not present then XMLGregorianCalendar
-will be used.
-
-One other common use of the binding file is to also generate asynchronous stubs. The line
-jaxws:enableAsyncMapping has to be uncommented to use this.
-
-More info about the binding file can be found here:
-https://jax-ws.dev.java.net/jax-ws-20-fcs/docs/customizations.html
-
-Server implementation
----------------------
-
-The service is implemented in the class CustomerServiceImpl. The class simply implements the previously
-generated service interface. The method getCustomersByName demonstrates how a query function could look like.
-The idea is to search and return all customers with the given name. If the searched name is none then the method
-returns an exception to indicate that no matching customer was found. (In a real implementation probably a list with
-zero objects would be used. This is mainly to show how custom exceptions can be used).
-For any other name the method will return a list of two Customer objects. The number of  objects can be increased to
-test how fast CXF works for larger data.
-
-Now that the service is implemented it needs to be made available. In this example a standalone server is used. 
-This can be done either with the JAX-WS API demonstrated in the class CustomerService or using a spring config as
-demonstrated in the class CustomerServiceSpringServer.
-
-Client implementation
----------------------
-
-The main client code lives in the class CustomerServiceTester. This class needs a proxy to the service and then 
-demonstrates some calls and their expected outcome using junit assertions.
-
-The first call is a request getCustomersByName for all customers with name "Smith". The result is then checked.
-Then the same method is called with the invalid name "None". In this case a NoSuchCustomerException is expected.
-The third call shows that the one way method updateCustomer will return instantly even if the service needs some
-time to process the request.
-
-The classes CustomerServiceClient and CustomerServiceSpringClient show how to get a service proxy using JAX-WS 
-or Spring and how to wire it to your business class (in this case CustomerServiceTester).
 
 Prerequisite
 ------------
 
-Please review the README in the samples main directory before continuing.
+If your environment already includes cxf-manifest.jar on the
+CLASSPATH, and the JDK and ant bin directories on the PATH
+it is not necessary to set the environment as described in
+the samples directory README.  If your environment is not
+properly configured, or if you are planning on using wsdl2java,
+javac, and java to build and run the demos, you must set the
+environment.
+
 
 Building and running the demo using Ant
 ---------------------------------------
@@ -101,17 +77,116 @@ Using either UNIX or Windows:
 To remove the code generated from the WSDL file and the .class
 files, run "mvn clean".
 
-There is no special maven profile for the spring client and server but you can easily set it up yourself.
 
-Using eclipse to run and test the demo
---------------------------------------
 
-run the following in the demo base directory
+Building the demo using wsdl2java and javac
+-------------------------------------------
 
-mvn eclipse:eclipse
+From the base directory of this sample (i.e., where this README file is
+located) first create the target directory build/classes and then 
+generate code from the WSDL file.
 
-Then use Import / Existing projects into workspace and browse to the wsdl_first directory. Import the wsdl_first project.
+For UNIX:
+  mkdir -p build/classes
 
-The demo can now be started using "Run as Java Application" on the CustomerServiceServer.java 
-and the CustomerServiceClient. For the spring demo run the classes CustomerServiceSpringClient.java 
-or CustomerServiceSpringServer.java 
+  wsdl2java -d build/classes -compile ./wsdl/hello_world.wsdl
+
+For Windows:
+  mkdir build\classes
+    Must use back slashes.
+
+  wsdl2java -d build\classes -compile .\wsdl\hello_world.wsdl
+    May use either forward or back slashes.
+
+Now compile the provided client and server applications with the commands:
+
+For UNIX:  
+  
+  export CLASSPATH=$CLASSPATH:$CXF_HOME/lib/cxf-manifest.jar:./build/classes
+  javac -d build/classes src/demo/hw/client/*.java
+  javac -d build/classes src/demo/hw/server/*.java
+
+For Windows:
+  set classpath=%classpath%;%CXF_HOME%\lib\cxf-manifest.jar;.\build\classes
+  javac -d build\classes src\demo\hw\client\*.java
+  javac -d build\classes src\demo\hw\server\*.java
+
+
+Running the demo using java
+---------------------------
+
+From the base directory of this sample (i.e., where this README file is
+located) run the commands, entered on a single command line:
+
+For UNIX (must use forward slashes):
+    java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
+         demo.hw.server.Server &
+
+    java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
+         demo.hw.client.Client ./wsdl/hello_world.wsdl
+
+The server process starts in the background.  After running the client,
+use the kill command to terminate the server process.
+
+For Windows (may use either forward or back slashes):
+  start 
+    java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
+         demo.hw.server.Server
+
+    java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
+       demo.hw.client.Client .\wsdl\hello_world.wsdl
+
+A new command windows opens for the server process.  After running the
+client, terminate the server process by issuing Ctrl-C in its command window.
+
+To remove the code generated from the WSDL file and the .class
+files, either delete the build directory and its contents or run:
+
+  ant clean
+
+
+Building and running the demo in a servlet container
+----------------------------------------------------
+
+Please refer to samples directory README for building demo in a servlet container.
+
+Using ant, run the client application with the command:
+
+  ant client-servlet -Dbase.url=http://localhost:#
+
+Where # is the TCP/IP port used by the servlet container,
+e.g., 8080.
+
+Or
+  ant client-servlet -Dhost=localhost -Dport=8080
+
+You can ignore the -Dhost and -Dport if your tomcat setup is same, i.e ant client-servlet
+
+Using java, run the client application with the command:
+
+  For UNIX:
+    
+    java -Djava.util.logging.config.file=$CXF_HOME/etc/logging.properties
+         demo.hw.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
+
+  For Windows:
+
+    java -Djava.util.logging.config.file=%CXF_HOME%\etc\logging.properties
+       demo.hw.client.Client http://localhost:#/helloworld/services/hello_world?wsdl
+
+Where # is the TCP/IP port used by the servlet container,
+e.g., 8080.
+
+
+Running demo with HTTP GET
+--------------------------
+APACHE CXF support HTTP GET to invoke the service, instead of running 
+
+   ant client
+
+you can use 
+
+   ant client.get 
+
+to invoke the service with simple HttpURLConnection, or you can even
+use your favorite browser to get the results back.

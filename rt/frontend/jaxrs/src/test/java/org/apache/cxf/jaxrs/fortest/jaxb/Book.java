@@ -19,17 +19,10 @@
 
 package org.apache.cxf.jaxrs.fortest.jaxb;
 
-import javax.xml.bind.annotation.XmlSeeAlso;
 
-@XmlSeeAlso({SuperBook.class })
 public class Book {
     private String name;
     private long id;
-    
-    public Book(String name, long id) {
-        this.name = name;
-        this.id = id;
-    }
     
     public Book() {
     }

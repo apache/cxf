@@ -42,7 +42,6 @@ public class StaxDatabindingTest extends AbstractCXFTest {
         
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceBean(new CallbackService());
-        sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress(address);
         sf.setDataBinding(new StaxDataBinding());
         sf.getFeatures().add(new StaxDataBindingFeature());
@@ -60,7 +59,6 @@ public class StaxDatabindingTest extends AbstractCXFTest {
         
         ServerFactoryBean sf = new ServerFactoryBean();
         sf.setServiceBean(new CopyService());
-        sf.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         sf.setAddress(address);
         sf.setDataBinding(new StaxDataBinding());
         sf.getFeatures().add(new StaxDataBindingFeature());

@@ -27,16 +27,6 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
     private static final String WEAK_PREFIX = "W/";
     
     public EntityTag fromString(String header) {
-        
-        
-        if (header == null) {
-            throw new IllegalArgumentException("ETag value can not be null");
-        }
-        
-        if ("*".equals(header)) {
-            return new EntityTag("*");
-        }
-        
         String tag = null;
         boolean weak =  false;
         int i = header.indexOf(WEAK_PREFIX);

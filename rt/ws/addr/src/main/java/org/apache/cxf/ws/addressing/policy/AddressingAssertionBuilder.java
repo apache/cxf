@@ -44,7 +44,7 @@ import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertionBuilder;
  */
 public class AddressingAssertionBuilder implements AssertionBuilder {
 
-    private static final Collection<QName> KNOWN_ELEMENTS = new ArrayList<QName>();
+    private static final Collection<QName> KNOWN = new ArrayList<QName>();
     private Bus bus;
     
     public AddressingAssertionBuilder(Bus b) {
@@ -52,12 +52,9 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
     }
     
     static {
-        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
-        KNOWN_ELEMENTS.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705);
-        KNOWN_ELEMENTS.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
-        KNOWN_ELEMENTS.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
+        KNOWN.add(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
+        KNOWN.add(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
+        KNOWN.add(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
     }
     
     public PolicyAssertion build(Element elem) {
@@ -66,25 +63,20 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
         QName qn = new QName(elem.getNamespaceURI(), localName);
         
         boolean optional = false;
-        
-        Attr attribute = PolicyConstants.findOptionalAttribute(elem);
+        PolicyConstants constants = bus.getExtension(PolicyConstants.class);
+        Attr attribute = elem.getAttributeNodeNS(constants.getNamespace(), 
+                                                 constants.getOptionalAttrName());
         if (attribute != null) {
             optional = Boolean.valueOf(attribute.getValue());
         }
-        if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)
-            || MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705.equals(qn)) {
+        if (MetadataConstants.ADDRESSING_ASSERTION_QNAME.equals(qn)) {
             PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-            NestedPrimitiveAssertion nap = new NestedPrimitiveAssertion(elem, builder);
-            nap.setName(MetadataConstants.ADDRESSING_ASSERTION_QNAME);
-            return nap;
-        } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)
-            || MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705.equals(qn)) {
+            return new NestedPrimitiveAssertion(elem, builder, constants);
+        } else if (MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME.equals(qn)) {
             return new PrimitiveAssertion(MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME, 
                                           optional);
         } else if (MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME.getLocalPart()
-            .equals(localName)
-            || MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705.getLocalPart()
-                .equals(localName)) {
+            .equals(localName)) {
             return new PrimitiveAssertion(MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME,
                                           optional);
         }
@@ -92,7 +84,7 @@ public class AddressingAssertionBuilder implements AssertionBuilder {
     }
 
     public Collection<QName> getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return KNOWN;
     }
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {

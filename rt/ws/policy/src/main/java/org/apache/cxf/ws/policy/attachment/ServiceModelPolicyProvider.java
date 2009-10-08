@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.policy.attachment;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -28,7 +27,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.Policy;
 
-@NoJSR250Annotations
 public class ServiceModelPolicyProvider extends AbstractPolicyProvider {
 
     public ServiceModelPolicyProvider(Bus b) {

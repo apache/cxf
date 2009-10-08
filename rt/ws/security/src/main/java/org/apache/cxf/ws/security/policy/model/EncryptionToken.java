@@ -22,10 +22,11 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
-public class EncryptionToken extends TokenWrapper {
+public class EncryptionToken extends AbstractSecurityAssertion implements TokenWrapper {
+
+    private Token encryptionToken;
 
     public EncryptionToken(SPConstants version) {
         super(version);
@@ -35,33 +36,33 @@ public class EncryptionToken extends TokenWrapper {
      * @return Returns the encryptionToken.
      */
     public Token getEncryptionToken() {
-        return getToken();
+        return encryptionToken;
     }
 
     /**
      * @param encryptionToken The encryptionToken to set.
      */
     public void setEncryptionToken(Token encryptionToken) {
-        setToken(encryptionToken);
+        this.encryptionToken = encryptionToken;
     }
 
-
-    public QName getRealName() {
-        return constants.getEncryptionToken();
+    public void setToken(Token tok) {
+        this.setEncryptionToken(tok);
     }
+
     public QName getName() {
-        return SP12Constants.INSTANCE.getEncryptionToken();
+        return constants.getEncryptionToken();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
         String prefix;
 
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         } else {
             prefix = writerPrefix;
@@ -97,11 +98,11 @@ public class EncryptionToken extends TokenWrapper {
             writer.writeNamespace(wspPrefix, wspNamespaceURI);
         }
 
-        if (token == null) {
+        if (encryptionToken == null) {
             throw new RuntimeException("EncryptionToken is not set");
         }
 
-        token.serialize(writer);
+        encryptionToken.serialize(writer);
 
         // </wsp:Policy>
         writer.writeEndElement();

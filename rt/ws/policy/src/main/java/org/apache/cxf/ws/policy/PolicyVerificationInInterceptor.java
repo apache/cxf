@@ -21,7 +21,6 @@ package org.apache.cxf.ws.policy;
 
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -35,8 +34,7 @@ import org.apache.cxf.service.model.EndpointInfo;
  * 
  */
 public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
-    public static final PolicyVerificationInInterceptor INSTANCE = new PolicyVerificationInInterceptor();
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(PolicyVerificationInInterceptor.class);
 
     public PolicyVerificationInInterceptor() {
@@ -51,13 +49,9 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
      * @throws PolicyException if none of the alternatives is supported
      */
     protected void handle(Message message) {
-        
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        if (null == aim) {
-            return;
-        }
-
         Exchange exchange = message.getExchange();
+        assert null != exchange;
+        
         BindingOperationInfo boi = exchange.get(BindingOperationInfo.class);
         if (null == boi) {
             LOG.fine("No binding operation info.");
@@ -70,10 +64,14 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
             return;
         } 
         EndpointInfo ei = e.getEndpointInfo();
-
-        Bus bus = exchange.get(Bus.class);
+        
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
+            return;
+        }
+        
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        if (null == aim) {
             return;
         }
         
@@ -84,13 +82,11 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
         
         getTransportAssertions(message);  
         
-        EffectivePolicy effectivePolicy = message.get(EffectivePolicy.class);
-        if (effectivePolicy == null) {
-            if (MessageUtils.isRequestor(message)) {
-                effectivePolicy = pe.getEffectiveClientResponsePolicy(ei, boi);
-            } else {
-                effectivePolicy = pe.getEffectiveServerRequestPolicy(ei, boi);
-            }
+        EffectivePolicy effectivePolicy = null;
+        if (MessageUtils.isRequestor(message)) {
+            effectivePolicy = pe.getEffectiveClientResponsePolicy(ei, boi);
+        } else {
+            effectivePolicy = pe.getEffectiveServerRequestPolicy(ei, boi);
         }
                 
         aim.checkEffectivePolicy(effectivePolicy.getPolicy());

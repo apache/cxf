@@ -650,39 +650,22 @@ public class HTTPConduit
         HttpURLConnection connection = 
             (HttpURLConnection) message.get(KEY_HTTP_CONNECTION);
         
-        MessageTrustDecider decider2 = message.get(MessageTrustDecider.class);
-        if (trustDecider != null || decider2 != null) {
+        if (trustDecider != null) {
             try {
                 // We must connect or we will not get the credentials.
                 // The call is (said to be) ingored internally if
                 // already connected.
                 connection.connect();
-                URLConnectionInfo info = getConnectionFactory(connection.getURL())
-                    .getConnectionInfo(connection);
-                if (trustDecider != null) {
-                    trustDecider.establishTrust(
-                        getConduitName(), 
-                        info,
-                        message);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Trust Decider "
-                            + trustDecider.getLogicalName()
-                            + " considers Conduit "
-                            + getConduitName() 
-                            + " trusted.");
-                    }
-                }
-                if (decider2 != null) {
-                    decider2.establishTrust(getConduitName(), 
-                                            info,
-                                            message);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Trust Decider "
-                            + decider2.getLogicalName()
-                            + " considers Conduit "
-                            + getConduitName() 
-                            + " trusted.");
-                    }
+                trustDecider.establishTrust(
+                    getConduitName(), 
+                    getConnectionFactory(connection.getURL()).getConnectionInfo(connection),
+                    message);
+                if (LOG.isLoggable(Level.FINE)) {
+                    LOG.log(Level.FINE, "Trust Decider "
+                        + trustDecider.getLogicalName()
+                        + " considers Conduit "
+                        + getConduitName() 
+                        + " trusted.");
                 }
             } catch (UntrustedURLConnectionIOException untrustedEx) {
                 // This cast covers HttpsURLConnection as well.
@@ -729,12 +712,9 @@ public class HTTPConduit
         String queryString = (String)message.get(Message.QUERY_STRING);
         if (result == null) {
             if (pathInfo == null && queryString == null) {
-                URL url = getURL();
-                message.put(Message.ENDPOINT_ADDRESS, url.toString());
-                return url;
+                return getURL();
             }
             result = getURL().toString();
-            message.put(Message.ENDPOINT_ADDRESS, result);
         }
         
         // REVISIT: is this really correct?
@@ -857,9 +837,6 @@ public class HTTPConduit
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
         for (String header : headers.keySet()) {
             List<String> headerList = headers.get(header);
-            if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
-                continue;
-            }
             if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
                 for (String s : headerList) {
                     connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);
@@ -1437,9 +1414,6 @@ public class HTTPConduit
     ) throws IOException {
 
         int responseCode = connection.getResponseCode();
-        if ((message != null) && (message.getExchange() != null)) {
-            message.getExchange().put(Message.RESPONSE_CODE, responseCode);
-        }
         
         // Process Redirects first.
         switch(responseCode) {
@@ -2062,9 +2036,6 @@ public class HTTPConduit
         }
         protected void handleResponseInternal() throws IOException {
             int responseCode = connection.getResponseCode();
-            if ((outMessage != null) && (outMessage.getExchange() != null)) {
-                outMessage.getExchange().put(Message.RESPONSE_CODE, responseCode);
-            }
             
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Response Code: " 
@@ -2158,7 +2129,6 @@ public class HTTPConduit
             
             
             incomingObserver.onMessage(inMessage);
-            
         }
 
 
@@ -2179,7 +2149,6 @@ public class HTTPConduit
         public void onMessage(Message inMessage) {
             // disposable exchange, swapped with real Exchange on correlation
             inMessage.setExchange(new ExchangeImpl());
-            inMessage.getExchange().put(Bus.class, bus);
             inMessage.put(DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
             // REVISIT: how to get response headers?
             //inMessage.put(Message.PROTOCOL_HEADERS, req.getXXX());

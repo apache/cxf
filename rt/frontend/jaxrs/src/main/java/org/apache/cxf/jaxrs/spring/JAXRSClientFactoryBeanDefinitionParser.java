@@ -28,8 +28,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
-import org.apache.cxf.jaxrs.model.UserResource;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -80,12 +78,9 @@ public class JAXRSClientFactoryBeanDefinitionParser extends AbstractFactoryBeanD
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
         } else if ("features".equals(name) || "providers".equals(name)
-                   || "schemaLocations".equals(name) || "modelBeans".equals(name)) {
+                   || "schemaLocations".equals(name)) {
             List list = ctx.getDelegate().parseListElement(el, bean.getBeanDefinition());
             bean.addPropertyValue(name, list);
-        } else if ("model".equals(name)) {
-            List<UserResource> resources = ResourceUtils.getResourcesFromElement(el);
-            bean.addPropertyValue("modelBeans", resources);
         } else {
             setFirstChildAsProperty(el, ctx, bean, name);            
         }        

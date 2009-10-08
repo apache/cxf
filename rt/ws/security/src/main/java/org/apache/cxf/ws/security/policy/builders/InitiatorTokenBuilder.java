@@ -30,7 +30,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -59,7 +58,6 @@ public class InitiatorTokenBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         InitiatorToken initiatorToken = new InitiatorToken(consts);
-        initiatorToken.setOptional(PolicyConstants.isOptional(element));
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
         policy = (Policy)policy.normalize(false);

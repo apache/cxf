@@ -1,27 +1,25 @@
 Welcome to Apache CXF!
 ======================
 Apache CXF is an open source services framework. CXF helps you build and 
-develop services using frontend programming APIs, like JAX-WS and JAX-RS. 
-These services can speak a variety of protocols such as SOAP, XML/HTTP, 
-RESTful HTTP, or CORBA and work over a variety of transports such as HTTP,
-JMS or JBI.
+develop services using frontend programming APIs, like JAX-WS. These 
+services can speak a variety of protocols such as SOAP, XML/HTTP, RESTful 
+HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.
 
 CXF includes a broad feature set, but it is primarily focused on the following 
 areas:
 
     * Web Services Standards Support: CXF supports a variety of web service 
       standards including SOAP, the Basic Profile, WSDL, WS-Addressing, 
-      WS-Policy, WS-ReliableMessaging, WS-Security, WS-SecurityPolicy,
-      WS-SecureConversation, and WS-Trust.
+      WS-Policy, WS-ReliableMessaging, and WS-Security.
     * Frontends: CXF supports a variety of "frontend" programming models. CXF
       implements the JAX-WS APIs. It also includes a "simple frontend" which 
       allows creation of clients and endpoints without annotations. CXF supports 
       both contract first development with WSDL and code first development 
-      starting from Java.  There is also a JAX-RS frontend for providing 
-      REST support.
+      starting from Java.  There is also a preliminary JAX-RS frontend for 
+      providing REST support.
     * Ease of use: CXF is designed to be intuitive and easy to use. There 
       are simple APIs to quickly build code-first services, Maven plug-ins to 
-      make tooling integration easy, JAX-WS API support, Spring 2.x XML support 
+      make tooling integration easy, JAX-WS API support, Spring 2.0 XML support 
       to make configuration a snap, and much more.
     * Binary and Legacy Protocol Support: CXF has been designed to provide a 
       pluggable architecture that supports not only XML but also non-XML type 

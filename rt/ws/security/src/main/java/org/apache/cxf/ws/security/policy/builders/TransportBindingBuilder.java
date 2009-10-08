@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.policy.builders;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -29,7 +30,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -38,6 +38,8 @@ import org.apache.cxf.ws.security.policy.model.Layout;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.TransportBinding;
 import org.apache.cxf.ws.security.policy.model.TransportToken;
+import org.apache.neethi.Assertion;
+import org.apache.neethi.Policy;
 
 public class TransportBindingBuilder implements AssertionBuilder {
     private static final List<QName> KNOWN_ELEMENTS 
@@ -56,7 +58,18 @@ public class TransportBindingBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         TransportBinding transportBinding = new TransportBinding(consts);
-        processAlternative(element, transportBinding, consts);
+
+        Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
+        policy = (Policy)policy.normalize(false);
+
+        for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+            processAlternative((List)iterator.next(), transportBinding, consts);
+
+            /*
+             * since there should be only one alternative
+             */
+            break;
+        }
 
         return transportBinding;
     }
@@ -65,44 +78,33 @@ public class TransportBindingBuilder implements AssertionBuilder {
         return KNOWN_ELEMENTS;
     }
 
-    private void processAlternative(Element element, 
+    private void processAlternative(List assertionList, 
                                     TransportBinding parent,
                                     SPConstants consts) {
-        Element polEl = DOMUtils.getFirstElement(element);
-        while (polEl != null) {
-            if (PolicyConstants.isPolicyElem(new QName(polEl.getNamespaceURI(),
-                                                       polEl.getLocalName()))) {
-                Element child = DOMUtils.getFirstElement(polEl);
-                while (child != null) {
-                    String name = child.getLocalName();
-                    if (name.equals(SPConstants.ALGO_SUITE)) {
-                        parent.setAlgorithmSuite((AlgorithmSuite)new AlgorithmSuiteBuilder().build(child));
-                    } else if (name.equals(SPConstants.TRANSPORT_TOKEN)) {
-                        parent.setTransportToken((TransportToken)new TransportTokenBuilder(builder)
-                                                        .build(child));
-                    } else if (name.equals(SPConstants.INCLUDE_TIMESTAMP)) {
-                        parent.setIncludeTimestamp(true);
-                    } else if (name.equals(SPConstants.LAYOUT)) {
-                        parent.setLayout((Layout)new LayoutBuilder().build(child));
-                    } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
-                        || name.equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
-                        
-                        if (consts.getVersion() == SPConstants.Version.SP_V11) {
-                            parent.setSignedSupportingToken((SupportingToken)
-                                                            new SupportingTokensBuilder(builder)
-                                                            .build(child));
-                        } else {
-                            parent.setSignedSupportingToken((SupportingToken)
-                                                            new SupportingTokens12Builder(builder)
-                                                                .build(child));                        
-                        }
-                    }
-                    child = DOMUtils.getNextElement(child);
-                }
+
+        for (Iterator iterator = assertionList.iterator(); iterator.hasNext();) {
+
+            Assertion primitive = (Assertion)iterator.next();
+            QName name = primitive.getName();
+
+            if (!consts.getNamespace().equals(name.getNamespaceURI())) {
+                continue;
             }
-            polEl = DOMUtils.getNextElement(polEl);
+            
+            if (name.getLocalPart().equals(SPConstants.ALGO_SUITE)) {
+                parent.setAlgorithmSuite((AlgorithmSuite)primitive);
+            } else if (name.getLocalPart().equals(SPConstants.TRANSPORT_TOKEN)) {
+                parent.setTransportToken((TransportToken)primitive);
+            } else if (name.getLocalPart().equals(SPConstants.INCLUDE_TIMESTAMP)) {
+                parent.setIncludeTimestamp(true);
+            } else if (name.getLocalPart().equals(SPConstants.LAYOUT)) {
+                parent.setLayout((Layout)primitive);
+            } else if (name.getLocalPart().equals(SPConstants.SIGNED_SUPPORTING_TOKENS)) {
+                parent.setSignedSupportingToken((SupportingToken)primitive);
+            } else if (name.getLocalPart().equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
+                parent.setSignedEndorsingSupportingTokens((SupportingToken)primitive);
+            }
         }
-        
     }
 
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {

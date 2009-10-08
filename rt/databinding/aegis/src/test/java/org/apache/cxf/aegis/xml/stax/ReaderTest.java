@@ -22,10 +22,13 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.cxf.aegis.util.jdom.StaxBuilder;
 import org.apache.cxf.aegis.xml.MessageReader;
+import org.apache.cxf.aegis.xml.jdom.JDOMReader;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.jdom.Document;
 import org.junit.Test;
 
 /**
@@ -56,6 +59,14 @@ public class ReaderTest extends AbstractCXFTest {
         }
 
         return new ElementReader(reader);
+    }
+
+    @Test
+    public void testJDOMReader() throws Exception {
+        StaxBuilder builder = new StaxBuilder();
+        Document doc = builder.build(getResourceAsReader("bean11.xml"));
+
+        testReading(new JDOMReader(doc.getRootElement()));
     }
 
     public void testReading(MessageReader reader) {

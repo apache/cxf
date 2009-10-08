@@ -22,7 +22,6 @@ class BeanTypePropertyInfo {
     private boolean nillable;
 
     private int minOccurs = 1;
-    private int maxOccurs = 1;
 
     public int getMinOccurs() {
         return minOccurs;
@@ -38,13 +37,5 @@ class BeanTypePropertyInfo {
 
     public void setNillable(boolean nillable) {
         this.nillable = nillable;
-    }
-
-    public int getMaxOccurs() {
-        return maxOccurs;
-    }
-
-    public void setMaxOccurs(int maxOccurs) {
-        this.maxOccurs = maxOccurs;
     }
 }

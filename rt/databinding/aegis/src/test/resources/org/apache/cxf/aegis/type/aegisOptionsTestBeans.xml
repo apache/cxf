@@ -23,7 +23,7 @@
 	xmlns:soap="http://cxf.apache.org/bindings/soap"
 	xsi:schemaLocation="
            http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd
+              http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
            http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
            http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
           ">
@@ -35,17 +35,11 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 
         <bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-                <property name="aegisContext">
-                	<bean class="org.apache.cxf.aegis.AegisContext">
-                	<!--  the test that uses this uses JDOM -->
-                		<property name="enableJDOMMappings" value="true"/>
-                		<property name="configuration">
-	                        <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
-                        		<property name="defaultMinOccurs" value="3"/>
-                        		<property name="defaultNillable" value="false"/>
-                        	</bean>
-                		</property>
-                	</bean>
+                <property name="configuration">
+                        <bean class="org.apache.cxf.aegis.type.TypeCreationOptions">
+                        <property name="defaultMinOccurs" value="3"/>
+                        <property name="defaultNillable" value="false"/>
+                        </bean>
                 </property>
         </bean>
            

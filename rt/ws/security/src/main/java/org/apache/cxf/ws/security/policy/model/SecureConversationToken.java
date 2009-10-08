@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.Policy;
 
@@ -38,13 +37,9 @@ public class SecureConversationToken extends SecurityContextToken {
 
     private Element issuerEpr;
 
-    public SecureConversationToken() {
-        super(SP12Constants.INSTANCE);
-    }
     public SecureConversationToken(SPConstants version) {
         super(version);
     }
-
 
     /**
      * @return Returns the bootstrapPolicy.
@@ -62,25 +57,22 @@ public class SecureConversationToken extends SecurityContextToken {
 
     /*
      * (non-Javadoc)
-     * @see org.apache.neethi.Assertion#getRealName()
+     * @see org.apache.neethi.Assertion#getName()
      */
-    public QName getRealName() {
-        return constants.getSecureConversationToken();
-    }
     public QName getName() {
-        return SP12Constants.INSTANCE.getSecureConversationToken();
+        return constants.getSecureConversationToken();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
         String prefix;
 
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         } else {
             prefix = writerPrefix;

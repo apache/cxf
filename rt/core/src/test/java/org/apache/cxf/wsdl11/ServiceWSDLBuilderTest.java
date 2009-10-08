@@ -49,7 +49,6 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.wsdl.WSDLManager;
-import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -294,9 +293,8 @@ public class ServiceWSDLBuilderTest extends Assert {
         assertEquals(1, schemas.size());
         XmlSchemaCollection schemaCollection = new XmlSchemaCollection();
         Element schemaElem = ((Schema)schemas.iterator().next()).getElement();
-        XmlSchema newSchema = schemaCollection.read(schemaElem); 
         assertEquals("http://apache.org/hello_world_soap_http/types",
-                     newSchema.getTargetNamespace() 
+                     schemaCollection.read(schemaElem).getTargetNamespace() 
                      );
     }
     

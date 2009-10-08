@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -30,6 +31,10 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.service.model.BindingFaultInfo;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingMessageInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.All;
@@ -70,6 +75,8 @@ public class EndpointPolicyImplTest extends Assert {
         assertNull(epi.getChosenAlternative());
         assertNull(epi.getInterceptors());
         assertNull(epi.getFaultInterceptors());
+        assertNull(epi.getVocabulary());
+        assertNull(epi.getFaultVocabulary());
         
         Policy p = control.createMock(Policy.class);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);
@@ -112,6 +119,8 @@ public class EndpointPolicyImplTest extends Assert {
         epi.checkExactlyOnes();
         EasyMock.expectLastCall();
         epi.chooseAlternative();
+        EasyMock.expectLastCall();
+        epi.initializeInterceptors(); 
         EasyMock.expectLastCall();
         
         control.replay();
@@ -174,7 +183,97 @@ public class EndpointPolicyImplTest extends Assert {
         control.verify();
     }
     
-
+    @Test
+    public void testInitialiseVocabularyServer() {
+        dotestInitializeVocabulary(false);
+    }
+    
+    @Test
+    public void testInitialiseVocabularyClient() {
+        dotestInitializeVocabulary(true);
+    }
+    
+    private void dotestInitializeVocabulary(boolean requestor) {
+        
+        EndpointInfo ei = control.createMock(EndpointInfo.class);
+        PolicyEngineImpl engine = control.createMock(PolicyEngineImpl.class);
+        
+        EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, requestor, null);   
+        List<PolicyAssertion> alternative = new ArrayList<PolicyAssertion>();
+        epi.setChosenAlternative(alternative);
+        PolicyAssertion ea = control.createMock(PolicyAssertion.class);        
+        alternative.add(ea);
+        EasyMock.expect(ea.isOptional()).andReturn(false);
+        PolicyAssertion eaOpt = control.createMock(PolicyAssertion.class);        
+        alternative.add(eaOpt);
+        EasyMock.expect(eaOpt.isOptional()).andReturn(true);
+        
+        BindingInfo bi = control.createMock(BindingInfo.class);
+        EasyMock.expect(ei.getBinding()).andReturn(bi);
+        BindingOperationInfo boi = control.createMock(BindingOperationInfo.class);
+        EasyMock.expect(bi.getOperations()).andReturn(Collections.singletonList(boi));
+        
+        Policy op = control.createMock(Policy.class);
+        EasyMock.expect(engine.getAggregatedOperationPolicy(boi)).andReturn(op);
+        PolicyAssertion oa = control.createMock(PolicyAssertion.class);
+        EasyMock.expect(engine.getAssertions(op, false)).andReturn(Collections.singletonList(oa));
+        BindingMessageInfo bmi = control.createMock(BindingMessageInfo.class);
+        if (requestor) {
+            EasyMock.expect(boi.getOutput()).andReturn(bmi).times(2);
+        } else {
+            EasyMock.expect(boi.getInput()).andReturn(bmi);
+        }
+        Policy mp = control.createMock(Policy.class);
+        EasyMock.expect(engine.getAggregatedMessagePolicy(bmi)).andReturn(mp);
+        PolicyAssertion ma = control.createMock(PolicyAssertion.class);
+        EasyMock.expect(engine.getAssertions(mp, false)).andReturn(Collections.singletonList(ma));
+        PolicyAssertion fa = null;
+        if (requestor) {
+            BindingFaultInfo bfi = control.createMock(BindingFaultInfo.class);
+            EasyMock.expect(boi.getFaults()).andReturn(Collections.singletonList(bfi));
+            Policy fp = control.createMock(Policy.class);
+            EasyMock.expect(engine.getAggregatedFaultPolicy(bfi)).andReturn(fp);
+            fa = control.createMock(PolicyAssertion.class);
+            EasyMock.expect(engine.getAssertions(fp, false)).andReturn(Collections.singletonList(fa));
+        }
+        
+        control.replay();
+        epi.initializeVocabulary();
+        Collection<PolicyAssertion> expected = new ArrayList<PolicyAssertion>();
+        expected.add(ea);
+        expected.add(oa);
+        expected.add(ma);
+        verifyVocabulary(expected, epi.getVocabulary());
+        if (requestor) {
+            expected.remove(ma);
+            expected.add(fa);
+            verifyVocabulary(expected, epi.getFaultVocabulary());
+            // 
+        } else {
+            assertNull(epi.getFaultVocabulary());
+        }
+          
+        control.verify();          
+    }
+    
+    private void verifyVocabulary(Collection<PolicyAssertion> expected, 
+                                  Collection<PolicyAssertion> actual) {
+        
+        assertEquals(expected.size(), actual.size());
+        for (Iterator<PolicyAssertion> i = expected.iterator(); i.hasNext();) {
+            PolicyAssertion e = i.next();
+            Iterator<PolicyAssertion> j = actual.iterator();
+            boolean eFound = false;
+            while (j.hasNext()) {
+                if (e == j.next()) {
+                    eFound = true;
+                    break;
+                }              
+            }
+            assertTrue("Expected assertion not found.", eFound);
+        }
+    }
+    
     @Test
     public void testUpdatePolicy() {
         
@@ -247,20 +346,19 @@ public class EndpointPolicyImplTest extends Assert {
         v.add(mockAssertion(aqn, requestor ? 2 : 1, false));
         fv.addAll(v);
         epi.setVocabulary(v);
-        epi.setChosenAlternative(v);
         epi.setFaultVocabulary(fv);
         
         PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
         setupPolicyInterceptorProviderRegistry(engine, reg);
         
         PolicyInterceptorProvider app = control.createMock(PolicyInterceptorProvider.class);               
-        EasyMock.expect(reg.get(aqn)).andReturn(app).anyTimes();
+        EasyMock.expect(reg.get(aqn)).andReturn(app).times(requestor ? 2 : 1);
         Interceptor api = control.createMock(Interceptor.class);
         EasyMock.expect(app.getInInterceptors())
-            .andReturn(Collections.singletonList(api)).anyTimes();
+            .andReturn(Collections.singletonList(api));
         if (requestor) {
             EasyMock.expect(app.getInFaultInterceptors())
-                .andReturn(Collections.singletonList(api)).anyTimes();
+                .andReturn(Collections.singletonList(api));
         }
         
         control.replay();
@@ -279,9 +377,8 @@ public class EndpointPolicyImplTest extends Assert {
     private void setupPolicyInterceptorProviderRegistry(PolicyEngineImpl engine, 
                                                         PolicyInterceptorProviderRegistry reg) {
         Bus bus = control.createMock(Bus.class);        
-        EasyMock.expect(engine.getBus()).andReturn(bus).anyTimes();
-        EasyMock.expect(bus.getExtension(PolicyInterceptorProviderRegistry.class))
-            .andReturn(reg).anyTimes();
+        EasyMock.expect(engine.getBus()).andReturn(bus);
+        EasyMock.expect(bus.getExtension(PolicyInterceptorProviderRegistry.class)).andReturn(reg);
     }
     
   

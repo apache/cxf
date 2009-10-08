@@ -40,8 +40,4 @@ public class Tags {
     public void addTag(TagVO tag) {
         list.add(tag);
     }
-    
-    public List<TagVO> getTags() {
-        return list;
-    }
 }

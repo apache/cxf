@@ -112,6 +112,7 @@ public final class Client {
         IOUtils.copy(in, bos);
         in.close();
         bos.close();
+        //System.out.println(bos.getOut().toString());
         return bos.getOut().toString();
     }
 

@@ -29,6 +29,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyConstants;
 
 public class PrimitiveAssertionBuilder implements AssertionBuilder {
 
@@ -47,7 +48,7 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
     }
     
     public PolicyAssertion build(Element element) {  
-        return new PrimitiveAssertion(element);
+        return new PrimitiveAssertion(element, getPolicyConstants());
     }
 
     public Collection<QName> getKnownElements() {
@@ -68,5 +69,16 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
         }
         return  null;
     }   
-
+    
+    protected PolicyConstants getPolicyConstants() {
+        PolicyConstants constants = null;
+        if (null != bus) {
+            constants = bus.getExtension(PolicyConstants.class);
+        }
+        if (null == constants) {
+            constants = new PolicyConstants();
+        }
+        return constants;
+        
+    }
 }

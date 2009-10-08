@@ -48,11 +48,6 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     public void handleMessage(Message message) throws Fault {
-        
-        if (mustPropogateException(message)) {
-            throw (Fault) message.getContent(Exception.class);
-        }
-        
         message.put(org.apache.cxf.message.Message.RESPONSE_CODE, new Integer(500));
         NSStack nsStack = new NSStack();
         nsStack.push();
@@ -86,16 +81,5 @@ public class XMLFaultOutInterceptor extends AbstractOutDatabindingInterceptor {
         } catch (XMLStreamException xe) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), xe);
         }
-    }
-    
-    @Override
-    public void handleFault(Message message) throws Fault {
-        if (mustPropogateException(message)) {
-            throw (Fault) message.getContent(Exception.class);
-        }
-    }
-    
-    protected boolean mustPropogateException(Message m) {
-        return Boolean.TRUE.equals(m.getExchange().get(Message.PROPOGATE_EXCEPTION));
     }
 }

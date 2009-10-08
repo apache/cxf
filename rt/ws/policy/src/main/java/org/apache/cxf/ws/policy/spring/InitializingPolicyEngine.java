@@ -19,9 +19,32 @@
 
 package org.apache.cxf.ws.policy.spring;
 
-import org.apache.cxf.ws.policy.PolicyEngineImpl;
+import java.util.ArrayList;
+import java.util.List;
 
-@Deprecated
-public class InitializingPolicyEngine extends PolicyEngineImpl {
+import org.apache.cxf.ws.policy.PolicyEngineImpl;
+import org.apache.cxf.ws.policy.PolicyProvider;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+
+public class InitializingPolicyEngine extends PolicyEngineImpl implements InitializingBean, 
+    ApplicationContextAware  {
+
+    private ApplicationContext context;
+    
+    public void setApplicationContext(ApplicationContext c) throws BeansException {
+        context = c;  
+    }
+
+    public void afterPropertiesSet() throws Exception {
+        String[] beanNames = context.getBeanNamesForType(PolicyProvider.class);
+        List<PolicyProvider> providers = new ArrayList<PolicyProvider>();
+        for (String bn : beanNames) {
+            providers.add((PolicyProvider)context.getBean(bn));            
+        }
+        super.setPolicyProviders(providers);
+    }
     
 }

@@ -20,27 +20,25 @@ package org.apache.cxf.jaxrs.client;
 
 import java.net.URI;
 import java.util.Map;
-import java.util.logging.Logger;
 
+import javax.ws.rs.Path;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.UpfrontConduitSelector;
-import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.jaxrs.AbstractJAXRSFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.service.Service;
 
 public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
-    
-    private static final Logger LOG = LogUtils.getL7dLogger(JAXRSClientFactoryBean.class);
     
     private String username;
     private String password;
@@ -113,8 +111,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             
             return client;
         } catch (Exception ex) {
-            LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
-            throw new RuntimeException(ex);
+            throw new WebApplicationException();
         }
     }
     
@@ -127,41 +124,23 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public Client createWithValues(Object... varValues) {
-        checkResources(false);
-        ClassResourceInfo cri = null;
+        checkResources();
+        
         try {
             Endpoint ep = createEndpoint();
             URI baseURI = URI.create(getAddress());
-            cri = serviceFactory.getClassResourceInfo().get(0);
-            boolean isRoot = cri.getURITemplate() != null;
+            ClassResourceInfo cri = serviceFactory.getClassResourceInfo().get(0);
+            boolean isRoot = AnnotationUtils.getClassAnnotation(cri.getServiceClass(), Path.class) != null;
             ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders,
                                                             varValues);
             initClient(proxyImpl, ep);    
             
-            try {
-                return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
+            return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
                                         new Class[]{cri.getServiceClass(), Client.class, 
                                                     InvocationHandlerAware.class}, 
                                         proxyImpl);
-            } catch (Exception ex) {
-                return (Client)ProxyHelper.getProxy(Thread.currentThread().getContextClassLoader(),
-                                                    new Class[]{cri.getServiceClass(), Client.class, 
-                                                                InvocationHandlerAware.class}, 
-                                     proxyImpl);
-            }
-        } catch (IllegalArgumentException ex) {
-            String message = ex.getLocalizedMessage();
-            if (cri != null) {
-                String expected = cri.getServiceClass().getSimpleName();
-                if ((expected + " is not an interface").equals(message)) {
-                    message += "; make sure CGLIB is on the classpath";
-                }
-            }
-            LOG.severe(ex.getClass().getName() + " : " + message);
-            throw ex;
         } catch (Exception ex) {
-            LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
-            throw new RuntimeException(ex);
+            throw new WebApplicationException();
         }
         
         
@@ -183,22 +162,14 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             ep.getEndpointInfo().addExtensor(authPolicy);
         }
         
-        applyFeatures(client);
-        client.getConfiguration().setConduitSelector(getConduitSelector(ep));
-        client.getConfiguration().setBus(getBus());
-        client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
-        client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
+        
+        client.setConduitSelector(getConduitSelector(ep));
+        client.setBus(getBus());
+        client.setOutInterceptors(getOutInterceptors());
+        client.setInInterceptors(getInInterceptors());
         if (headers != null) {
             client.headers(headers);
         }
         setupFactory(ep);
-    }
-    
-    protected void applyFeatures(AbstractClient client) {
-        if (getFeatures() != null) {
-            for (AbstractFeature feature : getFeatures()) {
-                feature.initialize(client.getConfiguration(), getBus());
-            }
-        }
     }
 } 

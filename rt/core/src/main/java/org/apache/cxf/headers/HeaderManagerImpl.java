@@ -21,29 +21,26 @@ package org.apache.cxf.headers;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
+import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 
-@NoJSR250Annotations(unlessNull = "bus")
 public class HeaderManagerImpl implements HeaderManager {
     Map<String, HeaderProcessor> processors = new ConcurrentHashMap<String, HeaderProcessor>();
     Bus bus;  
-    
-    public HeaderManagerImpl() {
-    }
-    public HeaderManagerImpl(Bus b) {
-        setBus(b);
-    }
     
     public Bus getBus() {
         return bus;
     }
     
     @Resource
-    public final void setBus(Bus bus) {        
+    public void setBus(Bus bus) {        
         this.bus = bus;
+    }
+    
+    @PostConstruct
+    public void register() {
         if (null != bus) {
             bus.setExtension(this, HeaderManager.class);
         }

@@ -36,7 +36,6 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
-import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
@@ -66,8 +65,17 @@ public class PolicyInterceptorsTest extends Assert {
     } 
     
     @Test
+    public void testAbstractPolicyInterceptor() {
+        ClientPolicyOutInterceptor interceptor = new ClientPolicyOutInterceptor();
+        assertNull(interceptor.getBus());
+        interceptor.setBus(bus);
+        assertSame(bus, interceptor.getBus());
+    }
+    
+    @Test
     public void testClientPolicyOutInterceptor() {
-        PolicyOutInterceptor interceptor = new PolicyOutInterceptor();
+        ClientPolicyOutInterceptor interceptor = new ClientPolicyOutInterceptor();
+        interceptor.setBus(bus);
        
         doTestBasics(interceptor, true, true);
         
@@ -86,6 +94,8 @@ public class PolicyInterceptorsTest extends Assert {
         Collection<PolicyAssertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
         EasyMock.expect(effectivePolicy.getChosenAlternative()).andReturn(assertions);
+        message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
+        EasyMock.expectLastCall();
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -93,25 +103,27 @@ public class PolicyInterceptorsTest extends Assert {
     
     @Test
     public void testClientPolicyInInterceptor() {
-        PolicyInInterceptor interceptor = new PolicyInInterceptor();
+        ClientPolicyInInterceptor interceptor = new ClientPolicyInInterceptor();
+        interceptor.setBus(bus);
         
         doTestBasics(interceptor, true, false);
         
         control.reset();
-        setupMessage(true, true, true, true, true, true);
-        EffectivePolicy effectivePolicy = control.createMock(EffectivePolicy.class);
-        EasyMock.expect(pe.getEffectiveClientResponsePolicy(ei, boi)).andReturn(effectivePolicy);
-        EasyMock.expect(effectivePolicy.getPolicy()).andReturn(new Policy()).times(2);
+        setupMessage(true, true, false, false, true, true);        
+        EndpointPolicy endpointPolicy = control.createMock(EndpointPolicy.class);
+        EasyMock.expect(pe.getClientEndpointPolicy(ei, conduit)).andReturn(endpointPolicy);
         Interceptor i = control.createMock(Interceptor.class);
-        EasyMock.expect(effectivePolicy.getInterceptors())
+        EasyMock.expect(endpointPolicy.getInterceptors())
             .andReturn(CastUtils.cast(Collections.singletonList(i), Interceptor.class));
         InterceptorChain ic = control.createMock(InterceptorChain.class);
-        EasyMock.expect(message.getInterceptorChain()).andReturn(ic).anyTimes();
+        EasyMock.expect(message.getInterceptorChain()).andReturn(ic);
         ic.add(i);
         EasyMock.expectLastCall();
+        Collection<PolicyAssertion> assertions = 
+            CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
+        EasyMock.expect(endpointPolicy.getVocabulary()).andReturn(assertions);
         message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
         EasyMock.expectLastCall();
-        ic.add(PolicyVerificationInInterceptor.INSTANCE);
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -120,6 +132,7 @@ public class PolicyInterceptorsTest extends Assert {
     @Test
     public void testClientPolicyInFaultInterceptor() {
         ClientPolicyInFaultInterceptor interceptor = new ClientPolicyInFaultInterceptor();
+        interceptor.setBus(bus);
         
         doTestBasics(interceptor, true, false);
         
@@ -137,6 +150,8 @@ public class PolicyInterceptorsTest extends Assert {
         Collection<PolicyAssertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
         EasyMock.expect(endpointPolicy.getFaultVocabulary()).andReturn(assertions);
+        message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
+        EasyMock.expectLastCall();
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -144,7 +159,8 @@ public class PolicyInterceptorsTest extends Assert {
 
     @Test
     public void testServerPolicyInInterceptor() {
-        PolicyInInterceptor interceptor = new PolicyInInterceptor();
+        ServerPolicyInInterceptor interceptor = new ServerPolicyInInterceptor();
+        interceptor.setBus(bus);
         
         doTestBasics(interceptor, false, false);
 
@@ -162,6 +178,8 @@ public class PolicyInterceptorsTest extends Assert {
         Collection<PolicyAssertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
         EasyMock.expect(endpointPolicy.getVocabulary()).andReturn(assertions);
+        message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
+        EasyMock.expectLastCall();
         control.replay();
         interceptor.handleMessage(message);
         control.verify();       
@@ -169,7 +187,8 @@ public class PolicyInterceptorsTest extends Assert {
     
     @Test
     public void testServerPolicyOutInterceptor() {
-        PolicyOutInterceptor interceptor = new PolicyOutInterceptor();
+        ServerPolicyOutInterceptor interceptor = new ServerPolicyOutInterceptor();
+        interceptor.setBus(bus);
         
         doTestBasics(interceptor, false, true);
         
@@ -188,6 +207,8 @@ public class PolicyInterceptorsTest extends Assert {
         Collection<PolicyAssertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
         EasyMock.expect(effectivePolicy.getChosenAlternative()).andReturn(assertions);
+        message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
+        EasyMock.expectLastCall();
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -200,6 +221,7 @@ public class PolicyInterceptorsTest extends Assert {
         
         ServerPolicyOutFaultInterceptor interceptor = 
             control.createMock(ServerPolicyOutFaultInterceptor.class, new Method[] {m});
+        interceptor.setBus(bus);
         
         doTestBasics(interceptor, false, true);
         
@@ -231,6 +253,8 @@ public class PolicyInterceptorsTest extends Assert {
         Collection<PolicyAssertion> assertions = 
             CastUtils.cast(Collections.EMPTY_LIST, PolicyAssertion.class);
         EasyMock.expect(effectivePolicy.getChosenAlternative()).andReturn(assertions);
+        message.put(EasyMock.eq(AssertionInfoMap.class), EasyMock.isA(AssertionInfoMap.class));
+        EasyMock.expectLastCall();
         control.replay();
         interceptor.handleMessage(message);
         control.verify();        
@@ -295,14 +319,15 @@ public class PolicyInterceptorsTest extends Assert {
                       Boolean setupEngine) {
 
         message = control.createMock(Message.class);
+        EasyMock.expect(message.get(Message.REQUESTOR_ROLE))
+            .andReturn(setupRequestor ? Boolean.TRUE : Boolean.FALSE);
+        if (setupRequestor != isClient) {
+            return;
+        }
         
         exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.get(Message.REQUESTOR_ROLE))
-            .andReturn(isClient ? Boolean.TRUE : Boolean.FALSE).anyTimes();
-
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus).anyTimes();
         if (usesOperationInfo) {
             if (null == boi && setupOperation) {
                 boi = control.createMock(BindingOperationInfo.class);
@@ -324,7 +349,7 @@ public class PolicyInterceptorsTest extends Assert {
             ei = control.createMock(EndpointInfo.class);
         }
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
-
+        
         if (null == pe && setupEngine) {
             pe = control.createMock(PolicyEngine.class);
         }
@@ -332,11 +357,10 @@ public class PolicyInterceptorsTest extends Assert {
         if (!setupEngine) {
             return;
         }
-
             
         if (isClient) {
             conduit = control.createMock(Conduit.class);
-            EasyMock.expect(exchange.getConduit(message)).andReturn(conduit).anyTimes();
+            EasyMock.expect(exchange.getConduit(message)).andReturn(conduit);
         } else {
             destination = control.createMock(Destination.class);
             EasyMock.expect(exchange.getDestination()).andReturn(destination);

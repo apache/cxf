@@ -52,7 +52,7 @@ public class RegistryImpl<K, T> implements Registry<K, T> {
     }
 
     public T get(K k) {
-        return entries.get(k);
+        return  entries.get(k);
     }
 
     

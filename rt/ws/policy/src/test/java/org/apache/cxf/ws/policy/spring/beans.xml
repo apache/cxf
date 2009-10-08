@@ -38,6 +38,8 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         </p:alternativeSelector>
     </p:engine>
     
+    <p:constants namespace="http://www.w3.org/ns/ws-policy"/>
+    
     <p:externalAttachment id="external4"
         location="classpath:/org/apache/cxf/ws/policy/attachment/external/attachments4.xml"/>
     

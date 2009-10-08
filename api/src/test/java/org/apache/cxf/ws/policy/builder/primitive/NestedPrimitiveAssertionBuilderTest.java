@@ -32,6 +32,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.neethi.Policy;
 import org.easymock.classextension.EasyMock;
@@ -111,7 +112,10 @@ public class NestedPrimitiveAssertionBuilderTest extends Assert {
         Policy nested = control.createMock(Policy.class);
         EasyMock.expect(builder.getPolicy(EasyMock.isA(Element.class))).andReturn(nested);
         
+        PolicyConstants pc = new PolicyConstants();
+        pc.setNamespace(PolicyConstants.NAMESPACE_W3_200607);
         Bus bus = control.createMock(Bus.class);
+        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(pc);
         control.replay();
         
         npab.setBus(bus);

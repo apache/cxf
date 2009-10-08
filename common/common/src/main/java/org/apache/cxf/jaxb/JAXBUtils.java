@@ -20,20 +20,18 @@
 package org.apache.cxf.jaxb;
 
 
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -46,14 +44,11 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
-import javax.xml.bind.SchemaOutputResolver;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.Result;
-import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Element;
@@ -63,12 +58,10 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
-import org.apache.cxf.common.util.CachedClass;
-import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
+
 import org.objectweb.asm.ClassWriter;
 import org.objectweb.asm.FieldVisitor;
 import org.objectweb.asm.Label;
@@ -624,7 +617,6 @@ public final class JAXBUtils {
             throw new JAXBException(ex);
         }
     }
-    
     public static Object createFileCodeWriter(File f) throws JAXBException {
         try {
             Class<?> cls;
@@ -639,7 +631,6 @@ public final class JAXBUtils {
             throw new JAXBException(ex);
         }
     }
-    
     public static Class<?> getParamClass(SchemaCompiler sc, String method) {
         Object o = ((ReflectionInvokationHandler)Proxy.getInvocationHandler(sc)).getTarget();
         for (Method m : o.getClass().getMethods()) {
@@ -649,147 +640,6 @@ public final class JAXBUtils {
         }
         return null;
     }
-    
-    public static JAXBBeanInfo getBeanInfo(JAXBContextProxy context, Class<?> cls) {
-        Object o = context.getBeanInfo(cls);
-        if (o == null) {
-            return null;
-        }
-        return ReflectionInvokationHandler.createProxyWrapper(o, JAXBBeanInfo.class);
-    }
-    
-    public static List<DOMResult> generateJaxbSchemas(
-        JAXBContext context, final Map<String, DOMResult> builtIns) throws IOException {
-        final List<DOMResult> results = new ArrayList<DOMResult>();
-
-        context.generateSchema(new SchemaOutputResolver() {
-            @Override
-            public Result createOutput(String ns, String file) throws IOException {
-                DOMResult result = new DOMResult();
-                
-                if (builtIns.containsKey(ns)) {
-                    DOMResult dr = builtIns.get(ns);
-                    result.setSystemId(dr.getSystemId());
-                    results.add(dr);
-                    return result;
-                }
-                result.setSystemId(file);
-                results.add(result);
-                return result;
-            }
-        });
-
-        return results;
-    }
-    
-    public static String getPackageNamespace(Class<?> cls) {
-        Package p = Package.getPackage(PackageUtils.getPackageName(cls));
-        if (p != null) {
-            javax.xml.bind.annotation.XmlSchema schemaAnn = 
-                p.getAnnotation(javax.xml.bind.annotation.XmlSchema.class);
-            if (schemaAnn != null) {
-                return schemaAnn.namespace();
-            }
-        }
-        return null;
-    }
-    
-    public static void scanPackages(Set<Class<?>> classes, 
-                                    Map<Package, CachedClass> objectFactoryCache) {
-        // try and read any jaxb.index files that are with the other classes.
-        // This should
-        // allow loading of extra classes (such as subclasses for inheritance
-        // reasons)
-        // that are in the same package. Also check for ObjectFactory classes
-        Map<String, InputStream> packages = new HashMap<String, InputStream>();
-        Map<String, ClassLoader> packageLoaders = new HashMap<String, ClassLoader>();
-        Set<Class<?>> objectFactories = new HashSet<Class<?>>();
-        for (Class<?> jcls : classes) {
-            String pkgName = PackageUtils.getPackageName(jcls);
-            if (!packages.containsKey(pkgName)) {
-                Package pkg = jcls.getPackage();
-                   
-                packages.put(pkgName, jcls.getResourceAsStream("jaxb.index"));
-                packageLoaders.put(pkgName, jcls.getClassLoader());
-                String objectFactoryClassName = pkgName + "." + "ObjectFactory";
-                Class<?> ofactory = null;
-                CachedClass cachedFactory = null;
-                if (pkg != null && objectFactoryCache != null) {
-                    synchronized (objectFactoryCache) {
-                        cachedFactory = objectFactoryCache.get(pkg);
-                    }
-                }
-                if (cachedFactory != null) {
-                    ofactory = cachedFactory.getCachedClass();
-                }
-                if (ofactory == null) {
-                    try {
-                        ofactory = Class.forName(objectFactoryClassName, false, jcls
-                                                 .getClassLoader());
-                        objectFactories.add(ofactory);
-                        addToObjectFactoryCache(pkg, ofactory, objectFactoryCache);
-                    } catch (ClassNotFoundException e) {
-                        addToObjectFactoryCache(pkg, null, objectFactoryCache);
-                    }
-                } else {
-                    objectFactories.add(ofactory);                    
-                }
-            }
-        }
-        for (Map.Entry<String, InputStream> entry : packages.entrySet()) {
-            if (entry.getValue() != null) {
-                try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(entry.getValue(),
-                                                                                     "UTF-8"));
-                    String pkg = entry.getKey();
-                    ClassLoader loader = packageLoaders.get(pkg);
-                    if (!StringUtils.isEmpty(pkg)) {
-                        pkg += ".";
-                    }
-
-                    String line = reader.readLine();
-                    while (line != null) {
-                        line = line.trim();
-                        if (line.indexOf("#") != -1) {
-                            line = line.substring(0, line.indexOf("#"));
-                        }
-                        if (!StringUtils.isEmpty(line)) {
-                            try {
-                                Class<?> ncls = Class.forName(pkg + line, false, loader);
-                                classes.add(ncls);
-                            } catch (Exception e) {
-                                // ignore
-                            }
-                        }
-                        line = reader.readLine();
-                    }
-                } catch (Exception e) {
-                    // ignore
-                } finally {
-                    try {
-                        entry.getValue().close();
-                    } catch (Exception e) {
-                        // ignore
-                    }
-                }
-            }
-        }
-        classes.addAll(objectFactories);
-    }
-
-       
-    private static void addToObjectFactoryCache(Package objectFactoryPkg, 
-                                         Class<?> ofactory,
-                                         Map<Package, CachedClass> objectFactoryCache) {
-        if (objectFactoryPkg == null || objectFactoryCache == null) {
-            return;
-        }
-        synchronized (objectFactoryCache) {
-            objectFactoryCache.put(objectFactoryPkg, 
-                                     new CachedClass(ofactory));
-        }
-    }
-    
     public static interface SchemaCompiler {
 
         void setErrorListener(Object elForRun);

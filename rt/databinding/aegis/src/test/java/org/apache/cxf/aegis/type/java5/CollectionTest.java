@@ -39,8 +39,8 @@ import org.w3c.dom.Document;
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
-import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.collection.CollectionType;
 import org.apache.cxf.aegis.type.collection.MapType;
@@ -49,7 +49,6 @@ import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,7 +73,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testType() throws Exception {
         Method m = CollectionService.class.getMethod("getStrings", new Class[0]);
 
-        AegisType type = creator.createType(m, -1);
+        Type type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -94,7 +93,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testRecursiveCollections() throws Exception {
         Method m = CollectionService.class.getMethod("getStringCollections", new Class[0]);
 
-        AegisType type = creator.createType(m, -1);
+        Type type = creator.createType(m, -1);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -121,7 +120,7 @@ public class CollectionTest extends AbstractAegisTest {
     public void testPDType() throws Exception {
         PropertyDescriptor pd = Introspector.getBeanInfo(CollectionDTO.class, Object.class)
             .getPropertyDescriptors()[0];
-        AegisType type = creator.createType(pd);
+        Type type = creator.createType(pd);
         tm.register(type);
         assertTrue(type instanceof CollectionType);
 
@@ -139,10 +138,10 @@ public class CollectionTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
 
-        AegisType dto = creator.createType(CollectionDTO.class);
+        Type dto = creator.createType(CollectionDTO.class);
         Set deps = dto.getDependencies();
 
-        AegisType type = (AegisType)deps.iterator().next();
+        Type type = (Type)deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 
@@ -151,7 +150,7 @@ public class CollectionTest extends AbstractAegisTest {
         deps = dto.getDependencies();
         assertEquals(1, deps.size());
 
-        AegisType comType = colType.getComponentType();
+        Type comType = colType.getComponentType();
         assertEquals(String.class, comType.getTypeClass());
     }
 
@@ -162,12 +161,12 @@ public class CollectionTest extends AbstractAegisTest {
         creator.setConfiguration(new TypeCreationOptions());
         tm.setTypeCreator(creator);
 
-        AegisType dto = creator.createType(ObjectDTO.class);
+        Type dto = creator.createType(ObjectDTO.class);
         Set deps = dto.getDependencies();
 
         assertFalse(deps.isEmpty());
 
-        AegisType type = (AegisType)deps.iterator().next();
+        Type type = (Type)deps.iterator().next();
 
         assertTrue(type instanceof CollectionType);
 
@@ -176,7 +175,7 @@ public class CollectionTest extends AbstractAegisTest {
         deps = dto.getDependencies();
         assertEquals(1, deps.size());
 
-        AegisType comType = colType.getComponentType();
+        Type comType = colType.getComponentType();
         assertEquals(Object.class, comType.getTypeClass());
     }
 
@@ -218,20 +217,13 @@ public class CollectionTest extends AbstractAegisTest {
         
     }
     
+
     /**
      * CXF-1833 complained of a bizarre schema when @@WebParaming a parameter of List<String>. This regression
      * test captures the fact that we don't, in fact, have this problem with correct use of JAX-WS.
      * @throws Exception
      */
-    @Test
-    public void webMethodOnListParam() throws Exception {
-        createJaxwsService(CollectionService.class, new CollectionService(), null, null);
-        Document doc = getWSDLDocument("CollectionServiceService");
-        // what we do not want is <xsd:schema targetNamespace="http://util.java" ... />
-        assertInvalid("//xsd:schema[@targetNamespace='http://util.java']",
-                      doc);
-    }
-    
+
     @Test
     public void testListTypes() throws Exception {
         createService(CollectionServiceInterface.class, new CollectionService(), null);
@@ -263,11 +255,11 @@ public class CollectionTest extends AbstractAegisTest {
     public void testNestedMapType() throws Exception {
         Method m = CollectionService.class.getMethod("mapOfMapWithStringAndPojo", 
                                                      new Class[] {Map.class});
-        AegisType type = creator.createType(m, 0);
+        Type type = creator.createType(m, 0);
         tm.register(type);
         assertTrue(type instanceof MapType);
         MapType mapType = (MapType) type;
-        AegisType valueType = mapType.getValueType();
+        Type valueType = mapType.getValueType();
         assertFalse(valueType.getSchemaType().getLocalPart().contains("any"));
     }
     
@@ -340,10 +332,6 @@ public class CollectionTest extends AbstractAegisTest {
             return strings.first();
         }
 
-        public void method1(List<String> headers1) {
-            // do nothing, this is purely for schema issues.
-        }
-
         public String takeStack(Stack<String> strings) {
             return strings.firstElement();
         }
@@ -358,6 +346,11 @@ public class CollectionTest extends AbstractAegisTest {
         }
         //CHECKSTYLE:ON
 
+
+        public void method1(List<String> headers1) {
+            // Do nothing here
+        }
+
         public void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam) {
             lastComplexMap = bigParam;
         }
@@ -365,6 +358,7 @@ public class CollectionTest extends AbstractAegisTest {
         protected Map<String, Map<String, BeanWithGregorianDate>> getLastComplexMap() {
             return lastComplexMap;
         }
+
 
     }
 }

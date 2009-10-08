@@ -18,57 +18,9 @@
  */
 package org.apache.cxf.transport.http;
 
-import java.io.IOException;
-
-import javax.annotation.Resource;
-
-
-import org.apache.cxf.Bus;
-import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.ConduitInitiator;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
-
-public class ClientOnlyHTTPTransportFactory extends AbstractHTTPTransportFactory
-    implements ConduitInitiator {
+public class ClientOnlyHTTPTransportFactory extends AbstractHTTPTransportFactory {
 
     public ClientOnlyHTTPTransportFactory() {
     }
-    
-    @Resource 
-    public void setBus(Bus b) {
-        super.setBus(b);
-    }
 
-    /**
-     * This call creates a new HTTPConduit for the endpoint. It is equivalent
-     * to calling getConduit without an EndpointReferenceType.
-     */
-    public Conduit getConduit(EndpointInfo endpointInfo) throws IOException {
-        return getConduit(endpointInfo, endpointInfo.getTarget());
-    }
-
-    /**
-     * This call creates a new HTTP Conduit based on the EndpointInfo and
-     * EndpointReferenceType.
-     * TODO: What are the formal constraints on EndpointInfo and 
-     * EndpointReferenceType values?
-     */
-    public Conduit getConduit(
-            EndpointInfo endpointInfo,
-            EndpointReferenceType target
-    ) throws IOException {
-        HTTPConduit conduit = target == null
-            ? new HTTPConduit(bus, endpointInfo)
-            : new HTTPConduit(bus, endpointInfo, target);
-        // Spring configure the conduit.  
-        String address = conduit.getAddress();
-        if (address != null && address.indexOf('?') != -1) {
-            address = address.substring(0, address.indexOf('?'));
-        }
-        configure(conduit, conduit.getBeanName(), address);
-        conduit.finalizeConfig();
-        return conduit;
-    }
-    
 }

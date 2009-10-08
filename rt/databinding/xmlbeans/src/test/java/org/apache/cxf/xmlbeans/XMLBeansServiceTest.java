@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Node;
 
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.junit.Before;
 import org.junit.Test;
 

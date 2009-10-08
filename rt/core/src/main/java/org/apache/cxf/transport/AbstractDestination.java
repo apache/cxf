@@ -92,26 +92,22 @@ public abstract class AbstractDestination
                     backChannel = getInbuiltBackChannel(inMessage);
                 }
             } else {
-                ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
-                if (mgr != null) {
-                    ConduitInitiator conduitInitiator 
-                        = mgr.getConduitInitiatorForUri(target.getAddress().getValue());
-                    if (conduitInitiator != null) {
-                        backChannel = conduitInitiator.getConduit(endpointInfo, target);
-                        // ensure decoupled back channel input stream is closed
-                        backChannel.setMessageObserver(new MessageObserver() {
-                            public void onMessage(Message m) {
-                                if (m.getContentFormats().contains(InputStream.class)) {
-                                    InputStream is = m.getContent(InputStream.class);
-                                    try {
-                                        is.close();
-                                    } catch (Exception e) {
-                                        // ignore
-                                    }
+                ConduitInitiator conduitInitiator = getConduitInitiator();
+                if (conduitInitiator != null) {
+                    backChannel = conduitInitiator.getConduit(endpointInfo, target);
+                    // ensure decoupled back channel input stream is closed
+                    backChannel.setMessageObserver(new MessageObserver() {
+                        public void onMessage(Message m) {
+                            if (m.getContentFormats().contains(InputStream.class)) {
+                                InputStream is = m.getContent(InputStream.class);
+                                try {
+                                    is.close();
+                                } catch (Exception e) {
+                                    // ignore
                                 }
                             }
-                        });
-                    }
+                        }
+                    });
                 }
             }
         }
@@ -136,6 +132,14 @@ public abstract class AbstractDestination
     protected boolean markPartialResponse(Message partialResponse,
                                           EndpointReferenceType decoupledTarget) {
         return false;
+    }
+    
+    /**
+     * @return the associated conduit initiator, or null if decoupled mode
+     * not supported.
+     */
+    protected ConduitInitiator getConduitInitiator() {
+        return null;
     }
     
     /**

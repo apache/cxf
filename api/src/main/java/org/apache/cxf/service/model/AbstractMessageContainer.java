@@ -34,8 +34,6 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
     private Map<QName, MessagePartInfo> messageParts 
         = new LinkedHashMap<QName, MessagePartInfo>(4);
     private List<MessagePartInfo> outOfBandParts;
-    private String documentation;
-    
     
     /**
      * Initializes a new instance of the <code>MessagePartContainer</code>.
@@ -47,13 +45,6 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
         mName = nm;
     }
 
-    public String getMessageDocumentation() {
-        return documentation;
-    }
-    public void setMessageDocumentation(String doc) {
-        documentation = doc;
-    }
-    
     public QName getName() {
         return mName;
     }

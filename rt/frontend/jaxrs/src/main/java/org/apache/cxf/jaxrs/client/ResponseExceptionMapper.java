@@ -20,15 +20,6 @@ package org.apache.cxf.jaxrs.client;
 
 import javax.ws.rs.core.Response;
 
-/**
- * Converts Response to checked or runtime Exception
- */
 public interface ResponseExceptionMapper<E extends Throwable> {
-    
-    /**
-     * Converts Response to checked or runtime Exception
-     * @param r JAXRS Response 
-     * @return mapped exception instance, can be null
-     */
     E fromResponse(Response r);
 }

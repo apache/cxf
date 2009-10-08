@@ -22,8 +22,9 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
@@ -31,9 +32,9 @@ import javax.ws.rs.core.Variant.VariantListBuilder;
 
 public class VariantListBuilderImpl extends VariantListBuilder {
     
-    private List<String> encodings = new ArrayList<String>();
-    private List<Locale> languages = new ArrayList<Locale>();
-    private List<MediaType> mediaTypes = new ArrayList<MediaType>();
+    private Set<String> encodings = new HashSet<String>();
+    private Set<String> languages = new HashSet<String>();
+    private Set<MediaType> mediaTypes = new HashSet<MediaType>();
     private List<Variant> variants = new ArrayList<Variant>();
     
     public VariantListBuilderImpl() {
@@ -57,6 +58,12 @@ public class VariantListBuilderImpl extends VariantListBuilder {
     @Override
     public VariantListBuilder encodings(String... encs) {
         encodings.addAll(Arrays.asList(encs));
+        return this;
+    }
+
+    @Override
+    public VariantListBuilder languages(String... ls) {
+        languages.addAll(Arrays.asList(ls));
         return this;
     }
 
@@ -104,7 +111,7 @@ public class VariantListBuilderImpl extends VariantListBuilder {
     }
     
     private void handleLanguages(MediaType type) {
-        for (Locale lang : languages) {
+        for (String lang : languages) {
             if (encodings.size() > 0) {
                 for (String enc : encodings) {
                     variants.add(new Variant(type, lang, enc));
@@ -114,10 +121,5 @@ public class VariantListBuilderImpl extends VariantListBuilder {
             }
         }
     }
-
-    @Override
-    public VariantListBuilder languages(Locale... ls) {
-        languages.addAll(Arrays.asList(ls));
-        return this;
-    }
+    
 }

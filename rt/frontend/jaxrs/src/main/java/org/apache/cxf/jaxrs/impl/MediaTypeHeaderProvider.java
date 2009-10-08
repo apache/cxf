@@ -32,10 +32,6 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
     public MediaType fromString(String mType) {
         
-        if (mType == null) {
-            throw new IllegalArgumentException("Media type value can not be null");
-        }
-        
         if (mType.equals(MediaType.MEDIA_TYPE_WILDCARD) || mType.startsWith("*;")) {
             return new MediaType("*", "*");
         }

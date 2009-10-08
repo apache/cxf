@@ -20,7 +20,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.util.List;
-import java.util.Locale;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Variant;
@@ -35,17 +34,17 @@ public class VariantListBuilderImplTest extends Assert {
         VariantListBuilderImpl vb = new VariantListBuilderImpl();
         MediaType mt1 = new MediaType("*", "*"); 
         MediaType mt2 = new MediaType("text", "xml");
-        List<Variant> variants = vb.mediaTypes(mt1, mt2)
-            .languages(new Locale("en"), new Locale("fr")).encodings("zip", "identity").add().build();
+        List<Variant> variants = 
+            vb.mediaTypes(mt1, mt2).languages("en", "fr").encodings("zip", "identity").add().build();
         assertEquals("8 variants need to be created", 8, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), "identity")));
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("fr"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("fr"), "identity")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("en"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("en"), "identity")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("fr"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("fr"), "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "en", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "en", "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "fr", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "fr", "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "en", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "en", "identity")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "fr", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "fr", "identity")));
     }
     
     @Test
@@ -67,35 +66,35 @@ public class VariantListBuilderImplTest extends Assert {
         VariantListBuilderImpl vb = new VariantListBuilderImpl();
         MediaType mt1 = new MediaType("*", "*"); 
         MediaType mt2 = new MediaType("text", "xml");
-        List<Variant> variants = vb.mediaTypes(mt1, mt2).languages(new Locale("en"), 
-                                                                   new Locale("fr")).add().build();
+        List<Variant> variants = 
+            vb.mediaTypes(mt1, mt2).languages("en", "fr").add().build();
         assertEquals("8 variants need to be created", 4, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("en"), null)));
-        assertTrue(verifyVariant(variants, new Variant(mt1, new Locale("fr"), null)));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("en"), null)));
-        assertTrue(verifyVariant(variants, new Variant(mt2, new Locale("fr"), null)));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "en", null)));
+        assertTrue(verifyVariant(variants, new Variant(mt1, "fr", null)));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "en", null)));
+        assertTrue(verifyVariant(variants, new Variant(mt2, "fr", null)));
     }
     
     @Test
     public void testBuildLangAndEnc() {
         VariantListBuilderImpl vb = new VariantListBuilderImpl();
-        List<Variant> variants = vb.languages(new Locale("en"), 
-                                              new Locale("fr")).encodings("zip", "identity").add().build();
+        List<Variant> variants = 
+            vb.languages("en", "fr").encodings("zip", "identity").add().build();
         assertEquals("4 variants need to be created", 4, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("en"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("en"), "identity")));
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("fr"), "zip")));
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("fr"), "identity")));
+        assertTrue(verifyVariant(variants, new Variant(null, "en", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(null, "en", "identity")));
+        assertTrue(verifyVariant(variants, new Variant(null, "fr", "zip")));
+        assertTrue(verifyVariant(variants, new Variant(null, "fr", "identity")));
     }
     
     @Test
     public void testBuildLang() {
         VariantListBuilderImpl vb = new VariantListBuilderImpl();
         List<Variant> variants = 
-            vb.languages(new Locale("en"), new Locale("fr")).add().build();
+            vb.languages("en", "fr").add().build();
         assertEquals("2 variants need to be created", 2, variants.size());
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("en"), null)));
-        assertTrue(verifyVariant(variants, new Variant(null, new Locale("en"), null)));
+        assertTrue(verifyVariant(variants, new Variant(null, "en", null)));
+        assertTrue(verifyVariant(variants, new Variant(null, "en", null)));
     }
     
     @Test

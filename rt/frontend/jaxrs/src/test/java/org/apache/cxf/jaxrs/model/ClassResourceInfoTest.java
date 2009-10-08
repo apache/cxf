@@ -28,16 +28,13 @@ import javax.annotation.Resource;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
 import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.UriInfo;
-
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,8 +42,8 @@ import org.junit.Test;
 public class ClassResourceInfoTest extends Assert {
     
     @Path("/bar")
-    @Produces("test/bar")
-    @Consumes("test/foo")
+    @ProduceMime("test/bar")
+    @ConsumeMime("test/foo")
     static class TestClass {
         @Context UriInfo u;
         @Context HttpHeaders h;
@@ -82,11 +79,6 @@ public class ClassResourceInfoTest extends Assert {
         
         @GET
         public void getIt() { 
-            
-        }
-        
-        @HEAD
-        public void head() { 
             
         }
     }
@@ -141,25 +133,25 @@ public class ClassResourceInfoTest extends Assert {
     @Test
     public void testGetProduce() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        assertEquals("test/bar", c.getProduceMime().get(0).toString());
+        assertEquals("test/bar", c.getProduceMime().value()[0]);
         
         c = new ClassResourceInfo(TestClass1.class);
-        assertEquals("test/bar", c.getProduceMime().get(0).toString());
+        assertEquals("test/bar", c.getProduceMime().value()[0]);
         
         c = new ClassResourceInfo(TestClass2.class);
-        assertEquals("test/bar", c.getProduceMime().get(0).toString());
+        assertEquals("test/bar", c.getProduceMime().value()[0]);
     }
     
     @Test
     public void testGetConsume() {
         ClassResourceInfo c = new ClassResourceInfo(TestClass.class);
-        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
+        assertEquals("test/foo", c.getConsumeMime().value()[0]);
         
         c = new ClassResourceInfo(TestClass1.class);
-        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
+        assertEquals("test/foo", c.getConsumeMime().value()[0]);
         
         c = new ClassResourceInfo(TestClass2.class);
-        assertEquals("test/foo", c.getConsumeMime().get(0).toString());
+        assertEquals("test/foo", c.getConsumeMime().value()[0]);
     }
     
     @Test
@@ -189,14 +181,5 @@ public class ClassResourceInfoTest extends Assert {
         assertSame(c2, c.getSubResource(TestClass.class, TestClass2.class));
         assertNotSame(c1, c2);
         
-    }
-    
-    @Test
-    public void testAllowedMethods() {
-        ClassResourceInfo c = ResourceUtils.createClassResourceInfo(
-                                  TestClass3.class, TestClass3.class, false, false);
-        Set<String> methods = c.getAllowedMethods();
-        assertEquals(2, methods.size());
-        assertTrue(methods.contains("HEAD") && methods.contains("GET"));
     }
 }

@@ -29,23 +29,23 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
+import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaComplexType;
-import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.cxf.common.util.SOAPConstants;
+import org.jdom.Attribute;
+import org.jdom.Element;
 
-public class MapType extends AegisType {
-    private AegisType keyType;
-    private AegisType valueType;
+public class MapType extends Type {
+    private Type keyType;
+    private Type valueType;
     private QName keyName;
     private QName valueName;
     private QName entryName;
 
-    public MapType(QName schemaType, AegisType keyType, AegisType valueType) {
+    public MapType(QName schemaType, Type keyType, Type valueType) {
         super();
 
         this.keyType = keyType;
@@ -61,8 +61,8 @@ public class MapType extends AegisType {
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         Map<Object, Object> map = instantiateMap();
         try {
-            AegisType kType = getKeyType();
-            AegisType vType = getValueType();
+            Type kType = getKeyType();
+            Type vType = getValueType();
 
             while (reader.hasMoreElementReaders()) {
                 MessageReader entryReader = reader.getNextElementReader();
@@ -143,8 +143,8 @@ public class MapType extends AegisType {
         try {
             Map map = (Map)object;
 
-            AegisType kType = getKeyType();
-            AegisType vType = getValueType();
+            Type kType = getKeyType();
+            Type vType = getValueType();
 
             for (Iterator itr = map.entrySet().iterator(); itr.hasNext();) {
                 Map.Entry entry = (Map.Entry)itr.next();
@@ -157,7 +157,7 @@ public class MapType extends AegisType {
     }
 
     private void writeEntry(MessageWriter writer, Context context,
-                            AegisType kType, AegisType vType,
+                            Type kType, Type vType,
                             Map.Entry entry) throws DatabindingException {
         kType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getKey(), kType);
         vType = TypeUtil.getWriteType(context.getGlobalContext(), entry.getValue(), vType);
@@ -176,58 +176,64 @@ public class MapType extends AegisType {
     }
 
     @Override
-    public void writeSchema(XmlSchema root) {
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
-        complex.setName(getSchemaType().getLocalPart());
-        root.addType(complex);
-        root.getItems().add(complex);
-        XmlSchemaSequence sequence = new XmlSchemaSequence();
-        complex.setParticle(sequence);
+    public void writeSchema(Element root) {
+        Element complex = new Element("complexType", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        complex.setAttribute(new Attribute("name", getSchemaType().getLocalPart()));
+        root.addContent(complex);
 
-        AegisType kType = getKeyType();
-        AegisType vType = getValueType();
-        
-        XmlSchemaElement element = new XmlSchemaElement();
-        sequence.getItems().add(element);
-        element.setName(getEntryName().getLocalPart());
-        element.setMinOccurs(0);
-        element.setMaxOccurs(Long.MAX_VALUE);
-        
-        XmlSchemaComplexType evType = new XmlSchemaComplexType(root);
-        element.setType(evType);
-        
-        XmlSchemaSequence evSequence = new XmlSchemaSequence();
-        evType.setParticle(evSequence);
+        Element seq = new Element("sequence", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        complex.addContent(seq);
 
-        createElement(evSequence, getKeyName(), kType);
-        createElement(evSequence, getValueName(), vType);
+        Type kType = getKeyType();
+        Type vType = getValueType();
+
+        Element element = new Element("element", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        seq.addContent(element);
+
+        element.setAttribute(new Attribute("name", getEntryName().getLocalPart()));
+        element.setAttribute(new Attribute("minOccurs", "0"));
+        element.setAttribute(new Attribute("maxOccurs", "unbounded"));
+
+        Element evComplex = new Element("complexType", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        element.addContent(evComplex);
+
+        Element evseq = new Element("sequence", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        evComplex.addContent(evseq);
+
+        createElement(root, evseq, getKeyName(), kType);
+        createElement(root, evseq, getValueName(), vType);
     }
 
     /**
      * Creates a element in a sequence for the key type and the value type.
      */
-    private void createElement(XmlSchemaSequence seq, QName name, AegisType type) {
-        XmlSchemaElement element = new XmlSchemaElement();
-        seq.getItems().add(element);
-        element.setName(name.getLocalPart());
-        element.setSchemaTypeName(type.getSchemaType());
-        element.setMinOccurs(0);
-        element.setMaxOccurs(1);
+    private void createElement(Element root, Element seq, QName name, Type type) {
+        Element element = new Element("element", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        seq.addContent(element);
+
+        String prefix = NamespaceHelper.getUniquePrefix((Element)root, type.getSchemaType()
+            .getNamespaceURI());
+
+        element.setAttribute(new Attribute("name", name.getLocalPart()));
+        element.setAttribute(TypeUtil.createTypeAttribute(prefix, type, root));
+
+        element.setAttribute(new Attribute("minOccurs", "0"));
+        element.setAttribute(new Attribute("maxOccurs", "1"));
     }
 
     @Override
-    public Set<AegisType> getDependencies() {
-        Set<AegisType> deps = new HashSet<AegisType>();
+    public Set<Type> getDependencies() {
+        Set<Type> deps = new HashSet<Type>();
         deps.add(getKeyType());
         deps.add(getValueType());
         return deps;
     }
 
-    public AegisType getKeyType() {
+    public Type getKeyType() {
         return keyType;
     }
 
-    public AegisType getValueType() {
+    public Type getValueType() {
         return valueType;
     }
 

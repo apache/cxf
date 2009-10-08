@@ -35,10 +35,6 @@ public class ArrayService {
     private org.w3c.dom.Document[] w3cArray;
     private String beforeValue;
     private String afterValue;
-    private Number numberValue;
-    
-    public ArrayService() {
-    }
     
     @WebMethod
     public SimpleBean[] getBeanArray() {
@@ -76,10 +72,6 @@ public class ArrayService {
     }
     
     @WebMethod
-    public void verifyCustomParamName(String param) {
-    }
-    
-    @WebMethod
     public void submitJDOMArray(String before, org.jdom.Element[] anything, String after) {
         beforeValue = before;
         jdomArray = anything;
@@ -100,14 +92,6 @@ public class ArrayService {
 
     public org.w3c.dom.Document[] getW3cArray() {
         return w3cArray;
-    }
-    
-    public void takeNumber(Number numberParam) {
-        numberValue = numberParam;
-    }
-    
-    public Number getNumberValue() {
-        return numberValue;
     }
 
     public String getBeforeValue() {

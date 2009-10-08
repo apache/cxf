@@ -21,16 +21,16 @@ package org.apache.cxf.aegis.type.basic;
 import java.math.BigInteger;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * <code>AegisType</code> for a <code>BigInteger</code>
+ * <code>Type</code> for a <code>BigInteger</code>
  * 
  * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
  */
-public class BigIntegerType extends AegisType {
+public class BigIntegerType extends Type {
     public BigIntegerType() {
         super();
     }

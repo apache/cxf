@@ -25,8 +25,6 @@ The following jars are required for all CXF usage:
 - XmlSchema.jar
 - wstx-asl.jar  [6] or another StAX implementation
 - wsdl4j.jar
-
-The following jars are required for XML catalog support:
 - xml-resolver.jar 
 
 For Java2WSDL and WSDL2Java:
@@ -51,16 +49,26 @@ For XML Configuration support:
 - spring-context.jar
 - spring-core.jar
 - spring.web.jar
-- FastInfoset.jar
+- FastInfoset-1.2.2.jar
+
+For JMS transport:
+- geronimo-jms_1.1_spec.jar (Or the Sun equivalent)
+- spring-jms.jar
+- commons-pool.jar
+- spring-dao.jar
+- spring-support.jar
+
 
 For standalone HTTP support:
-- geronimo-servlet.jar
+- geronimo-servlet.jar (Or the Sun equivalent)
 - jetty.jar
+- jetty-sslengine.jar
 - jetty-util.jar
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
  
 For Aegis support:
-- jdom.jar (optional, if you want to map xsd:anyType to JDOM)
+- jaxen.jar
+- jdom.jar
 
 For WS-Security support:
 - bcprov-jdk15.jar
@@ -78,10 +86,6 @@ For JAX-RS support:
 - axiom*
 - jsr311-api.jar
 - jettison.jar (Needed for JSON services only)
-
-For JMS transport
-- geronimo-jms.jar (Or the Sun equivalent)
-- spring-jms.jar
 
 For CORBA support:
 - antlr.jar

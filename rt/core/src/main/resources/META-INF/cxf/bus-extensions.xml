@@ -43,6 +43,5 @@
        	   interface="org.apache.cxf.headers.HeaderManager"/>
     <extension class="org.apache.cxf.catalog.OASISCatalogManager"
        	   interface="org.apache.cxf.catalog.OASISCatalogManager"/>
-    <extension class="org.apache.cxf.service.factory.FactoryBeanListenerManager"/>
            
 </extensions>

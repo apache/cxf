@@ -38,7 +38,7 @@
            http://cxf.apache.org/transports/http-jetty/configuration
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd">
+              http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
 
   <http:destination name="{http://apache.org/hello_world}Mortimer.http-destination">
     <!-- Nothing to Configure here for Mortimer -->

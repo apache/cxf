@@ -48,8 +48,8 @@ public final class SP12Constants extends SPConstants {
     public static final String INCLUDE_ALWAYS = SP12Constants.SP_NS
         + SPConstants.INCLUDE_TOKEN_ALWAYS_SUFFIX;
     
-    public static final QName TRUST_13 = new QName(SP12Constants.SP_NS, SPConstants.TRUST_13,
-            SP12Constants.SP_PREFIX);
+    public static final QName TRUST_13 = new QName(SP11Constants.SP_NS, SPConstants.TRUST_13,
+            SP11Constants.SP_PREFIX);
     
     public static final QName REQUIRE_CLIENT_CERTIFICATE 
         = new QName(SP12Constants.SP_NS, "RequireClientCertificate", SP12Constants.SP_PREFIX); 
@@ -77,10 +77,28 @@ public final class SP12Constants extends SPConstants {
     public static final QName LAYOUT = new QName(SP_NS, SPConstants.LAYOUT, SP_PREFIX);
 
 
+    public static final QName STRICT = new QName(SP12Constants.SP_NS, SPConstants.LAYOUT_STRICT,
+            SP12Constants.SP_PREFIX);
+
+    public static final QName LAX = new QName(SP12Constants.SP_NS, SPConstants.LAYOUT_LAX ,
+            SP12Constants.SP_PREFIX);
+
+    public static final QName LAXTSFIRST = new QName(SP12Constants.SP_NS,
+            SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST, SP12Constants.SP_PREFIX);
+
+    public static final QName LAXTSLAST = new QName(SP12Constants.SP_NS,
+            SPConstants.LAYOUT_LAX_TIMESTAMP_LAST, SP12Constants.SP_PREFIX);
+
     // ////////////////
 
     public static final QName INCLUDE_TIMESTAMP = new QName(SP12Constants.SP_NS,
             SPConstants.INCLUDE_TIMESTAMP, SP12Constants.SP_PREFIX);
+    
+    public static final QName ENCRYPT_BEFORE_SIGNING = new QName(SP12Constants.SP_NS, 
+            SPConstants.ENCRYPT_BEFORE_SIGNING, SP12Constants.SP_PREFIX);
+    
+    public static final QName SIGN_BEFORE_ENCRYPTING = new QName(SP12Constants.SP_NS,
+            SPConstants.SIGN_BEFORE_ENCRYPTING, SP12Constants.SP_PREFIX);
     
     public static final QName ONLY_SIGN_ENTIRE_HEADERS_AND_BODY = new QName(SP12Constants.SP_NS,
             SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, SP12Constants.SP_PREFIX);
@@ -123,9 +141,6 @@ public final class SP12Constants extends SPConstants {
 
     public static final QName USERNAME_TOKEN = new QName(SP12Constants.SP_NS,
             SPConstants.USERNAME_TOKEN , SP12Constants.SP_PREFIX);
-    public static final QName KEYVALUE_TOKEN = new QName(SP12Constants.SP_NS,
-                                                         SPConstants.KEYVALUE_TOKEN ,
-                                                         SP12Constants.SP_PREFIX);
 
     public static final QName WSS_USERNAME_TOKEN10 = new QName(SP12Constants.SP_NS,
             SPConstants.USERNAME_TOKEN10 , SP12Constants.SP_PREFIX);
@@ -440,9 +455,6 @@ public final class SP12Constants extends SPConstants {
     public QName getUserNameToken() {
         return USERNAME_TOKEN;
     }
-    public QName getKeyValueToken() {
-        return KEYVALUE_TOKEN;
-    }
     public QName getX509Token() {
         return X509_TOKEN;
     }
@@ -467,9 +479,5 @@ public final class SP12Constants extends SPConstants {
     public QName getRequiredDerivedKeys() {
         return REQUIRE_DERIVED_KEYS;
     }
-    public QName getIncludeTimestamp() {
-        return INCLUDE_TIMESTAMP;
-    }
-
 
 }

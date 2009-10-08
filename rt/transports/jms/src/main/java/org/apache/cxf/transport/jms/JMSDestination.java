@@ -19,12 +19,16 @@
 
 package org.apache.cxf.transport.jms;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -45,6 +49,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -104,7 +109,7 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
         jmsConfig.ensureProperlyConfigured(msg);
         jmsListener = JMSFactory.createJmsListener(ei, jmsConfig, this, 
-                                                   jmsConfig.getTargetDestination());
+                                                   jmsConfig.getTargetDestination(), null, false);
     }
 
     public void deactivate() {
@@ -173,7 +178,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             MessageImpl inMessage = new MessageImpl();            
             JMSUtils.populateIncomingContext(message, inMessage, JMSConstants.JMS_SERVER_REQUEST_HEADERS);
             
-            JMSUtils.retrieveAndSetPayload(inMessage, message, (String)inMessage.get(Message.ENCODING));
+            byte[] request = JMSUtils.retrievePayload(message, (String)inMessage.get(Message.ENCODING));
+            getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
+            inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);
@@ -223,12 +230,11 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
             return;
         }
         try {
-            final JMSMessageHeadersType messageProperties = (JMSMessageHeadersType)outMessage
+            final JMSMessageHeadersType headers = (JMSMessageHeadersType)outMessage
                 .get(JMSConstants.JMS_SERVER_RESPONSE_HEADERS);
-            JMSMessageHeadersType inMessageProperties = (JMSMessageHeadersType)inMessage
+            JMSMessageHeadersType inHeaders = (JMSMessageHeadersType)inMessage
                 .get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
-            JMSUtils.initResponseMessageProperties(messageProperties, inMessageProperties);
-            JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, messageProperties);
+            JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, inHeaders);
 
             // setup the reply message
             final javax.jms.Message request = (javax.jms.Message)inMessage
@@ -262,8 +268,12 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
 
                     reply.setJMSCorrelationID(determineCorrelationID(request));
 
-                    JMSUtils.prepareJMSProperties(messageProperties, outMessage, jmsConfig);
-                    JMSUtils.setJMSProperties(reply, messageProperties);
+                    JMSUtils.setMessageProperties(headers, reply);
+                    // ensure that the contentType is set to the out jms message header
+                    JMSUtils.addContentTypeToProtocolHeader(outMessage);
+                    Map<String, List<String>> protHeaders = CastUtils.cast((Map<?, ?>)outMessage
+                        .get(Message.PROTOCOL_HEADERS));
+                    JMSUtils.addProtocolHeaders(reply, protHeaders);
 
                     LOG.log(Level.FINE, "server sending reply: ", reply);
                     return reply;

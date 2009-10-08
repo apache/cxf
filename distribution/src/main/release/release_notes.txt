@@ -1,22 +1,10 @@
-Apache CXF 2.2.2 Release Notes
+Apache CXF 2.1.7 Release Notes
 
 1. Overview
- 
-Apache CXF 2.2.2 delivers the third major version of 
-the Celtix project (http://celtix.objectweb.org) and the XFire project
-(http://xfire.codehaus.org) merge.  This release is a major update from 
-the 2.1.x series.   The major new additions include:
 
- * WS-SecurityPolicy
- * WS-SecureConversation
- * Partial support for WS-Trust
- * Initial support for JAX-RS 1.0 (not TCK compliant yet) including a 
-   client API for accessing REST services   
-
-2.2.2 fixes over 23 JIRA issues reported by users and the community.  In 
-addition, 2.2.2 is the first version to pass the JAX-RS TCK and become
-JAX-RS certified.
-
+Apache CXF 2.1.7 delivers the latest set of patches and bug fixes for the Apache
+CXF 2.1.x branch.   This release fixes 25 JIRA issues that have been reported by 
+users.
 
 2. Installation Prerequisites 
 
@@ -28,7 +16,7 @@ with the specified versions, are installed on your system:
 
 2.1 Java 5 Development Kit
 
-You must install the J2SE Development Kit (JDK) 5.0, which can be downloaded
+You must install the J2SE Development Kit (JDK) 5.0 or 6, which can be downloaded
 from:
 
     http://java.sun.com/j2se/1.5.0/download.jsp
@@ -55,13 +43,20 @@ After installing Apache Ant, add the <AntInstallDir>/bin directory to your PATH.
 For more details, see the Installation Guide.
 
 
+
 3. Building the Samples
 
 Building the samples included in the binary distribution is easy. Change to
 the samples directory and follow the build instructions in the README.txt file 
 included with each sample.
 
-4. Reporting Problems
+4. Errata
+
+4.1 WS-Security
+The WS-Security configuration mechanisms may change between this release and 
+the next one as we add in support for WS-SecurityPolicy and WS-Trust.
+
+5. Reporting Problems
 
 If you have any problems or want to send feedback of any kind, please e-mail the
 cxf dev list, cxf-dev@incubator.apache.org.  You can also file issues in JIRA at:
@@ -69,43 +64,45 @@ cxf dev list, cxf-dev@incubator.apache.org.  You can also file issues in JIRA at
 http://issues.apache.org/jira/browse/CXF
 
 
-5. Migration notes:
+6. JAX-RS/JSR-311
 
-See the migration guide at:
-http://cxf.apache.org/22-migration-guide.html
-for caveats when upgrading from CXF 2.1.x to 2.2.x.
+2.1.2 upgraded the JAX-RS/JSR-311 support level to 0.8 from 0.6.   This may cause 
+existing JAX-RS applications to fail.  JAX-RS/JSR-311 is a work in progress and as
+the specification changes, we'll be updating the implementation to keep track with 
+the specification.   However, users of JAX-RS are highly encouraged to migrate to 
+CXF 2.2.2 or newer as the JAX-RS implementations there are fully JAX-RS 1.0 
+compliant.
 
 
-6. Specific issues, features, and improvements fixed in this version
-
-** Sub-task
-    * [CXF-2185] - Handler protocol match fails when multiple protocols are specified
+7. Specific issues, features, and improvements fixed in this version 
 
 ** Bug
-    * [CXF-1591] - WS Addressing Does Not Work with JAX-WS Provider Based Implementations
-    * [CXF-2164] - CXFBusImpl never removed from ThreadLocal, generates permgen out of memory error after some redeployments
-    * [CXF-2184] - XSD import statements do not apply given confguration
-    * [CXF-2190] - Invalid message sent using Dispatch
-    * [CXF-2201] - NullPointerException by XMLFormatValidator
-    * [CXF-2203] - AttachmentSerializer content id incorrect
-    * [CXF-2205] - Aegis databinding always trims strings
-    * [CXF-2206] - Mapping jaxb types to "default" package causes exception
-    * [CXF-2211] - Investigate possible OOM exception caused by Continuations
-    * [CXF-2212] - SAAJInInterceptor creates a SAAJ SOAPFault with only one "Detail" child
-    * [CXF-2213] - Currently CXF always produces true/false value for for mustUnderstand attribute irrespective of the SOAP version on the wire
-    * [CXF-2219] - org.apache.cxf.service.model.OperationInformation should overwrite hash()
-    * [CXF-2220] - Heavily reused "default" Work Queue Problem
-    * [CXF-2221] - Missing Soap Headers
-    * [CXF-2222] - Policy attached to an input operation in a WSDL does not get copied to the Stub operation by WSDL2Java
-    * [CXF-2224] - Parameter mapping by schema type fails to come up with an appropriate Aegis type and throws
-    * [CXF-2228] - WSDL2XML generated binding not passing correct method arguments in service implementation
-    * [CXF-2229] - thread safe issue caused by XMLOutputFactoryImpl
+    * [CXF-2301] - If a service is published with escaped address, it cannot be accessed from the service location in the WSDL.
+    * [CXF-2308] - Invalid signature of cxf.apache.org/javadoc/latest/org/apache/cxf/ws/addressing/AddressingProperties.html#setTo
+    * [CXF-2380] - Cannot use custom client TLS settings when creating javax.xml.ws.Service from "https://...?wsdl" URL when WSDL contains https imports
+    * [CXF-2381] - Attachments gone when in Multi-Threaded client
+    * [CXF-2398] - JMS Connections are not closed when JCA recycles CXF proxy
+    * [CXF-2409] - ClientOutFaultObserver in ClientImpl not initialized (no callback on client code)
+    * [CXF-2415] - Dynamic client returns a T when it should return a List<T>
+    * [CXF-2419] - WSDL2Java -allowElementReferences causes fatal errors in operation dispatching
+    * [CXF-2421] - Get the UnsupportedOperationException when reinstalling a cxf related bundle in OSGi platform
+    * [CXF-2425] - OSGi metadata does not handle well multiple versions of CXF bundle
+    * [CXF-2431] - NullPointerException from wsdl2java with no explanation
+    * [CXF-2432] - subscriptionDurable is commented in JMSFactory
+    * [CXF-2436] - SEI should be able to implements java.rmi.Remote
+    * [CXF-2440] - GZIP and MTOM attachments does not work on client
+    * [CXF-2442] - fail to create a service model from class when: BARE parameter style, XmlBeans data binding, XmlBeans' source is WSDL file
+    * [CXF-2444] - org.apache.cxf.service.model.InterfaceInfo attributes are not passed to the WSDL PortType during WSDL generation.
+    * [CXF-2447] - Invalid paths used in CXF for the xml files results in failures in java 6
+    * [CXF-2451] - Unable to call no-arg methods when using implicit headers - getting params [null]
 
 ** Improvement
-    * [CXF-1089] - Rest services String response into a CDATA section.
-    * [CXF-1907] - Refactor JAX-WS Dispatch clients....
-    * [CXF-2217] - add SMX_DATABINDING_DISABLED for AbstractBindingFactory so that to add proper interceptors for endpoint used in smx-cxf binding component
+    * [CXF-2372] - Allow JMS XAResource to participate in J2EE transaction
+    * [CXF-2375] - CXF treats synthetic methods as web methods. In the strict sense, this is not against the JAX-WS spec, but it causes issues with AspectJ instrumented classes.
+    * [CXF-2397] - Make use of ControlledValidationXmlBeanDefinitionReader optional depending upon existence of FastInfoSet.jar
+    * [CXF-2407] - WS-RM Connecting to Oracle
+    * [CXF-2416] - wsdl2java generates compiler warning
+    * [CXF-2434] - Set JMSConfig's reconnectionOnException default value to be true  
 
 ** New Feature
-    * [CXF-1004] - Implement JSR-311 1.0
-
+    * [CXF-2036] - Add option to retry a http request on socket error to http client

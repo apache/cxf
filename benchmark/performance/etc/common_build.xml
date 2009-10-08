@@ -52,6 +52,15 @@
         <pathelement location="${tools.jar}"/>
     </path>
 
+    <condition property="is.java.version.15">
+        <equals arg1="${ant.java.version}" arg2="1.5"/>
+    </condition>
+
+    <fail message="CXF requires Java version 1.5 or higher. You are currently using Java version ${ant.java.version}."
+        unless="is.java.version.15"/>
+
+
+
     <!-- Determine cxf.home, either from the environment variable CXF_HOME
        - or using ../..
        -->

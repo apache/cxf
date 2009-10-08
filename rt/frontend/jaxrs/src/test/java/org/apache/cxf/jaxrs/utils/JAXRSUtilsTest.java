@@ -19,8 +19,6 @@
 package org.apache.cxf.jaxrs.utils;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -41,7 +39,7 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.endpoint.Endpoint;
@@ -52,9 +50,7 @@ import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.JAXRSServiceFactoryBean;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.SimpleFactory;
-import org.apache.cxf.jaxrs.Timezone;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
-import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
@@ -452,14 +448,11 @@ public class JAXRSUtilsTest extends Assert {
                    JAXRSUtils.compareMediaTypes(m2, JAXRSUtils.ALL_TYPES) < 0);
         
         MediaType m3 = MediaType.valueOf("text/xml;q=0.2");
-        assertTrue("text/xml should be more preferred than text/xml;q=0.2", 
+        assertTrue("text/xml should be more preferred than than text/xml;q=0.2", 
                    JAXRSUtils.compareMediaTypes(m1, m3) < 0);
         MediaType m4 = MediaType.valueOf("text/xml;q=.3");
-        assertTrue("text/xml;q=.3 should be more preferred than text/xml;q=0.2", 
-                   JAXRSUtils.compareMediaTypes(m4, m3) < 0);
-        
         assertTrue("text/xml;q=.3 should be more preferred than than text/xml;q=0.2", 
-                  JAXRSUtils.compareMediaTypes(m3, m4) > 0);
+                   JAXRSUtils.compareMediaTypes(m4, m3) < 0);
     }
     
     @Test
@@ -488,10 +481,10 @@ public class JAXRSUtilsTest extends Assert {
         assertTrue("lists should be equal", 
                    JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) == 0);
         
-        sortedList1.add(MediaType.WILDCARD_TYPE);
+        sortedList1.add(MediaType.valueOf("*/*"));
         assertTrue("first list should be less specific", 
                    JAXRSUtils.compareSortedMediaTypes(sortedList1, sortedList2) > 0);
-        sortedList1.add(MediaType.WILDCARD_TYPE);
+        sortedList1.add(MediaType.valueOf("*/*"));
         assertTrue("second list should be more specific", 
                    JAXRSUtils.compareSortedMediaTypes(sortedList2, sortedList1) < 0);
     }
@@ -538,24 +531,6 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
-    public void testCookieParameters() throws Exception {
-        Class[] argType = {String.class, String.class};
-        Method m = Customer.class.getMethod("testCookieParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
-        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-        headers.add("Cookie", "c1=c1Value");
-        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           null, 
-                                                           messageImpl);
-        assertEquals(params.size(), 2);
-        assertEquals("c1Value", params.get(0));
-        assertEquals("c2Value", params.get(1));
-        
-        
-    }
-    
-    @Test
     public void testFromStringParameters() throws Exception {
         Class[] argType = {UUID.class, CustomerGender.class, CustomerGender.class};
         Method m = Customer.class.getMethod("testFromStringParam", argType);
@@ -570,20 +545,6 @@ public class JAXRSUtilsTest extends Assert {
                      u.toString(), params.get(0).toString());
         assertSame(CustomerGender.FEMALE, params.get(1));
         assertSame(CustomerGender.MALE, params.get(2));
-    }
-    
-    @Test
-    public void testFromValueEnum() throws Exception {
-        Class[] argType = {Timezone.class};
-        Method m = Customer.class.getMethod("testFromValueParam", argType);
-        Message messageImpl = createMessage();
-        messageImpl.put(Message.QUERY_STRING, "p1=Europe%2FLondon");
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           null, 
-                                                           messageImpl);
-        assertEquals(1, params.size());
-        assertSame("Timezone Parameter was not processed correctly", 
-                   Timezone.EUROPE_LONDON, params.get(0));
     }
     
     @Test
@@ -664,73 +625,37 @@ public class JAXRSUtilsTest extends Assert {
         Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testQueryBean", argType);
         MessageImpl messageImpl = new MessageImpl();
+        
         messageImpl.put(Message.QUERY_STRING, "a=aValue&b=123");
-
-        MessageImpl complexMessageImpl = new MessageImpl();
-        complexMessageImpl.put(Message.QUERY_STRING, "c=1&a=A&b=123&c=2&c=3&"
-                                + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
-                                + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
-                                + "e.c=42&e.a=B2&e.b=458&e.c=52&e.c=62&"
-                                + "d.d.c=7&d.d.a=C&d.d.b=789&d.d.c=8&d.d.c=9&"
-                                + "d.e.c=71&d.e.a=C1&d.e.b=790&d.e.c=81&d.e.c=91&"
-                                + "d.e.c=72&d.e.a=C2&d.e.b=791&d.e.c=82&d.e.c=92");
-
-        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+        
+        assertEquals("aValue", cb.getA());
+        assertEquals(new Long(123), cb.getB());
     }
     
     @Test
     public void testPathParametersBean() throws Exception {
         Class[] argType = {Customer.CustomerBean.class};
         Method m = Customer.class.getMethod("testPathBean", argType);
+        MessageImpl messageImpl = new MessageImpl();
         
-        MultivaluedMap<String, String> pathTemplates = new MetadataMap<String, String>();
-        pathTemplates.add("a", "aValue");
-        pathTemplates.add("b", "123");
-
-        MultivaluedMap<String, String> complexPathTemplates = new MetadataMap<String, String>();
-        complexPathTemplates.add("c", "1");
-        complexPathTemplates.add("a", "A");
-        complexPathTemplates.add("b", "123");
-        complexPathTemplates.add("c", "2");
-        complexPathTemplates.add("c", "3");
-
-        complexPathTemplates.add("d.c", "4");
-        complexPathTemplates.add("d.a", "B");
-        complexPathTemplates.add("d.b", "456");
-        complexPathTemplates.add("d.c", "5");
-        complexPathTemplates.add("d.c", "6");
-
-        complexPathTemplates.add("e.c", "41");
-        complexPathTemplates.add("e.a", "B1");
-        complexPathTemplates.add("e.b", "457");
-        complexPathTemplates.add("e.c", "51");
-        complexPathTemplates.add("e.c", "61");
-
-        complexPathTemplates.add("e.c", "42");
-        complexPathTemplates.add("e.a", "B2");
-        complexPathTemplates.add("e.b", "458");
-        complexPathTemplates.add("e.c", "52");
-        complexPathTemplates.add("e.c", "62");
-
-        complexPathTemplates.add("d.d.c", "7");
-        complexPathTemplates.add("d.d.a", "C");
-        complexPathTemplates.add("d.d.b", "789");
-        complexPathTemplates.add("d.d.c", "8");
-        complexPathTemplates.add("d.d.c", "9");
-
-        complexPathTemplates.add("d.e.c", "71");
-        complexPathTemplates.add("d.e.a", "C1");
-        complexPathTemplates.add("d.e.b", "790");
-        complexPathTemplates.add("d.e.c", "81");
-        complexPathTemplates.add("d.e.c", "91");
-
-        complexPathTemplates.add("d.e.c", "72");
-        complexPathTemplates.add("d.e.a", "C2");
-        complexPathTemplates.add("d.e.b", "791");
-        complexPathTemplates.add("d.e.c", "82");
-        complexPathTemplates.add("d.e.c", "92");
-
-        verifyParametersBean(m, pathTemplates, new MessageImpl(), complexPathTemplates, new MessageImpl());
+        MultivaluedMap<String, String> pathTamplates = new MetadataMap<String, String>();
+        pathTamplates.add("a", "aValue");
+        pathTamplates.add("b", "123");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           pathTamplates, 
+                                                           messageImpl);
+        assertEquals("Bean should be created", 1, params.size());
+        Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
+        assertNotNull(cb);
+        
+        assertEquals("aValue", cb.getA());
+        assertEquals(new Long(123), cb.getB());
     }
     
     @Test
@@ -739,128 +664,17 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testMatrixBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar;a=aValue/baz;b=123");
-
-        MessageImpl complexMessageImpl = new MessageImpl();
-        complexMessageImpl.put(Message.REQUEST_URI, "/bar;c=1/bar;a=A/bar;b=123/bar;c=2/bar;c=3"
-                                + "/bar;d.c=4/bar;d.a=B/bar;d.b=456/bar;d.c=5/bar;d.c=6"
-                                + "/bar;e.c=41/bar;e.a=B1/bar;e.b=457/bar;e.c=51/bar;e.c=61"
-                                + "/bar;e.c=42/bar;e.a=B2/bar;e.b=458/bar;e.c=52/bar;e.c=62"
-                                + "/bar;d.d.c=7/bar;d.d.a=C/bar;d.d.b=789/bar;d.d.c=8/bar;d.d.c=9"
-                                + "/bar;d.e.c=71/bar;d.e.a=C1/bar;d.e.b=790/bar;d.e.c=81/bar;d.e.c=91"
-                                + "/bar;d.e.c=72/bar;d.e.a=C2/bar;d.e.b=791/bar;d.e.c=82/bar;d.e.c=92");
-
-        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
-    }
-    
-    @Test
-    public void testFormParametersBean() throws Exception {
-        Class[] argType = {Customer.CustomerBean.class};
-        Method m = Customer.class.getMethod("testFormBean", argType);
-        MessageImpl messageImpl = new MessageImpl();
-        messageImpl.put(Message.REQUEST_URI, "/bar");
-        String body = "a=aValue&b=123";
-        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-
-        MessageImpl complexMessageImpl = new MessageImpl();
-        complexMessageImpl.put(Message.REQUEST_URI, "/bar");
-        body = "c=1&a=A&b=123&c=2&c=3&"
-                                + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
-                                + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
-                                + "e.c=42&e.a=B2&e.b=458&e.c=52&e.c=62&"
-                                + "d.d.c=7&d.d.a=C&d.d.b=789&d.d.c=8&d.d.c=9&"
-                                + "d.e.c=71&d.e.a=C1&d.e.b=790&d.e.c=81&d.e.c=91&"
-                                + "d.e.c=72&d.e.a=C2&d.e.b=791&d.e.c=82&d.e.c=92";
-        complexMessageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-
-        verifyParametersBean(m, null, messageImpl, null, complexMessageImpl);
-    }
-
-    private void verifyParametersBean(Method m,
-                                      MultivaluedMap<String, String> simpleValues,
-                                      MessageImpl simpleMessageImpl,
-                                      MultivaluedMap<String, String> complexValues,
-                                      MessageImpl complexMessageImpl) throws Exception {
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                           simpleValues, 
-                                                           simpleMessageImpl);
+                                                           new MetadataMap<String, String>(), 
+                                                           messageImpl);
         assertEquals("Bean should be created", 1, params.size());
         Customer.CustomerBean cb = (Customer.CustomerBean)params.get(0);
         assertNotNull(cb);
         
         assertEquals("aValue", cb.getA());
         assertEquals(new Long(123), cb.getB());
-
-        params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
-                                                       complexValues, 
-                                                       complexMessageImpl);
-        assertEquals("Bean should be created", 1, params.size());
-        Customer.CustomerBean cb1 = (Customer.CustomerBean)params.get(0);
-        assertNotNull(cb1);
-
-        assertEquals("A", cb1.getA());
-        assertEquals(new Long(123), cb1.getB());
-        List<String> list1 = (List<String>)cb1.getC();
-        assertEquals(3, list1.size());
-        assertEquals("1", list1.get(0));
-        assertEquals("2", list1.get(1));
-        assertEquals("3", list1.get(2));
-
-        Customer.CustomerBean cb2 = cb1.getD();
-        assertNotNull(cb2);
-
-        assertEquals("B", cb2.getA());
-        assertEquals(new Long(456), cb2.getB());
-        List<String> list2 = (List<String>)cb2.getC();
-        assertEquals(3, list2.size());
-        assertEquals("4", list2.get(0));
-        assertEquals("5", list2.get(1));
-        assertEquals("6", list2.get(2));
-
-        List<Customer.CustomerBean> cb2List = cb1.e;
-        assertEquals(2, cb2List.size());
-
-        int idx = 1;
-        for (Customer.CustomerBean cb2E : cb2List) {
-            assertNotNull(cb2E);
-
-            assertEquals("B" + idx, cb2E.getA());
-            assertEquals(new Long(456 + idx), cb2E.getB());
-            // ensure C was stripped properly since lists within lists are not supported
-            assertNull(cb2E.getC());
-            assertNull(cb2E.getD());
-            assertNull(cb2E.e);
-
-            idx++;
-        }
-
-        Customer.CustomerBean cb3 = cb2.getD();
-        assertNotNull(cb3);
-
-        assertEquals("C", cb3.getA());
-        assertEquals(new Long(789), cb3.getB());
-        List<String> list3 = (List<String>)cb3.getC();
-        assertEquals(3, list3.size());
-        assertEquals("7", list3.get(0));
-        assertEquals("8", list3.get(1));
-        assertEquals("9", list3.get(2));
-
-        List<Customer.CustomerBean> cb3List = cb2.e;
-        assertEquals(2, cb3List.size());
-
-        idx = 1;
-        for (Customer.CustomerBean cb3E : cb3List) {
-            assertNotNull(cb3E);
-
-            assertEquals("C" + idx, cb3E.getA());
-            assertEquals(new Long(789 + idx), cb3E.getB());
-            // ensure C was stripped properly since lists within lists are not supported
-            assertNull(cb3E.getC());
-            assertNull(cb3E.getD());
-            assertNull(cb3E.e);
-
-            idx++;
-        }
     }
+    
     
     @Test
     public void testMultipleQueryParameters() throws Exception {
@@ -932,26 +746,6 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("bar foo", params.get(1));
     }
     
-    @SuppressWarnings("unchecked")
-    @Test
-    public void testFormParameters() throws Exception {
-        Class[] argType = {String.class, List.class};
-        Method m = Customer.class.getMethod("testFormParam", argType);
-        MessageImpl messageImpl = new MessageImpl();
-        String body = "p1=1&p2=2&p2=3";
-        messageImpl.put(Message.REQUEST_URI, "/foo");
-        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
-        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
-                                                           null, messageImpl);
-        assertEquals("2 form params should've been identified", 2, params.size());
-        
-        assertEquals("First Form Parameter not matched correctly", 
-                     "1", params.get(0));
-        List<String> list = (List<String>)params.get(1);
-        assertEquals(2, list.size());
-        assertEquals("2", list.get(0));
-        assertEquals("3", list.get(1));
-    }
     
     @Test
     public void testSelectResourceMethod() throws Exception {
@@ -1005,7 +799,7 @@ public class JAXRSUtilsTest extends Assert {
                                                      HttpHeaders.class, 
                                                      Request.class,
                                                      SecurityContext.class,
-                                                     Providers.class,
+                                                     MessageBodyWorkers.class,
                                                      String.class,
                                                      List.class}), 
                 cri);
@@ -1040,9 +834,10 @@ public class JAXRSUtilsTest extends Assert {
             Customer.class.getMethod("setUriInfoContext", 
                                      new Class[]{UriInfo.class});
         OperationResourceInfo ori = 
-            new OperationResourceInfo(methodToInvoke,
-                                      AnnotationUtils.getAnnotatedMethod(methodToInvoke), cri);
+            new OperationResourceInfo(methodToInvoke, cri);
         ori.setHttpMethod("GET");
+        ori.setAnnotatedMethod(AnnotationUtils.getAnnotatedMethod(methodToInvoke));
+        
         
         Message m = new MessageImpl();
         
@@ -1066,12 +861,12 @@ public class JAXRSUtilsTest extends Assert {
                 cri);
         ori.setHttpMethod("GET");
         HttpServletRequest request = EasyMock.createMock(HttpServletRequest.class);
-        HttpServletResponse response = new HttpServletResponseFilter(
-                                           EasyMock.createMock(HttpServletResponse.class), null);
+        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
         ServletContext context = EasyMock.createMock(ServletContext.class);
         ServletConfig config = EasyMock.createMock(ServletConfig.class);        
         
         EasyMock.replay(request);
+        EasyMock.replay(response);
         EasyMock.replay(context);
         EasyMock.replay(config);
         
@@ -1102,8 +897,6 @@ public class JAXRSUtilsTest extends Assert {
         
         Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
-        m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         
         InjectionUtils.injectContextFields(c, ori.getClassResourceInfo(), m);
         assertSame(UriInfoImpl.class, c.getUriInfo2().getClass());
@@ -1120,17 +913,17 @@ public class JAXRSUtilsTest extends Assert {
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
         cri.setResourceProvider(new SingletonResourceProvider(c));
-                
+        
         Message m = createMessage();
         m.put(Message.PROTOCOL_HEADERS, new HashMap<String, List<String>>());
         ServletContext servletContextMock = EasyMock.createNiceMock(ServletContext.class);
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
         HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
         
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
         InjectionUtils.injectContextFields(c, cri, m);
         InjectionUtils.injectContextMethods(c, cri, m);
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo2().getClass());
@@ -1144,20 +937,17 @@ public class JAXRSUtilsTest extends Assert {
                    ((ThreadLocalProxy)c.getSecurityContext()).get().getClass());
         assertSame(ProvidersImpl.class, 
                    ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
-        assertSame(ProvidersImpl.class, 
-                   ((ThreadLocalProxy)c.getBodyWorkers()).get().getClass());
-  
+
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getThreadLocalServletContext()).get());
+
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getServletContext()).get());
-        assertSame(servletContextMock, 
-                   ((ThreadLocalProxy)c.getSuperServletContext()).get());
+        
         assertSame(httpRequest, 
                    ((ThreadLocalProxy)c.getServletRequest()).get());
-        HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponse()).get();
-        assertSame(httpResponse, filter.getResponse());
+        assertSame(httpResponse, 
+                   ((ThreadLocalProxy)c.getServletResponse()).get());
     }
     
     @Test
@@ -1172,17 +962,16 @@ public class JAXRSUtilsTest extends Assert {
         m.put(AbstractHTTPDestination.HTTP_CONTEXT, servletContextMock);
         HttpServletRequest httpRequest = EasyMock.createNiceMock(HttpServletRequest.class);
         m.put(AbstractHTTPDestination.HTTP_REQUEST, httpRequest);
-        HttpServletResponse httpResponse = EasyMock.createMock(HttpServletResponse.class);
+        HttpServletResponse httpResponse = EasyMock.createNiceMock(HttpServletResponse.class);
         m.put(AbstractHTTPDestination.HTTP_RESPONSE, httpResponse);
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
         InjectionUtils.injectResourceFields(c, cri, m);
         assertSame(servletContextMock, 
                    ((ThreadLocalProxy)c.getServletContextResource()).get());
         assertSame(httpRequest, 
                    ((ThreadLocalProxy)c.getServletRequestResource()).get());
-        HttpServletResponseFilter filter = (
-            HttpServletResponseFilter)((ThreadLocalProxy)c.getServletResponseResource()).get();
-        assertSame(httpResponse, filter.getResponse());
+        assertSame(httpResponse, 
+                   ((ThreadLocalProxy)c.getServletResponseResource()).get());
     }
     
     @Test
@@ -1191,7 +980,7 @@ public class JAXRSUtilsTest extends Assert {
         ClassResourceInfo cri = new ClassResourceInfo(Customer.class, true);
         Customer c = new Customer();
         cri.setResourceProvider(new SingletonResourceProvider(c));
-        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance(null));
+        InjectionUtils.injectContextProxies(cri, cri.getResourceProvider().getInstance());
         
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri); 
@@ -1262,8 +1051,6 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(null, cri);
         
         Message m = createMessage();
-        HttpServletResponse response = EasyMock.createMock(HttpServletResponse.class);
-        m.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
         Customer c = new Customer();
         ContextResolver<JAXBContext> cr = new JAXBContextProvider();
         ProviderFactory.getInstance(m).registerUserProvider(cr);
@@ -1297,8 +1084,7 @@ public class JAXRSUtilsTest extends Assert {
         
         InjectionUtils.injectResourceFields(c, ori.getClassResourceInfo(), m);
         assertSame(request.getClass(), c.getServletRequestResource().getClass());
-        HttpServletResponseFilter filter = (HttpServletResponseFilter)c.getServletResponseResource();
-        assertSame(response.getClass(), filter.getResponse().getClass());
+        assertSame(response.getClass(), c.getServletResponseResource().getClass());
         assertSame(context.getClass(), c.getServletContextResource().getClass());
         assertNull(c.getServletRequest());
         assertNull(c.getServletResponse());
@@ -1310,8 +1096,7 @@ public class JAXRSUtilsTest extends Assert {
         assertNull(c.getServletResponseResource());
         assertNull(c.getServletContextResource());
         assertSame(request.getClass(), c.getServletRequest().getClass());
-        filter = (HttpServletResponseFilter)c.getServletResponse();
-        assertSame(response.getClass(), filter.getResponse().getClass());
+        assertSame(response.getClass(), c.getServletResponse().getClass());
         assertSame(context.getClass(), c.getServletContext().getClass());
     }
     

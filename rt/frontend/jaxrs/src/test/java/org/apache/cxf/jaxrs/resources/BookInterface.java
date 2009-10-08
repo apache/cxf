@@ -19,18 +19,18 @@
 
 package org.apache.cxf.jaxrs.resources;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 
 public interface BookInterface {
     
     @GET
     @Path("/path2")
-    @Produces("text/bar2")
-    @Consumes("text/foo2")
+    @ProduceMime("text/bar2")
+    @ConsumeMime("text/foo2")
     String getAuthor();
     
     @Path("/books/{bookId}")

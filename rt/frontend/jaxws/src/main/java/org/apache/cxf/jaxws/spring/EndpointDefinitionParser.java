@@ -126,7 +126,6 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         bean.setLazyInit(false);
     }
 
-    @SuppressWarnings("deprecation")
     private void loadImplementor(BeanDefinitionBuilder bean, String val) {
         if (!StringUtils.isEmpty(val)) {
             if (val.startsWith("#")) {

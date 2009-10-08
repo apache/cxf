@@ -41,7 +41,6 @@ import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -50,11 +49,14 @@ import org.apache.cxf.service.Service;
 
 public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
+    public static final String RELATIVE_PATH = "relative.path";
+    public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSInInterceptor.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInInterceptor.class);
-    
+
     public JAXRSInInterceptor() {
-        super(Phase.UNMARSHAL);
+        super(Phase.PRE_STREAM);
     }
 
     public void handleMessage(Message message) {
@@ -65,8 +67,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse == null) {
                 ProviderFactory.getInstance(message).clearThreadLocalProxies();
-                message.getExchange().put(Message.PROPOGATE_EXCEPTION, 
-                                          JAXRSUtils.propogateException(message));
                 throw ex;
             }
             message.getExchange().put(Response.class, excResponse);
@@ -85,9 +85,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         RequestPreprocessor rp = ProviderFactory.getInstance(message).getRequestPreprocessor();
         if (rp != null) {
             rp.preprocess(message, new UriInfoImpl(message, null));
-            if (message.getExchange().get(Response.class) != null) {
-                return;
-            }
         }
         
         String requestContentType = (String)message.get(Message.CONTENT_TYPE);
@@ -123,37 +120,29 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new WebApplicationException(Response.Status.NOT_FOUND);
         }
 
-        message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
+        message.getExchange().put(ROOT_RESOURCE_CLASS, resource);
 
         String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         OperationResourceInfo ori = null;     
         
-        boolean operChecked = false;
         List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(message).getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
             String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
-            if (!acceptTypes.equals(newAcceptTypes) || (ori == null && !operChecked)) {
+            if (!acceptTypes.equals(newAcceptTypes) || ori == null) {
                 acceptTypes = newAcceptTypes;
                 acceptContentTypes = JAXRSUtils.sortMediaTypes(newAcceptTypes);
                 message.getExchange().put(Message.ACCEPT_CONTENT_TYPE, acceptContentTypes);
+                
                 if (ori != null) {
                     values = new MetadataMap<String, String>();
                     resource = JAXRSUtils.selectResourceClass(resources, 
                                                               rawPath, 
                                                               values);
                 }
-                try {                
-                    ori = JAXRSUtils.findTargetMethod(resource, 
-                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), httpMethod, values, 
-                        requestContentType, acceptContentTypes, false);
-                    setMessageProperties(message, ori, values);
-                } catch (WebApplicationException ex) {
-                    operChecked = true;
-                }
-                
+                ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                                  httpMethod, values, requestContentType, acceptContentTypes);
+                message.getExchange().put(OperationResourceInfo.class, ori);
             }
-            InjectionUtils.injectContextFields(sh.getProvider(), sh, message);
-            InjectionUtils.injectContextFields(sh.getProvider(), sh, message);
             Response response = sh.getProvider().handleRequest(message, resource);
             if (response != null) {
                 message.getExchange().put(Response.class, response);
@@ -172,20 +161,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                                           rawPath, 
                                                           values);
             }
-            try {                
-                ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
-                                            httpMethod, values, requestContentType, acceptContentTypes);
-                setMessageProperties(message, ori, values);
-            } catch (WebApplicationException ex) {
-                if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
-                    && "OPTIONS".equalsIgnoreCase(httpMethod)) {
-                    Response response = JAXRSUtils.createResponseBuilder(resource, 200, true).build();
-                    message.getExchange().put(Response.class, response);
-                    return;
-                } else {
-                    throw ex;
-                }
-            }
+            ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
+                                              httpMethod, values, requestContentType, acceptContentTypes);
+            message.getExchange().put(OperationResourceInfo.class, ori);
         }
 
         
@@ -195,17 +173,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         LOG.fine("Accept contentType is: " + acceptTypes);
         
         LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
-        setMessageProperties(message, ori, values);  
-      
-        //Process parameters
-        List<Object> params = JAXRSUtils.processParameters(ori, values, message);
-        message.setContent(List.class, params);
-    }
-    
-    private void setMessageProperties(Message message, OperationResourceInfo ori, 
-                                      MultivaluedMap<String, String> values) {
+        
         message.getExchange().put(OperationResourceInfo.class, ori);
-        message.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+        message.put(RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
+      
+        //2. Process parameters
+        List<Object> params = JAXRSUtils.processParameters(ori, values, message);
+
+        message.setContent(List.class, params);
     }
 }

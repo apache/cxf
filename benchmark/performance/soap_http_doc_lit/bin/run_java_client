@@ -17,13 +17,13 @@
 #  specific language governing permissions and limitations
 #  under the License.
 
-OPERATION=echoComplexTypeDoc
-#OPERATION=echoStringDoc
-#OPERATION=echoBase64Doc
+OPERARTION=echoComplexTypeDoc
+#OPERARTION=echoStringDoc
+#OPERARTION=echoBase64Doc
 BASEDON=Time
 AMOUNT=30
 PACKETSIZE=1
-THREADS=1
+THREADS=0
 BUILD_XML=build.xml
 WSDL=
 

@@ -22,13 +22,13 @@
     <artifactId>apache-cxf</artifactId>
     <packaging>pom</packaging>
     <name>Apache CXF Distribution</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
         <relativePath>../parent</relativePath>
     </parent>
 
@@ -119,11 +119,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>${pom.groupId}.xjcplugins</groupId>
-            <artifactId>cxf-xjc-boolean</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${pom.version}</version>
@@ -150,11 +145,6 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>cxf-rt-transports-http-osgi</artifactId>
             <version>${pom.version}</version>
         </dependency>
         <dependency>
@@ -275,6 +265,10 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
+            <groupId>commons-httpclient</groupId>
+            <artifactId>commons-httpclient</artifactId>
+        </dependency>
+        <dependency>
             <groupId>commons-logging</groupId>
             <artifactId>commons-logging</artifactId>
         </dependency>
@@ -330,42 +324,32 @@
                             <goal>copy</goal>
                         </goals>
                         <configuration>
+                            <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                             <artifactItems>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-integration-jbi</artifactId>
                                     <version>${pom.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-integration-jca</artifactId>
                                     <version>${pom.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-rt-bindings-jbi</artifactId>
                                     <version>${pom.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
                                     <groupId>${pom.groupId}</groupId>
                                     <artifactId>cxf-rt-transports-jbi</artifactId>
                                     <version>${pom.version}</version>
-                                    <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
-                                    <groupId>junit</groupId>
-                                    <artifactId>junit</artifactId>
-                                    <version>4.4</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
-                                </artifactItem>
-                                <artifactItem>
-                                    <groupId>commons-httpclient</groupId>
-                                    <artifactId>commons-httpclient</artifactId>
-                                    <version>3.1</version>
-                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                    <groupId>${pom.groupId}</groupId>
+                                    <artifactId>cxf-anttasks</artifactId>
+                                    <version>${pom.version}</version>
                                 </artifactItem>
                             </artifactItems>
                         </configuration>
@@ -450,10 +434,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution</developerConnection>
-    </scm>
 
 </project>

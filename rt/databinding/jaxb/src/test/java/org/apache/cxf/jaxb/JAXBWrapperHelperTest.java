@@ -64,7 +64,6 @@ public class JAXBWrapperHelperTest extends Assert {
         });
         
         WrapperHelper wh = new JAXBDataBinding().createWrapperHelper(SetIsOK.class,
-                                                                     null,
                                           partNames,
                                           elTypeNames,
                                           partClasses);

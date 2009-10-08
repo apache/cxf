@@ -22,7 +22,6 @@ package org.apache.cxf.jaxrs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -32,9 +31,7 @@ import javax.ws.rs.Path;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
-import org.apache.cxf.jaxrs.model.UserResource;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
@@ -60,6 +57,10 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     public void setEnableStaticResolution(boolean staticResolution) {
         this.enableStatic = staticResolution;
+    }
+    
+    public boolean resourcesAvailable() {
+        return !classResourceInfos.isEmpty();
     }
     
     @Override
@@ -100,8 +101,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         this.invoker = invoker;
     }
 
-    public List<Class<?>> getResourceClasses() {
-        List<Class<?>> resourceClasses = new ArrayList<Class<?>>();
+    public List<Class> getResourceClasses() {
+        List<Class> resourceClasses = new ArrayList<Class>();
         for (ClassResourceInfo cri : classResourceInfos) {
             resourceClasses.add(cri.getResourceClass());
         }
@@ -112,64 +113,16 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         return Collections.unmodifiableList(classResourceInfos);
     }
     
-    List<ClassResourceInfo> getRealClassResourceInfo() {
-        return classResourceInfos;
-    }
-    
     public void setResourceClass(Class cls) {
-        if (getCreatedFromModel(cls) == null) {
-            classResourceInfos.clear();
-            boolean isRoot = AnnotationUtils.getClassAnnotation(cls, Path.class) != null;
-            createResourceInfo(cls, isRoot);
-        }
+        classResourceInfos.clear();
+        boolean isRoot = AnnotationUtils.getClassAnnotation(cls, Path.class) != null;
+        createResourceInfo(cls, isRoot);
     }
     
     public void setResourceClasses(List<Class> classes) {
         for (Class resourceClass : classes) {
-            
-            ClassResourceInfo cri = getCreatedFromModel(resourceClass);
-            if (cri != null) {
-                if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
-                    cri = new ClassResourceInfo(cri);
-                    cri.setResourceClass(resourceClass);
-                    classResourceInfos.add(cri);
-                }
-                continue;
-            }
-            
             createResourceInfo(resourceClass, true);
         }
-    }
-    
-    public void setUserResources(List<UserResource> resources) {
-        Map<String, UserResource> map = userResourcesAsMap(resources);
-        for (UserResource ur : resources) {
-            if (ur.getPath() != null) {
-                ClassResourceInfo cri = ResourceUtils.createClassResourceInfo(map, ur, true, enableStatic);
-                if (cri != null) {
-                    classResourceInfos.add(cri);
-                }
-            }
-        }
-    }
-    
-    public void setUserResourcesWithServiceClass(List<UserResource> resources, Class<?> ...sClasses) {
-        Map<String, UserResource> map = userResourcesAsMap(resources);
-        for (Class<?> sClass : sClasses) {
-            ClassResourceInfo cri = ResourceUtils.createServiceClassResourceInfo(
-                map, map.get(sClass.getName()), sClass, true, enableStatic);
-            if (cri != null) {
-                classResourceInfos.add(cri);
-            }
-        }
-    }
-    
-    private Map<String, UserResource> userResourcesAsMap(List<UserResource> resources) {
-        Map<String, UserResource> map = new HashMap<String, UserResource>();
-        for (UserResource ur : resources) {
-            map.put(ur.getName(), ur);
-        }
-        return map;
     }
     
     protected ClassResourceInfo createResourceInfo(Class cls, boolean isRoot) {
@@ -190,34 +143,15 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             
             Class<?> realClass = ClassHelper.getRealClass(bean);
             
-            ClassResourceInfo cri = getCreatedFromModel(realClass);
-            if (cri != null) {
-                if (!InjectionUtils.isConcreteClass(cri.getServiceClass())) {
-                    cri = new ClassResourceInfo(cri);
-                    classResourceInfos.add(cri);
-                }
-                cri.setResourceClass(bean.getClass());
-                cri.setResourceProvider(new SingletonResourceProvider(bean));
-                continue;
-            }
-            
-            cri = ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic);
-            if (cri != null) {
-                classResourceInfos.add(cri);
-                cri.setResourceProvider(
+            ClassResourceInfo classResourceInfo = 
+                ResourceUtils.createClassResourceInfo(bean.getClass(), realClass, true, enableStatic);
+            if (classResourceInfo != null) {
+                classResourceInfos.add(classResourceInfo);
+                
+                classResourceInfo.setResourceProvider(
                                    new SingletonResourceProvider(bean));
             }
         }
-    }
-    
-    private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
-        for (ClassResourceInfo cri : classResourceInfos) {
-            if (cri.isCreatedFromModel() 
-                && cri.isRoot() && cri.getServiceClass().isAssignableFrom(realClass)) {
-                return cri;
-            }
-        }
-        return null;
     }
     
     protected void initializeServiceModel() {

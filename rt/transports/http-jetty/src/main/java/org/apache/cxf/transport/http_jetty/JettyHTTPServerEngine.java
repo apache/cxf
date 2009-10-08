@@ -53,7 +53,6 @@ import org.mortbay.jetty.servlet.HashSessionManager;
 import org.mortbay.jetty.servlet.SessionHandler;
 import org.mortbay.thread.QueuedThreadPool;
 
-
 /**
  * This class is the Jetty HTTP Server Engine that is configured to
  * work off of a designated port. The port will be enabled for 

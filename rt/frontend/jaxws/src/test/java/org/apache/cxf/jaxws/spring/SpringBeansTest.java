@@ -37,7 +37,6 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
-import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
@@ -68,29 +67,32 @@ public class SpringBeansTest extends Assert {
         }
     }
 
-    private EndpointImpl getEndpointImplBean(String s, ClassPathXmlApplicationContext ctx) {
-        Object bean = ctx.getBean(s);
-        assertNotNull(bean);
-        return (EndpointImpl) bean;
-    }
-    
     @Test
     public void testEndpoints() throws Exception {
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/endpoints.xml"});
 
-        EndpointImpl ep = getEndpointImplBean("simple", ctx);
+        Object bean = ctx.getBean("simple");
+        assertNotNull(bean);
+
+        EndpointImpl ep = (EndpointImpl) bean;
         assertNotNull(ep.getImplementor());
         assertNotNull(ep.getServer());
 
-        ep = getEndpointImplBean("simpleWithAddress", ctx);
+        bean = ctx.getBean("simpleWithAddress");
+        assertNotNull(bean);
+
+        ep = (EndpointImpl) bean;
         if (!(ep.getImplementor() instanceof org.apache.hello_world_soap_http.GreeterImpl)) {
             fail("can't get the right implementor object");
         }
         assertEquals("http://localhost:8080/simpleWithAddress",
                      ep.getServer().getEndpoint().getEndpointInfo().getAddress());        
 
-        ep = getEndpointImplBean("inlineImplementor", ctx);
+        bean = ctx.getBean("inlineImplementor");
+        assertNotNull(bean);
+
+        ep = (EndpointImpl) bean;
         if (!(ep.getImplementor() instanceof org.apache.hello_world_soap_http.GreeterImpl)) {
             fail("can't get the right implementor object");
         }
@@ -100,18 +102,24 @@ public class SpringBeansTest extends Assert {
         assertNotNull(ep.getServer());
 
 
-        ep = getEndpointImplBean("inlineInvoker", ctx);
+        bean = ctx.getBean("inlineInvoker");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
         assertTrue(ep.getInvoker() instanceof NullInvoker);
         assertTrue(ep.getService().getInvoker() instanceof NullInvoker);
 
-        ep = getEndpointImplBean("simpleWithBindingUri", ctx);
+        bean = ctx.getBean("simpleWithBindingUri");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
         assertEquals("get the wrong bindingId",
                      ep.getBindingUri(),
                      "http://cxf.apache.org/bindings/xformat");
         assertEquals("get a wrong transportId",
                      "http://cxf.apache.org/transports/local", ep.getTransportId());
 
-        ep = getEndpointImplBean("simpleWithBinding", ctx);
+        bean = ctx.getBean("simpleWithBinding");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
         BindingConfiguration bc = ep.getBindingConfig();
         assertTrue(bc instanceof SoapBindingConfiguration);
         SoapBindingConfiguration sbc = (SoapBindingConfiguration) bc;
@@ -119,37 +127,45 @@ public class SpringBeansTest extends Assert {
         assertTrue("the soap configure should set isMtomEnabled to be true",
                    sbc.isMtomEnabled());
 
-        ep = getEndpointImplBean("implementorClass", ctx);
+        bean = ctx.getBean("implementorClass");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
         assertEquals(Hello.class, ep.getImplementorClass());
         assertTrue(ep.getImplementor().getClass() == Object.class);
 
-        ep = getEndpointImplBean("epWithProps", ctx);
+        bean = ctx.getBean("epWithProps");
+        assertNotNull(bean);
+
+        ep = (EndpointImpl) bean;
         assertEquals("bar", ep.getProperties().get("foo"));
 
-        ep = getEndpointImplBean("classImpl", ctx);
+        bean = ctx.getBean("classImpl");
+        assertNotNull(bean);
+
+        ep = (EndpointImpl) bean;
         assertTrue(ep.getImplementor() instanceof Hello);
 
         QName name = ep.getServer().getEndpoint().getService().getName();
         assertEquals("http://service.jaxws.cxf.apache.org/service", name.getNamespaceURI());
         assertEquals("HelloServiceCustomized", name.getLocalPart());
 
-        name = ep.getServer().getEndpoint().getEndpointInfo().getName();
-        assertEquals("http://service.jaxws.cxf.apache.org/endpoint", name.getNamespaceURI());
-        assertEquals("HelloEndpointCustomized", name.getLocalPart());
-
-        Object bean = ctx.getBean("wsdlLocation");
+        bean = ctx.getBean("wsdlLocation");
         assertNotNull(bean);
 
-        ep = getEndpointImplBean("publishedEndpointUrl", ctx);
+        bean = ctx.getBean("publishedEndpointUrl");
+        assertNotNull(bean);
         String expectedEndpointUrl = "http://cxf.apache.org/Greeter";
+        ep = (EndpointImpl) bean;
         assertEquals(expectedEndpointUrl, ep.getPublishedEndpointUrl());
         
-        ep = getEndpointImplBean("epWithDataBinding", ctx);
+        bean = ctx.getBean("epWithDataBinding");
+        assertNotNull(bean);
+        ep = (EndpointImpl) bean;
         DataBinding dataBinding = ep.getDataBinding();
         
         assertTrue(dataBinding instanceof JAXBDataBinding);
         assertEquals("The namespace map should have an entry",
-                     ((JAXBDataBinding)dataBinding).getNamespaceMap().size(), 1);
+                        ((JAXBDataBinding)dataBinding).getNamespaceMap().size(), 1);
         // test for existence of Endpoint without an id element
         boolean found = false;
         String[] names = ctx.getBeanNamesForType(EndpointImpl.class);
@@ -265,13 +281,9 @@ public class SpringBeansTest extends Assert {
 
     @Test
     public void testClients() throws Exception {
-        AbstractFactoryBeanDefinitionParser.setFactoriesAreAbstract(false);
         ClassPathXmlApplicationContext ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
 
-        ClientHolderBean greeters = (ClientHolderBean)ctx.getBean("greeters");
-        assertEquals(3, greeters.greeterCount());
-        
         Object bean = ctx.getBean("client1.proxyFactory");
         assertNotNull(bean);
 

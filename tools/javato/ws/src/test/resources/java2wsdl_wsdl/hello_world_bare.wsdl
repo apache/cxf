@@ -31,7 +31,7 @@ under the License.
             xmlns="http://www.w3.org/2001/XMLSchema"
             elementFormDefault="qualified">
 
-            <element name="responseType" type="xsd:string" nillable="true"/>
+            <element name="responseType" type="xsd:string"/>
             <element name="requestType" type="xsd:string"/>
             <element name="myComplexStruct" type="x1:myComplexStructType"/>
 

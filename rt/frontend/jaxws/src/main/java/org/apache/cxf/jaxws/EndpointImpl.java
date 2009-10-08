@@ -21,7 +21,6 @@ package org.apache.cxf.jaxws;
 
 import java.security.AccessController;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -184,12 +183,6 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
 
     @Override
     public Map<String, Object> getProperties() {
-        if (server != null) {
-            return server.getEndpoint();
-        }
-        if (properties == null) {
-            properties = new HashMap<String, Object>();
-        }
         return properties;
     }
 

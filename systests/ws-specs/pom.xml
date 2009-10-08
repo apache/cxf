@@ -21,19 +21,15 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-ws-specs</artifactId>
     <name>Apache CXF WS-* Specifications System Tests</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/systests/ws-specs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests/ws-specs</developerConnection>
-    </scm>
     <build>
         <plugins>
             <plugin>
@@ -65,58 +61,6 @@
                         <configuration>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest_wsspec</testWsdlRoot>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-wssec10-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wsspec/wssec10/WsSecurity10.wsdl</wsdl>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-wssec11-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wsspec/wssec11/WsSecurity11.wsdl</wsdl>
-                                </wsdlOption>
-                            </wsdlOptions>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>generate-wssc-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <wsdlOptions>
-                                <wsdlOption>
-                                    <wsdl>${basedir}/src/test/resources/wsdl_systest_wsspec/wssc/WSSecureConversation.wsdl</wsdl>
-                                </wsdlOption>
-                            </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>

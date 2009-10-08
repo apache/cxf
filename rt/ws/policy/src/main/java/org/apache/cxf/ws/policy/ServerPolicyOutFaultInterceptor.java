@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
@@ -41,7 +40,7 @@ import org.apache.cxf.transport.Destination;
  * 
  */
 public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
-    public static final ServerPolicyOutFaultInterceptor INSTANCE = new ServerPolicyOutFaultInterceptor();
+
     private static final Logger LOG = LogUtils.getL7dLogger(ServerPolicyOutFaultInterceptor.class);
     
     public ServerPolicyOutFaultInterceptor() {
@@ -69,8 +68,7 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
             return;
         }
         EndpointInfo ei = e.getEndpointInfo();
-
-        Bus bus = exchange.get(Bus.class);
+        
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         if (null == pe) {
             return;
@@ -92,13 +90,13 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         List<Interceptor> interceptors = effectivePolicy.getInterceptors();
         for (Interceptor oi : interceptors) {
             msg.getInterceptorChain().add(oi);
-            LOG.log(Level.FINE, "Added interceptor of type {0}", oi.getClass().getSimpleName());
+            LOG.log(Level.INFO, "Added interceptor of type {0}", oi.getClass().getSimpleName());
         }
         
         // insert assertions of the chosen alternative into the message
         
         Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
-        if (null != assertions && !assertions.isEmpty()) {
+        if (null != assertions) {
             msg.put(AssertionInfoMap.class, new AssertionInfoMap(assertions));
         }
     }

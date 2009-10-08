@@ -22,10 +22,12 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
-public class RecipientToken extends TokenWrapper {
+public class RecipientToken extends AbstractSecurityAssertion implements TokenWrapper {
+
+    private Token receipientToken;
 
     public RecipientToken(SPConstants version) {
         super(version);
@@ -34,32 +36,41 @@ public class RecipientToken extends TokenWrapper {
     /**
      * @return Returns the receipientToken.
      */
-    public Token getRecipientToken() {
-        return getToken();
+    public Token getReceipientToken() {
+        return receipientToken;
     }
 
     /**
      * @param receipientToken The receipientToken to set.
      */
-    public void setRecipientToken(Token recipientToken) {
-        setToken(recipientToken);
+    public void setReceipientToken(Token receipientToken) {
+        this.receipientToken = receipientToken;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.apache.ws.security.policy.TokenWrapper#setToken(org.apache.ws.security.policy.Token)
+     */
+    public void setToken(Token tok) {
+        this.setReceipientToken(tok);
+    }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getRecipientToken();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getRecipientToken();
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
+
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -76,7 +87,7 @@ public class RecipientToken extends TokenWrapper {
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
-        Token token = getRecipientToken();
+        Token token = getReceipientToken();
         if (token == null) {
             throw new RuntimeException("RecipientToken doesn't contain any token assertions");
         }

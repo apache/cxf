@@ -36,6 +36,7 @@ public class CXFNonSpringServlet extends AbstractCXFServlet {
     @Override
     public void loadBus(ServletConfig servletConfig) throws ServletException {
         loadBusNoConfig(servletConfig);
+        // You could add the endpoint publish codes here
     }
 
     private void loadBusNoConfig(ServletConfig servletConfig) throws ServletException {

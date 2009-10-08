@@ -19,7 +19,12 @@
 
 package org.apache.cxf.databinding;
 
+import java.util.Collection;
+
 import javax.xml.namespace.QName;
+import javax.xml.validation.Schema;
+
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 /**
@@ -27,7 +32,10 @@ import org.apache.cxf.service.model.MessagePartInfo;
  * from a source of type T.
  * @param <T> The type of the source. Each data binding defines the set of source types that it supports.
  */
-public interface DataReader<T> extends BaseDataReader {
+public interface DataReader<T> {
+    String FAULT = DataReader.class.getName() + "Fault";
+    String ENDPOINT = DataReader.class.getName() + "Endpoint";
+
     /**
      * Read an object from the input.
      * @param input input source object.
@@ -56,4 +64,25 @@ public interface DataReader<T> extends BaseDataReader {
      * @return item read.
      */
     Object read(QName elementQName, T input, Class type);
+    /**
+     * Supply a schema to validate the input. Bindings silently ignore this parameter if they
+     * do not support schema validation, or the particular form of validation implied by
+     * a particular form of Schema.
+     * @param s
+     */
+    void setSchema(Schema s);
+    /**
+     * Attach a collection of attachments to a binding. This permits a binding to process the contents
+     * of one or more attachments as part of reading from this reader.
+     * @param attachments attachments.
+     */
+    void setAttachments(Collection<Attachment> attachments);
+    /**
+     * Set an arbitrary property on the reader.
+     * {@link #FAULT} and {@link #ENDPOINT} specify two common properties: the Fault object being read
+     * and the {@link org.apache.cxf.endpoint.Endpoint}.
+     * @param prop Name of the property.
+     * @param value Value of the property.
+     */
+    void setProperty(String prop, Object value);
 }

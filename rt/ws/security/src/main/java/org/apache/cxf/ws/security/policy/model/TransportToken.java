@@ -22,10 +22,12 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
-public class TransportToken extends TokenWrapper {
+public class TransportToken extends AbstractSecurityAssertion implements TokenWrapper {
+
+    private Token transportToken;
 
     public TransportToken(SPConstants version) {
         super(version);
@@ -35,14 +37,19 @@ public class TransportToken extends TokenWrapper {
      * @return Returns the transportToken.
      */
     public Token getTransportToken() {
-        return getToken();
+        return transportToken;
     }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getTransportToken();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getTransportToken();
+
+    public boolean isOptional() {
+        throw new UnsupportedOperationException();
+    }
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
 
     public short getType() {
@@ -51,13 +58,13 @@ public class TransportToken extends TokenWrapper {
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -72,12 +79,12 @@ public class TransportToken extends TokenWrapper {
         }
 
         // <wsp:Policy>
-        writer.writeStartElement(wspPrefix, SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         // serialization of the token ..
-        if (token != null) {
-            token.serialize(writer);
+        if (transportToken != null) {
+            transportToken.serialize(writer);
         }
 
         // </wsp:Policy>
@@ -85,6 +92,16 @@ public class TransportToken extends TokenWrapper {
 
         writer.writeEndElement();
         // </sp:TransportToken>
+    }
+
+    /*
+     * (non-Javadoc)
+     * @see
+     * org.apache.cxf.ws.security.policy.model.TokenWrapper#setToken(org.apache.cxf.ws.security.policy.model
+     * .Token)
+     */
+    public void setToken(Token tok) {
+        this.transportToken = tok;
     }
 
 }

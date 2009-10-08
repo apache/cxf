@@ -89,11 +89,10 @@ public final class JMSFactory {
      * settings in headers override the settings from jmsConfig
      * 
      * @param jmsConfig configuration information
-     * @param messageProperties context headers
+     * @param headers context headers
      * @return
      */
-    public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig,
-                                                JMSMessageHeadersType messageProperties) {
+    public static JmsTemplate createJmsTemplate(JMSConfiguration jmsConfig, JMSMessageHeadersType headers) {
         if (jmsConfig.getJmsTemplate() != null) {
             return jmsConfig.getJmsTemplate();
         }
@@ -102,15 +101,16 @@ public final class JMSFactory {
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         if (jmsConfig.getReceiveTimeout() != null) {
             jmsTemplate.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-        }
-        long timeToLive = (messageProperties != null && messageProperties.isSetTimeToLive())
-            ? messageProperties.getTimeToLive() : jmsConfig.getTimeToLive();
-        jmsTemplate.setTimeToLive(timeToLive);
-        int priority = (messageProperties != null && messageProperties.isSetJMSPriority())
-            ? messageProperties.getJMSPriority() : jmsConfig.getPriority();
+        } else {
+            // set the default value for support the spring 2.0.x
+            jmsTemplate.setReceiveTimeout(0);
+        }  
+        jmsTemplate.setTimeToLive(jmsConfig.getTimeToLive());
+        int priority = (headers != null && headers.isSetJMSPriority())
+            ? headers.getJMSPriority() : jmsConfig.getPriority();
         jmsTemplate.setPriority(priority);
-        int deliveryMode = (messageProperties != null && messageProperties.isSetJMSDeliveryMode())
-            ? messageProperties.getJMSDeliveryMode() : jmsConfig.getDeliveryMode();
+        int deliveryMode = (headers != null && headers.isSetJMSDeliveryMode()) ? headers
+            .getJMSDeliveryMode() : jmsConfig.getDeliveryMode();
         jmsTemplate.setDeliveryMode(deliveryMode);
         jmsTemplate.setExplicitQosEnabled(jmsConfig.isExplicitQosEnabled());
         jmsTemplate.setSessionTransacted(jmsConfig.isSessionTransacted());
@@ -119,20 +119,13 @@ public final class JMSFactory {
         }
         return jmsTemplate;
     }
-    /**
-     * Create and start listener using configuration information from jmsConfig. Uses
-     * resolveOrCreateDestination to determine the destination for the listener.
-     * 
-     * @param ei the EndpointInfo for the listener
-     * @param jmsConfig configuration information
-     * @param listenerHandler object to be called when a message arrives
-     * @param destinationName null for temp dest or a destination name
-     * @return
-     */
+
     public static AbstractMessageListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
-                                                                    String destinationName) {
+                                                                    String destinationName, 
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
         if (jmsConfig.getMessageListenerContainer() != null) {
             return jmsConfig.getMessageListenerContainer();
         }
@@ -156,20 +149,50 @@ public final class JMSFactory {
         return createJmsListener(jmsListener,
                                  jmsConfig,
                                  listenerHandler,
-                                 destinationName);            
+                                 destinationName, 
+                                 messageSelectorPrefix,
+                                 userCID);            
     }
     
-    public static DefaultMessageListenerContainer createJmsListener(
-                          DefaultMessageListenerContainer jmsListener,
-                          JMSConfiguration jmsConfig,
-                          MessageListener listenerHandler,
-                          String destinationName) {
+    /**
+     * Create and start listener using configuration information from jmsConfig. Uses
+     * resolveOrCreateDestination to determine the destination for the listener.
+     * 
+     * @param jmsConfig configuration information
+     * @param listenerHandler object to be called when a message arrives
+     * @param destinationName null for temp dest or a destination name
+     * @param messageSelectorPrefix prefix for the messageselector
+     * @return
+     */
+    public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
+                                                                    MessageListener listenerHandler,
+                                                                    String destinationName, 
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
+        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
+            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 destinationName, 
+                                 messageSelectorPrefix,
+                                 userCID);    
+    }
+    
+    public static DefaultMessageListenerContainer 
+    createJmsListener(DefaultMessageListenerContainer jmsListener,
+                      JMSConfiguration jmsConfig,
+                      MessageListener listenerHandler,
+                      String destinationName, 
+                      String messageSelectorPrefix,
+                      boolean userCID) {
         
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
         jmsListener.setPubSubDomain(jmsConfig.isPubSubDomain());
         jmsListener.setPubSubNoLocal(jmsConfig.isPubSubNoLocal());
-        
+        jmsListener.setAutoStartup(true);
         jmsListener.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsListener.setMessageSelector(jmsConfig.getMessageSelector());
         jmsListener.setSubscriptionDurable(jmsConfig.isSubscriptionDurable());
@@ -179,7 +202,7 @@ public final class JMSFactory {
         jmsListener.setMessageListener(listenerHandler);
         if (jmsConfig.getReceiveTimeout() != null) {
             jmsListener.setReceiveTimeout(jmsConfig.getReceiveTimeout());
-        }
+        } 
         if (jmsConfig.getRecoveryInterval() != JMSConfiguration.DEFAULT_VALUE) {
             jmsListener.setRecoveryInterval(jmsConfig.getRecoveryInterval());
         }
@@ -198,7 +221,11 @@ public final class JMSFactory {
             jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
         }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        if (staticSelectorPrefix.length() > 0) {
+        if (!userCID && messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                        + staticSelectorPrefix 
+                                        + messageSelectorPrefix + "%'");
+        } else if (staticSelectorPrefix.length() > 0) {
             jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
                                         + staticSelectorPrefix +  "%'");
         }
@@ -230,7 +257,7 @@ public final class JMSFactory {
      * @param pubSubDomain true=pubSub, false=Queues
      * @return resolved destination
      */
-    public static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
+    protected static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
                                                           final String replyToDestinationName,
                                                           final boolean pubSubDomain) {
         return (Destination)jmsTemplate.execute(new SessionCallback() {

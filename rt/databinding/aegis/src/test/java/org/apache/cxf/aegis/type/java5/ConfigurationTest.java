@@ -22,13 +22,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
-import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -60,7 +59,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     public void testNillableDefaultTrue() throws Exception {
         config.setDefaultNillable(true);
 
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
 
         assertTrue(info.isNillable(new QName(info.getDefaultNamespace(), "bogusProperty")));
@@ -69,7 +68,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     @Test
     public void testNillableDefaultFalse() throws Exception {
         config.setDefaultNillable(false);
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
 
         assertFalse(info.isNillable(new QName(info.getDefaultNamespace(), "bogusProperty")));
@@ -78,7 +77,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     @Test
     public void testMinOccursDefault0() throws Exception {
         config.setDefaultMinOccurs(0);
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
 
         assertEquals(info.getMinOccurs(new QName(info.getDefaultNamespace(), "bogusProperty")), 0);
@@ -87,7 +86,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     @Test
     public void testMinOccursDefault1() throws Exception {
         config.setDefaultMinOccurs(1);
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
 
         assertEquals(info.getMinOccurs(new QName(info.getDefaultNamespace(), "bogusProperty")), 1);
@@ -97,7 +96,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     public void testExtensibleDefaultTrue() throws Exception {
         config.setDefaultExtensibleElements(true);
         config.setDefaultExtensibleAttributes(true);
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
         assertTrue(info.isExtensibleElements());
         assertTrue(info.isExtensibleAttributes());
@@ -107,7 +106,7 @@ public class ConfigurationTest extends AbstractAegisTest {
     public void testExtensibleDefaultFalse() throws Exception {
         config.setDefaultExtensibleElements(false);
         config.setDefaultExtensibleAttributes(false);
-        AegisType type = tm.getTypeCreator().createType(AnnotatedBean1.class);
+        Type type = tm.getTypeCreator().createType(AnnotatedBean1.class);
         BeanTypeInfo info = ((BeanType)type).getTypeInfo();
         assertFalse(info.isExtensibleElements());
         assertFalse(info.isExtensibleAttributes());

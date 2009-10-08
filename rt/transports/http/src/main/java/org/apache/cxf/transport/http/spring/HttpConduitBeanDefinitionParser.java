@@ -102,7 +102,6 @@ public class HttpConduitBeanDefinitionParser
      * a TLSClientParametersConfig object initialized with the JAXB
      * generated type unmarshalled from the selected node.
      */
-    @SuppressWarnings("deprecation")
     public void mapTLSClientParameters(Element n, BeanDefinitionBuilder bean) {
         StringWriter writer = new StringWriter();
         XMLStreamWriter xmlWriter = StaxUtils.createXMLStreamWriter(writer);

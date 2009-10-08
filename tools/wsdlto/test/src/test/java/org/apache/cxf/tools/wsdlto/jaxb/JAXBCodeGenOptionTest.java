@@ -26,6 +26,7 @@ import org.junit.Test;
 
 public class JAXBCodeGenOptionTest extends AbstractCodeGenTest {
    
+    @org.junit.Ignore
     @Test
     public void testJaxbNpa() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/echo_date.wsdl"));
@@ -38,7 +39,7 @@ public class JAXBCodeGenOptionTest extends AbstractCodeGenTest {
         File piFile = 
             new File(output, "org/apache/cxf/tools/fortest/date/package-info.java");
         assertFalse(piFile.getAbsolutePath(), piFile.exists());
-    }
 
+    }
 
 }

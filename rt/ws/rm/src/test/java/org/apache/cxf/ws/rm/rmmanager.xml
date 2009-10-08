@@ -28,8 +28,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     </bean>
     <bean class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>
     <bean class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
-    <bean class="org.apache.cxf.bus.spring.BusExtensionPostProcessor"/>
-    
     <import resource="../../../../../META-INF/cxf/cxf-extension-rm.xml"/>  
     
 </beans>

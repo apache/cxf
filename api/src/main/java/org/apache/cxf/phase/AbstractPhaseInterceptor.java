@@ -26,7 +26,6 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageUtils;
 
 /**
  * Provides a starting point implementation for a interceptors that 
@@ -185,15 +184,5 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
         String method = (String)message.get(Message.HTTP_REQUEST_METHOD);
         return "GET".equals(method) && message.getContent(XMLStreamReader.class) == null;
     }
-    
-    /**
-     * Determine if current messaging role is that of requestor.
-     * 
-     * @param message the current Message
-     * @return true if the current messaging role is that of requestor
-     */
-    protected boolean isRequestor(T message) {
-        return MessageUtils.isRequestor(message);
-    }  
 
 }

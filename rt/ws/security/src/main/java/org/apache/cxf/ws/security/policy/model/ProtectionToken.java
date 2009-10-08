@@ -22,14 +22,13 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
-public class ProtectionToken extends TokenWrapper {
+public class ProtectionToken extends AbstractSecurityAssertion implements TokenWrapper {
 
-    public ProtectionToken() {
-        super(SP12Constants.INSTANCE);
-    }
+    private Token protectionToken;
+
     public ProtectionToken(SPConstants version) {
         super(version);
     }
@@ -38,33 +37,41 @@ public class ProtectionToken extends TokenWrapper {
      * @return Returns the protectionToken.
      */
     public Token getProtectionToken() {
-        return getToken();
+        return protectionToken;
     }
 
     /**
      * @param protectionToken The protectionToken to set.
      */
     public void setProtectionToken(Token protectionToken) {
-        setToken(protectionToken);
+        this.protectionToken = protectionToken;
     }
 
+    public void setToken(Token tok) {
+        this.setProtectionToken(tok);
+    }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getProtectionToken();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getProtectionToken();
+
+    public PolicyComponent normalize() {
+        /*
+         * ProtectionToken can not contain multiple values. Hence we consider it to always be in the
+         * normalized format.
+         */
+        return this;
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix;
 
         String writerPrefix = writer.getPrefix(namespaceURI);
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
 
         } else {
@@ -101,11 +108,11 @@ public class ProtectionToken extends TokenWrapper {
             writer.writeNamespace(wspPrefix, policyNamespaceURI);
         }
 
-        if (token == null) {
+        if (protectionToken == null) {
             throw new RuntimeException("ProtectionToken is not set");
         }
 
-        token.serialize(writer);
+        protectionToken.serialize(writer);
 
         // </wsp:Policy>
         writer.writeEndElement();

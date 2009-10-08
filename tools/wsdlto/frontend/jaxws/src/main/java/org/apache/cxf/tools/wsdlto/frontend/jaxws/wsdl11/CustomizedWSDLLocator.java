@@ -28,9 +28,9 @@ import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
-import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
+import org.apache.xml.resolver.Catalog;
 
 public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
     private String wsdlUrl;
@@ -39,7 +39,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
     private String baseUri;
     private String importedUri;
  
-    private OASISCatalogManager catalogResolver;
+    private Catalog catalogResolver;
    
     private Map<String, Element> elementMap;
     private String latestImportURI;
@@ -53,7 +53,7 @@ public class CustomizedWSDLLocator implements javax.wsdl.xml.WSDLLocator {
         elementMap = map; 
     }
 
-    public void setCatalogResolver(final OASISCatalogManager cr) {
+    public void setCatalogResolver(final Catalog cr) {
         this.catalogResolver = cr;
     }
 

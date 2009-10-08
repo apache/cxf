@@ -126,7 +126,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
         }
 
         public void handleMessage(SoapMessage mc) throws Fault {
-            
             boolean doDebug = LOG.isLoggable(Level.FINE);
             boolean doTimeDebug = TIME_LOG.isLoggable(Level.FINE);
             SoapVersion version = mc.getVersion();
@@ -146,7 +145,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             RequestData reqData = new RequestData();
     
             reqData.setMsgContext(mc);
-            
             /*
              * The overall try, just to have a finally at the end to perform some
              * housekeeping.

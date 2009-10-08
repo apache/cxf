@@ -25,17 +25,14 @@ import java.io.StringWriter;
 import java.net.URL;
 import java.util.Properties;
 
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-
 import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.javascript.JavascriptTestUtilities.Notifier;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.test.AbstractCXFSpringTest;
-import org.apache.cxf.test.XPathAssert;
-
+import org.jaxen.XPath;
+import org.jaxen.dom.DOMXPath;
 import org.junit.Before;
 import org.junit.Test;
 import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
@@ -127,9 +124,9 @@ public class JsHttpRequestTest extends AbstractCXFSpringTest {
                                            testUtilities.javaToJS(xml));
         assertNotNull(xmlResponse);
         Document doc = (Document)xmlResponse.getWrappedNode();
-        testUtilities.addNamespace("t", "http://apache.org/hello_world_xml_http/wrapped/types");
-        XPath textPath = XPathAssert.createXPath(testUtilities.getNamespaces());
-        String nodeText = (String)textPath.evaluate("//t:responseType/text()", doc, XPathConstants.STRING);
+        XPath echoStringPath = new DOMXPath("//t:responseType/text()");
+        echoStringPath.addNamespace("t", "http://apache.org/hello_world_xml_http/wrapped/types");
+        String nodeText = echoStringPath.stringValueOf(echoStringPath.selectSingleNode(doc));
         assertEquals("Hello \u05e9\u05dc\u05d5\u05dd", nodeText);
     }
     

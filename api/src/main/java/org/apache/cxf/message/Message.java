@@ -76,7 +76,6 @@ public interface Message extends StringMap {
     String REQUEST_URI = Message.class.getName() + ".REQUEST_URI";
     String QUERY_STRING = Message.class.getName() + ".QUERY_STRING";
 
-    String PROPOGATE_EXCEPTION = Message.class.getName() + ".PROPOGATE_EXCEPTION";
     /**
      * Boolean property specifying in the runtime is configured to process 
      * MTOM attachments.

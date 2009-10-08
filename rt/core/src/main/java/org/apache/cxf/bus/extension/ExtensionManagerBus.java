@@ -88,41 +88,38 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         extensions.put(ResourceManager.class, resourceManager);
 
-        ExtensionManagerImpl em = new ExtensionManagerImpl(new String[0],
-                                                           Thread.currentThread().getContextClassLoader(),
-                                                           extensions,
-                                                           resourceManager, 
-                                                           this);
-                                  
+        ExtensionManagerImpl em = new ExtensionManagerImpl(
+                                 Thread.currentThread().getContextClassLoader(),
+                                 extensions,
+                                 resourceManager);
+        
         setState(BusState.INITIAL);
         
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
             lifeCycleManager.initComplete();
+            
         }
 
         DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
         if (null == dfm) {
-            dfm = new DestinationFactoryManagerImpl(
-                new DeferredMap<DestinationFactory>(em, DestinationFactory.class),
-                this);
+            dfm = new DestinationFactoryManagerImpl(new DeferredMap<DestinationFactory>(em, 
+                DestinationFactory.class));
+            extensions.put(DestinationFactoryManager.class, dfm);
         }
 
         ConduitInitiatorManager cfm = this.getExtension(ConduitInitiatorManager.class);
         if (null == cfm) {
             cfm = new ConduitInitiatorManagerImpl(new DeferredMap<ConduitInitiator>(em, 
-                ConduitInitiator.class), this);
+                ConduitInitiator.class));
+            extensions.put(ConduitInitiatorManager.class, cfm);
         }
         
         BindingFactoryManager bfm = this.getExtension(BindingFactoryManager.class);
         if (null == bfm) {
-            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(em, BindingFactory.class),
-                                                this);
+            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(em, BindingFactory.class));
             extensions.put(BindingFactoryManager.class, bfm);
         }
-        em.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
-                              ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
-        
         
         this.setExtension(em, ExtensionManager.class);
     }

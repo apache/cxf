@@ -89,7 +89,10 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             .add(new UltimateReceiverMustUnderstandInterceptor(mustUnderstandQNames));
         Object o = soapMessage.getContextualProperty("endpoint-processes-headers");
         if (o == null) {
-            o = Collections.EMPTY_LIST;
+            //The default here really should be to make o = "" and process
+            //so any mustUnderstands are kill immediately. That will break
+            //existing apps though.  Thus, it's a migration issue.
+            return;
         }
         Collection<Object> o2;
         if (o instanceof Collection) {
@@ -106,8 +109,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             }
             Iterator<Header> hit = ultimateReceiverHeaders.iterator();
             while (hit.hasNext()) {
-                Header h = hit.next();
-                if (qn.equals(h.getName())) {
+                if (qn.equals(hit.next().getName())) {
                     hit.remove();
                 }
             }
@@ -115,14 +117,10 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         if (!ultimateReceiverHeaders.isEmpty()) {
             Set<QName> notFound = new HashSet<QName>();
             for (Header h : ultimateReceiverHeaders) {
-                if (!mustUnderstandQNames.contains(h.getName())) {
-                    notFound.add(h.getName());
-                }
+                notFound.add(h.getName());
             }
-            if (!notFound.isEmpty()) {
-                throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
+            throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
                                 soapMessage.getVersion().getMustUnderstand());
-            }
         }
     }
     private void initServiceSideInfo(Set<QName> mustUnderstandQNames, SoapMessage soapMessage,

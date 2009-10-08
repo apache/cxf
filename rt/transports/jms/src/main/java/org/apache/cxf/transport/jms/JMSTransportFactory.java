@@ -40,15 +40,10 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     static {
         URI_PREFIXES.add("jms://");
-        URI_PREFIXES.add("jms:");
     }
 
     private Bus bus;
 
-    public JMSTransportFactory() {
-        
-    }
-    
     @Resource(name = "cxf")
     public void setBus(Bus b) {
         bus = b;
@@ -68,7 +63,7 @@ public class JMSTransportFactory extends AbstractTransportFactory implements Con
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType target) throws IOException {
         JMSOldConfigHolder old = new JMSOldConfigHolder();
         JMSConfiguration jmsConf = old.createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
-        return new JMSConduit(endpointInfo, target, jmsConf);
+        return new JMSConduit(endpointInfo, target, jmsConf, bus);
     }
 
     /**

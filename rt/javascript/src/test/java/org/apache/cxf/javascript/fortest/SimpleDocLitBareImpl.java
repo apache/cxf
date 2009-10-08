@@ -26,6 +26,7 @@ import javax.jws.WebService;
 /**
  * 
  */
+@org.apache.cxf.feature.Features(features = "org.apache.cxf.feature.LoggingFeature")   
 @WebService(endpointInterface = "org.apache.cxf.javascript.fortest.SimpleDocLitBare",
             targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 public class SimpleDocLitBareImpl implements SimpleDocLitBare {

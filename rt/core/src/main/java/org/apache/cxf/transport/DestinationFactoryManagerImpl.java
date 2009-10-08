@@ -22,10 +22,10 @@ package org.apache.cxf.transport;
 import java.util.Map;
 import java.util.Properties;
 import java.util.ResourceBundle;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArraySet;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
 
 import org.apache.cxf.Bus;
@@ -33,17 +33,13 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.bus.extension.DeferredMap;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.MapProvider;
 
-@NoJSR250Annotations(unlessNull = "bus")
 public final class DestinationFactoryManagerImpl implements DestinationFactoryManager {
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(DestinationFactoryManager.class);
 
     Map<String, DestinationFactory> destinationFactories;
-    Set<String> failed = new CopyOnWriteArraySet<String>();
-    Set<String> loaded = new CopyOnWriteArraySet<String>();
     Properties factoryNamespaceMappings;
 
     private Bus bus;
@@ -51,23 +47,19 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     public DestinationFactoryManagerImpl() {
         destinationFactories = new ConcurrentHashMap<String, DestinationFactory>();
     }
-    public DestinationFactoryManagerImpl(Bus b) {
-        destinationFactories = new ConcurrentHashMap<String, DestinationFactory>();
-        setBus(b);
-    }
 
     public DestinationFactoryManagerImpl(Map<String, DestinationFactory> destinationFactories) {
         this.destinationFactories = destinationFactories;
-    }
-    public DestinationFactoryManagerImpl(Map<String, DestinationFactory> destinationFactories,
-                                         Bus b) {
-        this.destinationFactories = destinationFactories;
-        setBus(b);
     }
     public DestinationFactoryManagerImpl(MapProvider<String, DestinationFactory> destinationFactories) {
         this.destinationFactories = destinationFactories.createMap();
     }
 
+    /**
+     * Spring is slow for constructors with arguments. This
+     * accessor permits initialization via a property.
+     * @param mapProvider
+     */
     public void setMapProvider(MapProvider<String, DestinationFactory> mapProvider) {
         this.destinationFactories = mapProvider.createMap();
     }
@@ -75,6 +67,10 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
     @Resource
     public void setBus(Bus b) {
         bus = b;
+    }
+
+    @PostConstruct
+    public void register() {
         if (null != bus) {
             bus.setExtension(this, DestinationFactoryManager.class);
         }
@@ -115,28 +111,32 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
      */
     public DestinationFactory getDestinationFactory(String namespace) throws BusException {
         DestinationFactory factory = destinationFactories.get(namespace);
-        if (factory == null && !failed.contains(namespace)) {
-            factory = new TransportFinder<DestinationFactory>(bus,
-                    destinationFactories,
-                    loaded,
-                    DestinationFactory.class)
-                .findTransportForNamespace(namespace);
-        }
-        if (factory == null) {
-            failed.add(namespace);
+        if (null == factory) {
             throw new BusException(new Message("NO_DEST_FACTORY", BUNDLE, namespace));
         }
         return factory;
     }
 
-    public DestinationFactory getDestinationFactoryForUri(String uri) {       
-        DestinationFactory factory = new TransportFinder<DestinationFactory>(bus,
-                destinationFactories,
-                loaded,
-                DestinationFactory.class).findTransportForURI(uri);
-        
+    @PreDestroy
+    public void shutdown() {
+        // nothing to do
+    }
+
+    public DestinationFactory getDestinationFactoryForUri(String uri) {
+        //If the uri is related path or has no protocol prefix , we will set it to be http
+        if (uri.startsWith("/") || uri.indexOf(":") < 0) {
+            uri = "http://" + uri;
+        }
+        //first attempt the ones already registered
+        for (Map.Entry<String, DestinationFactory> df : destinationFactories.entrySet()) {
+            for (String prefix : df.getValue().getUriPrefixes()) {
+                if (uri.startsWith(prefix)) {
+                    return df.getValue();
+                }
+            }
+        }
         //looks like we'll need to undefer everything so we can try again.
-        if (factory == null && destinationFactories instanceof DeferredMap) {
+        if (destinationFactories instanceof DeferredMap) {
             ((DeferredMap)destinationFactories).undefer();
             for (DestinationFactory df : destinationFactories.values()) {
                 for (String prefix : df.getUriPrefixes()) {
@@ -146,7 +146,8 @@ public final class DestinationFactoryManagerImpl implements DestinationFactoryMa
                 }
             }
         }
-        return factory;
+
+        return null;
     }
-    
+
 }

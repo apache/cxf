@@ -25,11 +25,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
@@ -42,7 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class DocumentType extends AegisType {
+public class DocumentType extends Type {
     private DocumentBuilder builder;
 
     public DocumentType() {
@@ -65,32 +64,20 @@ public class DocumentType extends AegisType {
     public Object readObject(MessageReader mreader, Context context) throws DatabindingException {
         try {
             XMLStreamReader reader = ((ElementReader)mreader).getXMLStreamReader();
-            // we need to eat the surrounding element.
-            reader.nextTag();
-            Object tree = StaxUtils.read(builder, new FragmentStreamReader(reader), true);
-            reader.nextTag(); // eat the end tag.
-            return tree;
+            return StaxUtils.read(builder, new FragmentStreamReader(reader), true);
         } catch (XMLStreamException e) {
             throw new DatabindingException("Could not parse xml.", e);
         }
     }
 
     @Override
-    public void writeObject(Object object, MessageWriter writer, 
+    public void writeObject(Object object, MessageWriter writer,
                             Context context) throws DatabindingException {
         Document doc = (Document)object;
 
         try {
-            Element docElement = doc.getDocumentElement();
-            if (docElement == null) {
-                if (isNillable()) {
-                    writer.writeXsiNil();
-                } else {
-                    throw new DatabindingException("Could not write xml: null document element.");
-                }
-            } else {
-                StaxUtils.writeElement(docElement, ((ElementWriter)writer).getXMLStreamWriter(), false);
-            }
+            StaxUtils.writeElement(doc.getDocumentElement(), ((ElementWriter)writer).getXMLStreamWriter(),
+                                   false);
         } catch (XMLStreamException e) {
             throw new DatabindingException("Could not write xml.", e);
         }

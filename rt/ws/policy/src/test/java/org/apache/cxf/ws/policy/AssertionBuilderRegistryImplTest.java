@@ -23,6 +23,7 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.builder.xml.XmlPrimitiveAssertion;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -50,7 +51,10 @@ public class AssertionBuilderRegistryImplTest extends Assert {
     
     @Test
     public void testBuildUnknownAssertion() {
-        AssertionBuilderRegistry reg = new AssertionBuilderRegistryImpl();
+        AssertionBuilderRegistryImpl reg = new AssertionBuilderRegistryImpl();
+        Bus bus = control.createMock(Bus.class);
+        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(new PolicyConstants()).anyTimes();
+        reg.setBus(bus);
         reg.setIgnoreUnknownAssertions(false);
         Element[] elems = new Element[11];
         QName[] qnames = new QName[11];

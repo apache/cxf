@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
-import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -37,37 +36,21 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.JAXBDataBase;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxb.JAXBEncoderDecoder;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 
 public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     private static final Logger LOG = LogUtils.getLogger(JAXBDataBinding.class);
     JAXBDataBinding databinding;
-    boolean unwrapJAXBElement = true;
-    ValidationEventHandler veventHandler;
-    boolean setEventHandler = true;
     
-    public DataReaderImpl(JAXBDataBinding binding, boolean unwrap) {
+    public DataReaderImpl(JAXBDataBinding binding) {
         super(binding.getContext());
-        unwrapJAXBElement = unwrap;
         databinding = binding;
     }
 
     public Object read(T input) {
         return read(null, input);
     }
-    public void setProperty(String prop, Object value) {
-        if (prop.equals(JAXBDataBinding.UNWRAP_JAXB_ELEMENT)) {
-            unwrapJAXBElement = Boolean.TRUE.equals(value);
-        } else if (prop.equals(org.apache.cxf.message.Message.class.getName())) {
-            org.apache.cxf.message.Message m = (org.apache.cxf.message.Message)value;
-            veventHandler = (ValidationEventHandler)m.getContextualProperty("jaxb-validation-event-handler");
-            if (veventHandler == null) {
-                veventHandler = databinding.getValidationEventHandler();
-            }
-            setEventHandler = MessageUtils.getContextualBoolean(m, "set-jaxb-validation-event-handler", true);
-        }
-    }
+    
     private Unmarshaller createUnmarshaller() {
         try {
             Unmarshaller um = null;
@@ -75,8 +58,10 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             if (databinding.getUnmarshallerListener() != null) {
                 um.setListener(databinding.getUnmarshallerListener());
             }
-            if (setEventHandler) {
-                um.setEventHandler(veventHandler);
+            if (databinding.getValidationEventHandler() != null) {
+                um.setEventHandler(databinding.getValidationEventHandler());
+            } else {
+                um.setEventHandler(null);
             }
             if (databinding.getUnmarshallerProperties() != null) {
                 for (Map.Entry<String, Object> propEntry 

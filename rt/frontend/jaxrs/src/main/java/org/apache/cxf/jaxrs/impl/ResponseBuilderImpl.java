@@ -20,25 +20,18 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.net.URI;
-import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.EntityTag;
-import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.NewCookie;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Variant;
 
-import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 
 public final class ResponseBuilderImpl extends ResponseBuilder {
     private int status = 200;
@@ -56,17 +49,14 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
        
     public Response build() {
         ResponseImpl r = new ResponseImpl(status, entity);
-        MetadataMap<String, Object> m = 
-            new MetadataMap<String, Object>(metadata, false, true);
+        MetadataMap<String, Object> m = new MetadataMap<String, Object>();
+        m.putAll(metadata);
         r.addMetadata(m);
         reset();
         return r;
     }
 
     public ResponseBuilder status(int s) {
-        if (status < 100 || status > 599) {
-            throw new IllegalArgumentException("Illegal status value : " + s);
-        }
         status = s;
         return this;
     }
@@ -77,125 +67,85 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
     }
 
     public ResponseBuilder type(MediaType type) {
-        return type(type == null ? null : type.toString());
+        return type(type.toString());
     }
 
     public ResponseBuilder type(String type) {
-        return setHeader(HttpHeaders.CONTENT_TYPE, type);
+        metadata.putSingle("Content-Type", type);
+        return this;
     }
 
-    @Override
-    public ResponseBuilder language(Locale locale) {
-        return language(locale == null ? null : locale.toString());
-    }
-    
     public ResponseBuilder language(String language) {
-        return setHeader(HttpHeaders.CONTENT_LANGUAGE, language);
+        metadata.putSingle("Content-Language", language.toString());
+        return this;
     }
 
     public ResponseBuilder location(URI location) {
-        if (!location.isAbsolute()) {
-            Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
-            if (currentMessage != null) {
-                UriInfo ui = new UriInfoImpl(currentMessage.getExchange().getInMessage(), null);
-                location = ui.getBaseUriBuilder().path(location.toString()).build();
-            }
-        }
-        return setHeader(HttpHeaders.LOCATION, location);
+        metadata.putSingle("Location", location.toString());
+        return this;
     }
 
     public ResponseBuilder contentLocation(URI location) {
-        return setHeader(HttpHeaders.CONTENT_LOCATION, location);
+        metadata.putSingle("Content-Location", location.toString());
+        return this;
     }
 
     public ResponseBuilder tag(EntityTag tag) {
-        return tag(tag == null ? null : tag.toString());
+        return tag(tag.toString());
     }
 
     public ResponseBuilder tag(String tag) {
-        return setHeader(HttpHeaders.ETAG, tag);
+        metadata.putSingle("ETag", tag.toString());
+        return this;
     }
 
-    public ResponseBuilder lastModified(Date date) {
-        return setHeader(HttpHeaders.LAST_MODIFIED, date == null ? null : toHttpDate(date));
+    public ResponseBuilder lastModified(Date lastModified) {
+        metadata.putSingle("Last-Modified", lastModified.toString());
+        return this;
     }
 
     public ResponseBuilder cacheControl(CacheControl cacheControl) {
-        return setHeader(HttpHeaders.CACHE_CONTROL, cacheControl);
+        metadata.putSingle("Cache-Control", cacheControl.toString());
+        return this;
     }
 
-    @Override
-    public ResponseBuilder expires(Date date) {
-        return setHeader(HttpHeaders.EXPIRES, date == null ? null : toHttpDate(date));
+    public ResponseBuilder cookie(NewCookie cookie) {
+        metadata.putSingle("Set-Cookie", cookie.toString());
+        return this;
     }
-
+    
     @Override
     public ResponseBuilder cookie(NewCookie... cookies) {
-        return addHeader(HttpHeaders.SET_COOKIE, (Object[])cookies);
+        for (NewCookie cookie : cookies) {
+            metadata.add("Set-Cookie", cookie.toString());
+        }
+        return this;
     }
     
     public ResponseBuilder header(String name, Object value) {
-        if (HttpUtils.isDateRelatedHeader(name)) {
-            Object theValue = value instanceof Date ? toHttpDate((Date)value) : value;  
-            return setHeader(name, theValue);
-        } else {
-            return addHeader(name, value);
-        }
+        metadata.add(name, value.toString());
+        return this;
     }
 
     
     @Override
     public ResponseBuilder variant(Variant variant) {
-        type(variant == null ? null : variant.getMediaType());
-        language(variant == null ? null : variant.getLanguage());
-        setHeader(HttpHeaders.CONTENT_ENCODING, variant == null ? null : variant.getEncoding());
-        
+        if (variant.getMediaType() != null) {
+            type(variant.getMediaType());
+        }
+        if (variant.getLanguage() != null) {
+            language(variant.getLanguage());
+        }
+        if (variant.getEncoding() != null) {
+            metadata.putSingle("Content-Encoding", variant.getEncoding());
+        }
         return this;
     }
 
 
     @Override
     public ResponseBuilder variants(List<Variant> variants) {
-        if (variants == null) {
-            metadata.remove(HttpHeaders.VARY);
-            return this;
-        }
-        String acceptVary = null;
-        String acceptLangVary = null;
-        String acceptEncVary = null;
-        for (Variant v : variants) {
-            MediaType mt = v.getMediaType();
-            if (mt != null) {
-                acceptVary = HttpHeaders.ACCEPT;
-                addHeader(HttpHeaders.ACCEPT, mt);
-            }
-            Locale l = v.getLanguage();
-            if (l != null) {
-                acceptLangVary = HttpHeaders.ACCEPT_LANGUAGE;
-                addHeader(HttpHeaders.ACCEPT_LANGUAGE, l);
-            }
-            String enc = v.getEncoding();
-            if (enc != null) {
-                acceptEncVary = HttpHeaders.ACCEPT_ENCODING;
-                addHeader(HttpHeaders.ACCEPT_ENCODING, enc);
-            }
-        }
-        handleVaryValue(acceptVary, acceptLangVary, acceptEncVary);
-        return this;
-    }
-    
-    private void handleVaryValue(String ...values) {
-        List<Object> varyValues = metadata.get(HttpHeaders.VARY);
-        for (String v : values) {
-            if (v == null) {
-                metadata.remove(v);
-                if (varyValues != null) {
-                    varyValues.remove(v);
-                }
-            } else {
-                addHeader(HttpHeaders.VARY, v);
-            }
-        }
+        throw new UnsupportedOperationException("Only a single variant option is supported");
     }
     
 //  CHECKSTYLE:OFF
@@ -211,36 +161,6 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
         entity = null;
         status = 200;
     }
+
     
-    private String toHttpDate(Date date) {
-        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
-        return format.format(date);
-    }
-    
-    private ResponseBuilder setHeader(String name, Object value) {
-        if (value == null) {
-            metadata.remove(name);
-        } else {
-            metadata.putSingle(name, value.toString());
-        }
-        return this;
-    }
-    
-    private ResponseBuilder addHeader(String name, Object... values) {
-        if (values != null && values.length >= 1 && values[0] != null) {
-            for (Object value : values) {
-                if (!valueExists(name, value)) {
-                    metadata.add(name, value.toString());
-                }
-            }
-        } else {
-            metadata.remove(name);
-        }    
-        return this;
-    }
-    
-    private boolean valueExists(String key, Object value) {
-        List<Object> values = metadata.get(key);
-        return values == null ? false : values.contains(value.toString());
-    }
 }

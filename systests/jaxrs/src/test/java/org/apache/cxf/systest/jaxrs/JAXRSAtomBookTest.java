@@ -71,8 +71,32 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
                           + " application/xhtml+xml, image/png, image/jpeg, image/gif,"
                           + " image/x-xbitmap, */*;q=0.1");
         
-        Entry entry = addEntry(endpointAddress);
-        entry = addEntry(endpointAddress + "/relative");
+        Entry e = createBookEntry(256, "AtomBook");
+        StringWriter w = new StringWriter();
+        e.writeTo(w);
+        
+        PostMethod post = new PostMethod(endpointAddress);
+        post.setRequestEntity(
+             new StringRequestEntity(w.toString(), "application/atom+xml", null));
+        HttpClient httpclient = new HttpClient();
+        
+        String location = null;
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(201, result);
+            location = post.getResponseHeader("Location").getValue();
+            InputStream ins = post.getResponseBodyAsStream();
+            Document<Entry> entryDoc = abdera.getParser().parse(copyIn(ins));
+            assertEquals(entryDoc.getRoot().toString(), e.toString());
+        } finally {
+            post.releaseConnection();
+        }         
+        
+        Entry entry = getEntry(location, null);
+        assertEquals(location, entry.getBaseUri().toString());
+        assertEquals("AtomBook", entry.getTitle());
+                
+        
         
         endpointAddress =
             "http://localhost:9080/bookstore/bookstore/books/subresources/123"; 
@@ -98,34 +122,6 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
                                "*/*");
         
         
-    }
-    
-    private Entry addEntry(String endpointAddress) throws Exception {
-        Entry e = createBookEntry(256, "AtomBook");
-        StringWriter w = new StringWriter();
-        e.writeTo(w);
-        
-        PostMethod post = new PostMethod(endpointAddress);
-        post.setRequestEntity(
-             new StringRequestEntity(w.toString(), "application/atom+xml", null));
-        HttpClient httpclient = new HttpClient();
-        
-        String location = null;
-        try {
-            int result = httpclient.executeMethod(post);
-            assertEquals(201, result);
-            location = post.getResponseHeader("Location").getValue();
-            InputStream ins = post.getResponseBodyAsStream();
-            Document<Entry> entryDoc = abdera.getParser().parse(copyIn(ins));
-            assertEquals(entryDoc.getRoot().toString(), e.toString());
-        } finally {
-            post.releaseConnection();
-        }         
-        
-        Entry entry = getEntry(location, null);
-        assertEquals(location, entry.getBaseUri().toString());
-        assertEquals("AtomBook", entry.getTitle());
-        return entry;
     }
     
     @Test

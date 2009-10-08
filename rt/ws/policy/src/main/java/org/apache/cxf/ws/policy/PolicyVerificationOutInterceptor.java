@@ -30,8 +30,7 @@ import org.apache.cxf.phase.Phase;
  * 
  */
 public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor {
-    public static final PolicyVerificationOutInterceptor INSTANCE = new PolicyVerificationOutInterceptor();
-    
+
     private static final Logger LOG 
         = LogUtils.getL7dLogger(PolicyVerificationOutInterceptor.class);
     public PolicyVerificationOutInterceptor() {
@@ -47,6 +46,7 @@ public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor 
      * @throws PolicyException if none of the alternatives is supported
      */
     protected void handle(Message message) {
+        
         if (MessageUtils.isPartialResponse(message)) {
             LOG.fine("Not verifying policies on outbound partial response.");
             return;
@@ -68,13 +68,27 @@ public class PolicyVerificationOutInterceptor extends AbstractPolicyInterceptor 
         // on the outbound-server side of a response
         try {
             aim.checkEffectivePolicy(policy.getPolicy());
-        } catch (PolicyException e) {
-            LOG.fine("An exception was thrown when verifying that the effective policy for "
-                     + "this request was satisfied.  However, this exception will not result in "
-                     + "a fault.  The exception raised is: "
-                     + e.toString());
-            return;
+        } catch (final PolicyException e) {
+            if (isOutboundServer(message)) {
+                LOG.fine("An exception was thrown when verifying that the effective policy for "
+                         + "this request was satisfied.  However, this exception will not result in "
+                         + "a fault.  The exception raised is: "
+                         + e.toString());
+                return;
+            } else {
+                throw e;
+            }
         }
         LOG.fine("Verified policies for outbound message.");
+    }
+    
+    private boolean isOutboundServer(final Message message) {
+        final Object role = message.get(Message.REQUESTOR_ROLE);
+        final boolean isClient =
+            role != null ? Boolean.TRUE.equals(role) : false;
+        final boolean isOutbound =
+            message == message.getExchange().getOutMessage()
+            || message == message.getExchange().getOutFaultMessage();
+        return !isClient && isOutbound;
     }
 }

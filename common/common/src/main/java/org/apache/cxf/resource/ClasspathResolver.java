@@ -23,12 +23,9 @@ package org.apache.cxf.resource;
 import java.io.InputStream;
 import java.net.URL;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-
 /**
  * Resolve resources from the system class path.
  */
-@NoJSR250Annotations
 public class ClasspathResolver implements ResourceResolver {
 
     public <T> T resolve(String resourceName, Class<T> resourceType) { 

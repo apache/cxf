@@ -22,8 +22,8 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
 /**
  * @author Ruchith Fernando (ruchith.fernando@gmail.com)
@@ -74,21 +74,22 @@ public class HttpsToken extends Token {
         this.httpDigestAuthentication = httpDigestAuthentication;
     }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getHttpsToken();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getHttpsToken();
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 

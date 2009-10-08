@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 
 import javax.xml.namespace.QName;
@@ -38,10 +39,12 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.JavaUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
@@ -376,6 +379,20 @@ public final class ProcessorUtil {
        
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
         
+        //is elementByName is null,it could be generate from serviceInfo, we need read the schema element
+        //into schemaCollection
+        if (elementByName == null) {
+            Map<String, Element> maps = CastUtils.cast((Map<?, ?>)context.get(ToolConstants.SCHEMA_MAP));
+            if (maps != null) {
+                for (Element ele : maps.values()) {
+                    synchronized (ele.getOwnerDocument()) {
+                        schema.read(ele);
+                    }
+                }
+                elementByName = schema.getElementByQName(partElement);
+            }
+        }
+
         XmlSchemaComplexType type = (XmlSchemaComplexType)elementByName.getSchemaType();
 
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();

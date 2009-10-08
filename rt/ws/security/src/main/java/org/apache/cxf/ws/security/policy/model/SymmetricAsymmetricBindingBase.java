@@ -22,7 +22,7 @@ import org.apache.cxf.ws.security.policy.SPConstants;
 
 public abstract class SymmetricAsymmetricBindingBase extends Binding {
 
-    private SPConstants.ProtectionOrder protectionOrder = SPConstants.ProtectionOrder.SignBeforeEncrypting;
+    private String protectionOrder = SPConstants.SIGN_BEFORE_ENCRYPTING;
 
     private boolean signatureProtection;
 
@@ -51,15 +51,21 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
     /**
      * @return Returns the protectionOrder.
      */
-    public SPConstants.ProtectionOrder getProtectionOrder() {
+    public String getProtectionOrder() {
         return protectionOrder;
     }
 
     /**
      * @param protectionOrder The protectionOrder to set.
      */
-    public void setProtectionOrder(SPConstants.ProtectionOrder protectionOrder) {
-        this.protectionOrder = protectionOrder;
+    public void setProtectionOrder(String protectionOrder) {
+        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(protectionOrder)
+            || SPConstants.SIGN_BEFORE_ENCRYPTING.equals(protectionOrder)) {
+            this.protectionOrder = protectionOrder;
+        } else {
+            // throw new WSSPolicyException("Incorrect protection order value : "
+            // + protectionOrder);
+        }
     }
 
     /**

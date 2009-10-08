@@ -26,7 +26,16 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     
     <bean id="org.apache.cxf.binding.soap.SoapBindingFactory"
 	  class="org.apache.cxf.binding.soap.SoapBindingFactory" lazy-init="true">
-        <constructor-arg ref="cxf"/>
+        <property name="activationNamespaces">
+            <set>
+                <value>http://schemas.xmlsoap.org/soap/</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
+                <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
+                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
+            </set>
+        </property>
+        <property name="bus" ref="cxf"/>
     </bean>
     
     <bean class="org.apache.cxf.binding.soap.SoapTransportFactory"
@@ -36,8 +45,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
             <list>
                 <value>http://schemas.xmlsoap.org/soap/</value>
                 <value>http://schemas.xmlsoap.org/wsdl/soap/</value>
-		        <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
-            	<value>http://www.w3.org/2008/07/soap/bindings/JMS/</value>
+	        <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
             </list>
         </property>
         <property name="bus" ref="cxf"/>

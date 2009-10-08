@@ -64,11 +64,11 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBExtensionHelper.class);
 
     JAXBContext context;
-    final Class<? extends ExtensibilityElement> typeClass;
+    final Class<? extends TExtensibilityElementImpl> typeClass;
     final String namespace;
     String jaxbNamespace;
       
-    public JAXBExtensionHelper(Class<? extends ExtensibilityElement> cls,
+    public JAXBExtensionHelper(Class<? extends TExtensibilityElementImpl> cls,
                                String ns) {
         typeClass = cls;
         namespace = ns;
@@ -82,9 +82,9 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
         throws JAXBException, ClassNotFoundException {
         Class<?> parentTypeClass = ClassLoaderUtils.loadClass(parentType, JAXBExtensionHelper.class);
 
-        Class<? extends ExtensibilityElement> elementTypeClass = 
+        Class<? extends TExtensibilityElementImpl> elementTypeClass = 
             ClassLoaderUtils.loadClass(elementType, JAXBExtensionHelper.class)
-                .asSubclass(ExtensibilityElement.class);
+                .asSubclass(TExtensibilityElementImpl.class);
         addExtensions(registry, parentTypeClass, elementTypeClass, null);
     }
     public static void addExtensions(ExtensionRegistry registry,
@@ -107,7 +107,7 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
     }
     public static void addExtensions(ExtensionRegistry registry,
                                      Class<?> parentType,
-                                     Class<? extends ExtensibilityElement> cls,
+                                     Class<? extends TExtensibilityElementImpl> cls,
                                      String namespace) throws JAXBException {
         
         JAXBExtensionHelper helper = new JAXBExtensionHelper(cls, namespace);
@@ -164,7 +164,8 @@ public class JAXBExtensionHelper implements ExtensionSerializer, ExtensionDeseri
                     registry.registerDeserializer(parentType, elementType, helper); 
                     registry.registerSerializer(parentType, elementType, helper);                         
                     registry.mapExtensionTypes(parentType, elementType, cls);
-
+                    
+                    helper.getJAXBContext();
                     found = true;
                 }
             }

@@ -21,10 +21,8 @@ package org.apache.cxf.jaxrs.client;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -38,17 +36,12 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.UriBuilder;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.ext.form.Form;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.model.ParameterType;
-import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
@@ -57,13 +50,8 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.http.HTTPConduit;
 
 
-/**
- * Http-centric web client
- *
- */
+
 public class WebClient extends AbstractClient {
-    
-    private MultivaluedMap<String, String> templates;
     
     protected WebClient(String baseAddress) {
         this(URI.create(baseAddress));
@@ -83,10 +71,6 @@ public class WebClient extends AbstractClient {
         return bean.createWebClient();
     }
     
-    /**
-     * Creates WebClient
-     * @param baseURI baseURI
-     */
     public static WebClient create(URI baseURI) {
         return create(baseURI.toString());
     }
@@ -151,12 +135,6 @@ public class WebClient extends AbstractClient {
         return fromClient(client, false);
     }
     
-    /**
-     * Creates WebClient, baseURI will be set to Client currentURI
-     * @param client existing client
-     * @param inheritHeaders  if existing Client headers can be inherited by new proxy 
-     *        and subresource proxies if any 
-     */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
         WebClient webClient = create(client.getCurrentURI());
         if (inheritHeaders) {
@@ -179,23 +157,6 @@ public class WebClient extends AbstractClient {
     }
     
     /**
-     * Retieves ClientConfiguration
-     * @param client proxy or http-centric Client
-     * @return underlying ClientConfiguration instance 
-     */
-    public static ClientConfiguration getConfig(Object client) {
-        if (client instanceof Client) {
-            if (client instanceof WebClient) { 
-                return ((AbstractClient)client).getConfiguration();
-            } else if (client instanceof InvocationHandlerAware) {
-                Object handler = ((InvocationHandlerAware)client).getInvocationHandler();
-                return ((AbstractClient)handler).getConfiguration();
-            }
-        }
-        throw new IllegalArgumentException("Not a valid Client");
-    }
-    
-    /**
      * Does HTTP invocation
      * @param httpMethod HTTP method
      * @param body request body, can be null
@@ -203,231 +164,83 @@ public class WebClient extends AbstractClient {
      *         error message if client or server error occured
      */
     public Response invoke(String httpMethod, Object body) {
-        return doInvoke(httpMethod, body, InputStream.class, InputStream.class);
+        return doInvoke(httpMethod, body, InputStream.class);
     }
     
-    /**
-     * Does HTTP POST invocation
-     * @param body request body, can be null
-     * @return JAXRS Response
-     */
-    public Response post(Object body) {
-        return invoke("POST", body);
+    public Response post(Object o) {
+        return invoke("POST", o);
     }
     
-    /**
-     * Does HTTP PUT invocation
-     * @param body request body, can be null
-     * @return JAXRS Response
-     */
-    public Response put(Object body) {
-        return invoke("PUT", body);
+    public Response put(Object o) {
+        return invoke("PUT", o);
     }
 
-    /**
-     * Does HTTP GET invocation
-     * @return JAXRS Response
-     */
     public Response get() {
         return invoke("GET", null);
     }
-
-    /**
-     * Does HTTP HEAD invocation
-     * @return JAXRS Response
-     */
+    
     public Response head() {
         return invoke("HEAD", null);
     }
-
-    /**
-     * Does HTTP OPTIONS invocation
-     * @return JAXRS Response
-     */
+    
     public Response options() {
         return invoke("OPTIONS", null);
     }
-
-    /**
-     * Does HTTP DELETE invocation
-     * @return JAXRS Response
-     */
+    
     public Response delete() {
         return invoke("DELETE", null);
     }
-
-    /**
-     * Posts form data
-     * @param values form values
-     * @return JAXRS Response
-     */
+    
     public Response form(Map<String, List<Object>> values) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", values, InputStream.class, InputStream.class);
+        return doInvoke("POST", values, InputStream.class);
     }
     
-    /**
-     * Posts form data
-     * @param form form values
-     * @return JAXRS Response
-     */
     public Response form(Form form) {
         type(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        return doInvoke("POST", form.getData(), InputStream.class, InputStream.class);
+        return doInvoke("POST", form.getData(), InputStream.class);
     }
     
-    /**
-     * Does HTTP invocation and returns types response object 
-     * @param httpMethod HTTP method 
-     * @param body request body, can be null
-     * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
-     *         can be obtained too, see Client.getResponse()
-     */
     public <T> T invoke(String httpMethod, Object body, Class<T> responseClass) {
         
-        Response r = doInvoke(httpMethod, body, responseClass, responseClass);
+        Response r = doInvoke(httpMethod, body, responseClass);
         
-        if (r.getStatus() >= 400 && responseClass != null) {
+        if (r.getStatus() >= 400) {
             throw new WebApplicationException(r);
         }
         
         return responseClass.cast(r.getEntity());
     }
     
-    /**
-     * Does HTTP invocation and returns a collection of typed objects 
-     * @param httpMethod HTTP method 
-     * @param body request body, can be null
-     * @param memberClass expected type of collection member class
-     * @return typed collection
-     */
-    public <T> Collection<T> invokeAndGetCollection(String httpMethod, Object body, 
-                                                    Class<T> memberClass) {
-        
-        Response r = doInvoke(httpMethod, body, Collection.class, memberClass);
-        
-        if (r.getStatus() >= 400) {
-            throw new WebApplicationException(r);
-        }
-        
-        return CastUtils.cast((Collection)r.getEntity(), memberClass);
+    public <T> T post(Object o, Class<T> responseClass) {
+        return invoke("POST", o, responseClass);
     }
     
-    /**
-     * Does HTTP POST invocation and returns typed response object
-     * @param body request body, can be null
-     * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
-     *         can be obtained too, see Client.getResponse()
-     */
-    public <T> T post(Object body, Class<T> responseClass) {
-        return invoke("POST", body, responseClass);
-    }
-    
-    /**
-     * Does HTTP POST invocation and returns a collection of typed objects 
-     * @param body request body, can be null
-     * @param memberClass expected type of collection member class
-     * @return typed collection
-     */
-    public <T> Collection<? extends T> postAndGetCollection(Object body, Class<T> memberClass) {
-        return invokeAndGetCollection("POST", body, memberClass);
-    }
-    
-    /**
-     * Does HTTP GET invocation and returns a collection of typed objects 
-     * @param body request body, can be null
-     * @param memberClass expected type of collection member class
-     * @return typed collection
-     */
-    public <T> Collection<? extends T> getCollection(Class<T> memberClass) {
-        return invokeAndGetCollection("GET", null, memberClass);
-    }
-    
-    /**
-     * Does HTTP GET invocation and returns typed response object
-     * @param body request body, can be null
-     * @param responseClass expected type of response object
-     * @return typed object, can be null. Response status code and headers 
-     *         can be obtained too, see Client.getResponse()
-     */
     public <T> T get(Class<T> responseClass) {
         return invoke("GET", null, responseClass);
     }
     
-    /**
-     * Updates the current URI path
-     * @param path new relative path segment
-     * @return updated WebClient
-     */
     public WebClient path(Object path) {
         getCurrentBuilder().path(path.toString());
-        
         return this;
     }
     
-    /**
-     * Updates the current URI path with path segment which may contain template variables
-     * @param path new relative path segment
-     * @param values template variable values
-     * @return updated WebClient
-     */
-    public WebClient path(String path, Object... values) {
-        URITemplate t = new URITemplate(path);
-        List<String> vars = t.getVariables();
-        if (vars.size() > 0 && vars.size() == values.length) {
-            if (templates == null) {
-                templates = new MetadataMap<String, String>();
-            }
-            for (int i = 0; i < values.length; i++) {
-                templates.add(vars.get(i), values[i].toString());
-            }
-        }
-        URI u = UriBuilder.fromUri(URI.create("http://tempuri")).path(path).buildFromEncoded(values);
-        return path(u.getRawPath());
-    }
-    
-    /**
-     * Updates the current URI query parameters
-     * @param name query name
-     * @param values query values
-     * @return updated WebClient
-     */
     public WebClient query(String name, Object ...values) {
-        if (!"".equals(name)) {
-            getCurrentBuilder().queryParam(name, values);
-        } else {
-            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.QUERY);
+        for (Object o : values) {
+            getCurrentBuilder().queryParam(name, o.toString());
         }
         
         return this;
     }
     
-    /**
-     * Updates the current URI matrix parameters
-     * @param name matrix name
-     * @param values matrix values
-     * @return updated WebClient
-     */
     public WebClient matrix(String name, Object ...values) {
-        if (!"".equals(name)) {
-            getCurrentBuilder().matrixParam(name, values);
-        } else {
-            addParametersToBuilder(getCurrentBuilder(), name, values[0], ParameterType.MATRIX);
+        for (Object o : values) {
+            getCurrentBuilder().matrixParam(name, o.toString());
         }
-        
         return this;
     }
     
-    /**
-     * Moves WebClient to a new baseURI or forwards to new currentURI  
-     * @param newAddress new URI
-     * @param forward if true then currentURI will be based on baseURI  
-     * @return updated WebClient
-     */
     public WebClient to(String newAddress, boolean forward) {
-        clearTemplates();
         if (forward) {
             if (!newAddress.startsWith(getBaseURI().toString())) {
                 throw new IllegalArgumentException("Base address can not be preserved");
@@ -439,13 +252,7 @@ public class WebClient extends AbstractClient {
         return this;
     }
     
-    /**
-     * Goes back
-     * @param fast if true then goes back to baseURI otherwise to a previous path segment 
-     * @return updated WebClient
-     */
     public WebClient back(boolean fast) {
-        clearTemplates();
         if (fast) {
             getCurrentBuilder().replacePath(getBaseURI().getPath());
         } else {
@@ -454,7 +261,7 @@ public class WebClient extends AbstractClient {
                 return this;
             }
             List<PathSegment> segments = JAXRSUtils.getPathSegments(uri.getPath(), false);
-            getCurrentBuilder().replacePath(null);
+            getCurrentBuilder().replacePath(getBaseURI().getPath());
             for (int i = 0; i < segments.size() - 1; i++) {
                 getCurrentBuilder().path(HttpUtils.fromPathSegment(segments.get(i)));
             }
@@ -530,11 +337,10 @@ public class WebClient extends AbstractClient {
     
     @Override
     public WebClient reset() {
-        clearTemplates();
         return (WebClient)super.reset();
     }
     
-    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass, Type genericType) {
+    protected Response doInvoke(String httpMethod, Object body, Class<?> responseClass) {
         
         MultivaluedMap<String, String> headers = getHeaders();
         if (body != null) {
@@ -542,25 +348,21 @@ public class WebClient extends AbstractClient {
                 headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_XML_TYPE.toString());
             }
         } else {
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, MediaType.WILDCARD);
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, WILDCARD.toString());
         }
         if (responseClass != null && headers.getFirst(HttpHeaders.ACCEPT) == null) {
             headers.putSingle(HttpHeaders.ACCEPT, MediaType.APPLICATION_XML_TYPE.toString());
         }
         resetResponse();
-        try {
-            return doChainedInvocation(httpMethod, headers, body, responseClass, genericType);
-        } finally {
-            clearTemplates();
-        }
+        return doChainedInvocation(httpMethod, headers, body, responseClass);
         
     }
 
     protected Response doChainedInvocation(String httpMethod, 
-        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass, Type genericType) {
+        MultivaluedMap<String, String> headers, Object body, Class<?> responseClass) {
         
         Message m = createMessage(httpMethod, headers, getCurrentURI());
-        m.put(URITemplate.TEMPLATE_PARAMETERS, templates);
+        
         if (body != null) {
             MessageContentsList contents = new MessageContentsList(body);
             m.setContent(List.class, contents);
@@ -575,16 +377,15 @@ public class WebClient extends AbstractClient {
         
         // TODO : this needs to be done in an inbound chain instead
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
-        return handleResponse(connect, m, responseClass, genericType);
+        return handleResponse(connect, m, responseClass);
     }
     
-    protected Response handleResponse(HttpURLConnection conn, Message outMessage, 
-                                      Class<?> responseClass, Type genericType) {
+    protected Response handleResponse(HttpURLConnection conn, Message m, Class<?> responseClass) {
         try {
-            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange()).clone();
+            ResponseBuilder rb = setResponseBuilder(conn).clone();
             Response currentResponse = rb.clone().build();
             
-            Object entity = readBody(currentResponse, conn, outMessage, responseClass, genericType,
+            Object entity = readBody(currentResponse, conn, m, responseClass, responseClass,
                                      new Annotation[]{});
             rb.entity(entity);
             
@@ -595,14 +396,7 @@ public class WebClient extends AbstractClient {
     }
     
     protected HttpURLConnection getConnection(String methodName) {
-        return createHttpConnection(getCurrentBuilder().clone().buildFromEncoded(), methodName);
-    }
-    
-    private void clearTemplates() {
-        if (templates != null) {
-            templates.clear();
-            templates = null;
-        }
+        return createHttpConnection(getCurrentBuilder().clone().build(), methodName);
     }
     
     private class BodyWriter extends AbstractOutDatabindingInterceptor {
@@ -612,22 +406,20 @@ public class WebClient extends AbstractClient {
         }
         
         @SuppressWarnings("unchecked")
-        public void handleMessage(Message outMessage) throws Fault {
+        public void handleMessage(Message m) throws Fault {
             
-            OutputStream os = outMessage.getContent(OutputStream.class);
+            OutputStream os = m.getContent(OutputStream.class);
             if (os == null) {
                 return;
             }
-            MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
+            MessageContentsList objs = MessageContentsList.getContentsList(m);
             if (objs == null || objs.size() == 0) {
                 return;
             }
-            MultivaluedMap<String, String> headers = 
-                (MultivaluedMap)outMessage.get(Message.PROTOCOL_HEADERS);
+            MultivaluedMap<String, String> headers = (MultivaluedMap)m.get(Message.PROTOCOL_HEADERS);
             Object body = objs.get(0);
             try {
-                writeBody(body, outMessage, body.getClass(), body.getClass(), new Annotation[]{}, 
-                          headers, os);
+                writeBody(body, m, body.getClass(), body.getClass(), new Annotation[]{}, headers, os);
                 os.flush();
             } catch (Exception ex) {
                 throw new Fault(ex);
@@ -638,7 +430,10 @@ public class WebClient extends AbstractClient {
     static void copyProperties(Client toClient, Client fromClient) {
         AbstractClient newClient = toAbstractClient(toClient);
         AbstractClient oldClient = toAbstractClient(fromClient);
-        newClient.setConfiguration(oldClient.getConfiguration());
+        newClient.bus = oldClient.bus;
+        newClient.conduitSelector = oldClient.conduitSelector;
+        newClient.inInterceptors = oldClient.inInterceptors;
+        newClient.outInterceptors = oldClient.outInterceptors;
     }
     
     private static AbstractClient toAbstractClient(Client client) {

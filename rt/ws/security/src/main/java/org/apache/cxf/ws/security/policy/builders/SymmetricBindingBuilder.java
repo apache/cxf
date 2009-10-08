@@ -84,8 +84,7 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
             assertion = (Assertion)iterator.next();
             name = assertion.getName();
 
-            if (!consts.getNamespace().equals(name.getNamespaceURI())
-                && !SP12Constants.INSTANCE.getNamespace().equals(name.getNamespaceURI())) {
+            if (!consts.getNamespace().equals(name.getNamespaceURI())) {
                 continue;
             }
 
@@ -102,10 +101,10 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
                 symmetricBinding.setProtectionToken((ProtectionToken)assertion);
 
             } else if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(name.getLocalPart())) {
-                symmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.EncryptBeforeSigning);
+                symmetricBinding.setProtectionOrder(SPConstants.ENCRYPT_BEFORE_SIGNING);
 
             } else if (SPConstants.SIGN_BEFORE_ENCRYPTING.equals(name.getLocalPart())) {
-                symmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.SignBeforeEncrypting);
+                symmetricBinding.setProtectionOrder(SPConstants.SIGN_BEFORE_ENCRYPTING);
 
             } else if (SPConstants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY.equals(name.getLocalPart())) {
                 symmetricBinding.setEntireHeadersAndBodySignatures(true);

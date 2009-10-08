@@ -239,8 +239,7 @@ public class ProcessorTestBase extends Assert {
         assertTagEquals(expected, source, DEFAULT_IGNORE_ATTR, DEFAULT_IGNORE_TAG);
     }
 
-    protected void assertAttributesEquals(QName element,
-                                          Map<QName, String> q1,
+    protected void assertAttributesEquals(Map<QName, String> q1,
                                           Map<QName, String> q2, 
                                           Collection<String> ignoreAttr) {
         for (Map.Entry<QName, String>  attr : q1.entrySet()) {
@@ -250,9 +249,7 @@ public class ProcessorTestBase extends Assert {
             
             String found = q2.get(attr.getKey());
             if (found == null) {
-                throw new AssertionError("Attribute: " + attr.getKey() 
-                                         + " is missing in " 
-                                         + element);                
+                throw new AssertionError("Attribute: " + attr.getKey() + " is missing.");                
             }
             if (!found.equals(attr.getValue())) {
                 throw new ComparisonFailure("Attribute not equal: ", 
@@ -271,10 +268,8 @@ public class ProcessorTestBase extends Assert {
                                         source.getName().toString());
         }
 
-        assertAttributesEquals(expected.getName(), 
-                               expected.getAttributes(), source.getAttributes(), ignoreAttr);
-        assertAttributesEquals(expected.getName(),
-                               source.getAttributes(), expected.getAttributes(), ignoreAttr);
+        assertAttributesEquals(expected.getAttributes(), source.getAttributes(), ignoreAttr);
+        assertAttributesEquals(source.getAttributes(), expected.getAttributes(), ignoreAttr);
 
         if (!StringUtils.isEmpty(expected.getText())
                 && !expected.getText().equals(source.getText())) {

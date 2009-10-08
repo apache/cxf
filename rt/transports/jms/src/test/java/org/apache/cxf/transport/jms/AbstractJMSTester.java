@@ -108,7 +108,7 @@ public abstract class AbstractJMSTester extends Assert {
         os.close();
     }
 
-    protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) throws IOException {
+    protected JMSConduit setupJMSConduit(boolean send, boolean decoupled) {
         if (decoupled) {
             // setup the reference type
         } else {
@@ -117,7 +117,7 @@ public abstract class AbstractJMSTester extends Assert {
         
         JMSConfiguration jmsConfig = new JMSOldConfigHolder()
             .createJMSConfigurationFromEndpointInfo(bus, endpointInfo, true);
-        JMSConduit jmsConduit = new JMSConduit(endpointInfo, target, jmsConfig);
+        JMSConduit jmsConduit = new JMSConduit(endpointInfo, target, jmsConfig, bus);
         if (send) {
             // setMessageObserver
             observer = new MessageObserver() {

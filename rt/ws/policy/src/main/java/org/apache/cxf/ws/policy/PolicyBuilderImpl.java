@@ -35,7 +35,6 @@ import org.xml.sax.SAXException;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.neethi.All;
@@ -51,7 +50,6 @@ import org.apache.neethi.PolicyReference;
  * provides methods to create Policy and PolicyReferenceObjects
  * from DOM elements, but also from an input stream etc.
  */
-@NoJSR250Annotations
 public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(PolicyBuilderImpl.class);
@@ -145,9 +143,9 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
 
     private PolicyOperator processOperationElement(Element operationElement, PolicyOperator operator) {
         synchronized (operationElement) {
-    
             if (Constants.TYPE_POLICY == operator.getType()) {
                 Policy policyOperator = (Policy)operator;
+    
                 QName key;
     
                 NamedNodeMap nnm = operationElement.getAttributes();
@@ -169,6 +167,9 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
                 }            
             }
     
+            String policyNsURI = 
+                bus == null ? PolicyConstants.NAMESPACE_WS_POLICY
+                            : bus.getExtension(PolicyConstants.class).getNamespace();
             
             Element childElement;
             for (Node n = operationElement.getFirstChild(); n != null; n = n.getNextSibling()) {
@@ -179,15 +180,21 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
                 String namespaceURI = childElement.getNamespaceURI();
                 String localName = childElement.getLocalName();
     
-                QName qn = new QName(namespaceURI, localName);
-                if (PolicyConstants.isPolicyElem(qn)) {
-                    operator.addPolicyComponent(getPolicyOperator(childElement));
-                } else if (PolicyConstants.isAll(qn)) {
-                    operator.addPolicyComponent(getAllOperator(childElement));
-                } else if (PolicyConstants.isExactlyOne(qn)) {
-                    operator.addPolicyComponent(getExactlyOneOperator(childElement));
-                } else if (PolicyConstants.isPolicyRefElem(qn)) {
-                    operator.addPolicyComponent(getPolicyReference(childElement));                
+                if (policyNsURI.equals(namespaceURI)) {
+    
+                    if (Constants.ELEM_POLICY.equals(localName)) {
+                        operator.addPolicyComponent(getPolicyOperator(childElement));
+    
+                    } else if (Constants.ELEM_EXACTLYONE.equals(localName)) {
+                        operator.addPolicyComponent(getExactlyOneOperator(childElement));
+    
+                    } else if (Constants.ELEM_ALL.equals(localName)) {
+                        operator.addPolicyComponent(getAllOperator(childElement));
+    
+                    } else if (Constants.ELEM_POLICY_REF.equals(localName)) {
+                        operator.addPolicyComponent(getPolicyReference(childElement));
+                    }
+    
                 } else if (null != assertionBuilderRegistry) {
                     PolicyAssertion a = assertionBuilderRegistry.build(childElement);
                     if (null != a) {

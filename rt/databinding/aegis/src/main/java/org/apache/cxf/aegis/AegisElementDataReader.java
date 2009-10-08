@@ -21,7 +21,7 @@ package org.apache.cxf.aegis;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.staxutils.W3CDOMStreamReader;
 
 public class AegisElementDataReader extends AbstractAegisIoImpl 
@@ -44,7 +44,7 @@ public class AegisElementDataReader extends AbstractAegisIoImpl
         return reader.read(sreader);
     }
     
-    public Object read(Element input, AegisType desiredType) throws Exception {
+    public Object read(Element input, Type desiredType) throws Exception {
         W3CDOMStreamReader sreader = new W3CDOMStreamReader(input);
         sreader.nextTag(); //advance into the first tag
         return reader.read(sreader, desiredType);

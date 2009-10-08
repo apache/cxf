@@ -489,7 +489,7 @@
     <simpleType name="AnonUnionList">
         <list>
             <simpleType>
-                <union memberTypes="xsd:negativeInteger">
+                <union memberTypes="negativeInteger">
                     <simpleType>
                         <restriction base="positiveInteger"/>
                     </simpleType>
@@ -520,7 +520,7 @@
     <!-- union simple types -->
 
     <simpleType name="SimpleUnion">
-        <union memberTypes="xsd:positiveInteger">
+        <union memberTypes="positiveInteger">
             <simpleType>
                 <restriction base="negativeInteger"/>
             </simpleType>
@@ -528,7 +528,7 @@
     </simpleType>
 
     <simpleType name="UnionWithAnonEnum">
-        <union memberTypes="xsd:int">
+        <union memberTypes="int">
             <simpleType>
                 <restriction base="string">
                     <enumeration value="n/a"/>
@@ -542,18 +542,18 @@
     <!-- XXX - UnionWithStringList, UnionWithStringListRestriction and UnionWithAnonList
          rpc-literal and wrapped doc-literal generated code differs. -->
     <simpleType name="UnionWithStringList">
-        <union memberTypes="xsd:int x1:StringList"/>
+        <union memberTypes="int x1:StringList"/>
     </simpleType>
 
     <simpleType name="UnionWithStringListRestriction">
-        <union memberTypes="xsd:int">
+        <union memberTypes="int">
             <simpleType>
                 <restriction base="x1:StringList"/>
             </simpleType>
         </union>
     </simpleType>
     <simpleType name="UnionWithAnonList">
-        <union memberTypes="xsd:int">
+        <union memberTypes="int">
             <simpleType>
                 <list itemType="float"/>
             </simpleType>

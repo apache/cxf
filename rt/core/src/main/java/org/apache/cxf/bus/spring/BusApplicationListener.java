@@ -22,7 +22,6 @@ package org.apache.cxf.bus.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -35,7 +34,6 @@ import org.springframework.context.support.AbstractApplicationContext;
 /**
  * 
  */
-@NoJSR250Annotations
 public class BusApplicationListener implements ApplicationListener, ApplicationContextAware {
     AbstractApplicationContext ctx;
     

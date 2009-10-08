@@ -175,13 +175,7 @@ public final class DOMUtils {
     }
 
     public static String getAttribute(Element element, QName attName) {
-        Attr attr;
-        if (StringUtils.isEmpty(attName.getNamespaceURI())) {
-            attr = element.getAttributeNode(attName.getLocalPart());
-        } else {
-            attr = element.getAttributeNodeNS(attName.getNamespaceURI(), attName.getLocalPart());
-        }
-        return attr == null ? null : attr.getValue();
+        return element.getAttributeNS(attName.getNamespaceURI(), attName.getLocalPart());
     }
 
     public static void setAttribute(Node node, String attName, String val) {

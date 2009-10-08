@@ -21,11 +21,9 @@ package org.apache.cxf.phase;
 
 import java.util.SortedSet;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.extension.BusExtension;
 
-@NoJSR250Annotations
 public class PhaseManagerImpl implements PhaseManager, BusExtension {
 
     private SortedSet<Phase> inPhases;

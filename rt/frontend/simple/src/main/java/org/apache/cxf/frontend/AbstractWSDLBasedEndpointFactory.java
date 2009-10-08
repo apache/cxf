@@ -35,7 +35,6 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
-import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -190,8 +189,6 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         if (getOutFaultInterceptors() != null) {
             ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
         }
-        serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINT_SELECTED, ei, ep,
-                                 serviceFactory.getServiceClass());
         return ep;
     }
     private void modifyTransportIdPerAddress(EndpointInfo ei) {
@@ -236,8 +233,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
     protected EndpointInfo createEndpointInfo() throws BusException {
         if (transportId == null 
-            && getAddress() != null
-            && getAddress().contains("://")) {
+            && getAddress() != null) {
             DestinationFactory df = getDestinationFactory();
             if (df == null) {
                 DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
@@ -329,8 +325,6 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             wsdlEndpointFactory.createPortExtensors(ei, service);
         }
         service.getServiceInfos().get(0).addEndpoint(ei);
-        
-        serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINTINFO_CREATED, ei);
         return ei;
     }
 
@@ -404,9 +398,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             
             for (BindingOperationInfo boi : inf.getOperations()) {
                 serviceFactory.updateBindingOperation(boi);
-                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, inf, boi);
             }
-            serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_CREATED, inf);
             return inf;
         } catch (BusException ex) {
             throw new ServiceConstructionException(

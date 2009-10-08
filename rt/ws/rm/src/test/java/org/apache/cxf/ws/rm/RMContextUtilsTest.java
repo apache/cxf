@@ -41,6 +41,7 @@ public class RMContextUtilsTest extends Assert {
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
+        control.makeThreadSafe(true); 
     }
     
     @After

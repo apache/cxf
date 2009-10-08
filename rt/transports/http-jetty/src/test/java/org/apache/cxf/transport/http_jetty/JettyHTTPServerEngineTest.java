@@ -55,16 +55,14 @@ public class JettyHTTPServerEngineTest extends Assert {
     public void setUp() throws Exception {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
-        
-        Configurer configurer = new ConfigurerImpl();
-        bus.getExtension(Configurer.class);
-        EasyMock.expectLastCall().andReturn(configurer).anyTimes();
-
-        control.replay();
-
         factory = new JettyHTTPServerEngineFactory();
         factory.setBus(bus);
 
+        Configurer configurer = new ConfigurerImpl();
+
+        bus.getExtension(Configurer.class);
+        EasyMock.expectLastCall().andReturn(configurer).anyTimes();
+        control.replay();
     }
 
     @Test

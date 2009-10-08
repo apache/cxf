@@ -174,7 +174,7 @@ public class ServerLauncher {
                 }
                 inProcessServer.startInProcess();
                 serverIsReady = true;
-            } catch (Throwable ex) {
+            } catch (Exception ex) {
                 ex.printStackTrace();
                 serverLaunchFailed = true;
             }

@@ -54,7 +54,6 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
-import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -680,26 +679,14 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         maps = ContextUtils.retrieveMAPs(message, 
                                          isProviderContext,
                                          isOutbound);
-        LOG.log(Level.FINE, "MAPs retrieved from message {0}", maps);
+        LOG.log(Level.INFO, "MAPs retrieved from message {0}", maps);
 
         if (maps == null && isProviderContext) {
             maps = new AddressingPropertiesImpl();
-            setupNamespace(maps, message);
         }
         return maps;
     }
 
-    private void setupNamespace(AddressingPropertiesImpl maps, Message message) {
-        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
-        if (null == aim) {
-            return;
-        }
-        Collection<AssertionInfo> aic = aim.getAssertionInfo(MetadataConstants.USING_ADDRESSING_2004_QNAME);
-        if (aic != null && !aic.isEmpty()) {
-            maps.exposeAs(Names200408.WSA_NAMESPACE_NAME);
-        }
-    }
-    
     /**
      * Validate incoming MAPs
      * @param maps the incoming MAPs

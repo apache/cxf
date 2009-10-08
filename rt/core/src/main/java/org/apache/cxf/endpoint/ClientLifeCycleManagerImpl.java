@@ -22,10 +22,8 @@ package org.apache.cxf.endpoint;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.extension.BusExtension;
 
-@NoJSR250Annotations
 public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusExtension {
     
     private List<ClientLifeCycleListener> listeners = new ArrayList<ClientLifeCycleListener>(); 

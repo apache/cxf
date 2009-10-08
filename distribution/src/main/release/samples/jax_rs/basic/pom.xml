@@ -25,7 +25,7 @@
     <properties>
             <cxf.version>[2,)</cxf.version>
             <httpclient.version>3.1</httpclient.version>
-            <jsr311.version>1.0</jsr311.version>
+            <jsr311.version>0.8</jsr311.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>

@@ -1,6 +1,0 @@
-<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
-<properties>
-<entry key="testReadWriteComplexMap.expected">{"ns1.AegisTestBean2AegisSuperBeanMap":{"@xsi.type":"ns1:AegisTestBean2AegisSuperBeanMap","ns1.entry":{"ns1.key":{"@xsi.type":"ns2:AegisTestBean","ns2.boolValue":true,"ns2.strValue":"hovercraft"},"ns1.value":{"@xsi.type":"ns2:AegisSuperBean","ns2.boolValue":true,"ns2.strValue":"hovercraft2"}}}}</entry>
-<entry key="simpleBeanXml">&lt;?xml version='1.0' encoding='UTF-8'?&gt;<![CDATA[<ns1:AegisTestBean xmlns:ns1="http://fortest.jaxrs.cxf.apache.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:AegisTestBean"><ns1:boolValue>true</ns1:boolValue><ns1:strValue>hovercraft</ns1:strValue></ns1:AegisTestBean>]]></entry>
-<entry key="testAegisWriteXml"><![CDATA[<ns1:Book xmlns:ns1="http://resources.jaxrs.cxf.apache.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="ns1:Book"><ns1:id>127</ns1:id><ns1:name>CXF</ns1:name><ns1:state></ns1:state></ns1:Book>]]></entry>
-</properties>

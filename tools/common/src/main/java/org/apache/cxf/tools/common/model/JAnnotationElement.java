@@ -91,11 +91,7 @@ public final class JAnnotationElement {
 
     private void appendValue(final StringBuffer sb, final Object obj) {
         if (obj instanceof String) {
-            if (isPrimitive) {
-                sb.append(obj);
-            } else {
-                getStringValue(sb, obj);
-            }
+            getStringValue(sb, obj);
         } else if (obj instanceof Class) {
             Class clz = (Class) obj;
             if (containsSameClassName(clz) && !imports.contains(clz.getName())) {

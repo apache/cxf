@@ -21,11 +21,8 @@ package org.apache.cxf.binding.soap;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
-
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.wsdl.Port;
@@ -36,10 +33,7 @@ import javax.wsdl.factory.WSDLFactory;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
-import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
-import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -70,27 +64,13 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public SoapTransportFactory() {
         super();
     }
-    public Set<String> getUriPrefixes() {
-        return Collections.singleton("soap.tcp");
-    }
-    public String mapTransportURI(String s) {
-        if ("http://www.w3.org/2008/07/soap/bindings/JMS/".equals(s)) {
-            s = "http://cxf.apache.org/transports/jms";
-        }
-        return s;
-    }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
-        if (ei.getAddress() != null && ei.getAddress().startsWith("soap.tcp")) {
-            return new SoapTcpDestination(ei.getTarget(), ei);
-            //return SoapTcpDestination.getInstance(ei.getTarget(), ei);
-        }
-        
         SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
         DestinationFactory destinationFactory;
         try {
             destinationFactory = bus.getExtension(DestinationFactoryManager.class)
-                .getDestinationFactory(mapTransportURI(binding.getTransportURI()));
+                .getDestinationFactory(binding.getTransportURI());
             return destinationFactory.getDestination(ei);
         } catch (BusException e) {
             throw new RuntimeException("Could not find destination factory for transport "
@@ -133,7 +113,6 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             SoapBindingInfo sbi = (SoapBindingInfo)b;
             transportURI = sbi.getTransportURI();
         }
-        EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
         if (port != null) {
             List ees = port.getExtensibilityElements();
             for (Iterator itr = ees.iterator(); itr.hasNext();) {
@@ -142,14 +121,14 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 if (SOAPBindingUtil.isSOAPAddress(extensor)) {
                     final SoapAddress sa = SOAPBindingUtil.getSoapAddress(extensor);
     
+                    EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
                     info.addExtensor(sa);
                     info.setAddress(sa.getLocationURI());
-                } else {
-                    info.addExtensor(extensor);
+                    return info;
                 }
             }
         }
-        return info;
+        return new SoapEndpointInfo(serviceInfo, transportURI);
     }
 
 
@@ -158,16 +137,11 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {
-        if (!StringUtils.isEmpty(ei.getAddress()) && ei.getAddress().startsWith("soap.tcp://")) {
-            //TODO - examine policies and stuff to look for the sun tcp policies
-            return new TCPConduit(ei);
-        }
-        
         SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
         ConduitInitiator conduitInit;
         try {
             conduitInit = bus.getExtension(ConduitInitiatorManager.class)
-                .getConduitInitiator(mapTransportURI(binding.getTransportURI()));
+                .getConduitInitiator(binding.getTransportURI());
 
             return conduitInit.getConduit(ei);
         } catch (BusException e) {

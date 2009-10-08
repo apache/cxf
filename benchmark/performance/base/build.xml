@@ -23,7 +23,7 @@
         <mkdir dir="${basedir}/build/classes"/>
     </target>
     <target name="base.compile" depends="init">
-        <javac srcdir="${basedir}/src/main/java/" destdir="${basedir}/build/classes"
+        <javac srcdir="${basedir}/src" destdir="${basedir}/build/classes"
            debug="true">
             <classpath refid="cxf.classpath"/>
         </javac>

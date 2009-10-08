@@ -20,18 +20,18 @@ package org.apache.cxf.aegis.type.basic;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.services.AttributeBean;
 import org.apache.cxf.aegis.services.XmlMappedAttributeBean;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
+import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.common.util.SOAPConstants;
-
+import org.jdom.Document;
+import org.jdom.Element;
 import org.junit.Test;
 
 public class QualificationTest extends AbstractAegisTest {
@@ -51,12 +51,14 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
+        Type type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
         AttributeBean bean = new AttributeBean();
-        Element element = writeObjectToElement(type, bean, messageContext);
+        type.writeObject(bean, new JDOMWriter(element), messageContext);
         assertValid("/b:root[@xyzzy:attrExplicitString]", element);
         assertXPathEquals("/b:root/@xyzzy:attrExplicitString", "attrExplicit", element);
         assertValid("/b:root[@attrPlainString]", element);
@@ -73,12 +75,14 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        AegisType type = mapping.getTypeCreator().createType(AttributeBean.class);
+        Type type = mapping.getTypeCreator().createType(AttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
         AttributeBean bean = new AttributeBean();
-        Element element = writeObjectToElement(type, bean, messageContext);
+        type.writeObject(bean, new JDOMWriter(element), messageContext);
         assertValid("/b:root[@xyzzy:attrExplicitString]", element);
         assertXPathEquals("/b:root/@xyzzy:attrExplicitString", "attrExplicit", element);
         assertValid("/b:root[@pkg:attrPlainString]", element);
@@ -90,13 +94,14 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
+        Type type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
         XmlMappedAttributeBean bean = new XmlMappedAttributeBean();
-        
-        Element element = writeObjectToElement(type, bean, messageContext);
+        type.writeObject(bean, new JDOMWriter(element), messageContext);
         assertValid("/b:root[@attrXmlString]", element);
         assertXPathEquals("/b:root/@attrXmlString", "attrXml", element);
     }
@@ -111,13 +116,14 @@ public class QualificationTest extends AbstractAegisTest {
         context.initialize();
         TypeMapping mapping = context.getTypeMapping();
         
-        AegisType type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
+        Type type = mapping.getTypeCreator().createType(XmlMappedAttributeBean.class);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         Context messageContext = new Context(context);
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
         XmlMappedAttributeBean bean = new XmlMappedAttributeBean();
-
-        Element element = writeObjectToElement(type, bean, messageContext);
+        type.writeObject(bean, new JDOMWriter(element), messageContext);
         assertValid("/b:root[@pkg:attrXmlString]", element);
         assertXPathEquals("/b:root/@pkg:attrXmlString", "attrXml", element);
     }

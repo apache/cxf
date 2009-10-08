@@ -30,7 +30,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.policy.PolicyBuilder;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -63,57 +62,69 @@ public class IssuedTokenBuilder implements AssertionBuilder {
     
 
         IssuedToken issuedToken = new IssuedToken(consts);
-        issuedToken.setOptional(PolicyConstants.isOptional(element));
 
         String includeAttr = DOMUtils.getAttribute(element, consts.getIncludeToken());
         if (includeAttr != null) {
             issuedToken.setInclusion(consts.getInclusionFromAttributeValue(includeAttr));
         }
-        
-        Element child = DOMUtils.getFirstElement(element);
-        while (child != null) {
-            String ln = child.getLocalName();
-            if (SP11Constants.ISSUER.getLocalPart().equals(ln)) {
-                Element issuerEpr = DOMUtils
-                    .getFirstChildWithName(child, 
+        // Extract Issuer
+        Element issuerElem = DOMUtils.getFirstChildWithName(element, SP11Constants.ISSUER);
+        if (issuerElem != null) {
+            Element issuerEpr = DOMUtils
+                .getFirstChildWithName(issuerElem, 
                                        new QName(WSA_NAMESPACE, "Address"));
 
-                // try the other addressing namespace
-                if (issuerEpr == null) {
-                    issuerEpr = DOMUtils
-                        .getFirstChildWithName(child,
+            // try the other addressing namespace
+            if (issuerEpr == null) {
+                issuerEpr = DOMUtils
+                    .getFirstChildWithName(issuerElem,
                                            new QName(WSA_NAMESPACE_SUB,
                                                      "Address"));
-                }
-                issuedToken.setIssuerEpr(issuerEpr);
+            }
 
-                Element issuerMex = DOMUtils
-                    .getFirstChildWithName(child,
+            issuedToken.setIssuerEpr(issuerEpr);
+        }
+
+        // TODO check why this returns an Address element
+        // iter = issuerElem.getChildrenWithLocalName("Metadata");
+
+        if (issuerElem != null) {
+            Element issuerMex = DOMUtils
+                .getFirstChildWithName(issuerElem,
                                        new QName(WSA_NAMESPACE, "Metadata"));
 
-                // try the other addressing namespace
-                if (issuerMex == null) {
-                    issuerMex = DOMUtils
-                        .getFirstChildWithName(child,
-                                               new QName(WSA_NAMESPACE_SUB, 
-                                                         "Metadata"));
-                }
-    
-                issuedToken.setIssuerMex(issuerMex);
-            } else if (SPConstants.REQUEST_SECURITY_TOKEN_TEMPLATE.equals(ln)) {
-                issuedToken.setRstTemplate(child);
-            } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
-                Policy policy = builder.getPolicy(child);
-                policy = (Policy)policy.normalize(false);
-
-                for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
-                    processAlternative((List)iterator.next(), issuedToken);
-                    break; // since there should be only one alternative ..
-                }                
+            // try the other addressing namespace
+            if (issuerMex == null) {
+                issuerMex = DOMUtils
+                    .getFirstChildWithName(issuerElem,
+                                           new QName(WSA_NAMESPACE_SUB, 
+                                                     "Metadata"));
             }
-            
-            child = DOMUtils.getNextElement(child);
+
+            issuedToken.setIssuerMex(issuerMex);
         }
+
+        // Extract RSTTemplate
+        Element rstTmplElem = DOMUtils.getFirstChildWithName(element, 
+                                                             SP11Constants.REQUEST_SECURITY_TOKEN_TEMPLATE);
+        if (rstTmplElem != null) {
+            issuedToken.setRstTemplate(rstTmplElem);
+        }
+
+        Element policyElement = DOMUtils.getFirstChildWithName(element,
+                                                               org.apache.neethi.Constants.Q_ELEM_POLICY);
+
+        if (policyElement != null) {
+
+            Policy policy = builder.getPolicy(policyElement);
+            policy = (Policy)policy.normalize(false);
+
+            for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
+                processAlternative((List)iterator.next(), issuedToken);
+                break; // since there should be only one alternative ..
+            }
+        }
+
         return issuedToken;
     }
 
@@ -126,11 +137,11 @@ public class IssuedTokenBuilder implements AssertionBuilder {
             assertion = (Assertion)iterator.next();
             name = assertion.getName();
 
-            if (SPConstants.REQUIRE_DERIVED_KEYS.equals(name.getLocalPart())) {
+            if (SP11Constants.REQUIRE_DERIVED_KEYS.equals(name)) {
                 parent.setDerivedKeys(true);
-            } else if (SPConstants.REQUIRE_EXTERNAL_REFERENCE.equals(name.getLocalPart())) {
+            } else if (SP11Constants.REQUIRE_EXTERNAL_REFERENCE.equals(name)) {
                 parent.setRequireExternalReference(true);
-            } else if (SPConstants.REQUIRE_INTERNAL_REFERENCE.equals(name.getLocalPart())) {
+            } else if (SP11Constants.REQUIRE_INTERNAL_REFERENCE.equals(name)) {
                 parent.setRequireInternalReference(true);
             }
         }

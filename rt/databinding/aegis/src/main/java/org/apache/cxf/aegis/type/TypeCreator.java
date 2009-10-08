@@ -21,10 +21,14 @@ package org.apache.cxf.aegis.type;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.aegis.type.AbstractTypeCreator.TypeClassInfo;
+
+/**
+ * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
+ */
 public interface TypeCreator {
     /**
      * Get the mapped name of a method parameter.
@@ -35,20 +39,19 @@ public interface TypeCreator {
      */
     QName getElementName(Method m, int index);
 
-    AegisType createType(Method m, int index);
+    Type createType(Method m, int index);
 
-    AegisType createType(PropertyDescriptor pd);
-    
-    AegisType createType(Type type);
+    Type createType(PropertyDescriptor pd);
 
-    AegisType createType(Field f);
+    Type createType(Field f);
+
+    Type createType(Class clazz);
 
     TypeCreator getParent();
     
     void setParent(TypeCreator creator);
         
     void setTypeMapping(TypeMapping typeMapping);
-
     /** Retrieve the classInfo for a method. Needed to get parameters right. 
      * 
      * @param m Method object
@@ -56,18 +59,17 @@ public interface TypeCreator {
      * @return info
      */
     TypeClassInfo createClassInfo(Method m, int index); 
-
     /**
-     * Create class info for a Type.
-     * @param itemType
+     * Retrieve the class info for a class. Needed to get parameters right.
+     * @param itemClass
      * @return info
      */
-    TypeClassInfo createBasicClassInfo(Type itemType);
+    TypeClassInfo createBasicClassInfo(Class<?> itemClass);
     
     /**
      * Turn a TypeClassInfo into a type.
      * @param info
      * @return
      */
-    AegisType createTypeForClass(TypeClassInfo info);
+    Type createTypeForClass(TypeClassInfo info);
 }

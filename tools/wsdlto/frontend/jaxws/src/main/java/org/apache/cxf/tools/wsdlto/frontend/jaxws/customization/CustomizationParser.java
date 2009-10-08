@@ -58,6 +58,7 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
+import org.apache.xml.resolver.Catalog;
 
 public final class CustomizationParser {
     // For WSDL1.1
@@ -95,10 +96,7 @@ public final class CustomizationParser {
             if (wsdlNode == null && env.get(ToolConstants.CFG_CATALOG) != null) {
                 wsdlNode = resolveNodeByCatalog(wsdlURL);
             }
-            
-            if (wsdlNode == null) {
-                throw new ToolException(new Message("MISSING_WSDL", LOG, wsdlURL));
-            }
+            // TODO: if wsdlNode is null throw exception
             customizedElements.put(wsdlURL.toString(), wsdlNode);
             bindingFiles = (String[])env.get(ToolConstants.CFG_BINDING);
             if (bindingFiles == null) {
@@ -492,11 +490,28 @@ public final class CustomizationParser {
 
         } else if (isValidJaxbBindingFile(reader)) {
             String schemaLocation = root.getAttribute("schemaLocation");
-            String resolvedSchemaLocation = resolveByCatalog(schemaLocation);
-            if (resolvedSchemaLocation != null) {
+            boolean hasJaxbBindingChild = false;
+            
+            List<Element> elemList = 
+                DOMUtils.findAllElementsByTagNameNS(root, 
+                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
+                                                    ToolConstants.JAXB_BINDINGS.getLocalPart()); 
+            if (elemList.size() > 1) {
+                hasJaxbBindingChild = true;
+            }
+            
+            elemList = 
+                DOMUtils.findAllElementsByTagNameNS(root, 
+                                                    ToolConstants.JAXB_BINDINGS.getNamespaceURI(), 
+                                                    "globalBindings");
+            if (elemList.size() > 1) {
+                hasJaxbBindingChild = true;
+            }
+                           
+            if (StringUtils.isEmpty(schemaLocation) && !hasJaxbBindingChild) {
                 InputSource tmpIns = null;
                 try {
-                    tmpIns = convertToTmpInputSource(root, resolvedSchemaLocation);
+                    tmpIns = convertToTmpInputSource(root, wsdlURL);
                 } catch (Exception e1) {
                     Message msg = new Message("FAILED_TO_ADD_SCHEMALOCATION", LOG, bindingFile);
                     throw new ToolException(msg, e1);
@@ -504,7 +519,8 @@ public final class CustomizationParser {
                 jaxbBindings.add(tmpIns);
             } else {
                 jaxbBindings.add(new InputSource(bindingFile));
-            } 
+            }
+
         }
     }
 
@@ -538,14 +554,8 @@ public final class CustomizationParser {
     }
 
     private String resolveByCatalog(String url) {
-        if (StringUtils.isEmpty(url)) {
-            return null;
-        }
         Bus bus = (Bus)env.get(Bus.class);
-        OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-        if (catalogResolver == null) {
-            return null;
-        }
+        Catalog catalogResolver = OASISCatalogManager.getCatalogManager(bus).getCatalog();
         String resolvedLocation;
         try {
             resolvedLocation = catalogResolver.resolveSystem(url);

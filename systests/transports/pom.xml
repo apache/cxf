@@ -21,35 +21,17 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-transports</artifactId>
     <name>Apache CXF Transport System Tests</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-test-sources</id>
-                        <phase>generate-test-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <testWsdlRoot>${basedir}/src/test/resources/wsdl_systest_transport</testWsdlRoot>
-                        </configuration>
-                        <goals>
-                            <goal>wsdl2java</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <executions>
@@ -57,30 +39,6 @@
                         <id>attach-sources</id>
                         <goals>
                             <goal>test-jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-common-xsd</artifactId>
-                <version>${project.version}</version>
-                <executions>
-                    <execution>
-                        <id>generate-sources</id>
-                        <phase>generate-sources</phase>
-                        <configuration>
-                            <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
-                            <xsdOptions>
-                                <xsdOption>
-                                    <xsd>${basedir}/src/test/resources/jms/testcase.xsd</xsd>
-                                    <bindingFile>${basedir}/src/test/resources/jms/testcase.xjb</bindingFile>
-                                    <catalog>${basedir}/src/test/build-resources/catalog.cat</catalog>
-                                </xsdOption>
-                            </xsdOptions>
-                        </configuration>
-                        <goals>
-                            <goal>xsdtojava</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -254,7 +212,6 @@
             <artifactId>${spring.mock}</artifactId>
             <version>${spring.version}</version>
         </dependency>
-
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

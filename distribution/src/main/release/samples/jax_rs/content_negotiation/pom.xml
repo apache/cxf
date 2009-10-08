@@ -20,12 +20,11 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_content_negotiation</artifactId>
-    <version>1.0</version>
-    <name>JAX-RS Content Negotiation Demo</name>
+    <version>0.8</version>
     <properties>
             <cxf.version>[2,)</cxf.version>
             <httpclient.version>3.1</httpclient.version>
-            <jsr311.version>1.0</jsr311.version>
+            <jsr311.version>0.8</jsr311.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -130,10 +129,15 @@
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <!-- This dependency is needed if you're using the Jetty container -->
+        <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>

@@ -66,12 +66,14 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
         this.nested = p;
     }
 
-    public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder) {
-        this(elem, builder, true);
+    public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder, 
+                                    PolicyConstants constants) {
+        this(elem, builder, constants, true);
     }
     
-    public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder, boolean assertionRequired) {
-        super(elem);
+    public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder, 
+                                    PolicyConstants constants, boolean assertionRequired) {
+        super(elem, constants);
         this.assertionRequired = assertionRequired;
         
         // expect exactly one child element of type Policy
@@ -80,18 +82,18 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
         for (Node nd = elem.getFirstChild(); nd != null; nd = nd.getNextSibling()) {
             if (Node.ELEMENT_NODE == nd.getNodeType()) {
                 QName qn = new QName(nd.getNamespaceURI(), nd.getLocalName());
-                if (PolicyConstants.isPolicyElem(qn)
+                if (constants.getPolicyElemQName().equals(qn)
                     && null == policyElem) {
                     policyElem = (Element)nd;
                 } else {
                     throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
-                                                          PolicyConstants.POLICY_ELEM_NAME));
+                                                          constants.getPolicyElemQName()));
                 }                
             }
         }
         if (null == policyElem) {
             throw new PolicyException(new Message("UNEXPECTED_CHILD_ELEMENT_EXC", BUNDLE, 
-                                                  PolicyConstants.POLICY_ELEM_NAME));
+                                                  constants.getPolicyElemQName()));
         }
         
         nested = builder.getPolicy(policyElem);  

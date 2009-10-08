@@ -18,12 +18,13 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.neethi.All;
 import org.apache.neethi.ExactlyOne;
@@ -33,12 +34,11 @@ import org.apache.neethi.PolicyComponent;
 public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
 
     private EncryptionToken encryptionToken;
+
     private SignatureToken signatureToken;
+
     private ProtectionToken protectionToken;
 
-    public SymmetricBinding() {
-        super(SP12Constants.INSTANCE);
-    }
     public SymmetricBinding(SPConstants version) {
         super(version);
     }
@@ -98,63 +98,62 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
         this.signatureToken = signatureToken;
     }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getSymmetricBinding();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getSymmetricBinding();
-    }
+
     public PolicyComponent normalize() {
-        All all = new All();
-        all.addPolicyComponent(getPolicy().getFirstPolicyComponent());
-        all.addPolicyComponent(this);
-        return all;
-    }
-
-    public Policy getPolicy() {
-        Policy p = new Policy();
-        ExactlyOne ea = new ExactlyOne();
-        p.addPolicyComponent(ea);
-        All all = new All();
-        
-        if (this.getProtectionToken() != null) {
-            all.addPolicyComponent(this.getProtectionToken());
-        }
-        if (this.getSignatureToken() != null) {
-            all.addPolicyComponent(this.getSignatureToken());
-        }
-        if (this.getEncryptionToken() != null) {
-            all.addPolicyComponent(this.getEncryptionToken());
-        }
-        if (isIncludeTimestamp()) {
-            all.addPolicyComponent(new PrimitiveAssertion(SP12Constants.INCLUDE_TIMESTAMP));
-        }
-        if (getLayout() != null) {
-            all.addPolicyComponent(getLayout());
+        if (isNormalized()) {
+            return this;
         }
 
-        
-        ea.addPolicyComponent(all);
-        PolicyComponent pc = p.normalize(true);
-        if (pc instanceof Policy) {
-            return (Policy)pc;
-        } else {
-            p = new Policy();
-            p.addPolicyComponent(pc);
-            return p;
+        AlgorithmSuite algorithmSuite = getAlgorithmSuite();
+        List configurations = algorithmSuite.getConfigurations();
+
+        Policy policy = new Policy();
+        ExactlyOne exactlyOne = new ExactlyOne();
+
+        All wrapper;
+        SymmetricBinding symmetricBinding;
+
+        for (Iterator iterator = configurations.iterator(); iterator.hasNext();) {
+            wrapper = new All();
+            symmetricBinding = new SymmetricBinding(constants);
+
+            algorithmSuite = (AlgorithmSuite)iterator.next();
+            symmetricBinding.setAlgorithmSuite(algorithmSuite);
+
+            symmetricBinding.setEncryptionToken(getEncryptionToken());
+            symmetricBinding.setEntireHeadersAndBodySignatures(isEntireHeadersAndBodySignatures());
+            symmetricBinding.setIncludeTimestamp(isIncludeTimestamp());
+            symmetricBinding.setLayout(getLayout());
+            symmetricBinding.setProtectionOrder(getProtectionOrder());
+            symmetricBinding.setProtectionToken(getProtectionToken());
+            symmetricBinding.setSignatureProtection(isSignatureProtection());
+            symmetricBinding.setSignatureToken(getSignatureToken());
+            symmetricBinding.setSignedEndorsingSupportingTokens(getSignedEndorsingSupportingTokens());
+            symmetricBinding.setSignedSupportingToken(getSignedSupportingToken());
+            symmetricBinding.setTokenProtection(isTokenProtection());
+
+            symmetricBinding.setNormalized(true);
+            wrapper.addPolicyComponent(symmetricBinding);
+            exactlyOne.addPolicyComponent(wrapper);
         }
+
+        policy.addPolicyComponent(exactlyOne);
+        return policy;
     }
-    
+
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix;
         String writerPrefix = writer.getPrefix(namespaceURI);
 
         if (writerPrefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         } else {
             prefix = writerPrefix;
@@ -212,7 +211,7 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
             writer.writeEndElement();
         }
 
-        if (SPConstants.ProtectionOrder.EncryptBeforeSigning == getProtectionOrder()) {
+        if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(getProtectionOrder())) {
             // <sp:EncryptBeforeSigning />
             writer.writeStartElement(prefix, SPConstants.ENCRYPT_BEFORE_SIGNING, namespaceURI);
             writer.writeEndElement();

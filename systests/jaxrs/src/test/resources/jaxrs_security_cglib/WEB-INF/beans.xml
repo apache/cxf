@@ -53,12 +53,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:providers>
   </jaxrs:server>
 
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoInterface">
-      <lookup-method name="getSecureBook" bean="subResource" />
-  </bean>
-  
-  <bean id="subResource" class="org.apache.cxf.systest.jaxrs.security.SecureBook"/>
-  
+  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.security.SecureBookStoreNoInterface"/>
   <aop:config proxy-target-class="true"/>
   
   <security:global-method-security secured-annotations="enabled"/>

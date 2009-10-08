@@ -176,7 +176,7 @@ public class JAXWSDefinitionBuilder extends AbstractWSDLBuilder<Definition> {
         Map<String, Element> eleMap = cusParser.getCustomizedWSDLElements();        
         String wsdlUrl = URIParserUtil.getAbsoluteURI((String)context.get(ToolConstants.CFG_WSDLURL));
         CustomizedWSDLLocator wsdlLocator = new CustomizedWSDLLocator(wsdlUrl, eleMap);
-        wsdlLocator.setCatalogResolver(OASISCatalogManager.getCatalogManager(bus));
+        wsdlLocator.setCatalogResolver(OASISCatalogManager.getCatalogManager(bus).getCatalog());
         
         WSDLManager mgr = bus.getExtension(WSDLManager.class);
         WSDLReader reader = mgr.getWSDLFactory().newWSDLReader();

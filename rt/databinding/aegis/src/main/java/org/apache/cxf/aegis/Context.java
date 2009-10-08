@@ -38,7 +38,6 @@ public class Context {
     private Collection<Attachment> attachments;
     private Fault fault;
     private Map<Class<?>, Object> properties;
-    private Map<String, Object> namedProperties;
     
     public Context(AegisContext aegisContext) {
         this.globalContext = aegisContext;
@@ -88,14 +87,5 @@ public class Context {
     
     public void setProperty(Object value) {
         properties.put(value.getClass(), value);
-    }
-    
-    //named properties to solve other problems
-    public void setProperty(String name, Object value) {
-        namedProperties.put(name, value);
-    }
-    
-    public <T> T getProperty(String name, Class<T> type) {
-        return type.cast(namedProperties.get(name));
     }
 }

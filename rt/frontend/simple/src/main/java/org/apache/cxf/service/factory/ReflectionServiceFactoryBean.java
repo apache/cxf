@@ -52,9 +52,6 @@ import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.DOMError;
-import org.w3c.dom.DOMErrorHandler;
-
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.catalog.CatalogXmlSchemaURIResolver;
@@ -65,7 +62,6 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -83,11 +79,9 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
-import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.ServiceModelSchemaValidator;
-import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
@@ -164,7 +158,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private boolean populateFromClass;
     private boolean anonymousWrappers;
     private boolean qualifiedSchemas = true;
-    private boolean validate;
 
     private List<AbstractFeature> features;
     
@@ -172,6 +165,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
     private String styleCache;
     private Boolean defWrappedCache;
+    
+    
     
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
@@ -187,28 +182,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     
      
     protected DataBinding createDefaultDataBinding() {
-        if (getServiceClass() != null) {
-            org.apache.cxf.annotations.DataBinding db 
-                = getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
-            if (db != null) {
-                try {
-                    if (!StringUtils.isEmpty(db.ref())) {
-                        return getBus().getExtension(ResourceManager.class).resolveResource(db.ref(),
-                                                                                            db.value());
-                    }
-                    return db.value().newInstance();
-                } catch (Exception e) {
-                    LOG.log(Level.WARNING, "Could not create databinding " 
-                            + db.value().getName(), e);
-                }
-            }
-        }
         return new JAXBDataBinding(getQualifyWrapperSchema());
     }
     
     @Override
     public Service create() {
-        sendEvent(Event.START_CREATE);
         initializeServiceConfigurations();
 
         initializeServiceModel();
@@ -234,9 +212,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         fillInSchemaCrossreferences();
 
-        Service serv = getService();
-        sendEvent(Event.END_CREATE, serv);
-        return serv;
+        return getService();
     }
 
     /**
@@ -313,9 +289,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {
-        Endpoint ep = new EndpointImpl(getBus(), getService(), ei);
-        sendEvent(Event.ENDPOINT_CREATED, ei, ep, getServiceClass());
-        return ep;
+        return new EndpointImpl(getBus(), getService(), ei);
     }
 
     protected void initializeServiceConfigurations() {
@@ -333,10 +307,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     protected void buildServiceFromWSDL(String url) {
-        sendEvent(Event.CREATE_FROM_WSDL, url);        
-        
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.info("Creating Service " + getServiceQName() + " from WSDL: " + url);
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Creating Service " + getServiceQName() + " from WSDL: " + url);
         }
         populateFromClass = false;
         WSDLServiceFactory factory = new WSDLServiceFactory(getBus(), url, getServiceQName());
@@ -351,11 +323,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (setEPName) {
             factory.setEndpointName(getEndpointName(false));
         }
-        sendEvent(Event.WSDL_LOADED, factory.getDefinition());
         setService(factory.create());
+
         setServiceProperties();
-        
-        sendEvent(Event.SERVICE_SET, getService());
         
         EndpointInfo epInfo = getEndpointInfo();
         if (epInfo != null) {
@@ -370,21 +340,18 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 si.setProperty(EXTRA_CLASS, cls);
             }
         }
-        initializeDataBindings();
+        getDataBinding().initialize(getService());
     }
 
     protected void buildServiceFromClass() {
-        if (LOG.isLoggable(Level.INFO)) {
-            LOG.info("Creating Service " + getServiceQName() + " from class " + getServiceClass().getName());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Creating Service " + getServiceQName() + " from class " + getServiceClass().getName());
         }
         populateFromClass = true;
 
         if (Proxy.isProxyClass(this.getServiceClass())) {
             LOG.log(Level.WARNING, "USING_PROXY_FOR_SERVICE", getServiceClass());
         }
-        
-        sendEvent(Event.CREATE_FROM_CLASS, getServiceClass());
-
         ServiceInfo serviceInfo = new ServiceInfo();
         SchemaCollection col = serviceInfo.getXmlSchemaCollection();
         col.getXmlSchemaCollection().setSchemaResolver(new CatalogXmlSchemaURIResolver(this.getBus()));
@@ -392,12 +359,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         ServiceImpl service = new ServiceImpl(serviceInfo);
         setService(service);
+
         setServiceProperties();
 
         serviceInfo.setName(getServiceQName());
         serviceInfo.setTargetNamespace(serviceInfo.getName().getNamespaceURI());
-
-        sendEvent(Event.SERVICE_SET, getService());
 
         createInterface(serviceInfo);
 
@@ -408,7 +374,8 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 si.setProperty(EXTRA_CLASS, wrapperClasses);
             }
         }
-        initializeDataBindings();
+
+        getDataBinding().initialize(service);
 
         boolean isWrapped = isWrapped() || hasWrappedMethods(serviceInfo.getInterface());
         if (isWrapped) {
@@ -439,16 +406,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         }
-        if (LOG.isLoggable(Level.FINE) || isValidate()) {
+        if (LOG.isLoggable(Level.FINE)) {
             ServiceModelSchemaValidator validator = new ServiceModelSchemaValidator(serviceInfo);
             validator.walk();
             String validationComplaints = validator.getComplaints();
             if (!"".equals(validationComplaints)) {
-                if (isValidate()) {
-                    LOG.warning(validationComplaints);
-                } else {
-                    LOG.fine(validationComplaints);
-                }
+                LOG.fine(validationComplaints);
             }
         }
     }
@@ -473,21 +436,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         } else {
             buildServiceFromClass();
         }
-        
-        if (isValidate()) {
-            validateServiceModel();
-        }
+        // validateServiceModel();
     }
 
     public void validateServiceModel() {
-        
-        XmlSchemaValidationManager xsdValidator = getBus().getExtension(XmlSchemaValidationManager.class);
-        
         for (ServiceInfo si : getService().getServiceInfos()) {
-            if (xsdValidator != null) {
-                validateSchemas(xsdValidator, si.getXmlSchemaCollection());
-            }
-            
             for (OperationInfo opInfo : si.getInterface().getOperations()) {
                 for (MessagePartInfo mpi : opInfo.getInput().getMessageParts()) {
                     assert mpi.getXmlSchema() != null;
@@ -540,26 +493,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
 
             }
-        }
-    }
-
-    private void validateSchemas(XmlSchemaValidationManager xsdValidator, 
-                                 SchemaCollection xmlSchemaCollection) {
-        final boolean[] anyErrors = new boolean[1];
-        final StringBuilder errorBuilder = new StringBuilder();
-        anyErrors[0] = false;
-        xsdValidator.validateSchemas(xmlSchemaCollection.getXmlSchemaCollection(), new DOMErrorHandler() {
-
-            public boolean handleError(DOMError error) {
-                anyErrors[0] = true;
-                errorBuilder.append(error.getMessage());
-                LOG.warning(error.getMessage());
-                return true;
-            }
-        });
-        if (anyErrors[0]) {
-            throw new ServiceConstructionException(new Message("XSD_VALIDATION_ERROR", LOG,
-                                                               errorBuilder.toString()));
         }
     }
 
@@ -639,7 +572,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
             }
         }
-        sendEvent(Event.INTERFACE_CREATED, intf, getServiceClass());
     }
 
     protected void initializeWSDLOperation(InterfaceInfo intf, OperationInfo o, Method method) {
@@ -650,7 +582,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             : CastUtils.cast(op.getParameterOrdering(), String.class))) {
             bindOperation(o, method);
             o.setProperty(ReflectionServiceFactoryBean.METHOD, method);
-            sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
         } else {
             LOG.log(Level.WARNING, "NO_METHOD_FOR_OP", o.getName());
         }
@@ -663,7 +594,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
      * @param method
      */
     protected boolean initializeClassInfo(OperationInfo o, Method method, List<String> paramOrder) {
-        OperationInfo origOp = o;
         if (isWrapped(method)) {
             if (o.getUnwrappedOperation() == null) {
                 //the "normal" algorithm didn't allow for unwrapping,
@@ -712,7 +642,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 return false;
             }
         }
-        sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, origOp, method, origOp.getInput());
+
         // Initialize return type
         Class paramType = method.getReturnType();
         Type genericType = method.getGenericReturnType();
@@ -720,9 +650,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (o.hasOutput()
             && !initializeParameter(o, method, -1, paramType, genericType)) {
             return false;
-        }
-        if (origOp.hasOutput()) {
-            sendEvent(Event.OPERATIONINFO_OUT_MESSAGE_SET, origOp, method, origOp.getOutput());
         }
 
         setFaultClassInfo(o, method);
@@ -815,7 +742,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                         && name.getNamespaceURI().equals(ns)) {
                         fi.setProperty(Class.class.getName(), exClass);
                         mpi.setTypeClass(beanClass);
-                        sendEvent(Event.OPERATIONINFO_FAULT, o, exClass, fi);
                     }
                 }
             }
@@ -855,7 +781,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 createOperation(serviceInfo, intf, m);
             }
         }
-        sendEvent(Event.INTERFACE_CREATED, intf, getServiceClass());
+
         return intf;
     }
 
@@ -907,7 +833,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         bindOperation(op, m);
 
-        sendEvent(Event.INTERFACE_OPERATION_BOUND, op, m);
         return op;
     }
     
@@ -1423,8 +1348,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 part.setIndex(j);
             }
         }
-        sendEvent(Event.OPERATIONINFO_IN_MESSAGE_SET, op, method, inMsg);
-        
+
         boolean hasOut = hasOutMessage(method);
         if (hasOut) {
             // Setup the output message
@@ -1497,7 +1421,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     }
                 }
             }
-            sendEvent(Event.OPERATIONINFO_OUT_MESSAGE_SET, op, method, outMsg);
         }
         
         //setting the parameterOrder that
@@ -1946,7 +1869,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             .getSimpleName()));
         mpi.setElementQName(faultName);
         mpi.setTypeClass(beanClass);
-        sendEvent(Event.OPERATIONINFO_FAULT, op, exClass, fi);
         return fi;
     }
 
@@ -2395,18 +2317,5 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
     public void setFeatures(List<AbstractFeature> f) {
         this.features = f;
-    }
-
-    private boolean isValidate() {
-        return validate || System.getProperty("cxf.validateServiceSchemas", "false").equals("true");
-    }
-
-    /**
-     * If 'validate' is true, this class will validate the service. It will report problems
-     * with the service model and the XML schema for the service.
-     * @param validate
-     */
-    public void setValidate(boolean validate) {
-        this.validate = validate;
     }
 }

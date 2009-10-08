@@ -178,8 +178,8 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     }
     
     @Resource(name = "org.apache.cxf.workqueue.WorkQueueManager")
-    public void setManager(WorkQueueManager mgr) {
-        manager = (WorkQueueManagerImpl)mgr;
+    public void setManager(WorkQueueManagerImpl mgr) {
+        manager = mgr;
     }
     public WorkQueueManager getManager() {
         return manager;

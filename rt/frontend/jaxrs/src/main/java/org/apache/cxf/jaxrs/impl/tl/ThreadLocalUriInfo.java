@@ -39,7 +39,14 @@ public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
         return get().getAbsolutePathBuilder();
     }
 
-    
+    public List<String> getAncestorResourceURIs() {
+        return get().getAncestorResourceURIs();
+    }
+
+    public List<Object> getAncestorResources() {
+        return get().getAncestorResources();
+    }
+
     public URI getBaseUri() {
         return get().getBaseUri();
     }
@@ -88,16 +95,16 @@ public class ThreadLocalUriInfo extends AbstractThreadLocalProxy<UriInfo>
         return get().getPathParameters(decode);
     }
 
-    public List<Object> getMatchedResources() {
-        return get().getMatchedResources();
+    public List<String> getAncestorResourceURIs(boolean decode) {
+        return get().getAncestorResourceURIs(decode);
     }
 
-    public List<String> getMatchedURIs() {
-        return get().getMatchedURIs();
+    public String getPathExtension() {
+        return get().getPathExtension();
     }
 
-    public List<String> getMatchedURIs(boolean decode) {
-        return get().getMatchedURIs(decode);
+    public UriBuilder getPlatonicRequestUriBuilder() {
+        return get().getPlatonicRequestUriBuilder();
     }
 
 }

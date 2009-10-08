@@ -89,32 +89,31 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
         boolean supportsNode = this.supportsDataReader(message, Node.class);
         for (SoapHeaderInfo header : headers) {
             MessagePartInfo mpi = header.getPart();
-            if (mpi.getTypeClass() != null) {
-
-                Header param = findHeader(message, mpi);
+            Header param = findHeader(message, mpi);
+            
+            Object object = null;
+            if (param != null) {
+                message.getHeaders().remove(param);
                 
-                Object object = null;
-                if (param != null) {
-                    message.getHeaders().remove(param);
-                    
-                    if (param.getDataBinding() == null) {
-                        Node source = (Node)param.getObject();
-                        if (supportsNode) {
-                            object = getNodeDataReader(message).read(mpi, source);
-                        } else {
-                            W3CDOMStreamReader reader = new W3CDOMStreamReader((Element)source);
-                            try {
-                                reader.nextTag(); //advance into the first tag
-                            } catch (XMLStreamException e) {
-                                //ignore
-                            } 
-                            object = getDataReader(message, XMLStreamReader.class).read(mpi, reader);
-                        }
+                if (param.getDataBinding() == null) {
+                    Node source = (Node)param.getObject();
+                    if (supportsNode) {
+                        object = getNodeDataReader(message).read(mpi, source);
                     } else {
-                        object = param.getObject();
+                        W3CDOMStreamReader reader = new W3CDOMStreamReader((Element)source);
+                        try {
+                            reader.nextTag(); //advance into the first tag
+                        } catch (XMLStreamException e) {
+                            //ignore
+                        } 
+                        object = getDataReader(message, XMLStreamReader.class).read(mpi, reader);
                     }
-                    
+                } else {
+                    object = param.getObject();
                 }
+                
+            }
+            if (mpi.getTypeClass() != null) {
                 parameters.put(mpi, object);
             }
         }

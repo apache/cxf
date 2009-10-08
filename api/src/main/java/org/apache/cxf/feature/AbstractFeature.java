@@ -43,10 +43,6 @@ public abstract class AbstractFeature {
         initializeProvider(client, bus);
     }
     
-    public void initialize(InterceptorProvider interceptorProvider, Bus bus) {
-        initializeProvider(interceptorProvider, bus);
-    }
-    
     public void initialize(Bus bus) {
         initializeProvider(bus, bus);
     }

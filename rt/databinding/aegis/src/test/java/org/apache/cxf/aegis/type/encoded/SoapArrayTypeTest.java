@@ -24,7 +24,7 @@ import java.util.Arrays;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.junit.Test;
@@ -125,23 +125,12 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
         assertArrayEquals(Arrays.asList(objects).toString(),
                           new Object[]{42, new BigDecimal("42.42"), "Forty Two"},
                           objects);
-    }
-    
-    @Test
-    public void testUrTypeArrayReadWriteRef1() throws Exception {
-        Object[] objects;
+
         // round trip tests
         objects = readWriteReadRef("arrayUrType1.xml", Object[].class);
         assertArrayEquals(new Object[]{42, new Float(42.42f), "Forty Two"}, objects);
-    }
-
-    @Test
-    public void testUrTypeArrayReadWriteRef2() throws Exception {
-        Object[] objects;
-        // round trip tests
         objects = readWriteReadRef("arrayUrType2.xml", Object[].class);
         assertArrayEquals(new Object[]{42, new BigDecimal("42.42"), "Forty Two"}, objects);
-        
     }
 
     @Test
@@ -326,7 +315,7 @@ public class SoapArrayTypeTest extends AbstractEncodedTest {
     }
 
     private SoapArrayType createArrayType(Class<?> typeClass, QName schemaType) {
-        AegisType type = mapping.getType(typeClass);
+        Type type = mapping.getType(typeClass);
         if (type != null) {
             return (SoapArrayType) type;
         }

@@ -32,7 +32,6 @@ import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
 import org.springframework.context.ApplicationContext;
@@ -43,14 +42,12 @@ public class ClientProxyFactoryBeanDefinitionParser
 
     public ClientProxyFactoryBeanDefinitionParser() {
         super();
-        setBeanClass(SpringClientProxyFactoryBean.class);
+        setBeanClass(Object.class);
     }
+
     @Override
     protected Class getFactoryClass() {
         return SpringClientProxyFactoryBean.class;
-    }
-    protected Class getRawFactoryClass() {
-        return ClientProxyFactoryBean.class;
     }
 
     @Override
@@ -91,7 +88,7 @@ public class ClientProxyFactoryBeanDefinitionParser
     }
     
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
-        implements ApplicationContextAware, FactoryBean {
+        implements ApplicationContextAware {
 
         public SpringClientProxyFactoryBean() {
             super();
@@ -106,15 +103,6 @@ public class ClientProxyFactoryBeanDefinitionParser
                 BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
                 setBus(bus);
             }
-        }
-        public Object getObject() throws Exception {
-            return create();
-        }
-        public Class getObjectType() {
-            return this.getServiceClass();
-        }
-        public boolean isSingleton() {
-            return false;
         }
     }
 }

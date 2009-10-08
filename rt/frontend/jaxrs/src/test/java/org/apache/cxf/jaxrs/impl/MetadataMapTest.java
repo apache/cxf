@@ -82,8 +82,7 @@ public class MetadataMapTest extends Assert {
         m2.remove("baz");
     }
     
-    @Test
-    public void testGetCaseInsensitive() {
+    public void testCaseInsensitive() {
         MetadataMap<String, Object> m = new MetadataMap<String, Object>();
         m.add("Baz", "bar");
         MetadataMap<String, Object> m2 = new MetadataMap<String, Object>(m, true, true);
@@ -91,11 +90,5 @@ public class MetadataMapTest extends Assert {
         assertEquals("bar", m2.getFirst("Baz"));
         assertTrue(m2.containsKey("BaZ"));
         assertTrue(m2.containsKey("Baz"));
-        List<Object> values = m2.get("baz");
-        assertEquals(1, values.size());
-        assertEquals("bar", values.get(0).toString());
     }
-    
-    
-    
 }

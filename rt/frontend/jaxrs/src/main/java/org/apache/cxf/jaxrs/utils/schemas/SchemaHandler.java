@@ -34,11 +34,8 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 
-import org.apache.cxf.Bus;
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 public class SchemaHandler {
 
@@ -46,25 +43,20 @@ public class SchemaHandler {
     private static final String CLASSPATH_PREFIX = "classpath:";
     
     private Schema schema;
-    private Bus bus;
     
     public SchemaHandler() {
         
     }
     
-    public void setBus(Bus b) {
-        bus = b;
-    }
-    
     public void setSchemas(List<String> locations) {
-        schema = createSchema(locations, bus == null ? BusFactory.getThreadDefaultBus() : bus);
+        schema = createSchema(locations);
     }
     
     public Schema getSchema() {
         return schema;
     }
     
-    public static Schema createSchema(List<String> locations, Bus bus) {
+    public static Schema createSchema(List<String> locations) {
         
         SchemaFactory factory = SchemaFactory.newInstance(WSDLConstants.NS_SCHEMA_XSD);
         Schema s = null;
@@ -73,8 +65,8 @@ public class SchemaHandler {
             for (String loc : locations) {
                 InputStream is = null;
                 if (loc.startsWith(CLASSPATH_PREFIX)) {
-                    String path = loc.substring(CLASSPATH_PREFIX.length());
-                    is = ResourceUtils.getClasspathResourceStream(path, SchemaHandler.class, bus);
+                    String path = loc.substring(CLASSPATH_PREFIX.length() + 1);
+                    is = SchemaHandler.class.getClassLoader().getResourceAsStream(path);
                     if (is == null) {
                         LOG.warning("No schema resource " + loc + " is available on classpath");
                         return null;

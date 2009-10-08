@@ -22,11 +22,12 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
 public class Layout extends AbstractSecurityAssertion {
-    private SPConstants.Layout value = SPConstants.Layout.Lax;
+
+    private String value = SPConstants.LAYOUT_LAX;
 
     public Layout(SPConstants version) {
         super(version);
@@ -35,50 +36,66 @@ public class Layout extends AbstractSecurityAssertion {
     /**
      * @return Returns the value.
      */
-    public SPConstants.Layout getValue() {
+    public String getValue() {
         return value;
     }
 
     /**
      * @param value The value to set.
      */
-    public void setValue(SPConstants.Layout value) {
-        this.value = value;
+    public void setValue(String value) {
+        if (SPConstants.LAYOUT_LAX.equals(value) || SPConstants.LAYOUT_STRICT.equals(value)
+            || SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST.equals(value)
+            || SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(value)) {
+            this.value = value;
+        } else {
+            // throw new WSSPolicyException("Incorrect layout value : " +
+            // value);
+        }
     }
 
-    public QName getRealName() {
+    public QName getName() {
         return constants.getLayout();
     }
-    public QName getName() {
-        return SP12Constants.INSTANCE.getLayout();
+
+    public PolicyComponent normalize() {
+        throw new UnsupportedOperationException();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localName = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localName = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
 
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
         // <sp:Layout>
         writer.writeStartElement(prefix, localName, namespaceURI);
-        String wspPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
-        if (wspPrefix == null) {
-            wspPrefix = SPConstants.POLICY.getPrefix();
-            writer.setPrefix(wspPrefix, SPConstants.POLICY.getNamespaceURI());
-        }
 
         // <wsp:Policy>
-        writer.writeStartElement(wspPrefix, SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         // .. <sp:Strict /> | <sp:Lax /> | <sp:LaxTsFirst /> | <sp:LaxTsLast /> ..
-        writer.writeEmptyElement(prefix, value.name(), namespaceURI);
+        if (SPConstants.LAYOUT_STRICT.equals(value)) {
+            writer.writeStartElement(prefix, SPConstants.LAYOUT_STRICT, namespaceURI);
+
+        } else if (SPConstants.LAYOUT_LAX.equals(value)) {
+            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX, namespaceURI);
+
+        } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST.equals(value)) {
+            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST, namespaceURI);
+
+        } else if (SPConstants.LAYOUT_LAX_TIMESTAMP_LAST.equals(value)) {
+            writer.writeStartElement(prefix, SPConstants.LAYOUT_LAX_TIMESTAMP_LAST, namespaceURI);
+        }
+
+        writer.writeEndElement();
 
         // </wsp:Policy>
         writer.writeEndElement();

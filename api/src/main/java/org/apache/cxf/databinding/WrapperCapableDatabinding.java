@@ -20,15 +20,12 @@ package org.apache.cxf.databinding;
 
 import java.util.List;
 
-import javax.xml.namespace.QName;
-
 /**
  *  To create the WrapperHelper instance for the wrapper capable data binding
  */
 public interface WrapperCapableDatabinding {
         
     WrapperHelper createWrapperHelper(Class<?> wrapperType,
-                                      QName typeName,
                                       List<String> partNames,
                                       List<String> elTypeNames,
                                       List<Class<?>> partClasses);

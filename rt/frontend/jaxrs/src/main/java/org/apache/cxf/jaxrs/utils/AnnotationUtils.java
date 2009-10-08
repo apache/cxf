@@ -28,16 +28,16 @@ import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.DefaultValue;
-import javax.ws.rs.FormParam;
+import javax.ws.rs.Encoded;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -45,9 +45,10 @@ import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.Providers;
+import javax.ws.rs.ext.MessageBodyWorkers;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 
 public final class AnnotationUtils {
     
@@ -71,7 +72,7 @@ public final class AnnotationUtils {
         classes.add(SecurityContext.class);
         classes.add(HttpHeaders.class);
         classes.add(ContextResolver.class);
-        classes.add(Providers.class);
+        classes.add(MessageBodyWorkers.class);
         classes.add(Request.class);
         classes.add(HttpServletRequest.class);
         classes.add(HttpServletResponse.class);
@@ -89,7 +90,6 @@ public final class AnnotationUtils {
         classes.add(MatrixParam.class);
         classes.add(HeaderParam.class);
         classes.add(CookieParam.class);
-        classes.add(FormParam.class);
         return classes;
     }
     
@@ -97,8 +97,8 @@ public final class AnnotationUtils {
         Set<Class> classes = new HashSet<Class>();
         classes.add(HttpMethod.class);
         classes.add(Path.class);
-        classes.add(Produces.class);
-        classes.add(Consumes.class);
+        classes.add(ProduceMime.class);
+        classes.add(ConsumeMime.class);
         return classes;
     }
     
@@ -110,14 +110,14 @@ public final class AnnotationUtils {
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass);
     }
     
-    public static boolean isValidParamAnnotationClass(Class<?> annotationClass) { 
+    public static boolean isMethodParamAnnotationClass(Class<?> annotationClass) { 
         return PARAM_ANNOTATION_CLASSES.contains(annotationClass)
                || Context.class == annotationClass;
     }
     
-    public static boolean isValidParamAnnotations(Annotation[] paramAnnotations) {
+    public static boolean isMethodParamAnnotations(Annotation[] paramAnnotations) {
         for (Annotation a : paramAnnotations) {
-            if (AnnotationUtils.isValidParamAnnotationClass(a.annotationType())) {
+            if (AnnotationUtils.isMethodParamAnnotationClass(a.annotationType())) {
                 return true;
             }
         }
@@ -130,30 +130,28 @@ public final class AnnotationUtils {
     }
     
     public static String getAnnotationValue(Annotation a) {
-        String value = null;
         if (a.annotationType() == PathParam.class) {
-            value = ((PathParam)a).value();
+            return ((PathParam)a).value();
         } else if (a.annotationType() == QueryParam.class) {
-            value = ((QueryParam)a).value();
+            return ((QueryParam)a).value();
         } else if (a.annotationType() == MatrixParam.class) {
-            value = ((MatrixParam)a).value();
+            return ((MatrixParam)a).value();
         } else if (a.annotationType() == HeaderParam.class) {
-            value = ((HeaderParam)a).value();
+            return ((HeaderParam)a).value();
         } else if (a.annotationType() == CookieParam.class) {
-            value = ((CookieParam)a).value();
-        } else if (a.annotationType() == FormParam.class) {
-            value = ((FormParam)a).value();
+            return ((CookieParam)a).value();
         }
-        return value;
+        return null;
     }
     
+    @SuppressWarnings("unchecked")
     public static <T> T getAnnotation(Annotation[] anns, Class<T> type) { 
         if (anns == null) {
             return null;
         }
         for (Annotation a : anns) {    
             if (a.annotationType() == type) {
-                return type.cast(a);
+                return (T)a;
             }
         }
         return null;
@@ -176,7 +174,7 @@ public final class AnnotationUtils {
             }        
         }
         for (Annotation[] paramAnnotations : m.getParameterAnnotations()) {
-            if (isValidParamAnnotations(paramAnnotations)) {
+            if (isMethodParamAnnotations(paramAnnotations)) {
                 return m;
             }
         }
@@ -218,17 +216,17 @@ public final class AnnotationUtils {
         return null;
     }
     
-    public static <A extends Annotation> A getMethodAnnotation(Method m,
-                                                 Class<A> aClass) {
+    public static Annotation getMethodAnnotation(Method m,
+                                                 Class<? extends Annotation> aClass) {
         return m == null ? null : m.getAnnotation(aClass);
     }
     
-    public static <A extends Annotation> A getClassAnnotation(Class<?> c,
-                                                              Class<A> aClass) { 
+    public static Annotation getClassAnnotation(Class<?> c, 
+                                                Class<? extends Annotation> aClass) {
         if (c == null) {
             return null;
         }
-        A p = c.getAnnotation(aClass);
+        Annotation p = c.getAnnotation(aClass);
         if (p != null) {
             return p;
         }
@@ -248,10 +246,28 @@ public final class AnnotationUtils {
         return null;
     }
     
-    public static String getDefaultParameterValue(Annotation[] anns) {
+    public static boolean isEncoded(Annotation[] anns, OperationResourceInfo ori) {
+        
+        if (AnnotationUtils.getAnnotation(anns, Encoded.class) != null) {
+            return true;
+        }
+        
+        if (ori == null) {
+            return false;
+        }
+        return ori.isEncodedEnabled();
+    }
+    
+    public static String getDefaultParameterValue(Annotation[] anns, OperationResourceInfo ori) {
         
         DefaultValue dv = AnnotationUtils.getAnnotation(anns, DefaultValue.class);
-        return dv != null ? dv.value() : null;
+        if (dv != null) {
+            return dv.value();
+        }
         
+        if (ori == null) {
+            return null;
+        }
+        return ori.getDefaultParameterValue();
     }
 }

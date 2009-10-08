@@ -19,7 +19,7 @@
 package org.apache.cxf.aegis.type.basic;
 
 import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
@@ -28,7 +28,7 @@ import org.apache.cxf.aegis.xml.MessageWriter;
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class ByteType extends AegisType {
+public class ByteType extends Type {
     @Override
     public Object readObject(MessageReader reader, Context context) {
         return new Byte(reader.getValue().trim());

@@ -22,34 +22,30 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
-    <bean id="org.apache.cxf.ws.policy.AssertionBuilderRegistry" 
-    	class="org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl" lazy-init="true">
-    	<constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.ws.policy.AssertionBuilderRegistry" class="org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl">
         <constructor-arg>
             <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
               <property name="type" value="org.apache.cxf.ws.policy.AssertionBuilder"/>
               <property name="idsProperty" value="knownElements"/>
-              <property name="staticFieldName"  value="KNOWN_ELEMENTS"/>
             </bean>
         </constructor-arg>
+        <property name="bus" ref="cxf"/>
     </bean>
     
-    <bean id="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry"
-    	class="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistryImpl"
-    	lazy-init="true">
-    	<constructor-arg ref="cxf"/>
+    <bean class="org.apache.cxf.ws.policy.PolicyConstants"
+	  id="org.apache.cxf.ws.policy.PolicyConstants"/>
+    
+    <bean id="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry" class="org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistryImpl">
         <constructor-arg>
             <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
               <property name="type" value="org.apache.cxf.ws.policy.PolicyInterceptorProvider"/>
               <property name="idsProperty" value="assertionTypes"/>
-              <property name="staticFieldName"  value="ASSERTION_TYPES"/>
             </bean>
         </constructor-arg>
     </bean>   
     
     <bean id="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry" 
-          class="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry"
-          lazy-init="true">
+          class="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilderRegistry">
         <constructor-arg>
             <bean class="org.apache.cxf.configuration.spring.SpringBeanQNameMap">
               <property name="type" value="org.apache.cxf.ws.policy.attachment.external.DomainExpressionBuilder"/>
@@ -59,44 +55,32 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     </bean>   
     
     <bean class="org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder"
-	  id="org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder"
-	  lazy-init="true"/> 
+	  id="org.apache.cxf.ws.policy.attachment.external.EndpointReferenceDomainExpressionBuilder"/> 
     
-    <bean id="org.apache.cxf.ws.policy.PolicyBuilder" 
-    	class="org.apache.cxf.ws.policy.PolicyBuilderImpl"
-    	lazy-init="true">
+    <bean id="org.apache.cxf.ws.policy.PolicyBuilder" class="org.apache.cxf.ws.policy.PolicyBuilderImpl">
         <property name="bus" ref="cxf"/>
         <property name="assertionBuilderRegistry" ref="org.apache.cxf.ws.policy.AssertionBuilderRegistry"/>
     </bean>
   
-    <bean id="org.apache.cxf.ws.policy.PolicyEngine" 
-    	class="org.apache.cxf.ws.policy.PolicyEngineImpl"
-    	lazy-init="false">
-    	<!--
-    		cannot be lazy init as it needs to add functionality to the bus
-    		that would query the above beans as needed if policies are 
-    		found
-    	 -->
-       <constructor-arg ref="cxf"/>
+    <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.spring.InitializingPolicyEngine">
+       <property name="bus" ref="cxf"/>
     </bean>
     
     <bean class="org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider"
-	  id="org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider"
-	  lazy-init="true">
+	  id="org.apache.cxf.ws.policy.attachment.wsdl11.Wsdl11AttachmentPolicyProvider">
         <constructor-arg ref="cxf"/>
     </bean>
         
     <bean class="org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider"
-	  id="org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider"
-	  lazy-init="true">
+	  id="org.apache.cxf.ws.policy.attachment.ServiceModelPolicyProvider">
         <constructor-arg ref="cxf"/>
     </bean>
     
     <!-- MTOM Policy Support -->
     <bean class="org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder"
-	  id="org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder"
-	  lazy-init="true"/>
+	  id="org.apache.cxf.ws.policy.mtom.MTOMAssertionBuilder">
+        <property name="bus" ref="cxf"/>
+    </bean>
     <bean class="org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider"
-	  id="org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider"
-	  lazy-init="true"/>
+	  id="org.apache.cxf.ws.policy.mtom.MTOMPolicyInterceptorProvider"/>
 </beans>

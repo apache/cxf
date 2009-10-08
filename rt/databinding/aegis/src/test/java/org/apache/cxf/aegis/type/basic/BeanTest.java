@@ -23,32 +23,26 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamReader;
 
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.Attr;
+import org.w3c.dom.NodeList;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.services.SimpleBean;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeMapping;
+import org.apache.cxf.aegis.util.jdom.StaxBuilder;
+import org.apache.cxf.aegis.xml.jdom.JDOMReader;
+import org.apache.cxf.aegis.xml.jdom.JDOMWriter;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.cxf.helpers.DOMUtils;
-import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaAttribute;
-import org.apache.ws.commons.schema.XmlSchemaComplexType;
-import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.jdom.Document;
+import org.jdom.Element;
 import org.junit.Test;
 
 public class BeanTest extends AbstractAegisTest {
@@ -63,9 +57,6 @@ public class BeanTest extends AbstractAegisTest {
         addNamespace("a", "urn:anotherns");
         addNamespace("xsi", SOAPConstants.XSI_NS);
 
-    }
-
-    private void defaultContext() {
         context = new AegisContext();
         context.initialize();
         mapping = context.getTypeMapping();
@@ -73,7 +64,6 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testBean() throws Exception {
-        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
@@ -105,15 +95,16 @@ public class BeanTest extends AbstractAegisTest {
         bean.setBleh("bleh");
 
         // Test writing
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         assertValid("/b:root/b:bleh[text()='bleh']", element);
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
-
+    
     @Test
     public void testBeanWithXsiType() throws Exception {
-        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
@@ -130,7 +121,10 @@ public class BeanTest extends AbstractAegisTest {
 
         reader.getXMLStreamReader().close();
 
-        Element element = writeObjectToElement(type, bean, getContext());
+        // Test writing
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         assertValid("/b:root/b:bleh[text()='bleh']", element);
         assertValid("/b:root/b:howdy[text()='howdy']", element);
@@ -138,8 +132,6 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testUnmappedProperty() throws Exception {
-        
-        defaultContext();
         String ns = "urn:Bean";
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, ns, false);
 
@@ -162,15 +154,17 @@ public class BeanTest extends AbstractAegisTest {
 
         reader.getXMLStreamReader().close();
 
-        Element element = writeObjectToElement(type, bean, getContext());
+        // Test writing
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         assertInvalid("/b:root/b:bleh", element);
         assertValid("/b:root/b:howdycustom[text()='howdy']", element);
     }
-    
+
     @Test
     public void testAttributeMap() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.mapAttribute("howdy", new QName("urn:Bean", "howdy"));
         info.mapAttribute("bleh", new QName("urn:Bean", "bleh"));
@@ -190,35 +184,27 @@ public class BeanTest extends AbstractAegisTest {
         reader.getXMLStreamReader().close();
 
         // Test writing
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
+
         assertValid("/b:root[@b:bleh='bleh']", element);
         assertValid("/b:root[@b:howdy='howdy']", element);
-        
-        XmlSchema schema = newXmlSchema("urn:Bean");
+
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
         type.writeSchema(schema);
-        
-        XmlSchemaComplexType stype = (XmlSchemaComplexType)schema.getTypeByName("bean");
-        boolean howdy = false;
-        boolean bleh = false;
-        for (int x = 0; x < stype.getAttributes().getCount(); x++) {
-            XmlSchemaObject o = stype.getAttributes().getItem(x);
-            if (o instanceof XmlSchemaAttribute) {
-                XmlSchemaAttribute a = (XmlSchemaAttribute)o;
-                if ("howdy".equals(a.getName())) {
-                    howdy = true;
-                }
-                if ("bleh".equals(a.getName())) {
-                    bleh = true;
-                }
-            }
-        }
-        assertTrue(howdy);
-        assertTrue(bleh);
+
+        assertValid("//xsd:complexType[@name='bean']/xsd:attribute[@name='howdy']", schema);
+        assertValid("//xsd:complexType[@name='bean']/xsd:attribute[@name='bleh']", schema);
     }
 
     @Test
     public void testAttributeMapDifferentNS() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.mapAttribute("howdy", new QName("urn:Bean2", "howdy"));
         info.mapAttribute("bleh", new QName("urn:Bean2", "bleh"));
@@ -247,8 +233,9 @@ public class BeanTest extends AbstractAegisTest {
 
         bos.close();
         
-        Document doc = DOMUtils.readXml(new ByteArrayInputStream(bos.toByteArray()));
-        Element element = doc.getDocumentElement();
+        StaxBuilder builder = new StaxBuilder();
+        Document doc = builder.build(new ByteArrayInputStream(bos.toByteArray()));
+        Element element = doc.getRootElement();
 
         addNamespace("b2", "urn:Bean2");
         assertValid("/b:root[@b2:bleh='bleh']", element);
@@ -257,7 +244,6 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testNullProperties() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
         info.mapAttribute("howdy", new QName("urn:Bean", "howdy"));
@@ -271,47 +257,27 @@ public class BeanTest extends AbstractAegisTest {
         SimpleBean bean = new SimpleBean();
 
         // Test writing
-        
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         assertInvalid("/b:root[@b:howdy]", element);
         assertValid("/b:root/b:bleh[@xsi:nil='true']", element);
 
-        XmlSchema schema = newXmlSchema("urn:Bean");
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
         type.writeSchema(schema);
-        
-        XmlSchemaComplexType stype = (XmlSchemaComplexType)schema.getTypeByName("bean");
-        XmlSchemaSequence seq = (XmlSchemaSequence) stype.getParticle();
-        boolean howdy = false;
-        boolean bleh = false;
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement a = (XmlSchemaElement)o;
-                if ("bleh".equals(a.getName())) {
-                    bleh = true;
-                }
-            }
-        }
-
-        for (int x = 0; x < stype.getAttributes().getCount(); x++) {
-            XmlSchemaObject o = stype.getAttributes().getItem(x);
-            if (o instanceof XmlSchemaAttribute) {
-                XmlSchemaAttribute a = (XmlSchemaAttribute)o;
-                if ("howdy".equals(a.getName())) {
-                    howdy = true;
-                }
-            }
-        }
-
-        assertTrue(howdy);
-        assertTrue(bleh);
+        assertValid("//xsd:complexType[@name='bean']/xsd:attribute[@name='howdy']", schema);
+        assertValid("//xsd:complexType[@name='bean']/xsd:sequence/xsd:element[@name='bleh']", schema);
     }
     
     @Test
     public void testNillableInt() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(IntBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -320,75 +286,27 @@ public class BeanTest extends AbstractAegisTest {
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
-        XmlSchema schema = newXmlSchema("urn:Bean");
-        type.writeSchema(schema);
-        
-        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("bean");
-        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
-        boolean int1ok = false;
-        boolean int2ok = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement oe = (XmlSchemaElement) o;
-                if ("int1".equals(oe.getName())) {
-                    int1ok = true;
-                    assertTrue(oe.isNillable());
-                    assertEquals(0, oe.getMinOccurs());
-                } else if ("int2".equals(oe.getName())) {
-                    int2ok = true;
-                    assertEquals(0, oe.getMinOccurs());
-                    assertFalse(oe.isNillable());
-                }
-            }
-        }
-        assertTrue(int1ok);
-        assertTrue(int2ok);
-    }
-    
-    @Test
-    public void testNillableAnnotation() throws Exception {
-        context = new AegisContext();
-        TypeCreationOptions config = new TypeCreationOptions();
-        config.setDefaultNillable(false);
-        config.setDefaultMinOccurs(1);
-        context.setTypeCreationOptions(config);
-        context.initialize();
-        mapping = context.getTypeMapping();
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
 
-        BeanType type = (BeanType)mapping.getTypeCreator().createType(BeanWithNillableItem.class);
-        type.setTypeClass(BeanWithNillableItem.class);
-        type.setTypeMapping(mapping);
+        new Document(types);
 
-        XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
-        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("BeanWithNillableItem");
-        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
-        boolean itemFound = false;
-        boolean itemNotNillableFound = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement oe = (XmlSchemaElement) o;
-                if ("item".equals(oe.getName())) {
-                    itemFound = true;
-                    assertTrue(oe.isNillable());
-                    assertEquals(0, oe.getMinOccurs());
-                } else if ("itemNotNillable".equals(oe.getName())) {
-                    itemNotNillableFound = true;
-                    assertFalse(oe.isNillable());
-                }
-            }
-        }
-        assertTrue(itemFound);
-        assertTrue(itemNotNillableFound);
+
+        assertValid("//xsd:complexType[@name='bean']/xsd:sequence/xsd:element[@name='int1']"
+                    + "[@nillable='true'][@minOccurs='0']",
+                    schema);
+        assertValid("//xsd:complexType[@name='bean']/xsd:sequence/xsd:element[@name='int2'][@minOccurs='0']",
+                    schema);
+        assertInvalid("//xsd:complexType[@name='bean']/xsd:sequence"
+                        + "/xsd:element[@name='int2'][@nillable='true']",
+                      schema);
     }
-    
-    
     @Test
     public void testNillableIntMinOccurs1() throws Exception {
         context = new AegisContext();
+
         TypeCreationOptions config = new TypeCreationOptions();
         config.setDefaultMinOccurs(1);
         config.setDefaultNillable(false);
@@ -400,95 +318,98 @@ public class BeanTest extends AbstractAegisTest {
         type.setTypeClass(IntBean.class);
         type.setTypeMapping(mapping);
 
-        XmlSchema schema = newXmlSchema("urn:Bean");
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
         type.writeSchema(schema);
-        
-        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("IntBean");
-        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
-        boolean int1ok = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement oe = (XmlSchemaElement) o;
-                if ("int1".equals(oe.getName())) {
-                    int1ok = true;
-                    assertFalse(oe.isNillable());
-                    assertEquals(1, oe.getMinOccurs());
-                } 
-            }
-        }
-        assertTrue(int1ok);
+
+        assertValid("//xsd:complexType[@name='IntBean']/xsd:sequence/xsd:element[@name='int1']", schema);
+        assertInvalid(
+                      "//xsd:complexType[@name='IntBean']/xsd:sequence/xsd:element[@name='int1'][@minOccurs]",
+                      schema);
+        assertInvalid("//xsd:complexType[@name='IntBean']/xsd:sequence/xsd:element[@name='int1'][@nillable]",
+                      schema);
     }
     
     @Test
     public void testCharMappings() throws Exception {
-        defaultContext();
+        context = new AegisContext();
+        context.initialize();
+        mapping = context.getTypeMapping();
 
         BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
-        
-        XmlSchema schema = newXmlSchema("urn:Bean");
-        type.writeSchema(schema);
-        
-        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("SimpleBean");
-        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
-        boolean charok = false;
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement oe = (XmlSchemaElement) o;
-                if ("character".equals(oe.getName())) {
-                    charok = true;
-                    assertNotNull(oe.getSchemaTypeName());
-                    assertTrue(oe.isNillable());
-                    assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME, 
-                                 oe.getSchemaTypeName());
-                }
-            }
-        }
-        assertTrue(charok);
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
+
+        new Document(types);
+
+        type.writeSchema(schema);
+
+        NodeList typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='character']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        Attr typeAttr = (Attr)typeAttrNode.item(0);
+        String typeQnameString = typeAttr.getValue();
+        String[] pieces = typeQnameString.split(":");
+        assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getLocalPart(),
+                     pieces[1]);
     }
     
     @Test
     public void testByteMappings() throws Exception {
-        defaultContext();
+        context = new AegisContext();
+        context.initialize();
+        mapping = context.getTypeMapping();
 
         BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
 
-        XmlSchema schema = newXmlSchema("urn:Bean");
-        type.writeSchema(schema);
-        
-        XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("SimpleBean");
-        XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
-        boolean littleByteOk = false;
-        boolean bigByteOk = false;
+        Element types = new Element("types", "xsd", SOAPConstants.XSD);
+        Element schema = new Element("schema", "xsd", SOAPConstants.XSD);
+        types.addContent(schema);
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
-            if (o instanceof XmlSchemaElement) {
-                XmlSchemaElement oe = (XmlSchemaElement) o;
-                if ("littleByte".equals(oe.getName())) {
-                    littleByteOk = true;
-                    assertNotNull(oe.getSchemaTypeName());
-                    assertEquals(XmlSchemaConstants.BYTE_QNAME, oe.getSchemaTypeName());
-                } else if ("bigByte".equals(oe.getName())) {
-                    bigByteOk = true;
-                    assertNotNull(oe.getSchemaTypeName());
-                    assertEquals(XmlSchemaConstants.BYTE_QNAME, oe.getSchemaTypeName());
-                }
-            }
-        }
-        assertTrue(littleByteOk);
-        assertTrue(bigByteOk);
+        new Document(types);
+
+        type.writeSchema(schema);
+
+        NodeList typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='littleByte']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        Attr typeAttr = (Attr)typeAttrNode.item(0);
+        String typeQnameString = typeAttr.getValue();
+        String[] pieces = typeQnameString.split(":");
+        assertEquals("xsd", pieces[0]);
+        assertEquals("byte", pieces[1]);
         
+        typeAttrNode = 
+            assertValid("//xsd:complexType[@name='SimpleBean']/xsd:sequence/xsd:element[@name='bigByte']"
+                       + "/@type", 
+                       schema); 
+        assertEquals(1, typeAttrNode.getLength());
+        typeAttr = (Attr)typeAttrNode.item(0);
+        typeQnameString = typeAttr.getValue();
+        pieces = typeQnameString.split(":");
+        assertEquals("xsd", pieces[0]);
+        assertEquals("byte", pieces[1]);
+        
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
         SimpleBean bean = new SimpleBean();
         bean.setBigByte(new Byte((byte)0xfe));
         bean.setLittleByte((byte)0xfd);
-        Element element = writeObjectToElement(type, bean, getContext());
+        type.writeObject(bean, new JDOMWriter(element), getContext());
         Byte bb = new Byte((byte)0xfe);
         String bbs = bb.toString();
         assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
@@ -505,7 +426,6 @@ public class BeanTest extends AbstractAegisTest {
     
     @Test
     public void testNullNonNillableWithDate() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(DateBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -517,7 +437,9 @@ public class BeanTest extends AbstractAegisTest {
         DateBean bean = new DateBean();
 
         // Test writing
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         // Make sure the date doesn't have an element. Its non nillable so it
         // just
@@ -525,10 +447,8 @@ public class BeanTest extends AbstractAegisTest {
         assertInvalid("/b:root/b:date", element);
         assertValid("/b:root", element);
     }
-    
     @Test
     public void testExtendedBean() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(ExtendedBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -538,18 +458,19 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         PropertyDescriptor[] pds = info.getPropertyDescriptors();
-        assertEquals(9, pds.length);
+        assertEquals(8, pds.length);
 
         ExtendedBean bean = new ExtendedBean();
         bean.setHowdy("howdy");
 
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
+
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
-    
     @Test
     public void testByteBean() throws Exception {
-        defaultContext();
         BeanTypeInfo info = new BeanTypeInfo(ByteBean.class, "urn:Bean");
         info.setTypeMapping(mapping);
 
@@ -559,7 +480,7 @@ public class BeanTest extends AbstractAegisTest {
         type.setSchemaType(new QName("urn:Bean", "bean"));
 
         QName name = new QName("urn:Bean", "data");
-        AegisType dataType = type.getTypeInfo().getType(name);
+        Type dataType = type.getTypeInfo().getType(name);
         assertNotNull(dataType);
 
         assertTrue(type.getTypeInfo().isNillable(name));
@@ -567,7 +488,9 @@ public class BeanTest extends AbstractAegisTest {
         ByteBean bean = new ByteBean();
 
         // Test writing
-        Element element = writeObjectToElement(type, bean, getContext());
+        Element element = new Element("root", "b", "urn:Bean");
+        new Document(element);
+        type.writeObject(bean, new JDOMWriter(element), getContext());
 
         // Make sure the date doesn't have an element. Its non nillable so it
         // just
@@ -576,34 +499,32 @@ public class BeanTest extends AbstractAegisTest {
         addNamespace("xsi", SOAPConstants.XSI_NS);
         assertValid("/b:root/b:data[@xsi:nil='true']", element);
 
-        XMLStreamReader sreader = StaxUtils.createXMLStreamReader(element);
-        bean = (ByteBean)type.readObject(new ElementReader(sreader), getContext());
+        bean = (ByteBean)type.readObject(new JDOMReader(element), getContext());
         assertNotNull(bean);
         assertNull(bean.getData());
     }
     @Test
     public void testGetSetRequired() throws Exception {
-        defaultContext();
         BeanType type = new BeanType();
         type.setTypeClass(GoodBean.class);
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:foo", "BadBean"));
 
-        assertTrue(type.getTypeInfo().getElements().iterator().hasNext());
+        assertTrue(type.getTypeInfo().getElements().hasNext());
 
         type = new BeanType();
         type.setTypeClass(BadBean.class);
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:foo", "BadBean"));
 
-        assertFalse(type.getTypeInfo().getElements().iterator().hasNext());
+        assertFalse(type.getTypeInfo().getElements().hasNext());
 
         type = new BeanType();
         type.setTypeClass(BadBean2.class);
         type.setTypeMapping(mapping);
         type.setSchemaType(new QName("urn:foo", "BadBean2"));
 
-        assertFalse(type.getTypeInfo().getElements().iterator().hasNext());
+        assertFalse(type.getTypeInfo().getElements().hasNext());
     }
 
     public static class DateBean {
@@ -637,30 +558,6 @@ public class BeanTest extends AbstractAegisTest {
         public void setInt2(int int2) {
             this.int2 = int2;
         }
-    }
-    
-    public static class BeanWithNillableItem {
-        private IntBean item;
-        private Integer itemNotNillable;
-
-        @XmlElement(nillable = true)
-        public IntBean getItem() {
-            return item;
-        }
-
-        public void setItem(IntBean item) {
-            this.item = item;
-        }
-
-        public Integer getItemNotNillable() {
-            return itemNotNillable;
-        }
-
-        public void setItemNotNillable(Integer itemNotNillable) {
-            this.itemNotNillable = itemNotNillable;
-        }
-
-        
     }
 
     public static class ByteBean {

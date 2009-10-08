@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -35,6 +36,19 @@ public class URITemplateTest extends Assert {
     @Before
     public void setUp() throws Exception {
 
+    }
+
+    @Test
+    public void testUnlimited() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/customers/{id}", false);
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+        
+        assertTrue(uriTemplate.match("/customers/123", values));
+        assertEquals("123", values.getFirst("id"));
+        values.clear();
+  
+        assertTrue(uriTemplate.match("/customers/123/456", values));
+        assertEquals("123/456", values.getFirst("id"));
     }
 
     @Test
@@ -78,29 +92,6 @@ public class URITemplateTest extends Assert {
         assertTrue(uriTemplate.match("/customers;123456/123/orders;456/3", values));
         assertEquals("123", values.getFirst("id"));
         assertEquals("3", values.getFirst("order"));
-    }
-    
-    @Test
-    public void testMatchWithMultipleMatrixParams() throws Exception {
-        URITemplate uriTemplate = 
-            new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-
-        assertTrue(uriTemplate.match("renderwidget/id/1007/type/1/size/1/locale/en_US/properties;a=b", 
-                                     values));
-        assertEquals("1007", values.getFirst("id"));
-    }
-    
-    @Test
-    public void testMatchWithMultipleMatrixParams2() throws Exception {
-        URITemplate uriTemplate = 
-            new URITemplate("renderwidget/id/{id}/type/{type}/size/{size}/locale/{locale}/{properties}");
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-
-        assertTrue(uriTemplate.match(
-                   "renderwidget/id/1007/type/1/size/1/locale/en_US/properties;numResults=1;foo=bar", 
-                    values));
-        assertEquals("1007", values.getFirst("id"));
     }
 
     @Test
@@ -327,12 +318,12 @@ public class URITemplateTest extends Assert {
         List<String> list = Arrays.asList("bar", "baz", "blah");
         assertEquals("Wrong substitution", "/foo/bar/baz/blah", ut.substitute(list));
     }
-
+    
     @Test
     public void testSubstituteListIncomplete() throws Exception {
-        URITemplate ut = new URITemplate("/foo/{a}/{c}/{b}/{d:\\w}");
+        URITemplate ut = new URITemplate("/foo/{a}/{c}/{b}");
         List<String> list = Arrays.asList("bar", "baz");
-        assertEquals("Wrong substitution", "/foo/bar/baz/{b}/{d:\\w}", ut.substitute(list));
+        assertEquals("Wrong substitution", "/foo/bar/baz/{b}", ut.substitute(list));
     }
 
     @Test
@@ -396,86 +387,5 @@ public class URITemplateTest extends Assert {
         map.put("b", "baz");
         map.put("a", "blah");
         assertEquals("Wrong substitution", "/foo/blah", ut.substitute(map));
-    }
-
-    @Test
-    public void testVariables() {
-        URITemplate ut = new URITemplate("/foo/{a}/bar{c:\\d}{b:\\w}/{e}/{d}");
-        assertEquals(Arrays.asList("a", "c", "b", "e", "d"), ut.getVariables());
-        assertEquals(Arrays.asList("c", "b"), ut.getCustomVariables());
-    }
-
-    @Test
-    public void testTokenizerNoBraces() {
-        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("nobraces");
-        assertEquals("nobraces", tok.next());
-        assertFalse(tok.hasNext());
-    }
-
-    @Test
-    public void testTokenizerNoNesting() {
-        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar}baz");
-        assertEquals("foo", tok.next());
-        assertEquals("{bar}", tok.next());
-        assertEquals("baz", tok.next());
-        assertFalse(tok.hasNext());
-    }
-
-    @Test
-    public void testTokenizerNesting() {
-        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar{baz}}blah");
-        assertEquals("foo", tok.next());
-        assertEquals("{bar{baz}}", tok.next());
-        assertEquals("blah", tok.next());
-        assertFalse(tok.hasNext());
-    }
-
-    @Test
-    public void testTokenizerNoClosing() {
-        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo{bar}baz{blah");
-        assertEquals("foo", tok.next());
-        assertEquals("{bar}", tok.next());
-        assertEquals("baz", tok.next());
-        assertEquals("{blah", tok.next());
-        assertFalse(tok.hasNext());
-    }
-
-    @Test
-    public void testTokenizerNoOpening() {
-        CurlyBraceTokenizer tok = new CurlyBraceTokenizer("foo}bar}baz");
-        assertEquals("foo}bar}baz", tok.next());
-        assertFalse(tok.hasNext());
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void testUnclosedVariable() {
-        new URITemplate("/foo/{var/bar");
-    }
-
-    @Test
-    public void testUnopenedVariable() {
-        URITemplate ut = new URITemplate("/foo/var}/bar");
-        assertEquals("/foo/var}/bar", ut.getValue());
-    }
-
-    @Test
-    public void testNestedCurlyBraces() {
-        URITemplate ut = new URITemplate("/foo/{hex:[0-9a-fA-F]{2}}");
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("hex", "FF");
-        assertEquals("Wrong substitution", "/foo/FF", ut.substitute(map));
-    }
-    
-    @Test
-    public void testEncodeLiteralCharacters() {
-        URITemplate ut = new URITemplate("a {id} b");
-        assertEquals("a%20{id}%20b", ut.encodeLiteralCharacters());
-    }
-
-    @Test
-    public void testEncodeLiteralCharactersNotVariable() {
-        URITemplate ut = new URITemplate("a {digit:[0-9]} b");
-        System.out.println(ut.encodeLiteralCharacters());
-        assertEquals("a%20{digit:[0-9]}%20b", ut.encodeLiteralCharacters());
     }
 }

@@ -23,20 +23,14 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.lang.reflect.TypeVariable;
-import java.text.SimpleDateFormat;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.xml.stream.XMLStreamWriter;
@@ -47,12 +41,10 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
@@ -61,7 +53,6 @@ import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSOutInterceptor.class);
@@ -76,19 +67,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         try {
             processResponse(message);
         } finally {
-            Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
-            Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
-            if (rootInstance != null && rootProvider != null) {
-                try {
-                    ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
-                } catch (Throwable tex) {
-                    LOG.warning("Exception occurred during releasing the service instance, "
-                                + tex.getMessage());
-                }
-            }
             ProviderFactory.getInstance(message).clearThreadLocalProxies();
             ClassResourceInfo cri =
-                (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+                (ClassResourceInfo)message.getExchange().get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
             if (cri != null) {
                 cri.clearThreadLocalProxies();
             }
@@ -98,10 +79,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private void processResponse(Message message) {
-        
-        if (isResponseAlreadyCommited(message)) {
-            return;
-        }
         
         MessageContentsList objs = MessageContentsList.getContentsList(message);
         if (objs == null || objs.size() == 0) {
@@ -124,10 +101,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             List<ProviderInfo<ResponseHandler>> handlers = 
                 ProviderFactory.getInstance(message).getResponseHandlers();
             for (ProviderInfo<ResponseHandler> rh : handlers) {
-                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
-                                                   message.getExchange().getInMessage());
-                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
-                                                   message.getExchange().getInMessage());
                 Response r = rh.getProvider().handleResponse(message, ori, response);
                 if (r != null) {
                     response = r;
@@ -146,19 +119,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                   Response response, 
                                   OperationResourceInfo ori,
                                   boolean firstTry) {
-        int status = response.getStatus();
-        Object responseObj = response.getEntity();
-        if (status == 200 && !isResponseNull(responseObj) && firstTry 
-            && ori != null && JAXRSUtils.headMethodPossible(ori.getHttpMethod(), 
-                (String)message.getExchange().getInMessage().get(Message.HTTP_REQUEST_METHOD))) {
-            LOG.info(new org.apache.cxf.common.i18n.Message("HEAD_WITHOUT_ENTITY", BUNDLE).toString());
-            responseObj = null;
-        }
-        if (status == -1) {
-            status = isResponseNull(responseObj) ? 204 : 200;
-        }
-        
-        message.put(Message.RESPONSE_CODE, status);
+        message.put(Message.RESPONSE_CODE, response.getStatus());
         Map<String, List<String>> theHeaders = 
             (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
         if (firstTry && theHeaders != null) {
@@ -167,40 +128,26 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         } else {
             message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
         }
-        MultivaluedMap<String, Object> responseHeaders = 
-            (MultivaluedMap)message.get(Message.PROTOCOL_HEADERS);
-        setResponseDate(responseHeaders, firstTry);
-        if (isResponseNull(responseObj)) {
+        
+        Object responseObj = response.getEntity();
+        if (responseObj == null) {
             return;
         }
         
-        Object ignoreWritersProp = message.getExchange().get(JAXRSUtils.IGNORE_MESSAGE_WRITERS);
-        boolean ignoreWriters = 
-            ignoreWritersProp == null ? false : Boolean.valueOf(ignoreWritersProp.toString());
-        if (ignoreWriters) {
-            writeResponseToStream(message.getContent(OutputStream.class), responseObj);
-            return;
-        }
-        
+        Class targetType = responseObj.getClass();
         List<MediaType> availableContentTypes = computeAvailableContentTypes(message, response);  
         
         Method invoked = null;
         if (firstTry) {
             invoked = ori == null ? null : ori.getMethodToInvoke();
         }
-        Class<?> targetType = getRawResponseClass(responseObj);
-        Type genericType = 
-            getGenericResponseType(ori == null ? null : ori.getAnnotatedMethod(), responseObj);
-        if (genericType instanceof TypeVariable) {
-            genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
-                                                       (TypeVariable)genericType);
-        }
         
         MessageBodyWriter writer = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
             writer = ProviderFactory.getInstance(message)
-                .createMessageBodyWriter(targetType, genericType, 
+                .createMessageBodyWriter(targetType, 
+                      invoked != null ? invoked.getGenericReturnType() : null, 
                       invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                       type,
                       message);
@@ -218,23 +165,20 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         boolean enabled = checkBufferingMode(message, writer, firstTry);
-        Object entity = getEntity(responseObj);
         try {
+            
             responseType = checkFinalContentType(responseType);
             LOG.fine("Response content type is: " + responseType.toString());
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
             try {
-                writer.writeTo(entity, targetType, genericType, 
+                writer.writeTo(responseObj, targetType, 
+                               invoked != null ? invoked.getGenericReturnType() : null, 
                                invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
                                responseType, 
-                               responseHeaders, 
+                               response.getMetadata(), 
                                message.getContent(OutputStream.class));
-                Object newContentType = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
-                if (newContentType != null) {
-                    message.put(Message.CONTENT_TYPE, newContentType.toString());
-                }
                 checkCachedStream(message, outOriginal, enabled);
             } finally {
                 if (enabled) {
@@ -244,19 +188,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             }
             
         } catch (IOException ex) {
-            handleWriteException(message, response, ori, ex, entity, firstTry);
+            handleWriteException(message, response, ori, ex, responseObj, firstTry);
         } catch (Throwable ex) {
-            handleWriteException(message, response, ori, ex, entity, firstTry);
+            handleWriteException(message, response, ori, ex, responseObj, firstTry);
         }
-    }
-    
-    private boolean isResponseNull(Object o) {
-        return o == null || GenericEntity.class.isAssignableFrom(o.getClass()) 
-                            && ((GenericEntity)o).getEntity() == null; 
-    }
-    
-    private Object getEntity(Object o) {
-        return GenericEntity.class.isAssignableFrom(o.getClass()) ? ((GenericEntity)o).getEntity() : o; 
     }
     
     private boolean checkBufferingMode(Message m, MessageBodyWriter w, boolean firstTry) {
@@ -269,9 +204,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             enabled = InjectionUtils.invokeBooleanGetter(w, "getEnableBuffering");
         }
         if (enabled) {
-            boolean streamingOn = InjectionUtils.invokeBooleanGetter(w, "getEnableStreaming");
+            boolean streamingOn = 
+                "org.apache.cxf.jaxrs.provider.JAXBElementProvider".equals(w.getClass().getName())
+                && InjectionUtils.invokeBooleanGetter(w, "getEnableStreaming");
             if (streamingOn) {
-                m.setContent(XMLStreamWriter.class, new CachingXmlEventWriter());
+                m.put(XMLStreamWriter.class.getName(), new CachingXmlEventWriter());
             } else {
                 m.setContent(OutputStream.class, new CachedOutputStream());
             }
@@ -280,12 +217,10 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     private void checkCachedStream(Message m, OutputStream osOriginal, boolean enabled) throws Exception {
-        XMLStreamWriter writer = null;
-        if (enabled) {
-            writer = m.getContent(XMLStreamWriter.class);
-        } else {
-            writer = (XMLStreamWriter)m.get(XMLStreamWriter.class.getName());
+        if (!enabled) {
+            return;
         }
+        XMLStreamWriter writer = (XMLStreamWriter)m.get(XMLStreamWriter.class.getName());
         if (writer instanceof CachingXmlEventWriter) {
             CachingXmlEventWriter cache = (CachingXmlEventWriter)writer;
             if (cache.getEvents().size() != 0) {
@@ -294,16 +229,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                     StaxUtils.writeEvent(event, origWriter);
                 }
             }
-            m.setContent(XMLStreamWriter.class, null);
+            m.put(XMLStreamWriter.class.getName(), null);
             return;
         }
-        if (enabled) {
-            OutputStream os = m.getContent(OutputStream.class);
-            if (os != osOriginal && os instanceof CachedOutputStream) {
-                CachedOutputStream cos = (CachedOutputStream)os;
-                if (cos.size() != 0) {
-                    cos.writeCacheTo(osOriginal);
-                }
+        OutputStream os = m.getContent(OutputStream.class);
+        if (os != osOriginal && os instanceof CachedOutputStream) {
+            CachedOutputStream cos = (CachedOutputStream)os;
+            if (cos.size() != 0) {
+                cos.writeCacheTo(osOriginal);
             }
         }
     }
@@ -360,57 +293,29 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         List<MediaType> acceptContentTypes = 
             (List<MediaType>)exchange.get(Message.ACCEPT_CONTENT_TYPE);
         if (acceptContentTypes == null) {
-            acceptContentTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
+            acceptContentTypes = Collections.singletonList(MediaType.valueOf("*/*"));
         }        
         return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes);
         
-    }
-    
-    private Class<?> getRawResponseClass(Object targetObject) {
-        if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
-            return ((GenericEntity)targetObject).getRawType();
-        } else {
-            return targetObject.getClass();
-        }
-    }
-    
-    private Type getGenericResponseType(Method invoked, Object targetObject) {
-        if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
-            return ((GenericEntity)targetObject).getType();
-        } else {
-            return invoked == null ? targetObject.getClass() : invoked.getGenericReturnType();
-        }
     }
     
     private MediaType checkFinalContentType(MediaType mt) {
         if (mt.isWildcardType() || mt.isWildcardSubtype()) {
             return MediaType.APPLICATION_OCTET_STREAM_TYPE;
         } else if (mt.getParameters().containsKey("q")) {
-            return MediaType.valueOf(JAXRSUtils.removeMediaTypeParameter(mt, "q"));
+            StringBuilder sb = new StringBuilder();
+            sb.append(mt.getType()).append('/').append(mt.getSubtype());
+            if (mt.getParameters().size() > 1) {
+                for (String key : mt.getParameters().keySet()) {
+                    if (!"q".equals(key)) {
+                        sb.append(';').append(key).append('=').append(mt.getParameters().get(key));
+                    }
+                }
+            }
+            return MediaType.valueOf(sb.toString());
         } else {
             return mt;
         }
         
-    }
-    
-    private void setResponseDate(MultivaluedMap<String, Object> headers, boolean firstTry) {
-        if (!firstTry) {
-            return;
-        }
-        SimpleDateFormat format = HttpUtils.getHttpDateFormat();
-        headers.putSingle(HttpHeaders.DATE, format.format(new Date()));
-    }
-    
-    private boolean isResponseAlreadyCommited(Message m) {
-        return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.RESPONSE_COMMITED));
-    }
-    
-    private void writeResponseToStream(OutputStream os, Object responseObj) {
-        try {
-            byte[] bytes = responseObj.toString().getBytes("UTF-8");
-            os.write(bytes, 0, bytes.length);
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
     }
 }

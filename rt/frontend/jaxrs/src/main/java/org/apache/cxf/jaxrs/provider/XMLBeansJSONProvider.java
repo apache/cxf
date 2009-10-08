@@ -29,8 +29,8 @@ import java.net.HttpURLConnection;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -47,8 +47,8 @@ import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
 /**
  * JSON provider for XMLBeans data objects.
  */
-@Produces("application/json")
-@Consumes("application/json")
+@ProduceMime("application/json")
+@ConsumeMime("application/json")
 @Provider
 public class XMLBeansJSONProvider extends XMLBeansElementProvider {
 

@@ -32,6 +32,7 @@ import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.transport.TransportURIResolver;
 import org.apache.ws.commons.schema.XmlSchemaException;
 import org.apache.ws.commons.schema.resolver.URIResolver;
+import org.apache.xml.resolver.Catalog;
 
 /**
  * Resolves URIs using Apache Commons Resolver API.
@@ -39,17 +40,17 @@ import org.apache.ws.commons.schema.resolver.URIResolver;
 public class CatalogXmlSchemaURIResolver implements URIResolver {
 
     private ExtendedURIResolver resolver;
-    private OASISCatalogManager catalogResolver;
+    private Catalog catalogResolver;
     private Map<String, String> resolved = new HashMap<String, String>();
 
     public CatalogXmlSchemaURIResolver(Bus bus) {
         this(OASISCatalogManager.getCatalogManager(bus));
         this.resolver = new TransportURIResolver(bus);
-        this.catalogResolver = OASISCatalogManager.getCatalogManager(bus);
+        this.catalogResolver = OASISCatalogManager.getCatalogManager(bus).getCatalog();
     }
     public CatalogXmlSchemaURIResolver(OASISCatalogManager catalogManager) {
         this.resolver = new ExtendedURIResolver();
-        this.catalogResolver = catalogManager;
+        this.catalogResolver = catalogManager.getCatalog();
     }
     
     public Map<String, String> getResolvedMap() {
@@ -57,22 +58,20 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
     }
 
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
-        
         String resolvedSchemaLocation = null;
-        if (this.catalogResolver != null) {
-            try {
-                resolvedSchemaLocation = this.catalogResolver.resolveSystem(schemaLocation);
-                
-                if (resolvedSchemaLocation == null) {
-                    resolvedSchemaLocation = catalogResolver.resolveURI(schemaLocation);
-                }
-                if (resolvedSchemaLocation == null) {
-                    resolvedSchemaLocation = catalogResolver.resolvePublic(schemaLocation, baseUri);
-                }
-            } catch (IOException e) {
-                throw new RuntimeException("Catalog resolution failed", e);
+        try {
+            resolvedSchemaLocation = this.catalogResolver.resolveSystem(schemaLocation);
+            
+            if (resolvedSchemaLocation == null) {
+                resolvedSchemaLocation = catalogResolver.resolveURI(schemaLocation);
             }
+            if (resolvedSchemaLocation == null) {
+                resolvedSchemaLocation = catalogResolver.resolvePublic(schemaLocation, baseUri);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Catalog resolution failed", e);
         }
+
         InputSource in = null;
         if (resolvedSchemaLocation == null) {
             in = this.resolver.resolve(schemaLocation, baseUri);

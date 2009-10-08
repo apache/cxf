@@ -38,7 +38,7 @@
     <xs:import namespace="http://cxf.apache.org/configuration/security" 
                schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
     <xs:import namespace="http://www.springframework.org/schema/beans" 
-               schemaLocation="http://www.springframework.org/schema/beans/spring-beans.xsd"/>
+               schemaLocation="http://www.springframework.org/schema/beans/spring-beans-2.0.xsd"/>
     <xs:import namespace="http://cxf.apache.org/configuration/beans" 
                schemaLocation="http://cxf.apache.org/schemas/configuration/cxf-beans.xsd"/>
 

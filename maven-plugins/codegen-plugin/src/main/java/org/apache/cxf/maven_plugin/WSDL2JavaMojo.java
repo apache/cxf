@@ -24,25 +24,14 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
-import org.apache.maven.artifact.Artifact;
-import org.apache.maven.artifact.InvalidRepositoryException;
-import org.apache.maven.artifact.factory.ArtifactFactory;
-import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.artifact.repository.ArtifactRepositoryFactory;
-import org.apache.maven.artifact.resolver.ArtifactNotFoundException;
-import org.apache.maven.artifact.resolver.ArtifactResolutionException;
-import org.apache.maven.artifact.resolver.ArtifactResolver;
-import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.project.MavenProject;
-import org.apache.maven.project.ProjectUtils;
 
 /**
  * @goal wsdl2java
@@ -60,7 +49,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * Path where the generated sources should be placed
      * 
      * @parameter expression="${cxf.sourceRoot}"
-     *            default-value="${project.build.directory}/generated-sources/cxf"
+     *             default-value="${project.build.directory}/generated/src/main/java"
      * @required
      */
     File sourceRoot;
@@ -131,58 +120,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
     String excludes[];
 
     /**
-     * The local repository taken from Maven's runtime. Typically $HOME/.m2/repository.
-     * 
-     * @parameter expression="${localRepository}"
-     * @readonly
-     * @required
-     */
-    private ArtifactRepository localRepository;
-
-    /**
-     * Artifact factory, needed to create artifacts.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactFactory artifactFactory;
-
-    /**
-     * The remote repositories used as specified in your POM.
-     * 
-     * @parameter expression="${project.repositories}"
-     * @readonly
-     * @required
-     */
-    private List repositories;
-
-    /**
-     * Artifact repository factory component.
-     * 
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactRepositoryFactory artifactRepositoryFactory;
-
-    /**
-     * The Maven session.
-     * 
-     * @parameter expression="${session}"
-     * @readonly
-     * @required
-     */
-    private MavenSession mavenSession;
-
-    /**
-     * @component
-     * @readonly
-     * @required
-     */
-    private ArtifactResolver artifactResolver;
-
-    /**
      * Create WsdlOption objects for each wsdl file found in the root dir. includes, excludes filter which
      * files are considered. The defaultOptions will be applied.
      * 
@@ -213,9 +150,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @return wsdl file
      */
     private File getFileFromWsdlPath(String wsdlPath) {
-        if (wsdlPath == null) {
-            return null;
-        }
         File file = null;
         try {
             URI uri = new URI(wsdlPath);
@@ -248,11 +182,11 @@ public class WSDL2JavaMojo extends AbstractMojo {
             }
 
             File file = getFileFromWsdlPath(o.getWsdl());
-            if (file != null && file.exists()) {
+            if (file.exists()) {
                 file = file.getAbsoluteFile();
                 for (WsdlOption o2 : effectiveWsdlOptions) {
                     File file2 = getFileFromWsdlPath(o2.getWsdl());
-                    if (file2 != null && file2.exists() && file2.getAbsoluteFile().equals(file)) {
+                    if (file2.exists() && file2.getAbsoluteFile().equals(file)) {
                         o.getExtraargs().addAll(0, o2.getExtraargs());
                         effectiveWsdlOptions.remove(o2);
                         break;
@@ -267,7 +201,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @return effective WsdlOptions
      * @throws MojoExecutionException
      */
-    private List<WsdlOption> createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions()
+    private WsdlOption[] createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions() 
         throws MojoExecutionException {
         List<WsdlOption> effectiveWsdlOptions = new ArrayList<WsdlOption>();
         if (wsdlRoot != null && wsdlRoot.exists()) {
@@ -280,70 +214,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         if (wsdlOptions != null) {
             mergeOptions(effectiveWsdlOptions, wsdlOptions);
         }
-        downloadRemoteWsdls(effectiveWsdlOptions);
-        return effectiveWsdlOptions;
-    }
-    
-    @SuppressWarnings("unchecked")
-    public Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact) 
-        throws MojoExecutionException {
-        
-        /**
-         * First try to find the artifact in the reactor projects of the maven session.
-         * So an artifact that is not yet built can be resolved
-         */
-        List<MavenProject> rProjects = mavenSession.getSortedProjects();
-        for (MavenProject rProject : rProjects) {
-            if (artifact.getGroupId().equals(rProject.getGroupId())
-                && artifact.getArtifactId().equals(rProject.getArtifactId()) 
-                && artifact.getVersion().equals(rProject.getVersion())) {
-                Set<Artifact> artifacts = rProject.getArtifacts();
-                for (Artifact pArtifact : artifacts) {
-                    if ("wsdl".equals(pArtifact.getType())) {
-                        return pArtifact;
-                    }
-                }
-            }
-        }
-        
-        /**
-         * If this did not work resolve the artifact using the artifactResolver
-         */
-        try {
-            artifactResolver.resolve(artifact, remoteRepos, localRepository);
-        } catch (ArtifactResolutionException e) {
-            throw new MojoExecutionException("Error downloading wsdl artifact.", e);
-        } catch (ArtifactNotFoundException e) {
-            throw new MojoExecutionException("Resource can not be found.", e);
-        }
-        
-        return artifact;
-    }
-
-    public void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
-        List remoteRepos;
-        try {
-            remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,
-                                                                 mavenSession.getContainer());
-        } catch (InvalidRepositoryException e) {
-            throw new MojoExecutionException("Error build repositories for remote wsdls", e);
-        }
-        
-        for (WsdlOption wsdlOption : effectiveWsdlOptions) {
-            WsdlArtifact wsdlA = wsdlOption.getWsdlArtifact();
-            if (wsdlA == null) {
-                return;
-            }
-            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA
-                                                               .getArtifactId(), wsdlA.getVersion(), 
-                                                               Artifact.SCOPE_COMPILE, wsdlA.getType());
-            wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
-            if (wsdlArtifact != null) {
-                String path = wsdlArtifact.getFile().getAbsolutePath();
-                getLog().info("Resolved WSDL artifact to file " + path);
-                wsdlOption.setWsdl(path);
-            }
-        }
+        return effectiveWsdlOptions.toArray(new WsdlOption[effectiveWsdlOptions.size()]);
     }
 
     public void execute() throws MojoExecutionException {
@@ -357,9 +228,9 @@ public class WSDL2JavaMojo extends AbstractMojo {
         classesDir.mkdirs();
         markerDirectory.mkdirs();
 
-        List<WsdlOption> effectiveWsdlOptions = createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions();
+        WsdlOption[] effectiveWsdlOptions = createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions();
 
-        if (effectiveWsdlOptions.size() == 0) {
+        if (effectiveWsdlOptions.length == 0) {
             getLog().info("Nothing to generate");
             return;
         }

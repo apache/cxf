@@ -26,11 +26,6 @@ public class WsdlOption extends Option {
      * The WSDL file to process.
      */
     String wsdl;
-    
-    /**
-     * Alternatively to the wsdl string an artifact can be specified
-     */
-    WsdlArtifact wsdlArtifact;
 
     public String getWsdl() {
         return wsdl;
@@ -38,14 +33,6 @@ public class WsdlOption extends Option {
 
     public void setWsdl(String w) {
         wsdl = w;
-    }
-
-    public WsdlArtifact getWsdlArtifact() {
-        return wsdlArtifact;
-    }
-
-    public void setWsdlArtifact(WsdlArtifact wsdlArtifact) {
-        this.wsdlArtifact = wsdlArtifact;
     }
     
     public int hashCode() {

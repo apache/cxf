@@ -80,9 +80,6 @@ public final class PolicyUtils {
     }
     
     public static void logPolicy(Logger log, Level level, String msg, PolicyComponent pc) {
-        if (!log.isLoggable(level)) {
-            return;
-        }
         if (null == pc) {
             log.log(level, msg);
             return;

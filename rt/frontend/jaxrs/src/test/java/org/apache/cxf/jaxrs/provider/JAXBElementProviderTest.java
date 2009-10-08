@@ -19,34 +19,25 @@
 
 package org.apache.cxf.jaxrs.provider;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
 
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Result;
@@ -56,388 +47,11 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.ContentHandler;
 
-import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.provider.index.TestBean;
-import org.apache.cxf.jaxrs.resources.Book;
-import org.apache.cxf.jaxrs.resources.CollectionsResource;
-import org.apache.cxf.jaxrs.resources.SuperBook;
-import org.apache.cxf.jaxrs.resources.TagVO2;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JAXBElementProviderTest extends Assert {
 
-    @Test
-    public void testIsWriteableList() throws Exception {
-        testIsWriteableCollection("getBooks");
-    }
-    
-    @Test
-    public void testIsWriteableCollection() throws Exception {
-        testIsWriteableCollection("getBookCollection");
-    }
-    
-    @Test
-    public void testIsWriteableSet() throws Exception {
-        testIsWriteableCollection("getBookSet");
-    }
-    
-    @Test
-    public void testIsSupportedWithJaxbIndex() {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        assertTrue(provider.isSupported(TestBean.class, TestBean.class, new Annotation[]{}));
-    }
-    
-    @Test
-    public void testIsWriteableJAXBElements() throws Exception {
-        testIsWriteableCollection("getBookElements");
-    }
-    
-    private void testIsWriteableCollection(String mName) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setCollectionWrapperName("foo");
-        Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
-        assertTrue(provider.isWriteable(m.getReturnType(), m.getGenericReturnType(),
-                             new Annotation[0], MediaType.TEXT_XML_TYPE));
-    }
-    
-    @Test
-    public void testWriteCollection() throws Exception {
-        doWriteUnqualifiedCollection(true, "getBookCollection", "setBookCollection", 
-                                     Collection.class);
-    }
-    
-    @Test
-    public void testWriteList() throws Exception {
-        doWriteUnqualifiedCollection(true, "getBooks", "setBooks", List.class);
-    }
-    
-    @Test
-    public void testWriteSet() throws Exception {
-        doWriteUnqualifiedCollection(true, "getBookSet", "setBookSet", Set.class);
-    }
-    
-    @Test
-    public void testWriteCollectionJaxbName() throws Exception {
-        doWriteUnqualifiedCollection(false, "getBooks", "setBooks", List.class);
-    }
-    
-    @Test
-    public void testWriteArray() throws Exception {
-        doWriteUnqualifiedCollection(true, "getBooksArray", "setBooksArray", Book[].class);
-    }
-    
-    public void doWriteUnqualifiedCollection(boolean setName, String mName, String setterName, 
-                                             Class<?> type) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        if (setName) {
-            provider.setCollectionWrapperName("Books");
-        }
-        List<Book> books = new ArrayList<Book>();
-        books.add(new Book("CXF in Action", 123L));
-        books.add(new Book("CXF Rocks", 124L));
-        Object o = type.isArray() ? books.toArray() : type == Set.class 
-            ? new HashSet<Book>(books) : books;
-        
-        Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(o, m.getReturnType(), m.getGenericReturnType(),
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        doReadUnqualifiedCollection(bos.toString(), setterName, type);
-    }
-    
-    @Test
-    public void testWriteJAXBElementCollection() throws Exception {
-        doTestWriteJAXBCollection("getBookElements");
-    }
-    
-    @Test
-    public void testWriteJAXBElementCollection2() throws Exception {
-        doTestWriteJAXBCollection("getBookElements2");
-    }
-    
-    @Test
-    public void testWriteDerivedType() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setJaxbElementClassNames(Collections.singletonList(Book.class.getName()));
-        Book b = new SuperBook("CXF in Action", 123L, 124L);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(b, Book.class, Book.class,
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        readSuperBook(bos.toString(), true);
-    }
-    
-    @Test
-    public void testWriteDerivedType2() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        Book b = new SuperBook("CXF in Action", 123L, 124L);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(b, Book.class, Book.class,
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        
-        readSuperBook(bos.toString(), false);
-    }
-    
-    @Test
-    public void testWriteWithoutXmlRootElement() throws Exception {
-        doTestWriteWithoutXmlRootElement("SuperBook", false, false);
-    }
-    
-    @Test
-    public void testWriteWithoutXmlRootElement2() throws Exception {
-        doTestWriteWithoutXmlRootElement("SuperBook", true, false);
-    }
-    
-    @Test
-    public void testWriteWithoutXmlRootElement3() throws Exception {
-        doTestWriteWithoutXmlRootElement("{http://books}SuperBook", false, false);
-    }
-    
-    @Test
-    public void testWriteWithoutXmlRootElement4() throws Exception {
-        doTestWriteWithoutXmlRootElement("SuperBook", true, true);
-    }
-    
-    public void doTestWriteWithoutXmlRootElement(String name, boolean unmarshalAsJaxbElement,
-                                                 boolean marshalAsJaxbElement) 
-        throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        if (!marshalAsJaxbElement) {
-            provider.setJaxbElementClassMap(Collections.singletonMap(
-                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
-                name));
-        } else {
-            provider.setMarshallAsJaxbElement(marshalAsJaxbElement);
-        }
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
-            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
-                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
-                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
-                         new MetadataMap<String, Object>(), bos);
-        readSuperBook2(bos.toString(), unmarshalAsJaxbElement);
-    }
-    
-    @Test
-    public void testWriteCollectionWithoutXmlRootElement() 
-        throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setCollectionWrapperName("{http://superbooks}SuperBooks");
-        provider.setJaxbElementClassMap(Collections.singletonMap(
-                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), 
-                "{http://superbooks}SuperBook"));
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook b = 
-            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
-        List<org.apache.cxf.jaxrs.fortest.jaxb.SuperBook> books = 
-            Collections.singletonList(b);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(books, List.class, 
-                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
-                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
-                         new MetadataMap<String, Object>(), bos);
-        String expected = "<ns1:SuperBooks xmlns:ns1=\"http://superbooks\">"
-            + "<ns1:SuperBook xmlns:ns2=\"http://books\" xmlns:ns1=\"http://superbooks\"><id>123</id>"
-            + "<name>CXF in Action</name><superId>124</superId></ns1:SuperBook></ns1:SuperBooks>";
-        assertEquals(expected, bos.toString());
-    }
-    
-    
-    @Test
-    public void testWriteWithoutXmlRootElementDerived() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setJaxbElementClassMap(Collections.singletonMap(
-            org.apache.cxf.jaxrs.fortest.jaxb.Book.class.getName(), "Book"));
-        org.apache.cxf.jaxrs.fortest.jaxb.Book b = 
-            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook("CXF in Action", 123L, 124L);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
-                         org.apache.cxf.jaxrs.fortest.jaxb.Book.class,
-                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
-                         new MetadataMap<String, Object>(), bos);
-        readSuperBook2(bos.toString(), false);
-    }
-    
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testWriteWithoutXmlRootElementObjectFactory() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setJaxbElementClassMap(Collections.singletonMap(
-            org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class.getName(), 
-            "{http://books}SuperBook2"));
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 b = 
-            new org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2("CXF in Action", 123L, 124L);
-        
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(b, org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
-                         org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
-                         new Annotation[0], MediaType.TEXT_XML_TYPE, 
-                         new MetadataMap<String, Object>(), bos);
-        JAXBElementProvider provider2 = new JAXBElementProvider();
-        ByteArrayInputStream is = new ByteArrayInputStream(bos.toByteArray());
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2 book = 
-            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2)provider2.readFrom(
-                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class, 
-                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook2.class,
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        assertEquals(124L, book.getSuperId());
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void readSuperBook(String data, boolean xsiTypeExpected) throws Exception {
-        if (xsiTypeExpected) {
-            assertTrue(data.contains("xsi:type"));
-        }
-        JAXBElementProvider provider = new JAXBElementProvider();
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        SuperBook book = (SuperBook)provider.readFrom(
-                       (Class)SuperBook.class, SuperBook.class,
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        assertEquals(124L, book.getSuperId());
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void readSuperBook2(String data, boolean unmarshalAsJaxbElement) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        if (!unmarshalAsJaxbElement) {
-            provider.setJaxbElementClassMap(Collections.singletonMap(
-                org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class.getName(), "SuperBook"));
-        } else {
-            provider.setUnmarshallAsJaxbElement(true);
-        }
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        org.apache.cxf.jaxrs.fortest.jaxb.SuperBook book = 
-            (org.apache.cxf.jaxrs.fortest.jaxb.SuperBook)provider.readFrom(
-                       (Class)org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class, 
-                       org.apache.cxf.jaxrs.fortest.jaxb.SuperBook.class,
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        assertEquals(124L, book.getSuperId());
-    }
-    
-    private void doTestWriteJAXBCollection(String mName) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        List<JAXBElement<Book>> books = new ArrayList<JAXBElement<Book>>();
-        books.add(new JAXBElement<Book>(new QName("Books"), Book.class, null, 
-            new Book("CXF in Action", 123L)));
-        books.add(new JAXBElement<Book>(new QName("Books"), Book.class, null, 
-            new Book("CXF Rocks", 124L)));
-        
-        Method m = CollectionsResource.class.getMethod(mName, new Class[0]);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(books, m.getReturnType(), m.getGenericReturnType(),
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        doReadUnqualifiedCollection(bos.toString(), "setBooks", List.class);
-    }
-    
-    @Test
-    public void testWriteQualifiedCollection() throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        provider.setCollectionWrapperName("{http://tags}tags");
-        List<TagVO2> tags = new ArrayList<TagVO2>();
-        tags.add(new TagVO2("A", "B"));
-        tags.add(new TagVO2("C", "D"));
-        Method m = CollectionsResource.class.getMethod("getTags", new Class[0]);
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        provider.writeTo(tags, m.getReturnType(), m.getGenericReturnType(),
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        doReadQualifiedCollection(bos.toString(), false);
-    }
-    
-    @Test
-    public void testReadUnqualifiedCollection() throws Exception {
-        String data = "<Books><Book><id>123</id><name>CXF in Action</name>"
-            + "</Book><Book><id>124</id><name>CXF Rocks</name></Book></Books>";
-        doReadUnqualifiedCollection(data, "setBooks", List.class);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void doReadUnqualifiedCollection(String data, String mName, Class<?> type) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        Method m = CollectionsResource.class.getMethod(mName, 
-                                                       new Class[]{type});
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(
-                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        assertNotNull(o);
-        Book b1 = null;
-        Book b2 = null;
-        if (type.isArray()) {
-            assertEquals(2, ((Book[])o).length);
-            b1 = ((Book[])o)[0];
-            b2 = ((Book[])o)[1];
-        } else if (type == Set.class) {
-            Set<Book> set = (Set)o;
-            List<Book> books = new ArrayList<Book>(new TreeSet<Book>(set));
-            b1 = books.get(0);
-            b2 = books.get(1);
-        } else {
-            List<Book> books = (List<Book>)o;
-            b1 = books.get(0);
-            b2 = books.get(1);
-        }
-        
-        assertEquals(123, b1.getId());
-        assertEquals("CXF in Action", b1.getName());
-        
-        assertEquals(124, b2.getId());
-        assertEquals("CXF Rocks", b2.getName());    
-    }
-    
-    
-    @Test
-    public void testReadQualifiedCollection() throws Exception {
-        String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"
-            + "</ns1:thetag><ns1:thetag><group>D</group><name>C</name></ns1:thetag></ns1:tags>";
-        doReadQualifiedCollection(data, false);
-    }
-    
-    @Test
-    public void testReadQualifiedArray() throws Exception {
-        String data = "<ns1:tags xmlns:ns1=\"http://tags\"><ns1:thetag><group>B</group><name>A</name>"
-            + "</ns1:thetag><ns1:thetag><group>D</group><name>C</name></ns1:thetag></ns1:tags>";
-        doReadQualifiedCollection(data, true);
-    }
-    
-    @SuppressWarnings("unchecked")
-    public void doReadQualifiedCollection(String data, boolean isArray) throws Exception {
-        JAXBElementProvider provider = new JAXBElementProvider();
-        Method m = null;
-        if (!isArray) {
-            m = CollectionsResource.class.getMethod("setTags", new Class[]{List.class});
-        } else {
-            m = CollectionsResource.class.getMethod("setTagsArray", new Class[]{TagVO2[].class});
-        }
-        
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom(
-                      (Class)m.getParameterTypes()[0], m.getGenericParameterTypes()[0],
-                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        assertNotNull(o);
-        TagVO2 t1 = null;
-        TagVO2 t2 = null;
-        if (!isArray) {
-            assertEquals(2, ((List)o).size());
-            t1 = (TagVO2)((List)o).get(0);
-            t2 = (TagVO2)((List)o).get(1);
-        } else {
-            assertEquals(2, ((Object[])o).length);
-            t1 = (TagVO2)((Object[])o)[0];
-            t2 = (TagVO2)((Object[])o)[1];
-        }
-        assertEquals("A", t1.getName());
-        assertEquals("B", t1.getGroup());
-        
-        assertEquals("C", t2.getName());
-        assertEquals("D", t2.getGroup());
-    }
-    
     @Test
     public void testSetSchemasFromClasspath() {
         JAXBElementProvider provider = new JAXBElementProvider();
@@ -485,15 +99,14 @@ public class JAXBElementProviderTest extends Assert {
         
         JAXBElementProvider provider = new JAXBElementProvider() {
             @Override
-            protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, String enc)
+            protected Marshaller createMarshaller(Object obj, Class<?> cls, Type genericType, MediaType mt)
                 throws JAXBException {
                 return m;    
             }
         };
         
         provider.setMarshallerProperties(props);
-        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, 
-                         MediaType.APPLICATION_XML_TYPE, new MetadataMap<String, Object>(), 
+        provider.writeTo("123", String.class, (Type)String.class, new Annotation[]{}, null, null,
                          new ByteArrayOutputStream());
         
         assertEquals("Marshall properties have not been set", props, m.getProperties());
@@ -620,4 +233,5 @@ public class JAXBElementProviderTest extends Assert {
         }
         
     }
+    
 }

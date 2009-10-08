@@ -30,11 +30,6 @@ import org.junit.Test;
 
 public class MediaTypeHeaderProviderTest extends Assert {
     
-    @Test(expected = IllegalArgumentException.class)
-    public void testNullValue() throws Exception {
-        MediaType.valueOf(null);
-    }
-    
     @Test
     public void testSimpleType() {
         MediaType m = MediaType.valueOf("text/html");

@@ -18,13 +18,7 @@
  */
 
 package org.apache.cxf.tools.common;
-import java.util.logging.Logger;
-
 import org.apache.cxf.common.i18n.Message;
-
-/**
- * Exception used for unrecoverable error in a CXF tool.
- */
 public class ToolException extends RuntimeException {
 
     
@@ -50,13 +44,7 @@ public class ToolException extends RuntimeException {
     public ToolException(Throwable t) {
         super(t);
     }
-    /**
-     * Construct message from message property bundle and logger.
-     * @param messageId
-     * @param logger
-     */
-    public ToolException(String messageId, Logger logger) {
-        this(new Message(messageId, logger));
-    }
+    
+
 }
 

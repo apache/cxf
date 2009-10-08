@@ -18,56 +18,7 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+public interface TokenWrapper {
 
-import org.apache.cxf.ws.policy.PolicyAssertion;
-import org.apache.cxf.ws.security.policy.SPConstants;
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
-import org.apache.neethi.PolicyComponent;
-
-public abstract class TokenWrapper extends AbstractSecurityAssertion implements PolicyAssertion {
-    protected Token token;
-
-    public TokenWrapper(SPConstants version) {
-        super(version);
-    }
-    
-    public void setToken(Token tok) {
-        token = tok;
-    }
-    public Token getToken() {
-        return token;
-    }
-    
-    public PolicyComponent normalize() {
-        if (token != null) {
-            All all = new All();
-            all.addPolicyComponent(token.normalize());
-            all.addPolicyComponent(this);
-            return all;
-        }
-        return this;
-    }
-    
-    public Policy getPolicy() {
-        if (token != null) {
-            Policy p = new Policy();
-            ExactlyOne ea = new ExactlyOne();
-            p.addPolicyComponent(ea);
-            All all = new All();
-            all.addPolicyComponent(token);
-            ea.addPolicyComponent(all);
-            PolicyComponent pc = p.normalize(true);
-            if (pc instanceof Policy) {
-                return (Policy)pc;
-            } else {
-                p = new Policy();
-                p.addPolicyComponent(pc);
-                return p;
-            }
-        }
-        return null;
-    }
-
+    void setToken(Token tok);
 }

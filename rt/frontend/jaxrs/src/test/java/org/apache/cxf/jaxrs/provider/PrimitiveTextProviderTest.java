@@ -34,19 +34,19 @@ public class PrimitiveTextProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new PrimitiveTextProvider();
-        assertTrue(p.isWriteable(byte.class, null, null, null)
-                   && p.isWriteable(Byte.class, null, null, null)
-                   && p.isWriteable(boolean.class, null, null, null)
-                   && p.isWriteable(Boolean.class, null, null, null));
+        assertTrue(p.isWriteable(byte.class, null, null)
+                   && p.isWriteable(Byte.class, null, null)
+                   && p.isWriteable(boolean.class, null, null)
+                   && p.isWriteable(Boolean.class, null, null));
     }
     
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new PrimitiveTextProvider();
-        assertTrue(p.isReadable(byte.class, null, null, null)
-                   && p.isReadable(Byte.class, null, null, null)
-                   && p.isReadable(boolean.class, null, null, null)
-                   && p.isReadable(Boolean.class, null, null, null));
+        assertTrue(p.isReadable(byte.class, null, null)
+                   && p.isReadable(Byte.class, null, null)
+                   && p.isReadable(boolean.class, null, null)
+                   && p.isReadable(Boolean.class, null, null));
     }
     
     @SuppressWarnings("unchecked")

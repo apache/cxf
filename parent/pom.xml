@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <name>Apache CXF Parent</name>
     <url>http://cxf.apache.org</url>
 
@@ -36,12 +36,10 @@
         <surefire.fork.mode>once</surefire.fork.mode>
         <surefire.format>brief</surefire.format>
         <surefire.usefile>false</surefire.usefile>
-        <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
+	<surefire.fork.vmargs>-ea</surefire.fork.vmargs>
         <surefire.extra.sysprop.name1>None</surefire.extra.sysprop.name1>
         <surefire.extra.sysprop.value1>None</surefire.extra.sysprop.value1>
         <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
-        <compile.show.deprecation>true</compile.show.deprecation>
-
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
         <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
@@ -52,20 +50,23 @@
         <activemq.version>5.1.0</activemq.version>
         <derby.version>10.2.2.0</derby.version>
         <jaxb.version>2.1</jaxb.version>
-        <jaxb.impl.version>2.1.12</jaxb.impl.version>
-        <jaxb.xjc.version>2.1.12</jaxb.xjc.version>
-        <jdom.version>1.0</jdom.version>
+        <jaxb.impl.version>2.1.9</jaxb.impl.version>
+        <jaxb.xjc.version>2.1.9</jaxb.xjc.version>
         <jetty.version>6.1.21</jetty.version>
-        <msv.version>2009.1</msv.version>
-        <rhino.version>1.7R1</rhino.version>
         <saaj.version>1.3</saaj.version>
-        <spring.version>2.5.5</spring.version>
-        <spring.mock>spring-test</spring.mock>
+        <spring.version>2.0.8</spring.version>
+        <spring.mock>spring-mock</spring.mock>
         <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
-        <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
-        <stax.impl.version>4.0.5</stax.impl.version>
+        <stax.impl.artifactId>wstx-asl</stax.impl.artifactId>
+        <stax.impl.version>3.2.6</stax.impl.version>
+        <cglib-nodep.version>2.1_3</cglib-nodep.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
+        <derby.version>10.2.2.0</derby.version>
+        <activemq.version>4.1.1</activemq.version>
+        <rhino.version>1.6R7</rhino.version>
+        <jdom.version>1.0</jdom.version>
         <xmlbeans.version>2.4.0</xmlbeans.version>
+        <abdera.version>0.4.0-incubating</abdera.version>
         <xmlschema.version>1.4.5</xmlschema.version>
         <checkstyle.extension />
 
@@ -73,12 +74,10 @@
 
         <downloadSources>true</downloadSources>
 
-        <pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</pmd.eclipse.ruleset>
-
         <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
         <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
 
-        <resources.base.path/>
+        <resources.base.path />
 
     </properties>
 
@@ -160,7 +159,7 @@
                             </file>
                             <file>
                                 <name>.ruleset</name>
-                                <location>/${pmd.eclipse.ruleset}</location>
+                                <location>/cxf-pmd-ruleset.xml</location>
                             </file>
                         </additionalConfig>
                     </configuration>
@@ -386,7 +385,6 @@
                 <version>1.2.7</version>
             </dependency>
 
-
             <dependency>
                 <groupId>junit</groupId>
                 <artifactId>junit</artifactId>
@@ -453,11 +451,6 @@
                         <artifactId>jtidy</artifactId>
                     </exclusion>
                 </exclusions>
-            </dependency>
-            <dependency>
-                <groupId>org.codehaus.jra</groupId>
-                <artifactId>jra</artifactId>
-                <version>1.0-alpha-4</version>
             </dependency>
             <dependency>
                 <groupId>jtidy</groupId>
@@ -540,6 +533,37 @@
                 </exclusions>
             </dependency>
             <dependency>
+                <groupId>jaxen</groupId>
+                <artifactId>jaxen</artifactId>
+                <version>1.1</version>
+                <exclusions>
+                    <exclusion>
+                        <artifactId>dom4j</artifactId>
+                        <groupId>dom4j</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>xmlParserAPIs</artifactId>
+                        <groupId>xerces</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>xercesImpl</artifactId>
+                        <groupId>xerces</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>xom</artifactId>
+                        <groupId>xom</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>xalan</artifactId>
+                        <groupId>xalan</groupId>
+                    </exclusion>
+                    <exclusion>
+                        <artifactId>xml-apis</artifactId>
+                        <groupId>xml-apis</groupId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
                 <groupId>${stax.impl.groupId}</groupId>
                 <artifactId>${stax.impl.artifactId}</artifactId>
                 <version>${stax.impl.version}</version>
@@ -556,7 +580,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-
             <dependency>
                 <groupId>org.slf4j</groupId>
                 <artifactId>slf4j-jdk14</artifactId>
@@ -860,7 +883,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-javamail_1.4_spec</artifactId>
-                <version>1.6</version>
+                <version>1.3</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -1110,17 +1133,6 @@
                     </exclusion>
                 </exclusions>
             </dependency>
-            <!-- if we use the new woodstox artifact, we're using the new version -->
-            <dependency>
-                <groupId>org.codehaus.woodstox</groupId>
-                <artifactId>woodstox-core-asl</artifactId>
-                <version>4.0.3</version>
-            </dependency>
-            <dependency>
-                <groupId>net.java.dev.msv</groupId>
-                <artifactId>msv-core</artifactId>
-                <version>${msv.version}</version>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
@@ -1140,21 +1152,6 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>2.5</version>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-                <version>2.3</version>
-                <configuration>
-                    <encoding>UTF-8</encoding>
-                    <configLocation>cxf-checkstyle${checkstyle.extension}.xml</configLocation>
-                    <consoleOutput>true</consoleOutput>
-                    <failsOnError>true</failsOnError>
-                    <linkXRef>false</linkXRef>
-                    <suppressionsLocation>cxf-checkstyle-suppressions.xml</suppressionsLocation>
-                    <sourceDirectory>${basedir}/src</sourceDirectory>
-                    <excludes>**/archetype-resources/**/*.java</excludes>
-                </configuration>
             </plugin>
         </plugins>
     </reporting>
@@ -1187,6 +1184,15 @@
                 <stax.impl.version>1.4.2</stax.impl.version>
             </properties>
         </profile>
+        <profile>
+            <id>woodstox4</id>
+            <properties>
+                <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
+                <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
+                <stax.impl.version>4.0.2</stax.impl.version>
+            </properties>
+        </profile>
+
         <profile>
             <id>axis2-saaj</id>
             <properties>
@@ -1236,7 +1242,7 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <showDeprecation>${compile.show.deprecation}</showDeprecation>
+                            <showDeprecation>true</showDeprecation>
                             <showWarnings>true</showWarnings>
                             <compilerArgument>${compile.flags}</compilerArgument>
                         </configuration>
@@ -1360,20 +1366,13 @@
             </build>
         </profile>
         <profile>
-            <id>spring2.0</id>
+            <id>spring2.5</id>
             <properties>
-                <spring.version>2.0.8</spring.version>
-                <spring.mock>spring-mock</spring.mock>
+                <spring.version>2.5.4</spring.version>
+                <spring.mock>spring-test</spring.mock>
             </properties>
         </profile>
     </profiles>
-
-
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/parent</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/parent</developerConnection>
-    </scm>
 
 </project>
 

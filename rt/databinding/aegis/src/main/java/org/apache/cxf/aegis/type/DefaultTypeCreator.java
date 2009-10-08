@@ -20,9 +20,9 @@ package org.apache.cxf.aegis.type;
 
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.lang.reflect.ParameterizedType;
 
 import org.apache.cxf.aegis.DatabindingException;
+import org.apache.cxf.aegis.type.AbstractTypeCreator.TypeClassInfo;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.basic.BeanTypeInfo;
 
@@ -40,9 +40,9 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
         info.setDescription("method " + m.getName() + " parameter " + index);
 
         if (index >= 0) {
-            info.setType(m.getParameterTypes()[index]);
+            info.setTypeClass(m.getParameterTypes()[index]);
         } else {
-            info.setType(m.getReturnType());
+            info.setTypeClass(m.getReturnType());
         }
 
         return info;
@@ -54,9 +54,9 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public AegisType createCollectionType(TypeClassInfo info) {
-        if (!(info.getType() instanceof ParameterizedType)) {
-            throw new DatabindingException("Cannot create mapping for " + info.getType() 
+    public Type createCollectionType(TypeClassInfo info) {
+        if (info.getGenericType() == null) {
+            throw new DatabindingException("Cannot create mapping for " + info.getTypeClass().getName()
                                            + ", unspecified component type for " + info.getDescription());
         }
 
@@ -64,18 +64,10 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
     }
 
     @Override
-    public AegisType createDefaultType(TypeClassInfo info) {
+    public Type createDefaultType(TypeClassInfo info) {
         BeanType type = new BeanType();
-        /*
-         * As of this point, we refuse to do this for generics in general.
-         * This might be revisited ... it might turn out to 'just work'.
-         */
-        Class<?> typeClass = TypeUtil.getTypeClass(info.getType(), false);
-        if (typeClass == null) {
-            throw new DatabindingException("Unable to map generic type " + info.getType());
-        }
-        type.setSchemaType(createQName(typeClass));
-        type.setTypeClass(typeClass);
+        type.setSchemaType(createQName(info.getTypeClass()));
+        type.setTypeClass(info.getTypeClass());
         type.setTypeMapping(getTypeMapping());
 
         BeanTypeInfo typeInfo = type.getTypeInfo();
@@ -85,11 +77,11 @@ public class DefaultTypeCreator extends AbstractTypeCreator {
 
         return type;
     }
-    protected AegisType getOrCreateMapKeyType(TypeClassInfo info) {
+    protected Type getOrCreateMapKeyType(TypeClassInfo info) {
         return createObjectType();
     }
 
-    protected AegisType getOrCreateMapValueType(TypeClassInfo info) {
+    protected Type getOrCreateMapValueType(TypeClassInfo info) {
         return createObjectType();
     }
 }

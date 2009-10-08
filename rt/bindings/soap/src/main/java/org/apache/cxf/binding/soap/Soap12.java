@@ -59,9 +59,6 @@ public final class Soap12 implements SoapVersion {
     public static Soap12 getInstance() {
         return instance;
     }
-    public String getBindingId() {
-        return SoapBindingConstants.SOAP12_BINDING_ID;
-    }
 
     public double getVersion() {
         return version;

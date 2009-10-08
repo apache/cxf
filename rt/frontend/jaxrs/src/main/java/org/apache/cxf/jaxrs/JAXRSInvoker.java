@@ -24,6 +24,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
@@ -38,13 +39,11 @@ import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
-import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodInvocationInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfoStack;
-import org.apache.cxf.jaxrs.model.Parameter;
-import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -58,13 +57,21 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSServiceFactoryBean.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSInvoker.class);
     private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
-    private static final String SERVICE_OBJECT_SCOPE = "org.apache.cxf.service.scope";
-    private static final String REQUEST_SCOPE = "request";    
     
+    private List<Object> resourceObjects;
+
     public JAXRSInvoker() {
     }
 
+    public JAXRSInvoker(List<Object> resourceObjects) {
+        this.resourceObjects = resourceObjects;
+    }
     public Object invoke(Exchange exchange, Object request) {
+        return invoke(exchange, request, resourceObjects);
+    }
+    @SuppressWarnings("unchecked")
+    public Object invoke(Exchange exchange, Object request, List<Object> resources) {
+
         Response response = exchange.get(Response.class);
         if (response != null) {
             // this means a blocking request filter provided a Response
@@ -76,26 +83,11 @@ public class JAXRSInvoker extends AbstractInvoker {
             //      in the out interceptor instead of dealing with the contents list ?
             return new MessageContentsList(response);
         }
-        ResourceProvider provider = getResourceProvider(exchange);
-        Object serviceObject = getServiceObject(exchange);
-        try {
-            return invoke(exchange, request, serviceObject);
-        } finally {
-            if (!isServiceObjectRequestScope(exchange.getInMessage())) {
-                provider.releaseInstance(exchange.getInMessage(), serviceObject);
-            } else {
-                exchange.put(JAXRSUtils.ROOT_INSTANCE, serviceObject);
-                exchange.put(JAXRSUtils.ROOT_PROVIDER, provider);
-            }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public Object invoke(Exchange exchange, Object request, Object resourceObject) {
 
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
         
+        Object resourceObject = getServiceObject(exchange, resources);
         pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
                 
         Method methodToInvoke = InjectionUtils.checkProxy(
@@ -134,12 +126,10 @@ public class JAXRSInvoker extends AbstractInvoker {
             if (excResponse == null) {
                 ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
                 ClassResourceInfo criRoot =
-                    (ClassResourceInfo)exchange.get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+                    (ClassResourceInfo)exchange.get(JAXRSInInterceptor.ROOT_RESOURCE_CLASS);
                 if (criRoot != null) {
                     criRoot.clearThreadLocalProxies();
                 }
-                exchange.put(Message.PROPOGATE_EXCEPTION, 
-                             JAXRSUtils.propogateException(exchange.getInMessage()));
                 throw ex;
             }
             return new MessageContentsList(excResponse);
@@ -152,8 +142,8 @@ public class JAXRSInvoker extends AbstractInvoker {
         if (ori.isSubResourceLocator()) {
             try {
                 Message msg = exchange.getInMessage();
-                MultivaluedMap<String, String> values = getTemplateValues(msg);
-                String subResourcePath = (String)msg.get(JAXRSUtils.RELATIVE_PATH);
+                MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+                String subResourcePath = (String)msg.get(JAXRSInInterceptor.RELATIVE_PATH);
                 String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
                 String contentType = (String)msg.get(Message.CONTENT_TYPE);
                 if (contentType == null) {
@@ -163,6 +153,9 @@ public class JAXRSInvoker extends AbstractInvoker {
                     (List<MediaType>)msg.getExchange().get(Message.ACCEPT_CONTENT_TYPE);
 
                 result = checkResultObject(result, subResourcePath);
+
+                List<Object> newResourceObjects = new ArrayList<Object>();
+                newResourceObjects.add(result);
 
                 ClassResourceInfo subCri = cri.getSubResource(
                      methodToInvoke.getReturnType(),
@@ -185,7 +178,8 @@ public class JAXRSInvoker extends AbstractInvoker {
 
 
                 exchange.put(OperationResourceInfo.class, subOri);
-                msg.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
+                msg.put(JAXRSInInterceptor.RELATIVE_PATH,
+                        values.getFirst(URITemplate.FINAL_MATCH_GROUP));
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resouce class. Here we
                 // presume Inputstream has not been consumed yet by the root resource class.
@@ -194,7 +188,7 @@ public class JAXRSInvoker extends AbstractInvoker {
                 List<Object> newParams = JAXRSUtils.processParameters(subOri, values, msg);
                 msg.setContent(List.class, newParams);
 
-                return this.invoke(exchange, newParams, result);
+                return this.invoke(exchange, newParams, newResourceObjects);
             } catch (WebApplicationException ex) {
                 Response excResponse = JAXRSUtils.convertFaultToResponse(ex, 
                                                                          exchange.getInMessage());
@@ -205,38 +199,35 @@ public class JAXRSInvoker extends AbstractInvoker {
         return result;
     }
 
-    @SuppressWarnings("unchecked")
-    protected MultivaluedMap getTemplateValues(Message msg) {
-        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
-        MultivaluedMap<String, String> oldValues = 
-            (MultivaluedMap<String, String>)msg.get(URITemplate.TEMPLATE_PARAMETERS);
-        if (oldValues != null) {
-            values.putAll(oldValues);
-        }
-        return values;
-    }
-    
     private boolean setServiceLoaderAsContextLoader(Message inMessage) {
         Object en = inMessage.getContextualProperty(SERVICE_LOADER_AS_CONTEXT);
         return Boolean.TRUE.equals(en) || "true".equals(en);
     }
     
-    private boolean isServiceObjectRequestScope(Message inMessage) {
-        Object scope = inMessage.getContextualProperty(SERVICE_OBJECT_SCOPE);
-        return REQUEST_SCOPE.equals(scope);
-    }
-    
-    private ResourceProvider getResourceProvider(Exchange exchange) {
-        OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
-        ClassResourceInfo cri = ori.getClassResourceInfo();
-        return cri.getResourceProvider();
-    }
-    
     public Object getServiceObject(Exchange exchange) {
+        return getServiceObject(exchange, resourceObjects);
+    }
+    public Object getServiceObject(Exchange exchange, List<Object> resources) {
+        Object serviceObject = null;
+
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
 
-        return cri.getResourceProvider().getInstance(exchange.getInMessage());
+        if (resources != null) {
+            Class c  = cri.getResourceClass();
+            for (Object resourceObject : resources) {
+                if (c.isInstance(resourceObject)) {
+                    serviceObject = resourceObject;
+                    break;
+                }
+            }
+        }
+
+        if (serviceObject == null) {
+            serviceObject = cri.getResourceProvider().getInstance();
+        }
+
+        return serviceObject;
     }
 
     private static Object checkResultObject(Object result, String subResourcePath) {
@@ -280,13 +271,10 @@ public class JAXRSInvoker extends AbstractInvoker {
             values = Collections.emptyList();
         } else {
             values = new ArrayList<String>(params.size() - 1);
-            for (Parameter pm : ori.getParameters()) {
-                if (pm.getType() == ParameterType.PATH) {
-                    List<String> paramValues = params.get(pm.getName());
-                    if (paramValues != null) {
-                        values.addAll(paramValues);
-                    }
-                    
+            // if we have {bar}/{foo}/{bar} then we have a problem
+            for (Map.Entry<String, List<String>> entry : params.entrySet()) {
+                if (!entry.getKey().equals(URITemplate.FINAL_MATCH_GROUP)) {
+                    values.addAll(entry.getValue());
                 }
             }
         }

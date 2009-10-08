@@ -24,17 +24,17 @@ import java.util.Date;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.util.date.XsDateTimeFormat;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
- * AegisType for the Date class which serializes as an xsd:dateTime.
+ * Type for the Date class which serializes as an xsd:dateTime.
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
-public class DateTimeType extends AegisType {
+public class DateTimeType extends Type {
     private static XsDateTimeFormat format = new XsDateTimeFormat();
 
     public DateTimeType() {

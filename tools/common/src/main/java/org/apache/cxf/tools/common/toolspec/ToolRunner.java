@@ -20,7 +20,6 @@
 package org.apache.cxf.tools.common.toolspec;
 
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.lang.reflect.Constructor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -39,15 +38,10 @@ public final class ToolRunner {
                                boolean validate, String[] args) throws Exception {
         runTool(clz, toolspecStream, validate, args, true);
     }
-    
-    public static void runTool(Class<? extends ToolContainer> clz, InputStream toolspecStream,
-                               boolean validate, String[] args, OutputStream os) throws Exception {
-        runTool(clz, toolspecStream, validate, args, true, null, os);
-    }
 
     public static void runTool(Class<? extends ToolContainer> clz, InputStream toolspecStream,
                                boolean validate, String[] args, ToolContext context) throws Exception {
-        runTool(clz, toolspecStream, validate, args, true, context, null);
+        runTool(clz, toolspecStream, validate, args, true, context);
     }
 
     public static void runTool(Class<? extends ToolContainer> clz,
@@ -55,7 +49,7 @@ public final class ToolRunner {
                                boolean validate,
                                String[] args,
                                boolean exitOnFinish) throws Exception {
-        runTool(clz, toolspecStream, validate, args, true, null, null);
+        runTool(clz, toolspecStream, validate, args, true, null);
     }
     
     public static void runTool(Class<? extends ToolContainer> clz,
@@ -64,16 +58,6 @@ public final class ToolRunner {
                                String[] args,
                                boolean exitOnFinish,
                                ToolContext context) throws Exception {
-        runTool(clz, toolspecStream, validate, args, exitOnFinish, context, null);
-    }
-    
-    public static void runTool(Class<? extends ToolContainer> clz,
-                               InputStream toolspecStream,
-                               boolean validate,
-                               String[] args,
-                               boolean exitOnFinish,
-                               ToolContext context,
-                               OutputStream os) throws Exception {
 
         ToolContainer container = null;
 
@@ -95,10 +79,6 @@ public final class ToolRunner {
 
         try {
             container.setArguments(args);
-            if (os != null) {
-                container.setErrOutputStream(os);
-                container.setOutOutputStream(os);
-            }
             container.setContext(context);
             container.execute(exitOnFinish);
         } catch (Exception ex) {

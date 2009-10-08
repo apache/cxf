@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
+import org.apache.neethi.PolicyComponent;
 
 /**
  * Model bean to capture Trust10 assertion info
@@ -110,21 +111,35 @@ public class Trust10 extends AbstractSecurityAssertion {
         this.requireServerEntropy = requireServerEntropy;
     }
 
-    public QName getRealName() {
-        return SP11Constants.TRUST_10;
-    }
+    /*
+     * (non-Javadoc)
+     * @see org.apache.neethi.Assertion#getName()
+     */
     public QName getName() {
         return SP11Constants.TRUST_10;
     }
 
+    /*
+     * (non-Javadoc)
+     * @see org.apache.neethi.Assertion#isOptional()
+     */
+    public boolean isOptional() {
+        // TODO TODO Sanka
+        throw new UnsupportedOperationException("TODO Sanka");
+    }
+
+    public PolicyComponent normalize() {
+        return this;
+    }
+
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
 
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -140,7 +155,7 @@ public class Trust10 extends AbstractSecurityAssertion {
         }
 
         // <wsp:Policy>
-        writer.writeStartElement(wspPrefix, SPConstants.POLICY.getLocalPart(),
+        writer.writeStartElement(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getLocalPart(),
                                  SPConstants.POLICY.getNamespaceURI());
 
         if (isMustSupportClientChallenge()) {

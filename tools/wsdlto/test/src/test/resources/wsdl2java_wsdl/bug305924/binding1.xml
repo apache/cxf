@@ -16,10 +16,9 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<jaxb:bindings version="2.0" 
+<jaxb:bindings version="2.0" schemaLocation="hello_world.wsdl"
 	xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	schemaLocation="hello_world.wsdl#types1"
 	node="//xsd:element[@name='CreateProcess']/xsd:complexType/xsd:sequence/xsd:element[@name='MyProcess']/xsd:simpleType">
 	<jaxb:typesafeEnumClass name="MyProcess">
 		<jaxb:typesafeEnumMember name="BLUE" value="BLUE" />

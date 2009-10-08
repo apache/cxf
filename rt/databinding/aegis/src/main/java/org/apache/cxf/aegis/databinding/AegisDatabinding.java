@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.databinding;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,57 +29,67 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Node;
 
+import org.xml.sax.SAXException;
+
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
-import org.apache.cxf.aegis.type.TypeClassInfo;
+import org.apache.cxf.aegis.type.AbstractTypeCreator.TypeClassInfo;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
-import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
-import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
-import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
-import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.wsdl.WSDLConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
-import org.apache.ws.commons.schema.XmlSchemaException;
-import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+import org.jaxen.JaxenException;
+import org.jaxen.jdom.JDOMXPath;
+import org.jdom.Attribute;
+import org.jdom.Document;
+import org.jdom.Element;
+import org.jdom.JDOMException;
+import org.jdom.Namespace;
+import org.jdom.output.DOMOutputter;
 
 /**
- * CXF databinding object for Aegis. By default, this creates an AegisContext object. To customize the
- * behavior of the binding, an application should create its own AegisContext object and pass it to
- * {@link #setAegisContext(AegisContext)} <i>before</i> any call to {@link #initialize(Service)}. That does
- * not require special arrangements; the service factories do not call {{@link #initialize(Service)} until
- * after the application passes the data binding into the factory. This class adds root classes to the context
- * based on the SEI and implementation.
+ * CXF databinding object for Aegis. By default, this creates an AegisContext object. To customize
+ * the behavior of the binding, an application should create its own AegisContext object and
+ * pass it to {@link #setAegisContext(AegisContext)} <i>before</i> any call to {@link #initialize(Service)}.
+ * That does not require special arrangements; the service factories do not call {{@link #initialize(Service)}
+ * until after the application passes the data binding into the factory.
+ * 
+ * This class adds root classes to the context based on the SEI and implementation.
  * 
  * @see org.apache.cxf.aegis.AegisContext
  */
-public class AegisDatabinding extends AbstractDataBinding {
+public class AegisDatabinding
+    extends AbstractDataBinding {
 
     // these are here only for compatibility.
     /**
@@ -93,30 +104,57 @@ public class AegisDatabinding extends AbstractDataBinding {
      * @deprecated 2.1
      */
     public static final String READ_XSI_TYPE_KEY = "readXsiType";
-
+    
     protected static final int IN_PARAM = 0;
     protected static final int OUT_PARAM = 1;
     protected static final int FAULT_PARAM = 2;
 
     private static final Logger LOG = LogUtils.getL7dLogger(AegisDatabinding.class);
+    private static org.w3c.dom.Document xmimeSchemaDocument;
 
     private AegisContext aegisContext;
-    private Map<MessagePartInfo, AegisType> part2Type;
+    private Map<MessagePartInfo, Type> part2Type;
     private Service service;
     private boolean isInitialized;
     private Set<String> overrideTypes;
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
+    private JDOMXPath importXmimeXpath;
 
     public AegisDatabinding() {
         super();
-        part2Type = new HashMap<MessagePartInfo, AegisType>();
+        part2Type = new HashMap<MessagePartInfo, Type>();
+        // we have this also in AbstractXOPType. There has to be a better way.
+        importXmimeXpath = AbstractXOPType.getXmimeXpathImport();
+    }
+
+    private boolean schemaImportsXmime(Element schemaElement) {
+        try {
+            return importXmimeXpath.selectSingleNode(schemaElement) != null;
+        } catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private void ensureXmimeSchemaDocument() {
+        if (xmimeSchemaDocument != null) {
+            return;
+        }
+        try {
+            xmimeSchemaDocument = DOMUtils.readXml(getClass().getResourceAsStream("/schemas/wsdl/xmime.xsd"));
+        } catch (SAXException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     /**
-     * The Databinding API has initialize(Service). However, this object should be usable even if that API is
-     * never called.
+     * The Databinding API has initialize(Service). However, this object should
+     * be usable even if that API is never called.
      */
     private void ensureInitialized() {
         if (!isInitialized) {
@@ -147,7 +185,7 @@ public class AegisDatabinding extends AbstractDataBinding {
     public <T> DataReader<T> createReader(Class<T> cls) {
         ensureInitialized();
         if (cls.equals(XMLStreamReader.class)) {
-            return (DataReader<T>)new XMLStreamDataReader(this, getBus());
+            return (DataReader<T>)new XMLStreamDataReader(this);
         } else if (cls.equals(Node.class)) {
             return (DataReader<T>)new ElementDataReader(this);
         } else {
@@ -162,7 +200,7 @@ public class AegisDatabinding extends AbstractDataBinding {
     public <T> DataWriter<T> createWriter(Class<T> cls) {
         ensureInitialized();
         if (cls.equals(XMLStreamWriter.class)) {
-            return (DataWriter<T>)new XMLStreamDataWriter(this, getBus());
+            return (DataWriter<T>)new XMLStreamDataWriter(this);
         } else if (cls.equals(Node.class)) {
             return (DataWriter<T>)new ElementDataWriter(this);
         } else {
@@ -174,22 +212,19 @@ public class AegisDatabinding extends AbstractDataBinding {
      * {@inheritDoc}
      */
     public Class<?>[] getSupportedReaderFormats() {
-        return new Class[] {
-            XMLStreamReader.class, Node.class
-        };
+        return new Class[] {XMLStreamReader.class, Node.class};
     }
 
     /**
      * {@inheritDoc}
      */
     public Class<?>[] getSupportedWriterFormats() {
-        return new Class[] {
-            XMLStreamWriter.class, Node.class
-        };
+        return new Class[] {XMLStreamWriter.class, Node.class};
     }
 
     /**
-     * {@inheritDoc} Set up the data binding for a service.
+     * {@inheritDoc}
+     * Set up the data binding for a service.
      */
     public void initialize(Service s) {
 
@@ -247,7 +282,7 @@ public class AegisDatabinding extends AbstractDataBinding {
             if (overrideTypes != null) {
                 aegisContext.setRootClassNames(overrideTypes);
             }
-
+            
             if (configuration != null) {
                 aegisContext.setTypeCreationOptions(configuration);
             }
@@ -260,10 +295,8 @@ public class AegisDatabinding extends AbstractDataBinding {
         aegisContext.setMappingNamespaceURI(s.getServiceInfos().get(0).getName().getNamespaceURI());
         aegisContext.initialize();
         this.service = s;
-        s.getInInterceptors()
-            .add(new AegisSchemaValidationInInterceptor(getBus(), s.getServiceInfos().get(0)));
 
-        Set<AegisType> deps = new HashSet<AegisType>();
+        Set<Type> deps = new HashSet<Type>();
 
         for (ServiceInfo info : s.getServiceInfos()) {
             for (OperationInfo opInfo : info.getInterface().getOperations()) {
@@ -276,10 +309,10 @@ public class AegisDatabinding extends AbstractDataBinding {
             }
         }
 
-        Collection<AegisType> additional = aegisContext.getRootTypes();
+        Collection<Type> additional = aegisContext.getRootTypes();
 
         if (additional != null) {
-            for (AegisType t : additional) {
+            for (Type t : additional) {
                 if (!deps.contains(t)) {
                     deps.add(t);
                 }
@@ -299,8 +332,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo, 
-                                     Set<AegisType> deps) {
+    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo, Set<Type> deps) {
         try {
             initializeMessage(s, serviceTM, opInfo.getInput(), IN_PARAM, deps);
 
@@ -337,14 +369,11 @@ public class AegisDatabinding extends AbstractDataBinding {
     }
 
     protected void initializeMessage(Service s, TypeMapping serviceTM, AbstractMessageContainer container,
-                                     int partType, Set<AegisType> deps) {
-        if (container == null) {
-            return;
-        }
+                                     int partType, Set<Type> deps) {
         for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
             MessagePartInfo part = (MessagePartInfo)itr.next();
 
-            AegisType type = getParameterType(s, serviceTM, part, partType);
+            Type type = getParameterType(s, serviceTM, part, partType);
 
             if (part.getXmlSchema() == null) {
                 // schema hasn't been filled in yet
@@ -354,12 +383,8 @@ public class AegisDatabinding extends AbstractDataBinding {
                     part.setElementQName(type.getSchemaType());
                 }
             }
-
-            // The concept of type.isNillable is questionable: how are types nillable?
-            // However, this if at least allow .aegis.xml files to get control.
-            if (part.getProperty("nillable") == null) {
-                part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
-            }
+            
+            part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
             if (type.hasMinOccurs()) {
                 long miValue = type.getMinOccurs();
                 if (miValue != 0) {
@@ -385,9 +410,6 @@ public class AegisDatabinding extends AbstractDataBinding {
     }
 
     protected void initializeMessageTypes(ServiceInfo s, AbstractMessageContainer container, int partType) {
-        if (container == null) {
-            return;
-        }
         SchemaCollection col = s.getXmlSchemaCollection();
         for (Iterator itr = container.getMessageParts().iterator(); itr.hasNext();) {
             MessagePartInfo part = (MessagePartInfo)itr.next();
@@ -403,10 +425,10 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void addDependencies(Set<AegisType> deps, AegisType type) {
-        Set<AegisType> typeDeps = type.getDependencies();
+    private void addDependencies(Set<Type> deps, Type type) {
+        Set<Type> typeDeps = type.getDependencies();
         if (typeDeps != null) {
-            for (AegisType t : typeDeps) {
+            for (Type t : typeDeps) {
                 if (!deps.contains(t)) {
                     deps.add(t);
                     addDependencies(deps, t);
@@ -415,14 +437,14 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void createSchemas(Service s, Set<AegisType> deps) {
+    private void createSchemas(Service s, Set<Type> deps) {
 
-        Map<String, Set<AegisType>> tns2Type = new HashMap<String, Set<AegisType>>();
-        for (AegisType t : deps) {
+        Map<String, Set<Type>> tns2Type = new HashMap<String, Set<Type>>();
+        for (Type t : deps) {
             String ns = t.getSchemaType().getNamespaceURI();
-            Set<AegisType> types = tns2Type.get(ns);
+            Set<Type> types = tns2Type.get(ns);
             if (types == null) {
-                types = new HashSet<AegisType>();
+                types = new HashSet<Type>();
                 tns2Type.put(ns, types);
             }
             types.add(t);
@@ -437,104 +459,106 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
 
         Map<String, String> namespaceMap = getDeclaredNamespaceMappings();
+        boolean needXmimeSchema = false;
+        // utility types.
+        boolean needTypesSchema = false;
 
-        for (ServiceInfo si : s.getServiceInfos()) {
-            // these two must be recalculated per-service-info!
-            boolean needXmimeSchema = false;
-            boolean needTypesSchema = false;
+        for (Map.Entry<String, Set<Type>> entry : tns2Type.entrySet()) {
+            String xsdPrefix = SOAPConstants.XSD_PREFIX;
+            if (namespaceMap != null && namespaceMap.containsKey(SOAPConstants.XSD)) {
+                xsdPrefix = namespaceMap.get(SOAPConstants.XSD);
+            }
 
-            for (Map.Entry<String, Set<AegisType>> entry : tns2Type.entrySet()) {
+            Element e = new Element("schema", xsdPrefix, SOAPConstants.XSD);
 
-                String schemaNamespaceUri = entry.getKey();
+            e.setAttribute(new Attribute(WSDLConstants.ATTR_TNS, entry.getKey()));
 
-                if (XmlSchemaConstants.XSD_NAMESPACE_URI.equals(schemaNamespaceUri)) {
-                    continue;
+            if (null != namespaceMap) { // did application hand us some
+                                        // additional namespaces?
+                for (Map.Entry<String, String> mapping : namespaceMap.entrySet()) {
+                    // user gives us namespace->prefix mapping.
+                    e.addNamespaceDeclaration(Namespace.getNamespace(mapping.getValue(), mapping.getKey()));
                 }
+            }
 
-                if (AegisContext.UTILITY_TYPES_SCHEMA_NS.equals(schemaNamespaceUri)) {
-                    continue; // we handle this separately.
-                }
+            // if the user didn't pick something else, assign 'tns' as the
+            // prefix.
+            if (namespaceMap == null || !namespaceMap.containsKey(entry.getKey())) {
+                // Schemas are more readable if there is a specific prefix for
+                // the TNS.
+                e.addNamespaceDeclaration(Namespace.getNamespace(WSDLConstants.CONVENTIONAL_TNS_PREFIX, entry
+                    .getKey()));
+            }
+            e.setAttribute(new Attribute("elementFormDefault", "qualified"));
+            e.setAttribute(new Attribute("attributeFormDefault", "qualified"));
 
-                if (AbstractXOPType.XML_MIME_NS.equals(schemaNamespaceUri)) {
-                    continue; // similiarly.
-                }
+            for (Type t : entry.getValue()) {
+                t.writeSchema(e);
+            }
 
-                SchemaInfo schemaInfo = si.addNewSchema(entry.getKey());
-                XmlSchema schema = schemaInfo.getSchema();
-                NamespaceMap xmlsNamespaceMap = new NamespaceMap();
+            if (e.getChildren().size() == 0) {
+                continue;
+            }
 
-                // user-requested prefix mappings.
-                if (namespaceMap != null) {
-                    for (Map.Entry<String, String> e : namespaceMap.entrySet()) {
-                        xmlsNamespaceMap.add(e.getValue(), e.getKey());
+            if (schemaImportsXmime(e)) {
+                needXmimeSchema = true;
+            }
+            if (AegisContext.schemaImportsUtilityTypes(e)) {
+                needTypesSchema = true;
+            }
+
+            try {
+                NamespaceMap nsMap = new NamespaceMap();
+
+                nsMap.add(xsdPrefix, SOAPConstants.XSD);
+
+                // We prefer explicit prefixes over those generated in the
+                // types.
+                // This loop may have intended to support prefixes from
+                // individual aegis files,
+                // but that isn't a good idea.
+                for (Iterator itr = e.getAdditionalNamespaces().iterator(); itr.hasNext();) {
+                    Namespace n = (Namespace)itr.next();
+                    if (!nsMap.containsValue(n.getURI())) {
+                        nsMap.add(n.getPrefix(), n.getURI());
                     }
                 }
 
-                // tns: is conventional, and besides we have unit tests that are hardcoded to it.
-                if (!xmlsNamespaceMap.containsKey(WSDLConstants.CONVENTIONAL_TNS_PREFIX)
-                // if some wants something other than TNS, they get it.
-                    && !xmlsNamespaceMap.containsValue(entry.getKey())) {
-                    xmlsNamespaceMap.add(WSDLConstants.CONVENTIONAL_TNS_PREFIX, entry.getKey());
-                }
+                org.w3c.dom.Document schema = new DOMOutputter().output(new Document(e));
 
-                // ditto for xsd: instead of just namespace= for the schema schema.
-                if (!xmlsNamespaceMap.containsKey("xsd")
-                    && !xmlsNamespaceMap.containsValue(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
-                    xmlsNamespaceMap.add("xsd", XmlSchemaConstants.XSD_NAMESPACE_URI);
+                for (ServiceInfo si : s.getServiceInfos()) {
+                    SchemaCollection col = si.getXmlSchemaCollection();
+                    col.setNamespaceContext(nsMap);
+                    XmlSchema xmlSchema = addSchemaDocument(si, col, schema, entry.getKey());
+                    // Work around bug in JDOM DOMOutputter which fails to
+                    // correctly
+                    // assign namespaces to attributes. If JDOM worked right,
+                    // the collection object would get the prefixes for itself.
+                    xmlSchema.setNamespaceContext(nsMap);
                 }
-
-                schema.setNamespaceContext(xmlsNamespaceMap);
-                schema.setTargetNamespace(entry.getKey());
-                schema.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
-                schema.setAttributeFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
-
-                for (AegisType t : entry.getValue()) {
-                    try {
-                        t.writeSchema(schema);
-                    } catch (XmlSchemaException ex) {
-                        QName name = t.getSchemaType();
-                        String expected = " Schema for namespace '" + name.getNamespaceURI()
-                                          + "' already contains type '" + name.getLocalPart() + "'";
-                        String message = ex.getMessage();
-                        if (expected.equals(message)) {
-                            continue;
-                        } else {
-                            throw ex;
-                        }
-                    }
-                }
-
-                if (schemaImportsXmime(schema)) {
-                    needXmimeSchema = true;
-                }
-
-                if (AegisContext.schemaImportsUtilityTypes(schema)) {
-                    needTypesSchema = true;
-                }
+            } catch (JDOMException e1) {
+                throw new ServiceConstructionException(e1);
             }
 
-            if (needXmimeSchema) {
-                XmlSchema schema = aegisContext.addXmimeSchemaDocument(si.getXmlSchemaCollection()
-                    .getXmlSchemaCollection());
-                SchemaInfo schemaInfo = new SchemaInfo(schema.getTargetNamespace());
-                schemaInfo.setSchema(schema);
-                si.addSchema(schemaInfo);
-            }
-
-            if (needTypesSchema) {
-                XmlSchema schema = aegisContext.addTypesSchemaDocument(si.getXmlSchemaCollection()
-                    .getXmlSchemaCollection());
-                SchemaInfo schemaInfo = new SchemaInfo(schema.getTargetNamespace());
-                schemaInfo.setSchema(schema);
-                si.addSchema(schemaInfo);
-            }
-            // it's quite likely that the code in Aegis missed at least one ...
-            si.getXmlSchemaCollection().addCrossImports();
         }
-    }
 
-    private boolean schemaImportsXmime(XmlSchema schema) {
-        return XmlSchemaUtils.schemaImportsNamespace(schema, AbstractXOPType.XML_MIME_NS);
+        if (needXmimeSchema) {
+            ensureXmimeSchemaDocument();
+            for (ServiceInfo si : s.getServiceInfos()) {
+                SchemaCollection col = si.getXmlSchemaCollection();
+                // invented systemId.
+                addSchemaDocument(si, col, xmimeSchemaDocument, AbstractXOPType.XML_MIME_NS);
+            }
+        }
+        
+        if (needTypesSchema) {
+            org.w3c.dom.Document schema = aegisContext.getTypesSchemaDocument(); 
+            for (ServiceInfo si : s.getServiceInfos()) {
+                SchemaCollection col = si.getXmlSchemaCollection();
+                addSchemaDocument(si, col, schema, AegisContext.SCHEMA_NS);
+            }
+        }
+        
     }
 
     public QName getSuggestedName(Service s, TypeMapping tm, OperationInfo op, int param) {
@@ -548,7 +572,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         // No mapped name was specified, so if its a complex type use that name
         // instead
         if (name == null) {
-            AegisType type = tm.getTypeCreator().createType(m, param);
+            Type type = tm.getTypeCreator().createType(m, param);
 
             if (type.isComplex() && !type.isAbstract()) {
                 name = type.getSchemaType();
@@ -558,8 +582,13 @@ public class AegisDatabinding extends AbstractDataBinding {
         return name;
     }
 
-    private AegisType getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
-        AegisType type = tm.getType(param.getTypeQName());
+    private Type getParameterType(Service s, TypeMapping tm, MessagePartInfo param, int paramtype) {
+        Type type = tm.getType(param.getTypeQName());
+
+        /*
+         * if (type == null && tm.isRegistered(param.getTypeClass())) { type =
+         * tm.getType(param.getTypeClass()); part2type.put(param, type); }
+         */
 
         int offset = 0;
         if (paramtype == OUT_PARAM) {
@@ -568,8 +597,6 @@ public class AegisDatabinding extends AbstractDataBinding {
 
         TypeCreator typeCreator = tm.getTypeCreator();
         if (type == null) {
-            // Current author doesn't know how type can be non-null here.
-            boolean usingComponentType = false;
             OperationInfo op = param.getMessageInfo().getOperation();
 
             Method m = getMethod(s, op);
@@ -579,63 +606,29 @@ public class AegisDatabinding extends AbstractDataBinding {
             } else {
                 info = typeCreator.createBasicClassInfo(param.getTypeClass());
             }
-            Boolean nillable = info.getNillable();
-            /*
-             * Note that, for types from the mapping, the minOccurs, maxOccurs, and nillable from the 'info'
-             * will be ignored by createTypeForClass below. So we need to override.
-             */
-            type = typeCreator.createTypeForClass(info);
-
-            // if not writing outer, we don't need anything special.
-            if (param.getMessageInfo().getOperation().isUnwrapped() && param.getTypeClass().isArray()
-                && type.isWriteOuter()) {
-                /*
-                 * The service factory expects arrays going into the wrapper to be mapped to the array
-                 * component type and will then add min=0/max=unbounded. That doesn't work for Aegis where we
-                 * already created a wrapper ArrayType so we'll let it know we want the default.
-                 */
+            if (param.getMessageInfo().getOperation().isUnwrapped() && param.getTypeClass().isArray()) {
+                // The service factory expects arrays going into the wrapper to
+                // be
+                // mapped to the array component type and will then add
+                // min=0/max=unbounded. That doesn't work for Aegis where we
+                // already created a wrapper ArrayType so we'll let it know we
+                // want the default.
                 param.setProperty("minOccurs", "1");
                 param.setProperty("maxOccurs", "1");
-                if (nillable == null) {
-                    nillable = Boolean.TRUE;
-                }
-                param.setProperty("nillable", nillable);
-            } else {
-                if (nillable != null) {
-                    param.setProperty("nillable", nillable);
-                }
-                /*
-                 * TypeClassInfo uses -1 to mean 'not specified'
-                 */
-                if (info.getMinOccurs() != -1) {
-                    param.setProperty("minOccurs", Long.toString(info.getMinOccurs()));
-                }
-                if (info.getMaxOccurs() != -1) {
-                    param.setProperty("maxOccurs", Long.toString(info.getMaxOccurs()));
-                }
-                
-                if ((type instanceof ArrayType) && !type.isWriteOuter()) {
-                    param.setProperty("org.apache.cxf.aegis.outerType", type);
-                    ArrayType aType = (ArrayType) type;
-                    type = aType.getComponentType();
-                    usingComponentType = true;
-                }
+                param.setProperty("nillable", Boolean.TRUE);
             }
-
             if (info.getMappedName() != null) {
                 param.setConcreteName(info.getMappedName());
                 param.setName(info.getMappedName());
             }
-
-            if (!usingComponentType) {
-                // We have to register the type if we want minOccurs and such to
-                // work. (for custom types). Is this really still true with all the 
-                // param setting above?
-                if (info.nonDefaultAttributes()) {
-                    tm.register(type);
-                }
-                type.setTypeMapping(tm);
+            type = typeCreator.createTypeForClass(info);
+            // We have to register the type if we want minOccurs and such to
+            // work.
+            if (info.nonDefaultAttributes()) {
+                tm.register(type);
             }
+            type.setTypeMapping(tm);
+
             part2Type.put(param, type);
         }
 
@@ -653,29 +646,11 @@ public class AegisDatabinding extends AbstractDataBinding {
             return null;
         }
         SimpleMethodDispatcher smd = (SimpleMethodDispatcher)md;
-        return smd != null ? smd.getPrimaryMethod(op) : null;
+        return smd.getPrimaryMethod(op);
     }
 
-    public AegisType getType(MessagePartInfo part) {
+    public Type getType(MessagePartInfo part) {
         return part2Type.get(part);
-    }
-
-    public MessagePartInfo getPartFromClass(Class<?> cls) {
-        for (Map.Entry<MessagePartInfo, AegisType> entry : part2Type.entrySet()) {
-            if (entry.getValue().getTypeClass() == cls) {
-                return entry.getKey();
-            }
-        }
-        return null;
-    }
-
-    public AegisType getTypeFromClass(Class<?> cls) {
-        for (AegisType t : part2Type.values()) {
-            if (t.getTypeClass() == cls) {
-                return t;
-            }
-        }
-        return null;
     }
 
     public Service getService() {

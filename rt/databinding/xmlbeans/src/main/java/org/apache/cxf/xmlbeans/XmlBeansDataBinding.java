@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
@@ -113,7 +112,7 @@ public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperC
         }
     }
 
-    public WrapperHelper createWrapperHelper(Class<?> wrapperType, QName wrapperName, List<String> partNames,
+    public WrapperHelper createWrapperHelper(Class<?> wrapperType, List<String> partNames,
                                              List<String> elTypeNames, List<Class<?>> partClasses) {
         
         List<Method> getMethods = new ArrayList<Method>(partNames.size());

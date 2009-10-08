@@ -26,12 +26,12 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.ws.rs.Consumes;
+import javax.ws.rs.ConsumeMime;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
@@ -69,7 +69,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/jsonfeed")
-    @Produces({"application/xml", "application/json", "text/html", "application/atom+xml" })
+    @ProduceMime({"application/xml", "application/json", "text/html", "application/atom+xml" })
     public Feed getBooksAsJsonFeed(@Context UriInfo uParam) {
         return getBooksAsFeed(uParam);    
     }
@@ -77,7 +77,7 @@ public class AtomBookStore {
     
     @GET
     @Path("/books/feed")
-    @Produces({"application/atom+xml", "application/json" })
+    @ProduceMime({"application/atom+xml", "application/json" })
     public Feed getBooksAsFeed(@Context UriInfo uParam) {
         
         MediaType mt = headers.getMediaType();
@@ -112,7 +112,7 @@ public class AtomBookStore {
     
     @POST
     @Path("/books/feed")
-    @Consumes("application/atom+xml")
+    @ConsumeMime("application/atom+xml")
     public Response addBookAsEntry(Entry e) {
         try {
             String text = e.getContentElement().getValue();
@@ -121,37 +121,20 @@ public class AtomBookStore {
             Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
             books.put(b.getId(), b);
             
-            URI uri = 
-                uField.getBaseUriBuilder().path("books").path("entries") 
-                                                .path(Long.toString(b.getId())).build();
-            return Response.created(uri).entity(e).build();
-        } catch (Exception ex) {
-            return Response.serverError().build();
-        }
-    }
-    
-    @POST
-    @Path("/books/feed/relative")
-    @Consumes("application/atom+xml")
-    public Response addBookAsEntryRelativeURI(Entry e) throws Exception {
-        try {
-            String text = e.getContentElement().getValue();
-            StringReader reader = new StringReader(text);
-            JAXBContext jc = JAXBContext.newInstance(Book.class);
-            Book b = (Book)jc.createUnmarshaller().unmarshal(reader);
-            books.put(b.getId(), b);
+            // this code is broken as Response does not
             
-            URI uri = URI.create("books/entries/" + Long.toString(b.getId()));
+            URI uri = 
+                uField.getBaseUriBuilder().path("books/entries", 
+                                                Long.toString(b.getId())).build();
             return Response.created(uri).entity(e).build();
         } catch (Exception ex) {
             return Response.serverError().build();
         }
     }
-    
     
     @GET
     @Path("/books/entries/{bookId}/")
-    @Produces({"application/atom+xml", "application/json" })
+    @ProduceMime({"application/atom+xml", "application/json" })
     public Entry getBookAsEntry(@PathParam("bookId") String id) throws BookNotFoundFault {
         System.out.println("----invoking getBook with id: " + id);
         Book book = books.get(Long.parseLong(id));

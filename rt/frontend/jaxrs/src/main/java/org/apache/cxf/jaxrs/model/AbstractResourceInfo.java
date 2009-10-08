@@ -44,13 +44,10 @@ public abstract class AbstractResourceInfo {
     private static Map<Class<?>, Map<Field, ThreadLocalProxy>> resourceProxyMap;
     private static Map<Class<?>, Map<Method, ThreadLocalProxy>> setterProxyMap;
     
-    protected boolean root;
-    protected Class<?> resourceClass;
-    protected Class<?> serviceClass;
+    private boolean root;
+    private Class<?> resourceClass;
+    private Class<?> serviceClass;
     
-    protected AbstractResourceInfo() {
-        
-    }
     
     protected AbstractResourceInfo(Class<?> resourceClass, Class<?> serviceClass, boolean isRoot) {
         this.serviceClass = serviceClass;
@@ -62,10 +59,6 @@ public abstract class AbstractResourceInfo {
         }
     }
     
-    public void setResourceClass(Class<?> rClass) {
-        resourceClass = rClass;
-    }
-    
     public Class<?> getServiceClass() {
         return serviceClass;
     }
@@ -74,14 +67,9 @@ public abstract class AbstractResourceInfo {
         if (resourceClass == null || !root) {
             return;
         }
-        findContextFields(serviceClass);
-    }
-    
-    private void findContextFields(Class<?> cls) {
-        if (cls == Object.class || cls == null) {
-            return;
-        }
-        for (Field f : cls.getDeclaredFields()) {
+        
+        
+        for (Field f : getServiceClass().getDeclaredFields()) {
             for (Annotation a : f.getAnnotations()) {
                 if (a.annotationType() == Context.class) {
                     if (contextFields == null) {
@@ -105,7 +93,6 @@ public abstract class AbstractResourceInfo {
                 }
             }
         }
-        findContextFields(cls.getSuperclass());
     }
     
     private void initContextSetterMethods() {

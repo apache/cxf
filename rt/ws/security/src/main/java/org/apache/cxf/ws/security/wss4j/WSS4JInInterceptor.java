@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
 import java.util.List;
@@ -26,10 +25,7 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPBody;
 import javax.xml.soap.SOAPException;
@@ -43,20 +39,14 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
-import org.apache.cxf.ws.security.SecurityConstants;
-import org.apache.cxf.ws.security.tokenstore.SecurityToken;
-import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSPasswordCallback;
 import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
@@ -64,7 +54,6 @@ import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
-import org.apache.ws.security.message.token.SecurityTokenReference;
 import org.apache.ws.security.message.token.Timestamp;
 import org.apache.ws.security.processor.Processor;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -89,7 +78,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                                                                  WSS4JInInterceptor.class.getName()
                                                                      + "-Time");
     private SAAJInInterceptor saajIn = new SAAJInInterceptor();
-    private boolean ignoreActions;
 
     /**
      *
@@ -102,10 +90,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         setPhase(Phase.PRE_PROTOCOL);
         getAfter().add(SAAJInInterceptor.class.getName());
     }
-    public WSS4JInInterceptor(boolean ignore) {
-        this();
-        ignoreActions = ignore;
-    }
 
     public WSS4JInInterceptor(Map<String, Object> properties) {
         this();
@@ -117,9 +101,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    public void setIgnoreActions(boolean i) {
-        ignoreActions = i;
-    }
     private SOAPMessage getSOAPMessage(SoapMessage msg) {
         SOAPMessage doc = msg.getContent(SOAPMessage.class);
         if (doc == null) {
@@ -142,7 +123,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }               
         return result;
     }
-    
+
     public void handleMessage(SoapMessage msg) throws Fault {
         if (msg.containsKey(SECURITY_PROCESSED)) {
             return;
@@ -174,7 +155,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         try {
             reqData.setMsgContext(msg);
-            computeAction(msg, reqData);
+
             Vector actions = new Vector();
             String action = getAction(msg, version);
 
@@ -284,11 +265,11 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             /*
              * now check the security actions: do they match, in any order?
              */
-            if (!ignoreActions && !checkReceiverResultsAnyOrder(wsResult, actions)) {
+            if (!checkReceiverResultsAnyOrder(wsResult, actions)) {
                 LOG.warning("Security processing failed (actions mismatch)");
                 throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
             }
-            
+
             doResults(msg, actor, doc, wsResult);
 
             if (doTimeLog) {
@@ -317,17 +298,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
-    /**
-     * Do whatever is necessary to determine the action for the incoming message and 
-     * do whatever other setup work is necessary.
-     * 
-     * @param msg
-     * @param reqData
-     */
-    protected void computeAction(SoapMessage msg, RequestData reqData) {
-        
-    }
-    protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
+    private void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
         throws SOAPException, XMLStreamException {
         /*
          * All ok up to this point. Now construct and setup the security result
@@ -386,44 +357,6 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
         return action;
     }
-    
-    private class TokenStoreCallbackHandler implements CallbackHandler {
-        private CallbackHandler internal;
-        private TokenStore store;
-        public TokenStoreCallbackHandler(CallbackHandler in,
-                                         TokenStore st) {
-            internal = in;
-            store = st;
-        }
-        
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (int i = 0; i < callbacks.length; i++) {
-                WSPasswordCallback pc = (WSPasswordCallback)callbacks[i];
-                
-                String id = pc.getIdentifier();
-                
-                if (SecurityTokenReference.ENC_KEY_SHA1_URI.equals(pc.getKeyType())) {
-                    for (SecurityToken token : store.getValidTokens()) {
-                        if (id.equals(token.getSHA1())) {
-                            pc.setKey(token.getSecret());
-                            return;
-                        }
-                    }                    
-                } else { 
-                    SecurityToken tok = store.getToken(id);
-                    if (tok != null) {
-                        pc.setKey(tok.getSecret());
-                        pc.setCustomToken(tok.getAttachedReference());
-                        return;
-                    }
-                }
-            }
-            if (internal != null) {
-                internal.handle(callbacks);
-            }
-        }
-        
-    }
 
     private CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
         /*
@@ -432,40 +365,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
          */
         CallbackHandler cbHandler = null;
         if ((doAction & (WSConstants.ENCR | WSConstants.UT)) != 0) {
-            Object o = ((SoapMessage)reqData.getMsgContext())
-                .getContextualProperty(SecurityConstants.CALLBACK_HANDLER);
-            if (o instanceof String) {
-                try {
-                    o = ClassLoaderUtils.loadClass((String)o, this.getClass()).newInstance();
-                } catch (Exception e) {
-                    throw new WSSecurityException(e.getMessage(), e);
-                }
-            }            
-            if (o instanceof CallbackHandler) {
-                cbHandler = (CallbackHandler)o;
-            }
-            if (cbHandler == null) {
-                try {
-                    cbHandler = getPasswordCB(reqData);
-                } catch (WSSecurityException sec) {
-                    Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
-                    if (ep != null && ep.getEndpointInfo() != null) {
-                        TokenStore store = (TokenStore)ep.getEndpointInfo()
-                            .getProperty(TokenStore.class.getName());
-                        if (store != null) {
-                            return new TokenStoreCallbackHandler(cbHandler, store);
-                        }
-                    }                    
-                    throw sec;
-                }
-            }
-        }
-        Endpoint ep = ((SoapMessage)reqData.getMsgContext()).getExchange().get(Endpoint.class);
-        if (ep != null && ep.getEndpointInfo() != null) {
-            TokenStore store = (TokenStore)ep.getEndpointInfo().getProperty(TokenStore.class.getName());
-            if (store != null) {
-                return new TokenStoreCallbackHandler(cbHandler, store);
-            }
+            cbHandler = getPasswordCB(reqData);
         }
         return cbHandler;
     }

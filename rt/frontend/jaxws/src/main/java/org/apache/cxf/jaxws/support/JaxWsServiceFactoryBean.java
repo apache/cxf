@@ -41,6 +41,7 @@ import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.FaultAction;
 import javax.xml.ws.Service;
+import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.soap.Addressing;
@@ -49,11 +50,11 @@ import javax.xml.ws.soap.MTOM;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.XMLSchemaQNames;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
@@ -62,19 +63,17 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JAXWSMethodDispatcher;
 import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
+import org.apache.cxf.jaxws.interceptors.DispatchInDatabindingInterceptor;
+import org.apache.cxf.jaxws.interceptors.DispatchOutDatabindingInterceptor;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
-import org.apache.cxf.service.factory.FactoryBeanListener;
-import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
-import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
-import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
@@ -122,7 +121,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         this.schemaLocationMapping.put(JAXWSAConstants.NS_WSA, 
                                        JAXWSAConstants.WSA_XSD);
     }
-
+    
     private void loadWSFeatureAnnotation(Class<?> serviceClass, Class<?> implementorClass) {
         List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
         MTOM mtom = implInfo.getImplementorClass().getAnnotation(MTOM.class);        
@@ -181,16 +180,27 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     @Override
+    protected void initializeDefaultInterceptors() {
+        super.initializeDefaultInterceptors();
+
+        if (implInfo.isWebServiceProvider()) {
+            Class<?> type = implInfo.getProviderParameterType();
+            Mode mode = implInfo.getServiceMode();
+
+            getService().getInInterceptors().add(new DispatchInDatabindingInterceptor(type, mode));
+            getService().getOutInterceptors().add(new DispatchOutDatabindingInterceptor(mode));
+        }
+    }
+
+    @Override
     protected void initializeFaultInterceptors() {
         getService().getOutFaultInterceptors().add(new WebFaultOutInterceptor());
     }
 
     @Override
     public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {        
-        Endpoint ep = new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures, 
+        return new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures, 
                                      this.getFeatures(), this.isFromWsdl());
-        sendEvent(FactoryBeanListener.Event.ENDPOINT_CREATED, ei, ep);
-        return ep;
     }
 
     @Override
@@ -207,8 +217,6 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             : CastUtils.cast(op.getParameterOrdering(), String.class));
 
         bindOperation(o, method);
-
-        sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
     }
     
     protected void bindOperation(OperationInfo op, Method method) {
@@ -236,6 +244,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
     }
 
+
     @Override
     protected void initializeWSDLOperations() {
         if (implInfo.isWebServiceProvider()) {
@@ -244,6 +253,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             super.initializeWSDLOperations();
         }
     }
+
 
     protected void initializeWSDLOperationsForProvider() {
         Type[] genericInterfaces = getServiceClass().getGenericInterfaces();
@@ -270,67 +280,14 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         
         try {
             Method invoke = getServiceClass().getMethod("invoke", c);
-            QName catchAll = new QName("http://cxf.apache.org/jaxws/provider", "invoke");
-            
+
             // Bind every operation to the invoke method.
             for (ServiceInfo si : getService().getServiceInfos()) {
-                si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
-                for (BindingInfo bind : si.getBindings()) {
-                    for (BindingOperationInfo bop : bind.getOperations()) {
-                        OperationInfo o = bop.getOperationInfo();
-                        if (o.getInput() != null) {
-                            if (o.getInput().getMessageParts().isEmpty()) {
-                                MessagePartInfo inf = o.getInput().addMessagePart(o.getName());
-                                inf.setConcreteName(o.getName());
-                                bop.getInput().setMessageParts(o.getInput().getMessageParts());
-                            }
-                            for (MessagePartInfo inf : o.getInput().getMessageParts()) {
-                                inf.setTypeClass(c);
-                                break;
-                            }
-                        }
-                        if (o.getOutput() != null) {
-                            if (o.getOutput().getMessageParts().isEmpty()) {
-                                MessagePartInfo inf = o.getOutput().addMessagePart(o.getName());
-                                inf.setConcreteName(new QName(o.getName().getNamespaceURI(),
-                                                              o.getName().getLocalPart() + "Response"));
-                                bop.getOutput().setMessageParts(o.getOutput().getMessageParts());
-                            }
-                            for (MessagePartInfo inf : o.getOutput().getMessageParts()) {
-                                inf.setTypeClass(c);
-                                break;
-                            }
-                        }
-                        getMethodDispatcher().bind(o, invoke);
-                    }
-                    BindingOperationInfo bop = bind.getOperation(catchAll);
-                    if (bop == null) {
-                        OperationInfo op = bind.getInterface().getOperation(catchAll);
-                        if (op == null) {
-                            op = bind.getInterface().addOperation(catchAll);
-                            String name = catchAll.getLocalPart();
-                            MessageInfo mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(),
-                                                                           name + "Request"),
-                                                                           MessageInfo.Type.INPUT);
-                            op.setInput(catchAll.getLocalPart() + "Request", mInfo);
-                            MessagePartInfo mpi = mInfo.addMessagePart("parameters");
-                            mpi.setElement(true);
-                            mpi.setTypeClass(c);
-                            mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
-                            
-                            mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(), 
-                                                               name + "Response"),
-                                                               MessageInfo.Type.OUTPUT);
-                            op.setOutput(name + "Response", mInfo);
-                            mpi = mInfo.addMessagePart("parameters");
-                            mpi.setElement(true);
-                            mpi.setTypeClass(c);
-                            mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
-                        
-                            BindingOperationInfo bo = new BindingOperationInfo(bind, op);
-                            bind.addOperation(bo);
-                        }
-                    }
+                for (OperationInfo o : si.getInterface().getOperations()) {
+                    getMethodDispatcher().bind(o, invoke);
+                }
+                for (BindingInfo bi : si.getBindings()) {
+                    bi.setProperty(AbstractBindingFactory.DATABINDING_DISABLED, Boolean.TRUE);
                 }
             }
         } catch (SecurityException e) {
@@ -360,6 +317,44 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                                                            getRequestWrapperClassName(selected));
         }
     }
+
+    /**
+     * Create a mock service model with two operations - invoke and
+     * invokeOneway.
+     */
+    // @Override
+    // protected InterfaceInfo createInterface(ServiceInfo serviceInfo) {
+    // if (jaxWsImplementorInfo.isWebServiceProvider()) {
+    // return createInterfaceForProvider(serviceInfo);
+    // } else {
+    // return super.createInterface(serviceInfo);
+    // }
+    // }
+    //
+    // protected InterfaceInfo createInterfaceForProvider(ServiceInfo
+    // serviceInfo) {
+    //
+    // InterfaceInfo intf = new InterfaceInfo(serviceInfo, getInterfaceName());
+    //
+    // String ns = getServiceNamespace();
+    // OperationInfo invoke = intf.addOperation(new QName(ns, "invoke"));
+    //
+    // MessageInfo input = invoke.createMessage(new QName(ns, "input"));
+    // invoke.setInput("input", input);
+    //
+    // input.addMessagePart("in");
+    //
+    // MessageInfo output = invoke.createMessage(new QName(ns, "output"));
+    // invoke.setOutput("output", output);
+    //
+    // output.addMessagePart("out");
+    // //
+    // // OperationInfo invokeOneWay = intf.addOperation(new
+    // // QName(getServiceNamespace(), "invokeOneWay"));
+    // // invokeOneWay.setInput("input", input);
+    //
+    // return intf;
+    // }
 
 
     @Override
@@ -409,7 +404,6 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     protected final void initConfiguration(JaxWsImplementorInfo ii) {
         if (ii.isWebServiceProvider()) {
             jaxWsConfiguration = new WebServiceProviderConfiguration();
-            jaxWsConfiguration.setServiceFactory(this);
             getServiceConfigurations().add(0, jaxWsConfiguration);
             setWrapped(false);
             setDataBinding(new SourceDataBinding());
@@ -530,14 +524,5 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     protected void buildServiceFromClass() {
         super.buildServiceFromClass();
         getService().put(WS_FEATURES, getWsFeatures()); 
-    }
-    
-    protected void initializeParameter(MessagePartInfo part, Class rawClass, Type type) {
-        if (implInfo.isWebServiceProvider()) {
-            part.setTypeQName(XMLSchemaQNames.XSD_ANY);
-            part.setTypeClass(rawClass);
-            return;
-        }
-        super.initializeParameter(part, rawClass, type);
     }
 }

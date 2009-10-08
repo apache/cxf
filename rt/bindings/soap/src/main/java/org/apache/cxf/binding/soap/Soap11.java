@@ -72,14 +72,11 @@ public final class Soap11 implements SoapVersion {
     }
     
 
+
     public static Soap11 getInstance() {
         return INSTANCE;
     }
-
-    public String getBindingId() {
-        return SoapBindingConstants.SOAP11_BINDING_ID;
-    }
-
+    
     public double getVersion() {
         return version;
     }

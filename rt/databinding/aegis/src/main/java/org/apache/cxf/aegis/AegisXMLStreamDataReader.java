@@ -20,12 +20,10 @@ package org.apache.cxf.aegis;
 
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamReader;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
-import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.xml.stax.ElementReader;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -56,6 +54,7 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
         if (reader.getEventType() != XMLStreamConstants.START_ELEMENT) {
             Message message = new Message("STREAM_BAD_POSITION", LOG);
             throw new DatabindingException(message.toString());
+            
         }
     }
 
@@ -65,7 +64,7 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
     }
     
     /** {@inheritDoc}*/
-    public Object read(XMLStreamReader reader, AegisType desiredType) throws Exception {
+    public Object read(XMLStreamReader reader, Type desiredType) throws Exception {
         setupReaderPosition(reader);
         ElementReader elReader = new ElementReader(reader);
 
@@ -74,20 +73,12 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
             return null;
         }
         
-        AegisType type = TypeUtil.getReadTypeStandalone(reader, aegisContext, desiredType);
+        Type type = TypeUtil.getReadTypeStandalone(reader, aegisContext, desiredType);
         
         if (type == null) {
             throw new DatabindingException(new Message("NO_MAPPING", LOG));
         }
 
         return type.readObject(elReader, context);
-    }
-
-    public Object readFlatArray(XMLStreamReader input, 
-                                ArrayType arrayType, QName concreteName) throws Exception {
-        setupReaderPosition(input);
-        ElementReader elReader = new ElementReader(input);
-        return arrayType.readObject(elReader, concreteName, context);
-        
     }
 }

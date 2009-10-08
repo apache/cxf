@@ -36,7 +36,6 @@ import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.interceptor.CheckFaultInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.StaxInInterceptor;
@@ -48,7 +47,6 @@ public class ReadHeaderInterceptorTest extends TestBase {
 
     private ReadHeadersInterceptor rhi;
     private StaxInInterceptor staxIntc = new StaxInInterceptor();
-    private StartBodyInterceptor sbi;
 
     @Before
     public void setUp() throws Exception {
@@ -56,8 +54,6 @@ public class ReadHeaderInterceptorTest extends TestBase {
 
         rhi = new ReadHeadersInterceptor(BusFactory.getDefaultBus(), "phase1");
         chain.add(rhi);
-        sbi = new StartBodyInterceptor("phase1");
-        chain.add(sbi);
         chain.add(new CheckFaultInterceptor("phase2"));
     }
 

@@ -38,10 +38,6 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
-import org.apache.cxf.annotations.FastInfoset;
-import org.apache.cxf.annotations.GZIP;
-import org.apache.cxf.annotations.WSDLDocumentation;
-import org.apache.cxf.annotations.WSDLDocumentationCollection;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.systest.jaxws.types.Bar;
 
@@ -49,19 +45,6 @@ import org.apache.cxf.systest.jaxws.types.Bar;
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitWrappedCodeFirstService")
 @SOAPBinding(style = SOAPBinding.Style.DOCUMENT,
              use = SOAPBinding.Use.LITERAL)
-@WSDLDocumentationCollection(
-    {
-        @WSDLDocumentation("DocLitWrappedCodeFirstService interface"),
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService top level doc", 
-                           placement = WSDLDocumentation.Placement.TOP),   
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService binding doc", 
-                           placement = WSDLDocumentation.Placement.BINDING),   
-        @WSDLDocumentation(value = "DocLitWrappedCodeFirstService service/port doc", 
-                           placement = WSDLDocumentation.Placement.SERVICE_PORT)   
-    }
-)
-@GZIP
-@FastInfoset
 public interface DocLitWrappedCodeFirstService {
 
     @Oneway
@@ -92,25 +75,6 @@ public interface DocLitWrappedCodeFirstService {
     String multiListInput(List<String> inputs1, List<String> inputs2, String x, int y);
     
     @WebMethod
-    @WSDLDocumentationCollection(
-        {
-            @WSDLDocumentation("multiInOut doc"),
-            @WSDLDocumentation(value = "multiInOut Input doc", 
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_INPUT),   
-            @WSDLDocumentation(value = "multiInOut Output doc", 
-                               placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_OUTPUT),   
-            @WSDLDocumentation(value = "multiInOut InputMessage doc", 
-                               placement = WSDLDocumentation.Placement.INPUT_MESSAGE),   
-            @WSDLDocumentation(value = "multiInOut OutputMessage doc", 
-                               placement = WSDLDocumentation.Placement.OUTPUT_MESSAGE),   
-            @WSDLDocumentation(value = "multiInOut binding doc",
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION),
-            @WSDLDocumentation(value = "multiInOut binding Input doc", 
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_INPUT),   
-            @WSDLDocumentation(value = "multiInOut binding Output doc", 
-                               placement = WSDLDocumentation.Placement.BINDING_OPERATION_OUTPUT)   
-        }
-    )
     String multiInOut(@WebParam(mode = WebParam.Mode.OUT)
                       Holder<String> a,
                       @WebParam(mode = WebParam.Mode.INOUT)
@@ -142,18 +106,6 @@ public interface DocLitWrappedCodeFirstService {
                    @WebParam(mode = WebParam.Mode.OUT) Holder<String> out2);
     
     @WebMethod
-    @WSDLDocumentationCollection({
-        @WSDLDocumentation(value = "fault message doc",
-                           placement = WSDLDocumentation.Placement.FAULT_MESSAGE,
-                           faultClass = CustomException.class),   
-        @WSDLDocumentation(value = "fault binding doc",
-                           placement = WSDLDocumentation.Placement.BINDING_OPERATION_FAULT,
-                           faultClass = CustomException.class),   
-        @WSDLDocumentation(value = "fault porttype doc",
-                           placement = WSDLDocumentation.Placement.PORT_TYPE_OPERATION_FAULT,
-                           faultClass = CustomException.class)   
-        }
-    )
     int throwException(int i) 
         throws ServiceTestFault,
         CustomException,
@@ -213,23 +165,5 @@ public interface DocLitWrappedCodeFirstService {
         public List<Foo> getDbReves() {
             return dbReves;
         }
-    }
-    
-    CXF2411Result<CXF2411SubClass> doCXF2411();
-    
-    public class CXF2411Result<T extends CXF2411Base> {
-        private T[] content;
-        public T[] getContent() {
-            return content;
-        }
-        public void setContent(T[] content) {
-            this.content = content;
-        }
-    }
-
-    public class CXF2411Base {
-    }
-
-    public class CXF2411SubClass extends CXF2411Base {
     }
 }

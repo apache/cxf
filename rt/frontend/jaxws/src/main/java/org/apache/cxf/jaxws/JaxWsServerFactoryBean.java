@@ -28,6 +28,7 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.endpoint.Endpoint;
@@ -150,18 +151,14 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             if (jaxBid.equals(SOAPBinding.SOAP11HTTP_MTOM_BINDING)) {
                 conf.setMtomEnabled(true);
             }
-
-            if (transportId != null) {
-                conf.setTransportURI(transportId);
-            }
-            conf.setJaxWsServiceFactoryBean(sf);
             
+            conf.setJaxWsServiceFactoryBean(sf);
         }
         
         BindingInfo bindingInfo = super.createBindingInfo();        
 
         if (implInfo.isWebServiceProvider()) {
-            bindingInfo.getService().setProperty("soap.force.doclit.bare", Boolean.TRUE);
+            bindingInfo.setProperty(AbstractBindingFactory.DATABINDING_DISABLED, Boolean.TRUE);
         }
 
         return bindingInfo;

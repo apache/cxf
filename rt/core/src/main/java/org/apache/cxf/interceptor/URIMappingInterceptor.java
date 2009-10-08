@@ -35,15 +35,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.common.util.XMLSchemaQNames;
-import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.frontend.MethodDispatcher;
-import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -78,40 +74,12 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         if (op == null || opName == null || op.getName() == null
             || StringUtils.isEmpty(op.getName().getLocalPart())
             || !opName.equals(op.getName().getLocalPart())) {
-            
-            if (!Boolean.TRUE.equals(message.getContextualProperty(NO_VALIDATE_PARTS))) {
-                throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION_PATH", LOG, opName,
-                                                                       message.get(Message.PATH_INFO)));
-            }
-            MessageContentsList params = new MessageContentsList();
-            params.add(null);
-            message.setContent(List.class, params);
-            if (op == null) {
-                op = findAnyOp(message.getExchange());
-            }
-            if (op != null) {
-                message.getExchange().put(BindingOperationInfo.class, op);
-            }
-        } else {
-            message.getExchange().put(BindingOperationInfo.class, op);
-            MessageContentsList params = getParameters(message, op);
-            message.setContent(List.class, params);
+            throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION_PATH", LOG, opName,
+                                                                   message.get(Message.PATH_INFO)));
         }
-    }
-
-    private BindingOperationInfo findAnyOp(Exchange exchange) {
-        Endpoint ep = exchange.get(Endpoint.class);
-        BindingInfo service = ep.getEndpointInfo().getBinding();
-        
-        for (BindingOperationInfo b : service.getOperations()) {
-            if (b.getInput() != null && !b.getInput().getMessageInfo().getMessageParts().isEmpty()) {
-                MessagePartInfo inf = b.getInput().getMessageInfo().getMessagePart(0);
-                if (XMLSchemaQNames.XSD_ANY.equals(inf.getTypeQName())) {
-                    return b;
-                }
-            }
-        }
-        return null;
+        message.getExchange().put(BindingOperationInfo.class, op);
+        MessageContentsList params = getParameters(message, op);
+        message.setContent(List.class, params);
     }
 
     private Method getMethod(Message message, BindingOperationInfo operation) {        

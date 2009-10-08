@@ -19,34 +19,14 @@
 
 package org.apache.cxf.systest.ws.rm;
 
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.math.BigInteger;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import javax.xml.ws.BindingProvider;
-import javax.xml.ws.Dispatch;
-import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-import javax.xml.ws.handler.MessageContext;
-import javax.xml.xpath.XPathConstants;
-
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -60,9 +40,7 @@ import org.apache.cxf.greeter_control.Control;
 import org.apache.cxf.greeter_control.ControlService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
-import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Interceptor;
-import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -82,7 +60,6 @@ import org.apache.cxf.ws.rm.RMManager;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.RMProperties;
 import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -97,12 +74,8 @@ import org.junit.Test;
 public class SequenceTest extends AbstractBusClientServerTestBase {
 
     private static final Logger LOG = LogUtils.getLogger(SequenceTest.class);
-    private static final QName GREETMEONEWAY_NAME 
-        = new QName("http://cxf.apache.org/greeter_control", "greetMeOneWay");
     private static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
-    private static final QName GREETME_NAME 
-        = new QName("http://cxf.apache.org/greeter_control", "greetMe");
     private static final String GREETME_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeRequest";
     private static final String GREETME_RESPONSE_ACTION
@@ -117,7 +90,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     private Greeter greeter;
     private OutMessageRecorder outRecorder;
     private InMessageRecorder inRecorder;
-    private Dispatch<DOMSource> dispatch;
 
 
     @BeforeClass
@@ -135,7 +107,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     @After
     public void tearDown() throws Exception {
         try {
-            stopClient();
+            stopGreeter();
             stopControl();
         } catch (Throwable t) {
             //ignore
@@ -197,51 +169,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeter.greetMeOneWay("twice");
         greeter.greetMeOneWay("thrice");
 
-        verifyOnewayAnonymousAcks();
-    }
-
-    @Test
-    public void testOnewayAnonymousAcksProvider() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml");
-
-        greeter.greetMeOneWay("once");
-        greeter.greetMeOneWay("twice");
-        greeter.greetMeOneWay("thrice");
-
-        verifyOnewayAnonymousAcks();
-    }
-
-    @Test
-    public void testOnewayAnonymousAcksDispatch() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", false, true);
-
-        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
-                                         GREETMEONEWAY_NAME);
-
-        dispatch.invokeOneWay(getDOMRequest("One", true));
-        dispatch.invokeOneWay(getDOMRequest("Two", true));
-        dispatch.invokeOneWay(getDOMRequest("Three", true));
-
-        verifyOnewayAnonymousAcks();
-    }
-
-    @Test
-    public void testOnewayAnonymousAcksDispatchProvider() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml",
-             false, 
-             true);
-
-        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
-                                         GREETMEONEWAY_NAME);
-
-        dispatch.invokeOneWay(getDOMRequest("One", true));
-        dispatch.invokeOneWay(getDOMRequest("Two", true));
-        dispatch.invokeOneWay(getDOMRequest("Three", true));
-
-        verifyOnewayAnonymousAcks();
-    }
-
-    private void verifyOnewayAnonymousAcks() throws Exception {
         // three application messages plus createSequence
 
         awaitMessages(4, 4);
@@ -249,10 +176,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
 
         mf.verifyMessages(4, true);
-        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
-                                                 GREETMEONEWAY_ACTION,
-                                                 GREETMEONEWAY_ACTION,
-                                                 GREETMEONEWAY_ACTION};
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(), GREETMEONEWAY_ACTION,
+                                                 GREETMEONEWAY_ACTION, GREETMEONEWAY_ACTION};
         mf.verifyActions(expectedActions, true);
         mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
 
@@ -421,8 +346,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         MessageFlow mf = new MessageFlow(outRecorder.getOutboundMessages(), inRecorder.getInboundMessages());
         
         mf.verifyMessages(4, true);
-
-        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
+        String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(), 
                                                  GREETMEONEWAY_ACTION,
                                                  GREETMEONEWAY_ACTION, 
                                                  GREETMEONEWAY_ACTION};
@@ -459,52 +383,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         assertEquals("TWO", greeter.greetMe("two"));
         assertEquals("THREE", greeter.greetMe("three"));
 
-        verifyTwowayNonAnonymous();
-    }
-
-    @Test
-    public void testTwowayNonAnonymousProvider() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml", true);
-
-        assertEquals("ONE", greeter.greetMe("one"));
-        assertEquals("TWO", greeter.greetMe("two"));
-        assertEquals("THREE", greeter.greetMe("three"));
-
-        verifyTwowayNonAnonymous();
-    }
-
-    @Test
-    public void testTwowayNonAnonymousDispatch() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors.xml", true, true);
-
-        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
-                                         GREETME_NAME);
-
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("One")), "ONE");
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("Two")), "TWO");
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("Three")), "THREE");
-
-        verifyTwowayNonAnonymous();
-    }
-
-    @Test
-    public void testTwowayNonAnonymousDispatchProvider() throws Exception {
-        init("org/apache/cxf/systest/ws/rm/rminterceptors_provider.xml",
-             true,
-             true);
-
-        dispatch.getRequestContext().put(MessageContext.WSDL_OPERATION,
-                                         GREETME_NAME);
-
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("One")), "ONE");
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("Two")), "TWO");
-        verifyDOMResponse(dispatch.invoke(getDOMRequest("Three")), "THREE");
-
-        verifyTwowayNonAnonymous();
-    }
-
-    private void verifyTwowayNonAnonymous() throws Exception {
-    
         // CreateSequence and three greetMe messages
         // TODO there should be partial responses to the decoupled responses!
 
@@ -1136,7 +1014,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             for (int i = 0; i < clients.length; i++) {
                 greeter = clients[i].greeter;
                 greeterBus = clients[i].greeterBus;
-                stopClient();                
+                stopGreeter();                
             }
             greeter = null;
         }        
@@ -1225,7 +1103,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             for (int i = 0; i < clients.length; i++) {
                 greeter = clients[i].greeter;
                 greeterBus = clients[i].greeterBus;
-                stopClient();                
+                stopGreeter();                
             }
             greeter = null;
         }        
@@ -1330,30 +1208,14 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     }
 
     private void init(String cfgResource, boolean useDecoupledEndpoint) {
-        init(cfgResource, useDecoupledEndpoint, false, null);
-    }
-
-    private void init(String cfgResource, boolean useDecoupledEndpoint, Executor executor) {
-        init(cfgResource, useDecoupledEndpoint, false, executor);
-    }
-
-    private void init(String cfgResource, boolean useDecoupledEndpoint, boolean useDispatchClient) {
-        init(cfgResource, useDecoupledEndpoint, useDispatchClient, null);
+        init(cfgResource, useDecoupledEndpoint, null);
     }
     
-    private void init(String cfgResource, 
-                      boolean useDecoupledEndpoint, 
-                      boolean useDispatchClient, 
-                      Executor executor) {
+    private void init(String cfgResource, boolean useDecoupledEndpoint, Executor executor) {
         
         SpringBusFactory bf = new SpringBusFactory();
         initControl(bf, cfgResource);
-        initGreeterBus(bf, cfgResource);
-        if (useDispatchClient) {
-            initDispatch(useDecoupledEndpoint);
-        } else {
-            initProxy(useDecoupledEndpoint, executor);
-        }
+        initGreeter(bf, cfgResource, useDecoupledEndpoint, executor);
     }
     
     private void initControl(SpringBusFactory bf, String cfgResource) {
@@ -1365,17 +1227,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));        
     }
-
-    private void initGreeter(SpringBusFactory bf,
-                             String cfgResource,
-                             boolean useDecoupledEndpoint,
-                             Executor executor) {
-        initGreeterBus(bf, cfgResource);
-        initProxy(useDecoupledEndpoint, executor);
-    }
     
-    private void initGreeterBus(SpringBusFactory bf,
-                                String cfgResource) {
+    private void initGreeter(SpringBusFactory bf, String cfgResource, 
+                             boolean useDecoupledEndpoint, Executor executor) {
         greeterBus = bf.createBus(cfgResource);
         BusFactory.setDefaultBus(greeterBus);
         LOG.fine("Initialised greeter bus with configuration: " + cfgResource);
@@ -1384,46 +1238,29 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         greeterBus.getOutInterceptors().add(outRecorder);
         inRecorder = new InMessageRecorder();
         greeterBus.getInInterceptors().add(inRecorder);
-    }
-
-    private void initDispatch(boolean useDecoupledEndpoint) {
-        GreeterService gs = new GreeterService();
-        dispatch = gs.createDispatch(GreeterService.GreeterPort,
-                                     DOMSource.class, 
-                                     Service.Mode.MESSAGE);
-        dispatch.getRequestContext().put(
-                                     BindingProvider.SOAPACTION_USE_PROPERTY, 
-                                     false);
-
-        if (useDecoupledEndpoint) {
-            initDecoupledEndpoint(((DispatchImpl)dispatch).getClient());
-        }
-    }
-
-    private void initProxy(boolean useDecoupledEndpoint, Executor executor) {        
+        
         GreeterService gs = new GreeterService();
 
         if (null != executor) {
             gs.setExecutor(executor);
         }
-   
+
         greeter = gs.getGreeterPort();
         LOG.fine("Created greeter client.");
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 
-        if (useDecoupledEndpoint) {
-            initDecoupledEndpoint(ClientProxy.getClient(greeter));
+        if (!useDecoupledEndpoint) {
+            return;
         }
-    }
 
-    private void initDecoupledEndpoint(Client c) {
         // programatically configure decoupled endpoint that is guaranteed to
         // be unique across all test cases
         
         decoupledEndpointPort--;
         decoupledEndpoint = "http://localhost:" + decoupledEndpointPort + "/decoupled_endpoint";
 
+        Client c = ClientProxy.getClient(greeter);
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
         HTTPClientPolicy cp = hc.getClient();
         cp.setDecoupledEndpoint(decoupledEndpoint);
@@ -1431,24 +1268,18 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Using decoupled endpoint: " + cp.getDecoupledEndpoint());
     }
     
-    private void stopClient() {
+    private void stopGreeter() {
         if (null != greeterBus) {
             
             //ensure we close the decoupled destination of the conduit,
             //so that release the port if the destination reference count hit zero
-            if (greeter != null) {
-                ClientProxy.getClient(greeter).getConduit().close();
-            }
-            if (dispatch != null) {
-                ((DispatchImpl)dispatch).getClient().getConduit().close();
-            }
+            ClientProxy.getClient(greeter).getConduit().close();
             greeterBus.shutdown(true);
             greeter = null;
-            dispatch = null;
             greeterBus = null;
         }
     }
-
+    
     private void stopControl() {
         if (null != control) {  
             assertTrue("Failed to stop greeter", control.stopGreeter(null));
@@ -1483,52 +1314,5 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
                 it.remove();
             }
         }
-    }
-
-    private DOMSource getDOMRequest(String n) throws Exception {
-        return getDOMRequest(n, false);
-    }
-
-    private DOMSource getDOMRequest(String n, boolean oneway)
-        throws Exception {
-        InputStream is = 
-            getClass().getResourceAsStream((oneway ? "oneway" : "twoway")
-                                           + "Req" + n + ".xml");
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder builder = factory.newDocumentBuilder();
-        Document newDoc = builder.parse(is);
-        return new DOMSource(newDoc);
-    }
-
-    private static String convertToString(DOMSource domSource)
-        throws TransformerException {
-        Transformer xformer =
-            TransformerFactory.newInstance().newTransformer();
-        StringWriter output = new StringWriter();
-        xformer.transform(domSource, new StreamResult(output));
-        return output.toString();
-    }
-
-    private static String parseResponse(DOMSource domResponse) {
-        Element el = ((Document)domResponse.getNode()).getDocumentElement();
-        Map<String, String> ns = new HashMap<String, String>();
-        ns.put("soap", "http://schemas.xmlsoap.org/soap/envelope/");
-        ns.put("ns", "http://cxf.apache.org/greeter_control/types");
-        XPathUtils xp = new XPathUtils(ns);
-        return (String)xp.getValue("/soap:Envelope/soap:Body"
-                                   + "/ns:greetMeResponse/ns:responseType",
-                                   el,
-                                   XPathConstants.STRING);
-    }
-
-    private void verifyDOMResponse(DOMSource domResponse, String expected) 
-        throws TransformerException {
-        String s = convertToString(domResponse);
-        assertTrue("expected: " + s + " to contain: " + expected,
-                   s.indexOf(expected) != -1);
-        assertEquals("unexpected response: " + s,
-                     expected,
-                     parseResponse(domResponse));
     }
 }

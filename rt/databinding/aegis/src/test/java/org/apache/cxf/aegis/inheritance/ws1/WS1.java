@@ -20,6 +20,11 @@ package org.apache.cxf.aegis.inheritance.ws1;
 
 import java.util.Map;
 
+/**
+ * <br/>
+ * 
+ * @author xfournet
+ */
 public interface WS1 {
     BeanA getBeanA();
 
@@ -36,7 +41,6 @@ public interface WS1 {
     ResultBean getResultBean();
 
     Map echoMap(Map beans);
-    Map echoRawMap(Map rawMap);
 
     void throwException(boolean extendedOne) throws WS1Exception;
 }

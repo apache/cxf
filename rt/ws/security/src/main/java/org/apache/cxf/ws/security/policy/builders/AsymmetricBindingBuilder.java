@@ -88,8 +88,7 @@ public class AsymmetricBindingBuilder implements AssertionBuilder {
             assertion = (Assertion)iterator.next();
             name = assertion.getName();
 
-            if (!consts.getNamespace().equals(name.getNamespaceURI())
-                && !SP12Constants.INSTANCE.getNamespace().equals(name.getNamespaceURI())) {
+            if (!consts.getNamespace().equals(name.getNamespaceURI())) {
                 continue;
             }
 
@@ -110,10 +109,10 @@ public class AsymmetricBindingBuilder implements AssertionBuilder {
                 asymmetricBinding.setIncludeTimestamp(true);
 
             } else if (SPConstants.ENCRYPT_BEFORE_SIGNING.equals(name.getLocalPart())) {
-                asymmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.EncryptBeforeSigning);
+                asymmetricBinding.setProtectionOrder(SPConstants.ENCRYPT_BEFORE_SIGNING);
 
             } else if (SPConstants.SIGN_BEFORE_ENCRYPTING.equals(name.getLocalPart())) {
-                asymmetricBinding.setProtectionOrder(SPConstants.ProtectionOrder.SignBeforeEncrypting);
+                asymmetricBinding.setProtectionOrder(SPConstants.SIGN_BEFORE_ENCRYPTING);
 
             } else if (SPConstants.ENCRYPT_SIGNATURE.equals(name.getLocalPart())) {
                 asymmetricBinding.setSignatureProtection(true);

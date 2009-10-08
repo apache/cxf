@@ -20,17 +20,16 @@
 package org.apache.cxf.bus.spring;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.extension.BusExtension;
 
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.Ordered;
 
-@NoJSR250Annotations
 public class BusExtensionPostProcessor implements BeanPostProcessor, ApplicationContextAware, Ordered {
 
     private Bus bus;
@@ -61,7 +60,20 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);
-            bus.setExtension(new SpringBeanLocator(context), ConfiguredBeanLocator.class);
+            
+            final ApplicationContext ctx = context;
+            if (bus instanceof CXFBusImpl) {
+                CXFBusImpl b = (CXFBusImpl)bus;
+                b.setExtensionFinder(new CXFBusImpl.ExtensionFinder() {
+                    public <T> T findExtension(Class<T> cls) {
+                        try {
+                            return cls.cast(ctx.getBean(cls.getName(), cls));
+                        } catch (NoSuchBeanDefinitionException ex) {
+                            return null;
+                        }
+                    }
+                });
+            }
         }
         return bus;
     }

@@ -26,12 +26,10 @@ import java.util.logging.Logger;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeUtil;
-import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.aegis.xml.stax.ElementWriter;
 import org.apache.cxf.common.i18n.Message;
@@ -47,10 +45,12 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     private static final Logger LOG = LogUtils.getL7dLogger(XMLStreamDataReader.class);
 
     private AegisDatabinding databinding;
+
     private Collection<Attachment> attachments;
+    
     private Map<String, Object> properties;
     
-    public XMLStreamDataWriter(AegisDatabinding databinding, Bus bus) {
+    public XMLStreamDataWriter(AegisDatabinding databinding) {
         this.databinding = databinding;
     }
 
@@ -62,10 +62,8 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
     }
 
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
-        AegisType type = databinding.getType(part);
-        if (type == null) {
-            type = databinding.getTypeFromClass(obj.getClass());
-        }
+        Type type = databinding.getType(part);
+
         if (type == null) {
             throw new Fault(new Message("NO_MESSAGE_FOR_PART", LOG, part));
         }
@@ -75,21 +73,13 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         context.setAttachments(attachments);
         type = TypeUtil.getWriteType(databinding.getAegisContext(), obj, type);
         
-        /* 
-         * We arrive here with a 'type' of the inner type if isWriteOuter is null.
-         * However, in that case, the original type is available. 
-         */
-        AegisType outerType  = null;
-        if (part != null) {
-            outerType = part.getProperty("org.apache.cxf.aegis.outerType", AegisType.class);
-        }
         try {
             if (obj == null) {
                 if (part.getXmlSchema() instanceof XmlSchemaElement
                     && ((XmlSchemaElement)part.getXmlSchema()).getMinOccurs() == 0) {
                     //skip writing minOccurs=0 stuff if obj is null
                     return;
-                } else if (type.isNillable()) {
+                } else if (type.isNillable() && type.isWriteOuter()) {
                     ElementWriter writer = new ElementWriter(output);
                     MessageWriter w2 = writer.getElementWriter(part.getConcreteName());
                     w2.writeXsiNil();
@@ -98,18 +88,9 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                 }
             }
             ElementWriter writer = new ElementWriter(output);
-            // outerType is only != null for a flat array.
-            if (outerType == null) {
-                MessageWriter w2 = writer.getElementWriter(part != null ? part.getConcreteName() 
-                    : type.getSchemaType());
-                type.writeObject(obj, w2, context);
-                w2.close();
-            } else {
-                // it has better be an array (!)
-                ArrayType aType = (ArrayType) outerType;
-                // the part has to have a name or we can't do this.
-                aType.writeObject(obj, writer, context, part.getConcreteName());
-            }
+            MessageWriter w2 = writer.getElementWriter(part.getConcreteName());
+            type.writeObject(obj, w2, context);
+            w2.close();
         } catch (DatabindingException e) {
             throw new RuntimeException(e);
         }
@@ -134,4 +115,6 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
         }
         return properties.get(key);
     }
+
+
 }

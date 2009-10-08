@@ -19,7 +19,6 @@
 
 package org.apache.cxf.ws.policy.builder.xml;
 
-import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.ws.policy.PolicyAssertion;
@@ -35,15 +34,17 @@ import org.apache.neethi.PolicyComponent;
 public class XmlPrimitiveAssertion extends PrimitiveAssertion {
 
     private Element element;
+    private PolicyConstants constants;
 
     /**
      * Constructs a XmlPrimitiveAssertion from an xml element.
      * 
      * @param e the xml element
      */
-    public XmlPrimitiveAssertion(Element e) {
-        super(e);
+    public XmlPrimitiveAssertion(Element e, PolicyConstants c) {
+        super(e, c);
         element = e;
+        constants = c;
     }
 
     /**
@@ -67,11 +68,9 @@ public class XmlPrimitiveAssertion extends PrimitiveAssertion {
     protected PolicyAssertion cloneMandatory() {
         Element e = (Element)element.cloneNode(true);
         if (isOptional()) {
-            Attr att = PolicyConstants.findOptionalAttribute(e);
-            if (att != null) {
-                e.removeAttributeNode(att);
-            }
+            e.removeAttributeNode(e.getAttributeNodeNS(constants.getNamespace(), 
+                                                       constants.getOptionalAttrName()));
         }
-        return new XmlPrimitiveAssertion(e);        
+        return new XmlPrimitiveAssertion(e, constants);        
     }
 }

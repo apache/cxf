@@ -19,11 +19,16 @@
 
 package org.apache.cxf.bus.spring;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
 
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.resource.ResourceResolver;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
@@ -34,12 +39,12 @@ public class Jsr250BeanPostProcessor
     implements DestructionAwareBeanPostProcessor, Ordered, ApplicationContextAware {
 
     private ResourceManager resourceManager;
+    private List<ResourceResolver> resolvers;
+    
     private ApplicationContext context;
 
     private boolean isProcessing = true;
-    //private int count;
-    //private int count2;
-
+    
     Jsr250BeanPostProcessor() {
     }
     
@@ -58,32 +63,20 @@ public class Jsr250BeanPostProcessor
         return 1010;
     }
         
-    private boolean injectable(Object bean, String beanId) {
-        return !"cxf".equals(beanId) && ResourceInjector.processable(bean.getClass(), bean);
-    }
-    private ResourceManager getResourceManager(Object bean) {
-        if (resourceManager == null) {
-            if (bean instanceof ResourceManager) {
-                resourceManager = (ResourceManager)bean;
-                resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
-            } else {
-                Bus b = (Bus)context.getBean("cxf");
-                ResourceManager m = b.getExtension(ResourceManager.class);
-                if (resourceManager == null && m != null) {
-                    resourceManager = m;
-                    resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
-                }
-            }
-        }
-        return resourceManager;
-    }
     public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
         if (!isProcessing) {
             return bean;
         }
-        if (bean != null 
-            && injectable(bean, beanId)) {
-            new ResourceInjector(getResourceManager(bean)).construct(bean);
+        if (bean != null) {
+            new ResourceInjector(resourceManager, resolvers).construct(bean);
+        }
+        if (bean instanceof ResourceManager) {
+            resourceManager = (ResourceManager)bean;
+
+            Map<String, Object> mp = CastUtils.cast(context.getBeansOfType(ResourceResolver.class));
+            Collection<ResourceResolver> resolvs = CastUtils.cast(mp.values());
+            resolvers = new ArrayList<ResourceResolver>(resourceManager.getResourceResolvers());
+            resolvers.addAll(resolvs);
         }
         return bean;
     }
@@ -92,15 +85,8 @@ public class Jsr250BeanPostProcessor
         if (!isProcessing) {
             return bean;
         }
-        if (bean != null 
-            && injectable(bean, beanId)) {
-            new ResourceInjector(getResourceManager(bean)).inject(bean);
-            /*
-            System.out.println("p :" + (++count) + ": " + bean.getClass().getName() + " " + beanId);
-        } else if (bean != null) {
-            System.out.println("np: " + (++count2) 
-                               + ": " + bean.getClass().getName() + " " + beanId);
-            */
+        if (bean != null) {
+            new ResourceInjector(resourceManager, resolvers).inject(bean);
         }
         return bean;
     }
@@ -109,9 +95,8 @@ public class Jsr250BeanPostProcessor
         if (!isProcessing) {
             return;
         }
-        if (bean != null 
-            && injectable(bean, beanId)) {
-            new ResourceInjector(getResourceManager(bean)).destroy(bean);
+        if (bean != null) {
+            new ResourceInjector(resourceManager, resolvers).destroy(bean);
         }
     }
 

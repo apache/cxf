@@ -23,16 +23,14 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.ext.ContextResolver;
-import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.MessageBodyWorkers;
 import javax.ws.rs.ext.MessageBodyWriter;
-import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Message;
 
-public class ProvidersImpl implements Providers {
+public class ProvidersImpl implements MessageBodyWorkers {
 
     private Message m;
     public ProvidersImpl(Message m) {
@@ -49,14 +47,6 @@ public class ProvidersImpl implements Providers {
         Class<T> type, Type genericType, Annotation[] annotations, MediaType mediaType) {
         return ProviderFactory.getInstance(m).createMessageBodyWriter(
                    type, genericType, annotations, mediaType, m);
-    }
-
-    public <T> ContextResolver<T> getContextResolver(Class<T> contextType, MediaType mediaType) {
-        return ProviderFactory.getInstance(m).createContextResolver(contextType, m, mediaType);
-    }
-
-    public <T extends Throwable> ExceptionMapper<T> getExceptionMapper(Class<T> type) {
-        return ProviderFactory.getInstance(m).createExceptionMapper(type, m);
     }
 
 }

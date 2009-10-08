@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.tools.java2ws;
 
-import java.io.OutputStream;
 import java.util.Arrays;
 import java.util.List;
 
@@ -77,12 +76,6 @@ public class JavaToWS {
         ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
                            .getResourceAsStream("java2ws.xml"), false, args);      
     }
-    
-    public void run(OutputStream os) throws Exception {
-        ToolRunner.runTool(JavaToWSContainer.class, JavaToWSContainer.class
-                           .getResourceAsStream("java2ws.xml"), false, args, os);      
-    }
-    
 
     private boolean isExitOnFinish() {
         String exit = System.getProperty("exitOnFinish");

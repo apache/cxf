@@ -23,13 +23,13 @@
     <artifactId>cxf-bundle</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Bundle Jar</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
     </parent>
 
     <dependencies>
@@ -106,11 +106,6 @@
             <artifactId>cxf-xjc-bug671</artifactId>
             <version>${pom.version}</version>
         </dependency>
-        <dependency>
-            <groupId>${pom.groupId}.xjcplugins</groupId>
-            <artifactId>cxf-xjc-boolean</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
         
         <dependency>
             <groupId>${pom.groupId}</groupId>
@@ -145,11 +140,6 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>cxf-rt-transports-http-osgi</artifactId>
             <version>${pom.version}</version>
         </dependency>
         <dependency>
@@ -265,6 +255,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -286,7 +277,6 @@
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
-                            com.ctc.wstx.msv*;resolution:=optional,
                             javax.jms*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
                             repackage;resolution:=optional,
@@ -313,7 +303,7 @@
                         </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
-                            '=META-INF.cxf.osgi',
+                            org.codehaus.xfire.aegis.type.java5.*,
                             '=META-INF.cxf'
                         </Export-Package>
                         <_failok>true</_failok>
@@ -324,6 +314,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -375,10 +366,10 @@
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/wsdl.plugin.xml</resource>
-                                </transformer>
+                                </transformer>                     
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/tools.service.validator.xml</resource>
-                                </transformer>
+                                </transformer>                                           
                                 <transformer implementation="org.apache.cxf.maven.PluginTransformer">
                                     <resource>META-INF/tools-plugin.xml</resource>
                                 </transformer>
@@ -397,42 +388,5 @@
             </plugin>
         </plugins>
     </build>
-    <profiles>
-        <profile>
-            <id>deploy</id>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.apache.maven.plugins</groupId>
-                        <artifactId>maven-dependency-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>unpack-plugin-sources</id>
-                                <phase>generate-sources</phase>
-                                <goals>
-                                    <goal>unpack</goal>
-                                </goals>
-                                <configuration>
-                                    <artifactItems>
-                                        <artifactItem>
-                                            <groupId>org.apache.cxf</groupId>
-                                            <artifactId>cxf-codegen-plugin</artifactId>
-                                            <version>${project.version}</version>
-                                            <classifier>sources</classifier>
-                                        </artifactItem>
-                                    </artifactItems>
-                                    <outputDirectory>${project.build.directory}/sources</outputDirectory>
-                                </configuration>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-    </profiles>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/all</developerConnection>
-    </scm>
 
 </project>

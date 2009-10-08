@@ -44,14 +44,13 @@ import javax.wsdl.Port;
 import javax.wsdl.PortType;
 import javax.wsdl.Service;
 import javax.wsdl.Types;
-import javax.wsdl.WSDLElement;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.AttributeExtensible;
 import javax.wsdl.extensions.ElementExtensible;
 import javax.wsdl.extensions.ExtensibilityElement;
-import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -63,6 +62,7 @@ import org.apache.cxf.NSManager;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.AbstractPropertiesHolder;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -78,6 +78,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
+import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 
 /**
  * Consume a set of service definitions and produce a WSDL model. The ServiceInfo objects
@@ -98,7 +99,6 @@ public class ServiceWSDLBuilder {
     private int xsdCount;
     private final Bus bus;
     private final NSManager nsMan;
-    private Document docDoc;
     
     /**
      * Sets up the builder on a bus with a list of services.
@@ -169,7 +169,7 @@ public class ServiceWSDLBuilder {
             ServiceInfo si = services.get(0);
             definition = newDefinition(si.getName(), si.getTargetNamespace());
             addNamespace(WSDLConstants.CONVENTIONAL_TNS_PREFIX, si.getTargetNamespace(), definition);
-            addExtensibilityElements(definition, getWSDL11Extensors(si.getDescription()));
+            addExtensibilityElements(definition, getWSDL11Extensors(si));
 
             Collection<PortType> portTypes = new HashSet<PortType>();
             for (ServiceInfo service : services) {
@@ -220,39 +220,15 @@ public class ServiceWSDLBuilder {
      * @return the extensibility elements.
      */
     public List<ExtensibilityElement> getWSDL11Extensors(AbstractPropertiesHolder holder) {
-        if (holder == null) {
-            return null;
-        }
         return holder.getExtensors(ExtensibilityElement.class);
     }
     
-    protected void addDocumentation(WSDLElement wsdlel, String text) {
-        if (text == null) {
-            return;
-        }
-        if (docDoc == null) {
-            try {
-                docDoc = XMLUtils.newDocument();
-            } catch (ParserConfigurationException e) {
-                //ignore
-            }
-        }
-        Element el = docDoc.createElementNS(WSDLConstants.NS_WSDL11, "wsdl:documentation");
-        el.setTextContent(text);
-        wsdlel.setDocumentationElement(el);
-    }
     protected void addExtensibilityElements(ElementExtensible elementExtensible, 
         List<ExtensibilityElement> extensibilityElements) {
         if (extensibilityElements != null) {
             for (ExtensibilityElement element : extensibilityElements) {
-                if (element instanceof UnknownExtensibilityElement) {
-                    UnknownExtensibilityElement uee = (UnknownExtensibilityElement)element;
-                    String pfx = uee.getElement().getPrefix();
-                    addNamespace(pfx, element.getElementType().getNamespaceURI());
-                } else {
-                    QName qn = element.getElementType();
-                    addNamespace(qn.getNamespaceURI());
-                }
+                QName qn = element.getElementType();
+                addNamespace(qn.getNamespaceURI());
                 elementExtensible.addExtensibilityElement(element);
             }
         }
@@ -269,6 +245,39 @@ public class ServiceWSDLBuilder {
         }
     }
     
+    /**
+     * For a schema, require all namespace with prefixes to be imported. In theory,
+     * if a namespace has a prefix but is not used, the import is not needed, and could
+     * cause a problem. In practice, the code generating these schemas should not be adding
+     * spurious prefixes. Hypothetically, we could check that, in the overall WSDL, that
+     * all of the schemas that we are importing are accounted for. However, that's a validation
+     * that is best left to the validator.
+     * @param schemaInfo Schema to process.
+     */
+    protected void addRequiredSchemaImports(SchemaInfo schemaInfo) {
+        Element schemaElement = schemaInfo.getElement();
+        // we need an import for every namespace except the main one.
+        String schemaNamespace = schemaInfo.getNamespaceURI();
+        Map<String, String> queryPrefixMap = new HashMap<String, String>();
+        queryPrefixMap.put("xs", WSDLConstants.NS_SCHEMA_XSD);
+        XPathUtils xpu = new XPathUtils(queryPrefixMap);
+        NamespacePrefixList schemaPrefixes = schemaInfo.getSchema().getNamespaceContext();
+        for (String prefix : schemaPrefixes.getDeclaredPrefixes()) {
+            String namespace = schemaPrefixes.getNamespaceURI(prefix);
+            if (!namespace.equals(schemaNamespace) 
+                && !namespace.equals(WSDLConstants.NS_SCHEMA_XSD)
+                && !xpu.isExist("xs:import[@namespace='" + namespace + "']", 
+                                 schemaElement, 
+                                 XPathConstants.NODE)) {
+                Element importElement = XMLUtils.createElementNS(schemaElement.getOwnerDocument(), 
+                                                                 WSDLConstants.NS_SCHEMA_XSD,
+                                                                 "import");
+                importElement.setAttribute("namespace", namespace);
+                schemaElement.insertBefore(importElement, schemaElement.getFirstChild());
+            }
+        }
+    }
+
     protected void buildTypes(final Collection<SchemaInfo> schemas,
                               final Map<String, SchemaInfo> imports,
                               final Definition def) {
@@ -305,7 +314,8 @@ public class ServiceWSDLBuilder {
                                
                 imports.put(name, schemaInfo);
             }
-
+            // add imports for those schemata which are inlined.
+            addRequiredSchemaImports(schemaInfo);
         }
         if (useSchemaImports) {
             SchemaImpl schemaImpl = new SchemaImpl();
@@ -321,7 +331,6 @@ public class ServiceWSDLBuilder {
         Binding binding = null;
         for (BindingInfo bindingInfo : bindingInfos) {
             binding = definition.createBinding();
-            addDocumentation(binding, bindingInfo.getDocumentation());
             binding.setUndefined(false);
             for (PortType portType : portTypes) {
                 if (portType.getQName().equals(bindingInfo.getInterface().getName())) {
@@ -341,7 +350,6 @@ public class ServiceWSDLBuilder {
         BindingOperation bindingOperation = null;
         for (BindingOperationInfo bindingOperationInfo : bindingOperationInfos) {
             bindingOperation = def.createBindingOperation();
-            addDocumentation(bindingOperation, bindingOperationInfo.getDocumentation());
             bindingOperation.setName(bindingOperationInfo.getName().getLocalPart());
             for (Operation operation 
                     : CastUtils.cast(binding.getPortType().getOperations(), Operation.class)) {
@@ -365,7 +373,6 @@ public class ServiceWSDLBuilder {
         for (BindingFaultInfo bindingFaultInfo 
             : bindingFaultInfos) {
             bindingFault = def.createBindingFault();
-            addDocumentation(bindingFault, bindingFaultInfo.getDocumentation());
             bindingFault.setName(bindingFaultInfo.getFaultInfo().getFaultName().getLocalPart());
             bindingOperation.addBindingFault(bindingFault);
             addExtensibilityAttributes(bindingFault, bindingFaultInfo.getExtensionAttributes());
@@ -379,7 +386,6 @@ public class ServiceWSDLBuilder {
         BindingInput bindingInput = null;
         if (bindingMessageInfo != null) {
             bindingInput = def.createBindingInput();
-            addDocumentation(bindingInput, bindingMessageInfo.getDocumentation());
             bindingInput.setName(bindingMessageInfo.getMessageInfo().getName().getLocalPart());
             bindingOperation.setBindingInput(bindingInput);
             addExtensibilityAttributes(bindingInput, bindingMessageInfo.getExtensionAttributes());
@@ -392,7 +398,6 @@ public class ServiceWSDLBuilder {
         BindingOutput bindingOutput = null;
         if (bindingMessageInfo != null) {
             bindingOutput = def.createBindingOutput();
-            addDocumentation(bindingOutput, bindingMessageInfo.getDocumentation());
             bindingOutput.setName(bindingMessageInfo.getMessageInfo().getName().getLocalPart());
             bindingOperation.setBindingOutput(bindingOutput);
             addExtensibilityAttributes(bindingOutput, bindingMessageInfo.getExtensionAttributes());
@@ -411,7 +416,6 @@ public class ServiceWSDLBuilder {
                 continue;
             }
             Message message = definition.createMessage();
-            addDocumentation(message, mie.getValue().getMessageDocumentation());
             message.setUndefined(false);
             message.setQName(mie.getKey());
             for (MessagePartInfo mpi : mie.getValue().getMessageParts()) {
@@ -435,18 +439,14 @@ public class ServiceWSDLBuilder {
             definition.addMessage(message);
         }
         
-        addDocumentation(definition, serviceInfo.getTopLevelDoc());
         Service serv = definition.createService();
-        addDocumentation(serv, serviceInfo.getDocumentation());
         serv.setQName(serviceInfo.getName());
         addNamespace(serviceInfo.getName().getNamespaceURI());
-        addExtensibilityElements(serv, getWSDL11Extensors(serviceInfo));
         definition.addService(serv);
 
         for (EndpointInfo ei : serviceInfo.getEndpoints()) {
             addNamespace(ei.getTransportId());
             Port port = definition.createPort();
-            addDocumentation(port, ei.getDocumentation());
             port.setName(ei.getName().getLocalPart());
             port.setBinding(definition.getBinding(ei.getBinding().getName()));
             addExtensibilityElements(port, getWSDL11Extensors(ei));
@@ -465,9 +465,7 @@ public class ServiceWSDLBuilder {
         if (portType == null) {
             portType = def.createPortType();
             portType.setQName(intf.getName());
-            addDocumentation(portType, intf.getDocumentation());
             addNamespace(intf.getName().getNamespaceURI(), def);
-            addExtensibilityElements(portType, getWSDL11Extensors(intf));
             addExtensibilityAttributes(portType, intf.getExtensionAttributes());
             portType.setUndefined(false);
             buildPortTypeOperation(portType, intf.getOperations(), def);
@@ -523,33 +521,27 @@ public class ServiceWSDLBuilder {
             
             if (operation == null) {
                 operation = def.createOperation();
-                addDocumentation(operation, operationInfo.getDocumentation());
                 operation.setUndefined(false);
                 operation.setName(operationInfo.getName().getLocalPart());
                 addNamespace(operationInfo.getName().getNamespaceURI(), def);
                 if (operationInfo.isOneWay()) {
                     operation.setStyle(OperationType.ONE_WAY);
                 }
-                addExtensibilityElements(operation, getWSDL11Extensors(operationInfo));
                 Input input = def.createInput();
-                addDocumentation(input, operationInfo.getInput().getDocumentation());
                 input.setName(operationInfo.getInputName());
                 Message message = def.createMessage();
                 buildMessage(message, operationInfo.getInput(), def);
                 this.addExtensibilityAttributes(input, getInputExtensionAttributes(operationInfo));
-                this.addExtensibilityElements(input, getWSDL11Extensors(operationInfo.getInput()));
                 input.setMessage(message);
                 operation.setInput(input);
                 operation.setParameterOrdering(operationInfo.getParameterOrdering());
                 
                 if (operationInfo.getOutput() != null) {
                     Output output = def.createOutput();
-                    addDocumentation(output, operationInfo.getOutput().getDocumentation());
                     output.setName(operationInfo.getOutputName());
                     message = def.createMessage();
                     buildMessage(message, operationInfo.getOutput(), def);
                     this.addExtensibilityAttributes(output, getOutputExtensionAttributes(operationInfo));
-                    this.addExtensibilityElements(output, getWSDL11Extensors(operationInfo.getOutput()));
                     output.setMessage(message);
                     operation.setOutput(output);
                 }
@@ -558,12 +550,10 @@ public class ServiceWSDLBuilder {
                 Fault fault = null;
                 for (FaultInfo faultInfo : faults) {
                     fault = def.createFault();
-                    addDocumentation(fault, faultInfo.getDocumentation());
                     fault.setName(faultInfo.getFaultName().getLocalPart());
                     message = def.createMessage();
                     buildMessage(message, faultInfo, def);
                     this.addExtensibilityAttributes(fault, faultInfo.getExtensionAttributes());
-                    this.addExtensibilityElements(fault, getWSDL11Extensors(faultInfo));
                     fault.setMessage(message);
                     operation.addFault(fault);
                 }
@@ -599,7 +589,7 @@ public class ServiceWSDLBuilder {
     protected void buildMessage(Message message,
                                 AbstractMessageContainer messageContainer,
                                 final Definition def) {
-        addDocumentation(message, messageContainer.getMessageDocumentation());
+                
         message.setQName(messageContainer.getName());
         message.setUndefined(false);
         def.addMessage(message);

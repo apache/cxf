@@ -32,7 +32,7 @@ public class CacheControlHeaderProviderTest extends Assert {
     public void testFromSimpleString() {
         CacheControl c = CacheControl.valueOf(
             "public;must-revalidate");
-        assertTrue(!c.isPrivate() && !c.isNoStore()
+        assertTrue(c.isPublic() && !c.isPrivate() && !c.isNoStore()
                    && c.isMustRevalidate() && !c.isProxyRevalidate());
         assertTrue(!c.isNoCache()
                    && !c.isNoTransform() && c.getNoCacheFields().size() == 0
@@ -44,7 +44,7 @@ public class CacheControlHeaderProviderTest extends Assert {
         CacheControl c = CacheControl.valueOf(
             "private=\"foo\";no-cache=\"bar\";no-store;no-transform;"
             + "must-revalidate;proxy-revalidate;max-age=2;s-maxage=3");
-        assertTrue(c.isPrivate() && c.isNoStore()
+        assertTrue(!c.isPublic() && c.isPrivate() && c.isNoStore()
                    && c.isMustRevalidate() && c.isProxyRevalidate() && c.isNoCache());
         assertTrue(c.isNoTransform() && c.getNoCacheFields().size() == 1
                    && c.getPrivateFields().size() == 1);

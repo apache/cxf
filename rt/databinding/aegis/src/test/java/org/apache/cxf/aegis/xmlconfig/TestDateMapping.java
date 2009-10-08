@@ -28,9 +28,8 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.test.TestUtilities;
-import org.apache.ws.commons.schema.XmlSchema;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,14 +49,14 @@ public class TestDateMapping {
     @Test
     public void testWriteSqlDateAsDate() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();
         BeanWithDate bean = new BeanWithDate();
         java.sql.Date date = new java.sql.Date(0);
         bean.setFig(date);
-        AegisType sbType = context.getTypeMapping().getType(bean.getClass());
+        Type sbType = context.getTypeMapping().getType(bean.getClass());
         AegisWriter<XMLStreamWriter> writer = context.createXMLStreamWriter();
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xmlWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
@@ -70,17 +69,16 @@ public class TestDateMapping {
     @Test
     public void testWriteCustomTypeSchemaType() throws Exception {
         context = new AegisContext();
-        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
+        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
         rootClasses.add(BeanWithDate.class);
         context.setRootClasses(rootClasses);
         context.initialize();
         BeanWithDate bean = new BeanWithDate();
         java.sql.Date date = new java.sql.Date(0);
         bean.setFig(date);
-        AegisType sbType = context.getTypeMapping().getType(bean.getClass());
-        XmlSchema root = new XmlSchema(); // dummy to put schema in.
+        Type sbType = context.getTypeMapping().getType(bean.getClass());
      /* will explode if the type object created for the custom mapping isn't fully initialized.
       */
-        sbType.writeSchema(root); 
+        sbType.writeSchema(null);
     }
 }

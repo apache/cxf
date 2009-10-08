@@ -43,7 +43,6 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
-import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.BeanInvoker;
@@ -129,6 +128,9 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
                 }
             }
 
+            if (start) {
+                server.start();
+            }
         } catch (EndpointException e) {
             throw new ServiceConstructionException(e);
         } catch (BusException e) {
@@ -144,17 +146,8 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
             initializeAnnotationInterceptors(server.getEndpoint(), getServiceClass());
         }
 
-        applyFeatures();
 
-        getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED, server, serviceBean,
-                                      serviceBean == null 
-                                      ? getServiceClass() == null 
-                                          ? getServiceFactory().getServiceClass() : getServiceClass()
-                                          : ClassHelper.getRealClass(getServiceBean()));
-        
-        if (start) {
-            server.start();
-        }
+        applyFeatures();
         return server;
     }
 
@@ -208,11 +201,11 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     protected void applyExtraClass() {
-        Map props = this.getProperties();
-        if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-            Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
-            DataBinding dataBinding = getServiceFactory().getDataBinding();
-            if (dataBinding instanceof JAXBDataBinding) {
+        DataBinding dataBinding = getServiceFactory().getDataBinding();
+        if (dataBinding instanceof JAXBDataBinding) {
+            Map props = this.getProperties();
+            if (props != null && props.get("jaxb.additionalContextClasses") != null) {
+                Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
                 ((JAXBDataBinding)dataBinding).setExtraClass(extraClass);
             }
         }
@@ -271,7 +264,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
      * Sets the bean implementing the service. If this is set a
      * <code>BeanInvoker</code> is created for the provided bean.
      *
-     * @param serviceBean an instantiated implementation object
+     * @param serviceBean an instantiated implementaiton object
      */
     public void setServiceBean(Object serviceBean) {
         this.serviceBean = serviceBean;

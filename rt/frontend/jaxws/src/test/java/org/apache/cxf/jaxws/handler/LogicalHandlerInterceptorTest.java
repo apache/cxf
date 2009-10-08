@@ -87,7 +87,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
         });
         expect(invoker.getLogicalHandlers()).andReturn(list);
         expect(message.getExchange()).andReturn(exchange).anyTimes();
-        expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
+        expect(message.containsKey(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
         expect(message.keySet()).andReturn(new TreeSet<String>()).anyTimes();
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);
         expect(exchange.getOutMessage()).andReturn(message);

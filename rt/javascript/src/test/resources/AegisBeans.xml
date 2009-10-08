@@ -23,7 +23,7 @@
 	xmlns:soap="http://cxf.apache.org/bindings/soap"
 	xsi:schemaLocation="
            http://www.springframework.org/schema/beans
-              http://www.springframework.org/schema/beans/spring-beans.xsd
+              http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
            http://cxf.apache.org/bindings/soap http://cxf.apache.org/schemas/configuration/soap.xsd
            http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
 
@@ -33,29 +33,6 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-javascript-client.xml" />
-	<!-- 
-	 <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
-     <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
-	
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl">
-        <property name="inInterceptors">
-            <list>
-                <ref bean="logInbound"/>
-            </list>
-        </property>
-        <property name="outInterceptors">
-            <list>
-                <ref bean="logOutbound"/>
-            </list>
-        </property>
-        <property name="outFaultInterceptors">
-            <list>
-                <ref bean="logOutbound"/>
-            </list>
-        </property>
-    </bean>
-    --> 
-	
 
 	<simple:server id="aegis-service"
 		serviceClass="org.apache.cxf.javascript.fortest.AegisService"

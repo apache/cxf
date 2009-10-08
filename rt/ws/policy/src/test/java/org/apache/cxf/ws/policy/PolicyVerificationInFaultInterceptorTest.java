@@ -65,6 +65,7 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         
         PolicyVerificationInFaultInterceptor interceptor = 
             control.createMock(PolicyVerificationInFaultInterceptor.class, new Method[] {m});
+        interceptor.setBus(bus);
         
         setupMessage(false, false, false, false, false, false);
         control.replay();
@@ -126,18 +127,9 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         if (null == message) {
             message = control.createMock(Message.class); 
         }
-        if (setupAssertionInfoMap && null == aim) {
-            aim = control.createMock(AssertionInfoMap.class);
-        }
-        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
-        if (!setupAssertionInfoMap) {
-            return;           
-        }
-
         if (null == exchange) {
             exchange = control.createMock(Exchange.class);            
         }
-        
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(
             requestor ? Boolean.TRUE : Boolean.FALSE);
         if (!requestor) {
@@ -164,7 +156,6 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         }
         EasyMock.expect(endpoint.getEndpointInfo()).andReturn(ei);
         
-        EasyMock.expect(exchange.get(Bus.class)).andReturn(bus);
         if (setupPolicyEngine && null == engine) {
             engine = control.createMock(PolicyEngine.class);
         }
@@ -172,7 +163,13 @@ public class PolicyVerificationInFaultInterceptorTest extends Assert {
         if (!setupPolicyEngine) {
             return;           
         }
-
+        if (setupAssertionInfoMap && null == aim) {
+            aim = control.createMock(AssertionInfoMap.class);
+        }
+        EasyMock.expect(message.get(AssertionInfoMap.class)).andReturn(aim);
+        if (!setupAssertionInfoMap) {
+            return;           
+        }
         if (null == ex) {
             ex = control.createMock(Exception.class);
         }

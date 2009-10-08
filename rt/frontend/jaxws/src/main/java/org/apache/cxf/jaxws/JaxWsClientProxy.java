@@ -19,14 +19,16 @@
 
 package org.apache.cxf.jaxws;
 
-import java.io.IOException;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javax.xml.soap.SOAPConstants;
@@ -101,6 +103,7 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         if (oi == null) {
             // check for method on BindingProvider and Object
             if (method.getDeclaringClass().equals(BindingProvider.class)
+                || method.getDeclaringClass().equals(BindingProviderImpl.class)
                 || method.getDeclaringClass().equals(Object.class)) {
                 try {
                     return method.invoke(this, params);
@@ -131,15 +134,13 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                     throw ex.fillInStackTrace();
                 }
             }
-            if (ex instanceof Fault && ex.getCause() instanceof IOException) {
-                throw new WebServiceException(ex.getMessage(), ex.getCause());
-            }
+            
             if (getBinding() instanceof HTTPBinding) {
                 HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
                 exception.initCause(ex);
                 throw exception;
             } else if (getBinding() instanceof SOAPBinding) {
-                SOAPFault soapFault = createSoapFault((SOAPBinding)getBinding(), ex);
+                SOAPFault soapFault = createSoapFault(ex);
                 if (soapFault == null) {
                     throw new WebServiceException(ex);
                 }
@@ -177,15 +178,15 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
                 || Response.class.equals(m.getReturnType()));
     }
     
-    static SOAPFault createSoapFault(SOAPBinding binding, Exception ex) throws SOAPException {
+    private SOAPFault createSoapFault(Exception ex) throws SOAPException {
         SOAPFault soapFault;
         try {
-            soapFault = binding.getSOAPFactory().createFault();
+            soapFault = ((SOAPBinding)getBinding()).getSOAPFactory().createFault();
         } catch (Throwable t) {
             //probably an old version of saaj or something that is not allowing createFault 
             //method to work.  Try the saaj 1.2 method of doing this.
             try {
-                soapFault = binding.getMessageFactory().createMessage()
+                soapFault = ((SOAPBinding)getBinding()).getMessageFactory().createMessage()
                     .getSOAPBody().addFault();
             } catch (Throwable t2) {
                 //still didn't work, we'll just throw what we have
@@ -246,11 +247,131 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
         }
         ClientCallback callback = new JaxwsClientCallback(handler);
              
-        Response<Object> ret = new JaxwsResponseCallback(callback);
+        Response<Object> ret = new ResponseCallback(callback);
         client.invoke(callback, oi, params);
         return ret;
     }
 
+    static class JaxwsClientCallback extends ClientCallback {
+        final AsyncHandler<Object> handler;
+        
+        public JaxwsClientCallback(final AsyncHandler<Object> handler) {
+            this.handler = handler;
+        }
+        public void handleResponse(Map<String, Object> ctx, Object[] res) {
+            context = ctx;
+            result = res;
+            if (handler != null) {
+                handler.handleResponse(new Response<Object>() {
+
+                    public Map<String, Object> getContext() {
+                        return context;
+                    }
+
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                        cancelled = true;
+                        return true;
+                    }
+
+                    public Object get() throws InterruptedException, ExecutionException {
+                        return result[0];
+                    }
+
+                    public Object get(long timeout, TimeUnit unit) throws InterruptedException,
+                        ExecutionException, TimeoutException {
+                        return result[0];
+                    }
+
+                    public boolean isCancelled() {
+                        return cancelled;
+                    }
+
+                    public boolean isDone() {
+                        return true;
+                    }
+                    
+                });
+            }
+            done = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+
+        @Override
+        public void handleException(Map<String, Object> ctx, final Throwable ex) {
+            context = ctx;
+            exception = ex;
+            if (handler != null) {
+                handler.handleResponse(new Response<Object>() {
+
+                    public Map<String, Object> getContext() {
+                        return context;
+                    }
+
+                    public boolean cancel(boolean mayInterruptIfRunning) {
+                        cancelled = true;
+                        return true;
+                    }
+
+                    public Object get() throws InterruptedException, ExecutionException {
+                        throw new ExecutionException(ex);
+                    }
+
+                    public Object get(long timeout, TimeUnit unit) 
+                        throws InterruptedException, ExecutionException, TimeoutException {
+                        
+                        throw new ExecutionException(ex);
+                    }
+
+                    public boolean isCancelled() {
+                        return cancelled;
+                    }
+
+                    public boolean isDone() {
+                        return true;
+                    }
+
+                });
+            }
+            done = true;
+            synchronized (this) {
+                notifyAll();
+            }
+        }
+    }
+    static class ResponseCallback implements Response<Object> {
+        ClientCallback callback;
+        public ResponseCallback(ClientCallback cb) {
+            callback = cb;
+        }
+        
+        public Map<String, Object> getContext() {
+            try {
+                return callback.getResponseContext();
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+        public boolean cancel(boolean mayInterruptIfRunning) {
+            return callback.cancel(mayInterruptIfRunning);
+        }
+        public Object get() throws InterruptedException, ExecutionException {
+            return callback.get()[0];
+        }
+        public Object get(long timeout, TimeUnit unit) throws InterruptedException,
+            ExecutionException, TimeoutException {
+            return callback.get(timeout, unit)[0];
+        }
+        public boolean isCancelled() {
+            return callback.isCancelled();
+        }
+        public boolean isDone() {
+            return callback.isDone();
+        }
+    };
+
+    
     public Map<String, Object> getRequestContext() {
         return new WrappedMessageContext(this.getClient().getRequestContext(),
                                          null,

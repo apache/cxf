@@ -24,14 +24,14 @@ import javax.xml.datatype.Duration;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * @author Dan Diephouse
  */
-public class DurationType extends AegisType {
+public class DurationType extends Type {
     private DatatypeFactory dtFactory;
 
     public DurationType() {

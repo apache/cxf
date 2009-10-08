@@ -19,14 +19,7 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.io.IOException;
-import java.io.InputStream;
-
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.w3c.dom.Element;
-
-import org.xml.sax.SAXException;
 
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
@@ -52,14 +45,4 @@ public interface PolicyBuilder {
      * @return the Policy object constructed from the element
      */
     Policy getPolicy(Element element);
-    
-    
-    /**
-     * Creates a Policy object from an InputStream.
-     * 
-     * @param stream the inputstream
-     * @return the Policy object constructed from the element
-     */
-    Policy getPolicy(InputStream stream)
-        throws IOException, ParserConfigurationException, SAXException;
 }

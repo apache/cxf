@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
 
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
@@ -60,17 +59,12 @@ public class PrimitiveAssertion implements PolicyAssertion {
         optional = o;
     }
     
-    public PrimitiveAssertion(Element element) {
+    public PrimitiveAssertion(Element element, PolicyConstants constants) {
         name = new QName(element.getNamespaceURI(), element.getLocalName());
-        NamedNodeMap atts = element.getAttributes();
-        if (atts != null) {
-            for (int x = 0; x < atts.getLength(); x++) {
-                Attr att = (Attr)atts.item(x);
-                QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
-                if (PolicyConstants.isOptionalAttribute(qn)) {
-                    optional = Boolean.valueOf(att.getValue());                
-                }
-            }
+        Attr attribute = element.getAttributeNodeNS(constants.getNamespace(), 
+                                                    constants.getOptionalAttrName());
+        if (attribute != null) {
+            optional = Boolean.valueOf(attribute.getValue());
         }
     }
 

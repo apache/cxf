@@ -88,18 +88,28 @@ public class JMSConduitTest extends AbstractJMSTester {
         assertTrue("OutputStream should not be null", os != null);
     }
 
-    /*
-     * @Test public void testSendOut() throws Exception {
-     * setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
-     * "HelloWorldServiceLoop", "HelloWorldPortLoop"); JMSConduit conduit = setupJMSConduit(true, false);
-     * conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(10000)); try { for (int c = 0; c < 10; c++) {
-     * LOG.info("Sending message " + c); inMessage = null; Message message = new MessageImpl();
-     * sendoutMessage(conduit, message, false); verifyReceivedMessage(message); } } finally { conduit.close();
-     * } }
-     */
+    @Test
+    public void testSendOut() throws Exception {
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldServiceLoop", "HelloWorldPortLoop");
+        JMSConduit conduit = setupJMSConduit(true, false);
+        conduit.getJmsConfig().setReceiveTimeout(Long.valueOf(10000));
+
+        try {
+            for (int c = 0; c < 10; c++) {
+                LOG.info("Sending message " + c);
+                inMessage = null;
+                Message message = new MessageImpl();
+                sendoutMessage(conduit, message, false);
+                verifyReceivedMessage(message);
+            }
+        } finally {
+            conduit.close();
+        }
+    }
 
     /**
-     * Sends several messages and verifies the results. The service sends the message to itself. So it should
+     * Sends several messages and verfies the results. The service sends the message to itself. So it should
      * always receive the result
      * 
      * @throws Exception

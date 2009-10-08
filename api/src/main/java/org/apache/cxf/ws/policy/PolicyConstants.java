@@ -19,25 +19,14 @@
 
 package org.apache.cxf.ws.policy;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Attr;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-
-import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.extension.BusExtension;
 
 /**
  * Encapsulation of version-specific WS-Policy constants.
  */
-public final class PolicyConstants {
+public final class PolicyConstants implements BusExtension {
     
     public static final String NAMESPACE_WS_POLICY
         = "http://www.w3.org/ns/ws-policy";
@@ -49,24 +38,17 @@ public final class PolicyConstants {
         = "http://schemas.xmlsoap.org/ws/2004/09/policy";
     
     
-    public static final String POLICY_ELEM_NAME = "Policy";
-    public static final String POLICYREFERENCE_ELEM_NAME = "PolicyReference";
-    public static final String POLICYATTACHMENT_ELEM_NAME = "PolicyAttachment";
-    public static final String APPLIESTO_ELEM_NAME = "AppliesTo";
-
-    public static final String WSU_NAMESPACE_URI = 
-        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    public static final String WSU_ID_ATTR_NAME = "Id";
-
-    public static final String POLICY_OVERRIDE 
-        = "org.apache.cxf.ws.policy.override";
-        
-    public static final String POLICY_IN_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.PolicyInInterceptor";
-    public static final String POLICY_OUT_INTERCEPTOR_ID
-        = "org.apache.cxf.ws.policy.PolicyOutInterceptor";
+    public static final String CLIENT_POLICY_OUT_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.ClientPolicyOutInterceptor";
+    public static final String CLIENT_POLICY_IN_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.ClientPolicyInInterceptor";
     public static final String CLIENT_POLICY_IN_FAULT_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.ClientPolicyInFaultInterceptor";
+
+    public static final String SERVER_POLICY_IN_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.ServerPolicyInInterceptor";
+    public static final String SERVER_POLICY_OUT_INTERCEPTOR_ID
+        = "org.apache.cxf.ws.policy.ServerPolicyOutInterceptor";
     public static final String SERVER_POLICY_OUT_FAULT_INTERCEPTOR_ID
         = "org.apache.cxf.ws.policy.ServerPolicyOutFaultInterceptor";
     
@@ -84,101 +66,153 @@ public final class PolicyConstants {
     public static final String SERVER_OUTFAULT_ASSERTIONS
         = "org.apache.cxf.ws.policy.server.outfault.assertions";
     
+    private static String namespaceURI; 
+    
+    private static final String POLICY_ELEM_NAME = "Policy";
     
     private static final String ALL_ELEM_NAME = "All";
+    
     private static final String EXACTLYONE_ELEM_NAME = "ExactlyOne";
+    
+    private static final String POLICYREFERENCE_ELEM_NAME = "PolicyReference";
+    
+    private static final String POLICYATTACHMENT_ELEM_NAME = "PolicyAttachment";
+    
+    private static final String APPLIESTO_ELEM_NAME = "AppliesTo";
+    
     private static final String OPTIONAL_ATTR_NAME = "Optional"; 
+    
     private static final String POLICYURIS_ATTR_NAME = "PolicyURIs";
     
+    private static QName policyElemQName;
+    
+    private static QName allElemQName;
+    
+    private static QName exactlyOneElemQName;
+    
+    private static QName policyReferenceElemQName;
+    
+    private static QName policyAttachmentElemQName;
+    
+    private static QName appliesToElemQName;
+    
+    private static QName optionalAttrQName;
+    
+    private static QName policyURIsAttrQName;
+    
+    private static final String WSU_NAMESPACE_URI = 
+        "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
+    
+    private static final String WSU_ID_ATTR_NAME = "Id";
+    
+    private static final QName WSU_ID_ATTR_QNAME =
+        new QName(WSU_NAMESPACE_URI, WSU_ID_ATTR_NAME);
     
     
-    private static final Set<String> SUPPORTED_NAMESPACES = new HashSet<String>();
-    static {
-        SUPPORTED_NAMESPACES.add(NAMESPACE_WS_POLICY);
-        SUPPORTED_NAMESPACES.add(NAMESPACE_W3_200607);
-        SUPPORTED_NAMESPACES.add(NAMESPACE_XMLSOAP_200409);
+    public PolicyConstants() {
+        setNamespace(NAMESPACE_WS_POLICY);
     }
     
-    private PolicyConstants() {
-        //utility class
-    }
-    
-    public static List<Element> findAllPolicyElementsOfLocalName(Document doc, String localName) {
-        return findAllPolicyElementsOfLocalName(doc.getDocumentElement(), localName);
-    }
-    public static List<Element> findAllPolicyElementsOfLocalName(Element el, String localName) {
-        List<Element> ret = new LinkedList<Element>();
-        findAllPolicyElementsOfLocalName(el, localName, ret);
-        return ret;
-    }
-    public static void findAllPolicyElementsOfLocalName(Element el, String localName, List<Element> val) {
-        if (localName.equals(el.getLocalName()) && SUPPORTED_NAMESPACES.contains(el.getNamespaceURI())) {
-            val.add(el);
-        }
-        el = DOMUtils.getFirstElement(el);
-        while (el != null) {
-            findAllPolicyElementsOfLocalName(el, localName, val);
-            el = DOMUtils.getNextElement(el);
-        }
+    public Class<?> getRegistrationType() {
+        return PolicyConstants.class;
     }
 
-    public static boolean isOptional(Element e) {
-        Attr at = findOptionalAttribute(e);
-        if (at != null) {
-            String v = at.getValue();
-            return "true".equalsIgnoreCase(v) || "1".equals(v);
-        }
-        return false;
+    public void setNamespace(String uri) {
+        namespaceURI = uri;
+        
+        // update qnames
+        
+        policyElemQName = new QName(namespaceURI, POLICY_ELEM_NAME);
+        allElemQName = new QName(namespaceURI, ALL_ELEM_NAME);
+        exactlyOneElemQName = new QName(namespaceURI, EXACTLYONE_ELEM_NAME);
+        policyReferenceElemQName = new QName(namespaceURI, POLICYREFERENCE_ELEM_NAME);
+        policyAttachmentElemQName = new QName(namespaceURI, POLICYATTACHMENT_ELEM_NAME);
+        appliesToElemQName = new QName(namespaceURI, APPLIESTO_ELEM_NAME);
+        optionalAttrQName = new QName(namespaceURI, OPTIONAL_ATTR_NAME);
+        policyURIsAttrQName = new QName(namespaceURI, POLICYURIS_ATTR_NAME);
+        
     }
-    public static Attr findOptionalAttribute(Element e) {
-        NamedNodeMap atts = e.getAttributes();
-        for (int x = 0; x < atts.getLength(); x++) {
-            Attr att = (Attr)atts.item(x);
-            QName qn = new QName(att.getNamespaceURI(), att.getLocalName());
-            if (isOptionalAttribute(qn)) {
-                return att;
-            }
-        }
-        return null;
+  
+    public String getNamespace() {
+        return namespaceURI;
+    } 
+    
+    public String getWSUNamespace() {
+        return WSU_NAMESPACE_URI;
     }
-
-    public static Element findPolicyElement(Element parent) {
-        Node nd = parent.getFirstChild();
-        while (nd != null) {
-            if (POLICY_ELEM_NAME.equals(nd.getLocalName())
-                && SUPPORTED_NAMESPACES.contains(nd.getNamespaceURI())) {
-                return (Element)nd;
-            }
-            nd = nd.getNextSibling();
-        }
-        return null;
+    
+    public String getPolicyElemName() {
+        return POLICY_ELEM_NAME;
     }
-    public static boolean isOptionalAttribute(QName qn) {
-        return OPTIONAL_ATTR_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getAllElemName() {
+        return ALL_ELEM_NAME;
     }
-    public static boolean isPolicyElem(QName qn) {
-        return POLICY_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getExactlyOneElemName() {
+        return EXACTLYONE_ELEM_NAME;
     }
-    public static boolean isPolicyRefElem(QName qn) {
-        return POLICYREFERENCE_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getPolicyReferenceElemName() {
+        return POLICYREFERENCE_ELEM_NAME;
     }
-    public static boolean isAppliesToElem(QName qn) {
-        return APPLIESTO_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getPolicyAttachmentElemName() {
+        return POLICYATTACHMENT_ELEM_NAME;
     }
-    public static boolean isPolicyURIsAttr(QName qn) {
-        return POLICYURIS_ATTR_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getAppliesToElemName() {
+        return APPLIESTO_ELEM_NAME;
     }
-    public static boolean isExactlyOne(QName qn) {
-        return EXACTLYONE_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getOptionalAttrName() {
+        return OPTIONAL_ATTR_NAME;
     }
-    public static boolean isAll(QName qn) {
-        return ALL_ELEM_NAME.equals(qn.getLocalPart())
-            && SUPPORTED_NAMESPACES.contains(qn.getNamespaceURI());
+    
+    public String getPolicyURIsAttrName() {
+        return POLICYURIS_ATTR_NAME;
     }
+    
+    public String getIdAttrName() {
+        return WSU_ID_ATTR_NAME;
+    }
+    
+    public QName getPolicyElemQName() {
+        return policyElemQName;
+    }
+    
+    public QName getAllElemQName() {
+        return allElemQName;
+    }
+    
+    public QName getExactlyOneElemQName() {
+        return exactlyOneElemQName;
+    }
+    
+    public QName getPolicyReferenceElemQName() {
+        return policyReferenceElemQName;
+    }
+    
+    public QName getPolicyAttachmentElemQName() {
+        return policyAttachmentElemQName;
+    }
+    
+    public QName getAppliesToElemQName() {
+        return appliesToElemQName;
+    }
+    
+    public QName getOptionalAttrQName() {
+        return optionalAttrQName;
+    }
+    
+    public QName getPolicyURIsAttrQName() {
+        return policyURIsAttrQName;
+    }
+    
+    public QName getIdAttrQName() {
+        return WSU_ID_ATTR_QNAME;
+    } 
+    
+    
+   
 }

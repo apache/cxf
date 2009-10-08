@@ -23,13 +23,13 @@
     <artifactId>cxf-bundle-minimal</artifactId>
     <packaging>bundle</packaging>
     <name>Apache CXF Minimal Bundle Jar</name>
-    <version>2.3.0-SNAPSHOT</version>
+    <version>2.1.7</version>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-bundle-parent</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.1.7</version>
     </parent>
 
     <dependencies>
@@ -64,11 +64,6 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${pom.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>cxf-rt-transports-http-osgi</artifactId>
             <version>${pom.version}</version>
         </dependency>
 
@@ -131,11 +126,6 @@
             <version>${pom.version}</version>
         </dependency>
         <dependency>
-            <groupId>${pom.groupId}</groupId>
-            <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${pom.version}</version>
-        </dependency> 
-        <dependency>
                <groupId>com.sun.xml.fastinfoset</groupId>
                <artifactId>FastInfoset</artifactId>
                <optional>true</optional>
@@ -147,6 +137,7 @@
             <plugin>
                 <groupId>org.apache.felix</groupId>
                 <artifactId>maven-bundle-plugin</artifactId>
+                <version>1.4.1</version>
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
@@ -172,7 +163,6 @@
                             com.sun*;resolution:=optional,
                             javax.jms*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
-                            com.ctc.wstx.msv*;resolution:=optional,
                             repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
                             javax.xml.soap,
@@ -197,8 +187,8 @@
                         </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
+                            org.codehaus.xfire.aegis.type.java5.*,
                             '=META-INF.cxf',
-                            '=META-INF.cxf.osgi',
                             '=schemas',
                             '=schemas.configuration',
                             '=schemas.wsdl'
@@ -211,6 +201,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>1.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -275,10 +266,5 @@
             </plugin>
         </plugins>
     </build>
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/minimal</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/minimal</developerConnection>
-    </scm>
 
 </project>

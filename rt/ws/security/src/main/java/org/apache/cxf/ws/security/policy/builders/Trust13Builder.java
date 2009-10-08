@@ -28,15 +28,15 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
-import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Trust13;
 
 
 public class Trust13Builder implements AssertionBuilder {
 
     public PolicyAssertion build(Element element) {
-        element = PolicyConstants.findPolicyElement(element);
+        element = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
 
         if (element == null) {
             throw new IllegalArgumentException(

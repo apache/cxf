@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.transport.servlet;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.Hashtable;
 import java.util.Map;
@@ -25,6 +26,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -37,8 +39,7 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 
 
 
-public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
-    
+public abstract class AbstractCXFServlet extends HttpServlet {
     static final Map<String, WeakReference<Bus>> BUS_MAP = new Hashtable<String, WeakReference<Bus>>();
     static final Logger LOG = getLogger();
     
@@ -135,8 +136,28 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
         BUS_MAP.remove(s);
         bus.shutdown(true);
     }
-        
-    protected void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        invoke(request, response);
+    }
+
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+        invoke(request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+        invoke(request, response);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException,
+        IOException {
+        invoke(request, response);
+    }
+    
+    private  void invoke(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
             BusFactory.setThreadDefaultBus(getBus());
             controller.invoke(request, response);

@@ -42,18 +42,18 @@ public class SpringBeanQNameMapTest extends Assert {
                                                    .createMap());
         assertNotNull(beans);
 
-        assertEquals(1, PersonQNameImpl.getLoadCount());
+        assertEquals(2, PersonQNameImpl.getLoadCount());
         assertEquals(4, beans.keySet().size());
 
         QName qn1 = new QName("http://cxf.apache.org", "anonymous");
         Person p1 = beans.get(qn1);
         assertNotNull(p1);
-        assertEquals(1, PersonQNameImpl.getLoadCount());
+        assertEquals(2, PersonQNameImpl.getLoadCount());
 
         QName qn2 = new QName("http://cxf.apache.org", "myself");
         Person p2 = beans.get(qn2);
         assertNotNull(p2);
-        assertEquals(2, PersonQNameImpl.getLoadCount());
+        assertEquals(3, PersonQNameImpl.getLoadCount());
 
         QName qn3 = new QName("http://cxf.apache.org", "other");
         Person p3 = beans.get(qn3);

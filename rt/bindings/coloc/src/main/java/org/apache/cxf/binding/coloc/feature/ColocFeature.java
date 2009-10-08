@@ -21,14 +21,12 @@ package org.apache.cxf.binding.coloc.feature;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.coloc.ColocInInterceptor;
 import org.apache.cxf.binding.coloc.ColocOutInterceptor;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.DeferredConduitSelector;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
-@NoJSR250Annotations
 public class ColocFeature extends AbstractFeature {
 
     @Override

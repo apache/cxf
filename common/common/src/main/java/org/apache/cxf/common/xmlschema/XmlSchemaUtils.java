@@ -201,7 +201,7 @@ public final class XmlSchemaUtils {
      * @param namespaceUri
      */
     public static void addImportIfNeeded(XmlSchema schema, String namespaceUri) {
-        // no need to import nothing or the XSD schema, or the schema we are fixing.
+        // no need to import nothing or the XSD schema.
         if ("".equals(namespaceUri) 
             || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)
             || schema.getTargetNamespace().equals(namespaceUri)) {
@@ -223,23 +223,6 @@ public final class XmlSchemaUtils {
         imp.setNamespace(namespaceUri);
         inc.add(imp);
         schema.getItems().add(imp);
-    }
-    
-    /**
-     * For convenience, start from a qname, and add the import if it is non-null
-     * and has a namespace.
-     * @see #addImportIfNeeded(XmlSchema, String)
-     * @param schema
-     * @param qname
-     */
-    public static void addImportIfNeeded(XmlSchema schema, QName qname) {
-        if (qname == null) {
-            return;
-        }
-        if (qname.getNamespaceURI() == null) {
-            return;
-        }
-        addImportIfNeeded(schema, qname.getNamespaceURI());
     }
 
     /**
@@ -653,7 +636,7 @@ public final class XmlSchemaUtils {
         throw new UnsupportedConstruct(message);
         
     }
-    
+
     public static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
         Message message = new Message(messageKey, LOG, subject.getQName(), 
                                       cleanedUpSchemaSource(subject));
@@ -662,7 +645,7 @@ public final class XmlSchemaUtils {
     }
 
     public static String cleanedUpSchemaSource(XmlSchemaObject subject) {
-        if (subject == null || subject.getSourceURI() == null) {
+        if (subject.getSourceURI() == null) {
             return "";
         } else {
             return subject.getSourceURI() + ":" + subject.getLineNumber(); 

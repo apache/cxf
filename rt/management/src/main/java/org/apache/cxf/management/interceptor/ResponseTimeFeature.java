@@ -19,11 +19,9 @@
 package org.apache.cxf.management.interceptor;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 
-@NoJSR250Annotations
 public class ResponseTimeFeature extends AbstractFeature {
     private static final ResponseTimeMessageInInterceptor IN =
         new ResponseTimeMessageInInterceptor();

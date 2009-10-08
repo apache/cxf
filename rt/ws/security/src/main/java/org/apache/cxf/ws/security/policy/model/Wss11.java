@@ -22,7 +22,6 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class Wss11 extends Wss10 {
@@ -77,20 +76,17 @@ public class Wss11 extends Wss10 {
         this.requireSignatureConfirmation = requireSignatureConfirmation;
     }
 
-    public QName getRealName() {
-        return constants.getWSS11();
-    }
     public QName getName() {
-        return SP12Constants.INSTANCE.getWSS11();
+        return constants.getWSS11();
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String localname = getRealName().getLocalPart();
-        String namespaceURI = getRealName().getNamespaceURI();
+        String localname = getName().getLocalPart();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
@@ -102,12 +98,11 @@ public class Wss11 extends Wss10 {
 
         String pPrefix = writer.getPrefix(SPConstants.POLICY.getNamespaceURI());
         if (pPrefix == null) {
-            pPrefix = SPConstants.POLICY.getPrefix();
             writer.setPrefix(SPConstants.POLICY.getPrefix(), SPConstants.POLICY.getNamespaceURI());
         }
 
         // <wsp:Policy>
-        writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
+        writer.writeStartElement(prefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
         // <sp:MustSupportRefKeyIndentifier />

@@ -17,7 +17,6 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<!-- See README file in parent directory for information on running performance tests -->
 <project name="test.complex_type" default="build" basedir=".">
     <property name="thirdparty.classpath" location ="${basedir}/../base/build/classes"/>
 
@@ -55,24 +54,7 @@
         </sequential>
     </macrodef>
 
-    <target name="generate.code">
-        <echo level="info" message="Generating code using wsdl2java..."/>
-        <wsdl2java file="perf.wsdl"/>
-    </target>
 
-    <property name="cxf.war.file.name" value="complex_type"/>
-    <target name="war" depends="build">
-        <cxfwar wsdl="perf.wsdl" filename="${cxf.war.file.name}.war"/>
-    </target>
-
-    <target name="client-servlet" description="run demo client hitting servlet" depends="build">
-        <property name="param" value=""/>
-        <cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline=
-            "-WSDL http://localhost:8080/complex_type/services/complex_type?wsdl" />
-    </target>
-
-	<!-- client and server tasks below easier to run from script files in bin/ subdirectory
-	     Alternatively provide -Dxxxx=yyy options at command line for params listed below. -->
     <target name="client" description="run complex_type client">
         <property name="param" value=""/>
         <property name="pipe" value=""/>
@@ -97,5 +79,22 @@
             params="-host ${host}"
             jvmargs="-server -XX:CompileThreshold=1000 -Xmx1500M -Xms1500M -Xmn1000M -XX:+UseParallelGC -XX:+UseParallelOldGC"/>
     </target>
+
+    <target name="generate.code">
+        <echo level="info" message="Generating code using wsdl2java..."/>
+        <wsdl2java file="perf.wsdl"/>
+    </target>
+
+    <property name="cxf.war.file.name" value="complex_type"/>
+    <target name="war" depends="build">
+        <cxfwar wsdl="perf.wsdl" filename="${cxf.war.file.name}.war"/>
+    </target>
+
+    <target name="client-servlet" description="run demo client hitting servlet" depends="build">
+        <property name="param" value=""/>
+        <cxf.client.run classname="org.apache.cxf.performance.complex_type.client.Client" argline=
+            "-WSDL http://localhost:8080/complex_type/services/complex_type?wsdl" />
+    </target>
+
 
 </project>

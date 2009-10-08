@@ -28,7 +28,6 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -60,6 +59,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
@@ -82,13 +82,12 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         
     public static final String PARTIAL_RESPONSE = AbstractMultiplexDestination.class.getName()
         + ".partial.response";
-    public static final String RESPONSE_COMMITED = "http.response.done";
-    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
 
     protected final Bus bus;
+    protected final ConduitInitiator conduitInitiator;
 
     // Configuration values
     protected HTTPServerPolicy server;
@@ -106,11 +105,13 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      * @throws IOException
      */    
     public AbstractHTTPDestination(Bus b,
+                                   ConduitInitiator ci,
                                    EndpointInfo ei,
                                    boolean dp)
         throws IOException {
         super(b, getTargetReference(getAddressValue(ei, dp), b), ei);  
         bus = b;
+        conduitInitiator = ci;
         
         initConfig();
     }
@@ -177,6 +178,13 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     }
     
     /**
+     * @return the associated conduit initiator
+     */
+    protected ConduitInitiator getConduitInitiator() {
+        return conduitInitiator;
+    }
+
+    /**
      * Copy the request headers into the message.
      * 
      * @param message the current message
@@ -184,7 +192,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      */
     protected void copyRequestHeaders(Message message, Map<String, List<String>> headers) {
         HttpServletRequest req = (HttpServletRequest)message.get(HTTP_REQUEST);
-        
         //TODO how to deal with the fields        
         for (Enumeration e = req.getHeaderNames(); e.hasMoreElements();) {
             String fname = (String)e.nextElement();
@@ -201,7 +208,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                 values.add(val);
             }
         }
-        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
     }
 
     /**
@@ -231,14 +237,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
             for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
                 String header = (String)iter.next();
                 List<?> headerList = (List<?>)headers.get(header);
-                StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < headerList.size(); i++) {
-                    sb.append(headerList.get(i));
-                    if (i + 1 < headerList.size()) {
-                        sb.append(',');
-                    }
+                for (Object value : headerList) {
+                    response.addHeader(header, (String)value);
                 }
-                response.addHeader(header, sb.toString());
             }
         } else {
             response.setContentType(ct);

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.binding.soap.saaj;
 
-
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -63,18 +62,17 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  * SOAPMessage.
  */
 public class SAAJOutInterceptor extends AbstractSoapInterceptor {
-    public static final String ORIGINAL_XML_WRITER 
-        = SAAJOutInterceptor.class.getName() + ".original.xml.writer";
-    
+
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJOutInterceptor.class);
-    
+    private static final String ORIGINAL_XML_WRITER 
+        = SAAJOutInterceptor.class.getName() + ".original.xml.writer";
     private MessageFactory factory11;
     private MessageFactory factory12;
     
     public SAAJOutInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
-    public synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
+    private synchronized MessageFactory getFactory(SoapMessage message) throws SOAPException {
         if (message.getVersion() instanceof Soap11) {
             if (factory11 == null) { 
                 factory11 = MessageFactory.newInstance();
@@ -88,25 +86,6 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     }
     public void handleMessage(SoapMessage message) throws Fault {
         SOAPMessage saaj = message.getContent(SOAPMessage.class);
-
-        try { 
-            if (message.hasHeaders()
-                && saaj != null 
-                && saaj.getSOAPPart().getEnvelope().getHeader() == null) {
-
-                // creating an empty SOAPHeader at this point in the
-                // pre-existing SOAPMessage avoids the <soap:body> and 
-                // <soap:header> appearing in reverse order when the envolope
-                // is written to the wire
-                //
-                saaj.getSOAPPart().getEnvelope().addHeader();
-            }
-        } catch (SOAPException e) {
-            throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), 
-                                e,
-                                message.getVersion().getSender());
-        }    
-
         if (saaj == null) {
             SoapVersion version = message.getVersion();
             try {
@@ -126,9 +105,10 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
             } catch (SOAPException e) {
                 throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, version.getSender());
             }
-        } else if (!message.containsKey(ORIGINAL_XML_WRITER)) {
+        } else {
             //as the SOAPMessage already has everything in place, we do not need XMLStreamWriter to write
             //anything for us, so we just set XMLStreamWriter's output to a dummy output stream.         
+
             XMLStreamWriter origWriter = message.getContent(XMLStreamWriter.class);
             message.put(ORIGINAL_XML_WRITER, origWriter);
             
@@ -142,7 +122,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
         }
         
         // Add a final interceptor to write the message
-        message.getInterceptorChain().add(SAAJOutEndingInterceptor.INSTANCE);
+        message.getInterceptorChain().add(new SAAJOutEndingInterceptor());
     }
     @Override
     public void handleFault(SoapMessage message) {
@@ -150,14 +130,11 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
         XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
         if (writer != null) {
             message.setContent(XMLStreamWriter.class, writer);
-            message.remove(ORIGINAL_XML_WRITER);
         }
     }
 
     
-    public static class SAAJOutEndingInterceptor extends AbstractSoapInterceptor {
-        public static final SAAJOutEndingInterceptor INSTANCE = new SAAJOutEndingInterceptor();
-        
+    public class SAAJOutEndingInterceptor extends AbstractSoapInterceptor {
         public SAAJOutEndingInterceptor() {
             super(SAAJOutEndingInterceptor.class.getName(), Phase.PRE_PROTOCOL_ENDING);
         }
@@ -190,14 +167,11 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 }
                 
                 XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
-                message.remove(ORIGINAL_XML_WRITER);
-
                 try {
-                    if (writer != null) {
-                        StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
-                        writer.flush();
-                        message.setContent(XMLStreamWriter.class, writer);
-                    }
+                    StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
+                    writer.flush();
+                    message.setContent(XMLStreamWriter.class, writer);
+
                 } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
                                         .getSender());

@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.policy.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.namespace.QName;
@@ -28,12 +29,9 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
-import org.apache.neethi.All;
-import org.apache.neethi.ExactlyOne;
-import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 
-public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
+public class SupportingToken extends AbstractSecurityAssertion implements AlgorithmWrapper, TokenWrapper {
 
     /**
      * Type of SupportingToken
@@ -167,15 +165,8 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
     public void setToken(Token tok) {
         this.addToken(tok);
     }
-    public Token getToken() {
-        if (tokens.size() == 1) { 
-            return tokens.get(0);
-        }
-        return null;
-    }
 
-
-    public QName getRealName() {
+    public QName getName() {
         QName ret = null;
         
         switch (type) {
@@ -209,39 +200,6 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         }
         return ret;
     }
-    public QName getName() {
-        QName ret = null;
-        switch (type) {
-        case SUPPORTING_TOKEN_SUPPORTING:
-            ret = SP12Constants.INSTANCE.getSupportingTokens();
-            break;
-        case SUPPORTING_TOKEN_SIGNED:
-            ret = SP12Constants.INSTANCE.getSignedSupportingTokens();
-            break;
-        case SUPPORTING_TOKEN_ENDORSING:
-            ret = SP12Constants.INSTANCE.getEndorsingSupportingTokens();
-            break;
-        case SUPPORTING_TOKEN_SIGNED_ENDORSING:
-            ret = SP12Constants.INSTANCE.getSignedEndorsingSupportingTokens();
-            break;
-        case SUPPORTING_TOKEN_ENCRYPTED:
-            ret = SP12Constants.ENCRYPTED_SUPPORTING_TOKENS;
-            break;
-        case SUPPORTING_TOKEN_SIGNED_ENCRYPTED:
-            ret = SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS;
-            break;
-        case SUPPORTING_TOKEN_ENDORSING_ENCRYPTED:
-            ret = SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-            break;
-        case SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED:
-            ret = SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS;
-            break;
-        default:
-            ret = null;
-            break;
-        }
-        return ret;
-    }
 
     /**
      * @return true if the supporting token should be encrypted
@@ -254,20 +212,24 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
             || type == SPConstants.SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED;
     }
 
+    public PolicyComponent normalize() {
+        return this;
+    }
+
     public short getType() {
         return org.apache.neethi.Constants.TYPE_ASSERTION;
     }
 
     public void serialize(XMLStreamWriter writer) throws XMLStreamException {
-        String namespaceURI = getRealName().getNamespaceURI();
+        String namespaceURI = getName().getNamespaceURI();
 
         String prefix = writer.getPrefix(namespaceURI);
         if (prefix == null) {
-            prefix = getRealName().getPrefix();
+            prefix = getName().getPrefix();
             writer.setPrefix(prefix, namespaceURI);
         }
 
-        String localname = getRealName().getLocalPart();
+        String localname = getName().getLocalPart();
 
         // <sp:SupportingToken>
         writer.writeStartElement(prefix, localname, namespaceURI);
@@ -284,17 +246,22 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         writer.writeStartElement(pPrefix, SPConstants.POLICY.getLocalPart(), SPConstants.POLICY
             .getNamespaceURI());
 
-        for (Token token : getTokens()) {
+        Token token;
+        for (Iterator iterator = getTokens().iterator(); iterator.hasNext();) {
             // [Token Assertion] +
+            token = (Token)iterator.next();
             token.serialize(writer);
         }
 
         if (signedParts != null) {
             signedParts.serialize(writer);
+
         } else if (signedElements != null) {
             signedElements.serialize(writer);
+
         } else if (encryptedParts != null) {
             encryptedParts.serialize(writer);
+
         } else if (encryptedElements != null) {
             encryptedElements.serialize(writer);
         }
@@ -304,37 +271,4 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         writer.writeEndElement();
         // </sp:SupportingToken>
     }
-    
-    
-    public Policy getPolicy() {
-        Policy p = new Policy();
-        ExactlyOne ea = new ExactlyOne();
-        p.addPolicyComponent(ea);
-        All all = new All();
-
-        for (Token token : getTokens()) {
-            all.addPolicyComponent(token);
-        }
-        
-        if (signedParts != null) {
-            all.addPolicyComponent(signedParts);
-        } else if (signedElements != null) {
-            all.addPolicyComponent(signedElements);
-        } else if (encryptedParts != null) {
-            all.addPolicyComponent(encryptedParts);
-        } else if (encryptedElements != null) {
-            all.addPolicyComponent(encryptedElements);
-        }        
-        
-        ea.addPolicyComponent(all);
-        PolicyComponent pc = p.normalize(true);
-        if (pc instanceof Policy) {
-            return (Policy)pc;
-        } else {
-            p = new Policy();
-            p.addPolicyComponent(pc);
-            return p;
-        }
-    }
-
 }

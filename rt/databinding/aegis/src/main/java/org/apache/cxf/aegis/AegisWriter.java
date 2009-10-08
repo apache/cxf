@@ -20,7 +20,7 @@ package org.apache.cxf.aegis;
 
 import javax.xml.namespace.QName;
 
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 
 /**
  * Interface for Aegis writers.
@@ -41,21 +41,5 @@ public interface AegisWriter<SinkT> extends AegisIo {
                QName elementName,
                boolean optional,
                SinkT output, 
-               AegisType aegisType) throws Exception;
-    
-    /**
-     * Write an object to the sink, providing a {@link java.lang.reflect.Type} to specify
-     * its type.
-     * @param obj the object
-     * @param elementName XML element name
-     * @param optional true if null maps to no output at all.
-     * @param output where to put it.
-     * @param objectType A description of the type of the object.
-     * @throws Exception
-     */
-    void write(Object obj,
-               QName elementName,
-               boolean optional,
-               SinkT output,
-               java.lang.reflect.Type objectType) throws Exception;
+               Type aegisType) throws Exception;
 }

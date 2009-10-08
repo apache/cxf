@@ -25,7 +25,7 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.core.Response;
 
 @Path("{id}")
@@ -47,7 +47,7 @@ public class BookStoreTemplates {
     
     @PUT
     @Path("{bookId}")
-    @Produces("application/xml")
+    @ProduceMime("application/xml")
     public Response updateBook(@PathParam("id") String id, @PathParam("bookId") String bookId) {
         return null;
     }    

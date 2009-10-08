@@ -23,7 +23,7 @@ under the License.
        xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
        xmlns:sec="http://cxf.apache.org/configuration/security"
        xsi:schemaLocation="
-        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
@@ -45,26 +45,9 @@ under the License.
     </httpj:engine-factory>
 
     <!-- -->
-    <!-- HTTP/S configuration for proxy clients -->
+    <!-- HTTP/S configuration for clients -->
     <!-- -->
-    <http:conduit name="{http://jaxrs.systest.cxf.apache.org/}BookStore.http-conduit">
-        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
-	           </sec:keyManagers>
-	        <sec:trustManagers>
-	           <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
-	        </sec:trustManagers>
-        </http:tlsClientParameters>
-    </http:conduit>
-    
-    <!-- -->
-    <!-- HTTP/S configuration for web clients -->
-    <!-- -->
-    <http:conduit name="{https://localhost:9095}WebClient.http-conduit">
+    <http:conduit name="*.http-conduit">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">

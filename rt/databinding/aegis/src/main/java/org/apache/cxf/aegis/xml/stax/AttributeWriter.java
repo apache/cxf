@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.aegis.xml.stax;
 
-import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -44,11 +43,7 @@ public class AttributeWriter extends AbstractMessageWriter {
 
         try {
             if (namespace != null && namespace.length() > 0) {
-                if (XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI.equals(namespace)) {
-                    prefix = NamespaceHelper.getUniquePrefix(writer, namespace, "xsi", true);
-                } else {
-                    prefix = NamespaceHelper.getUniquePrefix(writer, namespace, null, true);   
-                }
+                prefix = NamespaceHelper.getUniquePrefix(writer, namespace, true);
             } else {
                 prefix = "";
             }

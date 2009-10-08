@@ -46,6 +46,11 @@ public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends
             || message == ex.getOutFaultMessage();
     }
     
+    
+    protected boolean isRequestor(T message) {
+        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
+    }
+    
     protected HandlerChainInvoker getInvoker(T message) {
         Exchange ex = message.getExchange();
         HandlerChainInvoker invoker = 

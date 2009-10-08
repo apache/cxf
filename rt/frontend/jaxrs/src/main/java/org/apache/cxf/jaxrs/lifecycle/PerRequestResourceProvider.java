@@ -19,71 +19,23 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-
-import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.jaxrs.utils.ResourceUtils;
-import org.apache.cxf.message.Message;
-
 public class PerRequestResourceProvider implements ResourceProvider {
-    private Constructor<?> c;
-    private Method postConstructMethod;
-    private Method preDestroyMethod;
+    private Class<?> resourceClass;
    
     public PerRequestResourceProvider(Class<?> clazz) {
-        c = ResourceUtils.findResourceConstructor(clazz, true);
-        if (c == null) {
-            throw new RuntimeException("Resource class " + clazz
-                                       + " has no valid constructor");
-        }
-        postConstructMethod = ResourceUtils.findPostConstructMethod(clazz);
-        preDestroyMethod = ResourceUtils.findPreDestroyMethod(clazz);
+        resourceClass = clazz;
     }
     
-    public boolean isSingleton() {
-        return false;
-    }
 
-    public Object getInstance(Message m) {  
-        return createInstance(m);
-    }
-    
-        
-    protected Object createInstance(Message m) {
-        
-        Object[] values = ResourceUtils.createConstructorArguments(c, m);
+    public Object getInstance() {  
+        Object resourceInstance = null;
         try {
-            Object instance = values.length > 0 ? c.newInstance(values) : c.newInstance(new Object[]{});
-            InjectionUtils.invokeLifeCycleMethod(instance, postConstructMethod);
-            return instance;
+            resourceInstance = resourceClass.newInstance();
         } catch (InstantiationException ex) {
-            String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
+            //TODO
         } catch (IllegalAccessException ex) {
-            String msg = "Resource class " + c.getDeclaringClass().getName() + " can not be instantiated"
-                + " due to IllegalAccessException";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
-        } catch (InvocationTargetException ex) {
-            String msg = "Resource class "
-                + c.getDeclaringClass().getName() + " can not be instantiated"
-                + " due to InvocationTargetException";
-            throw new WebApplicationException(Response.serverError().entity(msg).build());
-        }
-        
+            //TODO
+        }        
+        return resourceInstance;
     }
-
-    public void releaseInstance(Message m, Object o) {
-        InjectionUtils.invokeLifeCycleMethod(o, preDestroyMethod);
-    }
-
-    public Class<?> getResourceClass() {
-        return c.getDeclaringClass();
-    }
-    
-    
 }

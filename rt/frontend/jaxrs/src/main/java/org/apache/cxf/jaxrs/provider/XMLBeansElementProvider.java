@@ -29,8 +29,8 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.Produces;
+import javax.ws.rs.ConsumeMime;
+import javax.ws.rs.ProduceMime;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -44,8 +44,8 @@ import org.apache.xmlbeans.XmlObject;
 /**
  * Provider for XMLBeans data objects.
  */
-@Produces("application/xml")
-@Consumes("application/xml")
+@ProduceMime("application/xml")
+@ConsumeMime("application/xml")
 @Provider
 public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, MessageBodyWriter<XmlObject> {
 
@@ -68,19 +68,18 @@ public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, Me
     }
 
     /** {@inheritDoc} */
-    public long getSize(XmlObject t, Class<?> type, Type genericType, Annotation[] annotations, 
-                        MediaType mt) {
+    public long getSize(XmlObject t) {
         // return length not known
         return -1;
     }
 
     /** {@inheritDoc} */
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isXmlBean(type);
     }
 
     /** {@inheritDoc} */
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return isXmlBean(type);
     }
 

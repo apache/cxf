@@ -44,36 +44,6 @@ import java.util.*;
 public class DoMerges {
     public static boolean auto = false;
 
-    static void removeSvnMergeInfo() throws Exception {
-        Process p = Runtime.getRuntime().exec(new String[] {"svn", "st", "."});
-        BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-        List<String> list = new ArrayList<String>();
-        String line = reader.readLine();
-        while (line != null) {
-            if (line.charAt(1) == 'M') {
-                list.add(line.substring(5).trim());
-            } else if (line.charAt(1) == 'C' && line.charAt(0) != 'C') {
-                Process p2 = Runtime.getRuntime().exec(new String[] {"svn", "resolved", line.substring(5).trim()});
-                if (p2.waitFor() != 0) {
-                    Thread.sleep(10);
-                }
-
-                list.add(line.substring(5).trim());
-            }
-            line = reader.readLine();
-        }
-        p.waitFor();
-
-        for (String s : list) { 
-            p = Runtime.getRuntime().exec(new String[] {"svn", "propdel", "svn:mergeinfo", s});
-            reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
-            line = reader.readLine();
-            while (line != null) {
-                line = reader.readLine();
-            }
-            p.waitFor();
-        }
-    }
     static void doCommit() throws Exception {
         while (System.in.available() > 0) {
             System.in.read();
@@ -215,7 +185,7 @@ public class DoMerges {
                     }
                     System.exit(1);
                 }
-                removeSvnMergeInfo();
+
                 doCommit();
                 break;
             case 'B':

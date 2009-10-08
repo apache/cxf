@@ -32,26 +32,22 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 public class Attachment {
 
     private DataHandler handler;
-    private MultivaluedMap<String, String> headers = 
-        new MetadataMap<String, String>(false, true);
-    private Object object;
+    private MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+    private String contentId;
     
     public Attachment(org.apache.cxf.message.Attachment a) {
         handler = a.getDataHandler();
+        contentId = a.getId();
         for (Iterator<String> i = a.getHeaderNames(); i.hasNext();) {
             String name = i.next();
-            if ("Content-ID".equalsIgnoreCase(name)) {
-                continue;
-            }
             headers.add(name, a.getHeader(name));
         }
-        headers.putSingle("Content-ID", a.getId());
     }
     
     public Attachment(String id, DataHandler dh, MultivaluedMap<String, String> headers) {
         handler = dh;
-        this.headers = new MetadataMap<String, String>(headers, false, true);
-        this.headers.putSingle("Content-ID", id);
+        contentId = id;
+        this.headers = new MetadataMap<String, String>(headers);
     }
     
     public Attachment(String id, DataSource ds, MultivaluedMap<String, String> headers) {
@@ -64,19 +60,6 @@ public class Attachment {
              headers);
     }
     
-    public Attachment(String id, String mediaType, Object object) {
-        this.object = object;
-        headers.putSingle("Content-ID", id);
-        headers.putSingle("Content-Type", mediaType);
-    }
-    
-    public Attachment(String id, InputStream is, ContentDisposition cd) {
-        handler = new DataHandler(new InputStreamDataSource(is, "application/octet-stream"));
-        headers.putSingle("Content-Disposition", cd.toString());
-        headers.putSingle("Content-ID", id);
-        headers.putSingle("Content-Type", "application/octet-stream");
-    }
-    
     public ContentDisposition getContentDisposition() {
         String header = getHeader("Content-Disposition");
         
@@ -84,11 +67,11 @@ public class Attachment {
     }
 
     public String getContentId() {
-        return headers.getFirst("Content-ID");
+        return contentId;
     }
 
     public MediaType getContentType() {
-        String value = handler != null ? handler.getContentType() : headers.getFirst("Content-Type");
+        String value = handler.getContentType();
         return value == null ? MediaType.TEXT_PLAIN_TYPE : MediaType.valueOf(value);
     }
 
@@ -96,27 +79,14 @@ public class Attachment {
         return handler;
     }
 
-    public Object getObject() {
-        return object;
-    }
-    
     public String getHeader(String name) {
-        List<String> header = headers.get(name);
-        if (header == null || header.size() == 0) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < header.size(); i++) {
-            sb.append(header.get(i));
-            if (i + 1 < header.size()) {
-                sb.append(',');
-            }
-        }
-        return sb.toString();
+        String header = headers.getFirst(name);
+        return header == null ? headers.getFirst(name.toLowerCase()) : header; 
     }
     
     public List<String> getHeaderAsList(String name) {
-        return headers.get(name);
+        List<String> header = headers.get(name);
+        return header == null ? headers.get(name.toLowerCase()) : header;
     }
 
     public MultivaluedMap<String, String> getHeaders() {
@@ -125,7 +95,7 @@ public class Attachment {
     
     @Override
     public int hashCode() {
-        return headers.hashCode(); 
+        return contentId.hashCode() + 37 * headers.hashCode(); 
     }
     
     @Override
@@ -135,7 +105,7 @@ public class Attachment {
         }
         
         Attachment other = (Attachment)o;
-        return headers.equals(other.headers);
+        return contentId.equals(other.contentId) && headers.equals(other.headers);
     }
     
 

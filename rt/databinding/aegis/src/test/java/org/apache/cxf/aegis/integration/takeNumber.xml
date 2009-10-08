@@ -1,8 +1,0 @@
-<env:Envelope xmlns:env="http://schemas.xmlsoap.org/soap/envelope/">
- <env:Header/>
- <env:Body>
-  <takeNumber xmlns="urn:Array">
-  	<numberParam>123456789</numberParam>
-  </takeNumber>
- </env:Body>
-</env:Envelope>

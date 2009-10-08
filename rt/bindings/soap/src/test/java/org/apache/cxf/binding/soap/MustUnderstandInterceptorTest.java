@@ -36,7 +36,6 @@ import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
 import org.apache.cxf.binding.soap.interceptor.ReadHeadersInterceptor;
-import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -53,7 +52,6 @@ public class MustUnderstandInterceptorTest extends TestBase {
     private MustUnderstandInterceptor mui;
     private DummySoapInterceptor dsi;
     private ReadHeadersInterceptor rhi;
-    private StartBodyInterceptor sbi;
 
     @Before
     public void setUp() throws Exception {
@@ -64,10 +62,7 @@ public class MustUnderstandInterceptorTest extends TestBase {
 
         rhi = new ReadHeadersInterceptor(bus, "phase1");
         chain.add(rhi);
-        
-        sbi = new StartBodyInterceptor("phase1.5");
-        chain.add(sbi);
-        
+
         mui = new MustUnderstandInterceptor("phase2");
         chain.add(mui);
 

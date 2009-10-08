@@ -19,16 +19,15 @@
 package org.apache.cxf.aegis.type.encoded;
 
 import java.util.Set;
-
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeMapping;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
-import org.apache.ws.commons.schema.XmlSchema;
+import org.jdom.Element;
 
 /**
  * SoapRefType reads and writes SoapRef objects.
@@ -42,10 +41,10 @@ import org.apache.ws.commons.schema.XmlSchema;
  * instance is registered with the MarshalRegistry, and is written at the end of the message body by the
  * TrailingBlocks class.
  */
-public class SoapRefType extends AegisType {
-    private final AegisType baseType;
+public class SoapRefType extends Type {
+    private final Type baseType;
 
-    public SoapRefType(AegisType baseType) {
+    public SoapRefType(Type baseType) {
         if (baseType == null) {
             throw new NullPointerException("baseType is null");
         }
@@ -78,9 +77,8 @@ public class SoapRefType extends AegisType {
         SoapEncodingUtil.writeRef(writer, refId);
     }
 
-    @Override
-    public void writeSchema(XmlSchema schema) {
-        baseType.writeSchema(schema);
+    public void writeSchema(Element root) {
+        baseType.writeSchema(root);
     }
 
     public TypeMapping getTypeMapping() {
@@ -119,7 +117,7 @@ public class SoapRefType extends AegisType {
         baseType.setNillable(nillable);
     }
 
-    public Set<AegisType> getDependencies() {
+    public Set<Type> getDependencies() {
         return baseType.getDependencies();
     }
 

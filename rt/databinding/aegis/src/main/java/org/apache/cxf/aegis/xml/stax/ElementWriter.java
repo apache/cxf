@@ -31,6 +31,11 @@ import org.apache.cxf.aegis.xml.AbstractMessageWriter;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.StringUtils;
 
+/**
+ * LiteralWriter
+ * 
+ * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
+ */
 public class ElementWriter extends AbstractMessageWriter implements MessageWriter {
     private XMLStreamWriter writer;
 
@@ -147,18 +152,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     }
 
     public MessageWriter getElementWriter(QName qname) {
-        /*
-         * No one really wants xmlns= in their XML, prefixes are preferred.
-         * If the input qname has no prefix, go ahead and use the constructor that will
-         * generate one.
-         */
-        if ("".equals(qname.getPrefix())) {
-            return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI());
-        } else {
-            return new ElementWriter(writer, qname.getLocalPart(), 
-                                     qname.getNamespaceURI(), 
-                                     qname.getPrefix());
-        }
+        return new ElementWriter(writer, qname.getLocalPart(), qname.getNamespaceURI(), qname.getPrefix());
     }
 
     public String getNamespace() {
@@ -168,7 +162,6 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     public void close() {
         try {
             writer.writeEndElement();
-            writer.flush();
         } catch (XMLStreamException e) {
             throw new DatabindingException("Error writing document.", e);
         }
@@ -214,18 +207,13 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
     public String getPrefixForNamespace(String ns, String hint) {
         try {
             String pfx = writer.getPrefix(ns);
-            String contextPfx = writer.getNamespaceContext().getPrefix(ns);
 
             if (pfx == null) {
                 String ns2 = writer.getNamespaceContext().getNamespaceURI(hint);
-                // if the hint is "" (the default) and the context does 
-                if (ns2 == null && !"".equals(hint)) { 
+                if (ns2 == null) {
                     pfx = hint;
-                } else if (ns.equals(ns2)) {
-                    // just because it's in the context, doesn't mean it has been written.
-                    pfx = hint;
-                } else if (contextPfx != null) {
-                    pfx = contextPfx;
+                } else if (ns2.equals(ns)) {
+                    return pfx;
                 } else {
                     pfx = NamespaceHelper.getUniquePrefix(writer);
                 }

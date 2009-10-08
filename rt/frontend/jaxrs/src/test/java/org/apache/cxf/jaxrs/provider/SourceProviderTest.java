@@ -38,17 +38,17 @@ public class SourceProviderTest extends Assert {
     @Test
     public void testIsWriteable() {
         SourceProvider p = new SourceProvider();
-        assertTrue(p.isWriteable(StreamSource.class, null, null, null)
-                   && p.isWriteable(DOMSource.class, null, null, null)
-                   && p.isWriteable(Source.class, null, null, null));
+        assertTrue(p.isWriteable(StreamSource.class, null, null)
+                   && p.isWriteable(DOMSource.class, null, null)
+                   && p.isWriteable(Source.class, null, null));
     }
     
     @Test
     public void testIsReadable() {
         SourceProvider p = new SourceProvider();
-        assertTrue(p.isReadable(StreamSource.class, null, null, null)
-                   && p.isReadable(DOMSource.class, null, null, null)
-                   && p.isReadable(Source.class, null, null, null));
+        assertTrue(p.isReadable(StreamSource.class, null, null)
+                   && p.isReadable(DOMSource.class, null, null)
+                   && p.isReadable(Source.class, null, null));
     }
 
     @Test

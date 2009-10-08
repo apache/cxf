@@ -29,6 +29,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.AssertionBuilder;
 import org.apache.cxf.ws.policy.PolicyAssertion;
 import org.apache.cxf.ws.security.policy.SP11Constants;
+import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.model.Trust10;
 
 
@@ -40,9 +41,9 @@ public class Trust10Builder implements AssertionBuilder {
     public PolicyAssertion build(Element element)
         throws IllegalArgumentException {
 
-        
-        element = DOMUtils.getFirstElement(element);
-        if (element == null || !element.getLocalName().equals("Policy")) {
+        element = DOMUtils.getFirstChildWithName(element, SPConstants.POLICY);
+
+        if (element == null) {
             throw new IllegalArgumentException("Trust10 assertion doesn't contain any Policy");
         }
         

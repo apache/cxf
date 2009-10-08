@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.Stack;
 
+
 public interface CollectionServiceInterface {
 
     Collection<String> getStrings();
@@ -39,7 +40,7 @@ public interface CollectionServiceInterface {
     void takeDoubleList(List<Double> doublesList);
 
     String takeSortedStrings(SortedSet<String> strings);
-    
+
     //CHECKSTYLE:OFF
     String takeUnsortedSet(HashSet<String> strings);
     String takeStack(Stack<String> strings);
@@ -49,4 +50,5 @@ public interface CollectionServiceInterface {
     void method1(List<String> headers1);
     
     void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam); 
+
 }

@@ -204,7 +204,7 @@ public final class ToolConstants {
 
 
 
-    public static final String XML_SCHEMA_COLLECTION = "xmlSchemaCollection";
+    public static final String SCHEMA_MAP = "schemaMap";
     public static final String PORTTYPE_MAP = "portTypeMap";
     public static final String SCHEMA_TARGET_NAMESPACES = "schemaTargetNameSpaces";
     public static final String WSDL_DEFINITION = "wsdlDefinition";
@@ -217,7 +217,6 @@ public final class ToolConstants {
     // Tools framework
     public static final String FRONTEND_PLUGIN = "frontend";
     public static final String DATABINDING_PLUGIN = "databinding";
-    public static final String RUNTIME_DATABINDING_CLASS = "databinding-class";
 
     public static final String CFG_WSDL_VERSION = "wsdlversion";
 

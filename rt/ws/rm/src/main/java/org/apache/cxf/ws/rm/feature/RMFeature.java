@@ -20,7 +20,6 @@
 package org.apache.cxf.ws.rm.feature;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.ws.rm.RMInInterceptor;
@@ -36,7 +35,6 @@ import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
 /**
  * 
  */
-@NoJSR250Annotations
 public class RMFeature extends AbstractFeature {
 
     private RMAssertion rmAssertion;

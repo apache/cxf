@@ -84,20 +84,20 @@ public class WSDLToIDL extends AbstractCXFToolContainer {
                 corbaProcessor.process();
             }
         } catch (ToolException ex) {
-            err.println("Error : " + ex.getMessage());
+            System.err.println("Error : " + ex.getMessage());
             if (ex.getCause() instanceof BadUsageException) {
                 printUsageException(TOOL_NAME, (BadUsageException)ex.getCause());
             }
-            err.println();
+            System.err.println();
             if (isVerboseOn()) {
-                ex.printStackTrace(err);
+                ex.printStackTrace();
             }
             throw ex;
         } catch (Exception ex) {
-            err.println("Error : " + ex.getMessage());
-            err.println();
+            System.err.println("Error : " + ex.getMessage());
+            System.err.println();
             if (isVerboseOn()) {
-                ex.printStackTrace(err);
+                ex.printStackTrace();
             }
             throw new ToolException(ex.getMessage(), ex.getCause());
         }

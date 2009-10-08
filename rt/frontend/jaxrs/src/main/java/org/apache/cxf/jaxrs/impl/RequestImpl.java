@@ -23,6 +23,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -42,11 +43,9 @@ import org.apache.cxf.message.Message;
 public class RequestImpl implements Request {
     
     private final Message m;
-    private final HttpHeaders headers;
     
     public RequestImpl(Message m) {
         this.m = m;
-        this.headers = new HttpHeadersImpl(m);
     }
 
     
@@ -59,71 +58,31 @@ public class RequestImpl implements Request {
 
 
     public ResponseBuilder evaluatePreconditions(EntityTag eTag) {
-        ResponseBuilder rb = evaluateIfMatch(eTag);
-        if (rb == null) {
-            rb = evaluateIfNonMatch(eTag);
-        }
-        return rb;
-    }
-
-    private ResponseBuilder evaluateIfMatch(EntityTag eTag) {
-        List<String> ifMatch = headers.getRequestHeader(HttpHeaders.IF_MATCH);
+        String ifMatch = getHeaderValue("If-Match");
         
-        if (ifMatch == null || ifMatch.size() == 0) {
+        if (ifMatch == null || ifMatch.equals("*")) {
             return null;
         }
         
         try {
-            for (String value : ifMatch) {
-                if ("*".equals(value)) {
-                    return null;
-                }
-                EntityTag requestTag = EntityTag.valueOf(value);
-                // must be a strong comparison
-                if (!requestTag.isWeak() && !eTag.isWeak() && requestTag.equals(eTag)) {
-                    return null;
-                }
+            EntityTag requestTag = EntityTag.valueOf(ifMatch);
+            if (requestTag.equals(eTag) && !requestTag.isWeak()) {
+                return null;
             }
         } catch (IllegalArgumentException ex) {
             // ignore
         }
-        return Response.status(Response.Status.PRECONDITION_FAILED).tag(eTag);
+        
+        return Response.status(412).tag(eTag);
     }
 
-    private ResponseBuilder evaluateIfNonMatch(EntityTag eTag) {
-        List<String> ifNonMatch = headers.getRequestHeader(HttpHeaders.IF_NONE_MATCH);
-        
-        if (ifNonMatch == null || ifNonMatch.size() == 0) {
-            return null;
-        }
-        
-        String method = getMethod();
-        boolean getOrHead = "GET".equals(method) || "HEAD".equals(method);
-        try {
-            for (String value : ifNonMatch) {
-                boolean result = "*".equals(value);
-                if (!result) {
-                    EntityTag requestTag = EntityTag.valueOf(value);
-                    result = getOrHead ? requestTag.equals(eTag) 
-                        : !requestTag.isWeak() && !eTag.isWeak() && requestTag.equals(eTag);
-                }
-                if (result) {
-                    Response.Status status = getOrHead ? Response.Status.NOT_MODIFIED
-                        : Response.Status.PRECONDITION_FAILED;
-                    return Response.status(status).tag(eTag);
-                }
-            }
-        } catch (IllegalArgumentException ex) {
-            // ignore
-        }
-        return null;
-    }
-    
+
+
     public ResponseBuilder evaluatePreconditions(Date lastModified) {
-        List<String> ifModifiedSince = headers.getRequestHeader(HttpHeaders.IF_MODIFIED_SINCE);
+        String ifModifiedSince = getHeaderValue(HttpHeaders.IF_MODIFIED_SINCE);
         
-        if (ifModifiedSince == null || ifModifiedSince.size() == 0) {
-            return evaluateIfNotModifiedSince(lastModified);
+        if (ifModifiedSince == null) {
+            return null;
         }
         
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
@@ -131,10 +90,10 @@ public class RequestImpl implements Request {
         dateFormat.setLenient(false);
         Date dateSince = null;
         try {
-            dateSince = dateFormat.parse(ifModifiedSince.get(0));
+            dateSince = dateFormat.parse(ifModifiedSince);
         } catch (ParseException ex) {
             // invalid header value, request should continue
-            return Response.status(Response.Status.PRECONDITION_FAILED);
+            return null;
         }
         
         if (dateSince.before(lastModified)) {
@@ -143,31 +102,6 @@ public class RequestImpl implements Request {
         }
         
         return Response.status(Response.Status.NOT_MODIFIED);
-    }
-    
-    public ResponseBuilder evaluateIfNotModifiedSince(Date lastModified) {
-        List<String> ifNotModifiedSince = headers.getRequestHeader(HttpHeaders.IF_UNMODIFIED_SINCE);
-        
-        if (ifNotModifiedSince == null || ifNotModifiedSince.size() == 0) {
-            return null;
-        }
-        
-        SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
-
-        dateFormat.setLenient(false);
-        Date dateSince = null;
-        try {
-            dateSince = dateFormat.parse(ifNotModifiedSince.get(0));
-        } catch (ParseException ex) {
-            // invalid header value, request should continue
-            return Response.status(Response.Status.PRECONDITION_FAILED);
-        }
-        
-        if (dateSince.before(lastModified)) {
-            return Response.status(Response.Status.PRECONDITION_FAILED);
-        }
-        
-        return null;
     }
 
 
@@ -181,22 +115,18 @@ public class RequestImpl implements Request {
                 
     }
     
-    public String getMethod() {
-        return m.get(Message.HTTP_REQUEST_METHOD).toString();
-    }
-
-
-
-    public ResponseBuilder evaluatePreconditions() {
-        List<String> ifMatch = headers.getRequestHeader(HttpHeaders.IF_MATCH);
-        if (ifMatch != null) {
-            for (String value : ifMatch) {
-                if (!"*".equals(value)) {
-                    return Response.status(Response.Status.PRECONDITION_FAILED).tag(EntityTag.valueOf(value));
-                }
-            }
+    @SuppressWarnings("unchecked")
+    private String getHeaderValue(String name) {
+        Map<String, List<String>> headers = 
+            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
+        if (headers == null) {
+            return null;
         }
-        return null;
+        List<String> values = headers.get(name);
+        if (values == null || values.size() == 0) {
+            return null;
+        }
+        return values.get(0);
     }
 
 }

@@ -19,9 +19,6 @@
 
 package org.apache.cxf.jaxrs.resources;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class TagVO {
     private String name;
     private String group;

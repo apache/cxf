@@ -62,6 +62,18 @@ public final class SP11Constants extends SPConstants {
     public static final QName LAYOUT = new QName(SP_NS, SPConstants.LAYOUT, SP_PREFIX);
 
 
+    public static final QName STRICT = new QName(SP11Constants.SP_NS, SPConstants.LAYOUT_STRICT,
+            SP11Constants.SP_PREFIX);
+
+    public static final QName LAX = new QName(SP11Constants.SP_NS, SPConstants.LAYOUT_LAX ,
+            SP11Constants.SP_PREFIX);
+
+    public static final QName LAXTSFIRST = new QName(SP11Constants.SP_NS,
+            SPConstants.LAYOUT_LAX_TIMESTAMP_FIRST, SP11Constants.SP_PREFIX);
+
+    public static final QName LAXTSLAST = new QName(SP11Constants.SP_NS,
+            SPConstants.LAYOUT_LAX_TIMESTAMP_LAST, SP11Constants.SP_PREFIX);
+
     // ////////////////
 
     public static final QName INCLUDE_TIMESTAMP = new QName(SP_NS,
@@ -402,8 +414,6 @@ public final class SP11Constants extends SPConstants {
     public QName getRequiredDerivedKeys() {
         return REQUIRE_DERIVED_KEYS;
     }
-    public QName getIncludeTimestamp() {
-        return INCLUDE_TIMESTAMP;
-    }
+
     
 }

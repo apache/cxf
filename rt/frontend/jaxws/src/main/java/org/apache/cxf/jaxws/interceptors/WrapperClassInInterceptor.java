@@ -25,8 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.xml.namespace.QName;
-
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.WrapperCapableDatabinding;
@@ -57,8 +55,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
         BindingOperationInfo boi = ex.get(BindingOperationInfo.class);
-        if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE)) 
-            || boi == null) {
+        if (boi == null) {
             return;
         }
                
@@ -178,12 +175,6 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
         List<String> partNames = new ArrayList<String>();
         List<String> elTypeNames = new ArrayList<String>();
         List<Class<?>> partClasses = new ArrayList<Class<?>>();
-        QName wrapperName = null;
-        for (MessagePartInfo p : wrappedMessageInfo.getMessageParts()) {
-            if (wrapperClass == p.getTypeClass()) {
-                wrapperName = p.getElementQName();
-            }
-        }
         
         for (MessagePartInfo p : messageInfo.getMessageParts()) {
             if (Boolean.TRUE.equals(p.getProperty(ReflectionServiceFactoryBean.HEADER))) {
@@ -213,10 +204,9 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
             }
         }
         return dataBinding.createWrapperHelper(wrapperClass,
-                                               wrapperName,
-                                               partNames,
-                                               elTypeNames,
-                                               partClasses);
+                                                  partNames,
+                                                  elTypeNames,
+                                                  partClasses);
     }
     private void ensureSize(List<?> lst, int idx) {
         while (idx >= lst.size()) {

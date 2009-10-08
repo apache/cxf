@@ -19,13 +19,8 @@
 
 package org.apache.cxf.jaxrs.utils;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.reflect.Method;
 
-import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.Customer;
@@ -58,22 +53,5 @@ public class AnnotationTestUtilsTest extends Assert {
         assertSame(m, annotatedMethod);
     }
     
-    @Test
-    public void testCustomHttpMethodValue() throws Exception {
-        Method m = ResourceClass.class.getMethod("update", new Class[]{});
-        assertEquals("UPDATE", AnnotationUtils.getHttpMethodValue(m));
-    }
     
-    @Target({ElementType.METHOD })
-    @Retention(RetentionPolicy.RUNTIME)
-    @HttpMethod("UPDATE")
-    public @interface UPDATE { 
-    }
-    
-    public class ResourceClass {
-        @UPDATE
-        public void update() {
-            
-        }
-    }
 }

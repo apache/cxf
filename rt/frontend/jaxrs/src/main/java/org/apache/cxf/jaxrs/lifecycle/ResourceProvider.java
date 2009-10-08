@@ -19,12 +19,8 @@
 
 package org.apache.cxf.jaxrs.lifecycle;
 
-import org.apache.cxf.message.Message;
-
 public interface ResourceProvider {
 
-    Object getInstance(Message m);
-    void releaseInstance(Message m, Object o);
-    Class<?> getResourceClass();
-    boolean isSingleton();
+    Object getInstance();
+    //void setResourceClass(Class<?> clazz);
 }

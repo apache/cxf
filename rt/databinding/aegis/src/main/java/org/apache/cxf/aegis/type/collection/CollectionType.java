@@ -32,15 +32,15 @@ import java.util.Vector;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.basic.ArrayType;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 public class CollectionType extends ArrayType {
-    private AegisType componentType;
+    private Type componentType;
 
-    public CollectionType(AegisType componentType) {
+    public CollectionType(Type componentType) {
         super();
 
         this.componentType = componentType;
@@ -49,7 +49,7 @@ public class CollectionType extends ArrayType {
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         try {
-            return readCollection(reader, null, context);
+            return readCollection(reader, context);
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument.", e);
         }
@@ -61,7 +61,7 @@ public class CollectionType extends ArrayType {
         Collection values = null;
         
         /*
-         * getTypeClass returns the type of the object. These 'if's asked if the proposed
+         * getTypeClass returns the type of the object. These ifs asked if the proposed
          * type can be assigned to the object, not the other way around. Thus List before
          * Vector and Set before SortedSet.
          */
@@ -104,7 +104,7 @@ public class CollectionType extends ArrayType {
         try {
             Collection list = (Collection)object;
 
-            AegisType type = getComponentType();
+            Type type = getComponentType();
 
             if (type == null) {
                 throw new DatabindingException("Couldn't find component type for Collection.");
@@ -126,7 +126,7 @@ public class CollectionType extends ArrayType {
     }
 
     @Override
-    public AegisType getComponentType() {
+    public Type getComponentType() {
         return componentType;
     }
 }

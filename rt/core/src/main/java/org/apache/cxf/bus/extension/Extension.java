@@ -19,11 +19,8 @@
 
 package org.apache.cxf.bus.extension;
 
-import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
-
-import org.apache.cxf.Bus;
 
 
 public class Extension {
@@ -82,19 +79,10 @@ public class Extension {
         return namespaces;
     }
     
-    Object load(ClassLoader cl, Bus b) {
+    Object load(ClassLoader cl) {
         Object obj = null;
         try {
             Class<?> cls = cl.loadClass(className);
-            try {
-                //if there is a Bus constructor, use it.
-                if (b != null) {
-                    Constructor con = cls.getConstructor(Bus.class);
-                    return con.newInstance(b);
-                }
-            } catch (Exception ex) {
-                //ignore
-            }
             obj = cls.newInstance();
         } catch (ClassNotFoundException ex) {
             throw new ExtensionException(ex);

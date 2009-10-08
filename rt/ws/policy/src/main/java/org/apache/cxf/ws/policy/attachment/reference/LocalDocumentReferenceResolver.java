@@ -21,8 +21,8 @@ package org.apache.cxf.ws.policy.attachment.reference;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.neethi.Policy;
@@ -34,29 +34,24 @@ public class LocalDocumentReferenceResolver implements ReferenceResolver {
 
     private Document document;
     private PolicyBuilder builder;
+    private PolicyConstants constants;
     
-    public LocalDocumentReferenceResolver(Document di, PolicyBuilder b) {
+    public LocalDocumentReferenceResolver(Document di, PolicyBuilder b, PolicyConstants c) {
         document = di;
         builder = b;
+        constants = c;
     }
+    
     public Policy resolveReference(String uri) {
-        return resolveReference(uri, document.getDocumentElement());
-    }    
-    public Policy resolveReference(String uri, Element el) {
-        if (el == null) {
-            return null;
-        }
-        if (uri.equals(el.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                         PolicyConstants.WSU_ID_ATTR_NAME))) {
-            return builder.getPolicy(el);
-        }
-        Element el2 = DOMUtils.getFirstElement(el);
-        while (el2 != null) {
-            Policy p = resolveReference(uri, el2);
-            if (p != null) {
-                return p;
+        NodeList nl = document.getElementsByTagNameNS(constants.getNamespace(),
+                                                      constants.getPolicyElemName());
+        
+        for (int i = 0; i < nl.getLength(); i++) {
+            Element e = (Element)nl.item(i);
+            if (uri.equals(e.getAttributeNS(constants.getWSUNamespace(),
+                                            constants.getIdAttrName()))) {
+                return builder.getPolicy(e);
             }
-            el2 = DOMUtils.getNextElement(el2);
         }
         return null;
     }

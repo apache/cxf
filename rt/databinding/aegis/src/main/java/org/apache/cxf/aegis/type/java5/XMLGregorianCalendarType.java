@@ -24,14 +24,14 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 import org.apache.cxf.aegis.Context;
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.type.AegisType;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 
 /**
  * @author Dan Diephouse
  */
-public class XMLGregorianCalendarType extends AegisType {
+public class XMLGregorianCalendarType extends Type {
     private DatatypeFactory dtFactory;
 
     public XMLGregorianCalendarType() {

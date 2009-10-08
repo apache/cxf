@@ -27,7 +27,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingFactoryManager;
-import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -36,9 +35,8 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistryImpl;
-import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyBuilderImpl;
-import org.apache.cxf.ws.policy.PolicyEngine;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.policy.PolicyRegistryImpl;
 import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
@@ -68,6 +66,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
     private static ServiceInfo[] services;
     private static EndpointInfo[] endpoints;
     private Wsdl11AttachmentPolicyProvider app;
+    private PolicyConstants constants;
     private Bus bus;
     private IMocksControl control = EasyMock.createNiceControl();
     
@@ -86,6 +85,10 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         BindingFactoryManager bfm = control.createMock(BindingFactoryManager.class);
         EasyMock.expect(bus.getExtension(BindingFactoryManager.class)).andReturn(bfm).anyTimes();
         EasyMock.expect(bfm.getBindingFactory(EasyMock.isA(String.class))).andReturn(null).anyTimes();
+        PolicyConstants constants = new PolicyConstants();
+        // test data uses 2004/09 namespace
+        constants.setNamespace(PolicyConstants.NAMESPACE_XMLSOAP_200409);
+        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(constants).anyTimes();
         control.replay();
         
         int n = 19;
@@ -119,10 +122,12 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
     @Before
     public void setUp() {   
         control = EasyMock.createNiceControl();
+        constants = new PolicyConstants();
+        // test data uses 2004/09 namespace
+        constants.setNamespace(PolicyConstants.NAMESPACE_XMLSOAP_200409);
         bus = control.createMock(Bus.class);
-        bus.getExtension(ConfiguredBeanLocator.class);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();
+        EasyMock.expect(bus.getExtension(PolicyConstants.class)).andReturn(constants).anyTimes();
+        AssertionBuilderRegistry abr = new AssertionBuilderRegistryImpl();        
         abr.setIgnoreUnknownAssertions(false);
         XMLPrimitiveAssertionBuilder ab = new XMLPrimitiveAssertionBuilder();
         ab.setBus(bus);
@@ -130,14 +135,9 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         abr.register(new QName("http://cxf.apache.org/test/assertions", "B"), ab);
         abr.register(new QName("http://cxf.apache.org/test/assertions", "C"), ab);
         
-        PolicyBuilderImpl pb = new PolicyBuilderImpl();
-        bus.getExtension(PolicyBuilder.class);
-        EasyMock.expectLastCall().andReturn(pb).anyTimes();
-        bus.getExtension(PolicyEngine.class);
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
-        
+        PolicyBuilderImpl pb = new PolicyBuilderImpl(); 
         pb.setAssertionBuilderRegistry(abr);
-        app = new Wsdl11AttachmentPolicyProvider();
+        app = new Wsdl11AttachmentPolicyProvider(bus);
         app.setBuilder(pb);
         app.setRegistry(new PolicyRegistryImpl());
         control.replay();
@@ -157,11 +157,13 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         
         // no extensions       
         p = app.getElementPolicy(services[0]);
-        assertTrue(p == null || p.isEmpty());
+        assertNotNull(p);
+        assertTrue(p.isEmpty());
         
         // extensions not of type Policy or PolicyReference
         p = app.getElementPolicy(services[1]);
-        assertTrue(p == null || p.isEmpty());
+        assertNotNull(p);
+        assertTrue(p.isEmpty());
         
         // one extension of type Policy, without assertion builder
         try {
@@ -184,7 +186,7 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         verifyAssertionsOnly(p, 3);
         
         EndpointInfo ei = new EndpointInfo();
-        assertTrue(app.getElementPolicy(ei) == null);
+        assertTrue(app.getElementPolicy(ei).isEmpty());
     }
     
     @Test
@@ -195,13 +197,15 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         
         // no extensions        
         ep = app.getEffectivePolicy(services[0]);
-        assertTrue(ep == null || ep.isEmpty());
+        assertNotNull(ep);
+        assertTrue(ep.isEmpty());
         p = app.getElementPolicy(services[0]);
-        assertTrue(p == null || p.isEmpty());
+        assertTrue(PolicyComparator.compare(p, ep));
         
         // extensions not of type Policy or PolicyReference
         ep = app.getEffectivePolicy(services[1]);
-        assertTrue(ep == null || ep.isEmpty());
+        assertNotNull(ep);
+        assertTrue(ep.isEmpty());
         
         // one extension of type Policy, without assertion builder
         try {
@@ -237,7 +241,8 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // porttype has no extensions
         // binding has no extensions
         ep = app.getEffectivePolicy(endpoints[0]);
-        assertTrue(ep == null || ep.isEmpty());
+        assertNotNull(ep);
+        assertTrue(ep.isEmpty());
         
         // port has one extension of type Policy        
         // binding has no extensions
@@ -295,7 +300,8 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // operation has no extensions
         // binding operation has no extensions
         ep = app.getEffectivePolicy(getBindingOperationInfo(endpoints[0]));
-        assertTrue(ep == null || ep.isEmpty());
+        assertNotNull(ep);
+        assertTrue(ep.isEmpty());
         
         // operation has no extensions
         // binding operation has one extension of type Policy
@@ -327,7 +333,8 @@ public class Wsdl11AttachmentPolicyProviderTest extends Assert {
         // operation message has no extensions
         // message has no extensions
         ep = app.getEffectivePolicy(getBindingMessageInfo(endpoints[0], true));
-        assertTrue(ep == null || ep.isEmpty());
+        assertNotNull(ep);
+        assertTrue(ep.isEmpty());
         
         // binding operation message has one extension of type Policy
         // operation message has no extensions

@@ -34,7 +34,6 @@ public class TestPwdCallback implements CallbackHandler {
 
     static {
         passwords.put("myalias", "myAliasPassword");
-        passwords.put("alice", "alicePassword");
     }
 
     public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {

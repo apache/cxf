@@ -19,9 +19,6 @@
 package org.apache.cxf.aegis;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.lang.reflect.GenericArrayType;
-import java.lang.reflect.ParameterizedType;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -37,9 +34,9 @@ import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.aegis.type.AbstractTypeCreator;
-import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.aegis.type.DefaultTypeCreator;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
+import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
@@ -48,10 +45,12 @@ import org.apache.cxf.aegis.type.XMLTypeCreator;
 import org.apache.cxf.aegis.type.basic.BeanType;
 import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
-import org.apache.cxf.helpers.XMLUtils;
-import org.apache.ws.commons.schema.XmlSchema;
-import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.helpers.DOMUtils;
+import org.jaxen.JaxenException;
+import org.jaxen.jdom.JDOMXPath;
+import org.jdom.Element;
+import org.jdom.Namespace;
 
 /**
  * The Aegis Databinding context object. This object coordinates the data binding process: reading and writing
@@ -75,35 +74,43 @@ import org.apache.ws.commons.schema.XmlSchemaCollection;
 public class AegisContext {
 
     /**
-     * Namespace used for the miscellaneous Aegis type schema.
+     * Namespace used for miscellaneous Aegis types.
      */
-    public static final String UTILITY_TYPES_SCHEMA_NS = "http://cxf.apache.org/aegisTypes";
-    private Document aegisTypesSchemaDocument;
-    private Document xmimeSchemaDocument;
+    public static final String SCHEMA_NS = "http://cxf.apache.org/aegisTypes";
+    private static JDOMXPath importTypesXpath;
+
+    static {
+        try {
+            importTypesXpath = new JDOMXPath("xsd:import[@namespace='" + SCHEMA_NS + "']");
+            importTypesXpath.addNamespace(SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        } catch (JaxenException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     private boolean writeXsiTypes;
     private boolean readXsiTypes = true;
 
     private Set<String> rootClassNames;
-    private Set<java.lang.reflect.Type> rootClasses;
+    private Set<Class<?>> rootClasses;
     private Set<QName> rootTypeQNames;
     // this type mapping is the front of the chain of delegating type mappings.
     private TypeMapping typeMapping;
-    private Set<AegisType> rootTypes;
+    private Set<Type> rootTypes;
     private Map<Class<?>, String> beanImplementationMap;
     private TypeCreationOptions configuration;
     private boolean mtomEnabled;
     private boolean mtomUseXmime;
-    private boolean enableJDOMMappings;
     // this URI goes into the type map.
     private String mappingNamespaceURI;
+    private Document typesSchemaDocument;
 
     /**
      * Construct a context.
      */
     public AegisContext() {
         beanImplementationMap = new HashMap<Class<?>, String>();
-        rootClasses = new HashSet<java.lang.reflect.Type>();
+        rootClasses = new HashSet<Class<?>>();
         rootTypeQNames = new HashSet<QName>();
     }
 
@@ -143,9 +150,7 @@ public class AegisContext {
         }
         if (typeMapping == null) {
             boolean defaultNillable = configuration.isDefaultNillable();
-            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, 
-                                                                             mtomUseXmime, 
-                                                                             enableJDOMMappings);
+            TypeMapping baseTM = DefaultTypeMapping.createDefaultTypeMapping(defaultNillable, mtomUseXmime);
             if (mappingNamespaceURI == null) {
                 mappingNamespaceURI = DefaultTypeMapping.DEFAULT_MAPPING_URI;
             }
@@ -174,12 +179,12 @@ public class AegisContext {
     }
 
     /**
-     * If a class was provided as part of the 'root' list, retrieve it's AegisType by Class.
+     * If a class was provided as part of the 'root' list, retrieve it's Type by Class.
      * 
      * @param clazz
      * @return
      */
-    public AegisType getRootType(Class clazz) {
+    public Type getRootType(Class clazz) {
         if (rootClasses.contains(clazz)) {
             return typeMapping.getType(clazz);
         } else {
@@ -188,44 +193,16 @@ public class AegisContext {
     }
 
     /**
-     * If a class was provided as part of the root list, retrieve it's AegisType by schema type QName.
+     * If a class was provided as part of the root list, retrieve it's Type by schema type QName.
      * 
      * @param schemaTypeName
      * @return
      */
-    public AegisType getRootType(QName schemaTypeName) {
+    public Type getRootType(QName schemaTypeName) {
         if (rootTypeQNames.contains(schemaTypeName)) {
             return typeMapping.getType(schemaTypeName);
         } else {
             return null;
-        }
-    }
-    
-    private Set<Class<?>> rootMappableClasses() {
-        Set<Class<?>> mappableClasses = new HashSet<Class<?>>();
-        for (java.lang.reflect.Type jtype : rootClasses) {
-            addTypeToMappableClasses(mappableClasses, jtype);
-        }
-        return mappableClasses;
-    }
-
-    private void addTypeToMappableClasses(Set<Class<?>> mappableClasses, java.lang.reflect.Type jtype) {
-        if (jtype instanceof Class) {
-            Class<?> jclass = (Class<?>) jtype;
-            if (jclass.isArray()) {
-                mappableClasses.add(jclass.getComponentType());
-            }
-            mappableClasses.add(jclass);
-        } else if (jtype instanceof ParameterizedType) {
-            for (java.lang.reflect.Type t2 : ((ParameterizedType)jtype).getActualTypeArguments()) {
-                addTypeToMappableClasses(mappableClasses, t2);
-            }
-        } else if (jtype instanceof GenericArrayType) {
-            GenericArrayType gt = (GenericArrayType)jtype;
-            Class ct = (Class) gt.getGenericComponentType();
-            // this looks nutty, but there's no other way. Make an array and take it's class.
-            ct = Array.newInstance(ct, 0).getClass();
-            rootClasses.add(ct);
         }
     }
 
@@ -236,10 +213,10 @@ public class AegisContext {
      * @param classes list of class names
      */
     private void processRootTypes() {
-        rootTypes = new HashSet<AegisType>();
+        rootTypes = new HashSet<Type>();
         // app may have already supplied classes.
         if (rootClasses == null) {
-            rootClasses = new HashSet<java.lang.reflect.Type>();
+            rootClasses = new HashSet<Class<?>>();
         }
         rootTypeQNames = new HashSet<QName>();
         if (this.rootClassNames != null) {
@@ -255,32 +232,8 @@ public class AegisContext {
             }
         }
 
-        // This is a list of AegisType rather than Class so that it can set up for generic collections.
-        // When we see a generic, we process both the generic outer class and each parameter class.
-        // This is not the same thing as allowing mappings of arbitrary x<q> types.
-        
-        Set<Class<?>> rootMappableClassSet = rootMappableClasses();
-        /*
-         * First loop: process non-Class roots, creating full types for them
-         * and registering them.
-         */
-        for (java.lang.reflect.Type reflectType : rootClasses) {
-            if (!(reflectType instanceof Class)) {
-                // if it's not a Class, it can't be mapped from Class to type in the mapping.
-                // so we create 
-                AegisType aegisType = typeMapping.getTypeCreator().createType(reflectType);
-                typeMapping.register(aegisType);
-                // note: we don't handle arbitrary generics, so no BeanType 
-                // check here.
-                rootTypeQNames.add(aegisType.getSchemaType());
-            } 
-        }
-        /*
-         * Second loop: process Class roots, including those derived from 
-         * generic types, creating when not in the default mappings.
-         */
-        for (Class<?> c : rootMappableClassSet) {
-            AegisType t = typeMapping.getType(c);
+        for (Class<?> c : rootClasses) {
+            Type t = typeMapping.getType(c);
             if (t == null) {
                 t = typeMapping.getTypeCreator().createType(c);
                 typeMapping.register(t);
@@ -294,47 +247,43 @@ public class AegisContext {
         }
     }
 
-    public static boolean schemaImportsUtilityTypes(XmlSchema schema) {
-        return XmlSchemaUtils.schemaImportsNamespace(schema, UTILITY_TYPES_SCHEMA_NS);
-    }
-    
-    private Document getSchemaDocument(String resourcePath) { 
+    public static boolean schemaImportsUtilityTypes(Element schemaElement) {
         try {
-            return XMLUtils.parse(getClass().getResourceAsStream(resourcePath));
-        } catch (ParserConfigurationException e) {
+            return importTypesXpath.selectSingleNode(schemaElement) != null;
+        } catch (JaxenException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+    public Document getTypesSchemaDocument() {
+        ensureTypesSchemaDocument();
+        return typesSchemaDocument;
+    }
+
+    private void ensureTypesSchemaDocument() {
+        if (typesSchemaDocument != null) {
+            return;
+        }
+        try {
+            typesSchemaDocument = DOMUtils.readXml(getClass()
+                .getResourceAsStream("/META-INF/cxf/aegisTypes.xsd"));
         } catch (SAXException e) {
             throw new RuntimeException(e);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
         }
     }
-    
-    // could we make these documents static? What would we synchronize on?
-    private Document getAegisTypesSchemaDocument() { 
-        if (aegisTypesSchemaDocument == null) {
-            aegisTypesSchemaDocument = getSchemaDocument("/META-INF/cxf/aegisTypes.xsd");
-        } 
-        return aegisTypesSchemaDocument;
-    }
-    
-    private Document getXmimeSchemaDocument() {
-        if (xmimeSchemaDocument == null) {
-            xmimeSchemaDocument = getSchemaDocument("/schemas/wsdl/xmime.xsd");
+
+    public static void addUtilityTypesToSchema(Element root) {
+        if (schemaImportsUtilityTypes(root)) {
+            return;
         }
-        return xmimeSchemaDocument;
-    }
-
-    public XmlSchema addTypesSchemaDocument(XmlSchemaCollection collection) {
-        return collection.read(getAegisTypesSchemaDocument(), null);
-    }
-    
-    public XmlSchema addXmimeSchemaDocument(XmlSchemaCollection collection) {
-        return collection.read(getXmimeSchemaDocument(), null);
-    }
-
-    public static void addUtilityTypesToSchema(XmlSchema root) {
-        XmlSchemaUtils.addImportIfNeeded(root, UTILITY_TYPES_SCHEMA_NS);
+        Element element = new Element("import", SOAPConstants.XSD_PREFIX, SOAPConstants.XSD);
+        root.addContent(0, element);
+        element.setAttribute("namespace", SCHEMA_NS);
+        root.addNamespaceDeclaration(Namespace.getNamespace("aegisTypes", SCHEMA_NS));
     }
 
     /**
@@ -445,7 +394,7 @@ public class AegisContext {
      * 
      * @return the set of type objects.
      */
-    public Set<AegisType> getRootTypes() {
+    public Set<Type> getRootTypes() {
         return rootTypes;
     }
 
@@ -464,7 +413,7 @@ public class AegisContext {
         this.beanImplementationMap = beanImplementationMap;
     }
 
-    public Set<java.lang.reflect.Type> getRootClasses() {
+    public Set<Class<?>> getRootClasses() {
         return rootClasses;
     }
 
@@ -473,7 +422,7 @@ public class AegisContext {
      * 
      * @param rootClasses
      */
-    public void setRootClasses(Set<java.lang.reflect.Type> rootClasses) {
+    public void setRootClasses(Set<Class<?>> rootClasses) {
         this.rootClasses = rootClasses;
     }
 
@@ -519,17 +468,5 @@ public class AegisContext {
         if (typeMapping != null) {
             typeMapping.setMappingIdentifierURI(mappingNamespaceURI);
         }
-    }
-
-    public boolean isEnableJDOMMappings() {
-        return enableJDOMMappings;
-    }
-    
-    /**
-     * Whether to enable JDOM as a mapping for xsd:anyType if JDOM is in the classpath. 
-     * @param enableJDOMMappings
-     */
-    public void setEnableJDOMMappings(boolean enableJDOMMappings) {
-        this.enableJDOMMappings = enableJDOMMappings;
     }
 }

@@ -24,11 +24,11 @@
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
     
     <bean class="org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder"
-	  id="org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder" lazy-init="true"/>
+	  id="org.apache.cxf.transport.http.policy.HTTPClientAssertionBuilder"/>
     <bean class="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder"
-	  id="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder" lazy-init="true"/>
+	  id="org.apache.cxf.transport.http.policy.HTTPServerAssertionBuilder"/>
     <bean class="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider"
-          id="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider" lazy-init="true"/>
+          id="org.apache.cxf.transport.http.policy.NoOpPolicyInterceptorProvider"/>
  
     
     

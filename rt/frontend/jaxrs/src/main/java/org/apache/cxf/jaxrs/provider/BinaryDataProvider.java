@@ -45,7 +45,7 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
     
     private static final int BUFFER_SIZE = 4096;
 
-    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations) {
         return byte[].class.isAssignableFrom(type)
                || InputStream.class.isAssignableFrom(type)
                || Reader.class.isAssignableFrom(type);
@@ -66,14 +66,14 @@ public class BinaryDataProvider extends AbstractConfigurableProvider
         throw new IOException("Unrecognized class");
     }
 
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(Object t) {
         if (byte[].class.isAssignableFrom(t.getClass())) {
             return ((byte[])t).length;
         }
         return -1;
     }
 
-    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations) {
         return byte[].class.isAssignableFrom(type)
             || InputStream.class.isAssignableFrom(type)
             || File.class.isAssignableFrom(type)

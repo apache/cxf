@@ -22,8 +22,7 @@ package org.apache.cxf.binding.soap;
 import javax.xml.namespace.QName;
 
 public interface SoapVersion {
-    String getBindingId();
-    
+
     double getVersion();
 
     String getNamespace();

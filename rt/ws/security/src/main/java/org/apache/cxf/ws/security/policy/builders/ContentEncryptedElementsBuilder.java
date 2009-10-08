@@ -37,8 +37,7 @@ import org.apache.cxf.ws.security.policy.model.ContentEncryptedElements;
 
 
 public class ContentEncryptedElementsBuilder implements AssertionBuilder {
-    public static final List<QName> KNOWN_ELEMENTS 
-        = Collections.singletonList(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
+
     
     public PolicyAssertion build(Element element) {
         
@@ -60,7 +59,7 @@ public class ContentEncryptedElementsBuilder implements AssertionBuilder {
         return contentEncryptedElements;
     }
     public List<QName> getKnownElements() {
-        return KNOWN_ELEMENTS;
+        return Collections.singletonList(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS);
     }
     private void processElement(Element element, ContentEncryptedElements parent) {
         if (SPConstants.XPATH_EXPR.equals(element.getLocalName())) {

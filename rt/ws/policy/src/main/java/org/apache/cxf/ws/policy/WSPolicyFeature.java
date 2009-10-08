@@ -28,13 +28,11 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.ws.policy.attachment.external.ExternalAttachmentProvider;
 import org.apache.cxf.ws.policy.attachment.reference.ReferenceResolver;
 import org.apache.cxf.ws.policy.attachment.reference.RemoteReferenceResolver;
 import org.apache.neethi.Policy;
@@ -54,7 +52,6 @@ import org.springframework.context.ApplicationContextAware;
  * @see PolicyBuilder
  * @see AbstractFeature
  */
-@NoJSR250Annotations
 public class WSPolicyFeature extends AbstractFeature implements ApplicationContextAware {
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WSPolicyFeature.class);
@@ -63,12 +60,11 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     private Collection<Element> policyElements;
     private Collection<Element> policyReferenceElements;
     private boolean ignoreUnknownAssertions;
+    private String namespace;
     private AlternativeSelector alternativeSelector; 
     private ApplicationContext context;
-    private boolean enabled = true;
   
        
-
     public WSPolicyFeature() {
         super();
     }
@@ -77,14 +73,6 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         super();
         policies = new ArrayList<Policy>();
         Collections.addAll(policies, ps);
-    }
-
-    public boolean isEnabled() {
-        return enabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.enabled = enabled;
     }
     
     public void setApplicationContext(ApplicationContext c) throws BeansException {
@@ -100,8 +88,12 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         PolicyEngine pe = bus.getExtension(PolicyEngine.class);
         
         synchronized (pe) {
-            pe.setEnabled(enabled);
+            pe.setEnabled(true);
             pe.setIgnoreUnknownAssertions(ignoreUnknownAssertions);
+            if (null != namespace) {
+                PolicyConstants pc = bus.getExtension(PolicyConstants.class);
+                pc.setNamespace(namespace);
+            }
             if (null != alternativeSelector) {
                 pe.setAlternativeSelector(alternativeSelector);
             }
@@ -126,14 +118,6 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         EndpointInfo ei = endpoint.getEndpointInfo();
         EndpointPolicy ep = pe.getServerEndpointPolicy(ei, null);
         pe.setServerEndpointPolicy(ei, ep.updatePolicy(p));
-
-        // Add policy to the service model (and consequently to the WSDL)
-        ServiceModelPolicyUpdater pu = new ServiceModelPolicyUpdater(ei);
-        for (PolicyProvider pp : ((PolicyEngineImpl) pe).getPolicyProviders()) {
-            if (pp instanceof ExternalAttachmentProvider) {
-                pu.addPolicyAttachments(((ExternalAttachmentProvider) pp).getAttachments());
-            }
-        }
     }
 
     private Policy initializeEndpointPolicy(Endpoint endpoint, Bus bus) {
@@ -214,6 +198,9 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
         ignoreUnknownAssertions = ignore;
     } 
     
+    public void setNamespace(String ns) {
+        namespace = ns;
+    }
     
     public void setAlternativeSelector(AlternativeSelector as) {
         alternativeSelector = as;
@@ -261,7 +248,8 @@ public class WSPolicyFeature extends AbstractFeature implements ApplicationConte
     
     protected Policy resolveExternal(PolicyReference ref,  String baseURI, Bus bus) {
         PolicyBuilder builder = bus.getExtension(PolicyBuilder.class);
-        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
+        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder,
+            bus.getExtension(PolicyConstants.class));
         PolicyRegistry registry = bus.getExtension(PolicyEngine.class).getRegistry();
         Policy resolved = registry.lookup(ref.getURI());
         if (null != resolved) {

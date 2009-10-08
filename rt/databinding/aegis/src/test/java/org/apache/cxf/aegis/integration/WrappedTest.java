@@ -20,14 +20,11 @@ package org.apache.cxf.aegis.integration;
 
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.services.ArrayService;
 import org.apache.cxf.aegis.services.BeanService;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -38,18 +35,15 @@ import org.junit.Test;
 public class WrappedTest extends AbstractAegisTest {
     
     private ArrayService arrayService;
-    private Document arrayWsdlDoc;
     
     @Before 
     public void setUp() throws Exception {
         super.setUp();
-        setEnableJDOM(true);
         arrayService = new ArrayService();
         createService(BeanService.class, "BeanService");
         createService(ArrayService.class, arrayService, "Array", new QName("urn:Array", "Array"));
-        arrayWsdlDoc = getWSDLDocument("Array");
     }
-    
+
     @Test
     public void testBeanService() throws Exception {
         Node response = invoke("BeanService", "bean11.xml");
@@ -60,28 +54,6 @@ public class WrappedTest extends AbstractAegisTest {
         assertValid("//sb:getSimpleBeanResponse/sb:return", response);
         assertValid("//sb:getSimpleBeanResponse/sb:return/beanz:howdy[text()=\"howdy\"]", response);
         assertValid("//sb:getSimpleBeanResponse/sb:return/beanz:bleh[text()=\"bleh\"]", response);
-    }
-    
-    @Test
-    public void testArrayWsdl() throws Exception {
-        NodeList stuff = assertValid("//xsd:complexType[@name='ArrayOfString-2-50']", arrayWsdlDoc);
-        assertEquals(1, stuff.getLength());
-    }
-    
-    @Test
-    public void testXmlConfigurationOfParameterTypeSchema() throws Exception {
-        assertValid(
-                    "/wsdl:definitions/wsdl:types"
-                        + "/xsd:schema[@targetNamespace='urn:Array']"
-                        + "/xsd:complexType[@name=\"takeNumber\"]/xsd:sequence/xsd:element"
-                        + "[@type=\"xsd:long\"]",
-                    arrayWsdlDoc);
-    }
-    
-    @Test
-    public void testXmlConfigurationOfParameterType() throws Exception {
-        invoke("Array", "takeNumber.xml");
-        assertEquals(Long.valueOf(123456789), arrayService.getNumberValue());
     }
 
     @Test
@@ -125,8 +97,7 @@ public class WrappedTest extends AbstractAegisTest {
                         + "[@type=\"xsd:string\"]",
                     doc);
     }
-
-    @org.junit.Ignore // uses Jaxen.
+    
     @Test 
     public void testSubmitJDOMArray() throws Exception {
         
@@ -158,8 +129,70 @@ public class WrappedTest extends AbstractAegisTest {
         assertEquals("before items", arrayService.getBeforeValue());
         assertEquals(3, arrayService.getW3cArray().length);
         org.w3c.dom.Document e = arrayService.getW3cArray()[0];
-        assertValid("/iam:walrus", e);
+        assertValid("/a:anyType/iam:walrus", e);
         assertEquals("after items", arrayService.getAfterValue());
     }
 
+    // public void testGetArray()
+    // throws Exception
+    // {
+    // Document response = invokeService("Array",
+    // "/org/codehaus/xfire/message/wrapped/GetStringArray11.xml");
+    //
+    // addNamespace("a", "urn:Array");
+    // addNamespace("sb", "http://test.java.xfire.codehaus.org");
+    // assertValid("//a:getStringArrayResponse", response);
+    // assertValid("//a:getStringArrayResponse/a:out/a:string", response);
+    // }
+    //    
+    // public void testArrayService()
+    // throws Exception
+    // {
+    // Document response = invokeService("Array",
+    // "/org/codehaus/xfire/message/wrapped/SubmitStringArray11.xml");
+    //
+    // addNamespace("a", "urn:Array");
+    // addNamespace("sb", "http://test.java.xfire.codehaus.org");
+    // assertValid("//a:SubmitStringArrayResponse", response);
+    // assertValid("//a:SubmitStringArrayResponse/a:out[text()='true']",
+    // response);
+    // }
+    //
+    // public void testArrayServiceNoWhitespace()
+    // throws Exception
+    // {
+    // Document response = invokeService("Array",
+    // "/org/codehaus/xfire/message/wrapped/SubmitStringArray11NoWS.xml");
+    //
+    // addNamespace("a", "urn:Array");
+    // addNamespace("sb", "http://test.java.xfire.codehaus.org");
+    // assertValid("//a:SubmitStringArrayResponse", response);
+    // assertValid("//a:SubmitStringArrayResponse/a:out[text()='true']",
+    // response);
+    // }
+    //
+    // public void testArrayServiceWSDL()
+    // throws Exception
+    // {
+    // Document doc = getWSDLDocument("Array");
+    //
+    // addNamespace("wsdl", WSDLWriter.WSDL11_NS);
+    // addNamespace("wsdlsoap", WSDLWriter.WSDL11_SOAP_NS);
+    // addNamespace("xsd", SoapConstants.XSD);
+    //
+    // assertValid("/wsdl:definitions/wsdl:types", doc);
+    // assertValid("/wsdl:definitions/wsdl:types/xsd:schema", doc);
+    // assertValid("/wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace='urn:Array']",
+    // doc);
+    // assertValid("//xsd:schema[@targetNamespace='urn:Array']/xsd:element[@name='SubmitBeanArray']",
+    // doc);
+    // assertValid(
+    // "//xsd:element[@name='SubmitStringArray']/xsd:complexType/xsd:sequence/xsd:element"
+    //    + "[@name='array'][@type='tns:ArrayOfString']",
+    // doc);
+    // assertValid(
+    // "//xsd:element[@name='SubmitBeanArray']/xsd:complexType/xsd:sequence/xsd:element"
+    //  + "[@name='array'][@type='ns1:ArrayOfSimpleBean']",
+    // doc);
+    // }
 }

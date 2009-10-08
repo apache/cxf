@@ -59,16 +59,12 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:headers>
   </jaxrs:client>
   
-  <jaxrs:client id="ModelClient" 
-    modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
+  <!-- current JAXRSClient doesn't support the modelRef 
+  <jaxrs:client id="ModuleClient" 
     serviceClass="org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations"
-    address="http://localhost:8080/simpleWithAddress"
-    username="username"
-    password="password">
-    <jaxrs:headers>
-       <entry key="Accept" value="text/xml"/>
-    </jaxrs:headers>    
+    modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
+    address="http://localhost:8080/simpleWithAddress">    
   </jaxrs:client>
-  
+  --> 
    
   </beans>
