@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>2.1.7-SNAPSHOT</version>
+        <version>2.1.7</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>2.1.7-SNAPSHOT</version>
+    <version>2.1.7</version>
     <name>Apache CXF Parent</name>
     <url>http://cxf.apache.org</url>
 
@@ -77,7 +77,7 @@
         <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
         <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
 
-        <resources.base.path/>
+        <resources.base.path />
 
     </properties>
 
@@ -1377,8 +1377,8 @@
 
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/parent</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/parent</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.7/parent</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.1.7/parent</developerConnection>
     </scm>
 
 </project>
