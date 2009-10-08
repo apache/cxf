@@ -20,13 +20,13 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>2.2.4-SNAPSHOT</version>
+        <version>2.2.4</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-parent</artifactId>
-    <version>2.2.4-SNAPSHOT</version>
+    <version>2.2.4</version>
     <name>Apache CXF Parent</name>
     <url>http://cxf.apache.org</url>
 
@@ -74,7 +74,7 @@
         <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
         <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
 
-        <resources.base.path/>
+        <resources.base.path />
 
     </properties>
 
