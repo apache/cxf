@@ -136,9 +136,5 @@
         </plugins>
     </build>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/transports/jms</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/transports/jms</developerConnection>
-    </scm>
 
 </project>

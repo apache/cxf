@@ -30,10 +30,6 @@
     <name>Apache CXF JAX-RS System Tests</name>
     <version>2.2.4-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/systests/jaxrs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests/jaxrs</developerConnection>
-    </scm>
     <build>
         <plugins>
             <plugin>

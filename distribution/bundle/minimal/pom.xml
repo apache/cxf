@@ -276,9 +276,4 @@
         </plugins>
     </build>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/minimal</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/minimal</developerConnection>
-    </scm>
-
 </project>

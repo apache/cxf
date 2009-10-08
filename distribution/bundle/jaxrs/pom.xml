@@ -225,9 +225,4 @@
     </build>
 
    
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/distribution/bundle/jaxrs</developerConnection>
-    </scm>
-
 </project>

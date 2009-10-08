@@ -30,10 +30,6 @@
     <name>Apache CXF WS-* Specifications System Tests</name>
     <version>2.2.4-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/systests/ws-specs</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/systests/ws-specs</developerConnection>
-    </scm>
     <build>
         <plugins>
             <plugin>

@@ -64,8 +64,4 @@
       <artifactId>XmlSchema</artifactId>
     </dependency>
   </dependencies>
-  <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/wstx-msv-validation</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/wstx-msv-validation</developerConnection>
-  </scm>
 </project>
