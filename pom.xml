@@ -29,7 +29,7 @@
 
     <scm>
         <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/branches/2.2.x-fixes</connection>
-        <developerConnection>scm:svn:http://svn.apache.org/repos/asf/cxf/branches/2.2.x-fixes</developerConnection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/branches/2.2.x-fixes</developerConnection>
     </scm>
     <issueManagement>
         <system>jira</system>
