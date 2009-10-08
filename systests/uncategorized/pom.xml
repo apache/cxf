@@ -30,7 +30,6 @@
     <name>Apache CXF Uncategorized System Tests</name>
     <version>2.1.8-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
-
     <build>
         <plugins>
             <plugin>                                                                                                          

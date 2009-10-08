@@ -64,11 +64,5 @@
 
     </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/frontend/jaxws</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/tools/wsdlto/frontend/jaxws</developerConnection>
-    </scm>
-
-
 
 </project>

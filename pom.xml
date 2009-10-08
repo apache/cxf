@@ -28,8 +28,8 @@
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/branches/2.1.x-fixes</connection>
+        <developerConnection>scm:svn:http://svn.apache.org/repos/asf/cxf/branches/2.1.x-fixes</developerConnection>
     </scm>
     <issueManagement>
         <system>jira</system>

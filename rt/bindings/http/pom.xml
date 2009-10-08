@@ -130,9 +130,4 @@
         </plugins>
     </build>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/bindings/http</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/bindings/http</developerConnection>
-    </scm>
-
 </project>

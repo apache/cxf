@@ -102,10 +102,4 @@
         </plugins>
     </build>
 
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv-test</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/dv-test</developerConnection>
-    </scm>
-
 </project>

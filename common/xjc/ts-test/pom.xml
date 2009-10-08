@@ -99,10 +99,4 @@
         </plugins>
     </build>
 
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts-test</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/ts-test</developerConnection>
-    </scm>
-
 </project>

@@ -146,9 +146,4 @@
     </build>
 
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http-jetty</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http-jetty</developerConnection>
-    </scm>
-
 </project>

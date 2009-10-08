@@ -126,9 +126,4 @@
     </dependencies>
 
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/integration/jca</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/integration/jca</developerConnection>
-    </scm>
-
 </project>

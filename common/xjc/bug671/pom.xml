@@ -56,9 +56,4 @@
         </dependency>
     </dependencies>
 
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/common/xjc/bug671</developerConnection>
-    </scm>
-
 </project>

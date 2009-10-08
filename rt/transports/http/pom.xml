@@ -114,11 +114,4 @@
         </plugins>
     </build>
 
-
-
-    <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk/rt/transports/http</developerConnection>
-    </scm>
-
 </project>
