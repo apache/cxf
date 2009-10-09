@@ -69,7 +69,7 @@ public final class CustomerServiceTester {
         customer.setName("Smith");
         customerService.updateCustomer(customer);
         
-        System.out.println("All calls were succesful");
+        System.out.println("All calls were successful");
     }
 
 }
