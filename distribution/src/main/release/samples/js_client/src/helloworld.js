@@ -22,9 +22,9 @@ importPackage(Packages.javax.xml.namespace);
 importPackage(Packages.org.apache.hello_world_soap_http);
 
 var qname=new Packages.javax.xml.namespace.QName("http://apache.org/hello_world_soap_http", "SOAPService");
-var curpath=new File("..");
+var curpath=new File(".");
 var sepa=File.separator;
-var hwpath=curpath.getAbsolutePath()+sepa+"wsdl_first"+sepa+"wsdl"+sepa+"hello_world.wsdl";
+var hwpath=curpath.getAbsolutePath()+sepa+"wsdl"+sepa+"hello_world.wsdl";
 var url = new File(hwpath).toURL();
 var ss=new SOAPService(url,qname);
 var port = ss.getSoapPort();
