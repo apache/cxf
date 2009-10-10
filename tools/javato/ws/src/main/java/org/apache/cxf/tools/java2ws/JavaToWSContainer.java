@@ -83,10 +83,18 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
             }
             throw ex;
         } catch (Exception ex) {
-            err.println("Error: " + ex.getMessage());
+            
+            // Try to find an exception with a message on the stack
+            Throwable e = ex.getCause();
+            while ((e.getMessage() == null || "".equals(e.getMessage())) && e.getCause() != null) {
+                e = e.getCause();
+            }
+            err.println("Error: " + e.toString());
             err.println();
             if (isVerboseOn()) {
                 ex.printStackTrace(err);
+            } else {
+                err.println("Use the verbose setting to show the stacktrace of this error");
             }
 
             throw new ToolException(ex.getMessage(), ex.getCause());
