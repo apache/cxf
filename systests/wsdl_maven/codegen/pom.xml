@@ -49,10 +49,10 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdlArtifact>
-				    <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
-				    <artifactId>cxf-systests-java2ws</artifactId>
-				    <version>${project.version}</version>
-			     </wsdlArtifact>
+				                        <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
+				                        <artifactId>cxf-systests-java2ws</artifactId>
+				                        <version>${project.version}</version>
+			                        </wsdlArtifact>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -72,9 +72,9 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-	<groupId>org.apache.cxf.systests.wsdl_maven</groupId>
-	<artifactId>cxf-systests-java2ws</artifactId>
-	<version>${project.version}</version>
+            <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
+            <artifactId>cxf-systests-java2ws</artifactId>
+            <version>${project.version}</version>
         </dependency>
     </dependencies>
 </project>
