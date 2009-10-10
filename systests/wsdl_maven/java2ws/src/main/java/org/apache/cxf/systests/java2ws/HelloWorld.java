@@ -19,10 +19,14 @@
 
 package org.apache.cxf.systests.java2ws;
 
+import javax.jws.WebParam;
 import javax.jws.WebService;
 
-@WebService
-public interface HelloWorld {
-    String sayHi(String text);
-}
+import org.apache.cxf.annotations.WSDLDocumentation;
 
+@WebService
+@WSDLDocumentation(value = "A simple service with only one method")
+public interface HelloWorld {
+    @WSDLDocumentation(value = "Simply return the given text")
+    String sayHi(@WebParam(name = "text") String text);
+}
