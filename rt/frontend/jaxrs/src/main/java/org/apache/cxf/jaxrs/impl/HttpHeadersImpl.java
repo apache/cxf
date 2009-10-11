@@ -24,10 +24,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
@@ -40,6 +44,24 @@ import org.apache.cxf.message.Message;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
+    // TODO : it can optimized, "Mastering Regular Expressions" has the asnwers
+    private static final String COMPLEX_HEADER_EXPRESSION = 
+        "((\"(([^\"])|(?<=\\\\)\")*\")|([^\",]*))(;[\\w]+)?";
+    private static final Pattern COMPLEX_HEADER_PATTERN =
+        Pattern.compile(COMPLEX_HEADER_EXPRESSION);
+    private static final String QUOTE = "\"";
+    private static final Set<String> HEADERS_WITH_POSSIBLE_QUOTES;
+    static {
+        HEADERS_WITH_POSSIBLE_QUOTES = new HashSet<String>();
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.CACHE_CONTROL);
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.ETAG);
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.IF_MATCH);
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.IF_NONE_MATCH);
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.COOKIE);
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.SET_COOKIE);
+    }
+    
+    
     private MultivaluedMap<String, String> headers;
     
     @SuppressWarnings("unchecked")
@@ -129,16 +151,32 @@ public class HttpHeadersImpl implements HttpHeaders {
         if (HttpUtils.isDateRelatedHeader(headerName)) {
             return values;
         }
-        String[] ls =  values.get(0).split(",");
-        if (ls.length == 1) {
-            return Collections.singletonList(ls[0].trim());
-        } else {
-            List<String> newValues = new ArrayList<String>();
-            for (String v : ls) {
-                newValues.add(v.trim());
+        return getHeaderValues(headerName, values.get(0));
+    }
+    
+    private List<String> getHeaderValues(String headerName, String originalValue) {
+        if (!originalValue.contains(QUOTE)
+            || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
+            String[] ls = originalValue.split(",");
+            if (ls.length == 1) {
+                return Collections.singletonList(ls[0].trim());
+            } else {
+                List<String> newValues = new ArrayList<String>();
+                for (String v : ls) {
+                    newValues.add(v.trim());
+                }
+                return newValues;
             }
-            return newValues;
         }
+        List<String> values = new ArrayList<String>(4);
+        Matcher m = COMPLEX_HEADER_PATTERN.matcher(originalValue);
+        while (m.find()) {
+            String val = m.group().trim();
+            if (val.length() > 0) {
+                values.add(val);
+            }
+        }
+        return values;
     }
     
     private static class AcceptLanguageComparator implements Comparator<Locale> {

@@ -47,6 +47,46 @@ public class HttpHeadersImplTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
     }
+
+    @Test
+    public void testGetHeaderWithQuotes1() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader("COMPLEX_HEADER", 
+                         "\"a\", \"a\";param, b, b;param, \"c, d, e\", \"c, d, e\";param");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("COMPLEX_HEADER");
+        assertNotNull(values);
+        assertEquals(6, values.size());
+        assertEquals("\"a\"", values.get(0));
+        assertEquals("\"a\";param", values.get(1));
+        assertEquals("b", values.get(2));
+        assertEquals("b;param", values.get(3));
+        assertEquals("\"c, d, e\"", values.get(4));
+        assertEquals("\"c, d, e\";param", values.get(5));
+    }
+    
+    @Test
+    public void testGetHeaderWithQuotes2() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader("COMPLEX_HEADER", 
+                         "\"a   \\\"b\\\"\", b;param=b");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("COMPLEX_HEADER");
+        assertNotNull(values);
+        assertEquals(2, values.size());
+        assertEquals("\"a   \\\"b\\\"\"", values.get(0));
+        assertEquals("b;param=b", values.get(1));
+    }
     
     @Test
     public void testGetHeaders() throws Exception {
