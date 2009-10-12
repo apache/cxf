@@ -148,6 +148,9 @@ public class StaxSource extends SAXSource implements XMLReader {
                 default:
                     break;
                 }
+                if (!streamReader.hasNext()) {
+                    return;
+                }
                 streamReader.next();
             }
         } catch (XMLStreamException e) {

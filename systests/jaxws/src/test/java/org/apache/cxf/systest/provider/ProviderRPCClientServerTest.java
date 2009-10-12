@@ -29,6 +29,7 @@ import javax.xml.soap.SOAPConnection;
 import javax.xml.soap.SOAPConnectionFactory;
 import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -73,10 +74,21 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
                                  QName portName,
                                  int count,
                                  boolean doFault) throws Exception {
+        doGreeterRPCLit(service, portName, count, doFault, null);
+    }
+    private void doGreeterRPCLit(SOAPServiceRPCLit service,
+                                 QName portName,
+                                 int count,
+                                 boolean doFault,
+                                 String address) throws Exception {
         String response1 = new String("TestGreetMeResponse");
         String response2 = new String("TestSayHiResponse");
         try {
             GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+            if (address != null) {
+                ((BindingProvider)greeter).getRequestContext()
+                    .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
+            }
             for (int idx = 0; idx < count; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
@@ -164,17 +176,23 @@ public class ProviderRPCClientServerTest extends AbstractBusClientServerTestBase
         SOAPServiceRPCLit service = new SOAPServiceRPCLit(wsdl, serviceName);
         assertNotNull(service);
 
-        
+        String addresses[] = {
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8",
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-dom",
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-sax",
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-cxfstax",
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stax",
+            "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stream"               
+        };
         String response1 = new String("TestGreetMeResponseServerLogicalHandlerServerSOAPHandler");
-        try {
-            GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+        GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+        for (String ad : addresses) {
+            ((BindingProvider)greeter).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, ad);
             String greeting = greeter.greetMe("Milestone-0");
-            assertNotNull("no response received from service", greeting);
-            assertEquals(response1, greeting);
-        } catch (UndeclaredThrowableException ex) {
-            throw (Exception)ex.getCause();
+            assertNotNull("no response received from service " + ad, greeting);
+            assertEquals("wrong response received from service " + ad, response1, greeting);
         }
-
     }
     
     @Test

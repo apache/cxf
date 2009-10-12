@@ -19,6 +19,9 @@
 
 package org.apache.cxf.systest.provider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -28,7 +31,11 @@ public class XMLServer extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor = new HWDOMSourcePayloadXMLBindingProvider();
         String address = "http://localhost:9022/XMLService/XMLProviderPort";
-        Endpoint.publish(address, implementor);
+        Endpoint ep = Endpoint.create(implementor);
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put("schema-validation-enabled", Boolean.TRUE);
+        ep.setProperties(map);
+        ep.publish(address);
     }
 
     public static void main(String[] args) {

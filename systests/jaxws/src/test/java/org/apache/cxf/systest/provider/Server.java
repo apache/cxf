@@ -19,8 +19,12 @@
 
 package org.apache.cxf.systest.provider;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
@@ -28,7 +32,40 @@ public class Server extends AbstractBusTestServerBase {
     protected void run() {
         Object implementor = new HWSourcePayloadProvider();
         String address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8";
-        Endpoint.publish(address, implementor);        
+        Endpoint ep = Endpoint.create(implementor);
+        ep.publish(address);
+        
+        Map<String, Object> map = new HashMap<String, Object>();
+        map.put(SourceDataBinding.PREFERRED_FORMAT, "dom");
+        address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-dom";
+        ep = Endpoint.create(implementor);
+        ep.setProperties(map);
+        ep.publish(address);
+        
+        map.put(SourceDataBinding.PREFERRED_FORMAT, "sax");
+        address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-sax";
+        ep = Endpoint.create(implementor);
+        ep.setProperties(map);
+        ep.publish(address);
+
+        map.put(SourceDataBinding.PREFERRED_FORMAT, "stax");
+        address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stax";
+        ep = Endpoint.create(implementor);
+        ep.setProperties(map);
+        ep.publish(address);
+
+        map.put(SourceDataBinding.PREFERRED_FORMAT, "cxf.stax");
+        address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-cxfstax";
+        ep = Endpoint.create(implementor);
+        ep.setProperties(map);
+        ep.publish(address);
+
+        map.put(SourceDataBinding.PREFERRED_FORMAT, "stream");
+        address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit8-stream";
+        ep = Endpoint.create(implementor);
+        ep.setProperties(map);
+        ep.publish(address);
+
                
         implementor = new HWSoapMessageProvider();
         address = "http://localhost:9008/SOAPServiceProviderRPCLit/SoapPortProviderRPCLit1";

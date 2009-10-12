@@ -128,7 +128,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setBus(getBus());
         svrFactory.setServiceFactory(bean);
-        String address = "http://localhost:9000/test";
+        String address = "local://localhost:9000/test";
         svrFactory.setAddress(address);
 
         ServerImpl server = (ServerImpl)svrFactory.create();
@@ -169,7 +169,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setBus(getBus());
         svrFactory.setServiceFactory(bean);
-        String address = "http://localhost:9000/test";
+        String address = "local://localhost:9000/test";
         svrFactory.setAddress(address);
 
         ServerImpl server = (ServerImpl)svrFactory.create();
@@ -214,7 +214,7 @@ public class ProviderServiceFactoryTest extends AbstractJaxWsTest {
         svrFactory.setServiceClass(SourceMessageProvider.class);
         svrFactory.setBus(getBus());
         svrFactory.setServiceBean(new SourceMessageProvider());
-        String address = "http://localhost:9000/test";
+        String address = "local://localhost:9000/test";
         svrFactory.setAddress(address);
 
         svrFactory.create();
