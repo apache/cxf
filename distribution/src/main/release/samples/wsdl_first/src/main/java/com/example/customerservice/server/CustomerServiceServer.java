@@ -43,7 +43,7 @@ public class CustomerServiceServer {
     public static void main(String args[]) throws Exception {
         new CustomerServiceServer();
         System.out.println("Server ready...");
-        System.in.read();
+        Thread.sleep(5 * 60 * 1000);
         System.out.println("Server exiting");
         System.exit(0);
     }
