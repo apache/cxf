@@ -30,7 +30,6 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
@@ -242,8 +241,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         Source source = new StreamSource(new StringReader(req));
         source = disp.invoke(source);
         
-        DOMSource ds = (DOMSource)source;
-        Node nd = ds.getNode();
+        Node nd = XMLUtils.fromSource(source);
         if (nd instanceof Document) {
             nd = ((Document)nd).getDocumentElement();
         }
@@ -332,9 +330,13 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
         public Source invoke(Source obj) {
             //CHECK the incoming
-            DOMSource ds = (DOMSource)obj;
             
-            Node el = ds.getNode();
+            Node el;
+            try {
+                el = XMLUtils.fromSource(obj);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             if (el instanceof Document) {
                 el = ((Document)el).getDocumentElement();
             }

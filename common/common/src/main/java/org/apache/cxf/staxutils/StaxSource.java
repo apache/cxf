@@ -117,9 +117,6 @@ public class StaxSource extends SAXSource implements XMLReader {
                     String qname = prefix != null && prefix.length() > 0 
                         ? prefix + ":" + localName : localName;
                     contentHandler.endElement(uri, localName, qname);
-                    //for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
-                    //    contentHandler.endPrefixMapping(streamReader.getNamespaceURI(i));
-                    //}
                     break;
                 }
                 case XMLStreamConstants.ENTITY_DECLARATION:
@@ -133,10 +130,6 @@ public class StaxSource extends SAXSource implements XMLReader {
                     contentHandler.startDocument();
                     break;
                 case XMLStreamConstants.START_ELEMENT: {
-                    //for (int i = 0; i < streamReader.getNamespaceCount(); i++) {
-                    //    contentHandler.startPrefixMapping(streamReader.getNamespacePrefix(i),
-                    //                                      streamReader.getNamespaceURI(i));
-                    //}
                     String uri = streamReader.getNamespaceURI();
                     String localName = streamReader.getLocalName();
                     String prefix = streamReader.getPrefix();
