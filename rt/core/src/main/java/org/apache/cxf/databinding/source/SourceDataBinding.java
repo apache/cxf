@@ -32,6 +32,8 @@ import org.apache.cxf.service.Service;
  * A simple databinding implementation which reads and writes Source objects.
  */
 public class SourceDataBinding extends org.apache.cxf.databinding.AbstractDataBinding {
+    
+    public static final String PREFERRED_FORMAT = "source-preferred-format";
 
     private XMLStreamDataReader xsrReader;
     private XMLStreamDataWriter xswWriter;

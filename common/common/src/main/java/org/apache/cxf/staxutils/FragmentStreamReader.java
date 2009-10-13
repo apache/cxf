@@ -23,7 +23,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 /**
- * Wraps a XMLStreamReader and provides START_DOCUMENT and END_DOCUMENT events.
+ * Wraps a XMLStreamReader and provides optional START_DOCUMENT and END_DOCUMENT events.
  * 
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
@@ -32,6 +32,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     private boolean startElement;
     private boolean middle = true;
     private boolean endDoc;
+    private boolean doDocEvents = true;
 
     private int depth;
     private int current = -1;
@@ -40,6 +41,17 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     
     public FragmentStreamReader(XMLStreamReader reader) {
         super(reader);
+    }    
+    public FragmentStreamReader(XMLStreamReader reader, boolean doDocEvents) {
+        super(reader);
+        this.doDocEvents = doDocEvents;
+        if (!doDocEvents) {
+            startDoc = true;
+            
+            depth = getDepth();
+            current = reader.getEventType();
+            startElement = true;
+        }
     }    
    
     public int getEventType() {
@@ -58,7 +70,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
         return reader.hasNext();
     }
     
-    public int next() throws XMLStreamException {
+    public final int next() throws XMLStreamException {
         if (!startDoc) {
             startDoc = true;
             current = START_DOCUMENT;
@@ -82,6 +94,9 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
 
             if (current == END_ELEMENT && getDepth() < depth) {
                 middle = false;
+                if (!doDocEvents) {
+                    endDoc = true;
+                }
             }
         } else if (!endDoc) {
             // Move past the END_ELEMENT token.

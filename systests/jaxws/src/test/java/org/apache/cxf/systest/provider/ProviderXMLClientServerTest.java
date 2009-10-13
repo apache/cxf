@@ -72,6 +72,22 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
         assertEquals("greetMeResponse", respDoc.getFirstChild().getLocalName());
         assertEquals("TestXMLBindingProviderMessage", respDoc.getFirstChild()
                 .getTextContent());
+        
+        is = getClass().getResourceAsStream(
+            "/messages/XML_GreetMeDocLiteralReq_invalid.xml");
+        doc = XMLUtils.parse(is);
+        reqMsg = new DOMSource(doc);
+        assertNotNull(reqMsg);
+
+        disp = service.createDispatch(portName,
+                                      DOMSource.class, Service.Mode.PAYLOAD);
+        
+        try {
+            result = disp.invoke(reqMsg);
+            fail("should have a schema validation exception of some sort");
+        } catch (Exception ex) {
+            //expected - different validators are throwing different error messages though
+        }
     }
 
 }

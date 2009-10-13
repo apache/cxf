@@ -189,7 +189,10 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                     parameters.put(p, o);
                     
                     paramNum++;
-                } while (StaxUtils.toNextElement(xmlReader));
+                    if (message.getContent(XMLStreamReader.class) == null) {
+                        xmlReader = null;
+                    }
+                } while (xmlReader != null && StaxUtils.toNextElement(xmlReader));
     
             }
     

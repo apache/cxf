@@ -356,6 +356,7 @@ public final class StaxUtils {
                     throw new XMLStreamException(e);
                 }
             }
+       
         }
         
         XMLStreamReader reader = createXMLStreamReader(source);
@@ -929,6 +930,13 @@ public final class StaxUtils {
                 
                 if (null != el) {
                     return new W3CDOMStreamReader(el);
+                }
+            } else if ("javax.xml.transform.stax.StAXSource".equals(source.getClass().getName())) {
+                try {
+                    return (XMLStreamReader)source.getClass()
+                        .getMethod("getXMLStreamReader").invoke(source);
+                } catch (Exception ex) {
+                    //ignore
                 }
             }
             
