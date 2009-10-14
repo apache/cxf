@@ -322,6 +322,8 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
                         
                             BindingOperationInfo bo = new BindingOperationInfo(bind, op);
+                            op.setProperty("operation.is.synthetic", Boolean.TRUE);
+                            bo.setProperty("operation.is.synthetic", Boolean.TRUE);
                             bind.addOperation(bo);
                         }
                     }
