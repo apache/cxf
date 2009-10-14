@@ -25,6 +25,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.List;
@@ -199,7 +200,7 @@ public final class XMLUtils {
     }
 
     public static String toString(Source source, Properties props) throws TransformerException, IOException {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StringWriter bos = new StringWriter();
         StreamResult sr = new StreamResult(bos);
         Transformer trans = newTransformer();
         if (props == null) {
