@@ -21,6 +21,7 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
@@ -29,7 +30,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Node;
 
@@ -45,6 +48,10 @@ public class HWSAXSourceMessageProvider implements Provider<SAXSource> {
     
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+    
+    @Resource 
+    WebServiceContext ctx;
+    
     private InputSource sayHiInputSource;
     private InputSource greetMeInputSource;
     private MessageFactory factory;
@@ -65,6 +72,11 @@ public class HWSAXSourceMessageProvider implements Provider<SAXSource> {
     }
 
     public SAXSource invoke(SAXSource request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         SAXSource response = new SAXSource();
         try {
             SOAPMessage msg = factory.createMessage();

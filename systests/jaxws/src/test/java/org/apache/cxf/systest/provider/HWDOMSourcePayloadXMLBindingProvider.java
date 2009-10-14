@@ -21,13 +21,17 @@ package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
 
+import javax.annotation.Resource;
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 
@@ -43,11 +47,19 @@ import org.apache.cxf.helpers.DOMUtils;
 @javax.xml.ws.BindingType(value = "http://cxf.apache.org/bindings/xformat")
 public class HWDOMSourcePayloadXMLBindingProvider implements
         Provider<DOMSource> {
-
+    @Resource 
+    WebServiceContext ctx;
+    
     public HWDOMSourcePayloadXMLBindingProvider() {
     }
 
     public DOMSource invoke(DOMSource request) {
+        
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         DocumentBuilderFactory factory;
         DocumentBuilder builder;
         Document document = null;

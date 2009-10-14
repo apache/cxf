@@ -21,6 +21,7 @@ package org.apache.cxf.systest.provider;
 import java.io.InputStream;
 import java.util.Iterator;
 
+import javax.annotation.Resource;
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
 import javax.xml.soap.AttachmentPart;
@@ -30,7 +31,9 @@ import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Node;
 
@@ -48,6 +51,11 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+    
+    @Resource 
+    WebServiceContext ctx;
+
+    
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
     
@@ -67,6 +75,11 @@ public class HWSoapMessageProvider implements Provider<SOAPMessage> {
     }
     
     public SOAPMessage invoke(SOAPMessage request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         SOAPMessage response = null;        
         try {
             SOAPBody body = request.getSOAPBody();

@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.provider;
 import java.io.InputStream;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPBody;
@@ -28,7 +29,10 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
+
 import org.w3c.dom.Node;
 
 
@@ -42,6 +46,10 @@ public class HWDOMSourceMessageProvider implements Provider<DOMSource> {
 
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+    
+    @Resource 
+    WebServiceContext ctx;
+    
     private SOAPMessage sayHiResponse;
     private SOAPMessage greetMeResponse;
     private MessageFactory factory;
@@ -62,6 +70,11 @@ public class HWDOMSourceMessageProvider implements Provider<DOMSource> {
     }
 
     public DOMSource invoke(DOMSource request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         //XMLUtils.writeTo(request, System.out);
         DOMSource response = new DOMSource();
         try {
