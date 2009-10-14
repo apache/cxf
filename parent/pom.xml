@@ -47,7 +47,7 @@
 
         <!-- please maintain alphabetical order here -->
         <abdera.version>0.4.0-incubating</abdera.version>
-        <activemq.version>5.1.0</activemq.version>
+        <activemq.version>5.3.0</activemq.version>
         <derby.version>10.2.2.0</derby.version>
         <jaxb.version>2.1</jaxb.version>
         <jaxb.impl.version>2.1.9</jaxb.impl.version>
