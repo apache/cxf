@@ -25,9 +25,9 @@ import javax.xml.ws.Holder;
 
 @WebService
 public interface Echo {
-    String echo(String text,
-                @WebParam(mode = Mode.OUT)
+    String echo(@WebParam(name = "in", mode = Mode.IN)
+                String text,
+                @WebParam(name = "out", mode = Mode.OUT)
                 Holder<String> textAgain);
-    
     String simpleEcho(String text);
 }

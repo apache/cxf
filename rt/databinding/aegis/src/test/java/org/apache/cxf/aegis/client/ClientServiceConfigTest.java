@@ -19,11 +19,16 @@
 
 package org.apache.cxf.aegis.client;
 
+import javax.xml.ws.Endpoint;
+import javax.xml.ws.Holder;
+
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
+import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.invoker.BeanInvoker;
 import org.junit.Before;
@@ -45,6 +50,23 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         svrFac.setServiceClass(Echo.class);
         svrFac.setBus(getBus());
         svrFac.create();
+        
+        Endpoint endpoint = Endpoint.create(new EchoImpl());
+        EndpointImpl impl = (EndpointImpl) endpoint;
+        impl.setDataBinding(new AegisDatabinding());
+        endpoint.publish("local://JaxWsEcho");
+    }
+    
+    @Test
+    public void talkToJaxWsHolder() throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Echo.class);
+        factory.setDataBinding(new AegisDatabinding());
+        factory.setAddress("local://JaxWsEcho");
+        Echo client = (Echo) factory.create();
+        Holder<String> sholder = new Holder<String>();
+        client.echo("Channa Doll", sholder);
+        assertEquals("Channa Doll", sholder.value);
     }
     
     @Test
