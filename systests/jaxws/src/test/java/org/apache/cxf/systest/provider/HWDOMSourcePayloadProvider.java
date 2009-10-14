@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.provider;
 import java.io.InputStream;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.Detail;
 import javax.xml.soap.DetailEntry;
@@ -30,7 +31,9 @@ import javax.xml.soap.SOAPFactory;
 import javax.xml.soap.SOAPFault;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Provider;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
@@ -46,12 +49,16 @@ import org.apache.cxf.helpers.DOMUtils;
                       targetNamespace = "http://apache.org/hello_world_rpclit",
  wsdlLocation = "/wsdl/hello_world_rpc_lit.wsdl")
 public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
-
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+
+    @Resource 
+    WebServiceContext ctx;
+
     private Document sayHiResponse;
     private Document greetMeResponse;
     private MessageFactory factory;
+    
 
     public HWDOMSourcePayloadProvider() {
         try {
@@ -68,6 +75,11 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
     }
 
     public DOMSource invoke(DOMSource request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         DOMSource response = new DOMSource();
 
         Node n = request.getNode();
@@ -107,14 +119,5 @@ public class HWDOMSourcePayloadProvider implements Provider<DOMSource> {
         }
         return response;
     }
-/*    
-    private Node getElementChildNode(SOAPBody body) {
-        Node n = body.getFirstChild();
 
-        while (n.getNodeType() != Node.ELEMENT_NODE) {
-            n = n.getNextSibling();
-        }
-        
-        return n;        
-    }*/
 }

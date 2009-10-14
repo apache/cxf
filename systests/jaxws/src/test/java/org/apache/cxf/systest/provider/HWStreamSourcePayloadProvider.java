@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.transform.Transformer;
@@ -32,7 +33,9 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.DOMImplementation;
 import org.w3c.dom.Document;
@@ -54,6 +57,9 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
     
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+    @Resource 
+    WebServiceContext ctx;
+    
     private InputStream sayHiInputStream;
     private InputStream greetMeInputStream;
     private MessageFactory factory;
@@ -77,6 +83,11 @@ public class HWStreamSourcePayloadProvider implements Provider<StreamSource> {
     }
 
     public StreamSource invoke(StreamSource request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         StreamSource response = new StreamSource();
         try {
             DOMResult domResult = new DOMResult();

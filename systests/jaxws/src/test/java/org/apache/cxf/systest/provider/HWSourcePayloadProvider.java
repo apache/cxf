@@ -22,7 +22,9 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Writer;
 
+import javax.annotation.Resource;
 import javax.jws.HandlerChain;
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Source;
@@ -35,7 +37,9 @@ import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -54,12 +58,19 @@ import org.apache.cxf.staxutils.StaxUtils;
 @HandlerChain(file = "./handlers_invocation.xml", name = "TestHandlerChain")
 public class HWSourcePayloadProvider implements Provider<Source> {
     boolean doneStax;
-    
+    @Resource 
+    WebServiceContext ctx;
+
     public HWSourcePayloadProvider() {
     
     }
     
-    public Source invoke(Source request) {        
+    public Source invoke(Source request) {   
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
+        
         try {
             System.out.println(request.getClass().getName());
             String input = getSourceAsString(request);

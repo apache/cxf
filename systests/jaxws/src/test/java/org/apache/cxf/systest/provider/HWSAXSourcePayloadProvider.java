@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 
+import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.stream.XMLStreamWriter;
@@ -33,7 +34,9 @@ import javax.xml.transform.sax.SAXSource;
 import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
+import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.WebServiceProvider;
+import javax.xml.ws.handler.MessageContext;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -54,6 +57,11 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
     
     private static QName sayHi = new QName("http://apache.org/hello_world_rpclit", "sayHi");
     private static QName greetMe = new QName("http://apache.org/hello_world_rpclit", "greetMe");
+    
+    @Resource 
+    WebServiceContext ctx;
+
+    
     private MessageFactory factory;
     private InputSource sayHiInputSource;
     private InputSource greetMeInputSource;
@@ -76,6 +84,10 @@ public class HWSAXSourcePayloadProvider implements Provider<SAXSource> {
     }
 
     public SAXSource invoke(SAXSource request) {
+        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+        if (qn == null) {
+            throw new RuntimeException("No Operation Name");
+        }
         SAXSource response = new SAXSource();
         try {
             
