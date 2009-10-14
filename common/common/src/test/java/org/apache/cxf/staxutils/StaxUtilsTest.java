@@ -28,7 +28,9 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.xml.sax.InputSource;
 
@@ -111,6 +113,22 @@ public class StaxUtilsTest extends Assert {
         assertEquals(input, output);
     }
     
+    @Test
+    public void testCXF2468() throws Exception {
+        Document doc = XMLUtils.newDocument();
+        doc.appendChild(doc.createElementNS("http://blah.org/", "blah"));
+        Element foo = doc.createElementNS("http://blah.org/", "foo");
+        Attr attr = doc.createAttributeNS("http://www.w3.org/2001/XMLSchema-instance", "xsi:nil");
+        attr.setValue("true");
+        foo.setAttributeNodeNS(attr);
+        doc.getDocumentElement().appendChild(foo);
+        XMLStreamReader sreader = StaxUtils.createXMLStreamReader(doc);
+        StringWriter sw = new StringWriter();
+        XMLStreamWriter swriter = StaxUtils.createXMLStreamWriter(sw);
+        StaxUtils.copy(sreader, swriter, true);
+        swriter.flush();
+        assertTrue("No xsi namespace: " + sw.toString(), sw.toString().contains("XMLSchema-instance"));
+    }
     
     @Test
     public void testNonNamespaceAwareParser() throws Exception {

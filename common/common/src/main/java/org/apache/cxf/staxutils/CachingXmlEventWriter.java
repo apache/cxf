@@ -270,6 +270,9 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
 
         public Iterator getPrefixes(String namespaceURI) {
             String pfx = getPrefix(namespaceURI);
+            if (pfx == null) {
+                return Collections.emptyList().iterator();
+            }
             return Collections.singleton(pfx).iterator();
         }
         

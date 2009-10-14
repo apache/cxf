@@ -68,6 +68,7 @@ import org.xml.sax.XMLReader;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 
@@ -449,9 +450,16 @@ public final class StaxUtils {
 //        System.out.println("STAXUTILS:writeStartElement : node name : " + local +  " namespace URI" + uri);
         boolean writeElementNS = false;
         if (uri != null) {
-            String boundPrefix = writer.getPrefix(uri);
-            if (boundPrefix == null || !prefix.equals(boundPrefix)) {
-                writeElementNS = true;
+            writeElementNS = true;
+            Iterator<String> it = CastUtils.cast(writer.getNamespaceContext().getPrefixes(uri));
+            while (it != null && it.hasNext()) {
+                String s = it.next();
+                if (s == null) {
+                    s = "";
+                }
+                if (s.equals(prefix)) {
+                    writeElementNS = false;
+                }
             }
         }
 
@@ -509,6 +517,20 @@ public final class StaxUtils {
                 writer.writeAttribute(reader.getAttributeNamespace(i), reader.getAttributeLocalName(i),
                                       reader.getAttributeValue(i));
             } else {
+                Iterator<String> it = CastUtils.cast(writer.getNamespaceContext().getPrefixes(ns));
+                boolean writeNs = true;
+                while (it != null && it.hasNext()) {
+                    String s = it.next();
+                    if (s == null) {
+                        s = "";
+                    }
+                    if (s.equals(nsPrefix)) {
+                        writeNs = false;
+                    }
+                }
+                if (writeNs) {
+                    writer.writeNamespace(nsPrefix, ns);
+                }
                 writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader
                     .getAttributeLocalName(i), reader.getAttributeValue(i));
             }
