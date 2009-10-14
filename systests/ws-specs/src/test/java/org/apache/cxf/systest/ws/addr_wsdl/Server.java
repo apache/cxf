@@ -25,7 +25,6 @@ import java.util.Map;
 
 import javax.annotation.Resource;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
@@ -41,6 +40,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -93,9 +93,13 @@ public class Server extends AbstractBusTestServerBase {
 
         public Source invoke(Source obj) {
             //CHECK the incoming
-            DOMSource ds = (DOMSource)obj;
+            Element el;
+            try {
+                el = ((Document)XMLUtils.fromSource(obj)).getDocumentElement();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             
-            Element el = ((Document)ds.getNode()).getDocumentElement();
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);
@@ -120,9 +124,13 @@ public class Server extends AbstractBusTestServerBase {
         
         public Source invoke(Source obj) {
             //CHECK the incoming
-            DOMSource ds = (DOMSource)obj;
             
-            Element el = ((Document)ds.getNode()).getDocumentElement();
+            Element el;
+            try {
+                el = ((Document)XMLUtils.fromSource(obj)).getDocumentElement();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("ns", "http://apache.org/cxf/systest/ws/addr_feature/");
             XPathUtils xp = new XPathUtils(ns);

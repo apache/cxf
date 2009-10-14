@@ -217,9 +217,18 @@ public class StreamWriterContentHandler implements ContentHandler {
                         writer.writeAttribute(s,
                                               atts.getValue(i));
                     } else {
-                        writer.writeAttribute(atts.getURI(i),
-                                          atts.getQName(i),
-                                          atts.getValue(i));
+                        String pfx = atts.getQName(i);
+                        if (pfx.indexOf(':') != -1) {
+                            pfx = pfx.substring(0, pfx.indexOf(':'));
+                            writer.writeAttribute(pfx,
+                                                  atts.getURI(i),
+                                                  atts.getLocalName(i),
+                                                  atts.getValue(i));
+                        } else {
+                            writer.writeAttribute(atts.getURI(i),
+                                              atts.getLocalName(i),
+                                              atts.getValue(i));
+                        }
                     }
                 }
             }

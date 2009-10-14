@@ -72,7 +72,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             //generic Source, find the preferred type
             String s = (String)message.getContextualProperty(SourceDataBinding.PREFERRED_FORMAT);
             if (StringUtils.isEmpty(s)) {
-                s = "dom";  //for now, should probably be stax
+                s = "dom";
             }
             if ("dom".equalsIgnoreCase(s)) {
                 type = DOMSource.class;
@@ -155,7 +155,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             final InputStream ins = message.getContent(InputStream.class);
             message.removeContent(InputStream.class);
             
-            input = new FragmentStreamReader(input, false) {
+            input = new FragmentStreamReader(input) {
                 boolean closed;
                 public boolean hasNext() throws XMLStreamException {
                     boolean b = super.hasNext();

@@ -19,8 +19,8 @@
 
 package org.apache.cxf.systest.rest;
 
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.Map;
 import java.util.Properties;
@@ -75,12 +75,13 @@ public class RestClientServerHttpBindingTest extends AbstractBusClientServerTest
         InputStream is = getClass().getResourceAsStream("resources/CustomerJohnReq.xml");
         Source result = dispatcher.invoke(new StreamSource(is));
         String tempstring = source2String(result);
-        assertTrue("Result should start with Customer", tempstring.startsWith("<ns4:Customer"));
-        assertTrue("Result should have CustomerID", tempstring.lastIndexOf(">123456<") > 0);
+        assertTrue("Result should start with Customer: " + tempstring, 
+                   tempstring.startsWith("<ns4:Customer"));
+        assertTrue("Result should have CustomerID: " + tempstring, tempstring.lastIndexOf(">123456<") > 0);
     }
     
     private String source2String(Source source) throws Exception {
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        StringWriter bos = new StringWriter(1000);
         StreamResult sr = new StreamResult(bos);
         Transformer trans = TransformerFactory.newInstance().newTransformer();
         Properties oprops = new Properties();

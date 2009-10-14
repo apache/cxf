@@ -27,7 +27,6 @@ import java.util.logging.Logger;
 
 import javax.jws.WebService;
 import javax.xml.transform.Source;
-import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Provider;
@@ -36,11 +35,12 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -99,9 +99,17 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
     public static class GreeterProvider implements Provider<Source> {
 
         public Source invoke(Source obj) {
-            DOMSource ds = (DOMSource)obj;
+
+            Node el;
+            try {
+                el = XMLUtils.fromSource(obj);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+            if (el instanceof Document) {
+                el = ((Document)el).getDocumentElement();
+            }
             
-            Element el = ((Document)ds.getNode()).getDocumentElement();
             Map<String, String> ns = new HashMap<String, String>();
             ns.put("ns", "http://cxf.apache.org/greeter_control/types");
             XPathUtils xp = new XPathUtils(ns);

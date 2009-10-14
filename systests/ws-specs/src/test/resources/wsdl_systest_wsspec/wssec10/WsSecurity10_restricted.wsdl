@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Licensed to the Apache Software Foundation (ASF) under one
+ or more contributor license agreements. See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership. The ASF licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License. You may obtain a copy of the License at
+ 
+ http://www.apache.org/licenses/LICENSE-2.0
+ 
+ Unless required by applicable law or agreed to in writing,
+ software distributed under the License is distributed on an
+ "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ KIND, either express or implied. See the License for the
+ specific language governing permissions and limitations
+ under the License.
+-->
+<wsdl:definitions 
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+	xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+	xmlns:soapenc="http://schemas.xmlsoap.org/soap/encoding/" 
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata" 
+	xmlns:tns="http://WSSec/wssec10" 
+	xmlns:wsa="http://schemas.xmlsoap.org/ws/2004/08/addressing" 
+	xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+	xmlns:wssec10test="http://apache.cxf.org/" 
+	xmlns:wsap="http://schemas.xmlsoap.org/ws/2004/08/addressing/policy" 
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+	xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl" 
+	xmlns:soap12="http://schemas.xmlsoap.org/wsdl/soap12/" 
+	xmlns:wsa10="http://www.w3.org/2005/08/addressing" 
+	xmlns:wsx="http://schemas.xmlsoap.org/ws/2004/09/mex" 
+	name="PingService" 
+	targetNamespace="http://WSSec/wssec10">
+	<wsdl:import location="WsSecurity10_policy_restricted.wsdl" namespace="http://apache.cxf.org/"/>
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://WSSec/wssec10">
+		  	<xsd:element name="echo">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="0" name="request" nillable="true" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element>
+			<xsd:element name="echoResponse">
+				<xsd:complexType>
+					<xsd:sequence>
+						<xsd:element minOccurs="0" name="echoResult" nillable="true" type="xsd:string"/>
+					</xsd:sequence>
+				</xsd:complexType>
+			</xsd:element> 
+		</xsd:schema>
+	</wsdl:types>
+	
+	<wsdl:message name="IPingService_echo_InputMessage">
+		<wsdl:part name="parameters" element="tns:echo"/>
+	</wsdl:message>
+	<wsdl:message name="IPingService_echo_OutputMessage">
+		<wsdl:part name="parameters" element="tns:echoResponse"/>
+	</wsdl:message>
+	
+	<wsdl:portType name="IPingService">
+		
+		<wsdl:operation name="echo">
+			<wsdl:input wsaw:Action="http://WSSec/wssec10/echo" message="tns:IPingService_echo_InputMessage"/>
+			<wsdl:output wsaw:Action="http://WSSec/wssec10/echo" message="tns:IPingService_echo_OutputMessage"/>
+		</wsdl:operation>
+		
+	</wsdl:portType>
+	<wsdl:service name="PingService">
+		<wsdl:port name="UserNameOverTransport_IPingService" binding="wssec10test:UserNameOverTransport_IPingService">
+			<soap:address location="https://localhost:9001/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserNameOverTransport"/>
+		</wsdl:port>
+		<wsdl:port name="MutualCertificate10SignEncrypt_IPingService" binding="wssec10test:MutualCertificate10SignEncrypt_IPingService">
+			<soap:address location="http://localhost:9002/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/MutualCertificate10SignEncrypt"/>
+		</wsdl:port>
+		<wsdl:port name="MutualCertificate10SignEncryptRsa15TripleDes_IPingService" binding="wssec10test:MutualCertificate10SignEncryptRsa15TripleDes_IPingService">
+			<soap:address location="http://localhost/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/MutualCertificate10SignEncryptRsa15TripleDes"/>
+		</wsdl:port>
+		
+	</wsdl:service>
+</wsdl:definitions>
