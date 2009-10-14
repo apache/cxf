@@ -246,7 +246,9 @@ public class ServletController extends AbstractServletController {
                         + "</span>");
                 response.getWriter().write("<ul>");
                 for (OperationInfo oi : sd.getEndpointInfo().getInterface().getOperations()) {
-                    response.getWriter().write("<li>" + oi.getName().getLocalPart() + "</li>");
+                    if (oi.getProperty("operation.is.synthetic") != Boolean.TRUE) {
+                        response.getWriter().write("<li>" + oi.getName().getLocalPart() + "</li>");
+                    }
                 }
                 response.getWriter().write("</ul>");
                 response.getWriter().write("</td><td>");
