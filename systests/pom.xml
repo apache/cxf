@@ -38,6 +38,7 @@
         <module>databinding</module>
         <module>jaxrs</module>
         <module>ws-specs</module>
+        <module>wsdl_maven</module>
     </modules>
 
 </project>

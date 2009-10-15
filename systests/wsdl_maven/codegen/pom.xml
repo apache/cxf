@@ -20,17 +20,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
     <artifactId>cxf-systests-codegen</artifactId>
-    <version>2.2.4-SNAPSHOT</version>
+    <version>2.2.5-SNAPSHOT</version>
     <name>Test for reading wsdl from repo and generating code from it</name>
+    <parent>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-parent</artifactId>
+        <version>2.2.5-SNAPSHOT</version>
+        <relativePath>../../../parent/pom.xml</relativePath>
+    </parent>
     <build>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
@@ -43,10 +42,10 @@
                             <wsdlOptions>
                                 <wsdlOption>
                                     <wsdlArtifact>
-                                        <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
-                                        <artifactId>cxf-systests-java2ws</artifactId>
-                                        <version>${project.version}</version>
-                                    </wsdlArtifact>
+				                        <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
+				                        <artifactId>cxf-systests-java2ws</artifactId>
+				                        <version>${project.version}</version>
+			                        </wsdlArtifact>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
