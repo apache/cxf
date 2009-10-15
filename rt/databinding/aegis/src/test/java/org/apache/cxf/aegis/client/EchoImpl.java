@@ -22,7 +22,7 @@ import javax.xml.ws.Holder;
 
 public class EchoImpl implements Echo {
     public String echo(String text, Holder<String> textAgain) {
-        textAgain.value = "header2";
+        textAgain.value = text;
         return text;
     }
 
