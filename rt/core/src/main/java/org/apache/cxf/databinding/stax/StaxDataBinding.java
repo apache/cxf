@@ -120,7 +120,9 @@ public class StaxDataBinding extends AbstractDataBinding {
         public void write(Object obj, XMLStreamWriter writer) {
             try {
                 if (obj instanceof XMLStreamReader) {
-                    StaxUtils.copy((XMLStreamReader) obj, writer);
+                    XMLStreamReader xmlStreamReader = (XMLStreamReader) obj;
+                    StaxUtils.copy(xmlStreamReader, writer);
+                    xmlStreamReader.close();
                 } else if (obj instanceof XMLStreamWriterCallback) {
                     ((XMLStreamWriterCallback) obj).write(writer);
                 } else {
