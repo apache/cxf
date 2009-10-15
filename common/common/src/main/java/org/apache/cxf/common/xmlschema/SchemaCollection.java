@@ -20,7 +20,6 @@
 package org.apache.cxf.common.xmlschema;
 
 import java.io.Reader;
-import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -59,21 +58,9 @@ import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 import org.apache.ws.commons.schema.utils.TargetNamespaceValidator;
 
 /**
- * Wrapper class for XmlSchemaCollection that deals with various quirks and bugs. One bug is WSCOMMONS-272.
+ * Wrapper class for XmlSchemaCollection that deals with various quirks and bugs.
  */
 public class SchemaCollection {
-    private static final Method GET_ELEMENT_BY_NAME_METHOD;
-    static {
-        Method m = null;
-        try {
-            m = XmlSchema.class.getMethod("getElementByName", new Class[] {
-                String.class
-            });
-        } catch (Exception ex) {
-            // ignore
-        }
-        GET_ELEMENT_BY_NAME_METHOD = m;
-    }
 
     private XmlSchemaCollection schemaCollection;
     private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema 
@@ -234,24 +221,10 @@ public class SchemaCollection {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (name.getNamespaceURI().equals(schema.getTargetNamespace())) {
 
-                // for XmlSchema 1.4, we should use:
-                // schema.getElementByName(name.getLocalPart()) != null
-                // but that doesn't exist in 1.3 so for now, use reflection
-                try {
-                    if (GET_ELEMENT_BY_NAME_METHOD != null) {
-                        if (GET_ELEMENT_BY_NAME_METHOD.invoke(schema, new Object[] {
-                            name.getLocalPart()
-                        }) != null) {
-                            return schema;
-                        }
-                    } else if (schema.getElementByName(name) != null) {
-                        return schema;
-                    }
-
-                } catch (java.lang.reflect.InvocationTargetException ex) {
-                    // ignore
-                } catch (IllegalAccessException ex) {
-                    // ignore
+                if (schema.getElementByName(name.getLocalPart()) != null) {
+                    return schema;
+                } else if (schema.getElementByName(name) != null) {
+                    return schema;
                 }
             }
         }
