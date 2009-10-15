@@ -324,6 +324,10 @@ public class SpringBeansTest extends Assert {
         assertTrue(sbc.getVersion() instanceof Soap12);
         assertTrue("the soap configure should set isMtomEnabled to be true",
                    sbc.isMtomEnabled());
+        
+        Greeter g1 = greeters.getGreet1();
+        Greeter g2 = greeters.getGreet2();
+        assertNotSame(g1, g2);
     }
 
 }

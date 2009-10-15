@@ -24,9 +24,12 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.springframework.beans.factory.FactoryBean;
+import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionReaderUtils;
 import org.springframework.beans.factory.xml.ParserContext;
 
 /**
@@ -86,17 +89,34 @@ public abstract class AbstractFactoryBeanDefinitionParser extends AbstractBeanDe
         }
         
         String id = getIdOrName(element);
+        BeanDefinition container = ctx.getContainingBeanDefinition();
+        boolean noFactory = false;
+        if (StringUtils.isEmpty(id)) {
+            if (container == null) {
+                id = BeanDefinitionReaderUtils.generateBeanName(bean.getBeanDefinition(),
+                                                                ctx.getRegistry(),
+                                                                false);
+            } else {
+                id = BeanDefinitionReaderUtils.generateBeanName(bean.getBeanDefinition(),
+                                                                ctx.getRegistry(),
+                                                                true);
+                noFactory = true;
+                //inner bean, no need for the factory to be public at all
+            }
+        }
         if (createdFromAPI) {
             id = id + getSuffix();
         }
         
         if (FactoryBean.class.isAssignableFrom(getFactoryClass())) {
-            AbstractBeanDefinition def = factoryBean.getRawBeanDefinition().cloneBeanDefinition();
-            def.setBeanClass(getRawFactoryClass());
-            def.setAbstract(factoriesAreAbstract);
-            def.setLazyInit(true);
-            ctx.getRegistry().registerBeanDefinition(id + getFactoryIdSuffix(),
-                                                     def);
+            if (!noFactory) {
+                AbstractBeanDefinition def = factoryBean.getRawBeanDefinition().cloneBeanDefinition();
+                def.setBeanClass(getRawFactoryClass());
+                def.setAbstract(factoriesAreAbstract);
+                def.setLazyInit(true);
+                ctx.getRegistry().registerBeanDefinition(id + getFactoryIdSuffix(),
+                                                         def);
+            }
             bean.getBeanDefinition().setAttribute("id", id);
         } else {
             String factoryId = id + getFactoryIdSuffix();
