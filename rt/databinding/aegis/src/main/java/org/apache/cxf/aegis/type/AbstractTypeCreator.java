@@ -153,11 +153,16 @@ public abstract class AbstractTypeCreator implements TypeCreator {
             throw new UnsupportedOperationException("To use holder types "
                     + "you must have an XML descriptor declaring the component type.");
         }
-
-        Class heldCls = (Class) info.getGenericType();
-        info.setTypeClass(heldCls);
-
-        return createType(heldCls);
+        Object o = info.getGenericType();
+        if (o instanceof Class) { 
+            Class heldCls = (Class)o;
+            info.setTypeClass(heldCls);
+            return createType(heldCls);
+        }
+        ParameterizedType pt = (ParameterizedType) info.getGenericType();
+        Class c = (Class)pt.getActualTypeArguments()[0]; 
+        info.setTypeClass(c);
+        return createType(c);
     }
 
 
