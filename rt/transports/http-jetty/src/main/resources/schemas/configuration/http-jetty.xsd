@@ -130,6 +130,15 @@
                 set to 0 are used as the configuration for all Jetty listeners that are not explicitly configured.</xs:documentation>
              </xs:annotation>
        </xs:attribute>
+       <xs:attribute name="host" type="xs:string">
+             <xs:annotation>
+                <xs:documentation>
+                  Specifies the listen address used by the Jetty instance.
+                  Value can be a hostname or ip address.
+                  If not specified, Jetty will listen on all local addresses.
+                </xs:documentation>
+             </xs:annotation>
+       </xs:attribute>
        <xs:attribute name="continuationsEnabled" type="xs:boolean">
            <xs:annotation>
                 <xs:documentation>Specifies if Jetty Continuations will be explicitly supported

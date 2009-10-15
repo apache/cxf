@@ -35,17 +35,29 @@ public final class JettySslConnectorFactory implements JettyConnectorFactory {
     public JettySslConnectorFactory(TLSServerParameters params) {
         tlsServerParameters = params;
     }
-    
     /**
-     * Create a TLS/SSL Connector.
+     * Create a Listener.
      * 
-     * @param port The network port on which to listen.
+     * @param port the listen port
      */
     public AbstractConnector createConnector(int port) {
+        return createConnector(null, port);
+    }
+
+    /**
+     * Create a Listener.
+     * 
+     * @param host the host to bind to.  IP address or hostname is allowed. null to bind to all hosts.
+     * @param port the listen port
+     */
+    public AbstractConnector createConnector(String host, int port) {
         assert tlsServerParameters != null;
         
         CXFJettySslSocketConnector secureConnector = 
             new CXFJettySslSocketConnector();
+        if (host != null) {
+            secureConnector.setHost(host);
+        }
         secureConnector.setPort(port);
         decorateCXFJettySslSocketConnector(secureConnector);
         return secureConnector;

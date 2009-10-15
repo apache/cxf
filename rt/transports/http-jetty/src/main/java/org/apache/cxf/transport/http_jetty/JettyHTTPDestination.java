@@ -112,9 +112,9 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             serverEngineFactory.retrieveJettyHTTPServerEngine(nurl.getPort());
         if (engine == null) {
             engine = serverEngineFactory.
-                createJettyHTTPServerEngine(nurl.getPort(), nurl.getProtocol());
+                createJettyHTTPServerEngine(nurl.getHost(), nurl.getPort(), nurl.getProtocol());
         }
-        
+
         assert engine != null;
         
         // When configuring for "http", however, it is still possible that

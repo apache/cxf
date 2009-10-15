@@ -58,7 +58,12 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         
         String portStr = element.getAttribute("port");
         bean.addPropertyValue("port", portStr);
-               
+        
+        String hostStr = element.getAttribute("host");
+        if (hostStr != null && !"".equals(hostStr.trim())) {
+            bean.addPropertyValue("host", hostStr);
+        }
+
         String continuationsStr = element.getAttribute("continuationsEnabled");
         if (continuationsStr != null && continuationsStr.length() > 0) {
             bean.addPropertyValue("continuationsEnabled", continuationsStr);
@@ -152,8 +157,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         public SpringJettyHTTPServerEngine(
             JettyHTTPServerEngineFactory fac, 
             Bus bus,
+            String host,
             int port) {
-            super(fac, bus, port);
+            super(fac, bus, host, port);
         }
         
         public SpringJettyHTTPServerEngine() {

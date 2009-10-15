@@ -165,12 +165,15 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      * This call sets TLSServerParameters for a JettyHTTPServerEngine
      * that will be subsequently created. It will not alter an engine
      * that has already been created for that network port.
+     * @param host       if not null, server will listen on this address/host, 
+     *                   otherwise, server will listen on all local addresses.
      * @param port       The network port number to bind to the engine.
      * @param tlsParams  The tls server parameters. Cannot be null.
      * @throws IOException 
      * @throws GeneralSecurityException 
      */
     public void setTLSServerParametersForPort(
+        String host,
         int port, 
         TLSServerParameters tlsParams) throws GeneralSecurityException, IOException {
         if (tlsParams == null) {
@@ -178,7 +181,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         }
         JettyHTTPServerEngine ref = retrieveJettyHTTPServerEngine(port);
         if (null == ref) {
-            ref = new JettyHTTPServerEngine(this, bus, port);
+            ref = new JettyHTTPServerEngine(this, bus, host, port);
             ref.setTlsServerParameters(tlsParams);
             portMap.put(port, ref);
             ref.finalizeConfig();
@@ -189,8 +192,16 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             ref.setTlsServerParameters(tlsParams);            
         }
     }
-            
-    
+
+    /**
+     * calls thru to {{@link #createJettyHTTPServerEngine(String, int, String)} with 'null' for host value
+     */
+    public void setTLSServerParametersForPort(
+        int port, 
+        TLSServerParameters tlsParams) throws GeneralSecurityException, IOException {
+        setTLSServerParametersForPort(null, port, tlsParams);
+    }
+
     /**
      * This call retrieves a previously configured JettyHTTPServerEngine for the
      * given port. If none exists, this call returns null.
@@ -208,13 +219,21 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      * is already in use, a BindIOException will be thrown. If the 
      * engine is being Spring configured for TLS a GeneralSecurityException
      * may be thrown.
+     * 
+     * @param host if not null, server will listen on this host/address, otherwise
+     *        server will listen on all local addresses.
+     * @param port listen port for server
+     * @param protocol "http" or "https"
+     * @return
+     * @throws GeneralSecurityException
+     * @throws IOException
      */
-    public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(int port, String protocol)
-        throws GeneralSecurityException, IOException {
+    public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(String host, int port, 
+        String protocol) throws GeneralSecurityException, IOException {
         LOG.fine("Creating Jetty HTTP Server Engine for port " + port + ".");        
         JettyHTTPServerEngine ref = retrieveJettyHTTPServerEngine(port);
         if (null == ref) {
-            ref = new JettyHTTPServerEngine(this, bus, port);            
+            ref = new JettyHTTPServerEngine(this, bus, host, port);            
             portMap.put(port, ref);
             ref.finalizeConfig();
         } 
@@ -240,6 +259,13 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         return ref;
     }
 
+    /**
+     * Calls thru to {{@link #createJettyHTTPServerEngine(String, int, String)} with a 'null' host value
+     */
+    public synchronized JettyHTTPServerEngine createJettyHTTPServerEngine(int port, 
+        String protocol) throws GeneralSecurityException, IOException {
+        return createJettyHTTPServerEngine(null, port, protocol);
+    }
     
     /**
      * This method removes the Server Engine from the port map and stops it.

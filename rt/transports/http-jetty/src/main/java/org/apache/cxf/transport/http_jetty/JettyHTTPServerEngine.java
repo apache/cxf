@@ -84,6 +84,11 @@ public class JettyHTTPServerEngine
     private int port;
     
     /**
+     * This is the network address for which this engine is allocated.
+     */
+    private String host;
+
+    /**
      * This field holds the protocol for which this engine is 
      * enabled, i.e. "http" or "https".
      */
@@ -124,9 +129,11 @@ public class JettyHTTPServerEngine
     public JettyHTTPServerEngine(
         JettyHTTPServerEngineFactory fac, 
         Bus bus,
+        String host,
         int port) {
         this.bus     = bus;
         this.factory = fac;
+        this.host    = host;
         this.port    = port;
     }
     
@@ -140,6 +147,10 @@ public class JettyHTTPServerEngine
     
     public void setPort(int p) {
         port = p;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
     }
     
     public void setContinuationsEnabled(boolean enabled) {
@@ -179,6 +190,13 @@ public class JettyHTTPServerEngine
         return port;
     }
     
+    /**
+     * Returns the host for which this server engine was configured.
+     * @return
+     */
+    public String getHost() {
+        return host;
+    }
     
     /**
      * This method will shut down the server engine and
@@ -279,7 +297,14 @@ public class JettyHTTPServerEngine
             // create a new jetty server instance if there is no server there            
             server = new Server();
             if (connector == null) {
-                connector = connectorFactory.createConnector(port);
+                connector = connectorFactory.createConnector(getHost(), getPort());
+                if (LOG.isLoggable(Level.FINER)) {
+                    LOG.finer("connector.host: " 
+                              + connector.getHost() == null 
+                                ? "null" 
+                                : "\"" + connector.getHost() + "\"");
+                    LOG.finer("connector.port: " + connector.getPort());
+                }
             } 
             server.addConnector(connector);            
             if (handlers != null && handlers.size() > 0) {
@@ -503,16 +528,22 @@ public class JettyHTTPServerEngine
      * then it creates a TLS enabled one.
      */
     protected JettyConnectorFactory getHTTPConnectorFactory() {
-        return new JettyConnectorFactory() {                     
+        return new JettyConnectorFactory() {
             public AbstractConnector createConnector(int porto) {
+                return createConnector(null, porto);
+            }
+            public AbstractConnector createConnector(String hosto, int porto) {
                 // now we just use the SelectChannelConnector as the default connector
                 SelectChannelConnector result = 
                     new SelectChannelConnector();
                 
                 // Regardless the port has to equal the one
                 // we are configured for.
-                assert porto == port;                
-                
+                assert porto == port;
+                assert hosto == host;
+                if (hosto != null) {
+                    result.setHost(hosto);
+                }
                 result.setPort(porto);
                 return result;
             }
