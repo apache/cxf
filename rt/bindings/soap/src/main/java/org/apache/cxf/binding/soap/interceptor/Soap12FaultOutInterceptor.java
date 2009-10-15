@@ -20,9 +20,9 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Element;
@@ -31,7 +31,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultOutInterceptor.Soap11FaultOutInterceptorInternal;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -130,8 +129,9 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
     
                 // Fault
                 writer.writeEndElement();
-            } catch (XMLStreamException xe) {
-                throw new Fault(new Message("XML_WRITE_EXC", LOG), xe);
+            } catch (Exception xe) {
+                LOG.log(Level.WARNING, "XML_WRITE_EXC", xe);
+                throw f;
             }
         }
         

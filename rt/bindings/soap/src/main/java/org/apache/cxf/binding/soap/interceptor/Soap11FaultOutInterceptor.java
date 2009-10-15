@@ -20,11 +20,11 @@
 package org.apache.cxf.binding.soap.interceptor;
 
 import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
@@ -34,14 +34,13 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
-import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 
 public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
-    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(Soap11FaultOutInterceptor.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(Soap11FaultOutInterceptor.class);
 
     public Soap11FaultOutInterceptor() {
         super(Phase.PREPARE_SEND);
@@ -145,8 +144,9 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
     
                 // Fault
                 writer.writeEndElement();
-            } catch (XMLStreamException xe) {
-                throw new Fault(new Message("XML_WRITE_EXC", BUNDLE), xe);
+            } catch (Exception xe) {
+                LOG.log(Level.WARNING, "XML_WRITE_EXC", xe);
+                throw f;
             }
         }
     }
