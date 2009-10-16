@@ -208,16 +208,17 @@ public class JaxWsClientProxy extends org.apache.cxf.frontend.ClientProxy implem
             soapFault.setFaultCode(((SoapFault)ex).getFaultCode());
             soapFault.setFaultActor(((SoapFault)ex).getRole());
 
-            Node nd = soapFault.getOwnerDocument().importNode(((SoapFault)ex).getOrCreateDetail(),
-                                                              true);
-            nd = nd.getFirstChild();
-            soapFault.addDetail();
-            while (nd != null) {
-                Node next = nd.getNextSibling();
-                soapFault.getDetail().appendChild(nd);
-                nd = next;
+            if (((SoapFault)ex).hasDetails()) {
+                Node nd = soapFault.getOwnerDocument().importNode(((SoapFault)ex).getDetail(),
+                                                                  true);
+                nd = nd.getFirstChild();
+                soapFault.addDetail();
+                while (nd != null) {
+                    Node next = nd.getNextSibling();
+                    soapFault.getDetail().appendChild(nd);
+                    nd = next;
+                }
             }
-
         } else {
             String msg = ex.getMessage();
             if (msg != null) {

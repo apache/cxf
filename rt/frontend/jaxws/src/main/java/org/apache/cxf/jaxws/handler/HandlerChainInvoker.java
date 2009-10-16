@@ -414,7 +414,9 @@ public class HandlerChainInvoker {
                                       sfe,
                                       sfe.getFault().getFaultCodeAsQName());
         sf.setRole(sfe.getFault().getFaultActor());
-        sf.setDetail(sfe.getFault().getDetail());
+        if (sfe.getFault().hasDetail()) {
+            sf.setDetail(sfe.getFault().getDetail());
+        }
         
         return sf;        
     }
@@ -447,15 +449,29 @@ public class HandlerChainInvoker {
                 soapFault.setFaultString(sf.getFault().getFaultString());
                 soapFault.setFaultCode(sf.getFault().getFaultCode());
                 soapFault.setFaultActor(sf.getFault().getFaultActor());
-                Node nd = soapMessage.getSOAPPart().importNode(sf.getFault().getDetail().getFirstChild(),
-                                                               true);
-                soapFault.addDetail().appendChild(nd);
+                if (sf.getFault().hasDetail()) {
+                    Node nd = soapMessage.getSOAPPart().importNode(sf.getFault().getDetail(),
+                                                                   true);
+                    nd = nd.getFirstChild();
+                    soapFault.addDetail();
+                    while (nd != null) {
+                        soapFault.getDetail().appendChild(nd);
+                        nd = nd.getNextSibling();
+                    }
+                }
             } else if (exception instanceof Fault) {
                 SoapFault sf = SoapFault.createFault((Fault)exception, ((SoapMessage)msg).getVersion());
                 soapFault.setFaultString(sf.getReason());
                 soapFault.setFaultCode(sf.getFaultCode());
-                Node nd = soapMessage.getSOAPPart().importNode(sf.getOrCreateDetail(), true);
-                soapFault.addDetail().appendChild(nd);
+                if (sf.hasDetails()) {
+                    soapFault.addDetail();
+                    Node nd = soapMessage.getSOAPPart().importNode(sf.getDetail(), true);
+                    nd = nd.getFirstChild();
+                    while (nd != null) {
+                        soapFault.getDetail().appendChild(nd);
+                        nd = nd.getNextSibling();
+                    }
+                }
             } else {
                 soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandlerFault"));
                 soapFault.setFaultString(exception.getMessage());

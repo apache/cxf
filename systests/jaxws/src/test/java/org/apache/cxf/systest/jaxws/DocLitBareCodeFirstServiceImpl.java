@@ -45,6 +45,8 @@ public class DocLitBareCodeFirstServiceImpl implements DocLitBareCodeFirstServic
             } catch (SOAPException ex) {
                 throw new WebServiceException(ex);
             }
+        } else if ("emptyfault".equals(gmr.getName())) {
+            throw new RuntimeException("Empty!");
         }
         
         GreetMeResponse resp = new GreetMeResponse();

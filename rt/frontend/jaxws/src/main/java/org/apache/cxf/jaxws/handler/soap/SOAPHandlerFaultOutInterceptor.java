@@ -142,8 +142,15 @@ public class SOAPHandlerFaultOutInterceptor extends
                         .getVersion());
                     soapFault.setFaultString(sf.getReason());
                     soapFault.setFaultCode(sf.getFaultCode());
-                    Node nd = originalMsg.getSOAPPart().importNode(sf.getOrCreateDetail(), true);
-                    soapFault.addDetail().appendChild(nd);
+                    if (sf.hasDetails()) {
+                        soapFault.addDetail();
+                        Node nd = originalMsg.getSOAPPart().importNode(sf.getDetail(), true);
+                        nd = nd.getFirstChild();
+                        while (nd != null) {
+                            soapFault.getDetail().appendChild(nd);
+                            nd = nd.getNextSibling();
+                        }
+                    }
                 } else {
                     soapFault.setFaultString(exception.getMessage());
                     soapFault.setFaultCode(new QName("http://cxf.apache.org/faultcode", "HandleFault"));

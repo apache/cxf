@@ -74,14 +74,28 @@ public class FaultOutInterceptor extends AbstractPhaseInterceptor<Message> {
             try {
                 if (isDOMSupported(db)) {
                     DataWriter<Node> writer = db.createWriter(Node.class);
-    
-                    writer.write(bean, part, f.getOrCreateDetail());
+
+                    if (f.hasDetails()) {
+                        writer.write(bean, part, f.getDetail());
+                    } else {
+                        writer.write(bean, part, f.getOrCreateDetail());
+                        if (!f.getDetail().hasChildNodes()) {
+                            f.setDetail(null);
+                        }
+                    }
                 } else {
-                    XMLStreamWriter xsw = new W3CDOMStreamWriter(f.getOrCreateDetail());
-    
-                    DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
-    
-                    writer.write(bean, part, xsw);
+                    if (f.hasDetails()) {
+                        XMLStreamWriter xsw = new W3CDOMStreamWriter(f.getDetail());
+                        DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
+                        writer.write(bean, part, xsw);
+                    } else {
+                        XMLStreamWriter xsw = new W3CDOMStreamWriter(f.getOrCreateDetail());
+                        DataWriter<XMLStreamWriter> writer = db.createWriter(XMLStreamWriter.class);
+                        writer.write(bean, part, xsw);
+                        if (!f.getDetail().hasChildNodes()) {
+                            f.setDetail(null);
+                        }
+                    }
                 }
     
                 f.setMessage(ex.getMessage());
