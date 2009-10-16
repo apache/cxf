@@ -31,6 +31,8 @@ import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -106,6 +108,7 @@ public final class JAXBUtils {
     private static final Map<String, String> BUILTIN_DATATYPES_MAP;
     private static final Map<String, Class<?>> HOLDER_TYPES_MAP;
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBUtils.class, "CommonUtilityMessages");
+    private static ClassLoader jaxbXjcLoader;
 
     static {
         BUILTIN_DATATYPES_MAP = new HashMap<String, String>();        
@@ -501,6 +504,35 @@ public final class JAXBUtils {
         return cls;
     }
 
+    private static synchronized ClassLoader getXJCClassLoader() {
+        if (jaxbXjcLoader == null) {
+            try {
+                Class.forName("com.sun.tools.internal.xjc.api.XJC");
+                jaxbXjcLoader = ClassLoader.getSystemClassLoader();
+            } catch (Exception t2) {
+                //couldn't find either, probably cause tools.jar isn't on 
+                //the classpath.   Let's see if we can find the tools jar
+                String s = System.getProperty("java.home");
+                if (!StringUtils.isEmpty(s)) {
+                    File home = new File(s);
+                    File jar = new File(home, "lib/tools.jar");
+                    if (!jar.exists()) {
+                        jar = new File(home, "../lib/tools.jar");
+                    }
+                    if (jar.exists()) {
+                        try {
+                            jaxbXjcLoader = new URLClassLoader(new URL[] {jar.toURI().toURL()});
+                            Class.forName("com.sun.tools.internal.xjc.api.XJC", false, jaxbXjcLoader);
+                        } catch (Exception e) {
+                            jaxbXjcLoader = null;
+                        }
+                    }
+                }
+            } 
+        }
+        return jaxbXjcLoader;
+    }
+    
     public static JAXBContext createRIContext(Class<?> clss[], String defaultNS) throws JAXBException {
         try {
             Class<?> cls;
@@ -512,7 +544,7 @@ public final class JAXBUtils {
                 }
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
-                cls = Class.forName("com.sun.xml.internal.bind.v2.ContextFactory");
+                cls = Class.forName("com.sun.xml.internal.bind.v2.ContextFactory", true, getXJCClassLoader());
                 if (defaultNS != null) {
                     map.put("com.sun.xml.internal.bind.defaultNamespaceRemap", defaultNS);
                 }
@@ -557,10 +589,10 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
-                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext");
+                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
                 pkg = "com.sun.xml.internal.bind.";
             }
-            Class<?> refClass = Class.forName(pkg + "api.TypeReference");
+            Class<?> refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             Object ref = refClass.getConstructor(QName.class, 
                                                  Type.class, 
                                                  anns.getClass()).newInstance(qname, refcls, anns);
@@ -613,8 +645,7 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.tools.xjc.api.XJC");
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             } catch (Throwable e) {
-                // TODO Auto-generated catch block
-                cls = Class.forName("com.sun.tools.internal.xjc.api.XJC");
+                cls = Class.forName("com.sun.tools.internal.xjc.api.XJC", true, getXJCClassLoader());
                 sc = cls.getMethod("createSchemaCompiler").invoke(null);
             }
             
@@ -632,7 +663,8 @@ public final class JAXBUtils {
                 cls = Class.forName("com.sun.codemodel.writer.FileCodeWriter");
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
-                cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter");
+                cls = Class.forName("com.sun.codemodel.internal.writer.FileCodeWriter",
+                                    true, getXJCClassLoader());
             }
             return cls.getConstructor(File.class).newInstance(f);
         } catch (Exception ex) {
@@ -976,7 +1008,21 @@ public final class JAXBUtils {
         cw.visitEnd();
 
         byte bts[] = cw.toByteArray();
+        
+        
+        Class<?> cls;
+        try {
+            cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
+        } catch (ClassNotFoundException e) {
+            // TODO Auto-generated catch block
+            try {
+                cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
+            } catch (ClassNotFoundException e1) {
+                cls = JAXBUtils.class;
+            }
+        }
+        
         return helper.loadClass(className,
-                                JAXBUtils.class, bts);
+                                cls, bts);
     }
 }
