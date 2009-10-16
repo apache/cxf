@@ -28,7 +28,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class ClientHolderBean {
 
-    @Autowired(required = true)
+    @Autowired
     Collection<org.apache.hello_world_soap_http.Greeter> greeters;
     
     org.apache.hello_world_soap_http.Greeter greet1;
