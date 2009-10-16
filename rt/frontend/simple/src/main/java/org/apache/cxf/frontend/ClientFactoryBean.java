@@ -62,8 +62,7 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     protected Client createClient(Endpoint ep) {
-        Client client = new ClientImpl(getBus(), ep, getConduitSelector());
-        return client;
+        return new ClientImpl(getBus(), ep, getConduitSelector());
     }
 
     protected void applyFeatures(Client client) {
