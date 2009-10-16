@@ -29,7 +29,9 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.WebServiceException;
 
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -215,6 +217,34 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
     }
 
+    @Test
+    public void testClientProxyFactory() {
+        JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean(); 
+        cf.setAddress("http://localhost:9000/test");
+        cf.setServiceClass(Greeter.class);
+        Greeter greeter = (Greeter) cf.create();
+        Greeter greeter2 = (Greeter) cf.create();
+        Greeter greeter3 = (Greeter) cf.create();
+        
+        Client c = ClientProxy.getClient(greeter);
+        Client c2 = ClientProxy.getClient(greeter2);
+        Client c3 = ClientProxy.getClient(greeter3);
+        assertNotSame(c, c2);
+        assertNotSame(c, c3);
+        assertNotSame(c3, c2);
+        assertNotSame(c.getEndpoint(), c2.getEndpoint());
+        assertNotSame(c.getEndpoint(), c3.getEndpoint());
+        assertNotSame(c3.getEndpoint(), c2.getEndpoint());
+        
+        ((BindingProvider)greeter).getRequestContext().put("test", "manny"); 
+        ((BindingProvider)greeter2).getRequestContext().put("test", "moe"); 
+        ((BindingProvider)greeter3).getRequestContext().put("test", "jack");
+        
+        assertEquals("manny", ((BindingProvider)greeter).getRequestContext().get("test"));
+        assertEquals("moe", ((BindingProvider)greeter2).getRequestContext().get("test"));
+        assertEquals("jack", ((BindingProvider)greeter3).getRequestContext().get("test"));
+    }
+    
     
     public static class FaultThrower extends AbstractPhaseInterceptor<Message> {
         

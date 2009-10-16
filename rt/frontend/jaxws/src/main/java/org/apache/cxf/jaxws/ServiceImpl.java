@@ -69,6 +69,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
@@ -451,7 +452,7 @@ public class ServiceImpl extends ServiceDelegate {
         configureObject(service);
                 
         // Configure the JaxWsEndpoitnImpl
-        JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) clientFac.getClient().getEndpoint();
+        JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) ClientProxy.getClient(obj).getEndpoint();
         configureObject(jaxwsEndpoint);  
         List<Handler> hc = jaxwsEndpoint.getJaxwsBinding().getHandlerChain();
         
