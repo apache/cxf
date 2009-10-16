@@ -61,6 +61,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.ReflectionInvokationHandler.WrapReturn;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.JavaUtils;
 
 import org.objectweb.asm.ClassWriter;
