@@ -109,7 +109,14 @@ public class WebFaultOutInterceptor extends FaultOutInterceptor {
                 OperationInfo op = message.getExchange().get(BindingOperationInfo.class).getOperationInfo();
                 QName faultName = getFaultName(fault, cause.getClass(), op);
                 MessagePartInfo part = getFaultMessagePart(faultName, op);
-                writer.write(faultInfo, part, f.getOrCreateDetail());
+                if (f.hasDetails()) {
+                    writer.write(faultInfo, part, f.getDetail());
+                } else {
+                    writer.write(faultInfo, part, f.getOrCreateDetail());
+                    if (!f.getDetail().hasChildNodes()) {
+                        f.setDetail(null);
+                    }
+                }
     
                 f.setMessage(ex.getMessage());
             } catch (Exception nex) {

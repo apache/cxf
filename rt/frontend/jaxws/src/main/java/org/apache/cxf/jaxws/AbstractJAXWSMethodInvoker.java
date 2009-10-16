@@ -76,7 +76,9 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
                                             ex,
                                             sfe.getFault().getFaultCodeAsQName());
             fault.setRole(sfe.getFault().getFaultActor());
-            fault.setDetail(sfe.getFault().getDetail());
+            if (sfe.getFault().hasDetail()) {
+                fault.setDetail(sfe.getFault().getDetail());
+            }
             
             return fault;
         }
