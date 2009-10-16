@@ -55,7 +55,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     public void before() throws Exception {
         setupRhino("dlw-service-endpoint", 
                    "/org/apache/cxf/javascript/DocLitWrappedTests.js", 
-                   false);
+                   true);
     }
     
     @Override
