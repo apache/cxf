@@ -37,6 +37,8 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
@@ -224,6 +226,37 @@ public class SpringBeansTest extends Assert {
         assertTrue(saaj);
     }
 
+    @Test
+    public void testChildContext() throws Exception {
+        //Test for CXF-2283 - if a Child context is closed,
+        //we shouldn't be shutting down
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/servers.xml"});
+        
+        final Bus b = (Bus)ctx.getBean("cxf");
+        BusLifeCycleManager lifeCycleManager = b.getExtension(BusLifeCycleManager.class);
+        BusLifeCycleListener listener = new BusLifeCycleListener() {
+            public void initComplete() {
+            }
+
+            public void postShutdown() {
+                b.setProperty("post.was.called", Boolean.TRUE);
+            }
+
+            public void preShutdown() {
+                b.setProperty("pre.was.called", Boolean.TRUE);
+            }
+        };
+        lifeCycleManager.registerLifeCycleListener(listener);
+        ClassPathXmlApplicationContext ctx2 =
+                new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/child.xml"},
+                                                   ctx);
+        
+        ctx2.close();
+        
+        assertNull(b.getProperty("post.was.called"));
+        assertNull(b.getProperty("pre.was.called"));
+    }
     @Test
     public void testServers() throws Exception {
         ClassPathXmlApplicationContext ctx =
