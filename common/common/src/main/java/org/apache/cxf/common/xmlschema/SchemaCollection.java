@@ -86,7 +86,6 @@ public class SchemaCollection {
 
     public SchemaCollection(XmlSchemaCollection col) {
         schemaCollection = col;
-        col.getExtReg().setDefaultExtensionDeserializer(new FixedExtensionDeserializer());
         if (schemaCollection.getNamespaceContext() == null) {
             // an empty prefix map avoids extra checks for null.
             schemaCollection.setNamespaceContext(new NamespaceMap());
