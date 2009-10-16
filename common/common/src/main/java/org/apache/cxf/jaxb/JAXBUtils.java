@@ -584,15 +584,17 @@ public final class JAXBUtils {
                                       Annotation anns[]) throws JAXBException {
         try {
             Class<?> cls;
+            Class<?> refClass;
             String pkg = "com.sun.xml.bind.";
             try {
                 cls = Class.forName("com.sun.xml.bind.api.JAXBRIContext");
+                refClass = Class.forName(pkg + "api.TypeReference");
             } catch (ClassNotFoundException e) {
                 // TODO Auto-generated catch block
                 cls = Class.forName("com.sun.xml.internal.bind.api.JAXBRIContext", true, getXJCClassLoader());
                 pkg = "com.sun.xml.internal.bind.";
+                refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             }
-            Class<?> refClass = Class.forName(pkg + "api.TypeReference", true, getXJCClassLoader());
             Object ref = refClass.getConstructor(QName.class, 
                                                  Type.class, 
                                                  anns.getClass()).newInstance(qname, refcls, anns);
