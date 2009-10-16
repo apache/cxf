@@ -367,6 +367,12 @@
                                     <version>3.1</version>
                                     <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.geronimo.specs</groupId>
+                                    <artifactId>geronimo-ejb_3.0_spec</artifactId>
+                                    <version>1.0.1</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
