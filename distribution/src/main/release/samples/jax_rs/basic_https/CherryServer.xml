@@ -27,7 +27,6 @@
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
   xsi:schemaLocation="
        http://cxf.apache.org/configuration/security  		      http://cxf.apache.org/schemas/configuration/security.xsd
             http://cxf.apache.org/transports/http/configuration
