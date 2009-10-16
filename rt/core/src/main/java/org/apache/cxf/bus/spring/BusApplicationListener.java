@@ -42,18 +42,29 @@ public class BusApplicationListener implements ApplicationListener, ApplicationC
         if (ctx == null) {
             return;
         }
-        if (event instanceof ContextRefreshedEvent) {
-            Bus bus = (Bus)ctx.getBean("cxf");
-            ((CXFBusImpl)bus).initialize();
-            BusLifeCycleManager lcm = (BusLifeCycleManager)
-                ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
+        boolean doIt = false;
+        ApplicationContext ac = ctx;
+        while (ac != null && !doIt) {
+            if (event.getSource() == ac) {
+                doIt = true;
+            }
+            ac = ac.getParent();
+        }
+        
+        if (doIt) {
+            if (event instanceof ContextRefreshedEvent) {
+                Bus bus = (Bus)ctx.getBean("cxf");
+                ((CXFBusImpl)bus).initialize();
+                BusLifeCycleManager lcm = (BusLifeCycleManager)
+                    ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
+                            BusLifeCycleManager.class);
+                lcm.initComplete();
+            } else if (event instanceof ContextClosedEvent) {
+                BusLifeCycleManager lcm = (BusLifeCycleManager)
+                    ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
                         BusLifeCycleManager.class);
-            lcm.initComplete();
-        } else if (event instanceof ContextClosedEvent) {
-            BusLifeCycleManager lcm = (BusLifeCycleManager)
-                ctx.getBean("org.apache.cxf.buslifecycle.BusLifeCycleManager",
-                    BusLifeCycleManager.class);
-            lcm.postShutdown();
+                lcm.postShutdown();
+            }
         }
     }
 
