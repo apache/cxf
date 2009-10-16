@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.frontend.ClientFactoryBean;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
@@ -53,7 +54,7 @@ public class RountripTest extends AbstractSimpleFrontendTest {
         
         HelloService client = (HelloService) proxyFactory.create();
         
-        ClientImpl c = (ClientImpl) clientBean.getClient();
+        ClientImpl c = (ClientImpl)ClientProxy.getClient(client);
         c.getOutInterceptors().add(new LoggingOutInterceptor());
         c.getInInterceptors().add(new LoggingInInterceptor());
         

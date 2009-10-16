@@ -19,6 +19,7 @@
 
 package org.apache.cxf.service.factory;
 
+import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -51,9 +52,11 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
+import org.w3c.dom.Document;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -66,6 +69,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
+import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -78,12 +82,14 @@ import org.apache.cxf.frontend.FaultInfoException;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MethodComparator;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.ServiceModelSchemaValidator;
@@ -171,6 +177,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
     private String styleCache;
     private Boolean defWrappedCache;
+    private List<String> schemaLocations;
     
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
@@ -186,6 +193,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     
      
     protected DataBinding createDefaultDataBinding() {
+        
+        DataBinding retVal = null;
+        
         if (getServiceClass() != null) {
             org.apache.cxf.annotations.DataBinding db 
                 = getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
@@ -195,18 +205,67 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                         return getBus().getExtension(ResourceManager.class).resolveResource(db.ref(),
                                                                                             db.value());
                     }
-                    return db.value().newInstance();
+                    retVal = db.value().newInstance();
                 } catch (Exception e) {
                     LOG.log(Level.WARNING, "Could not create databinding " 
                             + db.value().getName(), e);
                 }
             }
         }
-        return new JAXBDataBinding(getQualifyWrapperSchema());
+        if (retVal == null) {
+            JAXBDataBinding db = new JAXBDataBinding(getQualifyWrapperSchema());
+            Map props = this.getProperties();
+            if (props != null && props.get("jaxb.additionalContextClasses") != null) {
+                Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
+                db.setExtraClass(extraClass);
+            }
+            retVal = db;
+        }
+        if (retVal instanceof AbstractDataBinding && schemaLocations != null) {
+            ResourceManager rr = getBus().getExtension(ResourceManager.class);
+
+            List<DOMSource> schemas = new ArrayList<DOMSource>();
+            for (String l : schemaLocations) {
+                URL url = rr.resolveResource(l, URL.class);
+
+                if (url == null) {
+                    URIResolver res;
+                    try {
+                        res = new URIResolver(l);
+                    } catch (IOException e) {
+                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG), e);
+                    }
+
+                    if (!res.isResolved()) {
+                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG));
+                    }
+                    url = res.getURL();
+                }
+
+                Document d;
+                try {
+                    d = DOMUtils.readXml(url.openStream());
+                } catch (Exception e) {
+                    throw new ServiceConstructionException(
+                        new Message("ERROR_READING_SCHEMA", LOG, l), e);
+                }
+                schemas.add(new DOMSource(d, url.toString()));
+            }
+
+            ((AbstractDataBinding)retVal).setSchemas(schemas);
+        }
+        return retVal;
     }
-    
+    public void reset() {
+        if (!dataBindingSet) {
+            setDataBinding(null);
+        }
+        setService(null);
+    }
+
     @Override
     public Service create() {
+        reset();
         initializeServiceConfigurations();
 
         initializeServiceModel();
@@ -234,6 +293,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         return getService();
     }
+
+
+
 
     /**
      * Code elsewhere in this function will fill in the name of the type of an
@@ -2384,5 +2446,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
      */
     public void setValidate(boolean validate) {
         this.validate = validate;
+    }
+
+    public void setSchemaLocations(List<String> schemaLocations) {
+        this.schemaLocations = schemaLocations;
     }
 }

@@ -22,18 +22,15 @@ import java.util.Map;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 
 public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
-    private Client client;
 
     public ClientFactoryBean() {
         this(new ReflectionServiceFactoryBean());
@@ -43,48 +40,39 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     }
 
     public Client create() {
-
-        if (client != null) {
-            return client;
+        getServiceFactory().reset();
+        if (getServiceFactory().getProperties() == null) {
+            getServiceFactory().setProperties(properties);
+        } else if (properties != null) {
+            getServiceFactory().getProperties().putAll(properties);
         }
-        applyExtraClass();
+        Client client = null;
         try {
             Endpoint ep = createEndpoint();
             applyProperties(ep);
-            createClient(ep);
+            client = createClient(ep);
             initializeAnnotationInterceptors(ep, getServiceClass());
         } catch (EndpointException e) {
             throw new ServiceConstructionException(e);
         } catch (BusException e) {
             throw new ServiceConstructionException(e);
         }
-        applyFeatures();
+        applyFeatures(client);
         return client;
     }
 
-    protected void createClient(Endpoint ep) {
-        client = new ClientImpl(getBus(), ep, getConduitSelector());
+    protected Client createClient(Endpoint ep) {
+        Client client = new ClientImpl(getBus(), ep, getConduitSelector());
+        return client;
     }
 
-    protected void applyFeatures() {
+    protected void applyFeatures(Client client) {
         if (getFeatures() != null) {
             for (AbstractFeature feature : getFeatures()) {
                 feature.initialize(client, getBus());
             }
         }
     }
-
-    protected void applyExtraClass() {
-        Map props = this.getProperties();
-        if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-            Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
-            DataBinding dataBinding = getServiceFactory().getDataBinding();
-            if (dataBinding instanceof JAXBDataBinding) {
-                ((JAXBDataBinding)dataBinding).setExtraClass(extraClass);
-            }
-        }
-    }
-
 
     protected void applyProperties(Endpoint ep) {
         //Apply the AuthorizationPolicy to the endpointInfo
@@ -95,11 +83,4 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
         }
     }
 
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
-    }
 }

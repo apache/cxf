@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
@@ -70,8 +71,9 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         props.put("jaxb.additionalContextClasses", 
                   new Class[] {GreetMe.class, GreetMeOneWay.class});
         svrBean.setProperties(props);
-        svrBean.create();
-        Class[] extraClass = ((JAXBDataBinding)svrBean.getServiceFactory().getDataBinding()).getExtraClass();
+        Server serv = svrBean.create();
+        Class[] extraClass = ((JAXBDataBinding)serv.getEndpoint().getService()
+                .getDataBinding()).getExtraClass();
         assertEquals(extraClass.length, 2);
         assertEquals(extraClass[0], GreetMe.class);
         assertEquals(extraClass[1], GreetMeOneWay.class);

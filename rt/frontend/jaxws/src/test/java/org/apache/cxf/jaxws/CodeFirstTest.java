@@ -206,14 +206,14 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     public void testRpcClient() throws Exception {
         SayHiImpl serviceImpl = new SayHiImpl();
         EndpointImpl ep = new EndpointImpl(getBus(), serviceImpl, (String) null);
-        ep.publish("http://localhost:9090/hello");
+        ep.publish("local://localhost:9090/hello");
         
         QName serviceName = new QName("http://mynamespace.com/", "SayHiService");
         QName portName = new QName("http://mynamespace.com/", "HelloPort");
         
         // need to set the same bus with service , so use the ServiceImpl
         ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
-        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "http://localhost:9090/hello"); 
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/", "local://localhost:9090/hello"); 
         
         SayHi proxy = service.getPort(portName, SayHi.class);
         long res = proxy.sayHi(3);
@@ -274,7 +274,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     @Test
     public void testNamespacedWebParamsBare() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
-        sf.setAddress("http://localhost/test");
+        sf.setAddress("local://localhost/test");
         sf.setServiceClass(FooServiceImpl.class);
         
         Server server = sf.create();
@@ -291,7 +291,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     @Test
     public void testNamespacedWebParamsWrapped() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
-        sf.setAddress("http://localhost/test");
+        sf.setAddress("local://localhost/test");
         sf.setServiceBean(new FooServiceImpl());
         sf.getServiceFactory().setWrapped(true);
         

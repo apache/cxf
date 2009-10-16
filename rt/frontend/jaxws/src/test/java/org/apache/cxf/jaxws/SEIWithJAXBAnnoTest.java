@@ -26,6 +26,7 @@ import java.util.List;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.service.AddNumbers;
 import org.apache.cxf.jaxws.service.AddNumbersImpl;
@@ -33,14 +34,14 @@ import org.junit.Test;
 
 
 public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
-    String address = "http://localhost:9000/Hello";
+    String address = "local://localhost:9000/Hello";
 
     
     @Test
     public void testXMLList() throws Exception {
         
         AddNumbersImpl serviceImpl = new AddNumbersImpl();
-        Endpoint.publish("http://localhost:9000/Hello", serviceImpl);
+        Endpoint.publish("local://localhost:9000/Hello", serviceImpl);
         
         
      
@@ -53,7 +54,7 @@ public class SEIWithJAXBAnnoTest extends AbstractJaxWsTest {
         AddNumbers proxy = (AddNumbers)factory.create();
         StringWriter strWriter = new StringWriter();
         LoggingOutInterceptor log = new LoggingOutInterceptor(new PrintWriter(strWriter));
-        factory.getClientFactoryBean().getClient().getOutInterceptors().add(log);
+        ClientProxy.getClient(proxy).getOutInterceptors().add(log);
         
         List<String> args = new ArrayList<String>();
         args.add("str1");

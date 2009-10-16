@@ -27,6 +27,8 @@ import org.apache.cxf.interceptor.ServiceInvokerInterceptor;
 import org.apache.cxf.service.Service;
 
 public abstract class AbstractServiceFactoryBean {
+    protected boolean dataBindingSet;
+
     private Bus bus;
     private DataBinding dataBinding;
     private Service service;
@@ -68,6 +70,7 @@ public abstract class AbstractServiceFactoryBean {
 
     public void setDataBinding(DataBinding dataBinding) {
         this.dataBinding = dataBinding;
+        this.dataBindingSet = dataBinding != null;
     }
 
     public Service getService() {

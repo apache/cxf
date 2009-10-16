@@ -19,30 +19,19 @@
 package org.apache.cxf.frontend;
 
 import java.io.IOException;
-import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
-import javax.xml.transform.dom.DOMSource;
-import org.w3c.dom.Document;
 
 import org.apache.cxf.BusException;
-import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
-import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxb.JAXBDataBinding;
-import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.BeanInvoker;
@@ -82,8 +71,6 @@ import org.apache.cxf.service.invoker.SingletonFactory;
  * </pre>
  */
 public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
-    private static final Logger LOG = LogUtils.getL7dLogger(ServerFactoryBean.class);
-
     private Server server;
     private boolean start = true;
     private Object serviceBean;
@@ -103,7 +90,11 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
     public Server create() {
         try {
-            applyExtraClass();
+            if (getServiceFactory().getProperties() == null) {
+                getServiceFactory().setProperties(getProperties());
+            } else if (getProperties() != null) {
+                getServiceFactory().getProperties().putAll(getProperties());
+            }
             if (serviceBean != null && getServiceClass() == null) {
                 setServiceClass(ClassHelper.getRealClass(serviceBean));
             }
@@ -155,41 +146,7 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     @Override
     protected void initializeServiceFactory() {
         super.initializeServiceFactory();
-
-        DataBinding db = getServiceFactory().getDataBinding();
-        if (db instanceof AbstractDataBinding && schemaLocations != null) {
-            ResourceManager rr = getBus().getExtension(ResourceManager.class);
-
-            List<DOMSource> schemas = new ArrayList<DOMSource>();
-            for (String l : schemaLocations) {
-                URL url = rr.resolveResource(l, URL.class);
-
-                if (url == null) {
-                    URIResolver res;
-                    try {
-                        res = new URIResolver(l);
-                    } catch (IOException e) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG), e);
-                    }
-
-                    if (!res.isResolved()) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG));
-                    }
-                    url = res.getURL();
-                }
-
-                Document d;
-                try {
-                    d = DOMUtils.readXml(url.openStream());
-                } catch (Exception e) {
-                    throw new ServiceConstructionException(
-                        new Message("ERROR_READING_SCHEMA", LOG, l), e);
-                }
-                schemas.add(new DOMSource(d, url.toString()));
-            }
-
-            ((AbstractDataBinding)db).setSchemas(schemas);
-        }
+        getServiceFactory().setSchemaLocations(schemaLocations);
     }
 
     protected void applyFeatures() {

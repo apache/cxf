@@ -18,6 +18,9 @@
  */
 package org.apache.cxf.jaxws;
 
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
@@ -66,6 +69,7 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
         
         localTransport = new LocalTransportFactory();
+        localTransport.setUriPrefixes(new HashSet<String>(Arrays.asList("http", "local")));
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
         dfm.registerDestinationFactory("http://cxf.apache.org/bindings/xformat", localTransport);

@@ -64,6 +64,7 @@ public class LocalTransportFactory extends AbstractTransportFactory
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
+    private Set<String> uriPrefixes = URI_PREFIXES;
     
     public LocalTransportFactory() {
         super();
@@ -132,7 +133,10 @@ public class LocalTransportFactory extends AbstractTransportFactory
     }
 
     public Set<String> getUriPrefixes() {
-        return URI_PREFIXES;
+        return uriPrefixes;
+    }
+    public void setUriPrefixes(Set<String> s) {
+        uriPrefixes = s;
     }
 
     public Set<String> getMessageFilterProperties() {

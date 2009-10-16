@@ -93,8 +93,9 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     private JaxWsImplementorInfo implInfo;
 
+    private List<WebServiceFeature> setWsFeatures;
     private List<WebServiceFeature> wsFeatures;
-
+    
     private boolean wrapperBeanGenerated;
     private Set<Class<?>> wrapperClasses;
     
@@ -114,6 +115,13 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         initConfiguration(implInfo);
         this.serviceClass = implInfo.getEndpointClass();
         loadWSFeatureAnnotation(implInfo.getSEIClass(), implInfo.getImplementorClass());
+    }
+    
+    @Override
+    public void reset() {
+        super.reset();
+        wrapperBeanGenerated = false;
+        wrapperClasses = null;
     }
 
     private void initSchemaLocations() {
@@ -155,6 +163,11 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
         if (features.size() > 0) {
             wsFeatures = features;
+            if (setWsFeatures != null) {
+                wsFeatures.addAll(setWsFeatures);
+            }
+        } else {
+            wsFeatures = setWsFeatures;
         }
     }
 
@@ -428,11 +441,14 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     public List<WebServiceFeature> getWsFeatures() {
-        return wsFeatures;
+        return setWsFeatures;
     }
 
-    public void setWsFeatures(List<WebServiceFeature> wsFeatures) {
-        this.wsFeatures = wsFeatures;
+    public void setWsFeatures(List<WebServiceFeature> swsFeatures) {
+        this.setWsFeatures = swsFeatures;
+        if (wsFeatures == null) {
+            wsFeatures = setWsFeatures;
+        }
     }
 
     private FaultInfo getFaultInfo(final OperationInfo operation, final Class expClass) {

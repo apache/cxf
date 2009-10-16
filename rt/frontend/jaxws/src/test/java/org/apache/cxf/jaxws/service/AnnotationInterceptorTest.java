@@ -45,11 +45,11 @@ public class AnnotationInterceptorTest extends AbstractJaxWsTest {
     @Before
     public void setUp() {
         fb = new ServerFactoryBean();
-        fb.setAddress("http://localhost");
+        fb.setAddress("local://localhost");
         fb.setBus(getBus());
         
         jfb = new JaxWsServerFactoryBean();
-        jfb.setAddress("http://localhost");
+        jfb.setAddress("local://localhost");
         jfb.setBus(getBus());
     }
     
