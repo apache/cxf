@@ -124,7 +124,7 @@ public class JavaToJSProcessor implements Processor {
             for (SchemaInfo schema : schemata) {
                 SchemaJavascriptBuilder jsBuilder = new SchemaJavascriptBuilder(serviceInfo
                     .getXmlSchemaCollection(), prefixManager, nameManager);
-                String allThatJavascript = jsBuilder.generateCodeForSchema(schema);
+                String allThatJavascript = jsBuilder.generateCodeForSchema(schema.getSchema());
                 writer.append(allThatJavascript);
             }
 

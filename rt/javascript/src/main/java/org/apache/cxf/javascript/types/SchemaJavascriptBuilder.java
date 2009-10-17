@@ -37,7 +37,6 @@ import org.apache.cxf.javascript.NameManager;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
 import org.apache.cxf.javascript.ParticleInfo;
 import org.apache.cxf.javascript.UnsupportedConstruct;
-import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
@@ -62,7 +61,7 @@ public class SchemaJavascriptBuilder {
     private SchemaCollection xmlSchemaCollection;
     private NameManager nameManager;
     private NamespacePrefixAccumulator prefixAccumulator;
-    private SchemaInfo schemaInfo;
+    //private SchemaInfo schemaInfo;
 
     // In general, I (bimargulies) hate fields that are temporary communications
     // between members of a class. However, given the style restrictions on the
@@ -70,6 +69,7 @@ public class SchemaJavascriptBuilder {
     private StringBuilder code;
     private StringBuilder accessors;
     private JavascriptUtils utils;
+    private XmlSchema xmlSchema;
 
     public SchemaJavascriptBuilder(SchemaCollection schemaCollection,
                                    NamespacePrefixAccumulator prefixAccumulator, NameManager nameManager) {
@@ -78,17 +78,17 @@ public class SchemaJavascriptBuilder {
         this.prefixAccumulator = prefixAccumulator;
     }
 
-    public String generateCodeForSchema(SchemaInfo schema) {
-        schemaInfo = schema;
+    public String generateCodeForSchema(XmlSchema schema) {
+        xmlSchema = schema;
         code = new StringBuilder();
         code.append("//\n");
-        code.append("// Definitions for schema: " + schema.getNamespaceURI());
-        if (schema.getSystemId() != null) {
-            code.append("\n//  " + schema.getSystemId());
+        code.append("// Definitions for schema: " + schema.getTargetNamespace());
+        if (schema.getSourceURI() != null) {
+            code.append("\n//  " + schema.getSourceURI());
         }
         code.append("\n//\n");
 
-        XmlSchemaObjectTable schemaTypes = schema.getSchema().getSchemaTypes();
+        XmlSchemaObjectTable schemaTypes = schema.getSchemaTypes();
         Iterator namesIterator = schemaTypes.getNames();
         while (namesIterator.hasNext()) {
             QName name = (QName)namesIterator.next();
@@ -122,7 +122,7 @@ public class SchemaJavascriptBuilder {
         }
 
         // now add in global elements with anonymous types.
-        schemaTypes = schema.getSchema().getElements();
+        schemaTypes = schema.getElements();
         namesIterator = schemaTypes.getNames();
         while (namesIterator.hasNext()) {
             QName name = (QName)namesIterator.next();
@@ -136,7 +136,8 @@ public class SchemaJavascriptBuilder {
                     XmlSchemaElement element = (XmlSchemaElement)xmlSchemaObject;
                     if (element.getSchemaTypeName() == null && element.getSchemaType() == null) {
                         Message message = new Message("ELEMENT_MISSING_TYPE", LOG, element.getQName(),
-                                                      element.getSchemaTypeName(), schema.getNamespaceURI());
+                                                      element.getSchemaTypeName(), 
+                                                      schema.getTargetNamespace());
                         LOG.warning(message.toString());
                         continue;
                     }
@@ -144,7 +145,7 @@ public class SchemaJavascriptBuilder {
                     if (element.getSchemaType() != null) {
                         type = element.getSchemaType();
                     } else {
-                        type = schema.getSchema().getTypeByName(element.getSchemaTypeName());
+                        type = schema.getTypeByName(element.getSchemaTypeName());
                     }
                     if (!(type instanceof XmlSchemaComplexType)) {
                         // we never make classes for simple type.
@@ -194,7 +195,7 @@ public class SchemaJavascriptBuilder {
         utils.appendLine("this.typeMarker = '" + typeObjectName + "';");
         for (XmlSchemaObject thing : items) {
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
-                                                              schemaInfo.getSchema(),
+                                                              xmlSchema,
                                                               xmlSchemaCollection, 
                                                               prefixAccumulator, 
                                                               type.getQName()); 
@@ -202,7 +203,7 @@ public class SchemaJavascriptBuilder {
         }
         
         for (XmlSchemaAnnotated thing : attrs) {
-            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, schemaInfo.getSchema(),
+            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, xmlSchema,
                                                                 xmlSchemaCollection,
                                                                 prefixAccumulator,
                                                                 type.getQName());
@@ -358,7 +359,7 @@ public class SchemaJavascriptBuilder {
         List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
         for (XmlSchemaObject sequenceItem : items) {
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(sequenceItem, 
-                                                              schemaInfo.getSchema(), 
+                                                              xmlSchema, 
                                                               xmlSchemaCollection, 
                                                               prefixAccumulator, 
                                                               type.getQName()); 
@@ -404,7 +405,7 @@ public class SchemaJavascriptBuilder {
             XmlSchemaObject contentElement = contentElements.get(i);
             utils.appendLine("cxfjsutils.trace('curElement: ' + cxfjsutils.traceElementName(curElement));");
             ParticleInfo itemInfo = ParticleInfo.forLocalItem(contentElement,
-                                                              schemaInfo.getSchema(),
+                                                              xmlSchema,
                                                               xmlSchemaCollection, 
                                                               prefixAccumulator, 
                                                               type.getQName()); 
@@ -413,7 +414,7 @@ public class SchemaJavascriptBuilder {
                 if (i != nContentElements - 1) {
                     XmlSchemaObject nextThing = contentElements.get(i + 1);
                     nextItem = ParticleInfo.forLocalItem(nextThing, 
-                                                         schemaInfo.getSchema(), 
+                                                         xmlSchema, 
                                                          xmlSchemaCollection, 
                                                          prefixAccumulator, 
                                                          type.getQName()); 
@@ -440,7 +441,7 @@ public class SchemaJavascriptBuilder {
             String ns = namespaces[x];
             nslist.append("'");
             if ("##targetNamespace".equals(ns)) {
-                nslist.append(schemaInfo.getNamespaceURI());
+                nslist.append(xmlSchema.getTargetNamespace());
             } else if ("##local".equals(ns)) {
                 // nothing, empty string
             } else {
@@ -499,7 +500,7 @@ public class SchemaJavascriptBuilder {
         
         utils.appendLine("var matcher = new org_apache_cxf_any_ns_matcher("
                          + matchType
-                         + ", '" + schemaInfo.getNamespaceURI() + "'"
+                         + ", '" + xmlSchema.getTargetNamespace() + "'"
                          + ", " + namespaceList
                          + ", " + nextLocalPartConstant
                          + ");");
@@ -566,7 +567,7 @@ public class SchemaJavascriptBuilder {
 
     private void deserializeElement(XmlSchemaComplexType type, XmlSchemaObject thing) {
         ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
-                                                          schemaInfo.getSchema(),
+                                                          xmlSchema,
                                                           xmlSchemaCollection, 
                                                           prefixAccumulator, 
                                                           type.getQName());
@@ -577,7 +578,7 @@ public class SchemaJavascriptBuilder {
         String accessorName = "set" + StringUtils.capitalize(itemInfo.getJavascriptName());
         utils.appendLine("cxfjsutils.trace('processing " + itemInfo.getJavascriptName() + "');");
         XmlSchemaElement element = (XmlSchemaElement) itemInfo.getParticle();
-        QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, schemaInfo.getSchema()); 
+        QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, xmlSchema); 
         String elementNamespaceURI = elementQName.getNamespaceURI();
         boolean elementNoNamespace = "".equals(elementNamespaceURI);
         XmlSchema elementSchema = null;
@@ -587,7 +588,7 @@ public class SchemaJavascriptBuilder {
         boolean qualified = !elementNoNamespace
                             && XmlSchemaUtils.isElementQualified(element, 
                                                                  itemInfo.isGlobal(), 
-                                                                 schemaInfo.getSchema(),
+                                                                 xmlSchema,
                                                                  elementSchema);
 
         if (!qualified) {
