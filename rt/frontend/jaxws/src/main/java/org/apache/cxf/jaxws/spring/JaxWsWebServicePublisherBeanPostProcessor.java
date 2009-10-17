@@ -36,10 +36,9 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.databinding.DataBinding;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
-import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
@@ -86,7 +85,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     private String urlPrefix = "/services/";
     private Servlet shadowCxfServlet;
     private String prototypeDataBindingBeanName;
-    private String prototypeServiceFactoryBeanName;
+    private String prototypeServerFactoryBeanName;
     private BeanFactory beanFactory;
     
     public JaxWsWebServicePublisherBeanPostProcessor() throws SecurityException, 
@@ -152,24 +151,23 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     }
     
     private void createAndPublishEndpoint(String url, Object implementor) {
-        ReflectionServiceFactoryBean serviceFactory = null;
-        if (prototypeServiceFactoryBeanName != null) {
-            if (!beanFactory.isPrototype(prototypeServiceFactoryBeanName)) {
+        ServerFactoryBean serverFactory = null;
+        if (prototypeServerFactoryBeanName != null) {
+            if (!beanFactory.isPrototype(prototypeServerFactoryBeanName)) {
                 throw 
                     new IllegalArgumentException(
-                        "prototypeServiceFactoryBeanName must indicate a scope='prototype' bean");
+                        "prototypeServerFactoryBeanName must indicate a scope='prototype' bean");
             }
-            serviceFactory = (ReflectionServiceFactoryBean)
-                             beanFactory.getBean(prototypeServiceFactoryBeanName, 
-                                                 ReflectionServiceFactoryBean.class); 
+            serverFactory = (ServerFactoryBean)
+                             beanFactory.getBean(prototypeServerFactoryBeanName, 
+                                                 ServerFactoryBean.class); 
         } else {
-            serviceFactory = new JaxWsServiceFactoryBean();
+            serverFactory = new JaxWsServerFactoryBean();
         }
 
-        JaxWsServerFactoryBean serverFactoryBean = new JaxWsServerFactoryBean();
-        serverFactoryBean.setServiceBean(implementor);
-        serverFactoryBean.setServiceClass(ClassHelper.getRealClass(implementor));
-        serverFactoryBean.setAddress(url);
+        serverFactory.setServiceBean(implementor);
+        serverFactory.setServiceClass(ClassHelper.getRealClass(implementor));
+        serverFactory.setAddress(url);
         
         DataBinding dataBinding = null;
         if (prototypeDataBindingBeanName != null) {
@@ -185,10 +183,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
             dataBinding = new JAXBDataBinding();
         }
         
-        serverFactoryBean.setDataBinding(dataBinding);
-        serverFactoryBean.setServiceFactory(serviceFactory);
-        serverFactoryBean.setBus(getServletBus());
-        serverFactoryBean.create();
+        serverFactory.setDataBinding(dataBinding);
+        serverFactory.setBus(getServletBus());
+        serverFactory.create();
     }
 
     public void setServletConfig(ServletConfig servletConfig) {
@@ -226,18 +223,18 @@ public class JaxWsWebServicePublisherBeanPostProcessor
         
     }
     
-    public String getPrototypeServiceFactoryBeanName() {
-        return prototypeServiceFactoryBeanName;
+    public String getPrototypeServerFactoryBeanName() {
+        return prototypeServerFactoryBeanName;
     }
 
     /**
-     * Set the service factory for all services launched by this bean. This must be the name of a 
+     * Set the server factory for all services launched by this bean. This must be the name of a 
      * scope='prototype' bean that implements 
-     * {@link org.apache.cxf.service.factory#ReflectionServiceFactoryBean}.
-     * @param prototypeServiceFactoryBeanName
+     * {@link org.apache.cxf.frontend#ServerFactoryBean}.
+     * @param prototypeServerFactoryBeanName
      */
-    public void setPrototypeServiceFactoryBeanName(String prototypeServiceFactoryBeanName) {
-        this.prototypeServiceFactoryBeanName = prototypeServiceFactoryBeanName;
+    public void setPrototypeServerFactoryBeanName(String prototypeServerFactoryBeanName) {
+        this.prototypeServerFactoryBeanName = prototypeServerFactoryBeanName;
     }
     
     public String getPrototypeDataBindingBeanName() {
