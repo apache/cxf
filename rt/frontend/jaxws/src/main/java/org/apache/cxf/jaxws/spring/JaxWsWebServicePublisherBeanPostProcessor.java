@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxws.spring;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.logging.Logger;
 
@@ -31,12 +30,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.databinding.DataBinding;
-import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 
@@ -60,24 +61,27 @@ import org.springframework.web.servlet.mvc.Controller;
  * and then creates a URL under /services/ based on the service name. Properties of the bean
  * permit you to configure this; if you set prototypeServiceFactoryBeanName, the code
  * will fetch that bean. It must be a prototype, since service factory object can't be used
- * for more than one endpoint. Similiarly, prototypeDataBindingBeanName can be used to 
+ * for more than one endpoint. Similarly, prototypeDataBindingBeanName can be used to 
  * control the data binding.
  * 
  * Note that this class uses {@link org.apache.cxf.transport.servlet#CXFServlet} from the 
- * cxf-rt-transports-http-jetty library, which is not part of the standard dependencies of the JAX-WS front
+ * cxf-rt-transports-http-jetty library, which is not part of 
+ * the standard dependencies of the JAX-WS front
  * end.
  * 
+ * If you use this processor in an environment with no servlet, it will still launch the
+ * endpoints using the embedded CXF server.
+ * 
  */
-public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements BeanPostProcessor,
+public class JaxWsWebServicePublisherBeanPostProcessor 
+             extends AbstractUrlHandlerMapping implements BeanPostProcessor,
     ServletConfigAware, BeanFactoryAware {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(Jsr181HandlerMapping.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(JaxWsWebServicePublisherBeanPostProcessor.class);
     
-    private static final String CXF_SERVLET_CLASS_NAME = "org.apache.cxf.transport.servlet";
-    private static final String AOP_UTILS_CLASS_NAME = "org.springframework.aop.support.AopUtils";
+    private static final String CXF_SERVLET_CLASS_NAME = "org.apache.cxf.transport.servlet.CXFServlet";
     private Class<?> servletClass;
     private Method servletGetBusMethod;
-    private Method aopUtilsGetTargetClassMethod;
 
     private String urlPrefix = "/services/";
     private Servlet shadowCxfServlet;
@@ -85,7 +89,8 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
     private String prototypeServiceFactoryBeanName;
     private BeanFactory beanFactory;
     
-    public Jsr181HandlerMapping() throws SecurityException, NoSuchMethodException, ClassNotFoundException {
+    public JaxWsWebServicePublisherBeanPostProcessor() throws SecurityException, 
+           NoSuchMethodException, ClassNotFoundException {
         try {
             servletClass = ClassLoaderUtils.loadClass(CXF_SERVLET_CLASS_NAME, getClass());
         } catch (ClassNotFoundException e) {
@@ -94,18 +99,14 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
             throw e;
         }
         servletGetBusMethod = servletClass.getMethod("getBus");
-        try {
-            Class<?> aopUtilsClass = ClassLoaderUtils.loadClass(AOP_UTILS_CLASS_NAME, getClass());
-            aopUtilsGetTargetClassMethod = aopUtilsClass.getMethod("getTargetClass", Object.class);
-        } catch (Exception e) {
-            Message message = new Message("AOP_GET_TARGET_CLASS_MISSING", LOG);
-            LOG.severe(message.toString());
-            
-        }
     }
     
     private Bus getServletBus() {
         try {
+            if (shadowCxfServlet == null) {
+                // no servlet going on. Just launch.
+                return BusFactory.getDefaultBus(true);
+            }
             return (Bus) servletGetBusMethod.invoke(shadowCxfServlet);
         } catch (Exception e) {
             // CXF internally inconsistent? 
@@ -126,23 +127,8 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
         return bean;
     }
     
-    private Class<?> aopUtilsGetTargetClass(Object possiblyProxiedObject) {
-        if (aopUtilsGetTargetClassMethod != null && possiblyProxiedObject != null) {
-            try {
-                return (Class<?>)aopUtilsGetTargetClassMethod.invoke(null, possiblyProxiedObject);
-            } catch (IllegalArgumentException e) {
-                return possiblyProxiedObject.getClass();
-            } catch (IllegalAccessException e) {
-                return possiblyProxiedObject.getClass();
-            } catch (InvocationTargetException e) {
-                return possiblyProxiedObject.getClass();
-            }
-        }
-        return possiblyProxiedObject.getClass();
-    }
-
     public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
-        Class<?> clazz = aopUtilsGetTargetClass(bean);
+        Class<?> clazz = ClassHelper.getRealClass(bean);
 
         if (clazz.isAnnotationPresent(WebService.class)) {
             WebService ws = (WebService)clazz.getAnnotation(WebService.class);
@@ -180,9 +166,9 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
             serviceFactory = new JaxWsServiceFactoryBean();
         }
 
-        ServerFactoryBean serverFactoryBean = new ServerFactoryBean();
+        JaxWsServerFactoryBean serverFactoryBean = new JaxWsServerFactoryBean();
         serverFactoryBean.setServiceBean(implementor);
-        serverFactoryBean.setServiceClass(aopUtilsGetTargetClass(implementor));
+        serverFactoryBean.setServiceClass(ClassHelper.getRealClass(implementor));
         serverFactoryBean.setAddress(url);
         
         DataBinding dataBinding = null;
@@ -206,7 +192,6 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
     }
 
     public void setServletConfig(ServletConfig servletConfig) {
-
         try {
             shadowCxfServlet = (Servlet)servletClass.newInstance();
         } catch (InstantiationException e) {
@@ -267,16 +252,4 @@ public class Jsr181HandlerMapping extends AbstractUrlHandlerMapping implements B
     public void setPrototypeDataBindingBeanName(String prototypeDataBindingBeanName) {
         this.prototypeDataBindingBeanName = prototypeDataBindingBeanName;
     }
- 
-    /**
-     * For unit testing ONLY. Disable use of Spring-AOP method to unwrap target classes, to
-     * ensure that this code works when AOP is not there.
-     * @param b
-     */
-    public void setSimulateNoAopForUnitTest(boolean b) {
-        if (b) {
-            aopUtilsGetTargetClassMethod = null;
-        }
-    }
-    
 }
