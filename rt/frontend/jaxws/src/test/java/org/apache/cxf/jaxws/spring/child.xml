@@ -28,6 +28,5 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
 
 	<bean class="org.apache.cxf.jaxws.spring.NullInvoker"/>
-	<bean class="org.apache.cxf.jaxws.spring.ClientHolderBean"/>
 
 </beans>
