@@ -19,15 +19,7 @@
 
 package org.apache.cxf.systest.jaxws.beanpostprocessor;
 
-import java.util.Map;
-
-import javax.xml.namespace.QName;
-
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.endpoint.Client;
-import org.apache.cxf.endpoint.Endpoint;
-import org.apache.cxf.jaxws.JaxWsClientFactoryBean;
-import org.apache.cxf.service.Service;
+import org.apache.cxf.jaxws.spring.JaxWsWebServicePublisherBeanPostProcessor;
 import org.apache.cxf.test.AbstractCXFSpringTest;
 
 import org.junit.Test;
@@ -39,19 +31,11 @@ public class CustomizedfBeanPostProcessorTest extends AbstractCXFSpringTest {
     
     @Test
     public void verifyServices() throws Exception {
-        JaxWsClientFactoryBean cf = new JaxWsClientFactoryBean();
-        cf.setAddress("local://services/Alger");
-        cf.setServiceClass(IWebServiceRUs.class);
-        cf.setBindingId("http://apache.org/cxf/binding/http");
-        Client client = cf.create();
-        String response = (String)client.invoke("consultTheOracle")[0];
-        assertEquals("All your bases belong to us.", response);
-        Service service = WebServiceRUs.getService();
-        assertEquals(AegisDatabinding.class, service.getDataBinding().getClass());
-        Map<QName, Endpoint> endpoints = service.getEndpoints();
-        Endpoint ep = endpoints.values().iterator().next();
-        assertEquals("http://apache.org/cxf/binding/http",
-                     ep.getBinding().getBindingInfo().getBindingId());
+        JaxWsWebServicePublisherBeanPostProcessor 
+            bpp = (JaxWsWebServicePublisherBeanPostProcessor)applicationContext.getBean("postprocess");
+        assertTrue(bpp.isCustomizedDataBinding());
+        assertTrue(bpp.isCustomizedServerFactory());
+        
     }
 
     @Override

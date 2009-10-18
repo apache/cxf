@@ -37,7 +37,7 @@ import org.springframework.core.io.Resource;
 public abstract class AbstractCXFSpringTest extends AbstractCXFTest {
     // subvert JUnit. We want to set up the application context ONCE, since it
     // is likely to include a Jetty or something else that we can't get rid of.
-    private static GenericApplicationContext applicationContext;
+    protected static GenericApplicationContext applicationContext;
     private DefaultResourceLoader resourceLoader;
     private Class<?> configContextClass = AbstractCXFSpringTest.class;
     /**

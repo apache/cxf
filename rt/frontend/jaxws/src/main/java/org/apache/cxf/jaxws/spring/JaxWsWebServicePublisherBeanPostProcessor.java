@@ -87,6 +87,9 @@ public class JaxWsWebServicePublisherBeanPostProcessor
     private String prototypeDataBindingBeanName;
     private String prototypeServerFactoryBeanName;
     private BeanFactory beanFactory;
+    // for testing
+    private boolean customizedServerFactory;
+    private boolean customizedDataBinding;
     
     public JaxWsWebServicePublisherBeanPostProcessor() throws SecurityException, 
            NoSuchMethodException, ClassNotFoundException {
@@ -160,7 +163,8 @@ public class JaxWsWebServicePublisherBeanPostProcessor
             }
             serverFactory = (ServerFactoryBean)
                              beanFactory.getBean(prototypeServerFactoryBeanName, 
-                                                 ServerFactoryBean.class); 
+                                                 ServerFactoryBean.class);
+            customizedServerFactory = true;
         } else {
             serverFactory = new JaxWsServerFactoryBean();
         }
@@ -176,6 +180,7 @@ public class JaxWsWebServicePublisherBeanPostProcessor
                     new IllegalArgumentException(
                         "prototypeDataBindingBeanName must indicate a scope='prototype' bean");
             }
+            customizedDataBinding = true;
             dataBinding = (DataBinding)
                              beanFactory.getBean(prototypeDataBindingBeanName, 
                                                  DataBinding.class); 
@@ -248,5 +253,21 @@ public class JaxWsWebServicePublisherBeanPostProcessor
      */
     public void setPrototypeDataBindingBeanName(String prototypeDataBindingBeanName) {
         this.prototypeDataBindingBeanName = prototypeDataBindingBeanName;
+    }
+    
+    /**
+     * For Unit Test.
+     * @return
+     */
+    public boolean isCustomizedServerFactory() {
+        return customizedServerFactory;
+    }
+
+    /**
+     * For Unit Test.
+     * @return
+     */
+    public boolean isCustomizedDataBinding() {
+        return customizedDataBinding;
     }
 }
