@@ -27,7 +27,7 @@
 	<context-param>
 		<param-name>contextConfigLocation</param-name>
 		<param-value>
-			classpath:org/apache/cxf/systest/servlet/spring.xml
+			classpath:org/apache/cxf/systest/servlet/spring-auto-launch.xml
 		</param-value>
 	</context-param>
 

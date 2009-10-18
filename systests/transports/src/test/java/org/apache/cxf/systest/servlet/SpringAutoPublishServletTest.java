@@ -18,11 +18,8 @@
  */
 package org.apache.cxf.systest.servlet;
 
-import javax.xml.ws.Endpoint;
-
 import org.w3c.dom.Document;
 
-import com.meterware.httpunit.HttpNotFoundException;
 import com.meterware.httpunit.PostMethodWebRequest;
 import com.meterware.httpunit.WebRequest;
 import com.meterware.httpunit.WebResponse;
@@ -50,13 +47,13 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
     @Test
     public void testInvokingSpringBeans() throws Exception {
 
-        WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter",
+        WebRequest req = new PostMethodWebRequest(CONTEXT_URL + "/services/SOAPService",
             getClass().getResourceAsStream("GreeterMessage.xml"),
             "text/xml; charset=utf-8");
 
         invokingEndpoint(req);
         
-        req = new PostMethodWebRequest(CONTEXT_URL + "/services/Greeter1",
+        req = new PostMethodWebRequest(CONTEXT_URL + "/services/DerivedGreeterService",
             getClass().getResourceAsStream("GreeterMessage.xml"), "text/xml; charset=utf-8");
         
         invokingEndpoint(req);
@@ -82,7 +79,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         client.setExceptionsThrownOnErrorStatus(true);
         
         WebRequest req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter/greetMe?"
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/SOAPService/greetMe?"
                                          + "requestType=hello");
         
         WebResponse response = client.getResponse(req);        
@@ -92,7 +89,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertValid("//h:greetMeResponse", doc);
         
         req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter1/greetMe?"
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/DerivedGreeterService/greetMe?"
                                          + "requestType=hello");
         
         response = client.getResponse(req);        
@@ -109,7 +106,7 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         client.setExceptionsThrownOnErrorStatus(true);
         
         WebRequest req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter?wsdl"); 
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/SOAPService?wsdl"); 
        
         WebResponse res = client.getResponse(req);        
         assertEquals(200, res.getResponseCode());
@@ -119,10 +116,10 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertNotNull(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/Greeter']", doc);
+        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/SOAPService']", doc);
         
         req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter2?wsdl");
+            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/DerivedGreeterService?wsdl");
         res = client.getResponse(req);    
         assertEquals(200, res.getResponseCode());
         assertEquals("text/xml", res.getContentType());
@@ -131,35 +128,9 @@ public class SpringAutoPublishServletTest extends AbstractServletTest {
         assertNotNull(doc);
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='http://cxf.apache.org/Greeter']", doc);
+        assertValid("//wsdlsoap:address"
+                    + "[@location='http://localhost/mycontext/services/DerivedGreeterService']", 
+                    doc);
         
-        Endpoint.publish("/services/Greeter3", new org.apache.hello_world_soap_http.GreeterImpl());
-        req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/Greeter3?wsdl");
-        res = client.getResponse(req);    
-        assertEquals(200, res.getResponseCode());
-        assertEquals("text/xml", res.getContentType());
-        
-        doc = DOMUtils.readXml(res.getInputStream());
-        assertNotNull(doc);
-        
-        assertValid("//wsdl:operation[@name='greetMe']", doc);
-        assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/Greeter3']", doc);
-
-    }
-    
-    @Test
-    public void testIgnoreServiceList() throws Exception {
-        ServletUnitClient client = newClient();
-        client.setExceptionsThrownOnErrorStatus(true);
-        
-        WebRequest req = 
-            new GetMethodQueryWebRequest(CONTEXT_URL + "/services/");
-        try {
-            client.getResponse(req);
-            fail();
-        } catch (HttpNotFoundException ex) {
-            // expected
-        }
     }
 }
