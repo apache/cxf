@@ -9,14 +9,21 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-local.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-http-binding.xml"/>
 	
 <!-- This test is not run with a servlet container. It tests non-servlet publication. -->
 <bean id="servicebean" class="org.apache.cxf.systest.jaxws.beanpostprocessor.WebServiceRUs"/>
 
 <bean id="dataBinding" class="org.apache.cxf.aegis.databinding.AegisDatabinding" scope='prototype'/>
 
+<bean id='serverFactory' class='org.apache.cxf.jaxws.JaxWsServerFactoryBean'
+	  scope='prototype'>
+	<property name="bindingId" value="http://apache.org/cxf/binding/http"/>
+</bean>
+
 <bean id="postprocess" class="org.apache.cxf.jaxws.spring.JaxWsWebServicePublisherBeanPostProcessor">
 	<property name='urlPrefix' value='local://services/' />
 	<property name='prototypeDataBindingBeanName' value="dataBinding"/>
+	<property name="prototypeServerFactoryBeanName" value="serverFactory"/>
 </bean>
 </beans>

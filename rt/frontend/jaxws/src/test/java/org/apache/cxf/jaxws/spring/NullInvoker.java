@@ -24,7 +24,6 @@ import org.apache.cxf.service.invoker.Invoker;
 public class NullInvoker implements Invoker {
 
     public Object invoke(Exchange exchange, Object o) {
-        // TODO Auto-generated method stub
         return null;
     }
 

@@ -118,8 +118,6 @@ public class SoapBindingFactory extends AbstractBindingFactory {
     public static final String HEADER = "messagepart.isheader";
     public static final String OUT_OF_BAND_HEADER = "messagepart.is_out_of_band_header";
 
-    private boolean mtomEnabled = true;
-
     public SoapBindingFactory() {
     }
     
@@ -858,13 +856,5 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         }
 
         d.setMessageObserver(mo);
-    }
-
-    public void setMtomEnabled(boolean mtomEnabled) {
-        this.mtomEnabled = mtomEnabled;
-    }
-
-    public boolean isMtomEnabled() {
-        return mtomEnabled;
     }
 }
