@@ -34,8 +34,6 @@ public final class Soap12 implements SoapVersion {
 
     private final String namespace = SOAP_NAMESPACE;
 
-    private final String prefix = "soap";
-
     private final String noneRole = namespace + "/role/none";
 
     private final String ultimateReceiverRole = namespace + "/role/ultimateReceiver";
@@ -44,13 +42,13 @@ public final class Soap12 implements SoapVersion {
 
     private final String soapEncodingStyle = "http://www.w3.org/2003/05/soap-encoding";
 
-    private final QName envelope = new QName(namespace, "Envelope", prefix);
+    private final QName envelope = new QName(namespace, "Envelope");
 
-    private final QName header = new QName(namespace, "Header", prefix);
+    private final QName header = new QName(namespace, "Header");
 
-    private final QName body = new QName(namespace, "Body", prefix);
+    private final QName body = new QName(namespace, "Body");
 
-    private final QName fault = new QName(namespace, "Fault", prefix);
+    private final QName fault = new QName(namespace, "Fault");
 
     private Soap12() {
        // Singleton 
@@ -69,10 +67,6 @@ public final class Soap12 implements SoapVersion {
 
     public String getNamespace() {
         return namespace;
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public QName getEnvelope() {
@@ -143,4 +137,9 @@ public final class Soap12 implements SoapVersion {
     public String getContentType() {
         return "application/soap+xml";
     }
+    
+    public String getPrefix() {
+        return "soap";
+    }
+
 }

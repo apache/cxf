@@ -369,7 +369,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                             AddressingPropertiesImpl maps) {
         if (maps.getMustUnderstand().contains(name)) {
             Element lastAdded = (Element)header.getLastChild();
-            String pfx = msg.getVersion().getPrefix();
+            String pfx = lastAdded.lookupPrefix(msg.getVersion().getNamespace());
+            if (StringUtils.isEmpty(pfx)) {
+                pfx = "soap";
+            }
             if (msg.hasAdditionalEnvNs()) {
                 String ns = msg.getVersion().getNamespace();
                 Map<String, String> nsMap = msg.getEnvelopeNs();
