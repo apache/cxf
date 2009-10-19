@@ -338,8 +338,10 @@ public final class XmlSchemaUtils {
             results.addAll(getContentElements(baseType, collection));
             // and now process our sequence.
             XmlSchemaSequence extSequence = getContentSequence(type);
-            for (int i = 0; i < extSequence.getItems().getCount(); i++) {
-                results.add(extSequence.getItems().getItem(i));
+            if (extSequence != null) {
+                for (int i = 0; i < extSequence.getItems().getCount(); i++) {
+                    results.add(extSequence.getItems().getItem(i));
+                }
             }
             return results;
         } else {

@@ -29,6 +29,7 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
+import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.javascript.AttributeInfo;
 import org.apache.cxf.javascript.ItemInfo;
@@ -41,6 +42,7 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
@@ -76,6 +78,16 @@ public class SchemaJavascriptBuilder {
         this.xmlSchemaCollection = schemaCollection;
         this.nameManager = nameManager;
         this.prefixAccumulator = prefixAccumulator;
+    }
+    
+    public String generateCodeForSchemaCollection(XmlSchemaCollection collection) {
+        StringBuilder accumulatedCode = new StringBuilder();
+        for (XmlSchema schema : collection.getXmlSchemas()) {
+            if (!XmlSchemaConstants.XSD_NAMESPACE_URI.equals(schema.getTargetNamespace())) {
+                accumulatedCode.append(generateCodeForSchema(schema));
+            }
+        }
+        return accumulatedCode.toString();
     }
 
     public String generateCodeForSchema(XmlSchema schema) {

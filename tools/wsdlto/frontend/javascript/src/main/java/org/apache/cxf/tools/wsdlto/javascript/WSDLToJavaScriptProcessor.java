@@ -27,7 +27,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
-import java.util.Collection;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -39,11 +38,11 @@ import org.apache.cxf.javascript.JavascriptQueryHandler;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
 import org.apache.cxf.javascript.service.ServiceJavascriptBuilder;
 import org.apache.cxf.javascript.types.SchemaJavascriptBuilder;
-import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.core.WSDLToProcessor;
+import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLToJavaScriptProcessor.class);
@@ -70,7 +69,6 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             }
         }
         
-        Collection<SchemaInfo> schemata = serviceInfo.getSchemas();
         try {
             FileOutputStream fileOutputStream = new FileOutputStream(jsFile);
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
@@ -80,15 +78,13 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
             BufferedWriter writer = new BufferedWriter(outputStreamWriter);
-                
-            for (SchemaInfo schema : schemata) {
-                LOG.fine("Processing schema " + schema.toString());
-                SchemaJavascriptBuilder jsBuilder = 
-                    new SchemaJavascriptBuilder(serviceInfo
-                    .getXmlSchemaCollection(), prefixManager, nameManager);
-                String allThatJavascript = jsBuilder.generateCodeForSchema(schema.getSchema());
-                writer.append(allThatJavascript);
-            }
+            
+            XmlSchemaCollection collection = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection();
+            SchemaJavascriptBuilder jsBuilder = 
+                new SchemaJavascriptBuilder(serviceInfo
+                .getXmlSchemaCollection(), prefixManager, nameManager);
+            String jsForSchemas = jsBuilder.generateCodeForSchemaCollection(collection); 
+            writer.append(jsForSchemas);
 
             ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
                                                                                    null,
