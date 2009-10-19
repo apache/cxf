@@ -373,8 +373,12 @@ public class STSClient implements Configurable {
                 writer.writeStartElement("wst", "Entropy", namespace);
                 writer.writeStartElement("wst", "BinarySecret", namespace);
                 writer.writeAttribute("Type", namespace + "/Nonce");
-                requestorEntropy = WSSecurityUtil
-                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                if (algorithmSuite == null) {
+                    requestorEntropy = WSSecurityUtil.generateNonce(8);
+                } else {
+                    requestorEntropy = WSSecurityUtil
+                        .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+                } 
                 writer.writeCharacters(Base64.encode(requestorEntropy));
 
                 writer.writeEndElement();
@@ -724,7 +728,10 @@ public class STSClient implements Configurable {
                     // Right now we only use PSHA1 as the computed key algo
                     P_SHA1 psha1 = new P_SHA1();
 
-                    int length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
+                    int length = (keySize > 0) ? keySize : 256;
+                    if (algorithmSuite != null) {
+                        length = (keySize > 0) ? keySize : algorithmSuite.getMaximumSymmetricKeyLength();
+                    }
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
                     } catch (ConversationException e) {
