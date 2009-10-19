@@ -20,6 +20,9 @@ package org.apache.cxf.ws.security.policy;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.ws.security.policy.SPConstants.IncludeTokenType;
+
 public final class SP11Constants extends SPConstants {
     
     public static final SP11Constants INSTANCE = new SP11Constants();
@@ -279,9 +282,8 @@ public final class SP11Constants extends SPConstants {
             return IncludeTokenType.INCLUDE_TOKEN_NEVER;
         } else if (INCLUDE_ONCE.equals(value)) {
             return IncludeTokenType.INCLUDE_TOKEN_ONCE;
-        } else {
-            return null;
-        }   
+        }
+        return StringUtils.isEmpty(value) ? IncludeTokenType.INCLUDE_TOKEN_ALWAYS : null;
     }
     
     public String getAttributeValueFromInclusion(IncludeTokenType value) {

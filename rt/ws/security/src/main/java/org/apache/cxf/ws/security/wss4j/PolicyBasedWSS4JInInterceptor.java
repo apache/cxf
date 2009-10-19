@@ -47,6 +47,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
@@ -243,6 +244,17 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             }
         }
      
+        return action;
+    }
+    private String checkTransportBinding(AssertionInfoMap aim, 
+                                         String action, 
+                                         SoapMessage message) {
+        if (isRequestor(message) && StringUtils.isEmpty(action)) {
+            //for a TransportBinding, these won't come back in the response
+            assertPolicy(aim, SP12Constants.TRANSPORT_BINDING);
+            assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
+            assertPolicy(aim, SP12Constants.SUPPORTING_TOKENS);
+        }
         return action;
     }
     private String checkSymetricBinding(AssertionInfoMap aim, 
@@ -444,6 +456,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             handleWSS11(aim, message);
             action = checkAsymetricBinding(aim, action, message);
             action = checkSymetricBinding(aim, action, message);
+            action = checkTransportBinding(aim, action, message);
             
             //stuff we can default to asserted an un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEYVALUE_TOKEN);
