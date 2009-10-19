@@ -494,6 +494,10 @@ public class STSClient implements Configurable {
         client.getRequestContext().put(SecurityConstants.TOKEN, tok);
         BindingOperationInfo boi = findOperation("/RST/Validate");
         
+        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
+                                       namespace + "/RST/Validate");
+
+        
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeStartElement("wst", "RequestType", namespace);
@@ -561,6 +565,10 @@ public class STSClient implements Configurable {
         client.getRequestContext().put(PolicyConstants.POLICY_OVERRIDE, cancelPolicy);
         client.getRequestContext().put(SecurityConstants.TOKEN, token);
         BindingOperationInfo boi = findOperation("/RST/Cancel");
+        
+        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
+                                       namespace + "/RST/Cancel");
+
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
