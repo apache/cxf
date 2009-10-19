@@ -50,6 +50,7 @@ import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -183,6 +184,10 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
     @Override
     public void setServiceClass(Class<?> serviceClass) {
+        if (serviceClass == null) {
+            Message message = new Message("SERVICECLASS_MUST_BE_SET", LOG);
+            throw new ServiceConstructionException(message);
+        }
         setJaxWsImplementorInfo(new JaxWsImplementorInfo(serviceClass));
         super.setServiceClass(getJaxWsImplementorInfo().getEndpointClass());
     }
