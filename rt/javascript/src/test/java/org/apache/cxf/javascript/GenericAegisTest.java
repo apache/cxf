@@ -64,7 +64,7 @@ public class GenericAegisTest  {
         for (SchemaInfo schema : schemata) {
             SchemaJavascriptBuilder builder = new SchemaJavascriptBuilder(serviceInfo
                 .getXmlSchemaCollection(), prefixManager, nameManager);
-            String allThatJavascript = builder.generateCodeForSchema(schema);
+            String allThatJavascript = builder.generateCodeForSchema(schema.getSchema());
             assertNotNull(allThatJavascript);
         }
 

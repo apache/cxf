@@ -29,8 +29,10 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.javascript.BasicNameManager;
 import org.apache.cxf.javascript.JavascriptQueryHandler;
@@ -44,6 +46,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.core.WSDLToProcessor;
 
 public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
+    private static final Logger LOG = LogUtils.getL7dLogger(WSDLToJavaScriptProcessor.class);
     private static final Charset UTF8 = Charset.forName("utf-8");
     
     public void process() throws ToolException {
@@ -79,10 +82,11 @@ public class WSDLToJavaScriptProcessor extends WSDLToProcessor {
             BufferedWriter writer = new BufferedWriter(outputStreamWriter);
                 
             for (SchemaInfo schema : schemata) {
+                LOG.fine("Processing schema " + schema.toString());
                 SchemaJavascriptBuilder jsBuilder = 
                     new SchemaJavascriptBuilder(serviceInfo
                     .getXmlSchemaCollection(), prefixManager, nameManager);
-                String allThatJavascript = jsBuilder.generateCodeForSchema(schema);
+                String allThatJavascript = jsBuilder.generateCodeForSchema(schema.getSchema());
                 writer.append(allThatJavascript);
             }
 

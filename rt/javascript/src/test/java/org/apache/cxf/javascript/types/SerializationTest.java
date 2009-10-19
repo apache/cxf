@@ -202,7 +202,7 @@ public class SerializationTest extends AbstractCXFSpringTest {
         for (SchemaInfo schema : schemata) {
             SchemaJavascriptBuilder builder = new SchemaJavascriptBuilder(serviceInfo
                 .getXmlSchemaCollection(), prefixAccumulator, nameManager);
-            String allThatJavascript = builder.generateCodeForSchema(schema);
+            String allThatJavascript = builder.generateCodeForSchema(schema.getSchema());
             assertNotNull(allThatJavascript);
             testUtilities.readStringIntoRhino(allThatJavascript, schema.toString() + ".js");
         }
