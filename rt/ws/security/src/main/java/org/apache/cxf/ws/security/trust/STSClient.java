@@ -69,6 +69,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Conduit;
@@ -295,6 +296,16 @@ public class STSClient implements Configurable {
                 return boi;
             }
         }
+        //operation is not correct as the Action is not set correctly.   Let's see if
+        //we can at least find it by name and then set the action and such manually later.
+        for (BindingOperationInfo boi : bi.getOperations()) {
+            if (boi.getInput().getMessageInfo().getMessageParts().size() > 0) {
+                MessagePartInfo mpi = boi.getInput().getMessageInfo().getMessagePart(0);
+                if ("RequestSecurityToken".equals(mpi.getConcreteName().getLocalPart())) {
+                    return boi;
+                }
+            }
+        }
         return null;
     }
 
@@ -318,6 +329,9 @@ public class STSClient implements Configurable {
         client.getRequestContext().putAll(ctx);
         if (action != null) {
             client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, action);
+        } else {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
+                                           namespace + "/RST/Issue");
         }
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
