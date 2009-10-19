@@ -146,7 +146,7 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                             if (removes == null) {
                                 removes = new ArrayList<Integer>();
                             }
-                            removes.add(mpi.getIndex());
+                            removes.add(part.getIndex());
                         }
                     } else {
                         ++count;
@@ -157,7 +157,9 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
                 } else if (removes != null) {
                     Collections.sort(removes, Collections.reverseOrder());
                     for (Integer i : removes) {
-                        newParams.remove(i.intValue());
+                        if (i < newParams.size()) {
+                            newParams.remove(i.intValue());
+                        }
                     }
                 }
                 
@@ -179,13 +181,15 @@ public class WrapperClassInInterceptor extends AbstractPhaseInterceptor<Message>
         
         for (MessagePartInfo p : messageInfo.getMessageParts()) {
             if (Boolean.TRUE.equals(p.getProperty(ReflectionServiceFactoryBean.HEADER))) {
-                int idx = p.getIndex();
-                ensureSize(elTypeNames, idx);
-                ensureSize(partClasses, idx);
-                ensureSize(partNames, idx);
-                elTypeNames.set(idx, null);
-                partClasses.set(idx, null);
-                partNames.set(idx, null);
+                if (p.getTypeClass() != null) {
+                    int idx = p.getIndex();
+                    ensureSize(elTypeNames, idx);
+                    ensureSize(partClasses, idx);
+                    ensureSize(partNames, idx);
+                    elTypeNames.set(idx, null);
+                    partClasses.set(idx, null);
+                    partNames.set(idx, null);
+                }
             } else {
                 String elementType = null;
                 if (p.getTypeQName() == null) {
