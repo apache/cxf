@@ -52,6 +52,7 @@ import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.Configurer;
@@ -61,9 +62,12 @@ import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -112,9 +116,9 @@ import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 /**
  * 
  */
-public class STSClient implements Configurable {
+public class STSClient implements Configurable, InterceptorProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(STSClient.class);
-
+    
     Bus bus;
     String name = "default.sts-client";
     Client client;
@@ -137,6 +141,12 @@ public class STSClient implements Configurable {
     int ttl = 300;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
+    
+    List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
+    List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
+    List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    List<AbstractFeature> features;
 
     public STSClient(Bus b) {
         bus = b;
@@ -280,6 +290,20 @@ public class STSClient implements Configurable {
                                                            policy, endpointName);
 
             client = new ClientImpl(bus, endpoint);
+        }
+        
+        client.getInFaultInterceptors().addAll(inFault);
+        client.getInInterceptors().addAll(in);
+        client.getOutInterceptors().addAll(out);
+        client.getOutFaultInterceptors().addAll(outFault);
+        in = null;
+        out = null;
+        inFault = null;
+        outFault = null;
+        if (features != null) {
+            for (AbstractFeature f : features) {
+                f.initialize(client, bus);
+            }
         }
     }
 
@@ -865,5 +889,55 @@ public class STSClient implements Configurable {
     public void setTemplate(Element rstTemplate) {
         template = rstTemplate;
     }
+    
+    public List<Interceptor> getOutFaultInterceptors() {
+        if (client != null) {
+            return client.getOutFaultInterceptors();
+        }
+        return outFault;
+    }
 
+    public List<Interceptor> getInFaultInterceptors() {
+        if (client != null) {
+            return client.getInFaultInterceptors();
+        }
+        return inFault;
+    }
+
+    public List<Interceptor> getInInterceptors() {
+        if (client != null) {
+            return client.getInInterceptors();
+        }
+        return in;
+    }
+
+    public List<Interceptor> getOutInterceptors() {
+        if (client != null) {
+            return client.getOutInterceptors();
+        }
+        return out;
+    }
+
+    public void setInInterceptors(List<Interceptor> interceptors) {
+        getInInterceptors().addAll(interceptors);
+    }
+
+    public void setInFaultInterceptors(List<Interceptor> interceptors) {
+        getInFaultInterceptors().addAll(interceptors);
+    }
+
+    public void setOutInterceptors(List<Interceptor> interceptors) {
+        getOutInterceptors().addAll(interceptors);
+    }
+
+    public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+        getOutFaultInterceptors().addAll(interceptors);
+    }
+    
+    public void setFeatures(List<AbstractFeature> f) {
+        features = f;
+    }
+    public List<AbstractFeature> getFeatures() {
+        return features;
+    }
 }
