@@ -22,10 +22,12 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTimeInterceptor {
-    
+    private EndingInterceptor ending = new EndingInterceptor(); 
+
     public ResponseTimeMessageOutInterceptor() {
         super(Phase.SEND);
     }
@@ -34,10 +36,9 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
         Exchange ex = message.getExchange();
         if (isClient(message)) {
             if (ex.isOneWay()) {
-                setOneWayMessage(ex);
-            } else {
-                beginHandlingMessage(ex);
-            }
+                message.getInterceptorChain().add(ending);
+            } 
+            beginHandlingMessage(ex);
         } else { // the message is handled by server
             endHandlingMessage(ex);
         }
@@ -55,6 +56,26 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
                 faultMode = FaultMode.RUNTIME_FAULT;
             }
             ex.put(FaultMode.class, faultMode);
+            endHandlingMessage(ex);
+        }
+    }
+
+    EndingInterceptor getEndingInterceptor() {
+        return ending;
+    }
+    
+    public class EndingInterceptor extends AbstractPhaseInterceptor<Message> {
+        public EndingInterceptor() {
+            super(Phase.PREPARE_SEND_ENDING);
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            Exchange ex = message.getExchange();
+            endHandlingMessage(ex);
+        }
+
+        public void handleFault(Message message) throws Fault {
+            Exchange ex = message.getExchange();
             endHandlingMessage(ex);
         }
     }

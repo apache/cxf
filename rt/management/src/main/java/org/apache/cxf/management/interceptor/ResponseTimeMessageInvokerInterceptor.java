@@ -40,7 +40,7 @@ public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageRespon
     
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
-        if (ex.isOneWay()) {
+        if (ex.isOneWay() && !isClient(message)) {
             setOneWayMessage(ex);
         }
     }
@@ -49,7 +49,7 @@ public class ResponseTimeMessageInvokerInterceptor extends AbstractMessageRespon
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
         ex.put(FaultMode.class, message.get(FaultMode.class));
-        if (ex.isOneWay()) {
+        if (ex.isOneWay() && !isClient(message)) {
             endHandlingMessage(ex);
         }
     }

@@ -39,6 +39,7 @@ public class ResponseTimeMessageInInterceptorTest extends AbstractMessageRespons
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
         EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
+        EasyMock.expect(exchange.isOneWay()).andReturn(false);
         MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         mhtr.endHandling();
         EasyMock.expectLastCall();        
