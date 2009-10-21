@@ -99,7 +99,21 @@ public interface Message extends StringMap {
     String WSDL_INTERFACE = "javax.xml.ws.wsdl.interface";
     String WSDL_OPERATION = "javax.xml.ws.wsdl.operation";
 
-    
+    /**
+     * Some properties to allow adding interceptors to the chain
+     * on a per-request basis.  All are a Collection<Interceptor> 
+     * These are NOT contextual properties (ie: not searched outside the message).
+     * They must exist on the message itself at time of Chain creation
+     */
+    String IN_INTERCEPTORS = Message.class.getName() + ".IN_INTERCEPTORS";
+    String OUT_INTERCEPTORS = Message.class.getName() + ".OUT_INTERCEPTORS";
+    String FAULT_IN_INTERCEPTORS = Message.class.getName() + ".FAULT_IN_INTERCEPTORS";
+    String FAULT_OUT_INTERCEPTORS = Message.class.getName() + ".FAULT_OUT_INTERCEPTORS";
+    /**
+     * As above, but Collection<InterceptorProvider> 
+     */
+    String INTERCEPTOR_PROVIDERS = Message.class.getName() + ".INTERCEPTOR_PROVIDER";
+
     String getId();
     void setId(String id);
     

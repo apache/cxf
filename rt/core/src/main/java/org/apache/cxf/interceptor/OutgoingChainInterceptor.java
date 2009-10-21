@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -30,6 +31,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.PreexistingConduitSelector;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -123,10 +125,33 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
             }
             chain.add(il);
         }
+        modifyChain(chain, ex);
         chain.setFaultObserver(ep.getOutFaultObserver());
         return chain;
     }
-
+    private static void modifyChain(PhaseInterceptorChain chain, Exchange ex) {
+        modifyChain(chain, ex.getInMessage());
+        modifyChain(chain, ex.getOutMessage());
+    }
+    private static void modifyChain(PhaseInterceptorChain chain, Message m) {
+        if (m == null) {
+            return;
+        }
+        Collection<InterceptorProvider> providers 
+            = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                chain.add(p.getOutInterceptors());
+            }
+        }
+        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.OUT_INTERCEPTORS));
+        if (is != null) {
+            chain.add(is);
+        }
+        if (m.getDestination() instanceof InterceptorProvider) {
+            chain.add(((InterceptorProvider)m.getDestination()).getOutInterceptors());
+        }
+    }
     private PhaseInterceptorChain getChain(Exchange ex) {
         Bus bus = ex.get(Bus.class);
         Binding binding = ex.get(Binding.class);
@@ -175,6 +200,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                                    i1, i2, i3);
         }
         
+        modifyChain(chain, ex);
         chain.setFaultObserver(ep.getOutFaultObserver());
         return chain;
     }

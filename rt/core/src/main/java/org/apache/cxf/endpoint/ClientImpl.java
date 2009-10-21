@@ -22,6 +22,7 @@ package org.apache.cxf.endpoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -408,11 +409,13 @@ public class ClientImpl
             PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
             message.setInterceptorChain(chain);
 
-            modifyChain(chain, reqContext);
             chain.setFaultObserver(outFaultObserver);
 
             // setup conduit selector
             prepareConduitSelector(message);
+            
+            // add additional interceptors and such
+            modifyChain(chain, message, false);
 
             // execute chain
             chain.doIntercept(message);
@@ -468,12 +471,14 @@ public class ClientImpl
             PhaseInterceptorChain chain = setupInterceptorChain(endpoint);
             message.setInterceptorChain(chain);
 
-            modifyChain(chain, reqContext);
             chain.setFaultObserver(outFaultObserver);
 
             // setup conduit selector
             prepareConduitSelector(message);
 
+            // add additional interceptors and such
+            modifyChain(chain, message, false);
+            
             // execute chain
             chain.doIntercept(message);
 
@@ -636,7 +641,9 @@ public class ClientImpl
         message.setInterceptorChain(chain);
 
         chain.setFaultObserver(outFaultObserver);
-
+        modifyChain(chain, message, true);
+        modifyChain(chain, message.getExchange().getOutMessage(), true);
+        
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         // execute chain
@@ -812,8 +819,26 @@ public class ClientImpl
         return outboundChainCache.get(pm.getOutPhases(), i1, i2, i3, i4);
     }
 
-    protected void modifyChain(InterceptorChain chain, Map<String, Object> ctx) {
-        // no-op
+    protected void modifyChain(InterceptorChain chain, Message ctx, boolean in) {
+        if (ctx == null) {
+            return;
+        }
+        Collection<InterceptorProvider> providers 
+            = CastUtils.cast((Collection<?>)ctx.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                if (in) {
+                    chain.add(p.getInInterceptors());
+                } else {
+                    chain.add(p.getOutInterceptors());
+                }
+            }
+        }
+        String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
+        Collection<Interceptor> is = CastUtils.cast((Collection<?>)ctx.get(key));
+        if (is != null) {
+            chain.add(is);
+        }
     }
 
     protected void setEndpoint(Endpoint e) {

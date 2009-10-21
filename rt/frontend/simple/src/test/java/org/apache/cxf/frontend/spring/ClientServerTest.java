@@ -17,9 +17,18 @@
  * under the License.
  */
 package org.apache.cxf.frontend.spring;
+import java.util.Arrays;
+
 import junit.framework.Assert;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.factory.HelloService;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -39,6 +48,39 @@ public class ClientServerTest extends Assert {
         
         String result = greeter.sayHello();
         assertEquals("We get the wrong sayHello result", result, "hello");
+        
+        
+        Client c = ClientProxy.getClient(greeter);
+        TestInterceptor out = new TestInterceptor();
+        TestInterceptor in = new TestInterceptor();
+        c.getRequestContext().put(Message.OUT_INTERCEPTORS, Arrays.asList(new Interceptor[] {out}));
+        result = greeter.sayHello();
+        assertTrue(out.wasCalled());
+        out.reset();
+
+        c.getRequestContext().put(Message.IN_INTERCEPTORS, Arrays.asList(new Interceptor[] {in}));
+        result = greeter.sayHello();
+        assertTrue(out.wasCalled());
+        assertTrue(in.wasCalled());
     }
+    
+    private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
+        boolean called;
+        
+        public TestInterceptor() {
+            super(Phase.USER_LOGICAL);
+        }
+        
+        public void handleMessage(Message message) throws Fault {
+            called = true;
+        }
+        public boolean wasCalled() {
+            return called;
+        }
+        public void reset() {
+            called = false;
+        }
+    }
+    
 
 }

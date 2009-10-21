@@ -22,6 +22,7 @@ package org.apache.cxf.transport;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
@@ -29,6 +30,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
@@ -101,12 +104,29 @@ public class ChainInitiationObserver implements MessageObserver {
             
             phaseChain.setFaultObserver(endpoint.getOutFaultObserver());
            
+            addToChain(phaseChain, message);
+            
             phaseChain.doIntercept(message);
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
         }
     }
-
+    private void addToChain(PhaseInterceptorChain chain, Message m) {
+        Collection<InterceptorProvider> providers 
+            = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                chain.add(p.getInInterceptors());
+            }
+        }
+        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.IN_INTERCEPTORS));
+        if (is != null) {
+            chain.add(is);
+        }
+        if (m.getDestination() instanceof InterceptorProvider) {
+            chain.add(((InterceptorProvider)m.getDestination()).getInInterceptors());
+        }
+    }
 
     protected Binding getBinding() {
         return endpoint.getBinding();
