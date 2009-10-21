@@ -28,10 +28,12 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.FaultInfo;
@@ -91,8 +93,8 @@ public final class ColocUtil {
                 LOG.fine("Interceptors contributed by databinding: " + il);
             }
             chain.add(il);
-
         }
+        modifyChain(chain, ex, false);
 
         return chain;
     }
@@ -126,10 +128,35 @@ public final class ColocUtil {
             chain.add(il);
         }
         chain.setFaultObserver(new ColocOutFaultObserver(bus));
-
+        modifyChain(chain, ex, true);
         return chain;
     }    
-    
+    private static void modifyChain(PhaseInterceptorChain chain, Exchange ex, boolean in) {
+        modifyChain(chain, ex.getInMessage(), in);
+        modifyChain(chain, ex.getOutMessage(), in);
+    }
+    private static void modifyChain(PhaseInterceptorChain chain, Message m, boolean in) {
+        if (m == null) {
+            return;
+        }
+        Collection<InterceptorProvider> providers 
+            = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                if (in) {
+                    chain.add(p.getInInterceptors());
+                } else {
+                    chain.add(p.getOutInterceptors());
+                }
+            }
+        }
+        String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
+        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(key));
+        if (is != null) {
+            chain.add(is);
+        }
+    }
+
     public static boolean isSameOperationInfo(OperationInfo oi1, OperationInfo oi2) {
         return  oi1.getName().equals(oi2.getName())
                 && isSameMessageInfo(oi1.getInput(), oi2.getInput())

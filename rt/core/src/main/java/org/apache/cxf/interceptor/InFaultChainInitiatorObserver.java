@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.interceptor;
 
+import java.util.Collection;
 import java.util.SortedSet;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
@@ -50,6 +53,22 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
         chain.add(e.getBinding().getInFaultInterceptors());
         if (e.getService().getDataBinding() instanceof InterceptorProvider) {
             chain.add(((InterceptorProvider)e.getService().getDataBinding()).getInFaultInterceptors());
+        }
+        
+        addToChain(chain, ex.getInFaultMessage());
+        addToChain(chain, ex.getOutMessage());
+    }
+    private void addToChain(PhaseInterceptorChain chain, Message m) {
+        Collection<InterceptorProvider> providers 
+            = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
+        if (providers != null) {
+            for (InterceptorProvider p : providers) {
+                chain.add(p.getInFaultInterceptors());
+            }
+        }
+        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.FAULT_IN_INTERCEPTORS));
+        if (is != null) {
+            chain.add(is);
         }
     }
     
