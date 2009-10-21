@@ -22,6 +22,18 @@
                 <xsl:when test="@schemaLocation='http://ndgo-introp-s24/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?xsd=xsd3'">
                     <xsl:attribute name="schemaLocation">WsSecurity11_3.xsd</xsl:attribute>
                 </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?xsd=xsd0'">
+                    <xsl:attribute name="schemaLocation">WsSecurity11_0.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?xsd=xsd1'">
+                    <xsl:attribute name="schemaLocation">WsSecurity11_1.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?xsd=xsd2'">
+                    <xsl:attribute name="schemaLocation">WsSecurity11_2.xsd</xsl:attribute>
+                </xsl:when>
+                <xsl:when test="@schemaLocation='http://131.107.153.205/Security_WsSecurity_Service_Indigo/WsSecurity11.svc?xsd=xsd3'">
+                    <xsl:attribute name="schemaLocation">WsSecurity11_3.xsd</xsl:attribute>
+                </xsl:when>
                 <xsl:otherwise>
                     <xsl:attribute name="schemaLocation"><xsl:value-of select="@schemaLocation"/></xsl:attribute>
                 </xsl:otherwise>
