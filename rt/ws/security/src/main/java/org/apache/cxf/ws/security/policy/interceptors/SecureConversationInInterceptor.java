@@ -462,7 +462,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         SecurityContextToken tok
                             = (SecurityContextToken)wser
                                 .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getID());
+                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
                         found = true;
                     }
                 }
