@@ -51,6 +51,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
+             <groupId>javax.xml.bind</groupId>
+             <artifactId>jaxb-api</artifactId>
+         </dependency>
+        <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-xjc</artifactId>
         </dependency>
@@ -62,6 +66,14 @@
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-activation_1.1_spec</artifactId>
         </dependency>
+        <dependency>
+             <groupId>org.apache.geronimo.specs</groupId>
+             <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+         </dependency>
+        <dependency>
+             <groupId>${stax.impl.groupId}</groupId>
+             <artifactId>${stax.impl.artifactId}</artifactId>
+         </dependency>
 
         <dependency>
             <groupId>ant</groupId>
