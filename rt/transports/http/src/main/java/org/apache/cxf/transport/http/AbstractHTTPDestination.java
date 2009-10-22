@@ -52,6 +52,7 @@ import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -62,6 +63,8 @@ import org.apache.cxf.transport.AbstractMultiplexDestination;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
+import org.apache.cxf.transport.https.CertConstraints;
+import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -97,6 +100,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     protected String contextMatchStrategy = "stem";
     protected boolean fixedParameterOrder;
     protected boolean multiplexWithAddress;
+    protected CertConstraints certConstraints;
     
     /**
      * Constructor
@@ -326,6 +330,11 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         setHeaders(inMessage);
         
         SSLUtils.propogateSecureSession(req, inMessage);
+
+        inMessage.put(CertConstraints.class.getName(), certConstraints);
+        inMessage.put(Message.IN_INTERCEPTORS,
+                Arrays.asList(new Interceptor[] {CertConstraintsInterceptor.INSTANCE}));
+
     }
     
     protected String getBasePath(String contextPath) throws IOException {

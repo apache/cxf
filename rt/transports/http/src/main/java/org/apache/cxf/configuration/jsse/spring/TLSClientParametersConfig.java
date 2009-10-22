@@ -86,6 +86,9 @@ public final class TLSClientParametersConfig {
                 TLSParameterJaxBUtils.getTrustManagers(
                         params.getTrustManagers()));
         }
+        if (params.isSetCertConstraints()) {
+            ret.setCertConstraints(params.getCertConstraints());
+        }
         return ret;
     }
     

@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:http="http://cxf.apache.org/transports/http/configuration"
+       xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:sec="http://cxf.apache.org/configuration/security"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans                 http://www.springframework.org/schema/beans/spring-beans-2.0.xsd
+        http://cxf.apache.org/jaxws                                 http://cxf.apache.org/schemas/jaxws.xsd
+        http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
+        http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+        http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
+        ">
+
+    <!-- -->
+    <!-- This Spring config file is designed to represent a minimal -->
+    <!-- configuration for spring-loading a CXF servant, where the -->
+    <!-- servant listens using HTTP/S as the transport protocol. -->
+    <!-- -->
+    <!-- Note that the service endpoint is spring-loaded.  In the -->
+    <!-- scenario in which this config is designed to run, the -->
+    <!-- server application merely instantiates a Bus, and does not -->
+    <!-- publish any services programmatically -->
+    <!-- -->
+
+    <!-- -->
+    <!-- Spring-load an HTTPS servant -->
+    <!-- -->
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9006"        
+        address="https://localhost:9006/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9006-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>  
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9007"        
+        address="https://localhost:9007/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9007-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server> 
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9008"        
+        address="https://localhost:9008/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9008-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>   
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9009"        
+        address="https://localhost:9009/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9009-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>   
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9010"        
+        address="https://localhost:9010/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9010-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>   
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9011"        
+        address="https://localhost:9011/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9011-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>    
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9012"        
+        address="https://localhost:9012/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9012-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server> 
+    
+    <jaxws:server 
+        id="JaxwsHttpsEndpoint9013"        
+        address="https://localhost:9013/SoapContext/HttpsPort"
+        serviceName="s:SOAPService"
+        endpointName="e:HttpsPort"
+        xmlns:e="http://apache.org/hello_world/services"
+        xmlns:s="http://apache.org/hello_world/services"
+        depends-on="port-9013-tls-config">
+        <jaxws:serviceBean>
+           <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
+        </jaxws:serviceBean>
+    </jaxws:server>      
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9006 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9006-tls-config">
+        <httpj:engine port="9006">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	    <sec:keyStore type="JKS" password="password"
+	                    file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:SubjectDNConstraints>
+	                    <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	                    <sec:RegularExpression>.*OU=Morpit.*</sec:RegularExpression>
+	                </sec:SubjectDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9007 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9007-tls-config">
+        <httpj:engine port="9007">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:SubjectDNConstraints>
+	                    <sec:RegularExpression>.*O=BadApacheTest.*</sec:RegularExpression>
+	                </sec:SubjectDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9008 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9008-tls-config">
+        <httpj:engine port="9008">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:SubjectDNConstraints>
+	                    <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	                    <sec:RegularExpression>.*O=BadApacheTest.*</sec:RegularExpression>
+	                </sec:SubjectDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9009 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9009-tls-config">
+        <httpj:engine port="9009">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:SubjectDNConstraints combinator="ANY">
+	                    <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	                    <sec:RegularExpression>.*O=BadApacheTest.*</sec:RegularExpression>
+	                </sec:SubjectDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9010 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9010-tls-config">
+        <httpj:engine port="9010">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:IssuerDNConstraints combinator="ALL">
+	                    <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	                    <sec:RegularExpression>.*O=BadApacheTest.*</sec:RegularExpression>
+	                </sec:IssuerDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9011 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9011-tls-config">
+        <httpj:engine port="9011">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Bethal.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:certConstraints>
+	                <sec:IssuerDNConstraints combinator="ANY">
+	                    <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	                    <sec:RegularExpression>.*O=BadApacheTest.*</sec:RegularExpression>
+	                </sec:IssuerDNConstraints>
+	            </sec:certConstraints>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9012 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9012-tls-config">
+        <httpj:engine port="9012">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:clientAuthentication required="true"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+    <!-- -->
+    <!-- TLS Port configuration parameters for port 9013 -->
+    <!-- -->
+    <httpj:engine-factory id="port-9013-tls-config">
+        <httpj:engine port="9013">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+	            <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Gordy.jks"/>
+	      		</sec:keyManagers>
+	      		<sec:trustManagers>
+	          	<sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	     		</sec:trustManagers>
+	     		<sec:clientAuthentication required="true"/>
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
+
+    <!-- -->
+    <!-- HTTP/S configuration for clients -->
+    <!-- -->
+    <http:conduit name="{http://apache.org/hello_world/services}HttpsPort.http-conduit">
+        <http:tlsClientParameters disableCNCheck="true">
+            <sec:keyManagers keyPassword="password">
+	           <sec:keyStore type="JKS" password="password" 
+	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
+	           </sec:keyManagers>
+	        <sec:trustManagers>
+	           <sec:keyStore type="JKS" password="password"
+	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
+	        </sec:trustManagers>
+	        <sec:certConstraints>
+	            <sec:SubjectDNConstraints>
+	                <sec:RegularExpression>.*CN=(Bethal|Gordy).*</sec:RegularExpression>
+	                <sec:RegularExpression>.*O=ApacheTest.*</sec:RegularExpression>
+	            </sec:SubjectDNConstraints>
+	            <sec:IssuerDNConstraints combinator="ANY">
+	                <sec:RegularExpression>.*CN=Bethal.*</sec:RegularExpression>
+	                <sec:RegularExpression>.*OU=Morpit.*</sec:RegularExpression>
+	            </sec:IssuerDNConstraints>
+	        </sec:certConstraints>
+        </http:tlsClientParameters>
+    </http:conduit>
+
+</beans>

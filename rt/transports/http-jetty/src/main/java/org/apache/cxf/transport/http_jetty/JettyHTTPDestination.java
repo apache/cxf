@@ -33,6 +33,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.configuration.jsse.TLSServerParameters;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.continuations.ContinuationInfo;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
@@ -45,6 +47,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationWrapper;
+import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -116,6 +119,13 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
 
         assert engine != null;
+        TLSServerParameters serverParameters = engine.getTlsServerParameters();
+        if (serverParameters != null && serverParameters.getCertConstraints() != null) {
+            CertificateConstraintsType constraints = serverParameters.getCertConstraints();
+            if (constraints != null) {
+                certConstraints = CertConstraintsJaxBUtils.createCertConstraints(constraints);
+            }
+        }
         
         // When configuring for "http", however, it is still possible that
         // Spring configuration has configured the port for https. 
@@ -297,7 +307,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             exchange.setInMessage(inMessage);
             exchange.setSession(new HTTPSession(req));
         }
-
+        
         try {    
             incomingObserver.onMessage(inMessage);
             resp.flushBuffer();

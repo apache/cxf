@@ -25,6 +25,7 @@ import java.util.List;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.TrustManager;
 
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.FiltersType;
 
 /**
@@ -37,6 +38,7 @@ public class TLSParameterBase {
     private String          provider;
     private List<String>    ciphersuites = new ArrayList<String>();
     private FiltersType     cipherSuiteFilters;
+    private CertificateConstraintsType certConstraints;
     private SecureRandom    secureRandom;
     private String          protocol;
     
@@ -124,6 +126,20 @@ public class TLSParameterBase {
      */
     public final void setSecureRandom(SecureRandom random) {
         secureRandom = random;
+    }
+    
+    /**
+     * Get the certificate constraints type
+     */
+    public CertificateConstraintsType getCertConstraints() {
+        return certConstraints;
+    }
+    
+    /**
+     * Set the certificate constraints type
+     */
+    public final void setCertConstraints(CertificateConstraintsType constraints) {
+        certConstraints = constraints;
     }
 
     /**

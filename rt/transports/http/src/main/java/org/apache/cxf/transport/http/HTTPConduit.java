@@ -50,6 +50,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
@@ -69,6 +70,9 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
+import org.apache.cxf.transport.https.CertConstraints;
+import org.apache.cxf.transport.https.CertConstraintsInterceptor;
+import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.workqueue.AutomaticWorkQueue;
@@ -256,6 +260,8 @@ public class HTTPConduit
      */
     private Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>();
     private boolean maintainSession;
+    
+    private CertConstraints certConstraints;
 
     /**
      * Constructor
@@ -478,7 +484,7 @@ public class HTTPConduit
      */
     public void prepare(Message message) throws IOException {
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
-        
+
         // This call can possibly change the conduit endpoint address and 
         // protocol from the default set in EndpointInfo that is associated
         // with the Conduit.
@@ -592,9 +598,13 @@ public class HTTPConduit
         
         message.put(KEY_HTTP_CONNECTION, connection);
         
+        if (certConstraints != null) {
+            message.put(CertConstraints.class.getName(), certConstraints);
+            message.getInterceptorChain().add(CertConstraintsInterceptor.INSTANCE);
+        }
+        
         // Set the headers on the message according to configured 
         // client side policy.
-        
         setHeadersByPolicy(message, currentURL, headers);
      
         
@@ -1371,6 +1381,10 @@ public class HTTPConduit
                     + "keyManagers " + tlsClientParameters.getKeyManagers()
                     + "trustManagers " + tlsClientParameters.getTrustManagers()
                     + "secureRandom " + tlsClientParameters.getSecureRandom());
+            }
+            CertificateConstraintsType constraints = params.getCertConstraints();
+            if (constraints != null) {
+                certConstraints = CertConstraintsJaxBUtils.createCertConstraints(constraints);
             }
         } else {
             if (LOG.isLoggable(Level.FINE)) {
