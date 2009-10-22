@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.https;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
@@ -32,12 +33,14 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import javax.imageio.IIOException;
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transport.http.HttpURLConnectionFactory;
@@ -61,17 +64,7 @@ public final class HttpsURLConnectionFactory
     private static final Logger LOG =
         LogUtils.getL7dLogger(HttpsURLConnectionFactory.class);
 
-    /*
-     *  For development and testing only
-     */
-    private static final String[] UNSUPPORTED =
-    {"SessionCaching", "SessionCacheKey", "MaxChainLength",
-     "CertValidator", "ProxyHost", "ProxyPort"};
-    
-    /*
-     *  For development and testing only
-     */
-    private static final String[] DERIVATIVE = {"CiphersuiteFilters"};
+    private static boolean weblogicWarned;
     
     /**
      * This field holds the conduit to which this connection factory
@@ -218,14 +211,12 @@ public final class HttpsURLConnectionFactory
                                                         tlsClientParameters.getSecureSocketProtocol());
         }
         
+        HostnameVerifier verifier = tlsClientParameters.isDisableCNCheck() 
+            ? CertificateHostnameVerifier.ALLOW_ALL : CertificateHostnameVerifier.DEFAULT;
         if (connection instanceof HttpsURLConnection) {
             // handle the expected case (javax.net.ssl)
             HttpsURLConnection conn = (HttpsURLConnection) connection;
-            if (tlsClientParameters.isDisableCNCheck()) {
-                conn.setHostnameVerifier(CertificateHostnameVerifier.ALLOW_ALL);
-            } else {
-                conn.setHostnameVerifier(CertificateHostnameVerifier.DEFAULT);
-            }
+            conn.setHostnameVerifier(verifier);
             conn.setSSLSocketFactory(socketFactory);
         } else {
             // handle the deprecated sun case and other possible hidden API's 
@@ -233,11 +224,15 @@ public final class HttpsURLConnectionFactory
             try {
                 Method method = connection.getClass().getMethod("getHostnameVerifier");
                 
-                InvocationHandler handler = new InvocationHandler() {
+                InvocationHandler handler = new ReflectionInvokationHandler(verifier) {
                     public Object invoke(Object proxy, 
                                          Method method, 
                                          Object[] args) throws Throwable {
-                        return true;
+                        try {
+                            return super.invoke(proxy, method, args);
+                        } catch (Exception ex) {
+                            return true;
+                        }
                     }
                 };
                 Object proxy = java.lang.reflect.Proxy.newProxyInstance(this.getClass().getClassLoader(),
@@ -247,14 +242,32 @@ public final class HttpsURLConnectionFactory
                 method = connection.getClass().getMethod("setHostnameVerifier", method.getReturnType());
                 method.invoke(connection, proxy);
             } catch (Exception ex) {
-                //Ignore this one, we're just setting it to a completely stupid verifier anyway
-                //that is pretty pointless.
+                //Ignore this one
             }
             try {
-                Method setSSLSocketFactory = connection.getClass().getMethod("setSSLSocketFactory", 
-                                                                             SSLSocketFactory.class);
-                setSSLSocketFactory.invoke(connection, socketFactory);
+                Method getSSLSocketFactory =  connection.getClass().getMethod("getSSLSocketFactory");
+                Method setSSLSocketFactory = connection.getClass()
+                    .getMethod("setSSLSocketFactory", getSSLSocketFactory.getReturnType());
+                if (getSSLSocketFactory.getReturnType().isInstance(socketFactory)) {
+                    setSSLSocketFactory.invoke(connection, socketFactory);
+                } else {
+                    //need to see if we can create one - mostly the weblogic case.   The 
+                    //weblogic SSLSocketFactory has a protected constructor that can take
+                    //a JSSE SSLSocketFactory so we'll try and use that
+                    Constructor c = getSSLSocketFactory.getReturnType()
+                        .getDeclaredConstructor(SSLSocketFactory.class);
+                    c.setAccessible(true);
+                    setSSLSocketFactory.invoke(connection, c.newInstance(socketFactory));
+                }
             } catch (Exception ex) {
+                if (connection.getClass().getName().contains("weblogic")) {
+                    if (!weblogicWarned) {
+                        weblogicWarned = true;
+                        LOG.warning("Could not configure SSLSocketFactory on Weblogic.  "
+                                    + " Use the Weblogic control panel to configure the SSL settings.");
+                    }
+                    return;
+                } 
                 //if we cannot set the SSLSocketFactor, we're in serious trouble.
                 throw new IllegalArgumentException("Error decorating connection class " 
                         + connection.getClass().getName(), ex);
@@ -267,14 +280,6 @@ public final class HttpsURLConnectionFactory
      */
     protected void addLogHandler(Handler handler) {
         LOG.addHandler(handler);
-    }
-       
-    protected String[] getUnSupported() {
-        return UNSUPPORTED;
-    }
-    
-    protected String[] getDerivative() {
-        return DERIVATIVE;
     }
 
     /**
