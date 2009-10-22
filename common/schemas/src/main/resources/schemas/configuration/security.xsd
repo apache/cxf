@@ -336,6 +336,48 @@
         <xs:attribute name="provider"/>
     </xs:complexType>
     
+    <xs:complexType name="CertificateConstraintsType">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds a list of regular expressions that corresponds to a sequence of
+        Certificate Constraints on either the Subject or Issuer DN.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:element name="SubjectDNConstraints" type="tns:DNConstraintsType" minOccurs="0"/>
+        <xs:element name="IssuerDNConstraints" type="tns:DNConstraintsType" minOccurs="0"/>
+      </xs:sequence>
+    </xs:complexType>
+    
+    <xs:complexType name="DNConstraintsType">
+      <xs:annotation>
+        <xs:documentation>
+        This structure holds a list of regular expressions that corresponds to a sequence of
+        Certificate Constraints. The optional combinator attribute refers to whether ALL or
+        ANY of these regular expressions must be satisfied.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:sequence>
+        <xs:choice>
+          <xs:element name="RegularExpression" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+        </xs:choice>
+      </xs:sequence>
+      <xs:attribute name="combinator" type="tns:CombinatorType" default="ALL"/>
+    </xs:complexType>
+    
+    <xs:simpleType name="CombinatorType">
+      <xs:annotation>
+        <xs:documentation>
+        This type refers to whether ALL or ANY of the DNConstraintsType regular expressions 
+        must be satisfied.
+        </xs:documentation>
+      </xs:annotation>
+      <xs:restriction base="xs:string">
+        <xs:enumeration value="ANY"/>
+        <xs:enumeration value="ALL"/>
+      </xs:restriction>
+    </xs:simpleType>
+    
     <!-- Although there are common elements of TLSClientParametersType
       ** and TLSServerParametersType they are listed separate so we
       ** can use the xs:all element.
@@ -376,6 +418,13 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains SecureRandom specification.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="certConstraints" type="tns:CertificateConstraintsType" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the Certificate Constraints specification.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
@@ -451,6 +500,13 @@
               <xs:annotation>
                 <xs:documentation>
                 This element contains Client Authentication specification.
+                </xs:documentation>
+              </xs:annotation>
+           </xs:element>
+           <xs:element name="certConstraints" type="tns:CertificateConstraintsType" minOccurs="0">
+              <xs:annotation>
+                <xs:documentation>
+                This element contains the Certificate Constraints specification.
                 </xs:documentation>
               </xs:annotation>
            </xs:element>
