@@ -27,6 +27,7 @@ public interface SoapVersion {
 
     String getNamespace();
 
+    @Deprecated
     String getPrefix();
 
     QName getEnvelope();

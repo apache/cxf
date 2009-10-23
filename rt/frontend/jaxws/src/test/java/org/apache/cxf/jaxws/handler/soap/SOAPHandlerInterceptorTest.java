@@ -143,11 +143,11 @@ public class SOAPHandlerInterceptorTest extends Assert {
                 try {
                     XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
                     SoapVersion soapVersion = Soap11.getInstance();
-                    writer.setPrefix(soapVersion.getPrefix(), soapVersion.getNamespace());
-                    writer.writeStartElement(soapVersion.getPrefix(), 
+                    writer.setPrefix("soap", soapVersion.getNamespace());
+                    writer.writeStartElement("soap", 
                                           soapVersion.getEnvelope().getLocalPart(),
                                           soapVersion.getNamespace());
-                    writer.writeNamespace(soapVersion.getPrefix(), soapVersion.getNamespace());
+                    writer.writeNamespace("soap", soapVersion.getNamespace());
                     writer.writeEndElement();
                     
                     writer.flush();
@@ -343,11 +343,11 @@ public class SOAPHandlerInterceptorTest extends Assert {
                 try {
                     XMLStreamWriter writer = message.getContent(XMLStreamWriter.class); 
                     SoapVersion soapVersion = Soap11.getInstance();
-                    writer.setPrefix(soapVersion.getPrefix(), soapVersion.getNamespace());
-                    writer.writeStartElement(soapVersion.getPrefix(), 
+                    writer.setPrefix("soap", soapVersion.getNamespace());
+                    writer.writeStartElement("soap", 
                                           soapVersion.getEnvelope().getLocalPart(),
                                           soapVersion.getNamespace());
-                    writer.writeNamespace(soapVersion.getPrefix(), soapVersion.getNamespace());
+                    writer.writeNamespace("soap", soapVersion.getNamespace());
                     
                     Object[] headerInfo = prepareSOAPHeader();
                     StaxUtils.writeElement((Element) headerInfo[1], writer, true, false);

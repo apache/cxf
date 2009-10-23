@@ -95,7 +95,10 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         final SoapVersion soapVersion = message.getVersion();
         try {            
             XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
-            String soapPrefix = soapVersion.getPrefix();
+            String soapPrefix = xtw.getPrefix(soapVersion.getNamespace());
+            if (StringUtils.isEmpty(soapPrefix)) {
+                soapPrefix = "soap";
+            }
             if (message.hasAdditionalEnvNs()) {
                 Map<String, String> nsMap = message.getEnvelopeNs();
                 for (Map.Entry<String, String> entry : nsMap.entrySet()) {
@@ -118,7 +121,12 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                 xtw.writeStartElement(soapPrefix, 
                                       soapVersion.getEnvelope().getLocalPart(),
                                       soapVersion.getNamespace());
-                xtw.writeNamespace(soapPrefix, soapVersion.getNamespace());
+                String s2 = xtw.getPrefix(soapVersion.getNamespace());
+                if (StringUtils.isEmpty(s2) || soapPrefix.equals(s2)) {
+                    xtw.writeNamespace(soapPrefix, soapVersion.getNamespace());
+                } else {
+                    soapPrefix = s2;
+                }
             }
             boolean preexistingHeaders = message.hasHeaders();
 
