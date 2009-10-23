@@ -35,7 +35,9 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
         
         Exchange ex = message.getExchange();        
         if (isClient(message)) {
-            endHandlingMessage(ex);
+            if (!ex.isOneWay()) {
+                endHandlingMessage(ex);
+            }
         } else {            
             beginHandlingMessage(ex);            
         }

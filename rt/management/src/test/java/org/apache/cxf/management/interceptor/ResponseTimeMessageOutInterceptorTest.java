@@ -18,6 +18,8 @@
  */
 
 package org.apache.cxf.management.interceptor;
+
+import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.management.counters.MessageHandlingTimeRecorder;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -113,23 +115,28 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         //need to increase the counter and is a client
         setupCounterRepository(true, true);
         setupExchangeForMessage();
-        EasyMock.expect(message.getExchange()).andReturn(exchange);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes(); 
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
+        EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
         //MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
         //mhtr.setOneWay(true);
         //EasyMock.expectLastCall();
          
         //EasyMock.replay(mhtr);
-        EasyMock.expect(exchange.isOneWay()).andReturn(true);
-        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(null);        
-        exchange.put(EasyMock.eq(MessageHandlingTimeRecorder.class), 
-                     EasyMock.isA(MessageHandlingTimeRecorder.class));
+        EasyMock.expect(exchange.isOneWay()).andReturn(true).anyTimes();
+        MessageHandlingTimeRecorder mhtr = EasyMock.createMock(MessageHandlingTimeRecorder.class);
+        EasyMock.expect(exchange.get(MessageHandlingTimeRecorder.class)).andReturn(mhtr).anyTimes();        
+        InterceptorChain chain = EasyMock.createMock(InterceptorChain.class);
+        EasyMock.expect(message.getInterceptorChain()).andReturn(chain);
+        chain.add(EasyMock.isA(ResponseTimeMessageOutInterceptor.EndingInterceptor.class));
         EasyMock.expectLastCall();
         EasyMock.replay(exchange);
         EasyMock.replay(message);
         
         rtmoi.handleMessage(message);
+        rtmoi.getEndingInterceptor().handleMessage(message);
+
         EasyMock.verify(message);
         EasyMock.verify(bus);
         EasyMock.verify(exchange);
