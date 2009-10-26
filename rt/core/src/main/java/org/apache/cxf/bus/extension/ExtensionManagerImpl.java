@@ -26,6 +26,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -104,7 +105,19 @@ public class ExtensionManagerImpl implements ExtensionManager {
             activateViaNS(deferred.keySet().iterator().next());
         }
     }
-
+    public <T> void activateAllByType(Class<T> type) {
+        for (Map.Entry<String, Collection<Extension>> e : deferred.entrySet()) {
+            Iterator<Extension> it = e.getValue().iterator();
+            while (it.hasNext()) {
+                Extension ex = it.next();
+                if (type.isAssignableFrom(ex.getClassObject(loader))) {
+                    loadAndRegister(ex);
+                    it.remove();
+                }
+            }
+        }
+    }
+    
     final void load(String resource) throws IOException {
         Enumeration<URL> urls = Thread.currentThread().getContextClassLoader().getResources(resource);
         while (urls.hasMoreElements()) {

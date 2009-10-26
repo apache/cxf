@@ -158,6 +158,8 @@ public class URIResolver {
                             huc.setRequestProperty("Proxy-Authorization", "Basic " + encoded);
                         }
                     }
+                    huc.setConnectTimeout(30000);
+                    huc.setReadTimeout(60000);
                     is =  huc.getInputStream();
                 } catch (ClassCastException ex) {
                     is = url.openStream();

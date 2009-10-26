@@ -33,7 +33,7 @@ public class DeferredMap<V> extends ConcurrentHashMap<String, V> {
     }
     
     public void undefer() {
-        em.activateAll();
+        em.activateAllByType(type);
     }
     
 
