@@ -29,6 +29,7 @@ import org.apache.cxf.Bus;
 public class Extension {
 
     private String className;
+    private Class<?> clazz;
     private String interfaceName;
     private boolean deferred;
     private Collection<String> namespaces = new ArrayList<String>();
@@ -54,11 +55,22 @@ public class Extension {
         return buf.toString();        
     }
     
+    Class<?> getClassObject(ClassLoader cl) {
+        if (clazz == null) {
+            try {
+                clazz = cl.loadClass(className);
+            } catch (ClassNotFoundException ex) {
+                throw new ExtensionException(ex);
+            }
+        }
+        return clazz;
+    }
     String getClassname() {
         return className;
     }
     
     void setClassname(String i) {
+        clazz = null;
         className = i;
     }
        
@@ -85,7 +97,7 @@ public class Extension {
     Object load(ClassLoader cl, Bus b) {
         Object obj = null;
         try {
-            Class<?> cls = cl.loadClass(className);
+            Class<?> cls = getClassObject(cl);
             try {
                 //if there is a Bus constructor, use it.
                 if (b != null) {
@@ -96,8 +108,6 @@ public class Extension {
                 //ignore
             }
             obj = cls.newInstance();
-        } catch (ClassNotFoundException ex) {
-            throw new ExtensionException(ex);
         } catch (IllegalAccessException ex) {
             throw new ExtensionException(ex);
         } catch (InstantiationException ex) {

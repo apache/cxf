@@ -23,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.xml.sax.InputSource;
 
@@ -40,6 +42,17 @@ import org.apache.cxf.service.model.EndpointInfo;
  * 
  */
 public class TransportURIResolver extends ExtendedURIResolver {
+    private static final Set<String> DEFAULT_URI_RESOLVER_HANDLES = new HashSet<String>();
+    static {
+        //bunch we really don't want to have the conduits checked for
+        //as we know the conduits don't handle.  No point
+        //wasting the time checking/loading conduits and such
+        DEFAULT_URI_RESOLVER_HANDLES.add("file");
+        DEFAULT_URI_RESOLVER_HANDLES.add("classpath");
+        DEFAULT_URI_RESOLVER_HANDLES.add("wsjar");
+        DEFAULT_URI_RESOLVER_HANDLES.add("jar");
+        DEFAULT_URI_RESOLVER_HANDLES.add("zip");
+    }
     protected Bus bus;
     
     public TransportURIResolver(Bus b) {
@@ -62,51 +75,55 @@ public class TransportURIResolver extends ExtendedURIResolver {
             base = null;
         }
         try {
-            if (base == null || !"https".equals(base.getScheme())) {
+            if (base == null 
+                || DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
                 is = super.resolve(curUri, baseUri);
             }
         } catch (Exception ex) {
             //nothing
         }
-        if (is == null && base != null && base.getScheme() != null) {
+        if (is == null && base != null 
+            && base.getScheme() != null) {
             try {
                 ConduitInitiator ci = bus.getExtension(ConduitInitiatorManager.class)
                     .getConduitInitiatorForUri(base.toString());
-                EndpointInfo info = new EndpointInfo();
-                info.setAddress(base.toString());
-                final Conduit c = ci.getConduit(info);
-                Message message = new MessageImpl();
-                Exchange exch = new ExchangeImpl();
-                message.setExchange(exch);
-                
-                message.put(Message.HTTP_REQUEST_METHOD, "GET");
-                c.setMessageObserver(new MessageObserver() {
-                    public void onMessage(Message message) {
-                        LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
-                        try {
-                            IOUtils.copy(message.getContent(InputStream.class), bout);
-                            message.getExchange().put(InputStream.class, bout.createInputStream());
-                            c.close(message);
-                        } catch (IOException e) {
-                            //ignore
+                if (ci != null) {
+                    EndpointInfo info = new EndpointInfo();
+                    info.setAddress(base.toString());
+                    final Conduit c = ci.getConduit(info);
+                    Message message = new MessageImpl();
+                    Exchange exch = new ExchangeImpl();
+                    message.setExchange(exch);
+                    
+                    message.put(Message.HTTP_REQUEST_METHOD, "GET");
+                    c.setMessageObserver(new MessageObserver() {
+                        public void onMessage(Message message) {
+                            LoadingByteArrayOutputStream bout = new LoadingByteArrayOutputStream();
+                            try {
+                                IOUtils.copy(message.getContent(InputStream.class), bout);
+                                message.getExchange().put(InputStream.class, bout.createInputStream());
+                                c.close(message);
+                            } catch (IOException e) {
+                                //ignore
+                            }
                         }
-                    }
-                });
-                c.prepare(message);
-                c.close(message);
-                InputStream ins = exch.get(InputStream.class);
-                resourceOpened.addElement(ins);
-                InputSource src = new InputSource(ins);
-                src.setPublicId(base.toString());
-                src.setSystemId(base.toString());
-                lastestImportUri = base.toString();
-                currentResolver.unresolve();
-                return src;
+                    });
+                    c.prepare(message);
+                    c.close(message);
+                    InputStream ins = exch.get(InputStream.class);
+                    resourceOpened.addElement(ins);
+                    InputSource src = new InputSource(ins);
+                    src.setPublicId(base.toString());
+                    src.setSystemId(base.toString());
+                    lastestImportUri = base.toString();
+                    currentResolver.unresolve();
+                    return src;
+                }
             } catch (Exception e) {
                 //ignore
             }
         }
-        if (is == null && "https".equals(base.getScheme())) {
+        if (is == null && !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
             is = super.resolve(curUri, baseUri);            
         }
         return is;
