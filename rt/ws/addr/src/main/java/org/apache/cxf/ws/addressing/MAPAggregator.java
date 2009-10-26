@@ -130,6 +130,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * element is to be advisory
      */
     public void setUsingAddressingAdvisory(boolean advisory) {
+        usingAddressingAdvisory = advisory;
     }
     
     /**
