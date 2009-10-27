@@ -119,7 +119,10 @@
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${pom.version}</Specification-Version>
                         <DynamicImport-Package>
-                            com.ctc.wstx.*
+                            com.ctc.wstx.*,
+                            org.apache.commons.logging.*,
+                            org.slf4j.*,
+                            org.slf4j.impl.*
                         </DynamicImport-Package>
                         <Import-Package>
                             !org.apache.cxf.*,
