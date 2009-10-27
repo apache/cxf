@@ -81,8 +81,10 @@ public final class LogUtils {
                                             Thread.currentThread().getContextClassLoader());
                 getLogger(LogUtils.class).fine("Using " + loggerClass.getName() + " for logging.");
             }
-        } catch (Exception ex) {
-            //ignore
+        } catch (Throwable ex) {
+            //ignore - if we get here, some issue prevented the logger class from being loaded.
+            //maybe a ClassNotFound or NoClassDefFound or similar.   Just use j.u.l
+            loggerClass = null;
         }
     }
     
