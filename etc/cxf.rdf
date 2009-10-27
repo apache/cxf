@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl"?>
+<rdf:RDF xml:lang="en"
+         xmlns="http://usefulinc.com/ns/doap#" 
+         xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+         xmlns:asfext="http://projects.apache.org/ns/asfext#">
+  <Project rdf:about="http://cxf.apache.org/">
+    <created>2009-04-04</created>
+    <license rdf:resource="http://usefulinc.com/doap/licenses/asl20" />
+    <name>Apache CXF</name>
+    <homepage rdf:resource="http://cxf.apache.org/" />
+    <asfext:pmc rdf:resource="http://cxf.apache.org/" />
+    <shortdesc>Apache CXF: An Open Source Service Framework</shortdesc>
+    <description>Apache CXF is an open source services framework. CXF helps you build and develop services using frontend programming APIs like JAX-WS and JAX-RS. These services can speak a variety of protocols such as SOAP, XML/HTTP, RESTful HTTP, or CORBA and work over a variety of transports such as HTTP, JMS or JBI.</description>
+    <bug-database rdf:resource="http://issues.apache.org/jira/browse/CXF" />
+    <mailing-list rdf:resource="http://cxf.apache.org/mailing-lists.html" />
+    <download-page rdf:resource="http://cxf.apache.org/download.html" />
+    <programming-language>Java</programming-language>
+    <category rdf:resource="http://projects.apache.org/category/library" />
+    <category rdf:resource="http://projects.apache.org/category/xml" />
+    <category rdf:resource="http://projects.apache.org/category/network-client" />
+    <category rdf:resource="http://projects.apache.org/category/network-server" />
+    <repository>
+      <SVNRepository>
+        <location rdf:resource="http://svn.apache.org/repos/asf/cxf"/>
+        <browse rdf:resource="http://svn.apache.org/viewvc/cxf/"/>
+      </SVNRepository>
+    </repository>
+    <maintainer>
+      <foaf:Person>
+        <foaf:name>Daniel Kulp</foaf:name>
+          <foaf:mbox rdf:resource="mailto:dkulp@apache.org"/>
+      </foaf:Person>
+    </maintainer>
+    <asfext:implements>
+      <asfext:Standard>
+        <asfext:title>Web Services Metadata</asfext:title>
+        <asfext:body>JCP</asfext:body>
+        <asfext:id>JSR 181</asfext:id>
+        <asfext:url rdf:resource="http://www.jcp.org/en/jsr/detail?id=181"/>
+      </asfext:Standard>
+      <asfext:Standard>
+        <asfext:title>JAX-WS</asfext:title>
+        <asfext:body>JCP</asfext:body>
+        <asfext:id>JSR 224</asfext:id>
+        <asfext:url rdf:resource="http://www.jcp.org/en/jsr/detail?id=224"/>
+      </asfext:Standard>
+      <asfext:Standard>
+        <asfext:title>JAX-RS</asfext:title>
+        <asfext:body>JCP</asfext:body>
+        <asfext:id>JSR 311</asfext:id>
+        <asfext:url rdf:resource="http://www.jcp.org/en/jsr/detail?id=311"/>
+      </asfext:Standard>
+    </asfext:implements>
+  </Project>
+
+</rdf:RDF>
