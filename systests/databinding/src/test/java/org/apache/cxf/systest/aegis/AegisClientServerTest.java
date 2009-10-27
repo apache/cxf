@@ -47,7 +47,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(AegisServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(AegisServer.class));
     }
     
     @Test
