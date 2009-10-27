@@ -1371,6 +1371,20 @@
                 <spring.version>2.5.4</spring.version>
                 <spring.mock>spring-test</spring.mock>
             </properties>
+        </profile> 
+        <profile>
+            <!-- Profile to clean even if you do not have the cxf plugins in
+             your local mavven repo -->
+            <id>clean</id>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache.snapshots</id>
+                    <url>http://repository.apache.org/snapshots/</url>
+                </pluginRepository>
+            </pluginRepositories>
+            <build>
+                <defaultGoal>clean</defaultGoal>
+            </build>
         </profile>
     </profiles>
 
