@@ -41,6 +41,11 @@ public class RMInInterceptor extends AbstractRMInterceptor {
         addBefore(MAPAggregator.class.getName());
     }
    
+    @Override
+    public void handleFault(Message message) {
+        message.put(MAPAggregator.class.getName(), true);
+    }
+
     protected void handle(Message message) throws SequenceFault, RMException {
         LOG.entering(getClass().getName(), "handleMessage");
         

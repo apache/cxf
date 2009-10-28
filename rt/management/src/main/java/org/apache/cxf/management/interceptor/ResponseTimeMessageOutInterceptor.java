@@ -34,6 +34,9 @@ public class ResponseTimeMessageOutInterceptor extends AbstractMessageResponseTi
     
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
+        if (Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))) {
+            return;
+        }
         if (isClient(message)) {
             if (ex.isOneWay()) {
                 message.getInterceptorChain().add(ending);

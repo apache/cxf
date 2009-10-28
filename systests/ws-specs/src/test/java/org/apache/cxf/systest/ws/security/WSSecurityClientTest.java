@@ -36,11 +36,17 @@ import javax.xml.ws.Service;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.http.HTTPBinding;
+import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.hello_world_soap_http.Greeter;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -170,8 +176,52 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         result = source2String(dispatcher.invoke(new StreamSource(is)));
         assertTrue(result.indexOf("Fault") != -1);
     }
+    
+    @Test
+    public void testDecoupledFaultFromSecurity() throws Exception {
+        Dispatch<Source> dispatcher = null;
+        java.io.InputStream is = null;
+        
+        //
+        // Sending no security headers should result in a Fault
+        //
+        dispatcher = createUsernameTokenDispatcher(true);
+        is = getClass().getResourceAsStream("test-data/NoHeadersRequest.xml");
+        try {
+            dispatcher.invoke(new StreamSource(is));
+            fail("exception should have been generated");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("Security"));
+        }
 
+        //
+        // Sending and empty header should result in a Fault
+        //
+        dispatcher = createUsernameTokenDispatcher(true);
+        is = getClass().getResourceAsStream("test-data/EmptyHeaderRequest.xml");
+        try {
+            dispatcher.invoke(new StreamSource(is));
+            fail("exception should have been generated");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("Security"));
+        }
+        //
+        // Sending and empty security header should result in a Fault
+        //
+        dispatcher = createUsernameTokenDispatcher(true);
+        is = getClass().getResourceAsStream("test-data/EmptySecurityHeaderRequest.xml");
+        try {
+            dispatcher.invoke(new StreamSource(is));
+            fail("exception should have been generated");
+        } catch (SOAPFaultException ex) {
+            assertTrue(ex.getMessage().contains("Security"));
+        }
+
+    }
     private static Dispatch<Source> createUsernameTokenDispatcher() {
+        return createUsernameTokenDispatcher(false);
+    }
+    private static Dispatch<Source> createUsernameTokenDispatcher(boolean decoupled) {
         //
         // Set up the client (stolen from JAX-RS system test)
         //
@@ -182,13 +232,14 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         service.addPort(
             USERNAME_TOKEN_PORT_QNAME,
-            HTTPBinding.HTTP_BINDING,
+            decoupled ? SOAPBinding.SOAP11HTTP_BINDING : HTTPBinding.HTTP_BINDING, 
             "http://localhost:9000/GreeterService/UsernameTokenPort"
         );
         final Dispatch<Source> dispatcher = service.createDispatch(
             USERNAME_TOKEN_PORT_QNAME,
             Source.class,
-            Service.Mode.MESSAGE
+            Service.Mode.MESSAGE,
+            new AddressingFeature(decoupled, decoupled)
         );
         final java.util.Map<String, Object> requestContext =
             dispatcher.getRequestContext();
@@ -196,6 +247,10 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             MessageContext.HTTP_REQUEST_METHOD,
             "POST"
         );
+        if (decoupled) {
+            HTTPConduit cond = (HTTPConduit)((DispatchImpl)dispatcher).getClient().getConduit();
+            cond.getClient().setDecoupledEndpoint("http://localhost:9001/decoupled");
+        }
         return dispatcher;
     }
 

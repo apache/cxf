@@ -46,7 +46,11 @@ public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTim
     @Override
     public void handleFault(Message message) {
         Exchange ex = message.getExchange();
-        ex.put(FaultMode.class, message.get(FaultMode.class));
+        FaultMode mode = message.get(FaultMode.class);
+        if (mode == null) {
+            mode = FaultMode.RUNTIME_FAULT;
+        }
+        ex.put(FaultMode.class, mode);
         endHandlingMessage(ex);
     }
 }

@@ -165,6 +165,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      * @param message the current message
      */
     public void  handleFault(Message message) {
+        message.put(MAPAggregator.class.getName(), this);
     }
 
     /**
@@ -342,8 +343,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 // request/response MAPs must be aggregated
                 aggregate(message, isFault);
             }
-        } else if (!ContextUtils.isRequestor(message)) {
-            // responder validates incoming MAPs
+        } else if (!ContextUtils.isRequestor(message)) {            
+            //responder validates incoming MAPs
             AddressingPropertiesImpl maps = getMAPs(message, false, false);
             boolean isOneway = message.getExchange().isOneWay();
             if (null == maps && !addressingRequired) {
