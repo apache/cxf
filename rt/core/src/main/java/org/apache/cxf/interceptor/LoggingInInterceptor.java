@@ -96,11 +96,15 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
     } 
 
     private void logging(Message message) throws Fault {
+        if (message.containsKey(LoggingMessage.ID_KEY)) {
+            return;
+        }
         String id = (String)message.getExchange().get(LoggingMessage.ID_KEY);
         if (id == null) {
             id = LoggingMessage.nextId();
             message.getExchange().put(LoggingMessage.ID_KEY, id);
         }
+        message.put(LoggingMessage.ID_KEY, id);
         final LoggingMessage buffer 
             = new LoggingMessage("Inbound Message\n----------------------------", id);
 
