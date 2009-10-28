@@ -546,11 +546,6 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void cancelSecurityToken(SecurityToken token) throws Exception {
         createClient();
 
-        if (isSecureConv) {
-            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
-                                           namespace + "/RST/SCT/Cancel");
-        }
-
         if (addressingNamespace == null) {
             addressingNamespace = "http://www.w3.org/2005/08/addressing";
         }
@@ -590,8 +585,13 @@ public class STSClient implements Configurable, InterceptorProvider {
         client.getRequestContext().put(SecurityConstants.TOKEN, token);
         BindingOperationInfo boi = findOperation("/RST/Cancel");
         
-        client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
-                                       namespace + "/RST/Cancel");
+        if (isSecureConv) {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION,
+                                           namespace + "/RST/SCT/Cancel");
+        } else {
+            client.getRequestContext().put(SoapBindingConstants.SOAP_ACTION, 
+                                           namespace + "/RST/Cancel");            
+        }
 
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
