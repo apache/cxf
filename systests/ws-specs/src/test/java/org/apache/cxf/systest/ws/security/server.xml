@@ -23,6 +23,8 @@
     xmlns:jaxws="http://cxf.apache.org/jaxws"
     xmlns:test="http://apache.org/hello_world_soap_http"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:wsa="http://cxf.apache.org/ws/addressing"
+    
     xsi:schemaLocation="http://cxf.apache.org/core
         http://cxf.apache.org/schemas/core.xsd
         http://www.springframework.org/schema/beans
@@ -51,6 +53,9 @@
         serviceName="test:GreeterService"
         endpointName="test:UsernameTokenPort"
         >
+        <jaxws:features>
+        	<wsa:addressing/>
+        </jaxws:features>
         <jaxws:inInterceptors>
             <ref bean="UsernameToken_Request"/>
             <bean class="org.apache.cxf.binding.soap.saaj.SAAJInInterceptor"/>

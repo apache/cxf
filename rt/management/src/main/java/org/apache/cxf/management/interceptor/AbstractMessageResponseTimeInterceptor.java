@@ -108,7 +108,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             
             String serviceName = "\"" + service.getName() + "\"";            
             String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
-            String operationName = "\"" + opInfo.getName().getLocalPart() + "\"";
+            String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
             
             StringBuffer buffer = new StringBuffer();
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
@@ -123,14 +123,16 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             buffer.append(ManagementConstants.PORT_NAME_PROP + "=" + portName);
             String serviceCounterName = buffer.toString();
             
-            buffer.append("," + ManagementConstants.OPERATION_NAME_PROP + "=" + operationName);
-            String operationCounterName = buffer.toString();
-            try {               
+            try {           
                 ObjectName serviceCounter = 
                     new ObjectName(serviceCounterName);                
                 cr.increaseCounter(serviceCounter, mhtr);
-                ObjectName operationCounter = new ObjectName(operationCounterName);
-                cr.increaseCounter(operationCounter, mhtr);                
+                if (operationName != null) {
+                    buffer.append("," + ManagementConstants.OPERATION_NAME_PROP + "=" + operationName);
+                    String operationCounterName = buffer.toString();
+                    ObjectName operationCounter = new ObjectName(operationCounterName);
+                    cr.increaseCounter(operationCounter, mhtr);                
+                }
             } catch (Exception exception) {
                 LOG.log(Level.WARNING, "CREATE_COUNTER_OBJECTNAME_FAILED", exception);
             }

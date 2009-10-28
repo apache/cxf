@@ -49,6 +49,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -58,6 +59,7 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.addressing.RelatesToType;
@@ -115,11 +117,31 @@ public class MAPCodec extends AbstractSoapInterceptor {
      */
     public void handleFault(SoapMessage message) {
         AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, true, false);
-        if (ContextUtils.isRequestor(message) 
-            && !message.getExchange().isOneWay()
-            && maps != null) {
-            //fault occured trying to sent the message, remove it
-            uncorrelatedExchanges.remove(maps.getMessageID().getValue());
+        if (!message.getExchange().isOneWay()) {
+            if (ContextUtils.isRequestor(message)
+                && maps != null) {
+                //fault occurred trying to send the message, remove it
+                uncorrelatedExchanges.remove(maps.getMessageID().getValue());
+            } else if (!ContextUtils.isRequestor(message) 
+                && maps == null
+                && !message.containsKey(MAPAggregator.class.getName())) {
+                //fault occurred while processing the incoming message, but possibly
+                //before the MAPAggregator was called.   We need to see if we can
+                //try and map this if at all possible so a FaultTo/ReplyTo can
+                //be properly determined to get the fault back to the rightful
+                //place.
+                for (Interceptor<? extends Message> i : message.getInterceptorChain()) {
+                    if (i instanceof MAPAggregator) {
+                        try {
+                            MAPAggregator agg = (MAPAggregator)i;
+                            agg.handleMessage(message);
+                        } catch (Throwable t) {
+                            //ignore
+                        }
+                        return;
+                    }
+                }
+            }
         }
     }
 

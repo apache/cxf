@@ -34,6 +34,7 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         // need to increase the counter and is not a client
         setupCounterRepository(true, false);
         setupExchangeForMessage();
+        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
@@ -116,6 +117,7 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
         setupCounterRepository(true, true);
         setupExchangeForMessage();
         EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
+        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes(); 
         EasyMock.expect(exchange.getOutMessage()).andReturn(message);
         EasyMock.expect(exchange.get(FaultMode.class)).andReturn(null);
@@ -146,6 +148,7 @@ public class ResponseTimeMessageOutInterceptorTest extends AbstractMessageRespon
     
     @Test
     public void testClientMessageOut() {
+        EasyMock.expect(message.get(Message.PARTIAL_RESPONSE_MESSAGE)).andReturn(Boolean.FALSE).anyTimes();
         EasyMock.expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE);
         EasyMock.expect(message.getExchange()).andReturn(exchange);
         EasyMock.expect(exchange.isOneWay()).andReturn(false);
