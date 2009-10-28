@@ -47,6 +47,27 @@ public class AttachmentDeserializerTest extends Assert {
     }
     
     @Test
+    public void testLazyAttachmentCollection() throws Exception {
+        InputStream is = getClass().getResourceAsStream("mimedata2");
+        String ct = "multipart/related; type=\"application/xop+xml\"; "
+                    + "start=\"<soap.xml@xfire.codehaus.org>\"; "
+                    + "start-info=\"text/xml; charset=utf-8\"; "
+                    + "boundary=\"----=_Part_4_701508.1145579811786\"";
+        
+        msg.put(Message.CONTENT_TYPE, ct);
+        msg.setContent(InputStream.class, is);
+        
+        AttachmentDeserializer deserializer = new AttachmentDeserializer(msg);
+        deserializer.initializeAttachments();
+        
+        InputStream attBody = msg.getContent(InputStream.class);
+        assertTrue(attBody != is);
+        assertTrue(attBody instanceof DelegatingInputStream);
+        attBody.close();
+        assertEquals(2, msg.getAttachments().size());
+    }
+    
+    @Test
     public void testDeserializerMtom() throws Exception {
         InputStream is = getClass().getResourceAsStream("mimedata");
         String ct = "multipart/related; type=\"application/xop+xml\"; "

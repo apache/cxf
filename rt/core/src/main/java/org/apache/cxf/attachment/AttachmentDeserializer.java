@@ -23,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -219,7 +220,8 @@ public class AttachmentDeserializer {
             cache((DelegatingInputStream) body, true);
         }
 
-        for (Attachment a : attachments.getLoadedAttachments()) {
+        List<Attachment> atts = new ArrayList<Attachment>(attachments.getLoadedAttachments());
+        for (Attachment a : atts) {
             DataSource s = a.getDataHandler().getDataSource();
             if (s instanceof AttachmentDataSource) {
                 AttachmentDataSource ads = (AttachmentDataSource)s;
@@ -316,7 +318,7 @@ public class AttachmentDeserializer {
 
     public void markClosed(DelegatingInputStream delegatingInputStream) throws IOException {
         closedCount++;
-        if (closedCount == createCount && !attachments.hasNext()) {
+        if (closedCount == createCount && !attachments.hasNext(false)) {
             int x = stream.read();
             while (x != -1) {
                 x = stream.read();
@@ -325,4 +327,24 @@ public class AttachmentDeserializer {
             closed = true;
         }
     }
+    /**
+     *  Check for more attachment.
+     *
+     * @return whether there is more attachment or not.  It will not deserialize the next attachment.
+     * @throws IOException
+     */
+    public boolean hasNext() throws IOException {
+        cacheStreamedAttachments();
+        if (closed) {
+            return false;
+        }
+
+        int v = stream.read();
+        if (v == -1) {
+            return false;
+        }
+        stream.unread(v);
+        return true;
+    }
+
 }
