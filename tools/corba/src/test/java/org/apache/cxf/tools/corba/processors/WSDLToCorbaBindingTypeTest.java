@@ -48,6 +48,7 @@ import org.apache.cxf.binding.corba.wsdl.Struct;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.binding.corba.wsdl.Union;
 import org.apache.cxf.binding.corba.wsdl.Unionbranch;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.corba.common.WSDLCorbaFactory;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToCorbaBinding;
 import org.apache.cxf.tools.corba.processors.wsdl.WSDLToIDLAction;
@@ -95,10 +96,13 @@ public class WSDLToCorbaBindingTypeTest extends Assert {
 
             Element typemap = getElementNode(document, "corba:typeMapping");            
             assertNotNull(typemap);
-            assertEquals(1, typemap.getElementsByTagName("corba:sequence").getLength());
-            int objectCount = typemap.getElementsByTagName("corba:object").getLength();
-            // With XmlSchema 1.4.3, this comes out as 1, and it seems correct by examination of the wsdl.
-            assertTrue(objectCount == 1 || objectCount == 2);
+            
+            assertEquals(1, DOMUtils.findAllElementsByTagNameNS(typemap, 
+                                                                "http://cxf.apache.org/bindings/corba", 
+                                                                "sequence").size());
+            assertEquals(2, DOMUtils.findAllElementsByTagNameNS(typemap, 
+                                                                "http://cxf.apache.org/bindings/corba", 
+                                                                "object").size());
 
             WSDLToIDLAction idlgen = new WSDLToIDLAction();
             idlgen.setBindingName("BankCORBABinding");
