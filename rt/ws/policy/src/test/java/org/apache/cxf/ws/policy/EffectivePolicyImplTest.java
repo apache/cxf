@@ -102,6 +102,7 @@ public class EffectivePolicyImplTest extends Assert {
                          BindingOperationInfo.class, 
                          PolicyEngineImpl.class,
                          boolean.class,
+                         boolean.class,
                          Assertor.class});
         Method m2 = EffectivePolicyImpl.class.getDeclaredMethod("chooseAlternative",
             new Class[] {PolicyEngineImpl.class, Assertor.class});
@@ -115,7 +116,7 @@ public class EffectivePolicyImplTest extends Assert {
         Assertor a = control.createMock(Assertor.class);
         boolean requestor = true;
        
-        effectivePolicy.initialisePolicy(ei, boi, pe, requestor, a);
+        effectivePolicy.initialisePolicy(ei, boi, pe, requestor, requestor, a);
         EasyMock.expectLastCall().andReturn(a);
         effectivePolicy.chooseAlternative(pe, a);
         EasyMock.expectLastCall();
@@ -123,7 +124,7 @@ public class EffectivePolicyImplTest extends Assert {
         EasyMock.expectLastCall();
         
         control.replay();
-        effectivePolicy.initialise(ei, boi, pe, a, requestor);
+        effectivePolicy.initialise(ei, boi, pe, a, requestor, requestor);
         control.verify();        
     }
     
@@ -194,7 +195,7 @@ public class EffectivePolicyImplTest extends Assert {
         
         control.replay();
         EffectivePolicyImpl epi = new EffectivePolicyImpl();
-        epi.initialisePolicy(ei, boi, engine, requestor, null);
+        epi.initialisePolicy(ei, boi, engine, requestor, requestor, null);
         assertSame(merged, epi.getPolicy());
         control.verify();
     }

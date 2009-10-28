@@ -118,7 +118,7 @@ public class PolicyEngineTest extends Assert {
         AssertingConduit conduit = control.createMock(AssertingConduit.class);
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, conduit, true);
+        epi.initialise(ei, boi, engine, conduit, true, true);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveClientRequestPolicy(ei, boi, conduit));
@@ -149,7 +149,7 @@ public class PolicyEngineTest extends Assert {
         AssertingDestination destination = control.createMock(AssertingDestination.class);
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, destination, false);
+        epi.initialise(ei, boi, engine, destination, false, false);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveServerResponsePolicy(ei, boi, destination));
@@ -207,7 +207,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, false);
+        epi.initialise(ei, boi, engine, false, true);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveServerRequestPolicy(ei, boi));
@@ -236,7 +236,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, true);
+        epi.initialise(ei, boi, engine, true, true);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));

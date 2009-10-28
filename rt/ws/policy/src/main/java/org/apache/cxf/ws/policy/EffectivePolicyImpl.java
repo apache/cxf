@@ -82,16 +82,16 @@ public class EffectivePolicyImpl implements EffectivePolicy {
                     BindingOperationInfo boi, 
                     PolicyEngineImpl engine, 
                     Assertor assertor,
-                    boolean requestor) {
-        initialisePolicy(ei, boi, engine, requestor, assertor);
+                    boolean requestor, boolean request) {
+        initialisePolicy(ei, boi, engine, requestor, request, assertor);
         chooseAlternative(engine, assertor);
         initialiseInterceptors(engine, false);  
     }
     void initialise(EndpointInfo ei, 
                     BindingOperationInfo boi, 
                     PolicyEngineImpl engine, 
-                    boolean requestor) {
-        Assertor assertor = initialisePolicy(ei, boi, engine, requestor, null);
+                    boolean requestor, boolean request) {
+        Assertor assertor = initialisePolicy(ei, boi, engine, requestor, request, null);
         chooseAlternative(engine, assertor);
         initialiseInterceptors(engine, requestor);  
     }
@@ -108,13 +108,14 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     Assertor initialisePolicy(EndpointInfo ei,
                           BindingOperationInfo boi,  
                           PolicyEngineImpl engine, 
-                          boolean requestor,
+                          boolean requestor, boolean request,
                           Assertor assertor) {
         
         if (boi.isUnwrapped()) {
             boi = boi.getUnwrappedOperation();
         }
-        BindingMessageInfo bmi = requestor ? boi.getInput() : boi.getOutput();
+        
+        BindingMessageInfo bmi = request ? boi.getInput() : boi.getOutput();
         EndpointPolicy ep;
         if (requestor) {
             ep = engine.getClientEndpointPolicy(ei, (Conduit)assertor);
