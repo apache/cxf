@@ -178,7 +178,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (c instanceof Assertor) {
                 assertor = (Assertor)c;
             }
-            epi.initialise(ei, boi, this, assertor, true);
+            epi.initialise(ei, boi, this, assertor, true, true);
             boi.setProperty(POLICY_INFO_REQUEST_CLIENT, epi);
             effectivePolicy = epi;
         }
@@ -200,7 +200,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
             if (d instanceof Assertor) {
                 assertor = (Assertor)d;
             }
-            epi.initialise(ei, boi, this, assertor, false);
+            epi.initialise(ei, boi, this, assertor, false, false);
             boi.setProperty(POLICY_INFO_RESPONSE_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -268,7 +268,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_REQUEST_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialise(ei, boi, this, false);
+            epi.initialise(ei, boi, this, false, true);
             boi.setProperty(POLICY_INFO_REQUEST_SERVER, epi);
             effectivePolicy = epi;
         }
@@ -284,7 +284,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialise(ei, boi, this, true);        
+            epi.initialise(ei, boi, this, true, true);        
             boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
             effectivePolicy = epi;
         }
