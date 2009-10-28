@@ -58,16 +58,28 @@ public class LazyAttachmentCollection
             throw new RuntimeException(e);
         }
     }
-    public boolean hasNext() throws IOException {
-        Attachment a = deserializer.readNext();
-        if (a != null) {
-            attachments.add(a);
-            return true;
-        }
-        return false;
+    /**
+     * Check for more attachments by attempting to deserialize the next attachment.
+     *
+     * @param shouldLoadNew if <i>false</i>, the "loaded attachments" List will not be changed.
+     * @return there is more attachment or not
+     * @throws IOException
+     */
+    public boolean hasNext(boolean shouldLoadNew) throws IOException {
+        if (shouldLoadNew) {
+            Attachment a = deserializer.readNext();
+            if (a != null) {
+                attachments.add(a);
+                return true;
+            }
+            return false;
+        } 
+        return deserializer.hasNext();
     }
 
-
+    public boolean hasNext() throws IOException {
+        return hasNext(true);
+    }
     public Iterator<Attachment> iterator() {
         return new Iterator<Attachment>() {
             int current;
