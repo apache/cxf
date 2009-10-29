@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Executor;
 
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
@@ -144,6 +145,11 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Hello service = new Hello();
 
         EndpointImpl ep = new EndpointImpl(getBus(), service, (String) null);
+        ep.setExecutor(new Executor() {
+            public void execute(Runnable r) {
+                new Thread(r).start();
+            }
+        });
         ep.publish("local://localhost:9090/hello");
 
         Node res = invoke("local://localhost:9090/hello", 

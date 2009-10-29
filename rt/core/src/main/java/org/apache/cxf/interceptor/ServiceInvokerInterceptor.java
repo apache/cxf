@@ -93,7 +93,15 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             invocation.run();
         } else {
             exchange.put(Executor.class, executor);
-            FutureTask<Object> o = new FutureTask<Object>(invocation, null);
+            FutureTask<Object> o = new FutureTask<Object>(invocation, null) {
+                @Override
+                protected void done() {
+                    super.done();
+                    synchronized (this) {
+                        this.notifyAll();
+                    }
+                }
+            };
             synchronized (o) {
                 executor.execute(o);
                 if (!exchange.isOneWay()) {
