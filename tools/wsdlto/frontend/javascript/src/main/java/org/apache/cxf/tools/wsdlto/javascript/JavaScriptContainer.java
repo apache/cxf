@@ -69,6 +69,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
     public Set<String> getArrayKeys() {
         Set<String> set = new HashSet<String>();
         set.add(ToolConstants.CFG_JSPACKAGEPREFIX);
+        set.add(ToolConstants.CFG_BEAN_CONFIG);
         return set;
     }
 

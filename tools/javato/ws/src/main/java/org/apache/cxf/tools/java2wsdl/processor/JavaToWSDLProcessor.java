@@ -192,6 +192,11 @@ public class JavaToWSDLProcessor implements Processor {
             } else if (beanFilesParameter instanceof List) {
                 // is there a better way to avoid the warning?
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
+            } else {
+                String list[] = (String[]) beanFilesParameter;
+                for (String b : list) {
+                    beanDefinitions.add(b);
+                }
             }
         }
         applicationContext = getApplicationContext(getBus(), beanDefinitions);

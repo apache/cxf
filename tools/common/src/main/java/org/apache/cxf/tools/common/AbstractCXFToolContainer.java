@@ -50,8 +50,6 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
     private boolean verbose;
     private String usage;
     private final ErrorVisitor errors = new ErrorVisitor();
-    private String beanConfigResource;
-    
     
     public AbstractCXFToolContainer(String nm, ToolSpec toolspec) throws Exception {
         super(toolspec);
@@ -114,12 +112,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
      * @throws ToolException for impossible options.
      */
     public void checkParams(ErrorVisitor err) throws ToolException {
-        CommandDocument doc = getCommandDocument();
-
-        if (doc.hasParameter(ToolConstants.CFG_BEAN_CONFIG)) {
-            String beanPath = doc.getParameter(ToolConstants.CFG_BEAN_CONFIG);           
-            setBeanConfigResource(beanPath);
-        }
+        //nothing to do here
     }
 
     public boolean isVerboseOn() {
@@ -289,17 +282,4 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         return map;
     }
 
-    /**
-     * @return Returns the beanConfigResource.
-     */
-    public String getBeanConfigResource() {
-        return beanConfigResource;
-    }
-
-    /**
-     * @param beanConfigResource The beanConfigResource to set.
-     */
-    public void setBeanConfigResource(String beanConfigResource) {
-        this.beanConfigResource = beanConfigResource;
-    }
 }

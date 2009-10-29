@@ -33,7 +33,7 @@ Examples:
 
     <usage>
         <optionGroup id="options">
-            <option id="frontend" maxOccurs="unbounded">
+            <option id="frontend" maxOccurs="1">
                 <annotation>
                     Specifies the front end. (defaults to JAXWS)
                 </annotation>
@@ -44,7 +44,7 @@ Examples:
                 </associatedArgument>
             </option>
 
-            <option id="databinding" maxOccurs="unbounded">
+            <option id="databinding" maxOccurs="1">
                 <annotation>
                     Specifies the data binding. (defaults to JAXB)
                 </annotation>
@@ -55,7 +55,7 @@ Examples:
                 </associatedArgument>
             </option>
 
-            <option id="wsdlversion" maxOccurs="unbounded">
+            <option id="wsdlversion" maxOccurs="1">
                 <annotation>
                     Specifies the WSDL version. (default is WSDL1.1)
                 </annotation>
@@ -271,7 +271,7 @@ Examples:
                 <switch>wsdlLocation</switch>
             </option>
 
-            <option id="xjc" maxOccurs="1">
+            <option id="xjc" maxOccurs="unbounded">
                 <annotation>
                     Specifies a comma separated list of arguments that are passed directly to XJC when the
                     JAXB data binding  is used. This option causes XJC to load additional plugins that 
