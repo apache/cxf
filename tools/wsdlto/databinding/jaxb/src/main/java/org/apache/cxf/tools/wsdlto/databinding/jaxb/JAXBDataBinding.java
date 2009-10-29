@@ -626,17 +626,28 @@ public class JAXBDataBinding implements DataBindingProfile {
                         writeDefaultType(writer, m.listParamTypes()[0], path + "/" + m.name().substring(3));
                         writer.write(");");
                     } else {
-                        writeDefaultValue(writer, indent,
-                                          path + "/" + m.name().substring(3),
-                                          varName + m.name().substring(3),
-                                          m.listParamTypes()[0]);
-                        writer.write("\n");
+                        int idx = path.indexOf("/" + m.name().substring(3) + "/");
+                        if (idx > 0) {
+                            idx = path.indexOf("/" + m.name().substring(3) + "/", idx + 1);
+                        }
+                        boolean hasTwo = idx > 0;
+                        if (!hasTwo) {
+                            writeDefaultValue(writer, indent,
+                                              path + "/" + m.name().substring(3),
+                                              varName + m.name().substring(3),
+                                              m.listParamTypes()[0]);
+                            writer.write("\n");
+                        }
                         writer.write(indent);
                         writer.write(varName);
                         writer.write(".");
                         writer.write(m.name());
                         writer.write("(");
-                        writer.write(varName + m.name().substring(3));
+                        if (!hasTwo) {
+                            writer.write(varName + m.name().substring(3));
+                        } else {
+                            writer.write("null");
+                        }
                         writer.write(");");
                     }
                 } else if (m.type().fullName().startsWith("java.util.List")) {
