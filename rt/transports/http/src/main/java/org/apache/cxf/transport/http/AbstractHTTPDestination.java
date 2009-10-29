@@ -138,23 +138,25 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         if (requestHeaders.containsKey("Authorization")) {
             List<String> authorizationLines = requestHeaders.get("Authorization"); 
             String credentials = authorizationLines.get(0);
-            String authType = credentials.split(" ")[0];
-            if ("Basic".equals(authType)) {
-                String authEncoded = credentials.split(" ")[1];
-                try {
-                    String authDecoded = new String(Base64Utility.decode(authEncoded));
-                    String authInfo[] = authDecoded.split(":");
-                    String username = (authInfo.length > 0) ? authInfo[0] : "";
-                    // Below line for systems that blank out password after authentication;
-                    // see CXF-1495 for more info
-                    String password = (authInfo.length > 1) ? authInfo[1] : "";
-                    AuthorizationPolicy policy = new AuthorizationPolicy();
-                    policy.setUserName(username);
-                    policy.setPassword(password);
-                    
-                    message.put(AuthorizationPolicy.class, policy);
-                } catch (Base64Exception ex) {
-                    //ignore, we'll leave things alone.  They can try decoding it themselves
+            if (credentials != null && !StringUtils.isEmpty(credentials.trim())) {
+                String authType = credentials.split(" ")[0];
+                if ("Basic".equals(authType)) {
+                    String authEncoded = credentials.split(" ")[1];
+                    try {
+                        String authDecoded = new String(Base64Utility.decode(authEncoded));
+                        String authInfo[] = authDecoded.split(":");
+                        String username = (authInfo.length > 0) ? authInfo[0] : "";
+                        // Below line for systems that blank out password after authentication;
+                        // see CXF-1495 for more info
+                        String password = (authInfo.length > 1) ? authInfo[1] : "";
+                        AuthorizationPolicy policy = new AuthorizationPolicy();
+                        policy.setUserName(username);
+                        policy.setPassword(password);
+                        
+                        message.put(AuthorizationPolicy.class, policy);
+                    } catch (Base64Exception ex) {
+                        //ignore, we'll leave things alone.  They can try decoding it themselves
+                    }
                 }
             }
         }
