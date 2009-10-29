@@ -38,10 +38,16 @@ public class Option {
     protected List<String> packagenames;
 
     /**
-     * Extra arguments to pass to the command-line code generator. For compatibility as well as to 
+     * Extra arguments to pass to the command-line code generator. For compatibility as well as to
      * specify any extra flags not addressed by other parameters
      */
     protected List<String> extraargs = new ArrayList<String>();
+
+    /**
+     * Extra arguments to pass to the XJC compiler command-line code generator.
+     * For compatibility as well as to specify any extra flags not addressed by other parameters
+     */
+    protected List<String> xjcargs = new ArrayList<String>();
 
     /**
      * Directory where generated java classes will be created. Defaults to plugin 'sourceRoot' parameter
@@ -158,6 +164,15 @@ public class Option {
     public void setExtraargs(List<String> ea) {
         this.extraargs.clear();
         this.extraargs.addAll(ea);
+    }
+
+    public List<String> getXJCargs() {
+        return xjcargs;
+    }
+
+    public void setXJCargs(List<String> ea) {
+        this.xjcargs.clear();
+        this.xjcargs.addAll(ea);
     }
 
     public List<String> getPackagenames() {
@@ -339,6 +354,7 @@ public class Option {
         destination.setDependencies(getDependencies());
         destination.setExtendedSoapHeaders(isExtendedSoapHeaders());
         destination.setExtraargs(getExtraargs());
+        destination.setXJCargs(getXJCargs());
         destination.setFrontEnd(getFrontEnd());
         destination.setNamespaceExcludes(namespaceExcludes);
         destination.setNoAddressBinding(isNoAddressBinding());

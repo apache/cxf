@@ -85,6 +85,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         Set<String> set = new HashSet<String>();
         set.add(ToolConstants.CFG_PACKAGENAME);
         set.add(ToolConstants.CFG_NEXCLUDE);
+        set.add(ToolConstants.CFG_XJC_ARGS);
         return set;
     }
 

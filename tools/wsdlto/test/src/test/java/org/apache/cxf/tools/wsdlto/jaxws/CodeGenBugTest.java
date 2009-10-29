@@ -1071,5 +1071,20 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertTrue(file.exists());
         String str = FileUtils.getStringFromFile(file);
         assertTrue(str.contains("http://child/xsd"));
-    }   
+    }
+    
+    @Test
+    public void testMultiXjcArgs() throws Exception {
+        String[] args = new String[] {"-d", output.getCanonicalPath(),
+                                      "-xjc-Xlocator",
+                                      "-xjc-Xsync-methods",
+                                      getLocation("/wsdl2java_wsdl/hello_world.wsdl")};
+        WSDLToJava.main(args);
+        File file = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/types/SayHi.java");
+        
+        assertTrue(file.exists());
+        String str = FileUtils.getStringFromFile(file);
+        assertTrue(str.contains("@XmlLocation"));
+        assertTrue(str.contains("synchronized"));
+    }
 }

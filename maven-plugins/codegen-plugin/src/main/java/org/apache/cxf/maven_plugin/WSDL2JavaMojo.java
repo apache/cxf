@@ -554,6 +554,16 @@ public class WSDL2JavaMojo extends AbstractMojo {
         if (wsdlOption.isNoAddressBinding()) {
             list.add("-noAddressBinding");
         }
+        if (wsdlOption.getXJCargs() != null) {
+            
+            for (String value : wsdlOption.getXJCargs()) {
+                if (value == null) {
+                    value = ""; // Maven makes empty tags into null
+                                // instead of empty strings.
+                }
+                list.add("-xjc" + value);
+            }
+        }
         if (wsdlOption.getExtraargs() != null) {
             Iterator<String> it = wsdlOption.getExtraargs().iterator();
             while (it.hasNext()) {

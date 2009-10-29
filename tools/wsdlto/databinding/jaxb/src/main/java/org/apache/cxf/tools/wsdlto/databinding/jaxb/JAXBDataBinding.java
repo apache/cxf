@@ -268,12 +268,18 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         
         if (context.get(ToolConstants.CFG_XJC_ARGS) != null) {
-            String xjcArgs = (String)context.get(ToolConstants.CFG_XJC_ARGS);
-            StringTokenizer tokenizer = new StringTokenizer(xjcArgs, ",", false);
-            while (tokenizer.hasMoreTokens()) {
-                String arg = tokenizer.nextToken();
-                args.add(arg);
-                LOG.log(Level.FINE, "xjc arg:" + arg);
+            Object o = context.get(ToolConstants.CFG_XJC_ARGS);
+            if (o instanceof String) {
+                o = new String[] {(String)o};
+            }
+            String[] xjcArgss = (String[])o;
+            for (String xjcArgs : xjcArgss) {
+                StringTokenizer tokenizer = new StringTokenizer(xjcArgs, ",", false);
+                while (tokenizer.hasMoreTokens()) {
+                    String arg = tokenizer.nextToken();
+                    args.add(arg);
+                    LOG.log(Level.FINE, "xjc arg:" + arg);
+                }
             }
         }
 
