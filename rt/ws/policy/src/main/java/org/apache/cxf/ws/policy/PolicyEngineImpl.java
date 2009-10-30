@@ -258,7 +258,7 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         EffectivePolicy effectivePolicy = (EffectivePolicy)boi.getProperty(POLICY_INFO_RESPONSE_CLIENT);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
-            epi.initialise(ei, boi, this, true, true);        
+            epi.initialise(ei, boi, this, true, false);        
             boi.setProperty(POLICY_INFO_RESPONSE_CLIENT, epi);
             effectivePolicy = epi;
         }
