@@ -25,6 +25,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -117,6 +118,20 @@ public class ASMHelper {
                 a.append(getClassCode(t));  
             }
             a.append(">;");
+            return a.toString();
+        } else if (type instanceof WildcardType) {
+            WildcardType wt = (WildcardType)type;
+            StringBuilder a = new StringBuilder();
+            Type[] lowBounds = wt.getLowerBounds();
+            Type[] upBounds = wt.getUpperBounds();
+            for (Type t : upBounds) {
+                a.append("+");
+                a.append(getClassCode(t));
+            }
+            for (Type t : lowBounds) {
+                a.append("-");
+                a.append(getClassCode(t));
+            }
             return a.toString();
         }
         return null;
