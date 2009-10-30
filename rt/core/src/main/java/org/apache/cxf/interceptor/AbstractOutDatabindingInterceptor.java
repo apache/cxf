@@ -167,6 +167,7 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         
         writer.setAttachments(atts);
         writer.setProperty(DataWriter.ENDPOINT, message.getExchange().get(Endpoint.class));
+        writer.setProperty(Message.class.getName(), message);
         
         setSchemaOutMessage(service, message, writer);
         return writer;

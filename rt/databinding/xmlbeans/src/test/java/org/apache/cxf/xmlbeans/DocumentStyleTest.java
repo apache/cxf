@@ -24,6 +24,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.endpoint.Server;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,16 +34,31 @@ import org.junit.Test;
  */
 public class DocumentStyleTest extends AbstractXmlBeansTest {
     String ns = "urn:TestService";
+    Server server;
     
     @Before
     public void setUp() throws Exception {
         super.setUp();
 
-        createService(TestService.class, new TestService(), "TestService", new QName(ns, "TestService"));
+        server = createService(TestService.class, new TestService(), 
+                               "TestService", 
+                               new QName(ns, "TestService"));
     }
 
     @Test
     public void testInvoke() throws Exception {
+        Node response = invoke("TestService", "/org/apache/cxf/xmlbeans/DocumentStyleRequest.xml");
+
+        assertNotNull(response);
+
+        addNamespace("x", "http://cxf.apache.org/xmlbeans");
+        addNamespace("y", "urn:TestService");
+        assertValid("//s:Body/y:mixedRequestResponse/x:response/x:form", response);
+    }
+
+    @Test
+    public void testInvokeWithHack() throws Exception {
+        server.getEndpoint().put(XmlBeansDataBinding.XMLBEANS_NAMESPACE_HACK, Boolean.TRUE);
         Node response = invoke("TestService", "/org/apache/cxf/xmlbeans/DocumentStyleRequest.xml");
 
         assertNotNull(response);

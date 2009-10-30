@@ -66,6 +66,12 @@ public class Fault extends UncheckedException {
     public Fault(String message, ResourceBundle b, Throwable t) {
         this(new Message(message, b), t);
     }
+    public Fault(String message, Logger log, Throwable t, Object ... params) {
+        this(new Message(message, log, params), t);
+    }
+    public Fault(String message, ResourceBundle b, Throwable t, Object ... params) {
+        this(new Message(message, b, params), t);
+    }
     
     public Fault(Throwable t) {
         super(t);
