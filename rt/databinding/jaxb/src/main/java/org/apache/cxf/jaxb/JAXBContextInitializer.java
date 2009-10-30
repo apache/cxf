@@ -28,6 +28,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.lang.reflect.WildcardType;
 import java.util.Collection;
 import java.util.Set;
 
@@ -178,6 +179,7 @@ class JAXBContextInitializer extends ServiceModelVisitor {
                 addClass((Class)cls);
             }
         } else if (cls instanceof ParameterizedType) {
+            addType(((ParameterizedType)cls).getRawType());
             for (Type t2 : ((ParameterizedType)cls).getActualTypeArguments()) {
                 addType(t2);
             }
@@ -203,6 +205,17 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             ct = Array.newInstance(ct, 0).getClass();
 
             addClass(ct);
+        } else if (cls instanceof WildcardType) {
+            for (Type t : ((WildcardType)cls).getUpperBounds()) {
+                addType(t);
+            }
+            for (Type t : ((WildcardType)cls).getLowerBounds()) {
+                addType(t);
+            }
+        } else if (cls instanceof TypeVariable) {
+            for (Type t : ((TypeVariable)cls).getBounds()) {
+                addType(t);
+            }
         }
     }
 

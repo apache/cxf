@@ -38,9 +38,13 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.service.ArrayService;
 import org.apache.cxf.jaxws.service.ArrayServiceImpl;
+import org.apache.cxf.jaxws.service.Entity;
 import org.apache.cxf.jaxws.service.FooServiceImpl;
+import org.apache.cxf.jaxws.service.GenericsService;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.service.HelloInterface;
+import org.apache.cxf.jaxws.service.QueryResult;
+import org.apache.cxf.jaxws.service.QuerySummary;
 import org.apache.cxf.jaxws.service.SayHi;
 import org.apache.cxf.jaxws.service.SayHiImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
@@ -310,4 +314,23 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         assertValid("//xsd:schema[@targetNamespace='http://namespace5']", doc);
     }
     
+    @Test
+    public void testCXF2509() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean(); 
+        //factory.setServiceClass(serviceInterface); 
+        factory.setServiceBean(new GenericsServiceImpl()); 
+        factory.setAddress("local://localhost/test"); 
+        Server server = factory.create();
+        Document doc = getWSDLDocument(server);
+        //XMLUtils.printDOM(doc);
+        assertValid("//xsd:schema/xsd:complexType[@name='entity']", doc);
+    }
+    
+    public static class GenericsServiceImpl implements GenericsService<Entity<String>, QuerySummary> {
+
+        public QueryResult<Entity<String>, QuerySummary> read(String query, String uc) {
+            return null;
+        }
+        
+    }
 }
