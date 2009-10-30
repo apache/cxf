@@ -51,6 +51,10 @@ import org.apache.cxf.service.model.ServiceInfo;
  * 
  */
 public class XmlBeansDataBinding extends AbstractDataBinding implements WrapperCapableDatabinding {
+    public static final String XMLBEANS_NAMESPACE_HACK
+        = XmlBeansDataBinding.class.getName() + ".NamespaceHack";
+    
+    
     private static final Logger LOG = LogUtils.getLogger(XmlBeansDataBinding.class);
 
     private static final Class<?> SUPPORTED_READER_FORMATS[] = new Class<?>[] {XMLStreamReader.class};
