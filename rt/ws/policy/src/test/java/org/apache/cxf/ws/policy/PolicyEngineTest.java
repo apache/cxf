@@ -236,7 +236,7 @@ public class PolicyEngineTest extends Assert {
         BindingOperationInfo boi = createMockBindingOperationInfo(); 
         EffectivePolicyImpl epi = control.createMock(EffectivePolicyImpl.class);
         EasyMock.expect(engine.createOutPolicyInfo()).andReturn(epi);
-        epi.initialise(ei, boi, engine, true, true);
+        epi.initialise(ei, boi, engine, true, false);
         EasyMock.expectLastCall();
         control.replay();
         assertSame(epi, engine.getEffectiveClientResponsePolicy(ei, boi));
