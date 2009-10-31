@@ -54,7 +54,6 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.FaultInfo;
@@ -79,20 +78,6 @@ import org.apache.ws.commons.schema.utils.NamespaceMap;
  * @see org.apache.cxf.aegis.AegisContext
  */
 public class AegisDatabinding extends AbstractDataBinding {
-
-    // these are here only for compatibility.
-    /**
-     * @deprecated 2.1
-     */
-    public static final String WRITE_XSI_TYPE_KEY = "writeXsiType";
-    /**
-     * @deprecated 2.1
-     */
-    public static final String OVERRIDE_TYPES_KEY = "overrideTypesList";
-    /**
-     * @deprecated 2.1
-     */
-    public static final String READ_XSI_TYPE_KEY = "readXsiType";
 
     protected static final int IN_PARAM = 0;
     protected static final int OUT_PARAM = 1;
@@ -197,27 +182,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         if (aegisContext == null) {
             aegisContext = new AegisContext();
 
-            Object val = s.get(READ_XSI_TYPE_KEY);
-            if ("false".equals(val) || Boolean.FALSE.equals(val)) {
-                aegisContext.setReadXsiTypes(false);
-            }
-
-            val = s.get(WRITE_XSI_TYPE_KEY);
-            if ("true".equals(val) || Boolean.TRUE.equals(val)) {
-                aegisContext.setWriteXsiTypes(true);
-            }
-
-            val = s.get(OVERRIDE_TYPES_KEY);
-            if (val != null) {
-                Collection nameCollection = (Collection)val;
-                Collection<String> typeNames = CastUtils.cast(nameCollection, String.class);
-                if (overrideTypes == null) {
-                    overrideTypes = new HashSet<String>();
-                }
-                overrideTypes.addAll(typeNames);
-            }
-
-            val = s.get("mtom-enabled");
+            Object val = s.get("mtom-enabled");
             if ("true".equals(val) || Boolean.TRUE.equals(val) || mtomEnabled) {
                 aegisContext.setMtomEnabled(true);
             }
