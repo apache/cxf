@@ -31,7 +31,7 @@ import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.message.Attachment;
 
 /**
- * @author Dan Diephouse
+ * Byte arrays. Also handles MTOM.
  */
 public class ByteArrayType extends AbstractXOPType {
     public ByteArrayType(boolean useXmimeBinaryType, String expectedContentTypes) {
@@ -50,16 +50,6 @@ public class ByteArrayType extends AbstractXOPType {
         copy(is, out);
         is.close();
         return out.toByteArray();
-        // }
-        // finally
-        // {
-        // DataSource dataSource = handler.getDataSource();
-        // if (dataSource instanceof AttachmentDataSource)
-        // {
-        // File attFile = ((AttachmentDataSource) dataSource).getFile();
-        // if (attFile != null) attFile.delete();
-        // }
-        // }
     }
 
     public static void copy(InputStream input, OutputStream output) throws IOException {
