@@ -710,8 +710,9 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers)
 		this.req.setRequestHeader("Content-Type", ctHeader);
 
 	} else {
-	// for now, assume SOAP 1.1. 1.2 calls for application/xml. 
-		this.req.setRequestHeader("Content-Type", "text/xml");
+	// for now, assume SOAP 1.1. 1.2 calls for application/xml.
+	// also assume we're talking Unicode here.
+		this.req.setRequestHeader("Content-Type", "text/xml;charset=utf-8");
 	}
 
 	if (headers) { // must be array indexed by header field.

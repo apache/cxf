@@ -20,7 +20,9 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xmlns:cxf="http://cxf.apache.org/core"
   xsi:schemaLocation="
+           http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd
            http://cxf.apache.org/jaxws                                 
               http://cxf.apache.org/schemas/jaxws.xsd
            http://www.springframework.org/schema/beans
@@ -31,6 +33,13 @@
   <import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
   <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
   <import resource="classpath:META-INF/cxf/cxf-extension-javascript-client.xml" />
+  <!-- 
+      <cxf:bus>
+        <cxf:features>
+            <cxf:logging/>
+        </cxf:features>
+    </cxf:bus>
+    -->
   
   <jaxws:server id="dlw-service-endpoint" 
     address="http://localhost:8808/SimpleDocLitWrapped" >
