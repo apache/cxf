@@ -29,4 +29,8 @@ public class Echo {
     public String echo(@WebParam(name = "echo") String echo) {
         return echo;
     }
+    
+    public String simpleEcho(String string) {
+        return string;
+    }
 }

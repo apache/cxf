@@ -26,6 +26,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.services.Echo;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
@@ -48,6 +49,15 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
         // turn off nanny in URIMappingInterceptor
         server.getEndpoint()
             .getService().put(AbstractInDatabindingInterceptor.NO_VALIDATE_PARTS, Boolean.TRUE);
+        
+        ServerFactoryBean sf2 = new ServerFactoryBean();
+        sf2.setAddress("http://localhost:9167/SimpleEcho");
+        sf2.setDataBinding(new AegisDatabinding());
+        sf2.setServiceBean(new Echo());
+        server = sf2.create();
+        // turn off nanny in URIMappingInterceptor
+        server.getEndpoint()
+            .getService().put(AbstractInDatabindingInterceptor.NO_VALIDATE_PARTS, Boolean.TRUE);
     }
     
     
@@ -61,6 +71,18 @@ public class AegisJaxwsGetTest extends AbstractCXFTest {
     public void testGetEcho() throws Exception {
         HttpClient httpClient = createClient();
         String url = "http://localhost:9167/Echo/echo/echo/hello";
+        HttpMethod method = null;
+        method = new GetMethod(url);
+        int status = httpClient.executeMethod(method);
+        assertEquals(HttpStatus.SC_OK, status);
+        String result = method.getResponseBodyAsString();
+        assertTrue(result.contains("hello"));
+        method.releaseConnection();
+    }
+    @Test
+    public void testGetEchoSimple() throws Exception {
+        HttpClient httpClient = createClient();
+        String url = "http://localhost:9167/SimpleEcho/simpleEcho/string/hello";
         HttpMethod method = null;
         method = new GetMethod(url);
         int status = httpClient.executeMethod(method);
