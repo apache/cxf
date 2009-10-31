@@ -18,13 +18,15 @@
  */
 package org.apache.cxf.aegis.services;
 
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+
 /**
- * Echo
- * 
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
+ * Simple echo service.
  */
 public class Echo {
-    public String echo(String echo) {
+    @WebMethod
+    public String echo(@WebParam(name = "echo") String echo) {
         return echo;
     }
 }

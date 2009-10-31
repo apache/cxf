@@ -42,7 +42,7 @@ public abstract class BusFactory {
     /** 
      * Creates a new bus. 
      * While concrete <code>BusFactory</code> may offer differently
-     * parametrized methods for creating a bus, all factories support
+     * parameterized methods for creating a bus, all factories support
      * this no-arg factory method.
      *
      * @return the newly created bus.
