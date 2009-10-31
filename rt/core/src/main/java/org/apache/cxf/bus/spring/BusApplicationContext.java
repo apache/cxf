@@ -144,14 +144,13 @@ public class BusApplicationContext extends ClassPathXmlApplicationContext {
             Resource cpr = findResource(cfgFile);
             if (cpr != null && cpr.exists()) {
                 resources.add(cpr);
+                LogUtils.log(LOG, Level.INFO, "USER_CFG_FILE_IN_USE", cfgFile);
             } else {
                 if (!usingDefault) {
                     LogUtils.log(LOG, Level.WARNING, "USER_CFG_FILE_NOT_LOADED", cfgFile);
                     String message = (new Message("USER_CFG_FILE_NOT_LOADED", LOG, cfgFile)).toString();
                     throw new ApplicationContextException(message);
-                } else {
-                    LogUtils.log(LOG, Level.INFO, "USER_CFG_FILE_NOT_SPECIFIED_MSG", cfgFile);
-                }
+                } 
             }
         }
             
