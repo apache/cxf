@@ -115,6 +115,7 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                         } else {
                             Element stackTrace = detail.getOwnerDocument().createElementNS(
                                     Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
+                            stackTrace.setTextContent(sb.toString());
                             detail.appendChild(stackTrace);
                         }                    
                     } catch (ParserConfigurationException pe) {
