@@ -140,6 +140,37 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     }
     
     @Test
+    public void callFunctionWithHeader() {
+        testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
+
+            public Void run(Context context) {
+                LOG.info("About to call testDummyHeader " + getAddress());
+                Notifier notifier = 
+                    testUtilities.rhinoCallConvert("testDummyHeader", Notifier.class, 
+                                                   testUtilities.javaToJS(getAddress()), 
+                                                   testUtilities.javaToJS("narcissus"),
+                                                   null);
+                boolean notified = notifier.waitForJavascript(1000 * 10);
+                assertTrue(notified);
+                Integer errorStatus = testUtilities.rhinoEvaluateConvert("globalErrorStatus", Integer.class);
+                assertNull(errorStatus);
+                String errorText = testUtilities.rhinoEvaluateConvert("globalErrorStatusText", String.class);
+                assertNull(errorText);
+
+                Scriptable responseObject = (Scriptable)testUtilities.rhinoEvaluate("globalResponseObject");
+                assertNotNull(responseObject);
+                // by default, for doc/lit/wrapped, we end up with a part object with a slot named 
+                // 'return'.
+                String returnValue = testUtilities.rhinoCallMethodInContext(String.class, responseObject,
+                                                                             "getReturn");
+                assertEquals("narcissus", returnValue);
+                return null;
+            }
+            
+        });
+    }
+    
+    @Test
     public void callIntReturnMethod() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {

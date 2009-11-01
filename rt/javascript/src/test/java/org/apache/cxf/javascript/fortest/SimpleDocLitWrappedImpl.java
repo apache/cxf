@@ -19,7 +19,17 @@
 
 package org.apache.cxf.javascript.fortest;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.annotation.Resource;
 import javax.jws.WebService;
+import javax.xml.bind.JAXBException;
+import javax.xml.namespace.QName;
+import javax.xml.ws.WebServiceContext;
+
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 
 /**
  * 
@@ -28,6 +38,8 @@ import javax.jws.WebService;
             targetNamespace = "uri:org.apache.cxf.javascript.fortest")
 public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     
+    @Resource
+    private WebServiceContext context;
     private String lastString;
     private int lastInt;
     private long lastLong;
@@ -38,6 +50,20 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
     private SpecificGenericClass lastSpecificGeneric;
     private GenericGenericClass<Double> lastGenericGeneric;
     private InheritanceTestDerived lastInheritanceTestDerived;
+    
+    public String echoWithHeader(String what) {
+        List<Header> headers = new ArrayList<Header>();
+        Header dummyHeader;
+        try {
+            dummyHeader = new Header(new QName("uri:org.apache.cxf", "dummy"), "decapitated",
+                                            new JAXBDataBinding(String.class));
+        } catch (JAXBException e) {
+            throw new RuntimeException(e);
+        }
+        headers.add(dummyHeader);
+        context.getMessageContext().put(Header.HEADER_LIST, headers);
+        return what;
+    }
 
     /** {@inheritDoc}*/
     public int basicTypeFunctionReturnInt(String s, int i, long l, float f, double d) {
