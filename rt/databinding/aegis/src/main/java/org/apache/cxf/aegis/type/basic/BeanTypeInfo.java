@@ -23,6 +23,8 @@ import java.beans.IntrospectionException;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -300,6 +302,11 @@ public class BeanTypeInfo {
         if (descriptors == null) {
             descriptors = new PropertyDescriptor[0];
         }
+        Arrays.sort(descriptors, new Comparator<PropertyDescriptor>() {
+            public int compare(PropertyDescriptor o1, PropertyDescriptor o2) {
+                return o1.getName().compareTo(o2.getName());
+            }
+        });
     }
 
     private PropertyDescriptor[] getInterfacePropertyDescriptors(Class<?> clazz) {
