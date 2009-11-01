@@ -73,7 +73,12 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         TestBean1[] beans = new TestBean1[3];
         beans[0] = new TestBean1();
         beans[0].beanTwoNotRequiredItem = new TestBean2("bean2");
-        beans[1] = null;
+        if (useWrapper) {
+            beans[1] = null;
+        } else {
+            // without a wrapper, it can't be null, so put something in there.
+            beans[1] = new TestBean1();
+        }
         beans[2] = new TestBean1();
         beans[2].optionalIntArrayItem = new int[2];
         beans[2].optionalIntArrayItem[0] = 4;
@@ -114,7 +119,6 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
         return null;
     }
     
-    @org.junit.Ignore // problems with names on auto-generated wrappers!
     @Test
     public void callFunctionWithBeans() {
         LOG.info("about to call test4/beanFunction");
@@ -253,7 +257,7 @@ public class DocLitWrappedClientTest extends JavascriptRhinoTest {
     public void callTest2WithNullString() {
         testUtilities.runInsideContext(Void.class, new JSRunnable<Void>() {
             public Void run(Context context) {
-                LOG.info("About to call test2 with null string" + getAddress());
+                LOG.info("About to call test2 with null string " + getAddress());
                 Notifier notifier = 
                     testUtilities.rhinoCallConvert("test2", Notifier.class, 
                                                    testUtilities.javaToJS(getAddress()), 
