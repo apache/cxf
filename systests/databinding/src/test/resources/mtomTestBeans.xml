@@ -50,9 +50,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
 		<simple:dataBinding>
 			<bean
-				class="org.apache.cxf.aegis.databinding.AegisDatabinding">
-				<property name="mtomEnabled" value="true" />
-			</bean>
+				class="org.apache.cxf.aegis.databinding.AegisDatabinding"/>
 		</simple:dataBinding>
 		<simple:serviceBean>
 			<ref bean="mtomImpl" />

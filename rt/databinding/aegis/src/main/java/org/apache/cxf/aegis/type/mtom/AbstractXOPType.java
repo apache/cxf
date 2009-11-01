@@ -44,7 +44,6 @@ import org.apache.ws.commons.schema.constants.Constants;
 
 /**
  * Base class for MtoM types.
- * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public abstract class AbstractXOPType extends Type {
     public static final String XOP_NS = "http://www.w3.org/2004/08/xop/include";

@@ -57,7 +57,6 @@ public class Base64Type extends Type {
     
     @Override
     public Object readObject(MessageReader mreader, Context context) throws DatabindingException {
-        boolean mtomEnabled = context.isMtomEnabled();
         XMLStreamReader reader = mreader.getXMLStreamReader();
 
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -69,11 +68,7 @@ public class Base64Type extends Type {
             }
             
             if (reader.isStartElement() && reader.getName().equals(AbstractXOPType.XOP_INCLUDE)) {
-                if (mtomEnabled) {
-                    return optimizedType.readMtoM(mreader, context);
-                } else {
-                    throw new DatabindingException("Unexpected element: " + reader.getName());
-                }
+                return optimizedType.readMtoM(mreader, context);
             }
 
             if (reader.isEndElement()) {
