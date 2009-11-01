@@ -35,7 +35,7 @@
     <properties>
         <surefire.fork.mode>once</surefire.fork.mode>
         <surefire.format>brief</surefire.format>
-        <surefire.usefile>false</surefire.usefile>
+        <surefire.usefile>true</surefire.usefile>
         <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
         <surefire.extra.sysprop.name1>None</surefire.extra.sysprop.name1>
         <surefire.extra.sysprop.value1>None</surefire.extra.sysprop.value1>
@@ -263,6 +263,7 @@
                         <excludes>
                             <exclude>**/*$*</exclude>
                         </excludes>
+                        <disableXmlReport>true</disableXmlReport>
                         <reportFormat>${surefire.format}</reportFormat>
                         <useFile>${surefire.usefile}</useFile>
                         <forkMode>${surefire.fork.mode}</forkMode>
