@@ -19,13 +19,15 @@
 
 package org.apache.cxf.transport.http;
 
+import java.io.IOException;
+import java.io.StreamTokenizer;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -60,22 +62,41 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         return true;
     }
     
-    @Override
-    public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
-                                           Message message,
-                                           String realm, String fullHeader) {
-        if (fullHeader.startsWith("Digest ")) {
-            Map<String, String> map = new HashMap<String, String>();
-            fullHeader = fullHeader.substring(7);
-            StringTokenizer tok = new StringTokenizer(fullHeader, ",=");
-            while (tok.hasMoreTokens()) {
-                String key = tok.nextToken().trim();
-                String value = tok.nextToken().trim();
+    static Map<String, String> parseHeader(String fullHeader) {
+        
+        Map<String, String> map = new HashMap<String, String>();
+        fullHeader = fullHeader.substring(7);
+        try {
+            StreamTokenizer tok = new StreamTokenizer(new StringReader(fullHeader));
+            tok.quoteChar('"');
+            tok.quoteChar('\'');
+            tok.whitespaceChars('=', '=');
+            tok.whitespaceChars(',', ',');
+            
+            while (tok.nextToken() != StreamTokenizer.TT_EOF) {
+                String key = tok.sval;
+                if (tok.nextToken() == StreamTokenizer.TT_EOF) {
+                    map.put(key, null);
+                    return map;
+                }
+                String value = tok.sval;
                 if (value.charAt(0) == '"') {
                     value = value.substring(1, value.length() - 1);
                 }
                 map.put(key, value);
             }
+        } catch (IOException ex) {
+            //ignore
+        }
+        return map;
+    }
+    
+    @Override
+    public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
+                                           Message message,
+                                           String realm, String fullHeader) {
+        if (fullHeader.startsWith("Digest ")) {
+            Map<String, String> map = parseHeader(fullHeader);
             if ("auth".equals(map.get("qop"))
                 || !map.containsKey("qop")) {
                 DigestInfo di = new DigestInfo();
