@@ -630,7 +630,8 @@ public final class JAXBEncoderDecoder {
     }
 
     private static Object updateSourceWithXSIType(Object source, final QName typeQName) {
-        if (source instanceof XMLStreamReader) {
+        if (source instanceof XMLStreamReader 
+            && typeQName != null) {
             XMLStreamReader reader = (XMLStreamReader)source;
             String type = reader.getAttributeValue(SOAPConstants.XSI_NS, "type");
             if (StringUtils.isEmpty(type)) {
