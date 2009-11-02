@@ -23,13 +23,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Reader;
 import java.io.StringReader;
-import java.io.StringWriter;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,7 +53,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
@@ -77,6 +78,7 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MultiplexDestination;
@@ -104,24 +106,14 @@ public final class EndpointReferenceUtils {
      * the code in here.
      */
     private static final class SchemaLSResourceResolver implements LSResourceResolver {
-        private final Map<String, DOMSource> schemas;
+        private final Map<String, String> schemas;
+        private final Set<String> done = new HashSet<String>();
         private final ExtendedURIResolver resolver = new ExtendedURIResolver();
         
-        private SchemaLSResourceResolver(Map<String, DOMSource> schemas) {
+        private SchemaLSResourceResolver(Map<String, String> schemas) {
             this.schemas = schemas;
         }
         
-        private Reader getSchemaAsStream(DOMSource source) {
-            StringWriter writer = new StringWriter();
-            StreamResult result = new StreamResult(writer);
-            try {
-                TransformerFactory.newInstance().newTransformer().transform(source, result);
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-            return new StringReader(writer.toString());
-        }
-
         public LSInput resolveResource(String type, String namespaceURI, String publicId,
                                        String systemId, String baseURI) {
 
@@ -131,28 +123,37 @@ public final class EndpointReferenceUtils {
                     URI uri = new URI(baseURI);
                     uri = uri.resolve(systemId);
                     newId = uri.toString();
+                    if (newId.equals(systemId)) {
+                        URL url = new URL(baseURI);
+                        url = new URL(url, systemId);
+                        newId = url.toExternalForm();
+                    }
                 } catch (URISyntaxException e) {
+                    //ignore
+                } catch (MalformedURLException e) {
                     //ignore
                 }
             }
+            if (done.contains(newId + ":" + namespaceURI)) {
+                return null;
+            }
             if (schemas.containsKey(newId + ":" + namespaceURI)) {
-                DOMSource ds = schemas.remove(newId + ":" + namespaceURI);
+                String ds = schemas.remove(newId + ":" + namespaceURI);
                 LSInputImpl impl = new LSInputImpl();
                 impl.setSystemId(newId);
                 impl.setBaseURI(newId);
-                impl.setCharacterStream(getSchemaAsStream(ds));
+                impl.setCharacterStream(new StringReader(ds));
+                done.add(newId + ":" + namespaceURI);
                 return impl;
             }
-            
-            for (Map.Entry<String, DOMSource> ent : schemas.entrySet()) {
-                if (ent.getKey().endsWith(namespaceURI)) {
-                    schemas.remove(ent.getKey());
-                    LSInputImpl impl = new LSInputImpl();
-                    impl.setSystemId(newId);
-                    impl.setBaseURI(newId);
-                    impl.setCharacterStream(getSchemaAsStream(ent.getValue()));
-                    return impl;
-                }
+            if (schemas.containsKey(newId + ":null")) {
+                String ds = schemas.get(newId + ":null");
+                LSInputImpl impl = new LSInputImpl();
+                impl.setSystemId(newId);
+                impl.setBaseURI(newId);
+                impl.setCharacterStream(new StringReader(ds));
+                done.add(newId + ":" + namespaceURI);
+                return impl;                
             }
                 
             //REVIST - we need to get catalogs in here somehow  :-(
@@ -585,18 +586,24 @@ public final class EndpointReferenceUtils {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Map<String, DOMSource> schemaSourcesMap = new LinkedHashMap<String, DOMSource>();
-            for (SchemaInfo si : serviceInfo.getSchemas()) {
-                Element el = si.getElement();
-                String baseURI = el.getBaseURI();
-                if (baseURI == null) {
-                    baseURI = si.getSystemId();
-                }
-                DOMSource ds = new DOMSource(el, baseURI);                
-                schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
-            }
+            Map<String, String> schemaSourcesMap = new LinkedHashMap<String, String>();
+            Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<String, Source>();
 
             try {
+                for (SchemaInfo si : serviceInfo.getSchemas()) {
+                    Element el = si.getElement();
+                    String baseURI = el.getBaseURI();
+                    if (baseURI == null) {
+                        baseURI = si.getSystemId();
+                    }
+                    DOMSource ds = new DOMSource(el, baseURI);   
+                    schemaSourcesMap2.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
+                    
+                    String s = StaxUtils.toString(el);
+                    schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), s);
+                }
+
+                
                 for (XmlSchema sch : serviceInfo.getXmlSchemaCollection().getXmlSchemas()) {
                     if (sch.getSourceURI() != null
                         && !schemaSourcesMap.containsKey(sch.getSourceURI() + ":" 
@@ -622,16 +629,22 @@ public final class EndpointReferenceUtils {
                         } catch (IOException ex) {
                             //ignore
                         }
-                        
-                        DOMSource ss = new DOMSource(doc, sch.getSourceURI());
+                        String s = StaxUtils.toString(doc);
                         schemaSourcesMap.put(sch.getSourceURI() + ":" 
-                                             + sch.getTargetNamespace(), ss);
+                                             + sch.getTargetNamespace(), s);
+                        
+                        Source source = new StreamSource(new StringReader(s), sch.getSourceURI());
+                        schemaSourcesMap2.put(sch.getSourceURI() + ":" 
+                                              + sch.getTargetNamespace(), source);
                     }
                 } 
 
+
                 factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap));
-                schema = factory.newSchema(schemaSourcesMap.values()
-                                           .toArray(new Source[schemaSourcesMap.size()]));
+                schema = factory.newSchema(schemaSourcesMap2.values()
+                                           .toArray(new Source[schemaSourcesMap2.size()]));
+                
+                
             } catch (Exception ex) {
                 // Something not right with the schema from the wsdl.
                 LOG.log(Level.WARNING, "SAXException for newSchema() on ", ex);
