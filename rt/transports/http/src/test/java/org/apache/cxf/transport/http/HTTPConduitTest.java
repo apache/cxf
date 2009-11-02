@@ -127,6 +127,17 @@ public class HTTPConduitTest extends Assert {
                      conduit.getURL().getPath(),
                      "/bar/foo");
     }
+    
+    @Test
+    public void testCXF2370() throws Exception {
+        String origNonce = "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==";
+        String fullHeader = "Digest realm=\"MyCompany realm.\", qop=\"auth\","
+            + "nonce=\"" + origNonce + "\"";
+        Map<String, String> map = DigestAuthSupplier.parseHeader(fullHeader);
+        assertEquals(origNonce, map.get("nonce"));
+        assertEquals("auth", map.get("qop"));
+        assertEquals("MyCompany realm.", map.get("realm"));
+    }
 
     /**
      * Verfies one of the tenents of our interface -- the Conduit sets up
