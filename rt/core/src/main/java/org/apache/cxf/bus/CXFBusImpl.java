@@ -22,6 +22,7 @@ package org.apache.cxf.bus;
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -29,10 +30,25 @@ import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.feature.LoggingFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 
 @NoJSR250Annotations
-public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus {    
+public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus {
+    static final boolean FORCE_LOGGING;
+    static {
+        boolean b = false;
+        try {
+            b = Boolean.getBoolean("org.apache.cxf.logging.enabled");
+            //treat these all the same
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.local.LocalTransportPipe.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.util.pipe.StandaloneTubeAssembler.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.HttpAdapter.dump");
+        } catch (Throwable t) {
+            //ignore
+        }
+        FORCE_LOGGING = b;
+    }
     
     protected final Map<Class, Object> extensions;
     private String id;
@@ -55,6 +71,10 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         state = BusState.INITIAL;
         
         CXFBusFactory.possiblySetDefaultBus(this);
+        if (FORCE_LOGGING) {
+            features = new CopyOnWriteArrayList<AbstractFeature>();
+            features.add(new LoggingFeature());
+        }
     }
 
     protected void setState(BusState state) {
@@ -151,8 +171,10 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
     }
 
     public synchronized void setFeatures(Collection<AbstractFeature> features) {
-        this.features = features;
-        
+        this.features = new CopyOnWriteArrayList<AbstractFeature>(features);
+        if (FORCE_LOGGING) {
+            this.features.add(new LoggingFeature());
+        }
         if (state == BusState.RUNNING) {
             initializeFeatures();
         }
