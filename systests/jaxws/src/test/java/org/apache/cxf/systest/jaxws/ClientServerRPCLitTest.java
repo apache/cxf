@@ -32,6 +32,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.Style;
 import javax.jws.soap.SOAPBinding.Use;
+import javax.xml.bind.UnmarshalException;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -39,8 +40,10 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.soap.SOAPFaultException;
 import javax.xml.xpath.XPathConstants;
 
 import org.w3c.dom.Document;
@@ -154,15 +157,25 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         in.setElem3(45);
 
         try {            
+            ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
             MyComplexStruct out = greeter.sendReceiveData(in); 
             assertNotNull("no response received from service", out);
             assertEquals(in.getElem1(), out.getElem1());
             assertEquals(in.getElem2(), out.getElem2());
             assertEquals(in.getElem3(), out.getElem3());
+            
+            
+            
         } catch (UndeclaredThrowableException ex) {
             throw (Exception) ex.getCause();
         }
         
+        try {
+            in.setElem2("invalid");
+            greeter.sendReceiveData(in); 
+        } catch (SOAPFaultException f) {
+            assertTrue(f.getCause() instanceof UnmarshalException);
+        }
     }
     
     @Test
