@@ -56,12 +56,15 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.SOAPConstants;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -76,6 +79,85 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
  * Utility functions for JAXB.
  */
 public final class JAXBEncoderDecoder {
+    private static final class AddXSITypeStreamReader extends StreamReaderDelegate {
+        private boolean first = true;
+        private final QName typeQName;
+
+        private AddXSITypeStreamReader(XMLStreamReader reader, QName typeQName) {
+            super(reader);
+            this.typeQName = typeQName;
+        }
+
+        public int getAttributeCount() {
+            return super.getAttributeCount() + (first ? 1 : 0);
+        }
+
+        public String getAttributeLocalName(int index) {
+            if (first && index == 0) {
+                return "type";
+            }
+            return super.getAttributeLocalName(index - 1);
+        }
+
+        public QName getAttributeName(int index) {
+            if (first && index == 0) {
+                return new QName(SOAPConstants.XSI_NS, "type");
+            }
+            return super.getAttributeName(index - 1);
+        }
+
+        public String getAttributeNamespace(int index) {
+            if (first && index == 0) {
+                return SOAPConstants.XSI_NS;
+            }
+            return super.getAttributeNamespace(index - 1);
+        }
+
+        public String getAttributePrefix(int index) {
+            if (first && index == 0) {
+                return "xsi";
+            }
+            return super.getAttributePrefix(index - 1);
+        }
+
+        public String getAttributeType(int index) {
+            if (first && index == 0) {
+                return "#TEXT";
+            }
+            return super.getAttributeType(index - 1);
+        }
+
+        public String getAttributeValue(int index) {
+            if (first && index == 0) {
+                String pfx = this.getNamespaceContext().getPrefix(typeQName.getNamespaceURI());
+                if (StringUtils.isEmpty(pfx)) {
+                    return typeQName.getLocalPart();
+                }
+                return pfx + ":" + typeQName.getLocalPart();
+            }
+            return super.getAttributeValue(index);
+        }
+
+        public int next()  throws XMLStreamException {
+            first = false;
+            return super.next();
+        }
+
+        public String getAttributeValue(String namespaceUri,
+                                        String localName) {
+            if (first
+                && SOAPConstants.XSI_NS.equals(namespaceUri)
+                && "type".equals(localName)) {
+                String pfx = this.getNamespaceContext().getPrefix(typeQName.getNamespaceURI());
+                if (StringUtils.isEmpty(pfx)) {
+                    return typeQName.getLocalPart();
+                }
+                return pfx + ":" + typeQName.getLocalPart();
+            }
+            return super.getAttributeValue(namespaceUri, localName);
+        }
+    }
+
     private static final Logger LOG = LogUtils.getLogger(JAXBEncoderDecoder.class);
 
     private JAXBEncoderDecoder() {
@@ -144,6 +226,10 @@ public final class JAXBEncoderDecoder {
                     writeObject(marshaller, source, new JAXBElement(elName, String.class, mObj));
                 } else if (mObj instanceof JAXBElement) {
                     writeObject(marshaller, source, mObj);
+                } else if (marshaller.getSchema() != null) {
+                    //force xsi:type so types can be validated instead of trying to 
+                    //use the RPC/lit element names that aren't in the schema 
+                    writeObject(marshaller, source, new JAXBElement(elName, Object.class, mObj));
                 } else {
                     writeObject(marshaller, source, new JAXBElement(elName, cls, mObj));
                 }
@@ -528,6 +614,10 @@ public final class JAXBEncoderDecoder {
 
             String obj = (String)unmarshall(u, source, elName, String.class, unwrap);
             return new HexBinaryAdapter().unmarshal(obj);
+        } else if (part != null && u.getSchema() != null
+            && !(part.getXmlSchema() instanceof XmlSchemaElement)) {
+            //Validating RPC/Lit, make sure we don't try a root element name thing
+            source = updateSourceWithXSIType(source, part.getTypeQName());
         }
 
         Object o = unmarshall(u, source, elName, clazz, unwrap);
@@ -537,6 +627,17 @@ public final class JAXBEncoderDecoder {
             o = ret;
         }
         return o;
+    }
+
+    private static Object updateSourceWithXSIType(Object source, final QName typeQName) {
+        if (source instanceof XMLStreamReader) {
+            XMLStreamReader reader = (XMLStreamReader)source;
+            String type = reader.getAttributeValue(SOAPConstants.XSI_NS, "type");
+            if (StringUtils.isEmpty(type)) {
+                source = new AddXSITypeStreamReader(reader, typeQName);
+            }
+        }
+        return source;
     }
 
     private static Object createSet(MessagePartInfo part, List<Object> ret) {
@@ -551,6 +652,7 @@ public final class JAXBEncoderDecoder {
         } catch (Exception e) {
             c = new HashSet<Object>();
         }
+        
         c.addAll(ret);
         return c;
     }

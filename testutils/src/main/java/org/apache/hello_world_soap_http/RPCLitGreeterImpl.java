@@ -49,6 +49,9 @@ public class RPCLitGreeterImpl implements GreeterRPCLit {
         System.out.println("Executing operation sendReceiveData");
         System.out.println("Received struct with values :\nElement-1 : " + in.getElem1() + "\nElement-2 : "
                            + in.getElem2() + "\nElement-3 : " + in.getElem3() + "\n");
+        if ("invalid".equals(in.getElem2())) {
+            in.setElem2(null);
+        }
         return in;
     }
 
