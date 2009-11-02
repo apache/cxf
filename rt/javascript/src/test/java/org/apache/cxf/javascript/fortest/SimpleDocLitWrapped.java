@@ -52,6 +52,9 @@ public interface SimpleDocLitWrapped {
     TestBean1 functionReturnTestBean1();
     
     @WebMethod
+    String echoWithHeader(@WebParam(name = "what") String what);
+    
+    @WebMethod
     int basicTypeFunctionReturnInt(@WebParam(name = "s") String s, 
                                    @WebParam(name = "i") int i, 
                                    @WebParam(name = "l") long l, 

@@ -468,6 +468,14 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 utils.appendLine("element = this.jsutils.getFirstElementChild(element);");
                 utils.appendLine("this.jsutils.trace('first element child: ' "
                                  + "+ this.jsutils.traceElementName(element));");
+                // loop to find the body.
+                utils.startWhile("!this.jsutils.isNodeNamedNS(element, "
+                                 + "'http://schemas.xmlsoap.org/soap/envelope/', 'Body')");
+                utils.appendLine("element = this.jsutils.getNextElementSibling(element);");
+                utils.startIf("element == null");
+                utils.appendLine("throw 'No env:Body in message.'");
+                utils.endBlock();
+                utils.endBlock();
                 // Go down one more from the body to the response item.
                 utils.appendLine("element = this.jsutils.getFirstElementChild(element);");
                 utils.appendLine("this.jsutils.trace('part element: ' "

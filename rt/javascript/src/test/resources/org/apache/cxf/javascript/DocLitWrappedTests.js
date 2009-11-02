@@ -135,3 +135,17 @@ function testInheritance(url) {
 
 	return globalNotifier;
 }
+
+function testDummyHeader(url, stringArg) 
+{
+	org_apache_cxf_trace.trace("Enter testDummyHeader.");
+	resetGlobals();
+	globalNotifier = new org_apache_cxf_notifier();
+	
+	var intf = new org_apache_cxf_javascript_fortest_SimpleDocLitWrapped();
+	intf.url = url;
+	// param order from the interface
+	intf.echoWithHeader(test1SuccessCallback, test1ErrorCallback, stringArg);
+    // Return the notifier as a convenience to the Java code.
+	return globalNotifier;
+}
