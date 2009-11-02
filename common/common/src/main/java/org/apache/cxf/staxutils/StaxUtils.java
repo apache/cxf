@@ -22,6 +22,7 @@ package org.apache.cxf.staxutils;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
+import java.io.StringWriter;
 import java.io.Writer;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
@@ -1174,4 +1175,19 @@ public final class StaxUtils {
             //shouldn't get here
         }
     }
+    public static String toString(Document doc) throws XMLStreamException {
+        StringWriter sw = new StringWriter(1024);
+        XMLStreamWriter writer = createXMLStreamWriter(sw);
+        copy(doc, writer);
+        writer.flush();
+        return sw.toString();
+    }
+    public static String toString(Element el) throws XMLStreamException {
+        StringWriter sw = new StringWriter(1024);
+        XMLStreamWriter writer = createXMLStreamWriter(sw);
+        copy(el, writer);
+        writer.flush();
+        return sw.toString();
+    }
+
 }
