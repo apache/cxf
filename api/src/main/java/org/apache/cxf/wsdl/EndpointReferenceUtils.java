@@ -19,10 +19,9 @@
 
 package org.apache.cxf.wsdl;
 
-import java.io.IOException;
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.Reader;
-import java.io.StringReader;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -73,6 +72,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.EndpointResolverRegistry;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerRegistry;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
@@ -106,11 +106,11 @@ public final class EndpointReferenceUtils {
      * the code in here.
      */
     private static final class SchemaLSResourceResolver implements LSResourceResolver {
-        private final Map<String, String> schemas;
+        private final Map<String, byte[]> schemas;
         private final Set<String> done = new HashSet<String>();
         private final ExtendedURIResolver resolver = new ExtendedURIResolver();
         
-        private SchemaLSResourceResolver(Map<String, String> schemas) {
+        private SchemaLSResourceResolver(Map<String, byte[]> schemas) {
             this.schemas = schemas;
         }
         
@@ -138,20 +138,20 @@ public final class EndpointReferenceUtils {
                 return null;
             }
             if (schemas.containsKey(newId + ":" + namespaceURI)) {
-                String ds = schemas.remove(newId + ":" + namespaceURI);
+                byte[] ds = schemas.remove(newId + ":" + namespaceURI);
                 LSInputImpl impl = new LSInputImpl();
                 impl.setSystemId(newId);
                 impl.setBaseURI(newId);
-                impl.setCharacterStream(new StringReader(ds));
+                impl.setByteStream(new ByteArrayInputStream(ds));
                 done.add(newId + ":" + namespaceURI);
                 return impl;
             }
             if (schemas.containsKey(newId + ":null")) {
-                String ds = schemas.get(newId + ":null");
+                byte[] ds = schemas.get(newId + ":null");
                 LSInputImpl impl = new LSInputImpl();
                 impl.setSystemId(newId);
                 impl.setBaseURI(newId);
-                impl.setCharacterStream(new StringReader(ds));
+                impl.setByteStream(new ByteArrayInputStream(ds));
                 done.add(newId + ":" + namespaceURI);
                 return impl;                
             }
@@ -586,7 +586,7 @@ public final class EndpointReferenceUtils {
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            Map<String, String> schemaSourcesMap = new LinkedHashMap<String, String>();
+            Map<String, byte[]> schemaSourcesMap = new LinkedHashMap<String, byte[]>();
             Map<String, Source> schemaSourcesMap2 = new LinkedHashMap<String, Source>();
 
             try {
@@ -598,9 +598,9 @@ public final class EndpointReferenceUtils {
                     }
                     DOMSource ds = new DOMSource(el, baseURI);   
                     schemaSourcesMap2.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
-                    
-                    String s = StaxUtils.toString(el);
-                    schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), s);
+                    LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
+                    StaxUtils.copy(el, StaxUtils.createXMLStreamWriter(out));
+                    schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), out.toByteArray());
                 }
 
                 
@@ -618,22 +618,17 @@ public final class EndpointReferenceUtils {
                             //bugs in XmlSchema could make this less useful)
                         }
                         
+                        LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
                         if (ins == null) {
-                            LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
                             sch.write(out);
-                            ins = out.createInputStream();
+                        } else {
+                            IOUtils.copyAndCloseInput(ins, out);
                         }
-                        Document doc = XMLUtils.parse(ins);
-                        try {
-                            ins.close();
-                        } catch (IOException ex) {
-                            //ignore
-                        }
-                        String s = StaxUtils.toString(doc);
+
                         schemaSourcesMap.put(sch.getSourceURI() + ":" 
-                                             + sch.getTargetNamespace(), s);
+                                             + sch.getTargetNamespace(), out.toByteArray());
                         
-                        Source source = new StreamSource(new StringReader(s), sch.getSourceURI());
+                        Source source = new StreamSource(out.createInputStream(), sch.getSourceURI());
                         schemaSourcesMap2.put(sch.getSourceURI() + ":" 
                                               + sch.getTargetNamespace(), source);
                     }
