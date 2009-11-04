@@ -132,6 +132,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                     } else {
                         throw new Fault("Invalid document type returned: " + dom.toString(), LOG);
                     }
+                    return;
                 }
                 
                 XMLStreamReader reader;
