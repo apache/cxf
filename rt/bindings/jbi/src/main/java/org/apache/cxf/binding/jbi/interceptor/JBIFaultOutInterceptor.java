@@ -61,7 +61,9 @@ public class JBIFaultOutInterceptor extends AbstractPhaseInterceptor<JBIMessage>
             StaxUtils.writeStartElement(writer, prefix, JBIFault.JBI_FAULT_ROOT, 
                                         JBIConstants.NS_JBI_BINDING);
             if (!jbiFault.hasDetails()) {
-                writer.writeEmptyElement("fault");
+                Element faultString = DOMUtils.createDocument().createElement("fault");
+                faultString.setTextContent(jbiFault.getCause().getMessage());
+                StaxUtils.writeNode(faultString, writer, true);   
             } else {
                 Element detail = jbiFault.getDetail();
                 Element elem = DOMUtils.getFirstElement(detail);

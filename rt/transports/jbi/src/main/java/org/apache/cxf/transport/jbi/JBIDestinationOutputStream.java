@@ -96,10 +96,13 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                 if (inMessage.getExchange().getOutFaultMessage() != null) {
                     org.apache.cxf.interceptor.Fault f = (org.apache.cxf.interceptor.Fault) 
                             inMessage.getContent(Exception.class);
-                    if (f.hasDetails()) {
-                        Fault fault = xchng.createFault();
+                    if (!(f.getCause() instanceof Error)) {
+                        Fault fault = xchng.createFault(); 
                         fault.setContent(new DOMSource(doc));
                         xchng.setFault(fault);
+                        if (!f.hasDetails()) {
+                            xchng.setProperty("faultstring", f.getMessage());
+                        }
                     } else {
                         xchng.setError(f);
                     }
