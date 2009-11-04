@@ -22,7 +22,10 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -33,6 +36,7 @@ import org.apache.cxf.tools.common.model.JavaPort;
 import org.apache.cxf.tools.common.model.JavaServiceClass;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.NameUtil;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 
 public class ClientGenerator extends AbstractJAXWSGenerator {
 
@@ -60,48 +64,64 @@ public class ClientGenerator extends AbstractJAXWSGenerator {
 
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
-        JavaModel javaModel = env.get(JavaModel.class);
         if (passthrough()) {
             return;
         }
-        if (javaModel.getServiceClasses().size() == 0) {
-            ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
-            String wsdl = serviceInfo.getDescription().getBaseURI();
-            Message msg = new Message("CAN_NOT_GEN_CLIENT", LOG, wsdl);
-            if (penv.isVerbose()) {
-                System.out.println(msg.toString());
-            }
-            return;
-        }
-
-        Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-        Iterator it = javaModel.getServiceClasses().values().iterator();
-        while (it.hasNext()) {
-            JavaServiceClass js = (JavaServiceClass)it.next();
-            Iterator i = js.getPorts().iterator();
-            while (i.hasNext()) {
-                JavaPort jp = (JavaPort)i.next();
-                String interfaceName = jp.getInterfaceClass();
-                JavaInterface intf = interfaces.get(interfaceName);
-                if (intf == null) {
-                    interfaceName = jp.getPortType();
-                    intf = interfaces.get(interfaceName);
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        for (JavaModel javaModel : map.values()) {
+        
+            if (javaModel.getServiceClasses().size() == 0) {
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                String wsdl = serviceInfo.getDescription().getBaseURI();
+                Message msg = new Message("CAN_NOT_GEN_CLIENT", LOG, wsdl);
+                if (penv.isVerbose()) {
+                    System.out.println(msg.toString());
                 }
-                
-                String clientClassName = interfaceName + "_"
-                                         + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Client";
-
-                clearAttributes();
-                setAttributes("clientClassName", clientClassName);
-                setAttributes("intf", intf);
-                setAttributes("service", js);
-                setAttributes("port", jp);
-
-                setCommonAttributes();
-
-                doWrite(CLT_TEMPLATE, parseOutputName(intf.getPackageName(), clientClassName));
+                return;
+            }
+    
+            Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
+            Iterator it = javaModel.getServiceClasses().values().iterator();
+            while (it.hasNext()) {
+                JavaServiceClass js = (JavaServiceClass)it.next();
+                Iterator i = js.getPorts().iterator();
+                while (i.hasNext()) {
+                    JavaPort jp = (JavaPort)i.next();
+                    String interfaceName = jp.getInterfaceClass();
+                    JavaInterface intf = interfaces.get(interfaceName);
+                    if (intf == null) {
+                        interfaceName = jp.getPortType();
+                        intf = interfaces.get(interfaceName);
+                    }
+                    
+                    String clientClassName = interfaceName + "_"
+                                             + NameUtil.mangleNameToClassName(jp.getPortName()) + "_Client";
+    
+                    clientClassName = mapClassName(intf.getPackageName(), clientClassName, penv);
+                    clearAttributes();
+                    setAttributes("clientClassName", clientClassName);
+                    setAttributes("intf", intf);
+                    setAttributes("service", js);
+                    setAttributes("port", jp);
+    
+                    setCommonAttributes();
+    
+                    doWrite(CLT_TEMPLATE, parseOutputName(intf.getPackageName(), clientClassName));
+                }
             }
         }
+    }
+
+    private String mapClassName(String packageName, String name, ToolContext context) {
+        ClassCollector collector = context.get(ClassCollector.class);
+        int count = 0;
+        String checkName = name;
+        while (collector.containClientClass(packageName, checkName)) {
+            checkName = name + (++count);
+        }
+        collector.addClientClassName(packageName, checkName,
+                                     packageName + "." + checkName);
+        return checkName;
     }
 
     public void register(final ClassCollector collector, String packageName, String fileName) {

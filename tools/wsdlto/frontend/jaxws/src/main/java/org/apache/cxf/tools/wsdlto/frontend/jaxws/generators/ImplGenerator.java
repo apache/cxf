@@ -22,6 +22,9 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -29,6 +32,8 @@ import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.common.model.JavaPort;
 import org.apache.cxf.tools.common.model.JavaServiceClass;
+import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 
 public class ImplGenerator extends AbstractJAXWSGenerator {
 
@@ -62,47 +67,62 @@ public class ImplGenerator extends AbstractJAXWSGenerator {
 
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
-        JavaModel javaModel = env.get(JavaModel.class);
-
         if (passthrough()) {
             return;
         }
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        for (JavaModel javaModel : map.values()) {
 
-        Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-            
-        Map<String, JavaServiceClass> services = javaModel.getServiceClasses();
-
-        JavaServiceClass service = null;
-        String port = "";
-        Iterator portIterator = null;
-        if (!services.values().isEmpty()) {
-            JavaServiceClass javaservice = services.values().iterator().next();
-            service = javaservice;
-      
-            if (javaservice.getPorts().size() != 0) {
-                portIterator = javaservice.getPorts().iterator();
+    
+            Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
+                
+            Map<String, JavaServiceClass> services = javaModel.getServiceClasses();
+    
+            JavaServiceClass service = null;
+            if (!services.values().isEmpty()) {
+                for (JavaServiceClass javaservice : services.values()) {
+                    service = javaservice;
+                    for (JavaPort jport : javaservice.getPorts()) {
+                        JavaInterface intf = interfaces.get(jport.getInterfaceClass());
+                        outputImpl(intf, service, jport.getPortName(), penv);
+                        
+                    }
+                }
+            } else {
+                for (Iterator iter = interfaces.keySet().iterator(); iter.hasNext();) {
+                    String interfaceName = (String)iter.next();
+                    JavaInterface intf = interfaces.get(interfaceName);
+                    outputImpl(intf, service, "", penv);
+                }
             }
-        }
-        for (Iterator iter = interfaces.keySet().iterator(); iter.hasNext();) {
-            String interfaceName = (String)iter.next();
-            JavaInterface intf = interfaces.get(interfaceName);
-            
-            if (portIterator != null) {
-                JavaPort jport = (JavaPort)portIterator.next();
-                port = jport.getPortName();
-            }
-
-            clearAttributes();
-            setAttributes("intf", intf);
-
-            setAttributes("service", service);
-  
-            setAttributes("port", port);
-            
-            setCommonAttributes();
-
-            doWrite(IMPL_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName() + "Impl"));
         }
     }
+    private void outputImpl(JavaInterface intf, JavaServiceClass service,
+                            String port, ToolContext penv) {
+        clearAttributes();
+        setAttributes("intf", intf);
 
+        setAttributes("service", service);
+  
+        setAttributes("port", port);
+        
+        setCommonAttributes();
+        
+        String name = intf.getName() + "Impl";
+        name = mapClassName(intf.getPackageName(), name, penv);
+        setAttributes("implName", name);
+        penv.put(ToolConstants.CFG_IMPL_CLASS, name);
+        doWrite(IMPL_TEMPLATE, parseOutputName(intf.getPackageName(), name));
+    }
+    private String mapClassName(String packageName, String name, ToolContext context) {
+        ClassCollector collector = context.get(ClassCollector.class);
+        int count = 0;
+        String checkName = name;
+        while (collector.containImplClass(packageName, checkName)) {
+            checkName = name + (++count);
+        }
+        collector.addImplClassName(packageName, checkName,
+                                   packageName + "." + checkName);
+        return checkName;
+    }
 }

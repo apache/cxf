@@ -53,6 +53,11 @@ public class ClassUtils {
             argList.add("-verbose");
         }
 
+        if ("1.5".equals(System.getProperty("java.specification.version"))) {
+            argList.add("-target");
+            argList.add("1.5");
+        }
+        
         if (context.get(ToolConstants.CFG_CLASSDIR) != null) {
             argList.add("-d");
             String classDir = (String)context.get(ToolConstants.CFG_CLASSDIR);

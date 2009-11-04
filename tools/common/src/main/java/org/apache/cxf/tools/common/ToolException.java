@@ -58,5 +58,8 @@ public class ToolException extends RuntimeException {
     public ToolException(String messageId, Logger logger) {
         this(new Message(messageId, logger));
     }
+    public ToolException(String messageId, Logger logger, Object ... args) {
+        this(new Message(messageId, logger, args));
+    }
 }
 

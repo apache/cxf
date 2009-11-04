@@ -24,6 +24,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.jws.WebService;
@@ -177,7 +178,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         File cxf = new File(org, "cxf");
         File[] files = cxf.listFiles();
-        assertEquals(23, files.length);
+        assertEquals(25, files.length);
 
         Class clz = classLoader.loadClass("org.cxf.Greeter");
         assertTrue("Generate " + clz.getName() + "error", clz.isInterface());
@@ -576,7 +577,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.execute();
 
         File file = new File(output, "org/apache/cxf/w2j/hello_world_soap_http");
-        assertEquals(4, file.list().length);
+        assertEquals(Arrays.asList(file.list()).toString(), 4, file.list().length);
         file = new File(output,
                         "org/apache/cxf/w2j/hello_world_soap_http/DocLitBare_DocLitBarePort_Client.java");
         assertTrue("DocLitBare_DocLitBarePort_Client is not found", file.exists());
@@ -935,7 +936,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         processor.setContext(env);
         processor.execute();
         File file = new File(output, "org/mypkg");
-        assertEquals(23, file.listFiles().length);
+        assertEquals(25, file.listFiles().length);
         Class<?> clz = classLoader.loadClass("org.mypkg.MyService");
         assertNotNull("Customized service class is not found", clz);
         clz = classLoader.loadClass("org.mypkg.MyGreeter");
@@ -1087,4 +1088,21 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertTrue(str.contains("@XmlLocation"));
         assertTrue(str.contains("synchronized"));
     }
+    
+    @Test
+    public void testCXF1939() throws Exception {
+        String[] args = new String[] {"-d", output.getCanonicalPath(),
+            "-impl", "-server", "-client", "-autoNameResolution",
+            getLocation("/wsdl2java_wsdl/cxf1939/hello_world.wsdl")};
+        WSDLToJava.main(args);
+                
+        assertNotNull(output);
+        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/GreeterImpl.java").exists());
+        assertTrue(new File(output, "org/apache/cxf/w2j/hello_world_soap_http/GreeterImpl1.java").exists());
+        assertTrue(new File(output, 
+                            "org/apache/cxf/w2j/hello_world_soap_http/TestServiceName.java").exists());
+        assertTrue(new File(output, 
+                            "org/apache/cxf/w2j/hello_world_soap_http/TestServiceName1.java").exists());
+    }
+
 }

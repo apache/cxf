@@ -101,6 +101,21 @@ public class ServiceProcessor extends AbstractProcessor {
         }
 
     }
+    private String mapName(String packageName, String name) {
+        while (isNameCollision(packageName, name)) {
+            name = name + "_Service";
+        }
+        ClassCollector collector = context.get(ClassCollector.class);
+        if (collector.isReserved(packageName, name)) {
+            int count = 0;
+            String checkName = name;
+            while (collector.isReserved(packageName, checkName)) {
+                checkName = name + (++count);
+            }
+            name = checkName;
+        }
+        return name;
+    }
 
     private boolean isNameCollision(String packageName, String className) {
         if (context.optionSet(ToolConstants.CFG_GEN_OVERWRITE)) {
@@ -113,88 +128,101 @@ public class ServiceProcessor extends AbstractProcessor {
     }
 
     private void processService(JavaModel model) throws ToolException {
-        JavaServiceClass sclz = new JavaServiceClass(model);
-        String name = NameUtil.mangleNameToClassName(service.getName().getLocalPart());
-        String namespace = service.getName().getNamespaceURI();
-        String packageName = ProcessorUtil.parsePackageName(namespace, context.mapPackageName(namespace));
-
-
-        //customizing
-        JAXWSBinding serviceBinding = null;
-        if (service.getDescription() != null) {
-            serviceBinding = service.getDescription().getExtensor(JAXWSBinding.class);
-        }
-        JAXWSBinding serviceBinding2 = service.getExtensor(JAXWSBinding.class);
-
-        //TODO : Handle service customized class
-        if (serviceBinding != null) {
-            if (serviceBinding.getPackage() != null) {
-                jaxwsBinding.setPackage(serviceBinding.getPackage());
-            }
-
-            if (serviceBinding.isEnableAsyncMapping()) {
-                jaxwsBinding.setEnableAsyncMapping(true);
-            }
-
-            if (serviceBinding.isEnableMime()) {
-                jaxwsBinding.setEnableMime(true);
-            }
-            jaxwsBinding.setEnableWrapperStyle(serviceBinding.isEnableWrapperStyle());
-
-            if (serviceBinding.getJaxwsClass() != null
-                && serviceBinding.getJaxwsClass().getClassName() != null) {
-                name = serviceBinding.getJaxwsClass().getClassName();  
-                sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());          
-            }
-            sclz.setPackageJavaDoc(serviceBinding.getPackageJavaDoc());
-        }
-        if (serviceBinding2 != null) {
-            if (serviceBinding2.getPackage() != null) {
-                jaxwsBinding.setPackage(serviceBinding2.getPackage());
-            }
-
-            if (serviceBinding2.isEnableAsyncMapping()) {
-                jaxwsBinding.setEnableAsyncMapping(true);
-            }
-
-            if (serviceBinding2.isEnableMime()) {
-                jaxwsBinding.setEnableMime(true);
-            }
-
-            if (serviceBinding2.isEnableWrapperStyle()) {
-                jaxwsBinding.setEnableWrapperStyle(true);
-            }
-            if (serviceBinding2.getJaxwsClass() != null
-                && serviceBinding2.getJaxwsClass().getClassName() != null) {
-                name = serviceBinding2.getJaxwsClass().getClassName();                
-                sclz.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
-            }
-            if (!serviceBinding2.getPackageJavaDoc().equals("")) {
-                sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
-            }
+        JavaServiceClass sclz = (JavaServiceClass)service.getProperty("JavaServiceClass");
+        if (sclz != null) {
+            return;
         }
         
-        sclz.setServiceName(service.getName().getLocalPart());
-        sclz.setNamespace(namespace);
-
-        if (jaxwsBinding.getPackage() != null) {
-            packageName = jaxwsBinding.getPackage();
+        for (JavaServiceClass sc : model.getServiceClasses().values()) {
+            if (sc.getServiceName().equals(service.getName().getLocalPart())) {
+                sclz = sc;
+            }
         }
-        sclz.setPackageName(packageName);
-
-        while (isNameCollision(packageName, name)) {
-            name = name + "_Service";
+        if (sclz == null) {
+            sclz = new JavaServiceClass(model);
+            service.setProperty("JavaServiceClass", sclz);
+            String name = NameUtil.mangleNameToClassName(service.getName().getLocalPart());
+            String namespace = service.getName().getNamespaceURI();
+            String packageName = ProcessorUtil.parsePackageName(namespace, context.mapPackageName(namespace));
+    
+    
+            //customizing
+            JAXWSBinding serviceBinding = null;
+            if (service.getDescription() != null) {
+                serviceBinding = service.getDescription().getExtensor(JAXWSBinding.class);
+            }
+            JAXWSBinding serviceBinding2 = service.getExtensor(JAXWSBinding.class);
+    
+            //TODO : Handle service customized class
+            if (serviceBinding != null) {
+                if (serviceBinding.getPackage() != null) {
+                    jaxwsBinding.setPackage(serviceBinding.getPackage());
+                }
+    
+                if (serviceBinding.isEnableAsyncMapping()) {
+                    jaxwsBinding.setEnableAsyncMapping(true);
+                }
+    
+                if (serviceBinding.isEnableMime()) {
+                    jaxwsBinding.setEnableMime(true);
+                }
+                jaxwsBinding.setEnableWrapperStyle(serviceBinding.isEnableWrapperStyle());
+    
+                if (serviceBinding.getJaxwsClass() != null
+                    && serviceBinding.getJaxwsClass().getClassName() != null) {
+                    name = serviceBinding.getJaxwsClass().getClassName();  
+                    sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());          
+                }
+                sclz.setPackageJavaDoc(serviceBinding.getPackageJavaDoc());
+            }
+            if (serviceBinding2 != null) {
+                if (serviceBinding2.getPackage() != null) {
+                    jaxwsBinding.setPackage(serviceBinding2.getPackage());
+                }
+    
+                if (serviceBinding2.isEnableAsyncMapping()) {
+                    jaxwsBinding.setEnableAsyncMapping(true);
+                }
+    
+                if (serviceBinding2.isEnableMime()) {
+                    jaxwsBinding.setEnableMime(true);
+                }
+    
+                if (serviceBinding2.isEnableWrapperStyle()) {
+                    jaxwsBinding.setEnableWrapperStyle(true);
+                }
+                if (serviceBinding2.getJaxwsClass() != null
+                    && serviceBinding2.getJaxwsClass().getClassName() != null) {
+                    name = serviceBinding2.getJaxwsClass().getClassName();                
+                    sclz.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
+                }
+                if (!serviceBinding2.getPackageJavaDoc().equals("")) {
+                    sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
+                }
+            }
+            
+            sclz.setServiceName(service.getName().getLocalPart());
+            sclz.setNamespace(namespace);
+    
+            if (jaxwsBinding.getPackage() != null) {
+                packageName = jaxwsBinding.getPackage();
+            }
+            sclz.setPackageName(packageName);
+            name = mapName(packageName, name);
+            sclz.setName(name);
+            ClassCollector collector = context.get(ClassCollector.class);
+            String checkName = name;
+            int count = 0;
+            while (collector.containServiceClass(packageName, checkName)) {
+                checkName = name + (++count);
+            }        
+            name = checkName;
+            sclz.setName(name);
+            collector.addServiceClassName(packageName, name, packageName + "." + name);
+    
+            Element handler = (Element)context.get(ToolConstants.HANDLER_CHAIN);
+            sclz.setHandlerChains(handler);
         }
-        sclz.setName(name);
-
-
-        if (model.getServiceClasses().containsKey(name)) {
-            sclz = model.getServiceClasses().get(name);
-        }
-
-        Element handler = (Element)context.get(ToolConstants.HANDLER_CHAIN);
-        sclz.setHandlerChains(handler);
-
 
         Collection<EndpointInfo> ports = service.getEndpoints();
 
@@ -204,7 +232,7 @@ public class ServiceProcessor extends AbstractProcessor {
         }
         
         sclz.setClassJavaDoc(jaxwsBinding.getClassJavaDoc());
-        model.addServiceClass(name, sclz);
+        model.addServiceClass(sclz.getName(), sclz);
     }
 
     private JavaPort processPort(JavaModel model, EndpointInfo port) throws ToolException {

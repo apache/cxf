@@ -41,6 +41,7 @@ public class JAXWSContainer extends WSDLToJavaContainer {
     public Set<String> getArrayKeys() {
         Set<String> set = super.getArrayKeys();
         set.add(ToolConstants.CFG_BINDING);
+        set.add(ToolConstants.CFG_RESERVE_NAME);
         return set;
     }
 

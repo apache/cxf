@@ -22,8 +22,10 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.util.Map;
 
 import javax.jws.HandlerChain;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -33,6 +35,7 @@ import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.common.model.JavaPort;
 import org.apache.cxf.tools.common.model.JavaServiceClass;
 import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 
 public class ServiceGenerator extends AbstractJAXWSGenerator {
     private static final String SERVICE_TEMPLATE = TEMPLATE_BASE + "/service.vm";
@@ -60,79 +63,82 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
 
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
-        JavaModel javaModel = env.get(JavaModel.class);
-
         if (passthrough()) {
             return;
         }
-        ClassCollector collector = penv.get(ClassCollector.class);
         
-        Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
-        
-        if (serviceClasses.size() == 0) {
-            ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
-            String wsdl = serviceInfo.getDescription().getBaseURI();
-            Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
-            if (penv.isVerbose()) {
-                System.out.println(msg.toString());
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        for (JavaModel javaModel : map.values()) {
+ 
+            ClassCollector collector = penv.get(ClassCollector.class);
+            
+            Map<String, JavaServiceClass> serviceClasses = javaModel.getServiceClasses();
+            
+            if (serviceClasses.size() == 0) {
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                String wsdl = serviceInfo.getDescription().getBaseURI();
+                Message msg = new Message("CAN_NOT_GEN_SERVICE", LOG, wsdl);
+                if (penv.isVerbose()) {
+                    System.out.println(msg.toString());
+                }
+                return;
             }
-            return;
-        }
-        
-        for (JavaServiceClass js : serviceClasses.values()) {
-            if (js.getHandlerChains() != null) {
-                HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
-                handlerGen.setJavaInterface(js);
-                handlerGen.generate(getEnvironment());
-
-                JAnnotation annot = handlerGen.getHandlerAnnotation();
-                               
-                if (handlerGen.getHandlerAnnotation() != null) {
-                    boolean existHandlerAnno = false;
-                    for (JAnnotation jann : js.getAnnotations()) {
-                        if (jann.getType() == HandlerChain.class) {
-                            existHandlerAnno = true;
+            
+            for (JavaServiceClass js : serviceClasses.values()) {
+                if (js.getHandlerChains() != null) {
+                    HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
+                    handlerGen.setJavaInterface(js);
+                    handlerGen.generate(getEnvironment());
+    
+                    JAnnotation annot = handlerGen.getHandlerAnnotation();
+                                   
+                    if (handlerGen.getHandlerAnnotation() != null) {
+                        boolean existHandlerAnno = false;
+                        for (JAnnotation jann : js.getAnnotations()) {
+                            if (jann.getType() == HandlerChain.class) {
+                                existHandlerAnno = true;
+                            }
+                        }
+                        if (!existHandlerAnno) {
+                            js.addAnnotation(annot);
+                            js.addImport("javax.jws.HandlerChain");
                         }
                     }
-                    if (!existHandlerAnno) {
-                        js.addAnnotation(annot);
-                        js.addImport("javax.jws.HandlerChain");
+                    
+                }
+    
+                for (JavaPort port : js.getPorts()) {
+                    if (!port.getPackageName().equals(js.getPackageName())) {
+                        js.addImport(port.getFullClassName());
                     }
                 }
+    
+                String url = (String)env.get(ToolConstants.CFG_WSDLURL);
+                String location = (String)env.get(ToolConstants.CFG_WSDLLOCATION);
+                if (location == null) {
+                    location = url;
+                }
                 
-            }
-
-            for (JavaPort port : js.getPorts()) {
-                if (!port.getPackageName().equals(js.getPackageName())) {
-                    js.addImport(port.getFullClassName());
+                String serviceSuperclass = "Service";
+                for (String s : collector.getGeneratedFileInfo()) {
+                    if (s.equals(js.getPackageName() + ".Service")) {
+                        serviceSuperclass = "javax.xml.ws.Service";
+                    }
                 }
-            }
-
-            String url = (String)env.get(ToolConstants.CFG_WSDLURL);
-            String location = (String)env.get(ToolConstants.CFG_WSDLLOCATION);
-            if (location == null) {
-                location = url;
-            }
-            
-            String serviceSuperclass = "Service";
-            for (String s : collector.getGeneratedFileInfo()) {
-                if (s.equals(js.getPackageName() + ".Service")) {
-                    serviceSuperclass = "javax.xml.ws.Service";
+                clearAttributes();
+                
+                setAttributes("service", js);
+                setAttributes("wsdlLocation", location);
+                setAttributes("serviceSuperclass", serviceSuperclass);
+                if ("Service".equals(serviceSuperclass)) {
+                    js.addImport("javax.xml.ws.Service");
                 }
+                setAttributes("wsdlUrl", url);
+                setCommonAttributes();
+    
+                doWrite(SERVICE_TEMPLATE, parseOutputName(js.getPackageName(), 
+                                                          js.getName()));
             }
-            clearAttributes();
-            
-            setAttributes("service", js);
-            setAttributes("wsdlLocation", location);
-            setAttributes("serviceSuperclass", serviceSuperclass);
-            if ("Service".equals(serviceSuperclass)) {
-                js.addImport("javax.xml.ws.Service");
-            }
-            setAttributes("wsdlUrl", url);
-            setCommonAttributes();
-
-            doWrite(SERVICE_TEMPLATE, parseOutputName(js.getPackageName(), 
-                                                      js.getName()));
         }
     }
 

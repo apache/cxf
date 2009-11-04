@@ -90,6 +90,7 @@ public final class ToolConstants {
     public static final String CFG_ANT_PROP = "ant.prop";
     public static final String CFG_NO_ADDRESS_BINDING = "noAddressBinding";
     public static final String CFG_ALLOW_ELEMENT_REFS = "allowElementReferences";
+    public static final String CFG_RESERVE_NAME = "reserveClass";
 
 
 
