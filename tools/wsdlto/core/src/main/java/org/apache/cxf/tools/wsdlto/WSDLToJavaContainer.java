@@ -204,7 +204,15 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         context.put(ToolConstants.XML_SCHEMA_COLLECTION, schemaCollection);
         
         context.put(ToolConstants.PORTTYPE_MAP, interfaces);
-        context.put(ClassCollector.class, new ClassCollector());
+        
+        ClassCollector collector = new ClassCollector();
+        String reserved[] = (String[])context.get(ToolConstants.CFG_RESERVE_NAME);
+        if (reserved != null) {
+            for (String r : reserved) {
+                collector.reserveClass(r);
+            }
+        }
+        context.put(ClassCollector.class, collector);
         Processor processor = frontend.getProcessor();
         if (processor instanceof ClassNameProcessor) {
             processor.setEnvironment(context);
@@ -228,12 +236,11 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             // Build the JavaModel from the ServiceModel
             processor.setEnvironment(context);
             processor.process();
-
-            if (!isSuppressCodeGen()) {
-                // Generate artifacts
-                for (FrontEndGenerator generator : frontend.getGenerators()) {
-                    generator.generate(context);
-                }
+        }
+        if (!isSuppressCodeGen()) {
+            // Generate artifacts
+            for (FrontEndGenerator generator : frontend.getGenerators()) {
+                generator.generate(context);
             }
         }
         context.remove(ToolConstants.SERVICE_LIST);

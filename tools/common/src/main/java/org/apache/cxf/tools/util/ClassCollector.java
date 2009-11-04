@@ -35,9 +35,36 @@ public class ClassCollector {
     private final Map<String, String> implClassNames = new HashMap<String, String>();
     private final Map<String, String> clientClassNames = new HashMap<String, String>();
     private final Map<String, String> serverClassNames = new HashMap<String, String>();
+    private final Map<String, String> reservedClassNames = new HashMap<String, String>();
+    
 
     private final Set<String> typesPackages = new HashSet<String>();
+    
+    public ClassCollector() {
+        
+    }
+    public void reserveClass(String fullName) {
+        String cls = fullName;
+        int idx = cls.lastIndexOf('.');
+        String pkg = "";
+        if (idx != -1) {
+            pkg = cls.substring(0, idx);
+            cls = cls.substring(idx + 1);
+        }        
+        reservedClassNames.put(key(pkg, cls), fullName);
 
+        addSeiClassName(pkg, cls, fullName);
+        addTypesClassName(pkg, cls, fullName);
+        addServerClassName(pkg, cls, fullName);
+        addImplClassName(pkg, cls, fullName);
+        addClientClassName(pkg, cls, fullName);
+        addServiceClassName(pkg, cls, fullName);
+        addExceptionClassName(pkg, cls, fullName);
+    }
+    
+    public boolean isReserved(String packagename, String type) {
+        return reservedClassNames.containsKey(key(packagename, type));
+    }
     public boolean containSeiClass(String packagename, String type) {
         return seiClassNames.containsKey(key(packagename, type));
     }
@@ -48,6 +75,18 @@ public class ClassCollector {
 
     public boolean containExceptionClass(String packagename, String type) {
         return exceptionClassNames.containsKey(key(packagename, type));
+    }
+    public boolean containServiceClass(String packagename, String type) {
+        return this.serviceClassNames.containsKey(key(packagename, type));
+    }
+    public boolean containClientClass(String packagename, String type) {
+        return this.clientClassNames.containsKey(key(packagename, type));
+    }
+    public boolean containServerClass(String packagename, String type) {
+        return this.serverClassNames.containsKey(key(packagename, type));
+    }
+    public boolean containImplClass(String packagename, String type) {
+        return this.implClassNames.containsKey(key(packagename, type));
     }
 
     public void addSeiClassName(String packagename, String type, String fullClassName) {

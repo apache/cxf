@@ -24,6 +24,9 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -31,6 +34,7 @@ import org.apache.cxf.tools.common.model.JavaExceptionClass;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
 
 public class FaultGenerator extends AbstractJAXWSGenerator {
@@ -62,29 +66,30 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
 
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
-        JavaModel javaModel = env.get(JavaModel.class);
-
         if (passthrough()) {
             return;
         }
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        for (JavaModel javaModel : map.values()) {
 
-        Map<String, JavaExceptionClass> exceptionClasses = javaModel
-                .getExceptionClasses();
-        for (Iterator iter = exceptionClasses.keySet().iterator(); iter
-                .hasNext();) {
-            String expClassName = (String)iter.next();
-            JavaExceptionClass expClz =
-                exceptionClasses.get(expClassName);
-
-            clearAttributes();
-            setAttributes("suid", getSUID());
-            setAttributes("expClass", expClz);
-            for (JavaField jf : expClz.getFields()) {
-                setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
+            Map<String, JavaExceptionClass> exceptionClasses = javaModel
+                    .getExceptionClasses();
+            for (Iterator iter = exceptionClasses.keySet().iterator(); iter
+                    .hasNext();) {
+                String expClassName = (String)iter.next();
+                JavaExceptionClass expClz =
+                    exceptionClasses.get(expClassName);
+    
+                clearAttributes();
+                setAttributes("suid", getSUID());
+                setAttributes("expClass", expClz);
+                for (JavaField jf : expClz.getFields()) {
+                    setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
+                }
+                setCommonAttributes();
+                doWrite(FAULT_TEMPLATE, parseOutputName(expClz.getPackageName(),
+                        expClz.getName()));
             }
-            setCommonAttributes();
-            doWrite(FAULT_TEMPLATE, parseOutputName(expClz.getPackageName(),
-                    expClz.getName()));
         }
     }
 

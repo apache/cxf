@@ -487,7 +487,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File types = new File(helloworldsoaphttp, "types");
         assertTrue(types.exists());
         File[] files = helloworldsoaphttp.listFiles();
-        assertEquals(7, files.length);
+        assertEquals(9, files.length);
         files = types.listFiles();
         assertEquals(17, files.length);
 
@@ -578,7 +578,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         File types = new File(helloworldsoaphttp, "types");
         assertTrue(types.exists());
         File[] files = helloworldsoaphttp.listFiles();
-        assertEquals(7, files.length);
+        assertEquals(9, files.length);
         files = types.listFiles();
         assertEquals(17, files.length);
 

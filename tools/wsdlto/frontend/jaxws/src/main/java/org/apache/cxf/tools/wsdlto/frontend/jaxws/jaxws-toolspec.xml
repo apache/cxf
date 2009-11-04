@@ -99,7 +99,18 @@ Examples:
                     <annotation>binding-file-name</annotation>
                 </associatedArgument>
             </option>
-
+            <option id="reserveClass" maxOccurs="unbounded">
+                <annotation>
+                    Reserve a class name to keep the code generator from generating
+                    a class of the given name.   In name cases, a binding file or 
+                    use of -autoNameResolution flag may be necessary for the 
+                    code generator to completely generate usable code.
+                </annotation>
+                <switch>reserveClass</switch>
+                <associatedArgument placement="afterSpace">
+                    <annotation>class-name</annotation>
+                </associatedArgument>
+            </option>
             <option id="catalog" maxOccurs="1">
                 <annotation>
                     Specify catalog file to map the imported wsdl/schema.

@@ -22,9 +22,11 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.generators;
 import java.util.Map;
 
 import javax.jws.HandlerChain;
+import javax.xml.namespace.QName;
 
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -34,6 +36,7 @@ import org.apache.cxf.tools.common.model.JAnnotationElement;
 import org.apache.cxf.tools.common.model.JavaInterface;
 import org.apache.cxf.tools.common.model.JavaModel;
 import org.apache.cxf.tools.util.ClassCollector;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.WSDLToJavaProcessor;
 
 public class SEIGenerator extends AbstractJAXWSGenerator {
 
@@ -66,61 +69,63 @@ public class SEIGenerator extends AbstractJAXWSGenerator {
 
     public void generate(ToolContext penv) throws ToolException {
         this.env = penv;
-        JavaModel javaModel = env.get(JavaModel.class);
-
         if (passthrough()) {
             return;
         }
 
-        Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
-
-        if (interfaces.size() == 0) {
-            ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
-            String wsdl = serviceInfo.getDescription().getBaseURI();
-            Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);
-            if (penv.isVerbose()) {
-                System.out.println(msg.toString());
+        Map<QName, JavaModel> map = CastUtils.cast((Map)penv.get(WSDLToJavaProcessor.MODEL_MAP));
+        for (JavaModel javaModel : map.values()) {
+        
+            Map<String, JavaInterface> interfaces = javaModel.getInterfaces();
+    
+            if (interfaces.size() == 0) {
+                ServiceInfo serviceInfo = (ServiceInfo)env.get(ServiceInfo.class);
+                String wsdl = serviceInfo.getDescription().getBaseURI();
+                Message msg = new Message("CAN_NOT_GEN_SEI", LOG, wsdl);
+                if (penv.isVerbose()) {
+                    System.out.println(msg.toString());
+                }
+                return;
             }
-            return;
-        }
-        for (JavaInterface intf : interfaces.values()) {
-
-            if (hasHandlerConfig(intf)) {
-                HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
-                // REVISIT: find a better way to handle Handler gen, should not
-                // pass JavaInterface around.
-                handlerGen.setJavaInterface(intf);
-                handlerGen.generate(getEnvironment());
-
-                JAnnotation annot = handlerGen.getHandlerAnnotation();
-                if (handlerGen.getHandlerAnnotation() != null) {
-                    boolean existHandlerAnno = false;
-                    for (JAnnotation jann : intf.getAnnotations()) {
-                        if (jann.getType() == HandlerChain.class) {
-                            existHandlerAnno = true;
+            for (JavaInterface intf : interfaces.values()) {
+    
+                if (hasHandlerConfig(intf)) {
+                    HandlerConfigGenerator handlerGen = new HandlerConfigGenerator();
+                    // REVISIT: find a better way to handle Handler gen, should not
+                    // pass JavaInterface around.
+                    handlerGen.setJavaInterface(intf);
+                    handlerGen.generate(getEnvironment());
+    
+                    JAnnotation annot = handlerGen.getHandlerAnnotation();
+                    if (handlerGen.getHandlerAnnotation() != null) {
+                        boolean existHandlerAnno = false;
+                        for (JAnnotation jann : intf.getAnnotations()) {
+                            if (jann.getType() == HandlerChain.class) {
+                                existHandlerAnno = true;
+                            }
+                        }
+                        if (!existHandlerAnno) {
+                            intf.addAnnotation(annot);
+                            intf.addImport("javax.jws.HandlerChain");
                         }
                     }
-                    if (!existHandlerAnno) {
-                        intf.addAnnotation(annot);
-                        intf.addImport("javax.jws.HandlerChain");
-                    }
                 }
+                if (penv.containsKey(ToolConstants.RUNTIME_DATABINDING_CLASS)) {
+                    JAnnotation ann = new JAnnotation(DataBinding.class);
+                    JAnnotationElement el 
+                        = new JAnnotationElement(null,
+                                                 penv.get(ToolConstants.RUNTIME_DATABINDING_CLASS),
+                                                 true);
+                    ann.addElement(el);
+                    intf.addAnnotation(ann);
+                }
+                clearAttributes();
+                setAttributes("intf", intf);
+                setCommonAttributes();
+    
+                doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));
+    
             }
-            if (penv.containsKey(ToolConstants.RUNTIME_DATABINDING_CLASS)) {
-                JAnnotation ann = new JAnnotation(DataBinding.class);
-                JAnnotationElement el 
-                    = new JAnnotationElement(null,
-                                             penv.get(ToolConstants.RUNTIME_DATABINDING_CLASS),
-                                             true);
-                ann.addElement(el);
-                intf.addAnnotation(ann);
-            }
-            clearAttributes();
-            setAttributes("intf", intf);
-            setCommonAttributes();
-
-            doWrite(SEI_TEMPLATE, parseOutputName(intf.getPackageName(), intf.getName()));
-
         }
     }
 

@@ -47,44 +47,65 @@ public class PortTypeProcessor extends AbstractProcessor {
         super(c);
     }
 
+    private JavaInterface getInterface(ServiceInfo serviceInfo,
+                                       InterfaceInfo interfaceInfo) throws ToolException {
+        JavaInterface intf = interfaceInfo.getProperty("JavaInterface", JavaInterface.class);
+        if (intf == null) {
+            intf = new InterfaceMapper(context).map(interfaceInfo);
+
+            JAXWSBinding jaxwsBinding = null;
+            if (serviceInfo.getDescription() != null) {
+                jaxwsBinding = serviceInfo.getDescription().getExtensor(JAXWSBinding.class);
+            }
+            JAXWSBinding infBinding = interfaceInfo.getExtensor(JAXWSBinding.class);
+            if (infBinding != null && infBinding.getPackage() != null) {
+                intf.setPackageName(infBinding.getPackage());
+            } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
+                intf.setPackageName(jaxwsBinding.getPackage());
+            }
+            
+            if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
+                intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
+            } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
+                intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
+            }
+
+            String name = intf.getName();
+            if (infBinding != null
+                && infBinding.getJaxwsClass() != null
+                && infBinding.getJaxwsClass().getClassName() != null) {
+                name = infBinding.getJaxwsClass().getClassName();
+                intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
+            }
+
+            ClassCollector collector = context.get(ClassCollector.class);
+            if (context.optionSet(ToolConstants.CFG_AUTORESOLVE)) {
+                int count = 0;
+                String checkName = name;
+                while (collector.isReserved(intf.getPackageName(), checkName)) {
+                    checkName = name + "_" + (++count);
+                }
+                name = checkName;
+            } else if (collector.isReserved(intf.getPackageName(), name)) {
+                throw new ToolException("RESERVED_SEI_NAME", LOG, name);
+            }
+            interfaceInfo.setProperty("InterfaceName", name);
+            intf.setName(name);
+            collector.addSeiClassName(intf.getPackageName(),
+                                      intf.getName(),
+                                      intf.getPackageName() + "." + intf.getName());
+        
+            interfaceInfo.setProperty("JavaInterface", intf);
+        }
+        return intf;
+    }
+    
     public void processClassNames(ServiceInfo serviceInfo) throws ToolException {
         InterfaceInfo interfaceInfo = serviceInfo.getInterface();
         if (interfaceInfo == null) {
             return;
         }
-
-        JavaInterface intf = new InterfaceMapper(context).map(interfaceInfo);
-
-        JAXWSBinding jaxwsBinding = null;
-        if (serviceInfo.getDescription() != null) {
-            jaxwsBinding = serviceInfo.getDescription().getExtensor(JAXWSBinding.class);
-        }
-        JAXWSBinding infBinding = interfaceInfo.getExtensor(JAXWSBinding.class);
-        if (infBinding != null && infBinding.getPackage() != null) {
-            intf.setPackageName(infBinding.getPackage());
-        } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
-            intf.setPackageName(jaxwsBinding.getPackage());
-        }
-        
-        if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
-            intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-        } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
-            intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
-        }
-
-        String name = intf.getName();
-        if (infBinding != null
-            && infBinding.getJaxwsClass() != null
-            && infBinding.getJaxwsClass().getClassName() != null) {
-            name = infBinding.getJaxwsClass().getClassName();
-            intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
-        }
-        intf.setName(name);
-
-        ClassCollector collector = context.get(ClassCollector.class);
-        collector.addSeiClassName(intf.getPackageName(),
-                                  intf.getName(),
-                                  intf.getPackageName() + "." + intf.getName());
+        getInterface(serviceInfo, interfaceInfo);
     }
 
     public void process(ServiceInfo serviceInfo) throws ToolException {
@@ -98,35 +119,8 @@ public class PortTypeProcessor extends AbstractProcessor {
             return;
         }
 
-        JavaInterface intf = new InterfaceMapper(context).map(interfaceInfo);
+        JavaInterface intf = getInterface(serviceInfo, interfaceInfo);
         intf.setJavaModel(jmodel);
-        
-        JAXWSBinding jaxwsBinding = null;
-        if (serviceInfo.getDescription() != null) {
-            jaxwsBinding = serviceInfo.getDescription().getExtensor(JAXWSBinding.class);
-        }
-        JAXWSBinding infBinding = interfaceInfo.getExtensor(JAXWSBinding.class);
-        if (infBinding != null && infBinding.getPackage() != null) {
-            intf.setPackageName(infBinding.getPackage());
-        } else if (jaxwsBinding != null && jaxwsBinding.getPackage() != null) {
-            intf.setPackageName(jaxwsBinding.getPackage());
-        }
-        
-        if (infBinding != null && !infBinding.getPackageJavaDoc().equals("")) {
-            intf.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-        } else if (jaxwsBinding != null && !jaxwsBinding.getPackageJavaDoc().equals("")) {
-            intf.setPackageJavaDoc(jaxwsBinding.getPackageJavaDoc());
-        }
-
-
-        String name = intf.getName();
-        if (infBinding != null
-            && infBinding.getJaxwsClass() != null
-            && infBinding.getJaxwsClass().getClassName() != null) {
-            name = infBinding.getJaxwsClass().getClassName();
-            intf.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
-        }
-        intf.setName(name);
 
         Element handler = (Element)context.get(ToolConstants.HANDLER_CHAIN);
         intf.setHandlerChains(handler);
