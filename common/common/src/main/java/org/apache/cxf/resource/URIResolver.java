@@ -203,7 +203,10 @@ public class URIResolver {
             // do nothing
         }
 
-        if (uri != null && "file".equals(uri.getScheme())) {
+        if (is == null && baseUriStr != null && baseUriStr.startsWith("classpath:")) {
+            tryClasspath(baseUriStr + uriStr);
+        }
+        if (is == null && uri != null && "file".equals(uri.getScheme())) {
             try {
                 file = new File(uri);
             } catch (IllegalArgumentException iae) {
