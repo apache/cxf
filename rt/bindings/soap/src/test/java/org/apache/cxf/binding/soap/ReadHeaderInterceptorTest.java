@@ -40,6 +40,9 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.StaxInInterceptor;
 import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -74,6 +77,17 @@ public class ReadHeaderInterceptorTest extends TestBase {
         }
     }
 
+    @Test
+    public void testNoClosingEnvTage() throws Exception {
+        soapMessage = TestUtil.createEmptySoapMessage(Soap12.getInstance(), chain);
+        InputStream in = getClass().getResourceAsStream("test-no-endenv.xml");
+        assertNotNull(in);
+        soapMessage.put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
+        soapMessage.setContent(XMLStreamReader.class, StaxUtils.createXMLStreamReader(in));
+
+        soapMessage.getInterceptorChain().doIntercept(soapMessage);
+        assertNotNull(soapMessage.getContent(Exception.class));
+    }
     @Test
     public void testHandleHeader() {
         try {

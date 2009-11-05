@@ -50,12 +50,41 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.HeaderManager;
 import org.apache.cxf.headers.HeaderProcessor;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.PartialXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
 
 public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
+    /**
+     * 
+     */
+    public static class CheckClosingTagsInterceptor extends AbstractSoapInterceptor {
+        public CheckClosingTagsInterceptor() {
+            super(Phase.POST_LOGICAL);
+        }
+        
+        /** {@inheritDoc}*/
+        public void handleMessage(SoapMessage message) throws Fault {
+            XMLStreamReader xmlReader = message.getContent(XMLStreamReader.class);
+            if (xmlReader != null) {
+                try {
+                    while (xmlReader.hasNext()) {
+                        if (xmlReader.next() == XMLStreamReader.END_DOCUMENT) {
+                            return;
+                        }
+                    }
+                } catch (XMLStreamException e) {
+                    throw new SoapFault(e.getMessage(), e, 
+                                        message.getVersion().getSender());
+                }
+            }
+        }
+
+    }
+
     private static final Logger LOG = LogUtils.getL7dLogger(ReadHeadersInterceptor.class);
 
     private Bus bus;
@@ -190,6 +219,11 @@ public class ReadHeadersInterceptor extends AbstractSoapInterceptor {
                 while (i == XMLStreamReader.NAMESPACE
                     || i == XMLStreamReader.ATTRIBUTE) {
                     i = xmlReader.next();
+                }
+                if (MessageUtils.getContextualBoolean(message, 
+                                                      SoapMessage.SCHEMA_VALIDATION_ENABLED,
+                                                      false)) {
+                    message.getInterceptorChain().add(new CheckClosingTagsInterceptor());
                 }
             }
         } catch (XMLStreamException e) {
