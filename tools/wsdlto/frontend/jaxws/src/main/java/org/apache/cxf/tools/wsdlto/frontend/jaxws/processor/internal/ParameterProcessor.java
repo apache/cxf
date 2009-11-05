@@ -43,6 +43,8 @@ import org.apache.cxf.tools.common.model.JavaParameter;
 import org.apache.cxf.tools.common.model.JavaReturn;
 import org.apache.cxf.tools.common.model.JavaType;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSParameter;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.WebParamAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlJavaTypeAdapterAnnotator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.annotator.XmlListAnotator;
@@ -203,11 +205,20 @@ public class ParameterProcessor extends AbstractProcessor {
             }
         }
 
+        JAXWSBinding mBinding = inputMessage.getOperation().getExtensor(JAXWSBinding.class);
         for (MessagePartInfo part : inputMessage.getMessageParts()) {
             if (isOutOfBandHeader(part) && !requireOutOfBandHeader()) {
                 continue;
             }
-            addParameter(method, getParameterFromPart(method, part, JavaType.Style.IN));
+            JavaParameter param = getParameterFromPart(method, part, JavaType.Style.IN);
+            if (mBinding != null && mBinding.getJaxwsParas() != null) {
+                for (JAXWSParameter jwp : mBinding.getJaxwsParas()) {
+                    if (part.getName().getLocalPart().equals(jwp.getPart())) {
+                        param.setName(jwp.getName());
+                    }
+                }
+            }
+            addParameter(method, param);
         }
     }
 
@@ -227,9 +238,17 @@ public class ParameterProcessor extends AbstractProcessor {
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
+        JAXWSBinding mBinding = inputMessage.getOperation().getExtensor(JAXWSBinding.class);
         for (QName item : wrappedElements) {
             JavaParameter jp = getParameterFromQName(part.getElementQName(),
                                   item, JavaType.Style.IN, part);
+            if (mBinding != null && mBinding.getJaxwsParas() != null) {
+                for (JAXWSParameter jwsp : mBinding.getJaxwsParas()) {
+                    if (item.equals(jwsp.getElementName())) {
+                        jp.setName(jwsp.getName());
+                    }
+                }
+            }
             
             if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) { 
                 jp.setTargetNamespace("");
@@ -296,8 +315,19 @@ public class ParameterProcessor extends AbstractProcessor {
             } else {
                 processReturn(method, null);
             }
+            JAXWSBinding mBinding = outputMessage.getOperation().getExtensor(JAXWSBinding.class);
             for (MessagePartInfo part : outParts) {
-                addParameter(method, getParameterFromPart(method, part, JavaType.Style.OUT));
+
+                JavaParameter param = getParameterFromPart(method, part, JavaType.Style.OUT);
+                if (mBinding != null && mBinding.getJaxwsParas() != null) {
+                    for (JAXWSParameter jwp : mBinding.getJaxwsParas()) {
+                        if (part.getName().getLocalPart().equals(jwp.getPart())) {
+                            param.setName(jwp.getName());
+                        }
+                    }
+                }
+
+                addParameter(method, param);
             }
         } else {
             processReturn(method, null);
@@ -444,6 +474,16 @@ public class ParameterProcessor extends AbstractProcessor {
                 if (!qualified) {
                     jp.setTargetNamespace("");
                 }
+                
+                JAXWSBinding mBinding = outputMessage.getOperation().getExtensor(JAXWSBinding.class);
+                if (mBinding != null && mBinding.getJaxwsParas() != null) {
+                    for (JAXWSParameter jwsp : mBinding.getJaxwsParas()) {
+                        if (outElement.equals(jwsp.getElementName())) {
+                            jp.setName(jwsp.getName());
+                        }
+                    }
+                }
+
                 addParameter(method, jp);
             }
         }

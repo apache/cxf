@@ -648,8 +648,8 @@ public final class CustomizationParser {
                 binding1.setJaxwsClass(binding2.getJaxwsClass());
             }
 
-            if (binding2.getJaxwsPara() != null) {
-                binding1.setJaxwsPara(binding2.getJaxwsPara());
+            if (binding2.getJaxwsParas() != null) {
+                binding1.setJaxwsParas(binding2.getJaxwsParas());
             }
             return binding1;
         }

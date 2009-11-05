@@ -82,11 +82,12 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         assertEquals("Customized method name does not parsered", "echoMeOneWay", binding.getMethodName());
 
 
-        assertEquals("Customized parameter element name does not parsered", "tns:number1", binding
-            .getJaxwsPara().getElementName());
+        assertEquals("Customized parameter element name does not parsered", "number1", binding
+            .getJaxwsParas().get(0).getElementName().getLocalPart());
         assertEquals("Customized parameter message name does not parsered", "greetMeOneWayRequest", binding
-            .getJaxwsPara().getMessageName());
-        assertEquals("customized parameter name does not parsered", "num1", binding.getJaxwsPara().getName());
+            .getJaxwsParas().get(0).getMessageName());
+        assertEquals("customized parameter name does not parsered", "num1",
+                     binding.getJaxwsParas().get(0).getName());
     }
 
 
@@ -129,11 +130,12 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         assertEquals("Customized method name does not parsered", "echoMeOneWay", binding.getMethodName());
 
 
-        assertEquals("Customized parameter element name does not parsered", "tns:number1", binding
-            .getJaxwsPara().getElementName());
+        assertEquals("Customized parameter element name does not parsered", "number1", binding
+            .getJaxwsParas().get(0).getElementName().getLocalPart());
         assertEquals("Customized parameter message name does not parsered", "greetMeOneWayRequest", binding
-            .getJaxwsPara().getMessageName());
-        assertEquals("customized parameter name does not parsered", "num1", binding.getJaxwsPara().getName());
+            .getJaxwsParas().get(0).getMessageName());
+        assertEquals("customized parameter name does not parsered", "num1",
+                     binding.getJaxwsParas().get(0).getName());
     }
 
     // tests the error case described in JIRA CXF-556
