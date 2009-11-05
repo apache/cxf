@@ -53,6 +53,7 @@
             <xsd:element name="extensionMappings" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="languageMappings" type="xsd:anyType" minOccurs="0"/>
             <xsd:element name="schemaLocations" type="schemasType" minOccurs="0"/>
+            <xsd:element name="resourceComparator" type="xsd:anyType" minOccurs="0"/> 
           </xsd:all>
           <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
           <xsd:attribute name="address" type="xsd:string" />

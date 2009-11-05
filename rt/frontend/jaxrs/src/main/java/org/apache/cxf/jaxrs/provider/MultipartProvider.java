@@ -39,6 +39,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -62,7 +63,7 @@ import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 @Provider
 @Consumes({"multipart/related", "multipart/mixed", "multipart/alternative" })
 @Produces({"multipart/related", "multipart/mixed", "multipart/alternative" })
-public class MultipartProvider 
+public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     private static final Logger LOG = LogUtils.getL7dLogger(MultipartProvider.class);
@@ -100,10 +101,21 @@ public class MultipartProvider
         return false;
     }
 
+    protected void checkContentLength() {
+        if (mc != null) {
+            List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
+            if (values.size() == 1 && "0".equals(values.get(0))) {
+                String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+                LOG.warning(message);
+                throw new WebApplicationException(400);
+            }
+        }
+    }
+    
     public Object readFrom(Class<Object> c, Type t, Annotation[] anns, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException, WebApplicationException {
-        
+        checkContentLength();
         List<Attachment> infos = 
             AttachmentUtils.getAttachments(mc, attachmentDir, attachmentThreshold);
         

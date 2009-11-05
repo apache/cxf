@@ -33,6 +33,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -112,6 +113,14 @@ public class BookStore {
     @Path("propogateexception2")
     public Book propogateException2() throws BookNotFoundFault {
         PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propogate.exception", Boolean.FALSE);
+        throw new BookNotFoundFault("Book Exception");
+    }
+    
+    @GET
+    @Path("propogateexception3")
+    public Book propogateException3() throws BookNotFoundFault {
+        PhaseInterceptorChain.getCurrentMessage().getExchange()
+            .put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);
         throw new BookNotFoundFault("Book Exception");
     }
     
@@ -444,6 +453,15 @@ public class BookStore {
         books.put(book.getId(), book);
 
         return Response.ok(book).build();
+    }
+    
+    @POST
+    @Path("/books/customstatus")
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    public Response addBookCustomFailure(Book book, @Context HttpServletResponse response) {
+        response.setStatus(333);
+        return null;
     }
     
     @POST

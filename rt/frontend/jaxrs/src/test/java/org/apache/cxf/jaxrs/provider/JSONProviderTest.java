@@ -180,6 +180,22 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteToSingleTagBadgerFish() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setConvention("badgerfish");
+        TagVO tag = createTag("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO.class, TagVO.class, TagVO.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"tagVO\":{\"group\":{\"$\":\"b\"},\"name\":{\"$\":\"a\"}}}", s);
+        
+    }
+    
+    @Test
     public void testWriteToSingleQualifiedTag() throws Exception {
         JSONProvider p = new JSONProvider();
         Map<String, String> namespaceMap = new HashMap<String, String>();
@@ -194,6 +210,22 @@ public class JSONProviderTest extends Assert {
         
         String s = os.toString();
         assertEquals("{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}", s);
+    }
+    
+    @Test
+    public void testWriteToSingleQualifiedTagBadgerFish() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setConvention("badgerfish");
+        TagVO2 tag = createTag2("a", "b");
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(tag, (Class)TagVO2.class, TagVO2.class, TagVO2.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"ns2:thetag\":{\"@xmlns\":{\"ns2\":\"http:\\/\\/tags\"},"
+                     + "\"group\":{\"$\":\"b\"},\"name\":{\"$\":\"a\"}}}", s);
     }
     
     @Test
@@ -219,20 +251,29 @@ public class JSONProviderTest extends Assert {
     public void testWriteQualifiedCollection() throws Exception {
         String data = "{\"ns1.tag\":[{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}]}";
-        doWriteQualifiedCollection(false, data);
+        doWriteQualifiedCollection(false, false, data);
     }
     
     @Test
     public void testWriteQualifiedCollection2() throws Exception {
         String data = "{{\"group\":\"b\",\"name\":\"a\"}"
             + ",{\"group\":\"d\",\"name\":\"c\"}}";
-        doWriteQualifiedCollection(true, data);
+        doWriteQualifiedCollection(true, false, data);
     }
     
-    public void doWriteQualifiedCollection(boolean drop, String data) throws Exception {
+    @Test
+    public void testWriteQualifiedCollection3() throws Exception {
+        String data = "[{\"group\":\"b\",\"name\":\"a\"}"
+            + ",{\"group\":\"d\",\"name\":\"c\"}]";
+        doWriteQualifiedCollection(true, true, data);
+    }
+    
+    public void doWriteQualifiedCollection(boolean drop, boolean serializeAsArray, String data) 
+        throws Exception {
         JSONProvider p = new JSONProvider();
         p.setCollectionWrapperName("{http://tags}tag");
         p.setDropCollectionWrapperElement(drop);
+        p.setSerializeAsArray(serializeAsArray);
         Map<String, String> namespaceMap = new HashMap<String, String>();
         namespaceMap.put("http://tags", "ns1");
         p.setNamespaceMap(namespaceMap);
@@ -243,9 +284,9 @@ public class JSONProviderTest extends Assert {
         Method m = CollectionsResource.class.getMethod("getTags", new Class[0]);
         p.writeTo(tags, m.getReturnType(), m.getGenericReturnType(), new Annotation[0], 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
-        
         String s = os.toString();
         assertEquals(s, data);
+        
     }
     
     @Test

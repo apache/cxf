@@ -112,7 +112,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
         ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, 
                                           rawPath, 
-                                          values);
+                                          values,
+                                          message);
         if (resource == null) {
             org.apache.cxf.common.i18n.Message errorMsg = 
                 new org.apache.cxf.common.i18n.Message("NO_ROOT_EXC", 
@@ -140,11 +141,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                     values = new MetadataMap<String, String>();
                     resource = JAXRSUtils.selectResourceClass(resources, 
                                                               rawPath, 
-                                                              values);
+                                                              values,
+                                                              message);
                 }
                 try {                
                     ori = JAXRSUtils.findTargetMethod(resource, 
-                        values.getFirst(URITemplate.FINAL_MATCH_GROUP), httpMethod, values, 
+                        message, httpMethod, values, 
                         requestContentType, acceptContentTypes, false);
                     setMessageProperties(message, ori, values);
                 } catch (WebApplicationException ex) {
@@ -170,11 +172,12 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 values = new MetadataMap<String, String>();
                 resource = JAXRSUtils.selectResourceClass(resources, 
                                                           rawPath, 
-                                                          values);
+                                                          values,
+                                                          message);
             }
             try {                
-                ori = JAXRSUtils.findTargetMethod(resource, values.getFirst(URITemplate.FINAL_MATCH_GROUP), 
-                                            httpMethod, values, requestContentType, acceptContentTypes);
+                ori = JAXRSUtils.findTargetMethod(resource, message, 
+                                            httpMethod, values, requestContentType, acceptContentTypes, true);
                 setMessageProperties(message, ori, values);
             } catch (WebApplicationException ex) {
                 if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
@@ -205,7 +208,6 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     private void setMessageProperties(Message message, OperationResourceInfo ori, 
                                       MultivaluedMap<String, String> values) {
         message.getExchange().put(OperationResourceInfo.class, ori);
-        message.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
     }
 }

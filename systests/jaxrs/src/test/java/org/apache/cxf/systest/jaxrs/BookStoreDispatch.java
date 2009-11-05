@@ -16,33 +16,41 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.impl;
 
-import java.io.IOException;
+package org.apache.cxf.systest.jaxrs;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
 
-import org.apache.cxf.message.Message;
+import java.util.HashMap;
+import java.util.Map;
 
-public class HttpServletResponseFilter extends HttpServletResponseWrapper {
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 
-    private Message m;
-    public HttpServletResponseFilter(HttpServletResponse response, Message message) {
-        super(response);
-        m = message;
-    }
+@Path("/")
+public class BookStoreDispatch {
 
-    @Override
-    public void setStatus(int sc) {
-        super.setStatus(sc);
-        m.getExchange().put(Message.RESPONSE_CODE, sc);
+    private Map<Long, Book> books = new HashMap<Long, Book>();
+    private Long mainId = 123L;
+    
+    public BookStoreDispatch() {
+        init();
     }
     
-    @Override
-    public ServletOutputStream getOutputStream() throws IOException {
-        return new ServletOutputStreamFilter(super.getOutputStream(), m);
+    @GET
+    @Path("/books/html/{bookid}")
+    @Produces("text/html")
+    public Book getBookHtml() {
+        return books.get(123L);
+    }
+    
+    final void init() {
+        Book book = new Book();
+        book.setId(mainId);
+        book.setName("CXF in Action");
+        books.put(book.getId(), book);
     }
     
 }
+
+

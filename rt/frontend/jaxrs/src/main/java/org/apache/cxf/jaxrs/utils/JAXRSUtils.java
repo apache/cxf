@@ -98,7 +98,6 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 public final class JAXRSUtils {
 
     public static final MediaType ALL_TYPES = new MediaType();
-    public static final String RELATIVE_PATH = "relative.path";
     public static final String ROOT_RESOURCE_CLASS = "root.resource.class";
     public static final String IGNORE_MESSAGE_WRITERS = "ignore.message.writers";
     public static final String ROOT_INSTANCE = "service.root.instance";
@@ -218,7 +217,8 @@ public final class JAXRSUtils {
     
     public static ClassResourceInfo selectResourceClass(List<ClassResourceInfo> resources,
                                                  String path, 
-                                                 MultivaluedMap<String, String> values) {
+                                                 MultivaluedMap<String, String> values,
+                                                 Message message) {
         
         LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
                                                         BUNDLE, 
@@ -230,7 +230,7 @@ public final class JAXRSUtils {
         
         SortedMap<ClassResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<ClassResourceInfo, MultivaluedMap<String, String>>(
-                new ClassResourceInfoComparator());
+                new ClassResourceInfoComparator(message));
         
         for (ClassResourceInfo cri : resources) {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
@@ -264,18 +264,8 @@ public final class JAXRSUtils {
         return null;
     }
 
-    public static OperationResourceInfo findTargetMethod(ClassResourceInfo resource, 
-                                                         String path,
-                                                         String httpMethod, 
-                                                         MultivaluedMap<String, String> values, 
-                                                         String requestContentType, 
-                                                         List<MediaType> acceptContentTypes) {
-        return JAXRSUtils.findTargetMethod(resource, path, httpMethod, values, requestContentType, 
-                                           acceptContentTypes, true);
-    }
-    
-    public static OperationResourceInfo findTargetMethod(ClassResourceInfo resource, 
-                                                         String path,
+    public static OperationResourceInfo findTargetMethod(ClassResourceInfo resource,
+                                                         Message message,
                                                          String httpMethod, 
                                                          MultivaluedMap<String, String> values, 
                                                          String requestContentType, 
@@ -289,9 +279,14 @@ public final class JAXRSUtils {
             LOG.fine(msg.toString());
             
         }
+        String path = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        if (path == null) {
+            path = "/";
+        }
+        
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
-                new OperationResourceInfoComparator());
+                new OperationResourceInfoComparator(message));
         MediaType requestType = requestContentType == null 
                                 ? ALL_TYPES : MediaType.valueOf(requestContentType);
         
@@ -812,8 +807,11 @@ public final class JAXRSUtils {
         if (genericType instanceof ParameterizedType) {
             return ProviderFactory.getInstance(m).createContextResolver(
                       ((ParameterizedType)genericType).getActualTypeArguments()[0], m);
+        } else if (m != null) {
+            return ProviderFactory.getInstance(m).createContextResolver(genericType, m);
+        } else {
+            return null;
         }
-        return null;
     }
 
     public static Object createResourceValue(Message m, Type genericType, Class<?> clazz) {

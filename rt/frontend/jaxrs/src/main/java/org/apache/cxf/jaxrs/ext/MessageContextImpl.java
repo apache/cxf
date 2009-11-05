@@ -109,19 +109,19 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public HttpServletRequest getHttpServletRequest() {
-        return JAXRSUtils.createServletResourceValue(m, HttpServletRequest.class);
+        return getContext(HttpServletRequest.class);
     }
 
     public HttpServletResponse getHttpServletResponse() {
-        return JAXRSUtils.createServletResourceValue(m, HttpServletResponse.class);
+        return getContext(HttpServletResponse.class);
     }
     
     public ServletConfig getServletConfig() {
-        return JAXRSUtils.createServletResourceValue(m, ServletConfig.class);
+        return getContext(ServletConfig.class);
     }
 
     public ServletContext getServletContext() {
-        return JAXRSUtils.createServletResourceValue(m, ServletContext.class);
+        return getContext(ServletContext.class);
     }
 
     public void put(Object key, Object value) {

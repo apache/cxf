@@ -355,6 +355,22 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         assertEquals("java.jpg", cd2.getParameter("filename"));
     }
     
+    @Test
+    public void testMultipartRequestNoBody() throws Exception { 
+        PostMethod post = new PostMethod("http://localhost:9085/bookstore/books/image");
+        String ct = "multipart/mixed";
+        post.setRequestHeader("Content-Type", ct);
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(400, result);
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
+    
     private void doAddBook(String address, String resourceName, int status) throws Exception {
         doAddBook("multipart/related", address, resourceName, status);
     }

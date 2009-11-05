@@ -153,7 +153,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             try {
                 Message msg = exchange.getInMessage();
                 MultivaluedMap<String, String> values = getTemplateValues(msg);
-                String subResourcePath = (String)msg.get(JAXRSUtils.RELATIVE_PATH);
+                String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
                 String httpMethod = (String)msg.get(Message.HTTP_REQUEST_METHOD);
                 String contentType = (String)msg.get(Message.CONTENT_TYPE);
                 if (contentType == null) {
@@ -177,15 +177,15 @@ public class JAXRSInvoker extends AbstractInvoker {
                 }
 
                 OperationResourceInfo subOri = JAXRSUtils.findTargetMethod(subCri,
-                                                         subResourcePath,
+                                                         exchange.getInMessage(),
                                                          httpMethod,
                                                          values,
                                                          contentType,
-                                                         acceptContentType);
+                                                         acceptContentType,
+                                                         true);
 
 
                 exchange.put(OperationResourceInfo.class, subOri);
-                msg.put(JAXRSUtils.RELATIVE_PATH, values.getFirst(URITemplate.FINAL_MATCH_GROUP));
                 msg.put(URITemplate.TEMPLATE_PARAMETERS, values);
                 // work out request parameters for the sub-resouce class. Here we
                 // presume Inputstream has not been consumed yet by the root resource class.

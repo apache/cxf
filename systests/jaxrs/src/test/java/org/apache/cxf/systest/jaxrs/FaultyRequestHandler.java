@@ -16,33 +16,27 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.impl;
+package org.apache.cxf.systest.jaxrs;
 
-import java.io.IOException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpServletResponseWrapper;
-
+import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.message.Message;
 
-public class HttpServletResponseFilter extends HttpServletResponseWrapper {
+public class FaultyRequestHandler implements RequestHandler {
 
-    private Message m;
-    public HttpServletResponseFilter(HttpServletResponse response, Message message) {
-        super(response);
-        m = message;
+    @Context
+    private UriInfo uriInfo;
+    
+    public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+        if (uriInfo.getPath().endsWith("/propogateexception4")) {
+            m.getExchange().put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);
+            throw new RuntimeException();
+        }
+        return null;
     }
 
-    @Override
-    public void setStatus(int sc) {
-        super.setStatus(sc);
-        m.getExchange().put(Message.RESPONSE_CODE, sc);
-    }
-    
-    @Override
-    public ServletOutputStream getOutputStream() throws IOException {
-        return new ServletOutputStreamFilter(super.getOutputStream(), m);
-    }
-    
 }

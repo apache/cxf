@@ -21,11 +21,34 @@ package org.apache.cxf.jaxrs.model;
 
 import java.util.Comparator;
 
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.Message;
 
 public class OperationResourceInfoComparator implements Comparator<OperationResourceInfo> {
     
+    private Message message;
+    private ResourceComparator rc; 
+
+    public OperationResourceInfoComparator(Message m) {
+        this.message = m;
+        if (message != null) {
+            Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
+            if (o != null) {
+                rc = (ResourceComparator)o;
+            }
+        }
+    }
+    
     public int compare(OperationResourceInfo e1, OperationResourceInfo e2) {
+        
+        if (rc != null) {
+            int result = rc.compare(e1, e2, message);
+            if (result != 0) {
+                return result;
+            }
+        }
         
         if (e1.getHttpMethod() != null && e2.getHttpMethod() == null
             || e1.getHttpMethod() == null && e2.getHttpMethod() != null) {
