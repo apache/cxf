@@ -28,7 +28,7 @@ public class JAXWSParameter {
 
     public JAXWSParameter(String msgName, String part, QName elementName, String name) {
         this.messageName = msgName;
-        this.setPart(part);
+        this.part = part;
         this.eleName = elementName;
         this.name = name;
     }
