@@ -49,7 +49,7 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
-@Consumes({"application/xml", "application/*+xml", "text/xml" })
+@Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
 public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 

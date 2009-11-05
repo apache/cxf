@@ -27,7 +27,6 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -69,7 +68,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                     Marshaller.JAXB_NO_NAMESPACE_SCHEMA_LOCATION,
                                     Marshaller.JAXB_SCHEMA_LOCATION});
     
-    private Map<String, Object> mProperties = new HashMap<String, Object>();
+    private Map<String, Object> mProperties = Collections.emptyMap();
     private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
     
@@ -135,6 +134,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
         try {
+            
+            checkContentLength();
+            
             boolean isCollection = InjectionUtils.isSupportedCollectionOrArray(type);
             Class<?> theType = isCollection ? InjectionUtils.getActualType(genericType) : type;
             theType = getActualType(theType, genericType, anns);

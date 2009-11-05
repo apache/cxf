@@ -76,6 +76,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testPropogateException3() throws Exception {
+        String data = "<nobook/>";
+        getAndCompare("http://localhost:9080/bookstore/propogateexception3",
+                      data, "application/xml", 500);
+    }
+    
+    @Test
+    public void testPropogateException4() throws Exception {
+        String data = "<nobook/>";
+        getAndCompare("http://localhost:9080/bookstore/propogateexception4",
+                      data, "application/xml", 500);
+    }
+    
+    @Test
     public void testWebApplicationException() throws Exception {
         getAndCompare("http://localhost:9080/bookstore/webappexception",
                       "This is a WebApplicationException",
@@ -288,8 +302,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testNoMessageWriterFound() throws Exception {
-        String msg1 = ".No message body writer found for response class : GregorianCalendar.";
-        String msg2 = ".No message body writer found for response class : Calendar.";
+        String msg1 = "No message body writer has been found for response class GregorianCalendar.";
+        String msg2 = "No message body writer has been found for response class Calendar.";
         
         getAndCompareStrings("http://localhost:9080/bookstore/timetable", 
                              new String[]{msg1, msg2}, "*/*", 500);
@@ -585,6 +599,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAddBookNoBody() throws Exception {
+        PostMethod post = new PostMethod("http://localhost:9080/bookstore/books");
+        post.setRequestHeader("Content-Type", "application/xml");
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(400, result);
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
+    
+    @Test
     public void testAddBook() throws Exception {
         doAddBook("http://localhost:9080/bookstore/books");               
     }
@@ -612,6 +641,27 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         } finally {
             // Release current connection to the connection pool once you are done
             post.releaseConnection();
+        }
+    }
+    
+    
+    @Test
+    public void testAddBookCustomFailureStatus() throws Exception {
+        String endpointAddress = "http://localhost:9080/bookstore/books/customstatus";
+
+        File input = new File(getClass().getResource("resources/update_book.txt").toURI());
+        PostMethod put = new PostMethod(endpointAddress);
+        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
+        put.setRequestEntity(entity);
+        HttpClient httpclient = new HttpClient();
+
+        try {
+            int result = httpclient.executeMethod(put);
+            assertEquals(333, result);
+        } finally {
+            // Release current connection to the connection pool once you are
+            // done
+            put.releaseConnection();
         }
     }
     

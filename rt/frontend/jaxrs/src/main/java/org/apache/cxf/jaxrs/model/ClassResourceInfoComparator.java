@@ -21,9 +21,33 @@ package org.apache.cxf.jaxrs.model;
 
 import java.util.Comparator;
 
-public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo> {
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.ext.ResourceComparator;
+import org.apache.cxf.message.Message;
 
+public class ClassResourceInfoComparator implements Comparator<ClassResourceInfo> {
+    
+    private Message message;
+    private ResourceComparator rc; 
+
+    public ClassResourceInfoComparator(Message m) {
+        this.message = m;
+        if (message != null) {
+            Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
+            if (o != null) {
+                rc = (ResourceComparator)o;
+            }
+        }
+    }
+    
     public int compare(ClassResourceInfo cr1, ClassResourceInfo cr2) {
+        
+        if (rc != null) {
+            int result = rc.compare(cr1, cr2, message);
+            if (result != 0) {
+                return result;
+            }
+        }
         
         return URITemplate.compareTemplates(
                cr1.getURITemplate(), 

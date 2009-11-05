@@ -93,9 +93,14 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private Map<String, String> collectionWrapperMap;
     private List<String> jaxbElementClassNames;
     private Map<String, Object> cProperties;
+    private Map<String, Object> uProperties;
     
     public void setContextProperties(Map<String, Object> contextProperties) {
         cProperties = contextProperties;
+    }
+    
+    public void setUnmarshallerProperties(Map<String, Object> unmarshalProperties) {
+        uProperties = unmarshalProperties;
     }
     
     public void setUnmarshallAsJaxbElement(boolean value) {
@@ -113,7 +118,18 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     public void setJaxbElementClassMap(Map<String, String> map) {
         jaxbElementClassMap = map;
     }
-
+    
+    protected void checkContentLength() {
+        if (mc != null) {
+            List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
+            if (values.size() == 1 && "0".equals(values.get(0))) {
+                String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+                LOG.warning(message);
+                throw new WebApplicationException(400);
+            }
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     protected Object convertToJaxbElementIfNeeded(Object obj, Class<?> cls, Type genericType) 
         throws Exception {
@@ -392,6 +408,11 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         Unmarshaller unmarshaller = context.createUnmarshaller();
         if (schema != null) {
             unmarshaller.setSchema(schema);
+        }
+        if (uProperties != null) {
+            for (Map.Entry<String, Object> entry : uProperties.entrySet()) {
+                unmarshaller.setProperty(entry.getKey(), entry.getValue());
+            }
         }
         return unmarshaller;        
     }

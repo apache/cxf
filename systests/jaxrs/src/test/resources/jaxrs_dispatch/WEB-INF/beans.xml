@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+  
+  http://www.apache.org/licenses/LICENSE-2.0
+  
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<!-- START SNIPPET: beans -->
+<!--beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:simple="http://cxf.apache.org/simple"
+  xsi:schemaLocation="
+  http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+  http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd"-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+  xmlns:cxf="http://cxf.apache.org/core"
+  xsi:schemaLocation="
+http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/util 
+http://www.springframework.org/schema/util/spring-util-2.0.xsd
+http://cxf.apache.org/jaxrs
+http://cxf.apache.org/schemas/jaxrs.xsd
+http://cxf.apache.org/core
+http://cxf.apache.org/schemas/core.xsd">
+
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
+
+  <bean class="org.apache.cxf.systest.jaxrs.BookStoreDispatch" id="serviceBean"/>
+
+  <bean id="dispatchProvider1" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+      <property name="resourcePath" value="/book.html"/>
+  </bean>
+  
+  <bean id="dispatchProvider2" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+      <property name="resourcePath" value="/bookRequestScope.jsp"/>
+  </bean>
+  
+  <bean id="dispatchProvider3" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+      <property name="resourcePath" value="/bookSessionScope.jsp"/>
+      <property name="scope" value="session"/>
+  </bean>
+  
+  <bean id="dispatchProvider4" class="org.apache.cxf.jaxrs.provider.RequestDispatcherProvider">
+      <property name="resourcePath" value="/book.html"/>
+      <property name="dispatcherName" value="default"/>
+  </bean>
+  
+  <jaxrs:server id="bookservice1" address="/bookstore1">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean"/>
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="dispatchProvider1"/>
+    </jaxrs:providers> 
+  </jaxrs:server>
+  
+  <jaxrs:server id="bookservice2" address="/bookstore2">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean"/>
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="dispatchProvider2"/>
+    </jaxrs:providers> 
+  </jaxrs:server>
+
+  <jaxrs:server id="bookservice3" address="/bookstore3">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean"/>
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="dispatchProvider3"/>
+    </jaxrs:providers> 
+  </jaxrs:server>
+  
+  <jaxrs:server id="bookservice4" address="/bookstore4">
+    <jaxrs:serviceBeans>
+      <ref bean="serviceBean"/>
+    </jaxrs:serviceBeans>		  
+    <jaxrs:providers>
+       <ref bean="dispatchProvider4"/>
+    </jaxrs:providers> 
+  </jaxrs:server>
+
+</beans>
+<!-- END SNIPPET: beans -->

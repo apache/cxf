@@ -99,7 +99,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
     private void processResponse(Message message) {
         
-        if (isResponseAlreadyCommited(message)) {
+        if (isResponseAlreadyHandled(message)) {
             return;
         }
         
@@ -137,7 +137,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             serializeMessage(message, response, ori, true);        
             
         } else {
-            message.put(Message.RESPONSE_CODE, 204);
+            Object customStatus = message.getExchange().get(Message.RESPONSE_CODE);
+            int status = customStatus == null ? 204 : (Integer)customStatus;
+            message.put(Message.RESPONSE_CODE, status);
         }
     }
     
@@ -213,6 +215,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
     
         OutputStream outOriginal = message.getContent(OutputStream.class);
         if (writer == null) {
+            message.put(Message.CONTENT_TYPE, "text/plain");
             message.put(Message.RESPONSE_CODE, 500);
             writeResponseErrorMessage(outOriginal, "NO_MSG_WRITER", targetType.getSimpleName());
             return;
@@ -231,6 +234,11 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                responseType, 
                                responseHeaders, 
                                message.getContent(OutputStream.class));
+                
+                if (isResponseRedirected(message)) {
+                    return;
+                }
+                
                 Object newContentType = responseHeaders.getFirst(HttpHeaders.CONTENT_TYPE);
                 if (newContentType != null) {
                     message.put(Message.CONTENT_TYPE, newContentType.toString());
@@ -401,8 +409,16 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         headers.putSingle(HttpHeaders.DATE, format.format(new Date()));
     }
     
+    private boolean isResponseAlreadyHandled(Message m) {
+        return isResponseAlreadyCommited(m) || isResponseRedirected(m);
+    }
+    
     private boolean isResponseAlreadyCommited(Message m) {
         return Boolean.TRUE.equals(m.getExchange().get(AbstractHTTPDestination.RESPONSE_COMMITED));
+    }
+
+    private boolean isResponseRedirected(Message outMessage) {
+        return Boolean.TRUE.equals(outMessage.get(AbstractHTTPDestination.REQUEST_REDIRECTED));
     }
     
     private void writeResponseToStream(OutputStream os, Object responseObj) {
@@ -410,6 +426,8 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             byte[] bytes = responseObj.toString().getBytes("UTF-8");
             os.write(bytes, 0, bytes.length);
         } catch (Exception ex) {
+            LOG.severe("Problem with writing the data to the output stream");
+            ex.printStackTrace();
             throw new RuntimeException(ex);
         }
     }

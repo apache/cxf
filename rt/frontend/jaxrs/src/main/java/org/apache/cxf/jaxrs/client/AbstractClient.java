@@ -360,7 +360,7 @@ public class AbstractClient implements Client {
             }
              
         } else {
-            reportNoMessageHandler("NO_MSG_WRITER", cls);
+            reportNoMessageHandler("NO_MSG_WRITER", cls, contentType);
         }
                                                                                  
     }
@@ -405,7 +405,7 @@ public class AbstractClient implements Client {
         } else if (cls == Response.class) {
             return r;
         } else {
-            reportNoMessageHandler("NO_MSG_READER", cls);
+            reportNoMessageHandler("NO_MSG_READER", cls, contentType);
         }
         return null;                                                
     }
@@ -439,11 +439,12 @@ public class AbstractClient implements Client {
         }
     }
     
-    protected static void reportNoMessageHandler(String name, Class<?> cls) {
+    protected static void reportNoMessageHandler(String name, Class<?> cls, MediaType ct) {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
-                                                   cls);
+                                                   cls,
+                                                   ct.toString());
         LOG.severe(errorMsg.toString());
         throw new WebApplicationException(415);
     }

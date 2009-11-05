@@ -87,6 +87,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     public static final String PARTIAL_RESPONSE = AbstractMultiplexDestination.class.getName()
         + ".partial.response";
     public static final String RESPONSE_COMMITED = "http.response.done";
+    public static final String REQUEST_REDIRECTED = "http.request.redirected";
     
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
@@ -458,6 +459,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
   
    
     protected OutputStream flushHeaders(Message outMessage) throws IOException {
+        if (isResponseRedirected(outMessage)) {
+            return null;
+        }
         updateResponseHeaders(outMessage);
         Object responseObj = outMessage.get(HTTP_RESPONSE);
         OutputStream responseStream = null;
@@ -507,6 +511,10 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
             outMessage.remove(HTTP_RESPONSE);
         }
         return responseStream;
+    }
+    
+    private boolean isResponseRedirected(Message outMessage) {
+        return Boolean.TRUE.equals(outMessage.get(REQUEST_REDIRECTED));
     }
     
     /**

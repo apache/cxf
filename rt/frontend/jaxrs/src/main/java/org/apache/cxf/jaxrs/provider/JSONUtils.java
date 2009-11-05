@@ -31,6 +31,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -40,6 +42,8 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.codehaus.jettison.AbstractXMLStreamWriter;
+import org.codehaus.jettison.badgerfish.BadgerFishXMLInputFactory;
+import org.codehaus.jettison.badgerfish.BadgerFishXMLOutputFactory;
 import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
@@ -52,6 +56,16 @@ public final class JSONUtils {
     private static final Charset UTF8 = Charset.forName("utf-8");
 
     private JSONUtils() {
+    }
+    
+    public static XMLStreamWriter createBadgerFishWriter(OutputStream os) throws XMLStreamException {
+        XMLOutputFactory factory = new BadgerFishXMLOutputFactory();
+        return factory.createXMLStreamWriter(os);
+    }
+    
+    public static XMLStreamReader createBadgerFishReader(InputStream is) throws XMLStreamException {
+        XMLInputFactory factory = new BadgerFishXMLInputFactory();
+        return factory.createXMLStreamReader(is);
     }
     
     public static XMLStreamWriter createStreamWriter(OutputStream os, 

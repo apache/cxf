@@ -44,7 +44,7 @@ import org.apache.cxf.message.Message;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
-    // TODO : it can optimized, "Mastering Regular Expressions" has the asnwers
+    // TODO : it can be optimized, "Mastering Regular Expressions" has the answers
     private static final String COMPLEX_HEADER_EXPRESSION = 
         "((\"(([^\"])|(?<=\\\\)\")*\")|([^\",]*))(;[\\w]+)?";
     private static final Pattern COMPLEX_HEADER_PATTERN =

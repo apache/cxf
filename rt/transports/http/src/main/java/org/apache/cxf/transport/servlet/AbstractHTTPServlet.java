@@ -19,15 +19,24 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.cxf.helpers.IOUtils;
 
 
 
@@ -39,39 +48,75 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private static final List<String> KNOWN_HTTP_VERBS = 
         Arrays.asList(new String[]{"POST", "GET", "PUT", "DELETE", "HEAD", "OPTIONS", "TRACE"});
     
+    private static final String STATIC_RESOURCES_PARAMETER = "static-resources-list";
+    
+    private static final String REDIRECTS_PARAMETER = "redirects-list";
+    private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
+    private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
+    
+    private List<String> staticResourcesList;
+    private List<String> redirectList; 
+    private String dispatcherServletPath;
+    private String dispatcherServletName;
+    
+    public void init(ServletConfig servletConfig) throws ServletException {
+        super.init(servletConfig);
+
+        staticResourcesList = parseListSequence(servletConfig.getInitParameter(STATIC_RESOURCES_PARAMETER));
+        
+        redirectList = parseListSequence(servletConfig.getInitParameter(REDIRECTS_PARAMETER));
+        dispatcherServletName = servletConfig.getInitParameter(REDIRECT_SERVLET_NAME_PARAMETER);
+        dispatcherServletPath = servletConfig.getInitParameter(REDIRECT_SERVLET_PATH_PARAMETER);
+    }
+    
+    private static List<String> parseListSequence(String values) {
+        if (values != null) {
+            List<String> list = new LinkedList<String>();
+            String[] pathValues = values.split(" ");
+            for (String value : pathValues) {
+                String theValue = value.trim();
+                if (theValue.length() > 0) {
+                    list.add(theValue);
+                }
+            }
+            return list;
+        } else {
+            return null;
+        }
+    }
     
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
 
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doDelete(HttpServletRequest request, HttpServletResponse response)
         throws ServletException, IOException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
 
     @Override
     protected void doPut(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException, IOException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
     
     @Override
     protected void doHead(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException, IOException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
     
     @Override
     protected void doOptions(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException, IOException {
-        invoke(request, response);
+        handleRequest(request, response);
     }
     
     /**
@@ -100,11 +145,105 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
         if (KNOWN_HTTP_VERBS.contains(method)) {
             super.service(request, response);
         } else {
-            invoke(request, response);
+            handleRequest(request, response);
         }
+    }
+    
+    protected void handleRequest(HttpServletRequest request, HttpServletResponse response) 
+        throws ServletException {
+        if (staticResourcesList != null 
+            && matchPath(staticResourcesList, request.getPathInfo())) {
+            serveStaticContent(request, response, request.getPathInfo());
+            return;
+        }
+        if (redirectList != null 
+            && matchPath(redirectList, request.getPathInfo())) {
+            redirect(request, response, request.getPathInfo());
+            return;
+        }
+        invoke(request, response);
+    }
+    
+    private static boolean matchPath(List<String> values, String pathInfo) {
+        for (String value : values) {
+            if (pathInfo.matches(value)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    protected void serveStaticContent(HttpServletRequest request, 
+                                      HttpServletResponse response,
+                                      String pathInfo) throws ServletException {
+        InputStream is = super.getServletContext().getResourceAsStream(pathInfo);
+        if (is == null) {
+            throw new ServletException("Static resource " + pathInfo + " is not available");
+        }
+        try {
+            ServletOutputStream os = response.getOutputStream();
+            IOUtils.copy(is, os);
+            os.flush();
+        } catch (IOException ex) {
+            throw new ServletException("Static resource " + pathInfo 
+                                       + " can not be written to the output stream");
+        }
+        
+    }
+    
+    protected void redirect(HttpServletRequest request, HttpServletResponse response, String pathInfo) 
+        throws ServletException {
+        
+        String theServletPath = dispatcherServletPath == null ? "/" : dispatcherServletPath;
+        
+        ServletContext sc = super.getServletContext();
+        RequestDispatcher rd = dispatcherServletName != null 
+            ? sc.getNamedDispatcher(dispatcherServletName) 
+            : sc.getRequestDispatcher(theServletPath + pathInfo);
+        if (rd == null) {
+            throw new ServletException("No RequestDispatcher can be created for path " + pathInfo);
+        }
+        try {
+            HttpServletRequestFilter servletRequest = 
+                new HttpServletRequestFilter(request, pathInfo, theServletPath);
+            rd.forward(servletRequest, response);
+        } catch (Throwable ex) {
+            throw new ServletException("RequestDispatcher for path " + pathInfo + " has failed");
+        }   
     }
     
     protected abstract void invoke(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException;
+    
+    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
+        
+        private String pathInfo;
+        private String servletPath;
+        
+        public HttpServletRequestFilter(HttpServletRequest request, 
+                                        String pathInfo,
+                                        String servletPath) {
+            super(request);
+            this.pathInfo = pathInfo;
+            this.servletPath = servletPath;
+        }
+        
+        @Override
+        public String getServletPath() {
+            return servletPath;
+        }
+        
+        @Override
+        public String getPathInfo() {
+            return pathInfo; 
+        }
+        
+        @Override
+        public String getRequestURI() {
+            String query = super.getQueryString();
+            return query != null ? pathInfo + "?" + query : pathInfo; 
+        }
+        
+    }
 
 }

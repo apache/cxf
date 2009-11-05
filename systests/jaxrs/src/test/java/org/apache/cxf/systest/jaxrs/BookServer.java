@@ -44,10 +44,14 @@ public class BookServer extends AbstractBusTestServerBase {
         
         providers.add(p);
         providers.add(new GenericHandlerWriter());
+        providers.add(new FaultyRequestHandler());
         sf.setProviders(providers);
-        List<Interceptor> ints = new ArrayList<Interceptor>();
-        ints.add(new CustomOutInterceptor());
-        sf.setOutInterceptors(ints);
+        List<Interceptor> outInts = new ArrayList<Interceptor>();
+        outInts.add(new CustomOutInterceptor());
+        sf.setOutInterceptors(outInts);
+        List<Interceptor> outFaultInts = new ArrayList<Interceptor>();
+        outFaultInts.add(new CustomOutFaultInterceptor());
+        sf.setOutFaultInterceptors(outFaultInts);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
         sf.setAddress("http://localhost:9080/");

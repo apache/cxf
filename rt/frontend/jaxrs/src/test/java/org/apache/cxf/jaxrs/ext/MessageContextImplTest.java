@@ -27,14 +27,20 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
+import javax.xml.bind.JAXBContext;
 
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -131,9 +137,41 @@ public class MessageContextImplTest extends Assert {
         assertSame(request.getClass(), mc.getContext(ServletConfig.class).getClass());
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testContextResolver() {
+        ContextResolver<JAXBContext> resolver = new CustomContextResolver();
+        ProviderFactory factory = ProviderFactory.getInstance();
+        factory.registerUserProvider(resolver);
+        
+        Message m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        m.setExchange(ex);
+        ex.setInMessage(m);
+        Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(factory);
+        EasyMock.replay(e);
+        ex.put(Endpoint.class, e);
+        MessageContext mc = new MessageContextImpl(m);
+        ContextResolver<JAXBContext> resolver2 = 
+            mc.getResolver(ContextResolver.class, JAXBContext.class);
+        assertNotNull(resolver2);
+        assertSame(resolver2, resolver);
+    }
+    
     @Test
     public void testNoContext() {
         MessageContext mc = new MessageContextImpl(new MessageImpl());
         assertNull(mc.getContext(Message.class));
+    }
+    
+    public static class CustomContextResolver implements ContextResolver<JAXBContext> {
+
+        public JAXBContext getContext(Class<?> type) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
     }
 }

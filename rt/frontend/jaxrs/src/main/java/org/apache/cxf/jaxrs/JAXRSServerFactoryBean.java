@@ -32,6 +32,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.endpoint.ServerImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.jaxrs.ext.ResourceComparator;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -61,6 +62,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     private boolean start = true;
     private Map<Object, Object> languageMappings;
     private Map<Object, Object> extensionMappings;
+    private ResourceComparator rc;
     
     public JAXRSServerFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -68,6 +70,10 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
 
     public JAXRSServerFactoryBean(JAXRSServiceFactoryBean sf) {
         super(sf);
+    }
+    
+    public void setResourceComparator(ResourceComparator rcomp) {
+        rc = rcomp;
     }
     
     public void setStaticSubresourceResolution(boolean enableStatic) {
@@ -99,7 +105,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
-            
+            if (rc != null) {
+                ep.put("org.apache.cxf.jaxrs.comparator", rc);
+            }
             
             if (start) {
                 server.start();

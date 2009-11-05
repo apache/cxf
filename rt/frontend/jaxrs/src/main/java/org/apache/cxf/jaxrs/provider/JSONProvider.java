@@ -59,6 +59,9 @@ import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 @Provider
 public class JSONProvider extends AbstractJAXBProvider  {
     
+    private static final String MAPPED_CONVENTION = "mapped";
+    private static final String BADGER_FISH_CONVENTION = "badgerfish";
+    
     private ConcurrentHashMap<String, String> namespaceMap = 
         new ConcurrentHashMap<String, String>();
     private boolean serializeAsArray;
@@ -72,6 +75,14 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean writeXsiType = true;
     private boolean readXsiType = true;
     private boolean ignoreNamespaces;
+    private String convention = MAPPED_CONVENTION;
+    
+    public void setConvention(String value) {
+        if (!MAPPED_CONVENTION.equals(value) && !BADGER_FISH_CONVENTION.equals(value)) {
+            throw new IllegalArgumentException("Unsupported convention \"" + value);
+        }
+        convention = value;
+    }
     
     public void setIgnoreNamespaces(boolean ignoreNamespaces) {
         this.ignoreNamespaces = ignoreNamespaces;
@@ -178,7 +189,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
 
     protected XMLStreamReader createReader(Class<?> type, InputStream is) 
         throws Exception {
-        return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
+        if (BADGER_FISH_CONVENTION.equals(convention)) {
+            return JSONUtils.createBadgerFishReader(is);
+        } else {
+            return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
+        }
     }
     
     protected InputStream getInputStream(Class<Object> cls, Type type, InputStream is) throws Exception {
@@ -282,6 +297,9 @@ public class JSONProvider extends AbstractJAXBProvider  {
                 startTag = "{\"" + qname.getLocalPart() + "\":[";
             }
             endTag = "]}";
+        } else if (serializeAsArray) {
+            startTag = "[";
+            endTag = "]";
         } else {
             startTag = "{";
             endTag = "}";
@@ -314,6 +332,11 @@ public class JSONProvider extends AbstractJAXBProvider  {
     
     protected XMLStreamWriter createWriter(Object actualObject, Class<?> actualClass, 
         Type genericType, String enc, OutputStream os, boolean isCollection) throws Exception {
+        
+        if (BADGER_FISH_CONVENTION.equals(convention)) {
+            return JSONUtils.createBadgerFishWriter(os);
+        }
+        
         QName qname = getQName(actualClass, genericType, actualObject, true);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
              writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys,

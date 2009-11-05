@@ -37,6 +37,7 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.endpoint.Endpoint;
@@ -57,22 +58,8 @@ public final class ProviderFactory {
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
     static {
-        // TODO : do dynamic instantiation of JSON and few other default providers
-        JSONProvider jsonProvider = null;
-        try {
-            jsonProvider = new JSONProvider();
-        } catch (Throwable ex) {
-            String message = "Problem with instantiating the default JSON provider, ";
-            if (ex.getMessage() != null) {
-                message += ex.getMessage();
-            } else {
-                message += "exception class : " + ex.getClass().getName();  
-            }
-            LOG.info(message);
-        }
-        
-        SHARED_FACTORY.setProviders(new JAXBElementProvider(),
-                                    jsonProvider,
+        SHARED_FACTORY.setProviders(createProvider("org.apache.cxf.jaxrs.provider.JAXBElementProvider"),
+                                    createProvider("org.apache.cxf.jaxrs.provider.JSONProvider"),
                                     new BinaryDataProvider(),
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
@@ -101,6 +88,21 @@ public final class ProviderFactory {
     private RequestPreprocessor requestPreprocessor;
     
     private ProviderFactory() {
+    }
+    
+    private static Object createProvider(String className) {
+        try {
+            return ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
+        } catch (Throwable ex) {
+            String message = "Problem with instantiating the default provider " + className;
+            if (ex.getMessage() != null) {
+                message += ex.getMessage();
+            } else {
+                message += ", exception class : " + ex.getClass().getName();  
+            }
+            LOG.info(message);
+        }
+        return  null;
     }
     
     public static ProviderFactory getInstance() {
