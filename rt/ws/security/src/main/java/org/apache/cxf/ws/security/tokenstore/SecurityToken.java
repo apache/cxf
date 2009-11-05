@@ -157,7 +157,7 @@ public class SecurityToken {
                  Element lifetimeElem) {
         this.id = id;
         this.token = cloneElement(tokenElem);
-        if (lifetimeElem !=null) {
+        if (lifetimeElem != null) {
             processLifeTime(lifetimeElem);
         }
     }
