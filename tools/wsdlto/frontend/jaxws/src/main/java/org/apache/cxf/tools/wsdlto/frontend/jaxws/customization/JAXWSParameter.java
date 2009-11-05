@@ -18,13 +18,17 @@
  */
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
+import javax.xml.namespace.QName;
+
 public class JAXWSParameter {
     private String name;
-    private String eleName;
+    private String part;
+    private QName eleName;
     private String messageName;
 
-    public JAXWSParameter(String msgName , String elementName, String name) {
+    public JAXWSParameter(String msgName, String part, QName elementName, String name) {
         this.messageName = msgName;
+        this.setPart(part);
         this.eleName = elementName;
         this.name = name;
     }
@@ -37,11 +41,19 @@ public class JAXWSParameter {
         return name;
     }
 
-    public void setElementName(String elementName) {
+    public void setPart(String part) {
+        this.part = part;
+    }
+
+    public String getPart() {
+        return part;
+    }
+
+    public void setElementName(QName elementName) {
         this.eleName = elementName;
     }
 
-    public String getElementName() {
+    public QName getElementName() {
         return eleName;
     }
 

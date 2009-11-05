@@ -20,6 +20,8 @@
 package org.apache.cxf.tools.wsdlto.frontend.jaxws.customization;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
@@ -49,7 +51,7 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
     
     private String classJavaDoc;
 
-    private JAXWSParameter jaxwsPara;
+    private List<JAXWSParameter> jaxwsPara;
 
     private JAXWSClass jaxwsClass;
 
@@ -123,11 +125,17 @@ public class JAXWSBinding implements ExtensibilityElement, Serializable {
         return this.packageName;
     }
 
-    public void setJaxwsPara(JAXWSParameter para) {
-        jaxwsPara = para;
+    public void addJaxwsPara(JAXWSParameter para) {
+        if (jaxwsPara == null) {
+            jaxwsPara = new ArrayList<JAXWSParameter>();
+        }
+        jaxwsPara.add(para);
     }
 
-    public JAXWSParameter getJaxwsPara() {
+    public void setJaxwsParas(List<JAXWSParameter> p) {
+        jaxwsPara = new ArrayList<JAXWSParameter>(p);
+    }
+    public List<JAXWSParameter> getJaxwsParas() {
         return jaxwsPara;
     }
 

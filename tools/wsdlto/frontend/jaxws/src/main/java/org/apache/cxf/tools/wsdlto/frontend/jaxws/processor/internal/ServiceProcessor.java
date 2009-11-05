@@ -343,8 +343,8 @@ public class ServiceProcessor extends AbstractProcessor {
 
         if (bopBinding != null && bopBinding.isEnableMime()) {
             enableOpMime = true;
-            if (bopBinding.getJaxwsPara() != null) {
-                jaxwsBinding.setJaxwsPara(bopBinding.getJaxwsPara());
+            if (bopBinding.getJaxwsParas() != null) {
+                jaxwsBinding.setJaxwsParas(bopBinding.getJaxwsParas());
             }
         }
         JavaInterface jf = null;
