@@ -223,6 +223,64 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/jsonform")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookJsonFromForm(Book b1) 
+        throws Exception {
+        b1.setId(124);
+        return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/filesform")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookFilesForm(@Multipart("owner") String name, 
+                                     @Multipart("files") List<Book> books) 
+        throws Exception {
+        if (books.size() != 2) {
+            throw new WebApplicationException();
+        }
+        Book b1 = books.get(0);
+        Book b2 = books.get(1);
+        if (!"CXF in Action - 1".equals(b1.getName())
+            || !"CXF in Action - 2".equals(b2.getName())
+            || !"Larry".equals(name)) {
+            throw new WebApplicationException();
+        }
+        b1.setId(124);
+        b1.setName("CXF in Action - 2");
+        return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/jaxbform")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookJaxbFromForm(Book b1) 
+        throws Exception {
+        b1.setId(124);
+        return Response.ok(b1).build();
+    }
+    
+    @POST
+    @Path("/books/jsonjaxbform")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookJaxbJsonForm(@Multipart("jsonPart") Book b1, 
+                                        @Multipart("bookXML") Book b2) 
+        throws Exception {
+        if (!"CXF in Action - 1".equals(b1.getName())
+            || !"CXF in Action - 2".equals(b2.getName())) {
+            throw new WebApplicationException();
+        }
+        b2.setId(124);
+        return Response.ok(b2).build();
+    }
+    
+    
+    @POST
     @Path("/books/dsource2")
     @Produces("text/xml")
     public Response addBookFromDataSource2(@Multipart("rootPart") DataSource ds1,

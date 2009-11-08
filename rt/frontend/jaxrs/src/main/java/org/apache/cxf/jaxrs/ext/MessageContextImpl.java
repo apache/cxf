@@ -34,12 +34,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.attachment.AttachmentDeserializer;
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.attachment.AttachmentUtil;
 import org.apache.cxf.endpoint.Endpoint;
@@ -49,7 +51,9 @@ import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
 import org.apache.cxf.jaxrs.interceptor.AttachmentOutputInterceptor;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
 public class MessageContextImpl implements MessageContext {
 
@@ -59,8 +63,10 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public Object get(Object key) {
-        if (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS.equals(key.toString())) {
-            return createAttachments(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
+        String keyValue = key.toString();
+        if (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS.equals(keyValue)
+            || (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded").equals(keyValue)) {
+            return createAttachments(key.toString());
         }
         return m.get(key);
     }
@@ -171,12 +177,29 @@ public class MessageContextImpl implements MessageContext {
     
     private MultipartBody createAttachments(String propertyName) {
         Message inMessage = m.getExchange().getInMessage();
+        boolean embeddedAttachment = inMessage.get("org.apache.cxf.multipart.embedded") != null;
+        
         Object o = inMessage.get(propertyName);
         if (o != null) {
             return (MultipartBody)o;
         }
-        new AttachmentInputInterceptor().handleMessage(inMessage);
         
+        if (embeddedAttachment) {
+            inMessage = new MessageImpl();
+            inMessage.setExchange(new ExchangeImpl());
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, 
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_DIRECTORY));
+            inMessage.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, 
+                m.getExchange().getInMessage().get(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD));
+            inMessage.setContent(InputStream.class, 
+                m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.input"));
+            inMessage.put(Message.CONTENT_TYPE, 
+                m.getExchange().getInMessage().get("org.apache.cxf.multipart.embedded.ctype").toString());
+        }
+        
+        
+        new AttachmentInputInterceptor().handleMessage(inMessage);
+    
         List<Attachment> newAttachments = new LinkedList<Attachment>();
         try {
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
@@ -187,6 +210,7 @@ public class MessageContextImpl implements MessageContext {
             throw new WebApplicationException(500);
         }
         
+    
         Collection<org.apache.cxf.message.Attachment> childAttachments = inMessage.getAttachments();
         if (childAttachments == null) {
             childAttachments = Collections.emptyList();
@@ -195,7 +219,10 @@ public class MessageContextImpl implements MessageContext {
         for (org.apache.cxf.message.Attachment a : childAttachments) {
             newAttachments.add(new Attachment(a));
         }
-        MultipartBody body = new MultipartBody(newAttachments, getHttpHeaders().getMediaType(), false);
+        MediaType mt = embeddedAttachment 
+            ? (MediaType)inMessage.get("org.apache.cxf.multipart.embedded.ctype")
+            : getHttpHeaders().getMediaType();
+        MultipartBody body = new MultipartBody(newAttachments, mt, false);
         inMessage.put(propertyName, body);
         return body;
     }

@@ -192,7 +192,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
         if (BADGER_FISH_CONVENTION.equals(convention)) {
             return JSONUtils.createBadgerFishReader(is);
         } else {
-            return JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
+            XMLStreamReader reader = JSONUtils.createStreamReader(is, readXsiType, namespaceMap);
+            return createTransformReaderIfNeeded(reader, is);
         }
     }
     
@@ -342,7 +343,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
              writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys,
              isCollection || dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
-        return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
+        return createTransformWriterIfNeeded(writer, os);
     }
     
     protected void marshal(Object actualObject, Class<?> actualClass, 

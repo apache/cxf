@@ -1,0 +1,8 @@
+
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="gazetteer"
+Content-Type: application/json; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+
+{"Book":{"name":"CXF in Action - 2","id":123}}
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB--

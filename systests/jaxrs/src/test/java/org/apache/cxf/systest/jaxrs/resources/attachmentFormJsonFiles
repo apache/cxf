@@ -1,0 +1,24 @@
+
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="owner"
+Content-Type: text/plain
+
+Larry
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="files"
+Content-Type: multipart/mixed; boundary=_Part_4_701508.1145579811786
+
+--_Part_4_701508.1145579811786
+Content-Disposition: form-data; name="book1"
+Content-Type: application/json; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+
+{"Book":{"name":"CXF in Action - 1","id":123}}
+--_Part_4_701508.1145579811786
+Content-Disposition: form-data; name="book2"
+Content-Type: application/json; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+
+{"Book":{"name":"CXF in Action - 2","id":124}}
+--_Part_4_701508.1145579811786--
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB--

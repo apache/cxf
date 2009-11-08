@@ -36,6 +36,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
+import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -78,7 +79,12 @@ public final class AttachmentUtils {
         if (attachmentThreshold != null) {
             mc.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, attachmentThreshold);
         }
-        return (MultipartBody)mc.get(MultipartBody.INBOUND_MESSAGE_ATTACHMENTS);
+        
+        boolean embeddedAttachment = mc.get("org.apache.cxf.multipart.embedded") != null;
+        String propertyName = embeddedAttachment ? MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded"
+            : MultipartBody.INBOUND_MESSAGE_ATTACHMENTS;
+                
+        return (MultipartBody)mc.get(propertyName);
     }
     
     public static List<Attachment> getAttachments(MessageContext mc, 
@@ -91,7 +97,7 @@ public final class AttachmentUtils {
         Multipart id = AnnotationUtils.getAnnotation(anns, Multipart.class);
         if (id != null) {
             for (Attachment a : infos) {
-                if (a.getContentId().equals(id.value())) {
+                if (matchAttachmentId(a, id, mt)) {
                     checkMediaTypes(a.getContentType(), id.type());
                     return a;    
                 }
@@ -107,6 +113,17 @@ public final class AttachmentUtils {
         }
         
         return infos.size() > 0 ? infos.get(0) : null; 
+    }
+    
+    private static boolean matchAttachmentId(Attachment at, Multipart mid, MediaType multipartType) {
+        if (at.getContentId().equals(mid.value())) {
+            return true;
+        }
+        ContentDisposition cd = at.getContentDisposition();
+        if (cd != null && mid.value().equals(cd.getParameter("name"))) {
+            return true;
+        }
+        return false;
     }
 
     @SuppressWarnings("unchecked")

@@ -286,7 +286,8 @@ public final class JAXRSUtils {
         
         SortedMap<OperationResourceInfo, MultivaluedMap<String, String>> candidateList = 
             new TreeMap<OperationResourceInfo, MultivaluedMap<String, String>>(
-                new OperationResourceInfoComparator(message));
+                new OperationResourceInfoComparator(message, httpMethod));
+
         MediaType requestType = requestContentType == null 
                                 ? ALL_TYPES : MediaType.valueOf(requestContentType);
         

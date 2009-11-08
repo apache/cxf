@@ -1,0 +1,16 @@
+
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="bookJson"
+Content-Type: application/json; charset=US-ASCII
+Content-Transfer-Encoding: 8bit
+Content-ID: <jsonPart>
+
+{"Book":{"name":"CXF in Action - 1","id":123}}
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="bookXML"
+Content-Type: application/xml
+Content-Transfer-Encoding: 8bit
+Content-ID: <jaxbPart>
+
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Book><name>CXF in Action - 2</name></Book>
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB--

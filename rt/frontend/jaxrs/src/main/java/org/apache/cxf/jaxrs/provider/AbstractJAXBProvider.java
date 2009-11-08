@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxrs.provider;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
@@ -26,7 +28,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -51,7 +58,12 @@ import javax.xml.bind.annotation.XmlAnyElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.validation.Schema;
 
 import org.apache.cxf.common.i18n.BundleUtils;
@@ -62,10 +74,15 @@ import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.StaxStreamFilter;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
@@ -86,6 +103,15 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     protected Map<String, String> jaxbElementClassMap;
     protected boolean unmarshalAsJaxbElement;
     protected boolean marshalAsJaxbElement;
+    
+    protected Map<String, String> outElementsMap;
+    protected Map<String, String> outAppendMap;
+    protected List<String> outDropElements;
+    protected List<String> inDropElements;
+    protected Map<String, String> inElementsMap;
+    protected Map<String, String> inAppendMap;
+    protected Map<String, String> inAppendAttributesMap;
+    private boolean attributesToElements;
     
     private MessageContext mc;
     private Schema schema;
@@ -198,7 +224,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return convertStringToQName(name);
     }
     
-    private QName convertStringToQName(String name) {
+    protected static QName convertStringToQName(String name) {
         int ind1 = name.indexOf('{');
         if (ind1 != 0) {
             return new QName(name);
@@ -535,6 +561,97 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         throw new WebApplicationException(t, r);
     }
     
+    public void setOutTransformElements(Map<String, String> outElements) {
+        this.outElementsMap = outElements;
+    }
+    
+    public void setInAppendElements(Map<String, String> inElements) {
+        this.inAppendMap = inElements;
+    }
+    
+    public void setInAppendAttributes(Map<String, String> inElements) {
+        this.inAppendAttributesMap = inElements;
+    }
+    
+    public void setInTransformElements(Map<String, String> inElements) {
+        this.inElementsMap = inElements;
+    }
+    
+    public void setOutAppendElements(Map<String, String> map) {
+        this.outAppendMap = map;
+    }
+
+    public void setOutDropElements(List<String> dropElementsSet) {
+        this.outDropElements = dropElementsSet;
+    }
+
+    public void setInDropElements(List<String> dropElementsSet) {
+        this.inDropElements = dropElementsSet;
+    }
+    
+    protected static Set<QName> convertToSetOfQNames(List<String> dropEls) {
+        Set<QName> dropElements = Collections.emptySet();
+        if (dropEls != null) {
+            dropElements = new LinkedHashSet<QName>(dropEls.size());
+            for (String val : dropEls) {
+                dropElements.add(convertStringToQName(val));
+            }
+        }
+        return dropElements;
+    }
+    
+    protected XMLStreamReader createTransformReaderIfNeeded(XMLStreamReader reader, InputStream is) {
+        if (inDropElements != null) {
+            Set<QName> dropElements = convertToSetOfQNames(inDropElements);
+            reader = StaxUtils.createFilteredReader(createNewReaderIfNeeded(reader, is),
+                                               new StaxStreamFilter(dropElements.toArray(new QName[]{})));    
+        }
+        if (inElementsMap != null || inAppendMap != null || inAppendAttributesMap != null) {
+            reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
+                                           inElementsMap, inAppendMap, inAppendAttributesMap);
+        }
+        return reader;
+    }
+    
+    protected XMLStreamWriter createTransformWriterIfNeeded(XMLStreamWriter writer,
+                                                            OutputStream os) {
+        if (outElementsMap != null || outDropElements != null 
+            || outAppendMap != null || attributesToElements) {
+            writer = createNewWriterIfNeeded(writer, os);
+            writer = new OutTransformWriter(writer, outElementsMap, outAppendMap,
+                                            outDropElements, attributesToElements);
+        }
+        return writer;
+    }
+    
+    protected XMLStreamReader createNewReaderIfNeeded(XMLStreamReader reader, InputStream is) {
+        return reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
+    }
+    
+    protected XMLStreamWriter createNewWriterIfNeeded(XMLStreamWriter writer, OutputStream os) {
+        return writer == null ? StaxUtils.createXMLStreamWriter(os) : writer;
+    }
+    
+    protected static void convertToMapOfQNames(Map<String, String> map,
+                                               Map<QName, QName> elementsMap,
+                                               Map<String, String> nsMap) {
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                QName lname = convertStringToQName(entry.getKey());
+                QName rname = convertStringToQName(entry.getValue());
+                elementsMap.put(lname, rname);
+                if (nsMap != null) {
+                    nsMap.put(lname.getNamespaceURI(), rname.getNamespaceURI());
+                }
+            }
+        }
+    }
+    
+    
+    public void setAttributesToElements(boolean value) {
+        this.attributesToElements = value;
+    }
+
     @XmlRootElement
     protected static class CollectionWrapper {
         
@@ -576,6 +693,358 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             } else {
                 return theList;
             }
+        }
+        
+    }
+    
+    protected static class OutTransformWriter extends DelegatingXMLStreamWriter {
+        private Map<QName, QName> elementsMap = new HashMap<QName, QName>(5);
+        private Map<QName, QName> appendMap = new HashMap<QName, QName>(5);
+        private Map<String, String> nsMap = new HashMap<String, String>(5);
+        private Set<String> prefixes = new HashSet<String>(2);
+        private Set<String> writtenUris = new HashSet<String>(2);
+        
+        private Set<QName> dropElements;
+        private List<Integer> droppingIndexes = new LinkedList<Integer>();
+        private List<QName> appendedElements = new LinkedList<QName>();
+        private List<Integer> appendedIndexes = new LinkedList<Integer>();
+        private int currentDepth;
+        private boolean attributesToElements;
+        
+        public OutTransformWriter(XMLStreamWriter writer, 
+                                  Map<String, String> outMap,
+                                  Map<String, String> append,
+                                  List<String> dropEls,
+                                  boolean attributesToElements) {
+            super(writer);
+            convertToMapOfQNames(outMap, elementsMap, nsMap);
+            convertToMapOfQNames(append, appendMap, null);
+            dropElements = convertToSetOfQNames(dropEls);
+            this.attributesToElements = attributesToElements;
+        }
+
+        @Override
+        public void writeNamespace(String prefix, String uri) throws XMLStreamException {
+            if (matchesDropped()) {
+                return;
+            }
+            if (writtenUris.contains(uri)) {
+                return;
+            }
+            String value = nsMap.get(uri);
+            if (value != null && value.length() == 0) {
+                return;
+            }
+            super.writeNamespace(prefix, value != null ? value : uri);
+        }
+        
+        @Override
+        public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+            currentDepth++;
+            QName currentQName = new QName(uri, local);
+            
+            QName appendQName = appendMap.get(currentQName);
+            if (appendQName != null && !appendedElements.contains(appendQName)) {
+                currentDepth++;
+                String theprefix = uri.equals(appendQName.getNamespaceURI()) ? prefix : "";
+                write(new QName(appendQName.getNamespaceURI(), appendQName.getLocalPart(), theprefix));
+                if (theprefix.length() > 0) {
+                    super.writeNamespace(theprefix, uri);
+                    writtenUris.add(uri);
+                }
+                appendedElements.add(appendQName);
+                appendedIndexes.add(currentDepth - 2);
+            }
+            
+            if (dropElements.contains(currentQName)) {
+                droppingIndexes.add(currentDepth - 1);
+                return;
+            }
+            write(new QName(uri, local, prefix));
+        }
+        
+        @Override
+        public void writeEndElement() throws XMLStreamException {
+            --currentDepth;
+            if (indexRemoved(droppingIndexes)) {
+                return;
+            }
+            super.writeEndElement();
+            if (indexRemoved(appendedIndexes)) {
+                super.writeEndElement();
+            }
+        }
+        
+        @Override
+        public void writeCharacters(String text) throws XMLStreamException {
+            if (matchesDropped()) {
+                return;
+            }
+            super.writeCharacters(text);
+        }
+        
+        private void write(QName qname) throws XMLStreamException {
+            QName name = elementsMap.get(qname);
+            if (name == null) {
+                name = qname;
+            }
+            boolean writeNs = false;
+            String prefix = "";
+            if (name.getNamespaceURI().length() > 0) {
+                if (qname.getPrefix().length() == 0) {
+                    prefix = findUniquePrefix();
+                    writeNs = true;
+                } else {
+                    prefix = qname.getPrefix();
+                    prefixes.add(prefix);
+                }
+                prefixes.add(prefix);
+            }
+            super.writeStartElement(prefix, name.getLocalPart(), name.getNamespaceURI());
+            if (writeNs) {
+                this.writeNamespace(prefix, name.getNamespaceURI());
+            }
+        }
+        
+        private String findUniquePrefix() {
+            
+            int i = 0;
+            while (true) {
+                if (!prefixes.contains("ps" + ++i)) {
+                    return "ps" + i;
+                }
+            }
+        }
+        
+        private boolean matchesDropped() {
+            int size = droppingIndexes.size();
+            if (size > 0 && droppingIndexes.get(size - 1) == currentDepth - 1) {
+                return true;
+            }
+            return false;
+        }
+        
+        private boolean indexRemoved(List<Integer> indexes) {
+            int size = indexes.size();
+            if (size > 0 && indexes.get(size - 1) == currentDepth) {
+                indexes.remove(size - 1);
+                return true;
+            }
+            return false;
+        }
+        
+        @Override
+        public NamespaceContext getNamespaceContext() {
+            return new DelegatingNamespaceContext(super.getNamespaceContext(), nsMap);
+        }
+        
+        @Override
+        public void writeAttribute(String uri, String local, String value) throws XMLStreamException {
+            if (!attributesToElements) {
+                super.writeAttribute(uri, local, value);
+            } else {
+                writeAttributeAsElement(uri, local, value);
+            }
+        }
+
+        @Override
+        public void writeAttribute(String local, String value) throws XMLStreamException {
+            if (!attributesToElements) {
+                super.writeAttribute(local, value);
+            } else {
+                writeAttributeAsElement("", local, value);
+            }
+        }
+        
+        private void writeAttributeAsElement(String uri, String local, String value)
+            throws XMLStreamException {
+            this.writeStartElement(uri, local);
+            this.writeCharacters(value);
+            this.writeEndElement();
+        }
+    }
+    
+    private static class AttributeValue {
+        private String name;
+        private String value;
+        
+        public AttributeValue(String n, String v) {
+            this.name = n;
+            this.value = v;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        public String getValue() {
+            return value;
+        }
+    }
+    
+    protected static class InTransformReader extends DepthXMLStreamReader {
+        
+        private static final String INTERN_NAMES = "org.codehaus.stax2.internNames";
+        private static final String INTERN_NS = "org.codehaus.stax2.internNsUris";
+        
+        private Map<QName, QName> inElementsMap = new HashMap<QName, QName>(5);
+        private Map<QName, QName> inAppendMap = new HashMap<QName, QName>(5);
+        private Map<String, String> nsMap = new HashMap<String, String>(5);
+        private MultivaluedMap<QName, AttributeValue> inAttributes;
+        private QName currentQName;
+        private QName previousQName;
+        private List<AttributeValue> currentAttributes;
+        private int previousDepth = -1;
+        
+        public InTransformReader(XMLStreamReader reader, 
+                                 Map<String, String> inMap,
+                                 Map<String, String> appendMap,
+                                 Map<String, String> appendAttrMap) {
+            super(reader);
+            convertToMapOfQNames(inMap, inElementsMap, nsMap);
+            convertToMapOfQNames(appendMap, inAppendMap, null);
+            convertToMapOfAttributes(appendAttrMap);
+        }
+        
+        private void convertToMapOfAttributes(Map<String, String> map) {
+            if (map != null) {
+                inAttributes = new MetadataMap<QName, AttributeValue>();
+                for (Map.Entry<String, String> entry : map.entrySet()) {
+                    QName lname = convertStringToQName(entry.getKey());
+                    String[] values = entry.getValue().split(":");
+                    inAttributes.add(lname, new AttributeValue(values[0], values[1]));
+                }
+            }
+        }
+        
+        public int getAttributeCount() {
+            return currentAttributes == null ? super.getAttributeCount() 
+                : currentAttributes.size() + super.getAttributeCount();
+        }
+
+        public String getAttributeLocalName(int ind) {
+            if (currentAttributes == null) {
+                return super.getAttributeLocalName(ind);
+            } else {
+                int count = super.getAttributeCount();
+                return ind < count ? super.getAttributeLocalName(ind) 
+                    : currentAttributes.get(ind - count).getName(); 
+            }
+        }
+
+        public String getAttributeNamespace(int ind) {
+            return currentAttributes == null ? reader.getAttributeNamespace(ind) : "";
+        }
+
+        public String getAttributeValue(int ind) {
+            if (currentAttributes == null) {
+                return super.getAttributeValue(ind);
+            } else {
+                int count = super.getAttributeCount();
+                return ind < count ? super.getAttributeValue(ind) 
+                    : currentAttributes.get(ind - count).getValue(); 
+            }
+        }
+
+        public int next() throws XMLStreamException {
+            currentAttributes = null;
+            if (currentQName != null) {
+                return XMLStreamConstants.START_ELEMENT;
+            } else if (previousDepth != -1 && previousDepth == getDepth() + 1) {
+                previousDepth = -1;
+                return XMLStreamConstants.END_ELEMENT;
+            } else {
+                return super.next();
+            }
+        }
+        
+        public Object getProperty(String name) throws IllegalArgumentException {
+
+            if (INTERN_NAMES.equals(name) || INTERN_NS.equals(name)) {
+                return Boolean.FALSE;
+            }
+            return super.getProperty(name);
+        }
+
+        public String getLocalName() {
+            QName cQName = getCurrentName();
+            if (cQName != null) {
+                String name = cQName.getLocalPart();
+                resetCurrentQName();
+                return name;
+            }
+            return super.getLocalName();
+        }
+
+        private QName getCurrentName() {
+            return currentQName != null ? currentQName 
+                : previousQName != null ? previousQName : null;
+        }
+        
+        private void resetCurrentQName() {
+            currentQName = previousQName;
+            previousQName = null;
+        }
+        
+        public NamespaceContext getNamespaceContext() {
+            return new DelegatingNamespaceContext(super.getNamespaceContext(), nsMap);
+        }
+
+        public String getNamespaceURI() {
+         
+            QName theName = readCurrentElement();
+            if (inAttributes != null) {
+                currentAttributes = inAttributes.remove(theName);
+            }
+            QName appendQName = inAppendMap.remove(theName);
+            if (appendQName != null) {
+                previousDepth = getDepth();
+                previousQName = theName;
+                currentQName = appendQName;
+                return currentQName.getNamespaceURI();
+            }
+            QName expected = inElementsMap.get(theName);
+            if (expected == null) {
+                return theName.getNamespaceURI();
+            }
+            currentQName = expected;
+            return currentQName.getNamespaceURI();
+        }
+        
+        private QName readCurrentElement() {
+            if (currentQName != null) {
+                return currentQName;
+            }
+            String ns = super.getNamespaceURI();
+            String name = super.getLocalName();
+            return new QName(ns, name);
+        }
+    }
+
+    private static class DelegatingNamespaceContext implements NamespaceContext {
+
+        private NamespaceContext nc;
+        private Map<String, String> nsMap;
+        
+        public DelegatingNamespaceContext(NamespaceContext nc, Map<String, String> nsMap) {
+            this.nc = nc;
+            this.nsMap = nsMap;
+        }
+        
+        public String getNamespaceURI(String prefix) {
+            return nc.getNamespaceURI(prefix);
+        }
+
+        public String getPrefix(String ns) {
+            String value = nsMap.get(ns);
+            if (value != null && value.length() == 0) {
+                return null;
+            }
+            return value != null ? nc.getPrefix(value) : nc.getPrefix(ns);
+        }
+
+        public Iterator getPrefixes(String ns) {
+            return nc.getPrefixes(ns);
         }
         
     }

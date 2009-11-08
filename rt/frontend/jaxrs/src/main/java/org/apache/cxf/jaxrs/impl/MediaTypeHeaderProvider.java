@@ -65,7 +65,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                     throw new IllegalArgumentException("Wrong media type  parameter, seperator is missing");
                 }
                 parameters.put(token.substring(0, equalSign).trim().toLowerCase(), 
-                               token.substring(equalSign + 1).trim().toLowerCase());
+                               token.substring(equalSign + 1).trim());
             }
             
         }
