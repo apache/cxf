@@ -42,6 +42,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.JAXBElementProviderTest.TagVO2Holder;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
@@ -53,7 +54,7 @@ import org.apache.cxf.jaxrs.resources.Tags;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-
+//CHECKSTYLE:OFF
 public class JSONProviderTest extends Assert {
 
     @Test
@@ -105,6 +106,22 @@ public class JSONProviderTest extends Assert {
         Object tagsObject = p.readFrom((Class)TagVO.class, null, null, 
                                           null, null, new ByteArrayInputStream(bytes));
         TagVO tag = (TagVO)tagsObject;
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testReadFromQualifiedTag() throws Exception {
+        JSONProvider p = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns1");
+        p.setNamespaceMap(namespaceMap);
+        byte[] bytes = "{\"ns1.thetag\":{\"group\":\"b\",\"name\":\"a\"}}"
+            .getBytes();
+        Object tagsObject = p.readFrom((Class)TagVO2.class, null, null, 
+                                          null, null, new ByteArrayInputStream(bytes));
+        TagVO2 tag = (TagVO2)tagsObject;
         assertEquals("a", tag.getName());
         assertEquals("b", tag.getGroup());
     }
@@ -516,8 +533,346 @@ public class JSONProviderTest extends Assert {
             "{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}",
             s);
     }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInDropElement() throws Exception {
+        String data = "{\"Extra\":{\"ManyTags\":{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}}}";
+        JSONProvider provider = new JSONProvider();
+        provider.setInDropElements(Collections.singletonList("Extra"));
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                      new MetadataMap<String, String>(), is);
+        ManyTags holder = (ManyTags)o;
+        assertNotNull(holder);    
+        TagVO tag = holder.getTags().getTags().get(0);
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
     
+    @Test
+    public void testInAppendElementNoNs() throws Exception {
+        String data = "{\"tags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}";
+        readAppendElementsNoNs(data, Collections.singletonMap("tags", "ManyTags"));
+    }
+    
+    @Test
+    public void testInAppendElementNoNs2() throws Exception {
+        String data = "{\"ManyTags\":{\"list\":[{\"group\":\"b\",\"name\":\"a\"}]}}";
+        readAppendElementsNoNs(data, Collections.singletonMap("list", "tags"));
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readAppendElementsNoNs(String data, Map<String, String> appendMap) throws Exception {
+        JSONProvider provider = new JSONProvider();
+        provider.setInAppendElements(appendMap);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                      new MetadataMap<String, String>(), is);
+        ManyTags holder = (ManyTags)o;
+        assertNotNull(holder);    
+        TagVO tag = holder.getTags().getTags().get(0);
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @Test
+    public void testInNsElementFromLocal() throws Exception {
+        String data = "{thetag:{\"group\":\"B\",\"name\":\"A\"}}";
+        readTagVO2AfterTransform(data, "thetag");
+    }
+    
+    @Test
+    public void testInNsElementFromNsElement() throws Exception {
+        String data = "{t.thetag2:{\"group\":\"B\",\"name\":\"A\"}}";
+        readTagVO2AfterTransform(data, "{http://bar}thetag2");
+    }
+    
+    @Test
+    public void testInLocalFromLocal() throws Exception {
+        String data = "{thetag:{\"group\":\"B\",\"name\":\"A\"}}";
+        readTagVOAfterTransform(data, "thetag");
+    }
+    
+    @Test
+    public void testInLocalFromNsElement() throws Exception {
+        String data = "{t.thetag2:{\"group\":\"B\",\"name\":\"A\"}}";
+        readTagVOAfterTransform(data, "{http://bar}thetag2");
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInAppendAttributes() throws Exception {
+        String data = "{t.tagholder:{t.thetag:{\"group\":\"B\",\"name\":\"A\"}}}";
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://tags", "t");
+        provider.setNamespaceMap(nsmap);
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}tagholder", "attr:custom");
+        provider.setInAppendAttributes(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
+                      new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        assertEquals("custom", holder.getAttribute());
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyValue, "{http://tags}thetag");
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://bar", "t");
+        provider.setNamespaceMap(nsmap);
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2.class, TagVO2.class,
+                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, String>(),
+                      is);
+        TagVO2 tag2 = (TagVO2)o;
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testInNsElementsFromLocals() throws Exception {
+        String data = "{tagholder:{thetag:{\"group\":\"B\",\"name\":\"A\"}}}";
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagholder", "{http://tags}tagholder");
+        map.put("thetag", "{http://tags}thetag");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @Test
+    public void testOutAttributesAsElements() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "thetag");
+        map.put("{http://tags}tagholder", "tagholder");
+        provider.setOutTransformElements(map);
+        provider.setAttributesToElements(true);
+        TagVO2 tag = new TagVO2("A", "B");
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
         
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(holder, TagVO2Holder.class, TagVO2Holder.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = 
+            "{\"tagholder\":{\"attr\":\"attribute\",\"thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyValue, "tagVO");
+        provider.setInTransformElements(map);
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://bar", "t");
+        provider.setNamespaceMap(nsmap);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO.class, TagVO.class,
+                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, String>(),
+                      is);
+        TagVO tag2 = (TagVO)o;
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    
+    @Test
+    @Ignore
+    // name:A is lost
+    public void testDropElementsIgnored() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        List<String> list = new ArrayList<String>();
+        list.add("ManyTags");
+        list.add("list");
+        list.add("tags");
+        provider.setOutDropElements(list);
+        ManyTags many = new ManyTags();
+        Tags tags = new Tags();
+        tags.addTag(new TagVO("A", "B"));
+        tags.addTag(new TagVO("C", "D"));
+        many.setTags(tags);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(many, ManyTags.class, ManyTags.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        System.out.println(bos.toString());
+    }
+ 
+    @Test
+    public void testDropElements() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        List<String> list = new ArrayList<String>();
+        list.add("ManyTags");
+        list.add("tags");
+        provider.setOutDropElements(list);
+        ManyTags many = new ManyTags();
+        Tags tags = new Tags();
+        tags.addTag(new TagVO("A", "B"));
+        tags.addTag(new TagVO("C", "D"));
+        many.setTags(tags);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(many, ManyTags.class, ManyTags.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"list\":[{\"group\":\"B\",\"name\":\"A\"},"
+            + "{\"group\":\"D\",\"name\":\"C\"}]}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    
+    @Test
+    public void testDropQualifiedElements() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        List<String> list = new ArrayList<String>();
+        list.add("{http://tags}thetag");
+        list.add("name");
+        provider.setOutDropElements(list);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"group\":\"B\"}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendNsElementBeforeLocal() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "{http://tagsvo2}t");
+        provider.setOutAppendElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ps1.t\":{\"tagVO\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendLocalBeforeLocal() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "supertag");
+        provider.setOutAppendElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"supertag\":{\"tagVO\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendElementsSameNs() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tags}t");
+        provider.setOutAppendElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ns1.t\":{\"ns1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendElementsDiffNs() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tagsvo2}t");
+        provider.setOutAppendElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ps1.t\":{\"ns1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalNsToLocalNs() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tagsvo2}t");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ns2.t\":{\"group\":\"B\",\"name\":\"A\"}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+
+    @Test
+    public void testOutElementsMapLocalNsToLocal() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "t");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"t\":{\"group\":\"B\",\"name\":\"A\"}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalToLocalNs() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> namespaceMap = new HashMap<String, String>();
+        namespaceMap.put("http://tags", "ns1");
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "{http://tags}thetag");
+        provider.setOutTransformElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"ps1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalToLocal() throws Exception {
+        JSONProvider provider = new JSONProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "supertag");
+        map.put("group", "group2");
+        provider.setOutTransformElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "{\"supertag\":{\"group2\":\"B\",\"name\":\"A\"}}";
+        assertEquals(expected, bos.toString());
+    }
+    
     private TagVO createTag(String name, String group) {
         return new TagVO(name, group);
     }
@@ -577,6 +932,5 @@ public class JSONProviderTest extends Assert {
         }
     }
 
-    
-
 }
+//CHECKSTYLE:ON

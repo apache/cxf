@@ -44,6 +44,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.namespace.QName;
@@ -60,8 +63,11 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.index.TestBean;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
+import org.apache.cxf.jaxrs.resources.ManyTags;
 import org.apache.cxf.jaxrs.resources.SuperBook;
+import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
+import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -350,6 +356,328 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
+    public void testInNsElementFromLocal() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<thetag><group>B</group><name>A</name></thetag>";
+        readTagVO2AfterTransform(data, "thetag");
+    }
+    
+    @Test
+    public void testInNsElementFromNsElement() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<t:thetag2 xmlns:t=\"http://bar\"><group>B</group><name>A</name></t:thetag2>";
+        readTagVO2AfterTransform(data, "{http://bar}thetag2");
+    }
+    
+    @Test
+    public void testInAppendElementNoNs() throws Exception {
+        String data = "<tags><list><group>b</group><name>a</name></list></tags>";
+        readAppendElementsNoNs(data, Collections.singletonMap("tags", "ManyTags"));
+    }
+    
+    @Test
+    public void testInAppendElementNoNs2() throws Exception {
+        String data = "<ManyTags><list><group>b</group><name>a</name></list></ManyTags>";
+        readAppendElementsNoNs(data, Collections.singletonMap("list", "tags"));
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readAppendElementsNoNs(String data, Map<String, String> appendMap) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setInAppendElements(appendMap);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        ManyTags holder = (ManyTags)o;
+        assertNotNull(holder);    
+        TagVO tag = holder.getTags().getTags().get(0);
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInAppendAttributes() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ns1:tagholder xmlns:ns1=\"http://tags\">"
+            + "<ns1:thetag><group>B</group><name>A</name></ns1:thetag></ns1:tagholder>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}tagholder", "attr:custom");
+        provider.setInAppendAttributes(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        assertEquals("custom", holder.getAttribute());
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());
+    }
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testInDropElement() throws Exception {
+        String data = "<Extra><ManyTags><tags><list><group>b</group><name>a</name></list></tags>"
+            + "</ManyTags></Extra>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setInDropElements(Collections.singletonList("Extra"));
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)ManyTags.class, ManyTags.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        ManyTags holder = (ManyTags)o;
+        assertNotNull(holder);    
+        TagVO tag = holder.getTags().getTags().get(0);
+        assertEquals("a", tag.getName());
+        assertEquals("b", tag.getGroup());
+    }
+        
+    @Test
+    public void testInLocalFromLocal() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<thetag><group>B</group><name>A</name></thetag>";
+        readTagVOAfterTransform(data, "thetag");
+    }
+    
+    
+    @Test
+    public void testInLocalFromNsElement() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<t:thetag2 xmlns:t=\"http://bar\"><group>B</group><name>A</name></t:thetag2>";
+        readTagVOAfterTransform(data, "{http://bar}thetag2");
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyValue, "{http://tags}thetag");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2.class, TagVO2.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2 tag2 = (TagVO2)o;
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testInNsElementsFromLocals() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagholder", "{http://tags}tagholder");
+        map.put("thetag", "{http://tags}thetag");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put(keyValue, "tagVO");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO.class, TagVO.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO tag2 = (TagVO)o;
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @Test
+    public void testOutAttributesAsElements() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "thetag");
+        map.put("{http://tags}tagholder", "tagholder");
+        provider.setOutTransformElements(map);
+        provider.setAttributesToElements(true);
+        TagVO2 tag = new TagVO2("A", "B");
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(holder, TagVO2Holder.class, TagVO2Holder.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?><tagholder><attr>attribute</attr>"
+            + "<thetag><group>B</group><name>A</name></thetag></tagholder>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendElementsDiffNs() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tagsvo2}t");
+        provider.setOutAppendElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?><ps1:t xmlns:ps1=\"http://tagsvo2\">"
+            + "<ns2:thetag xmlns:ns2=\"http://tags\"><group>B</group><name>A</name></ns2:thetag></ps1:t>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendNsElementBeforeLocal() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "{http://tagsvo2}t");
+        provider.setOutAppendElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?><ps1:t xmlns:ps1=\"http://tagsvo2\">"
+            + "<tagVO><group>B</group><name>A</name></tagVO></ps1:t>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendLocalBeforeLocal() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "supertag");
+        provider.setOutAppendElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<supertag><tagVO><group>B</group><name>A</name></tagVO></supertag>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutAppendElementsSameNs() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tags}t");
+        provider.setOutAppendElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ns2:t xmlns:ns2=\"http://tags\"><ns2:thetag><group>B</group><name>A</name></ns2:thetag>"
+            + "</ns2:t>";
+        assertEquals(expected, bos.toString());
+    }
+    
+        
+    @Test
+    public void testOutElementsMapLocalNsToLocalNs() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "{http://tagsvo2}t");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ns2:t xmlns:ns2=\"http://tagsvo2\"><group>B</group><name>A</name></ns2:t>";
+        assertEquals(expected, bos.toString());
+        
+    }
+    
+    @Test
+    public void testOutElementsMapLocalNsToLocal() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}thetag", "t");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<t><group>B</group><name>A</name></t>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalToLocalNs() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "{http://tags}thetag");
+        provider.setOutTransformElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ps1:thetag xmlns:ps1=\"http://tags\"><group>B</group><name>A</name></ps1:thetag>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalToLocal() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("tagVO", "thetag");
+        map.put("group", "group2");
+        provider.setOutTransformElements(map);
+        TagVO tag = new TagVO("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO.class, TagVO.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<thetag><group2>B</group2><name>A</name></thetag>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testDropElements() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        List<String> list = new ArrayList<String>();
+        list.add("tagVO");
+        list.add("ManyTags");
+        list.add("list");
+        provider.setOutDropElements(list);
+        ManyTags many = new ManyTags();
+        Tags tags = new Tags();
+        tags.addTag(new TagVO("A", "B"));
+        tags.addTag(new TagVO("C", "D"));
+        many.setTags(tags);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(many, ManyTags.class, ManyTags.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<tags><group>B</group><name>A</name><group>D</group><name>C</name></tags>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testDropQualifiedElements() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        List<String> list = new ArrayList<String>();
+        list.add("{http://tags}thetag");
+        list.add("name");
+        provider.setOutDropElements(list);
+        TagVO2 tag = new TagVO2("A", "B");
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(tag, TagVO2.class, TagVO2.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<group>B</group>";
+        assertEquals(expected, bos.toString());
+
+    }
+    
+    @Test
     public void testReadUnqualifiedCollection() throws Exception {
         String data = "<Books><Book><id>123</id><name>CXF in Action</name>"
             + "</Book><Book><id>124</id><name>CXF Rocks</name></Book></Books>";
@@ -617,6 +945,27 @@ public class JAXBElementProviderTest extends Assert {
         public void setSchema(Schema schema) {
             // TODO Auto-generated method stub
             
+        }
+        
+    }
+    
+    @XmlRootElement(name = "tagholder", namespace = "http://tags")
+    public static class TagVO2Holder {
+        @XmlElement(name = "thetag", namespace = "http://tags")
+        private TagVO2 t;
+        @XmlAttribute
+        private String attr = "attribute"; 
+        
+        public void setTag(TagVO2 tag) {
+            this.t = tag;
+        }
+
+        public TagVO2 getTagValue() {
+            return t;
+        }
+
+        public String getAttribute() {
+            return attr;
         }
         
     }

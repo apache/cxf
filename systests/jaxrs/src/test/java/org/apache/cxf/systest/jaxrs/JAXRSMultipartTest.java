@@ -89,6 +89,30 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookJSONForm() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/jsonform";
+        doAddFormBook(address, "attachmentFormJson", 200);               
+    }
+    
+    @Test
+    public void testBookJaxbForm() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/jaxbform";
+        doAddFormBook(address, "attachmentFormJaxb", 200);               
+    }
+    
+    @Test
+    public void testBookJSONJAXBForm() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/jsonjaxbform";
+        doAddFormBook(address, "attachmentFormJsonJaxb", 200);               
+    }
+    
+    @Test
+    public void testBookJSONFormFiles() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/filesform";
+        doAddFormBook(address, "attachmentFormJsonFiles", 200);               
+    }
+    
+    @Test
     public void testBookAsMessageContextAttachment() throws Exception {
         String address = "http://localhost:9085/bookstore/books/attachment";
         doAddBook(address, "attachmentData", 200);               
@@ -380,6 +404,30 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         
         String ct = type + "; type=\"text/xml\"; " + "start=\"rootPart\"; "
             + "boundary=\"----=_Part_4_701508.1145579811786\"";
+        post.setRequestHeader("Content-Type", ct);
+        InputStream is = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);
+        RequestEntity entity = new InputStreamRequestEntity(is);
+        post.setRequestEntity(entity);
+        HttpClient httpclient = new HttpClient();
+        
+        try {
+            int result = httpclient.executeMethod(post);
+            assertEquals(status, result);
+            if (status == 200) {
+                InputStream expected = getClass().getResourceAsStream("resources/expected_add_book.txt");
+                assertEquals(getStringFromInputStream(expected), post.getResponseBodyAsString());
+            }
+        } finally {
+            // Release current connection to the connection pool once you are done
+            post.releaseConnection();
+        }
+    }
+    
+    private void doAddFormBook(String address, String resourceName, int status) throws Exception {
+        PostMethod post = new PostMethod(address);
+        
+        String ct = "multipart/form-data; boundary=bqJky99mlBWa-ZuqjC53mG6EzbmlxB";
         post.setRequestHeader("Content-Type", ct);
         InputStream is = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/" + resourceName);

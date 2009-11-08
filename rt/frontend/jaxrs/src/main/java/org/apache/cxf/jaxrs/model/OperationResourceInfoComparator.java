@@ -28,10 +28,12 @@ import org.apache.cxf.message.Message;
 
 public class OperationResourceInfoComparator implements Comparator<OperationResourceInfo> {
     
+    private static final String HEAD_METHOD = "HEAD";
+    private boolean headMethod;
     private Message message;
-    private ResourceComparator rc; 
+    private ResourceComparator rc;    
 
-    public OperationResourceInfoComparator(Message m) {
+    public OperationResourceInfoComparator(Message m, String method) {
         this.message = m;
         if (message != null) {
             Object o = m.getExchange().get(Endpoint.class).get("org.apache.cxf.jaxrs.comparator");
@@ -39,6 +41,7 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
                 rc = (ResourceComparator)o;
             }
         }
+        headMethod = HEAD_METHOD.equals(method);
     }
     
     public int compare(OperationResourceInfo e1, OperationResourceInfo e2) {
@@ -54,6 +57,15 @@ public class OperationResourceInfoComparator implements Comparator<OperationReso
             || e1.getHttpMethod() == null && e2.getHttpMethod() != null) {
             // subresource method takes precedence over a subresource locator
             return e1.getHttpMethod() != null ? -1 : 1;
+        }
+        
+        if (headMethod) {
+            if (HEAD_METHOD.equals(e1.getHttpMethod())) {
+                return -1;
+            } else if (HEAD_METHOD.equals(e2.getHttpMethod())) {
+                return 1;
+            }
+                
         }
 
             

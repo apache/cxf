@@ -38,6 +38,7 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
@@ -240,6 +241,18 @@ public class BookStore {
     public Book getBookByHeader(@DefaultValue("123") @HeaderParam("BOOK2") String id) 
         throws Exception {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/getheadbook/")
+    public Book getBookGetHead() throws Exception {
+        return doGetBook("123");
+    }
+    
+    @HEAD
+    @Path("/getheadbook/")
+    public Response getBookGetHead2() throws Exception {
+        return Response.ok().header("HEAD_HEADER", "HEAD_HEADER_VALUE").build();
     }
     
     

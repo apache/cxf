@@ -55,7 +55,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     
@@ -386,28 +386,44 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBook123WebClient() throws Exception {
+    public void testGetHeadBook123WebClient() throws Exception {
+        String address = "http://localhost:9080/bookstore/getheadbook/";
+        WebClient client = WebClient.create(address);
+        Response r = client.head();
+        assertEquals("HEAD_HEADER_VALUE", r.getMetadata().getFirst("HEAD_HEADER"));
+    }
+    
+    @Test
+    public void testGetHeadBook123WebClient2() throws Exception {
+        String address = "http://localhost:9080/bookstore/getheadbook/";
+        WebClient client = WebClient.create(address);
+        Book b = client.get(Book.class);
+        assertEquals(b.getId(), 123L);
+    }
+    
+    @Test
+    public void testGetBook123WithProxy() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
         Book b = bs.getBook("123");
         assertEquals(b.getId(), 123);
     }
     
     @Test
-    public void testDeleteWithWebClient() throws Exception {
+    public void testDeleteWithProxy() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
         Response r = bs.deleteBook("123");
         assertEquals(200, r.getStatus());
     }
     
     @Test
-    public void testCreatePut() throws Exception {
+    public void testCreatePutWithProxy() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
         Response r = bs.createBook(777L);
         assertEquals(200, r.getStatus());
     }
     
     @Test
-    public void testUpdateWithWebClient() throws Exception {
+    public void testUpdateWithProxy() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
         Book book = new Book();
         book.setId(888);
@@ -426,6 +442,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/*", 
                                "application/xml", 200);
     }
+    
     
     @Test
     public void testGetBook123() throws Exception {
@@ -552,7 +569,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings(
             "http://localhost:9080/bookstore/booksubresourceobject/123/chaptersobject/sub/1",
             "resources/expected_get_chapter1.txt", "application/xml",
-            "application/xml;charset=iso-8859-1", 200);
+            "application/xml;charset=ISO-8859-1", 200);
     }
     
     @Test
@@ -560,7 +577,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/1",
                                "resources/expected_get_chapter1.txt",
-                               "application/xml", "application/xml;charset=iso-8859-1", 200);
+                               "application/xml", "application/xml;charset=ISO-8859-1", 200);
     }
     
     @Test
@@ -579,7 +596,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/xml", 200);
         getAndCompareAsStrings("http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse2",
                                "resources/expected_get_chapter1.txt",
-                               "application/xml", "application/xml;charset=iso-8859-1", 200);
+                               "application/xml", "application/xml;charset=ISO-8859-1", 200);
     }
     
     @Test
@@ -588,7 +605,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings(
             "http://localhost:9080/bookstore/booksubresource/123/chapters/sub/1/recurse2/ids",
             "resources/expected_get_chapter1.txt",
-            "application/xml", "application/xml;charset=iso-8859-1", 200);
+            "application/xml", "application/xml;charset=ISO-8859-1", 200);
     }
     
     @Test

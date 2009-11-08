@@ -41,7 +41,7 @@ public class ContentDisposition {
             String v = values.get(i).trim();
             if (v.startsWith(name)) {
                 String[] parts = v.split("=");
-                return parts.length == 2 ? parts[1].trim() : ""; 
+                return parts.length == 2 ? parts[1].trim().replace("\"", "").replace("'", "") : ""; 
             }
         }
         return null;
@@ -51,7 +51,8 @@ public class ContentDisposition {
         Map<String, String> map = new LinkedHashMap<String, String>();
         for (int i = 1; i < values.size(); i++) {
             String[] parts = values.get(i).split("=");
-            map.put(parts[0].trim(), parts.length == 2 ? parts[1].trim() : ""); 
+            map.put(parts[0].trim(), parts.length == 2 
+                    ? parts[1].trim().replace("\"", "").replace("'", "") : ""); 
         }
         return map;
     }

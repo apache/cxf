@@ -186,9 +186,9 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
         MessageContext mc = getContext();
         XMLStreamReader reader = mc != null ? mc.getContent(XMLStreamReader.class) : null;
+        reader = createTransformReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
-            reader = reader == null ? StaxUtils.createXMLStreamReader(is) : reader;
-            return new JAXBCollectionWrapperReader(reader);
+            return new JAXBCollectionWrapperReader(createNewReaderIfNeeded(reader, is));
         } else {
             return reader;
         }
@@ -336,7 +336,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }
         }
-        return writer;
+        return createTransformWriterIfNeeded(writer, os);
     }
     
     protected void marshalToOutputStream(Marshaller ms, Object obj, OutputStream os, MediaType mt) 
@@ -379,4 +379,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         
     }
+    
+    
 }

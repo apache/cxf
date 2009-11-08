@@ -61,7 +61,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
 
 @Provider
-@Consumes({"multipart/related", "multipart/mixed", "multipart/alternative" })
+@Consumes({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
 @Produces({"multipart/related", "multipart/mixed", "multipart/alternative" })
 public class MultipartProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
@@ -88,7 +88,9 @@ public class MultipartProvider extends AbstractConfigurableProvider
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, 
                               MediaType mt) {
-        return isSupported(type, genericType, annotations, mt);
+        return isSupported(type, genericType, annotations, mt)
+             || (mt.getType().equals("multipart") && mt.getSubtype().equals("form-data") 
+                && !MultivaluedMap.class.isAssignableFrom(type));
     }
     
     private boolean isSupported(Class<?> type, Type genericType, Annotation[] annotations, 
@@ -119,7 +121,8 @@ public class MultipartProvider extends AbstractConfigurableProvider
         List<Attachment> infos = 
             AttachmentUtils.getAttachments(mc, attachmentDir, attachmentThreshold);
         
-        if (Collection.class.isAssignableFrom(c)) {
+        if (Collection.class.isAssignableFrom(c) 
+            && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {
             Class<?> actual = InjectionUtils.getActualType(t);
             actual = actual != null ? actual : Object.class;
             if (Attachment.class.isAssignableFrom(actual)) {
@@ -152,6 +155,13 @@ public class MultipartProvider extends AbstractConfigurableProvider
         } else if (Attachment.class.isAssignableFrom(c)) {
             return multipart;
         } else {
+            if (mediaTypeSupported(multipart.getContentType())) {
+                mc.put("org.apache.cxf.multipart.embedded", true);
+                mc.put("org.apache.cxf.multipart.embedded.ctype", multipart.getContentType());
+                mc.put("org.apache.cxf.multipart.embedded.input", 
+                       multipart.getDataHandler().getInputStream());
+                anns = new Annotation[]{};
+            }
             MessageBodyReader<Object> r = 
                 mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
             if (r != null) {
