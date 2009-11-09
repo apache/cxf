@@ -20,5 +20,6 @@
 
 SYSTEM "http://schemas.xmlsoap.org/wsdl/" "../../../../../../common/schemas/src/main/resources/schemas/wsdl/wsdl.xsd"
 SYSTEM "http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd" "../../../../../../common/schemas/src/main/resources/schemas/wsdl/wsdl.xsd"
+SYSTEM "http://cxf.apache.org/schemas/configuration/parameterized-types.xsd" "../../../../../../common/schemas/src/main/resources/schemas/configuration/parameterized-types.xsd"
 SYSTEM "http://cxf.apache.org/schemas/configuration/security.xsd" "../../../../../../common/schemas/src/main/resources/schemas/configuration/security.xsd"
 SYSTEM "http://cxf.apache.org/schemas/wsdl/http-conf.xsd" "schemas/wsdl/http-conf.xsd"

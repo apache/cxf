@@ -124,6 +124,9 @@
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
+                                    <extensionArgs>
+                                         <extensionArg>-Xdv</extensionArg>
+                                     </extensionArgs>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
@@ -132,6 +135,18 @@
                         </goals>
                     </execution>
                 </executions>
+                <dependencies>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-xjc-dv</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                    <dependency>
+                        <groupId>org.apache.cxf</groupId>
+                        <artifactId>cxf-common-utilities</artifactId>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>

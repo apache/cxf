@@ -77,10 +77,6 @@ public class ApplicationContextTest extends Assert {
         }
     }
     
-    // This test fails because I think it is trying to read the http-conf.xsd
-    // twice, failing on a duplicate name for 
-    //http://cxf.apache.org/transports/http/configuration,authorization
-    
     @Test
     public void testContext() throws Exception {
         String s4 = getClass()
@@ -90,7 +86,18 @@ public class ApplicationContextTest extends Assert {
             new String[] {S1, S2, S3, s4});
         
         //ctx.refresh();
+        checkContext(ctx);
+    }
+    @Test
+    public void testContextWithProperties() throws Exception {
+        String s4 = getClass()
+            .getResource("/org/apache/cxf/transport/http_jetty/spring/beans-props.xml").toString();
         
+        TestApplicationContext ctx = new TestApplicationContext(
+            new String[] {S1, S2, S3, s4});
+        checkContext(ctx);
+    }
+    private void checkContext(TestApplicationContext ctx) throws Exception {
         ConfigurerImpl cfg = new ConfigurerImpl(ctx);
         
         EndpointInfo info = getEndpointInfo("bla", "Foo", "http://localhost:9000");
@@ -170,4 +177,6 @@ public class ApplicationContextTest extends Assert {
         info2.setAddress(address);
         return info2;
     }
+    
+
 }

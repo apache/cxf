@@ -154,6 +154,10 @@
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/configuration/security.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/configuration/security.xjb</bindingFile>
+                                    <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <extensionArgs>
+                                         <extensionArg>-Xdv</extensionArg>
+                                     </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xsd</xsd>

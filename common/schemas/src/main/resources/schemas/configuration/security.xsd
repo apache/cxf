@@ -26,12 +26,16 @@
            xmlns:tns="http://cxf.apache.org/configuration/security"
            xmlns:beans="http://www.springframework.org/schema/beans"
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xmlns:pt="http://cxf.apache.org/configuration/parameterized-types" 
            xsi:schemaLocation="
                http://www.springframework.org/schema/beans
                http://www.springframework.org/schema/beans/spring-beans.xsd"
            jaxb:version="2.0">
 
     <xs:import namespace="http://www.springframework.org/schema/beans"/>
+    
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
     <xs:complexType name="AuthorizationPolicy">
         <xs:annotation>
@@ -99,14 +103,14 @@
     </xs:complexType>
     
     <xs:complexType name="ClientAuthentication">
-        <xs:attribute name="want"     type="xs:boolean">
+        <xs:attribute name="want"     type="pt:ParameterizedBoolean">
           <xs:annotation>
             <xs:documentation>
             This attribute specifies if client authentication should be requested.
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>
-        <xs:attribute name="required" type="xs:boolean">
+        <xs:attribute name="required" type="pt:ParameterizedBoolean">
           <xs:annotation>
             <xs:documentation>
             This attribute specifies if client authentication should be required.
@@ -429,7 +433,7 @@
               </xs:annotation>
            </xs:element>
         </xs:all>
-           <xs:attribute name="disableCNCheck" type="xs:boolean" default="false">
+           <xs:attribute name="disableCNCheck" type="pt:ParameterizedBoolean" default="false">
              <xs:annotation>
                 <xs:documentation>
                 This attribute specifies if JSSE should omit checking if the

@@ -21,11 +21,14 @@
   xmlns:jms="http://cxf.apache.org/transports/jms" 
   xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" 
-  targetNamespace="http://cxf.apache.org/transports/jms" 
+  targetNamespace="http://cxf.apache.org/transports/jms"
+  xmlns:pt="http://cxf.apache.org/configuration/parameterized-types" 
   elementFormDefault="qualified" jaxb:version="2.0">
   
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/"
         schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+        schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
     <!-- Valid wsdl elements -->
     <xs:element name="client" type="jms:ClientBehaviorPolicyType"/>
@@ -41,8 +44,8 @@
         </xs:annotation>
         <xs:complexContent>
             <xs:extension base="wsdl:tExtensibilityElement">
-        		<xs:attribute name="lowWaterMark" type="xs:int" default="20"/>
-        		<xs:attribute name="highWaterMark" type="xs:int" default="500" />
+        		<xs:attribute name="lowWaterMark" type="pt:ParameterizedInt" default="20"/>
+        		<xs:attribute name="highWaterMark" type="pt:ParameterizedInt" default="500" />
         	</xs:extension>
 		</xs:complexContent>
     </xs:complexType>
@@ -50,13 +53,13 @@
     <xs:complexType name="ClientConfig">
     	<xs:complexContent>
     		<xs:extension base="wsdl:tExtensibilityElement">
-    			<xs:attribute name="clientReceiveTimeout" type="xs:long"
+    			<xs:attribute name="clientReceiveTimeout" type="pt:ParameterizedLong"
     				default="60000" />
-    			<xs:attribute name="messageTimeToLive" type="xs:long"
+    			<xs:attribute name="messageTimeToLive" type="pt:ParameterizedLong"
     				default="0" />
                 <xs:attribute name="conduitSelectorPrefix" type="xs:string" use="optional" default=""/>    				
-                <xs:attribute name="useConduitIdSelector" type="xs:boolean" use="optional"/>
-                <xs:attribute name="enforceSpec" type="xs:boolean" use="optional" default="true"/>
+                <xs:attribute name="useConduitIdSelector" type="pt:ParameterizedBoolean" use="optional"/>
+                <xs:attribute name="enforceSpec" type="pt:ParameterizedBoolean" use="optional" default="true"/>
     		</xs:extension>
     	</xs:complexContent>
     </xs:complexType>
@@ -64,7 +67,7 @@
     <xs:complexType name="ServerConfig">
 		<xs:complexContent>
             <xs:extension base="wsdl:tExtensibilityElement">
-        		<xs:attribute name="messageTimeToLive" type="xs:long" default="0" />
+        		<xs:attribute name="messageTimeToLive" type="pt:ParameterizedLong" default="0" />
         		<xs:attribute name="durableSubscriptionClientId" type="xs:string" />
 			</xs:extension>
 		</xs:complexContent>        	
@@ -85,19 +88,19 @@
             <xs:element name="property" type="jms:JMSPropertyType" minOccurs="0" maxOccurs="unbounded"/>
         </xs:sequence>
         <xs:attribute name="JMSCorrelationID" type="xs:string"/>
-        <xs:attribute name="JMSDeliveryMode" type="xs:int"/>
-        <xs:attribute name="JMSExpiration" type="xs:long"/>
+        <xs:attribute name="JMSDeliveryMode" type="pt:ParameterizedInt"/>
+        <xs:attribute name="JMSExpiration" type="pt:ParameterizedLong"/>
         <xs:attribute name="JMSMessageID" type="xs:string"/>
-        <xs:attribute name="JMSPriority" type="xs:int"/>
-        <xs:attribute name="JMSRedelivered" type="xs:boolean"/>
+        <xs:attribute name="JMSPriority" type="pt:ParameterizedInt"/>
+        <xs:attribute name="JMSRedelivered" type="pt:ParameterizedBoolean"/>
         <xs:attribute name="JMSReplyTo" type="xs:string"/>
-        <xs:attribute name="JMSTimeStamp" type="xs:long"/>
+        <xs:attribute name="JMSTimeStamp" type="pt:ParameterizedLong"/>
         <xs:attribute name="JMSType" type="xs:string"/>
-        <xs:attribute name="TimeToLive" type="xs:long"/>
+        <xs:attribute name="TimeToLive" type="pt:ParameterizedLong"/>
     </xs:complexType>
     
     <xs:simpleType name="JMSClientReceiveTimeOut">
-        <xs:restriction base="xs:long"/>
+        <xs:restriction base="pt:ParameterizedLong"/>
     </xs:simpleType>
     
     <xs:simpleType name="DestinationStyleType">
@@ -221,8 +224,8 @@
     					</xs:documentation>
     				</xs:annotation>
     			</xs:attribute>
-    			<xs:attribute name="useJms11" type="xs:boolean" use="optional"/>
-    			<xs:attribute name="reconnectOnException" type="xs:boolean" use="optional"/>
+    			<xs:attribute name="useJms11" type="pt:ParameterizedBoolean" use="optional"/>
+    			<xs:attribute name="reconnectOnException" type="pt:ParameterizedBoolean" use="optional"/>
     		</xs:extension>
     	</xs:complexContent>
     </xs:complexType>
@@ -257,14 +260,14 @@
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="useMessageIDAsCorrelationID" type="xs:boolean" default="false">
+                <xs:attribute name="useMessageIDAsCorrelationID" type="pt:ParameterizedBoolean" default="false">
                     <xs:annotation>
                         <xs:documentation>
                           Flag to indicate whether to use JMS Message Id as correlation ID. It is serverside only so should go in ServerPolicy
                         </xs:documentation>
                     </xs:annotation>
                 </xs:attribute>
-                <xs:attribute name="transactional" type="xs:boolean" default="false">
+                <xs:attribute name="transactional" type="pt:ParameterizedBoolean" default="false">
                     <xs:annotation>
                         <xs:documentation>
                           Flag to specify whether to use JMS transaction support on server side.

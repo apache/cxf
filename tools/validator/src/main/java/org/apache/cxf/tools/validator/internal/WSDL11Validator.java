@@ -45,6 +45,7 @@ import org.xml.sax.InputSource;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -174,10 +175,23 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         return dir;
     }
 
+        
     protected List<InputSource> getDefaultSchemas() throws IOException {
         List<InputSource> xsdList = new ArrayList<InputSource>();
+        URL url = ClassLoaderUtils.getResource("/schemas/configuration/parameterized-types.xsd",
+                                               this.getClass());
+        if (url != null) {
+            InputSource is = new InputSource(url.openStream());
+            is.setSystemId(url.toString());
+            xsdList.add(is);
+        }
+        addDefaultSchemas(ToolConstants.CXF_SCHEMAS_DIR_INJAR, xsdList);
+        
+        return xsdList;
+    }
+    private void addDefaultSchemas(String location, List<InputSource> xsdList) throws IOException {
         ClassLoader clzLoader = Thread.currentThread().getContextClassLoader();
-        Enumeration<URL> urls = clzLoader.getResources(ToolConstants.CXF_SCHEMAS_DIR_INJAR);
+        Enumeration<URL> urls = clzLoader.getResources(location);
         while (urls.hasMoreElements()) {
             URL url = urls.nextElement();
             //from jar files 
@@ -238,7 +252,6 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
         }
         
         sort(xsdList);
-        return xsdList;
     }
 
     private void sort(List<InputSource> list) {

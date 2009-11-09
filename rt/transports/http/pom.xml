@@ -87,6 +87,9 @@
                                     <xsd>${basedir}/src/main/resources/schemas/wsdl/http-conf.xsd</xsd>
                                     <bindingFile>${basedir}/src/main/resources/schemas/wsdl/http-conf.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
+                                    <extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                     <deleteDirs>
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
