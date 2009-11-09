@@ -20,6 +20,7 @@
 
 <xs:schema targetNamespace="http://cxf.apache.org/transports/http/configuration" 
            xmlns:http-conf="http://cxf.apache.org/transports/http/configuration" 
+           xmlns:ptp="http://cxf.apache.org/configuration/parameterized-types" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -30,9 +31,12 @@
 
     <xs:import namespace="http://schemas.xmlsoap.org/wsdl/" 
         schemaLocation="http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd"/>
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+        schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
     <xs:element name="server" type="http-conf:HTTPServerPolicy"/>
     <xs:element name="client" type="http-conf:HTTPClientPolicy"/>
+    
     <xs:element name="contextMatchStrategy" type="xs:string" default="stem"/>
     <xs:element name="fixedParameterOrder"  type="xs:boolean" default="false"/>
     
@@ -163,7 +167,7 @@
         <xs:complexContent>
             <xs:extension base="wsdl:tExtensibilityElement">
 
-                <xs:attribute name="ConnectionTimeout" type="xs:unsignedInt" use="optional" default="30000">
+                <xs:attribute name="ConnectionTimeout" type="ptp:ParameterizedUInt" use="optional" default="30000">
                     <xs:annotation>
                         <xs:documentation>
                         Specifies the amount of time, in milliseconds, that the consumer will attempt to establish a connection before it times out. 0 is infinite.
@@ -171,7 +175,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="ReceiveTimeout" type="xs:unsignedInt" use="optional" default="60000">
+                <xs:attribute name="ReceiveTimeout" type="ptp:ParameterizedUInt" use="optional" default="60000">
                     <xs:annotation>
                         <xs:documentation>
                         Specifies the amount of time, in milliseconds, that the consumer will wait for a response before it times out. 0 is infinite.
@@ -179,7 +183,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="AutoRedirect" type="xs:boolean" use="optional" default="false">
+                <xs:attribute name="AutoRedirect" type="ptp:ParameterizedBoolean" use="optional" default="false">
                     <xs:annotation>
                         <xs:documentation>
                        Specifies if the consumer will automatically follow a server issued redirection.
@@ -188,7 +192,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="MaxRetransmits" type="xs:int" use="optional" default="-1">
+                <xs:attribute name="MaxRetransmits" type="ptp:ParameterizedInt" use="optional" default="-1">
                     <xs:annotation>
                         <xs:documentation>
                         Specifies the maximum amount of retransmits that are allowed for redirects. Retransmits for 
@@ -202,7 +206,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="AllowChunking" type="xs:boolean" use="optional" default="true">
+                <xs:attribute name="AllowChunking" type="ptp:ParameterizedBoolean" use="optional" default="true">
                     <xs:annotation>
                         <xs:documentation>
                         If true, the client is free to use chunking streams if it wants, but it is not 
@@ -211,7 +215,7 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
-                <xs:attribute name="ChunkingThreshold" type="xs:int" use="optional" default="4096">
+                <xs:attribute name="ChunkingThreshold" type="ptp:ParameterizedInt" use="optional" default="4096">
                     <xs:annotation>
                         <xs:documentation>
                         If AllowChunking is true, this sets the threshold at which messages start
@@ -338,7 +342,7 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
-                <xs:attribute name="ProxyServerPort" type="xs:int" use="optional">
+                <xs:attribute name="ProxyServerPort" type="ptp:ParameterizedInt" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                         Specifies the port number used by the proxy server.

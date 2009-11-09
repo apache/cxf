@@ -56,7 +56,7 @@ import com.sun.xml.xsom.XmlString;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * Modifies the JAXB code model to initialise fields mapped from schema elements 
+ * Modifies the JAXB code model to initialize fields mapped from schema elements 
  * with their default value.
  */
 public class DefaultValuePlugin {
@@ -105,11 +105,10 @@ public class DefaultValuePlugin {
                 // Use XML schema object model to determine if field is mapped
                 // from an element (attributes default values are handled
                 // natively) and get its default value.
-
                 XmlString xmlDefaultValue = null;
                 XSType xsType = null;
                 boolean isElement = false;
-
+                boolean isRequiredAttr = true;
                 if (f.getPropertyInfo().getSchemaComponent() instanceof XSParticle) {
                     XSParticle particle = (XSParticle)f.getPropertyInfo().getSchemaComponent();
                     XSTerm term = particle.getTerm();
@@ -126,6 +125,7 @@ public class DefaultValuePlugin {
                     XSAttributeDecl decl = attributeUse.getDecl();
                     xmlDefaultValue = decl.getDefaultValue();                        
                     xsType = decl.getType();
+                    isRequiredAttr = attributeUse.isRequired();
                 }
 
                 
@@ -143,19 +143,30 @@ public class DefaultValuePlugin {
                     }
                 }
 
-                if (null == xmlDefaultValue || null == xmlDefaultValue.value) {
-                    continue;
+                JExpression dvExpr = null;
+                if (null != xmlDefaultValue && null != xmlDefaultValue.value) {
+                    dvExpr = getDefaultValueExpression(f, co, outline, xsType, isElement,
+                                                       xmlDefaultValue, false);
                 }
-                
-                JExpression dvExpr = 
-                    getDefaultValueExpression(f, co, outline, xsType, isElement, xmlDefaultValue);
-                
-                if (null == dvExpr) {
+                 
+                if (null == dvExpr
+                    && !isElement && !isRequiredAttr
+                    && xsType != null && xsType.getOwnerSchema() != null
+                    && !"http://www.w3.org/2001/XMLSchema"
+                        .equals(xsType.getOwnerSchema().getTargetNamespace())) {
+                    //non-primitive attribute, may still be able to convert it, but need to do
+                    //a bunch more checks and changes to setters and isSet and such
+                    dvExpr = 
+                        getDefaultValueExpression(f, co, outline, xsType, isElement, xmlDefaultValue, true);
+                    
+                    updateSetter(co, f, co.implClass);
+                    updateGetter(co, f, co.implClass, dvExpr, true);                    
+                    
+                } else if (null == dvExpr) {
                     continue;
+                } else {
+                    updateGetter(co, f, co.implClass, dvExpr, false);                    
                 }
-                
-                updateGetter(co, f, co.implClass, dvExpr);               
-                
             }
         }
 
@@ -168,11 +179,14 @@ public class DefaultValuePlugin {
                                           Outline outline,
                                           XSType xsType,
                                           boolean isElement,
-                                          XmlString xmlDefaultValue
-                                          ) {
+                                          XmlString xmlDefaultValue,
+                                          boolean unbox) {
         JType type = f.getRawType();
         String typeName = type.fullName();
-        String defaultValue = xmlDefaultValue.value;
+        String defaultValue = xmlDefaultValue == null ? null : xmlDefaultValue.value;
+        if (defaultValue == null) {
+            return null;
+        }
 
         JExpression dv = null;
         
@@ -230,12 +244,39 @@ public class DefaultValuePlugin {
             if (cls.getClassType() == ClassType.ENUM) {
                 dv = cls.staticInvoke("fromValue").arg(defaultValue);
             }
+        } else if (unbox) {
+            typeName = type.unboxify().fullName();
+            if ("int".equals(typeName)) {
+                dv = JExpr.lit(Integer.valueOf(defaultValue).intValue());
+            } else if ("long".equals(typeName)) {
+                dv = JExpr.lit(Long.valueOf(defaultValue).longValue());
+            } else if ("short".equals(typeName)) {
+                dv = JExpr.lit(Short.valueOf(defaultValue).shortValue());
+            } else if ("boolean".equals(typeName)) {
+                dv = JExpr.lit(Boolean.valueOf(defaultValue).booleanValue());
+            } else if ("double".equals(typeName)) {
+                dv = JExpr.lit(Double.valueOf(defaultValue).doubleValue());
+            } else if ("float".equals(typeName)) {
+                dv = JExpr.lit(Float.valueOf(defaultValue).floatValue());
+            } else if ("byte".equals(typeName)) {
+                dv = JExpr.lit(Byte.valueOf(defaultValue).byteValue());
+            } else {
+                dv = getDefaultValueExpression(f,
+                                               co,
+                                               outline,
+                                               xsType,
+                                               true,
+                                               xmlDefaultValue,
+                                               false);
+            }
         }
         // TODO: GregorianCalendar, ...
         return dv;
     }
     
-    private void updateGetter(ClassOutline co, FieldOutline fo, JDefinedClass dc, JExpression dvExpr) {
+    private void updateGetter(ClassOutline co, FieldOutline fo, 
+                              JDefinedClass dc, JExpression dvExpr,
+                              boolean remapRet) {
 
         String fieldName = fo.getPropertyInfo().getName(false);
         JType type = fo.getRawType();
@@ -248,6 +289,9 @@ public class DefaultValuePlugin {
         JDocComment doc = method.javadoc();
         int mods = method.mods().getValue();
         JType mtype = method.type();
+        if (remapRet) {
+            mtype = mtype.unboxify();
+        }
 
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Updating getter: " + getterName);
@@ -260,11 +304,55 @@ public class DefaultValuePlugin {
         method.javadoc().append(doc);
 
         JFieldRef fr = JExpr.ref(fieldName);
+        if (dvExpr != null) {
+            JExpression test = JOp.eq(JExpr._null(), fr);
+            JConditional jc =  method.body()._if(test);
+            jc._then()._return(dvExpr);
+            jc._else()._return(fr);
+        } else {
+            method.body()._return(fr);
+        }
+    }
+    private void updateSetter(ClassOutline co, FieldOutline fo, 
+                              JDefinedClass dc) {
 
-        JExpression test = JOp.eq(JExpr._null(), fr);
-        JConditional jc =  method.body()._if(test);
-        jc._then()._return(dvExpr);
-        jc._else()._return(fr);
+        String fieldName = fo.getPropertyInfo().getName(false);
+        JType type = fo.getRawType();
+        String typeName = type.fullName();
+
+        String getterName = ("java.lang.Boolean".equals(typeName) ? "is" : "get")
+                            + fo.getPropertyInfo().getName(true);
+        JMethod method = dc.getMethod(getterName, new JType[0]);
+        JType mtype = method.type();
+        String setterName = "set" + fo.getPropertyInfo().getName(true);
+        method = dc.getMethod(setterName, new JType[] {mtype});
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Updating setter: " + setterName);
+        }
+        JDocComment doc = method.javadoc();
+        // remove existing method and define new one
+        dc.methods().remove(method);
+
+        int mods = method.mods().getValue();
+        mtype = mtype.unboxify();
+        method = dc.method(mods, method.type(), setterName);
+        
+        method.javadoc().append(doc);
+        method.param(mtype, "value");
+
+        JFieldRef fr = JExpr.ref(fieldName);
+        method.body().assign(fr, JExpr.ref("value"));
+        
+        method = dc.method(mods, method.type(), "unset" + fo.getPropertyInfo().getName(true));
+        method.body().assign(fr, JExpr._null());
+        
+        method = dc.getMethod("isSet" + fo.getPropertyInfo().getName(true), new JType[0]);
+        if (method != null) {
+            //move to end
+            dc.methods().remove(method);
+            dc.methods().add(method);
+        }
+        
     }
 
 }

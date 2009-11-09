@@ -26,6 +26,7 @@
            xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
            xmlns:sec="http://cxf.apache.org/configuration/security"
   		   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  		   xmlns:ptp="http://cxf.apache.org/configuration/parameterized-types" 
   		   xsi:schemaLocation="
   		     http://www.springframework.org/schema/beans
   		       http://www.springframework.org/schema/beans/spring-beans.xsd"
@@ -36,17 +37,18 @@
 
     <xs:import namespace="http://cxf.apache.org/configuration/security"
                schemaLocation="http://cxf.apache.org/schemas/configuration/security.xsd"/>
-    
+    <xs:import namespace="http://cxf.apache.org/configuration/parameterized-types"
+               schemaLocation="http://cxf.apache.org/schemas/configuration/parameterized-types.xsd"/>
     
     <!-- Is this really supposed to be supperceeded by http-conf:HTTPListenerPolicy? -->
     <xs:complexType name="ThreadingParametersType">
-       <xs:attribute name="minThreads" type="xs:unsignedShort">
+       <xs:attribute name="minThreads" type="ptp:ParameterizedUShort">
           <xs:annotation>
              <xs:documentation>Specifies the minimum number of threads available to the Jetty instance for processing requests.</xs:documentation>
           </xs:annotation>
        </xs:attribute>
-       <xs:attribute name="maxThreads" type="xs:unsignedShort">
-                    <xs:annotation>
+       <xs:attribute name="maxThreads" type="ptp:ParameterizedUShort">
+       <xs:annotation>
              <xs:documentation>Specifies the maximum number of threads available to the Jetty instance for processing requests.</xs:documentation>
           </xs:annotation>
        </xs:attribute>
@@ -118,11 +120,11 @@
          </xs:choice>         
          <xs:element name="connector" type="xsd:anyType" minOccurs="0"/>
          <xs:element name="handlers" type="xsd:anyType" minOccurs="0"/>
-         <xs:element name="sessionSupport" type="xsd:boolean" minOccurs="0"/>
-         <xs:element name="reuseAddress" type="xsd:boolean" minOccurs="0" />          
+         <xs:element name="sessionSupport" type="ptp:ParameterizedBoolean" minOccurs="0"/>
+         <xs:element name="reuseAddress" type="ptp:ParameterizedBoolean" minOccurs="0" />          
        </xs:sequence>
        
-       <xs:attribute name="port" type="xs:int" use="required">
+       <xs:attribute name="port" type="ptp:ParameterizedInt" use="required">
              <xs:annotation>
                 <xs:documentation>Specifies the port used by the Jetty instance.
                 You can specify a value of 0 for the port attribute. Any threading 
@@ -139,7 +141,7 @@
                 </xs:documentation>
              </xs:annotation>
        </xs:attribute>
-       <xs:attribute name="continuationsEnabled" type="xs:boolean">
+       <xs:attribute name="continuationsEnabled" type="ptp:ParameterizedBoolean">
            <xs:annotation>
                 <xs:documentation>Specifies if Jetty Continuations will be explicitly supported
                 by Jetty destinations. Continuations will be checked if this attribute is set to true or                            omitted, ignored otherwise</xs:documentation>
