@@ -216,25 +216,21 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     /**
-     * @return Returns the namespaceMap.
+     * @return the namespaceMap (URI to prefix). This will be null 
+     * if no particular namespace map has been set.
      */
     public Map<String, String> getNamespaceMap() {
         return namespaceMap;
     }
 
     /**
+     * Set a map of from URI to prefix. If possible, the data binding will use these 
+     * prefixes on the wire.
+     * 
      * @param namespaceMap The namespaceMap to set.
      */
     public void setNamespaceMap(Map<String, String> namespaceMap) {
-        // make some checks. This is a map from namespace to prefix, but we want unique prefixes.
-        if (namespaceMap != null) {
-            Set<String> prefixesSoFar = new HashSet<String>();
-            for (Map.Entry<String, String> mapping : namespaceMap.entrySet()) {
-                if (prefixesSoFar.contains(mapping.getValue())) {
-                    throw new IllegalArgumentException("Duplicate prefix " + mapping.getValue());
-                }
-            }
-        }
+        checkNamespaceMap(namespaceMap);
         this.namespaceMap = namespaceMap;
     }
 
@@ -253,6 +249,7 @@ public abstract class AbstractDataBinding implements DataBinding {
                 if (prefixesSoFar.contains(mapping.getValue())) {
                     throw new IllegalArgumentException("Duplicate prefix " + mapping.getValue());
                 }
+                prefixesSoFar.add(mapping.getValue());
             }
         }
     }
