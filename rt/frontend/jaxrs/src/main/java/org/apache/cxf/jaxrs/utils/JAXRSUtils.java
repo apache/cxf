@@ -745,14 +745,21 @@ public final class JAXRSUtils {
     private static Object processCookieParam(Message m, String cookieName, 
                               Class<?> pClass, Type genericType, String defaultValue) {
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(HttpHeaders.COOKIE);
-        String value = values.size() == 1 && values.get(0).contains(cookieName + '=') 
-                       ? values.get(0) : defaultValue != null ? cookieName + '=' + defaultValue : null;
-        
-        if (value == null) {
+        String theValue = null;
+        for (String s : values) {
+            if (s.startsWith(cookieName)) {
+                theValue = s;
+                break;
+            }
+        }
+        if (theValue == null && defaultValue != null) {
+            theValue = cookieName + '=' + defaultValue;
+        }
+        if (theValue == null) {
             return null;
         }
         
-        Cookie c = Cookie.valueOf(value);
+        Cookie c = Cookie.valueOf(theValue);
         if (pClass.isAssignableFrom(Cookie.class)) {
             return c;
         }

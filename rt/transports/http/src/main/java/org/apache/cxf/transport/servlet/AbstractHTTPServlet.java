@@ -21,8 +21,10 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletConfig;
@@ -53,6 +55,17 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     private static final String REDIRECTS_PARAMETER = "redirects-list";
     private static final String REDIRECT_SERVLET_NAME_PARAMETER = "redirect-servlet-name";
     private static final String REDIRECT_SERVLET_PATH_PARAMETER = "redirect-servlet-path";
+    
+    private static final Map<String, String> STATIC_CONTENT_TYPES;
+    
+    static {
+        STATIC_CONTENT_TYPES = new HashMap<String, String>();
+        STATIC_CONTENT_TYPES.put("html", "text/html");
+        STATIC_CONTENT_TYPES.put("txt", "text/plain");
+        STATIC_CONTENT_TYPES.put("css", "text/css");
+        STATIC_CONTENT_TYPES.put("pdf", "application/pdf");
+        // TODO : add more types if needed
+    }
     
     private List<String> staticResourcesList;
     private List<String> redirectList; 
@@ -151,14 +164,16 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
     
     protected void handleRequest(HttpServletRequest request, HttpServletResponse response) 
         throws ServletException {
-        if (staticResourcesList != null 
-            && matchPath(staticResourcesList, request.getPathInfo())) {
-            serveStaticContent(request, response, request.getPathInfo());
-            return;
-        }
+        
         if (redirectList != null 
             && matchPath(redirectList, request.getPathInfo())) {
             redirect(request, response, request.getPathInfo());
+            return;
+        }
+        
+        if (staticResourcesList != null 
+            && matchPath(staticResourcesList, request.getPathInfo())) {
+            serveStaticContent(request, response, request.getPathInfo());
             return;
         }
         invoke(request, response);
@@ -181,6 +196,14 @@ public abstract class AbstractHTTPServlet extends HttpServlet {
             throw new ServletException("Static resource " + pathInfo + " is not available");
         }
         try {
+            int ind = pathInfo.lastIndexOf(".");
+            if (ind != -1 && ind < pathInfo.length()) {
+                String type = STATIC_CONTENT_TYPES.get(pathInfo.substring(ind + 1));
+                if (type != null) {
+                    response.setContentType(type);
+                }
+            }
+            
             ServletOutputStream os = response.getOutputStream();
             IOUtils.copy(is, os);
             os.flush();
