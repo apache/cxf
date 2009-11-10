@@ -406,6 +406,7 @@ public class RMSoapInterceptorTest extends Assert {
     private SoapMessage setUpInboundMessage(String resource) throws XMLStreamException {
         Message message = new MessageImpl();
         SoapMessage soapMessage = new SoapMessage(message);
+        message.put(Message.SCHEMA_VALIDATION_ENABLED, false);
         InputStream is = RMSoapInterceptorTest.class.getResourceAsStream(resource);
         assertNotNull(is);
         XMLStreamReader reader = XMLInputFactory.newInstance().createXMLStreamReader(is);

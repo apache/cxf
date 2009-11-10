@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.xpath.XPath;
 import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpressionException;
@@ -36,6 +37,7 @@ import org.w3c.dom.NodeList;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolException;
@@ -105,7 +107,9 @@ public class JAXWSBindingParser {
                     String partPath = "//" +  childElement.getAttribute("part");
                     Node node = queryXPathNode(element.getOwnerDocument().getDocumentElement(), partPath);
                     String messageName = "";
+                    String partName = "";
                     if (node != null) {
+                        partName = ((Element)node).getAttribute("name");
                         Node messageNode = node.getParentNode();
                         if (messageNode != null) {
                             Element messageEle = (Element)messageNode;
@@ -114,9 +118,20 @@ public class JAXWSBindingParser {
                     }
 
                     String name = childElement.getAttribute("name");
-                    String elementName = childElement.getAttribute("childElementName");
-                    JAXWSParameter jpara = new JAXWSParameter(messageName, elementName, name);
-                    jaxwsBinding.setJaxwsPara(jpara);
+                    String elementNameString = childElement.getAttribute("childElementName");
+                    QName elementName = null;
+                    if (!StringUtils.isEmpty(elementNameString)) {
+                        String ns = "";
+                        if (elementNameString.indexOf(':') != -1) {
+                            ns = elementNameString.substring(0, elementNameString.indexOf(':'));
+                            ns = childElement.lookupNamespaceURI(ns);
+                            elementNameString = elementNameString
+                                .substring(elementNameString.indexOf(':') + 1);
+                        }
+                        elementName = new QName(ns, elementNameString);
+                    }
+                    JAXWSParameter jpara = new JAXWSParameter(messageName, partName, elementName, name);
+                    jaxwsBinding.addJaxwsPara(jpara);
                 } else if (isJAXWSClass(child)) {
                     Element childElement = (Element)child;
                     String clzName = childElement.getAttribute("name");
