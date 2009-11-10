@@ -58,7 +58,7 @@
         <spring.mock>spring-mock</spring.mock>
         <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
         <stax.impl.artifactId>wstx-asl</stax.impl.artifactId>
-        <stax.impl.version>3.2.6</stax.impl.version>
+        <stax.impl.version>3.2.9</stax.impl.version>
         <cglib-nodep.version>2.1_3</cglib-nodep.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <derby.version>10.2.2.0</derby.version>
