@@ -51,6 +51,8 @@ public class JAXRSRequestDispatcherTest extends AbstractBusClientServerTestBase 
         namespaces.put("books", "http://www.w3.org/books");
         String value = source.getValue("xhtml:html/xhtml:body/xhtml:ul/books:bookTag", namespaces);
         assertEquals("CXF Rocks", value);
+        String ct = client.getResponse().getMetadata().getFirst("Content-Type").toString();
+        assertEquals("text/html", ct);
     }
     
     @Test

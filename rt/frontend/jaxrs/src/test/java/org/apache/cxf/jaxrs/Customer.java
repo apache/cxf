@@ -332,6 +332,11 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         // complete
     }
     
+    public void testMultipleCookieParam(@CookieParam("c1") String c1,
+                                        @CookieParam("c2") String c2) {
+        // complete
+    }
+    
     public void testParams(@Context UriInfo info,
                            @Context HttpHeaders hs,
                            @Context Request r,
