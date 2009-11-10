@@ -413,7 +413,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                     SecurityToken tok = store.getToken(id);
                     if (tok != null) {
                         pc.setKey(tok.getSecret());
-                        pc.setCustomToken(tok.getAttachedReference());
+                        pc.setCustomToken(tok.getToken());
                         return;
                     }
                 }
