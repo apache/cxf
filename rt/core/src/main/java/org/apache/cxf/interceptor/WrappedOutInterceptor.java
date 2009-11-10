@@ -36,6 +36,11 @@ import org.apache.cxf.service.model.MessagePartInfo;
 
 public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WrappedOutInterceptor.class);
+    private static final String DEF_PREFIXES[] = new String[] {
+        "ns1".intern(), "ns2".intern(), "ns3".intern(),
+        "ns4".intern(), "ns5".intern(), "ns6".intern(),
+        "ns7".intern(), "ns8".intern(), "ns9".intern()
+    };
 
     private WrappedOutEndingInterceptor ending = new WrappedOutEndingInterceptor();
     
@@ -70,12 +75,21 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
                     pfx = service.getDataBinding().getDeclaredNamespaceMappings().get(name.getNamespaceURI());
                 }
                 if (pfx == null) {
-                    int x = 1;
-                    while (!StringUtils.isEmpty(xmlWriter.getNamespaceContext()
-                                                     .getNamespaceURI("ns" + x))) {
-                        x++;
+                    for (String t : DEF_PREFIXES) {
+                        if (!StringUtils.isEmpty(xmlWriter.getNamespaceContext()
+                                                     .getNamespaceURI(t))) {
+                            pfx = t;
+                            break;
+                        }
                     }
-                    pfx = "ns" + x;
+                    if (pfx == null) {    
+                        int x = 10;
+                        while (!StringUtils.isEmpty(xmlWriter.getNamespaceContext()
+                                                         .getNamespaceURI("ns" + x))) {
+                            x++;
+                        }
+                        pfx = "ns" + x;
+                    }
                 }
                 xmlWriter.setPrefix(pfx, name.getNamespaceURI());
                 xmlWriter.writeStartElement(pfx, name.getLocalPart(), name.getNamespaceURI());
