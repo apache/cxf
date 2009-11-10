@@ -53,10 +53,6 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this();
         force = f;
     }
-    protected boolean isRequestor(Message message) {
-        return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
-    }
-    
     
     public void handleMessage(Message message) {
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
