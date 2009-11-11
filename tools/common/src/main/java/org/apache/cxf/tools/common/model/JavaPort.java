@@ -152,7 +152,7 @@ public class JavaPort {
     }
 
     public String getFullClassName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (!StringUtils.isEmpty(getPackageName())) {
             sb.append(getPackageName());
             sb.append(".");

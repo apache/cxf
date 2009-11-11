@@ -125,7 +125,7 @@ public class AbstractWSDLToProcessor implements Processor {
 
     
     public WSDLExtensibilityPlugin getWSDLPlugin(final String key, final Class clz) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(key);
         sb.append("-");
         sb.append(clz.getName());

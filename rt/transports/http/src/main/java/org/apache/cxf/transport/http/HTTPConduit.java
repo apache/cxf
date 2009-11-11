@@ -2087,7 +2087,7 @@ public class HTTPConduit
                 LOG.fine("Content length: " + connection.getContentLength());
                 Map<String, List<String>> headerFields = connection.getHeaderFields();
                 if (null != headerFields) {
-                    StringBuffer buf = new StringBuffer();
+                    StringBuilder buf = new StringBuilder();
                     buf.append("Header fields: ");
                     buf.append(System.getProperty("line.separator"));
                     for (String h : headerFields.keySet()) {

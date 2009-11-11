@@ -203,7 +203,7 @@ public final class URITemplate {
             throw new IllegalArgumentException("values is null");
         }
         Iterator<String> iter = values.iterator();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (UriChunk chunk : uriChunks) {
             if (chunk instanceof Variable) {
                 Variable var = (Variable)chunk;
@@ -241,7 +241,7 @@ public final class URITemplate {
         if (valuesMap == null) {
             throw new IllegalArgumentException("valuesMap is null");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (UriChunk chunk : uriChunks) {
             if (chunk instanceof Variable) {
                 Variable var = (Variable)chunk;
@@ -271,7 +271,7 @@ public final class URITemplate {
      */
     public String encodeLiteralCharacters() {
         final float encodedRatio = 1.5f;
-        StringBuffer sb = new StringBuffer((int)(encodedRatio * template.length()));
+        StringBuilder sb = new StringBuilder((int)(encodedRatio * template.length()));
         for (UriChunk chunk : uriChunks) {
             String val = chunk.getValue();
             if (chunk instanceof Literal) {

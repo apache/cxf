@@ -73,7 +73,7 @@ public class ProviderFactory {
         boolean isE4X = f.getName().endsWith(".jsx");
         BufferedReader bufrd = new BufferedReader(new FileReader(f));
         String line = null;
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (;;) {
             line = bufrd.readLine();
             if (line == null) {
@@ -125,7 +125,7 @@ public class ProviderFactory {
                     try {
                         provider.publish();
                     } catch (AbstractDOMProvider.JSDOMProviderException ex) {
-                        StringBuffer msg = new StringBuffer(f.getPath());
+                        StringBuilder msg = new StringBuilder(f.getPath());
                         msg.append(": ").append(ex.getMessage());
                         throw new Exception(msg.toString());
                     }
@@ -146,7 +146,7 @@ public class ProviderFactory {
             String modestr = (mode == Service.Mode.PAYLOAD) ? "payload" : "message";
             String type = e4x ? "E4X" : "JavaScript";
             String base = isBase ? "base " : "";
-            StringBuffer msg = new StringBuffer("creating a ");
+            StringBuilder msg = new StringBuilder("creating a ");
             msg.append(modestr)
                 .append(" ")
                 .append(type)

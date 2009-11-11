@@ -87,7 +87,7 @@ public final class AnnotationUtil {
 
     private static String getClassPath() {
         ClassLoader loader = AnnotationUtil.class.getClassLoader();
-        StringBuffer classpath = new StringBuffer(System.getProperty("java.class.path"));
+        StringBuilder classpath = new StringBuilder(System.getProperty("java.class.path"));
         if (loader instanceof URLClassLoader) {
             URLClassLoader urlloader = (URLClassLoader)loader;
             for (URL url : urlloader.getURLs()) {

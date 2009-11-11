@@ -104,7 +104,7 @@ public final class JarLoader {
     }
 
     private static String buildPartialName(List<String> nameComponents, int size) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         for (int i = 0; i < size; i++) {
             sb.append(nameComponents.get(i));

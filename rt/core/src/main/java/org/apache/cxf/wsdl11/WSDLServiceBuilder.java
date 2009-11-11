@@ -468,7 +468,7 @@ public class WSDLServiceBuilder {
 
     public BindingInfo buildBinding(ServiceInfo service, Binding binding) {
         BindingInfo bi = null;
-        StringBuffer ns = new StringBuffer(100);
+        StringBuilder ns = new StringBuilder(100);
         BindingFactory factory = WSDLServiceUtils.getBindingFactory(binding, bus, ns);
         if (factory instanceof WSDLBindingFactory) {
             WSDLBindingFactory wFactory = (WSDLBindingFactory)factory;

@@ -99,7 +99,7 @@ public class XNode {
     }
 
     public String getText() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("[");
         sb.append(name.getLocalPart());
         sb.append(":");
@@ -109,7 +109,7 @@ public class XNode {
     }
 
     public String getPlainText() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         Stack<XNode> parentNodes = getParentNodes();
         while (!parentNodes.empty()) {
             sb.append(parentNodes.pop().getText());
@@ -120,7 +120,7 @@ public class XNode {
     }
 
     public String getXPath() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("/");
         sb.append(prefix);
         sb.append(":");
@@ -157,7 +157,7 @@ public class XNode {
 
     public String toString() {
         Stack<XNode> parentNodes = getParentNodes();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         while (!parentNodes.empty()) {
             sb.append(parentNodes.pop().getXPath());
         }

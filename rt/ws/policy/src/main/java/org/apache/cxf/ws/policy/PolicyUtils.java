@@ -87,7 +87,7 @@ public final class PolicyUtils {
             log.log(level, msg);
             return;
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(msg);
         nl(buf);
         printPolicyComponent(pc, buf, 0);
@@ -95,12 +95,12 @@ public final class PolicyUtils {
     }
     
     public static void printPolicyComponent(PolicyComponent pc) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         printPolicyComponent(pc, buf, 0);
         System.out.println(buf.toString());
     }
     
-    public static void printPolicyComponent(PolicyComponent pc, StringBuffer buf, int level) {
+    public static void printPolicyComponent(PolicyComponent pc, StringBuilder buf, int level) {
         indent(buf, level);
         buf.append("type: ");
         buf.append(typeToString(pc.getType()));
@@ -132,13 +132,13 @@ public final class PolicyUtils {
         }
     }
     
-    private static void indent(StringBuffer buf, int level) {
+    private static void indent(StringBuilder buf, int level) {
         for (int i = 0; i < level; i++) {
             buf.append(INDENT);
         }
     }
     
-    private static void nl(StringBuffer buf) {
+    private static void nl(StringBuilder buf) {
         buf.append(System.getProperty("line.separator"));
     }
     

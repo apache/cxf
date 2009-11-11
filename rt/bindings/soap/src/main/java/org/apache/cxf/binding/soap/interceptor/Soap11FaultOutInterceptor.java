@@ -96,7 +96,7 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                 String config = (String)message.getContextualProperty(
                         org.apache.cxf.message.Message.FAULT_STACKTRACE_ENABLED);
                 if (config != null && Boolean.valueOf(config).booleanValue() && fault.getCause() != null) {
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     for (StackTraceElement ste : fault.getCause().getStackTrace()) {                    
                         sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName()  
                                 + "!" + ste.getLineNumber() + "\n");

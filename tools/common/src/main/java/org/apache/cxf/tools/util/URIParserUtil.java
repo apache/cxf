@@ -151,7 +151,7 @@ public final class URIParserUtil {
                 tokens[i] = tokenizer.nextToken();
             }
         }
-        StringBuffer namespace = new StringBuffer("http://");
+        StringBuilder namespace = new StringBuilder("http://");
         String dot = "";
         for (int i = 0; i < tokens.length; i++) {
             if (i == 1) {
@@ -174,7 +174,7 @@ public final class URIParserUtil {
     }
 
     private static String removeIllegalIdentifierChars(String token) {
-        StringBuffer newToken = new StringBuffer();
+        StringBuilder newToken = new StringBuilder();
         for (int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 

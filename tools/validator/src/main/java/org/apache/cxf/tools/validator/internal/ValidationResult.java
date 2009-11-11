@@ -60,7 +60,7 @@ public final class ValidationResult {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n Summary: ");
         sb.append(" Failures: ");
         sb.append(errors.size());

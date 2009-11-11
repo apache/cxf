@@ -459,7 +459,7 @@ public final class EndpointReferenceUtils {
         }
 
         //wsdlLocation attribute is a list of anyURI.
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
         for (String str : wsdlLocation) {
             strBuf.append(str);
             strBuf.append(" ");

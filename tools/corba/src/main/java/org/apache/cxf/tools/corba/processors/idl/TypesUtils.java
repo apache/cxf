@@ -83,7 +83,7 @@ public final class TypesUtils {
         Integer id = 0;
         do {
             id++;
-            StringBuffer name = new StringBuffer();
+            StringBuilder name = new StringBuilder();
             name.append("_");
             name.append("Anon" + id.toString());
             name.append("_");

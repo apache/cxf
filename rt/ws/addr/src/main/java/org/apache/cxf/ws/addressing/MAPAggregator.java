@@ -553,7 +553,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     }
 
     private String addPath(String uri, String path) {
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(uri);
         String delimiter = getDelimiter(uri);
         if (!uri.endsWith(delimiter) && !path.startsWith(delimiter)) {

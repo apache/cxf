@@ -88,7 +88,7 @@ public class WorkQueueImplMBeanWrapper implements ManagedComponent {
         if (mgr instanceof WorkQueueManagerImpl) {
             busId = ((WorkQueueManagerImpl)mgr).getBus().getId();
         }
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
         buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
         buffer.append(WorkQueueManagerImplMBeanWrapper.TYPE_VALUE + "=");

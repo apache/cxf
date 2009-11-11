@@ -81,7 +81,7 @@ public class AttachmentSerializer {
         //   type="application/soap+xml; action="urn:ihe:iti:2007:RetrieveDocumentSet""
         if ((bodyCt.indexOf('"') != -1) && (bodyCt.indexOf(';') != -1)) {
             int pos = bodyCt.indexOf(';');
-            StringBuffer st = new StringBuffer(bodyCt.substring(0 , pos));
+            StringBuilder st = new StringBuilder(bodyCt.substring(0 , pos));
             st.append("\"").append(bodyCt.substring(pos, bodyCt.length() - 1));
             bodyCt = st.toString();
         }        

@@ -200,7 +200,7 @@ public final class JAXBUtils {
      */
     public static String nameSpaceURIToPackage(URI uri) {
        
-        StringBuffer packageName = new StringBuffer();
+        StringBuilder packageName = new StringBuilder();
         String authority = uri.getAuthority();
         if (authority == null && "urn".equals(uri.getScheme())) {
             authority = uri.getSchemeSpecificPart();
@@ -270,7 +270,7 @@ public final class JAXBUtils {
     }
     
     private static String normalizePackageNamePart(String name) {
-        StringBuffer sname = new StringBuffer(name.toLowerCase());
+        StringBuilder sname = new StringBuilder(name.toLowerCase());
 
         for (int i = 0; i < sname.length(); i++) {
             sname.setCharAt(i, Character.toLowerCase(sname.charAt(i)));
@@ -311,7 +311,7 @@ public final class JAXBUtils {
         // conventional (!) Java class, method, or constant identifier
 
         boolean legalIdentifier = false;
-        StringBuffer buf = new StringBuffer(name);
+        StringBuilder buf = new StringBuilder(name);
         legalIdentifier = Character.isJavaIdentifierStart(buf.charAt(0));
 
         for (int i = 1; i < name.length() && legalIdentifier; i++) {
@@ -348,7 +348,7 @@ public final class JAXBUtils {
             return;
         }
         int index = listIndex + 1;
-        StringBuffer sword = new StringBuffer(word);
+        StringBuilder sword = new StringBuilder(word);
         int first = 0;
         char firstChar = sword.charAt(first);
         if (Character.isLowerCase(firstChar)) {
@@ -407,7 +407,7 @@ public final class JAXBUtils {
         return Character.isUpperCase(c) || Character.isLowerCase(c);
     }
     
-    private static boolean isConventionalIdentifier(StringBuffer buf, IdentifierType type) {
+    private static boolean isConventionalIdentifier(StringBuilder buf, IdentifierType type) {
         if (null == buf || buf.length() == 0) {
             return false;
         }
@@ -439,7 +439,7 @@ public final class JAXBUtils {
     }
     
     private static String makeConventionalIdentifier(List<String> words, IdentifierType type) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         boolean firstWord = true;
         if (IdentifierType.GETTER == type) {
             buf.append("get");

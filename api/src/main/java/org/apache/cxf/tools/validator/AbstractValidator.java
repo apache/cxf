@@ -35,7 +35,7 @@ public abstract class AbstractValidator {
     }
 
     public String getErrorMessage() {
-        StringBuffer strbuffer = new StringBuffer();
+        StringBuilder strbuffer = new StringBuilder();
         for (int i = 0; i < errorMessages.size(); i++) {
             strbuffer.append(errorMessages.get(i));
             strbuffer.append(System.getProperty("line.separator"));

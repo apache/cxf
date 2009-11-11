@@ -64,7 +64,7 @@ public final class JAnnotationElement {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (name != null) {
             sb.append(name);
         }
@@ -89,7 +89,7 @@ public final class JAnnotationElement {
         return sb.toString();
     }
 
-    private void appendValue(final StringBuffer sb, final Object obj) {
+    private void appendValue(final StringBuilder sb, final Object obj) {
         if (obj instanceof String) {
             if (isPrimitive) {
                 sb.append(obj);
@@ -119,7 +119,7 @@ public final class JAnnotationElement {
         }
     }
 
-    private void appendEnumValue(final StringBuffer sb, final Object obj) {
+    private void appendEnumValue(final StringBuilder sb, final Object obj) {
         Enum e = (Enum) obj;
 
         String clzName = e.getClass().getName();
@@ -133,7 +133,7 @@ public final class JAnnotationElement {
         sb.append(e.name());
     }
 
-    private void getStringValue(final StringBuffer sb, final Object obj) {
+    private void getStringValue(final StringBuilder sb, final Object obj) {
         sb.append("\"");
         sb.append(obj);
         sb.append("\"");

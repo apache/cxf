@@ -86,7 +86,7 @@ public class DatabindingException extends RuntimeException {
         if (extraMessages.isEmpty()) {
             return super.getMessage();
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (String s : extraMessages) {
             buf.append(s);
         }

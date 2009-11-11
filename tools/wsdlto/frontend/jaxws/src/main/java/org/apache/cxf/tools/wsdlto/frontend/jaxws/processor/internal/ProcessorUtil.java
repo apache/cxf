@@ -282,7 +282,7 @@ public final class ProcessorUtil {
     }
 
     private static String escapeSpace(String url) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < url.length(); i++) {
             if (url.charAt(i) == ' ') {
                 buf.append("%20");

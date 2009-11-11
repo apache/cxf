@@ -57,7 +57,7 @@ public class ClassLoaderSwitcher {
      */
     public void switchClassLoader(MavenProject project, boolean useCompileClasspath, File classesDir) {
         List<URL> urlList = new ArrayList<URL>();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         try {
             urlList.add(classesDir.toURI().toURL());

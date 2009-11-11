@@ -35,7 +35,7 @@ public final class XDef extends XWsdl {
 
     @Override
     public String getText() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("{");
         sb.append(getAttributeValue());
         sb.append("}");

@@ -78,7 +78,7 @@ public class WSDLToIDLPlugin extends AbstractMojo {
 
         
         List<URL> urlList = new ArrayList<URL>();
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
 
         try {
             urlList.add(outputDir.toURI().toURL());

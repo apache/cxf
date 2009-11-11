@@ -32,7 +32,7 @@ public class Extension {
     private Collection<String> namespaces = new ArrayList<String>();
     
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("class: ");
         buf.append(className);
         buf.append(", interface: ");

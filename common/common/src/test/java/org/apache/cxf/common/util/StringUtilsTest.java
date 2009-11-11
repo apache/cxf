@@ -25,10 +25,6 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class StringUtilsTest extends Assert {
-    public void testTrim() throws Exception {
-        String target = "////soapport///";
-        assertEquals("soapport", StringUtils.trim(target, "/"));
-    }
     
     @Test
     public void testDiff() throws Exception {

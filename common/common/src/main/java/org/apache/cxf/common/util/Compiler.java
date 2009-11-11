@@ -160,7 +160,7 @@ public class Compiler {
     }
 
     private boolean isLongCommandLines(String args[]) {
-        StringBuffer strBuffer = new StringBuffer();
+        StringBuilder strBuffer = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             strBuffer.append(args[i]);
         }

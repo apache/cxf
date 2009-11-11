@@ -45,7 +45,7 @@ public final class StringUtils {
     }
 
     public static String wrapper(String string, String startToken, String endToken) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(startToken);
         sb.append(string);
         sb.append(endToken);
@@ -69,10 +69,15 @@ public final class StringUtils {
     }
 
     public static boolean isEmpty(String str) {
-        if (str == null || str.length() == 0) {
-            return true;
+        if (str != null) {
+            int len = str.length();
+            for (int x = 0; x < len; ++x) {
+                if (str.charAt(x) > ' ') {
+                    return false;
+                }
+            }
         }
-        return str.trim().length() == 0;
+        return true;
     }
     
     public static boolean isEmpty(List<String> list) {
@@ -83,19 +88,6 @@ public final class StringUtils {
             return true;
         }
         return false;
-    }
-    
-    public static String trim(String target, String token) {
-        int tokenLength = token.length();
-        int targetLength = target.length();
-        
-        if (target.startsWith(token)) {            
-            return trim(target.substring(tokenLength), token);
-        }
-        if (target.endsWith(token)) {            
-            return trim(target.substring(0, targetLength - tokenLength), token);
-        }
-        return target;
     }
 
     public static boolean isEqualUri(String uri1, String uri2) {
@@ -228,7 +220,7 @@ public final class StringUtils {
         if (str == null || strLen == 0) {
             return str;
         }
-        return new StringBuffer(strLen)
+        return new StringBuilder(strLen)
             .append(Character.toLowerCase(str.charAt(0)))
             .append(str.substring(1))
             .toString();

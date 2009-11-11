@@ -152,7 +152,7 @@ public final class NamespaceHelper {
             words[i] = st.nextToken();
         }
 
-        StringBuffer sb = new StringBuffer(80);
+        StringBuilder sb = new StringBuilder(80);
 
         for (int i = words.length - 1; i >= 0; --i) {
             String word = words[i];
@@ -219,7 +219,7 @@ public final class NamespaceHelper {
             words[i] = st.nextToken();
         }
 
-        StringBuffer sb = new StringBuffer(namespace.length());
+        StringBuilder sb = new StringBuilder(namespace.length());
 
         for (int i = words.length - 1; i >= 0; --i) {
             addWordToPackageBuffer(sb, words[i], i == words.length - 1);
@@ -244,7 +244,7 @@ public final class NamespaceHelper {
      * @param word the word to append
      * @param firstWord a flag indicating whether this is the first word
      */
-    private static void addWordToPackageBuffer(StringBuffer sb, String word, boolean firstWord) {
+    private static void addWordToPackageBuffer(StringBuilder sb, String word, boolean firstWord) {
 
         if (JavaUtils.isJavaKeyword(word)) {
             word = JavaUtils.makeNonJavaKeyword(word);

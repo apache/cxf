@@ -679,7 +679,7 @@ public final class PolicyUtils {
     }
     
     public static String toString(HTTPClientPolicy p) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(p);
         buf.append("[DecoupledEndpoint=\"");
         buf.append(p.getDecoupledEndpoint());
@@ -690,7 +690,7 @@ public final class PolicyUtils {
     }
     
     public static String toString(HTTPServerPolicy p) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(p);
         buf.append("[ContentType=\"");
         buf.append(p.getContentType());

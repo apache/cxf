@@ -196,7 +196,7 @@ public abstract class AbstractCXFToolContainer extends AbstractToolContainer {
         }
 
         StringTokenizer strToken = new StringTokenizer(loc, "-.!~*'();?:@&=+$,");
-        StringBuffer strBuf = new StringBuffer();
+        StringBuilder strBuf = new StringBuilder();
 
         if (!strToken.hasMoreTokens()) {
             strBuf.append(loc);

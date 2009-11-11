@@ -267,7 +267,7 @@ public class SchemaValidator extends AbstractDefinitionValidator {
 class NewStackTraceErrorHandler implements ErrorHandler {
     protected boolean valid;
 
-    private StringBuffer buffer;
+    private StringBuilder buffer;
 
     private int numErrors;
 
@@ -276,7 +276,7 @@ class NewStackTraceErrorHandler implements ErrorHandler {
     NewStackTraceErrorHandler() {
         valid = true;
         numErrors = 0;
-        buffer = new StringBuffer();
+        buffer = new StringBuilder();
         errors = new ArrayList<SAXParseException>();
     }
 

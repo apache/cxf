@@ -91,7 +91,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
             if (null != assertions && !assertions.isEmpty()) {
                 if (LOG.isLoggable(Level.FINEST)) {
-                    StringBuffer buf = new StringBuffer();
+                    StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
                     String nl = System.getProperty("line.separator");
                     buf.append(nl);
@@ -122,7 +122,7 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             Collection<PolicyAssertion> assertions = effectivePolicy.getChosenAlternative();
             if (null != assertions && !assertions.isEmpty()) {
                 if (LOG.isLoggable(Level.FINEST)) {
-                    StringBuffer buf = new StringBuffer();
+                    StringBuilder buf = new StringBuilder();
                     buf.append("Chosen alternative: ");
                     String nl = System.getProperty("line.separator");
                     buf.append(nl);

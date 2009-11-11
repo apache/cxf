@@ -47,7 +47,7 @@ public class BadUsageException extends Exception {
     }
 
     public String getMessage() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (errors != null) {
             sb.append(errors.toString());

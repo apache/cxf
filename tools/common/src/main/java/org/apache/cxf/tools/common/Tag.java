@@ -83,7 +83,7 @@ public class Tag {
     
     private String createIndent(int size) {
         String indent = "    ";
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < size; i++) {
             sb.append(indent);
         }
@@ -91,7 +91,7 @@ public class Tag {
     }
 
     private String formatAttribute(final Tag tag) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(tag.getName().getLocalPart());
         sb.append(" ");
         for (Map.Entry<QName, String> attr : tag.getAttributes().entrySet()) {
@@ -104,7 +104,7 @@ public class Tag {
     }
 
     private String formatTag(Tag tag, int indent) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(createIndent(indent));
         sb.append(indent);
         sb.append("<");
@@ -128,7 +128,7 @@ public class Tag {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(formatTag(this, 0));
         return sb.toString();
     }

@@ -52,7 +52,7 @@ public abstract class AbstractMessageWriter implements MessageWriter {
         String prefix = getPrefixForNamespace(type.getNamespaceURI(), type.getPrefix());
         String value;
         if (prefix != null && prefix.length() > 0) {
-            StringBuffer sb = new StringBuffer(prefix.length() + 1 + type.getLocalPart().length());
+            StringBuilder sb = new StringBuilder(prefix.length() + 1 + type.getLocalPart().length());
             sb.append(prefix);
             sb.append(':');
             sb.append(type.getLocalPart());

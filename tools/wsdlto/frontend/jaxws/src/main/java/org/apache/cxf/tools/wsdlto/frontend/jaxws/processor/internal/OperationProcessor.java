@@ -329,7 +329,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 response = mappedClass.getName();
             }
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(clzName);
         sb.append("<");
         if ("void".equals(response)) {

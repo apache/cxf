@@ -57,7 +57,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     }
     
     public String toString() {
-        StringBuffer buffer = new StringBuffer(this.getClass().getName());
+        StringBuilder buffer = new StringBuilder(this.getClass().getName());
         buffer.append(" [namespaceURI: ");
         buffer.append(namespaceUri);
         buffer.append("] [systemId: ");
