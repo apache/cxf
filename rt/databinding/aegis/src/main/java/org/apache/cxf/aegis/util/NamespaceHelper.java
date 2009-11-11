@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.aegis.DatabindingException;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.JavaUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * Namespace utilities.
@@ -55,14 +56,12 @@ public final class NamespaceHelper {
      */
     public static String getUniquePrefix(Element element, String namespaceURI) {
         String prefix = getPrefix(element, namespaceURI);
-
         // it is OK to have both namespace URI and prefix be empty. 
         if (prefix == null) {
             if ("".equals(namespaceURI)) {
                 return "";
             }
-            prefix = getUniquePrefix(element);
-            DOMUtils.addNamespacePrefix(element, namespaceURI, prefix);
+            prefix = DOMUtils.createNamespace(element, namespaceURI);
         }
         return prefix;
     }
@@ -75,20 +74,6 @@ public final class NamespaceHelper {
         DOMUtils.getPrefixesRecursive(element, namespaceURI, prefixes);
     }
 
-    public static String getUniquePrefix(Element el) {
-        int n = 1;
-
-        while (true) {
-            String nsPrefix = "ns" + n;
-
-            if (DOMUtils.getNamespace(el, nsPrefix) == null) {
-                return nsPrefix;
-            }
-
-            n++;
-        }
-    }
-
     /**
      * Create a unique namespace uri/prefix combination.
      * 
@@ -99,9 +84,34 @@ public final class NamespaceHelper {
      */
     public static String getUniquePrefix(XMLStreamWriter writer, String namespaceURI, boolean declare)
         throws XMLStreamException {
-        String prefix = writer.getNamespaceContext().getPrefix(namespaceURI);
+        return getUniquePrefix(writer, namespaceURI, null, declare);
+    }
+    
+    
+    /**
+     * Make a unique prefix.
+     * @param writer target writer.
+     * @param namespaceURI namespace
+     * @param preferred if there's a proposed prefix (e.g. xsi), here it is.
+     * @param declare whether to declare to the stream.
+     * @return the prefix.
+     * @throws XMLStreamException
+     */
+    public static String getUniquePrefix(XMLStreamWriter writer, 
+                                         String namespaceURI,
+                                         String preferred,
+                                         boolean declare)
+        throws XMLStreamException {
+        
+        if (preferred != null) {
+            String existing = writer.getNamespaceContext().getNamespaceURI(preferred);
+            if (namespaceURI.equals(existing)) {
+                return preferred;
+            }
+        }
+        String prefix = preferred; 
         if (prefix == null) {
-            prefix = getUniquePrefix(writer);
+            prefix = StaxUtils.getUniquePrefix(writer);
 
             if (declare) {
                 writer.setPrefix(prefix, namespaceURI);
@@ -110,20 +120,6 @@ public final class NamespaceHelper {
         }
 
         return prefix;
-    }
-
-    public static String getUniquePrefix(XMLStreamWriter writer) {
-        int n = 1;
-
-        while (true) {
-            String nsPrefix = "ns" + n;
-
-            if (writer.getNamespaceContext().getNamespaceURI(nsPrefix) == null) {
-                return nsPrefix;
-            }
-
-            n++;
-        }
     }
 
     /**

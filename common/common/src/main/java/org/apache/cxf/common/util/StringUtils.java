@@ -69,10 +69,10 @@ public final class StringUtils {
     }
 
     public static boolean isEmpty(String str) {
-        if (str != null && str.trim().length() > 0) {
-            return false;
+        if (str == null || str.length() == 0) {
+            return true;
         }
-        return true;
+        return str.trim().length() == 0;
     }
     
     public static boolean isEmpty(List<String> list) {

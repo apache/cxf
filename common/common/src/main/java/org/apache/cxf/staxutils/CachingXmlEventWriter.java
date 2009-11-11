@@ -160,21 +160,9 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
         } 
     }
     
-    private String creatPrefix() {
-        int count = 1;
-        String pfx = "ns" + count;
-        while (curContext.getNamespaceURI(pfx) != null) {
-            count++;
-            pfx = "ns" + count;
-        }
-        return pfx;
-    }
     public void writeAttribute(String uri, String name, String value) throws XMLStreamException {
         if (!StringUtils.isEmpty(uri)) {
-            String pfx = this.getPrefix(uri);
-            if (pfx == null) {
-                pfx = creatPrefix();
-            }
+            String pfx = StaxUtils.getUniquePrefix(this, uri, false);
             addEvent(factory.createAttribute(pfx, uri, name, value));            
         } else {            
             addEvent(factory.createAttribute(name, value));            

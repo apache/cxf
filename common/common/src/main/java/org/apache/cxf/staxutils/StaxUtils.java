@@ -81,6 +81,11 @@ public final class StaxUtils {
     private static final BlockingQueue<XMLOutputFactory> OUTPUT_FACTORY_POOL;
     
     private static final String XML_NS = "http://www.w3.org/2000/xmlns/";
+    private static final String DEF_PREFIXES[] = new String[] {
+        "ns1".intern(), "ns2".intern(), "ns3".intern(),
+        "ns4".intern(), "ns5".intern(), "ns6".intern(),
+        "ns7".intern(), "ns8".intern(), "ns9".intern()
+    };
     
     static {
         int i = 20;
@@ -212,6 +217,7 @@ public final class StaxUtils {
         }
     }
 
+    
     public static void nextEvent(XMLStreamReader dr) {
         try {
             dr.next();
@@ -1020,7 +1026,6 @@ public final class StaxUtils {
         return new QName(ns, localName, prefix);
     }
     
-
     /**
      * Create a unique namespace uri/prefix combination.
      * 
@@ -1042,18 +1047,29 @@ public final class StaxUtils {
         }
         return prefix;
     }
-
+    public static String getUniquePrefix(XMLStreamWriter writer, String namespaceURI)
+        throws XMLStreamException {
+        return getUniquePrefix(writer, namespaceURI, false);
+    }
     public static String getUniquePrefix(XMLStreamWriter writer) {
-        int n = 1;
-        
         NamespaceContext nc = writer.getNamespaceContext();
+        if (nc == null) {
+            return DEF_PREFIXES[0];
+        }
+        for (String t : DEF_PREFIXES) {
+            String uri = nc.getNamespaceURI(t);
+            if (StringUtils.isEmpty(uri)) {
+                return t;
+            }
+        }
+
+        int n = 10;
         while (true) {
             String nsPrefix = "ns" + n;
-
-            if (nc == null || nc.getNamespaceURI(nsPrefix) == null) {
+            String uri = nc.getNamespaceURI(nsPrefix);
+            if (StringUtils.isEmpty(uri)) {
                 return nsPrefix;
             }
-
             n++;
         }
     }

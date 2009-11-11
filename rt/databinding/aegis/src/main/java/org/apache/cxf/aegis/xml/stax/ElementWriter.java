@@ -26,10 +26,10 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.aegis.DatabindingException;
-import org.apache.cxf.aegis.util.NamespaceHelper;
 import org.apache.cxf.aegis.xml.AbstractMessageWriter;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.staxutils.StaxUtils;
 
 /**
  * LiteralWriter
@@ -103,7 +103,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
                
                 if (!StringUtils.isEmpty(namespace)) {
                     declare = true;
-                    prefix = NamespaceHelper.getUniquePrefix(writer);
+                    prefix = StaxUtils.getUniquePrefix(writer);
                 } else {
                     prefix = "";
                     if (!StringUtils.isEmpty(writer.getNamespaceContext().getNamespaceURI(""))) {
@@ -193,7 +193,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
             String pfx = writer.getPrefix(ns);
 
             if (pfx == null) {
-                pfx = NamespaceHelper.getUniquePrefix(writer);
+                pfx = StaxUtils.getUniquePrefix(writer);
 
                 writer.setPrefix(pfx, ns);
                 writer.writeNamespace(pfx, ns);
@@ -221,7 +221,7 @@ public class ElementWriter extends AbstractMessageWriter implements MessageWrite
                 } else if (contextPfx != null) {
                     pfx = contextPfx;
                 } else {
-                    pfx = NamespaceHelper.getUniquePrefix(writer);
+                    pfx = StaxUtils.getUniquePrefix(writer);
                 }
 
                 writer.setPrefix(pfx, ns);
