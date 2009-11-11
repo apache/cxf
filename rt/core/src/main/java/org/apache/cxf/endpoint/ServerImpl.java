@@ -138,15 +138,17 @@ public class ServerImpl implements Server {
         if (mgr != null) {
             mgr.stopServer(this);
         }
-        
+
         MessageObserver mo = getDestination().getMessageObserver();
         if (mo instanceof MultipleEndpointObserver) {
-            ((MultipleEndpointObserver) mo).getEndpoints().remove(endpoint);
-        } else {
-            getDestination().setMessageObserver(null);
-            getDestination().shutdown();
+            ((MultipleEndpointObserver)mo).getEndpoints().remove(endpoint);
+            if (!((MultipleEndpointObserver)mo).getEndpoints().isEmpty()) {
+                return;
+            }
         }
-        
+        getDestination().setMessageObserver(null);
+        getDestination().shutdown();
+
         if (null != serverRegistry) {
             LOG.fine("unregister the server to serverRegistry ");
             serverRegistry.unregister(this);
