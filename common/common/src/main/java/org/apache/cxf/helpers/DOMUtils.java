@@ -549,7 +549,7 @@ public final class DOMUtils {
             p = "ns" + i;
             i++;
         }
-        el.setAttribute(XMLNAMESPACE + ":" + p, ns);
+        addNamespacePrefix(el, ns, p);
         return p;
     }
 

@@ -39,6 +39,7 @@ import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor {
 
@@ -129,14 +130,10 @@ public class JBIWrapperOutInterceptor extends AbstractOutDatabindingInterceptor 
             QName name = outPart.getConcreteName();
 
             try {
-                
-                int x = 1;
-                while (xmlWriter.getNamespaceContext().getNamespaceURI("ns" + x) != null) {
-                    x++;
-                }
-                xmlWriter.setPrefix("ns" + x, name.getNamespaceURI());
-                xmlWriter.writeStartElement("ns" + x, name.getLocalPart(), name.getNamespaceURI());
-                xmlWriter.writeNamespace("ns" + x, name.getNamespaceURI());
+                String pfx = StaxUtils.getUniquePrefix(xmlWriter, name.getNamespaceURI());
+                xmlWriter.setPrefix(pfx, name.getNamespaceURI());
+                xmlWriter.writeStartElement(pfx, name.getLocalPart(), name.getNamespaceURI());
+                xmlWriter.writeNamespace(pfx, name.getNamespaceURI());
             } catch (XMLStreamException e) {
                 throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
             }
