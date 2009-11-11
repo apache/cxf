@@ -23,6 +23,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+
 public class Option {
 
     /**
@@ -99,7 +100,7 @@ public class Option {
      * Specifies that the wsdlurl contains a plain text, new line delimited,
      * list of wsdlurls instead of the wsdl itself.
      */
-    boolean wsdlList;
+    Boolean wsdlList;
 
     /**
      * Specifies the frontend. Default is JAXWS. Currently supports only JAXWS frontend.
@@ -125,12 +126,12 @@ public class Option {
      * Enables or disables processing of implicit SOAP headers (i.e. SOAP headers defined in the 
      * wsdl:binding but not wsdl:portType section.) Default is false.
      */
-    boolean extendedSoapHeaders;
+    Boolean extendedSoapHeaders;
 
     /**
      * Enables validating the WSDL before generating the code. 
      */
-    boolean validateWsdl;
+    Boolean validateWsdl;
 
     /**
      * The WSDL service name to use for the generated code
@@ -140,17 +141,17 @@ public class Option {
     /**
      * Automatically resolve naming conflicts without requiring the use of binding customizations
      */
-    boolean autoNameResolution;
+    Boolean autoNameResolution;
 
     /**
      * Disable generation of service address binding in the generated Java classes
      */
-    boolean noAddressBinding;
+    Boolean noAddressBinding;
     
     /**
      * Allow element references when determining if an operation can be unwrapped or not 
      */
-    boolean allowElementRefs;
+    Boolean allowElementRefs;
 
 
     public Option() {
@@ -240,7 +241,7 @@ public class Option {
     }
 
     public boolean isWsdlList() {
-        return wsdlList;
+        return wsdlList == null ? false : wsdlList;
     }
 
     public void setWsdlList(boolean wsdlList) {
@@ -280,7 +281,7 @@ public class Option {
     }
 
     public boolean isExtendedSoapHeaders() {
-        return extendedSoapHeaders;
+        return extendedSoapHeaders == null ? false : extendedSoapHeaders;
     }
 
     public void setExtendedSoapHeaders(boolean extendedSoapHeaders) {
@@ -288,7 +289,7 @@ public class Option {
     }
 
     public boolean isValidateWsdl() {
-        return validateWsdl;
+        return validateWsdl == null ? false : validateWsdl;
     }
 
     public void setValidateWsdl(boolean validateWsdl) {
@@ -320,7 +321,7 @@ public class Option {
     }
 
     public boolean isAutoNameResolution() {
-        return autoNameResolution;
+        return autoNameResolution == null ? false : autoNameResolution;
     }
 
     public void setAutoNameResolution(boolean autoNameResolution) {
@@ -328,7 +329,7 @@ public class Option {
     }
 
     public boolean isNoAddressBinding() {
-        return noAddressBinding;
+        return noAddressBinding == null ? false : noAddressBinding;
     }
 
     public void setNoAddressBinding(boolean noAddressBinding) {
@@ -336,7 +337,7 @@ public class Option {
     }
 
     public boolean isAllowElementRefs() {
-        return allowElementRefs;
+        return allowElementRefs == null ? false : allowElementRefs;
     }
 
     public void setAllowElementRefs(boolean allowElementRefs) {
@@ -367,5 +368,79 @@ public class Option {
             destination.setWsdlLocation(getWsdlLocation());
         }
         destination.setWsdlVersion(getWsdlVersion());
+    }
+    public void merge(Option defaultOptions) {
+        if (wsdlList == null) {
+            wsdlList = defaultOptions.wsdlList;
+        }
+        if (extendedSoapHeaders == null) {
+            extendedSoapHeaders = defaultOptions.extendedSoapHeaders;
+        }
+        if (validateWsdl == null) {
+            validateWsdl = defaultOptions.validateWsdl;
+        }
+        if (autoNameResolution == null) {
+            autoNameResolution = defaultOptions.autoNameResolution;
+        }
+        if (noAddressBinding == null) {
+            noAddressBinding = defaultOptions.noAddressBinding;
+        }
+        if (allowElementRefs == null) {
+            allowElementRefs = defaultOptions.allowElementRefs;
+        }
+        if (defaultExcludesNamespace == null) {
+            defaultExcludesNamespace = defaultOptions.defaultExcludesNamespace;
+        }
+        if (defaultNamespacePackageMapping == null) {
+            defaultNamespacePackageMapping = defaultOptions.defaultNamespacePackageMapping;
+        }
+        if (frontEnd == null) {
+            frontEnd = defaultOptions.frontEnd;
+        }
+        if (dataBinding == null) {
+            dataBinding = defaultOptions.dataBinding;
+        }
+        if (wsdlVersion == null) {
+            wsdlVersion = defaultOptions.wsdlVersion;
+        }
+        if (catalog == null) {
+            catalog = defaultOptions.catalog;
+        }
+        if (serviceName == null) {
+            serviceName = defaultOptions.serviceName;
+        }
+        if (outputDir == null) {
+            outputDir = defaultOptions.outputDir;
+        }
+        extraargs.addAll(defaultOptions.extraargs);
+        xjcargs.addAll(defaultOptions.xjcargs);
+        
+        bindingFiles = mergeList(bindingFiles, defaultOptions.bindingFiles, String.class);
+        dependencies = mergeList(dependencies, defaultOptions.dependencies, File.class);
+        redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
+        if (packagenames == null) {
+            packagenames = defaultOptions.packagenames;
+        } else {
+            packagenames.addAll(defaultOptions.packagenames);
+        }
+        if (namespaceExcludes == null) {
+            namespaceExcludes = defaultOptions.namespaceExcludes;
+        } else {
+            namespaceExcludes.addAll(defaultOptions.namespaceExcludes);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    private <T> T[] mergeList(T[] l1, T[] l2, Class<T> cls) {
+        if (l1 == null) {
+            return l2;
+        } else if (l2 == null) {
+            return l1;
+        }
+        int len = l1.length + l2.length;
+        T ret[] = (T[])java.lang.reflect.Array.newInstance(cls, len);
+        System.arraycopy(l1, 0, ret, 0, l1.length);
+        System.arraycopy(l2, 0, ret, l1.length, l2.length);
+        return ret;
     }
 }
