@@ -114,6 +114,16 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @parameter expression="${cxf.useCompileClasspath}" default-value="false"
      */
     boolean useCompileClasspath;
+    
+    
+    /**
+     * Disables the scanning of the wsdlRoot/testWsdlRoot directories configured above.
+     * By default, we scan for *.wsdl (see include/exclude params as well) in the wsdlRoot
+     * directories and run wsdl2java on all the wsdl's we find.    This disables that scan
+     * and requires an explicit wsdlOption to be set for each wsdl that needs to be processed.
+     * @parameter expression="${cxf.disableDirectoryScan}" default-value="false"
+     */
+    boolean disableDirectoryScan;
 
     /**
      * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
@@ -240,9 +250,15 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * 
      * @param options
      */
-    private void mergeOptions(List<WsdlOption> effectiveWsdlOptions, WsdlOption[] explicitWsdlOptions) {
+    private void mergeOptions(List<WsdlOption> effectiveWsdlOptions) {
+        if (wsdlOptions == null) {
+            return;
+        }
         File outputDirFile = testSourceRoot == null ? sourceRoot : testSourceRoot;
-        for (WsdlOption o : explicitWsdlOptions) {
+        for (WsdlOption o : wsdlOptions) {
+            if (defaultOptions != null) {
+                o.merge(defaultOptions);
+            }
             if (o.getOutputDir() == null) {
                 o.setOutputDir(outputDirFile);
             }
@@ -259,7 +275,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
                     }
                 }
             }
-            effectiveWsdlOptions.add(0, o);
+            effectiveWsdlOptions.add(o);
         }
     }
 
@@ -270,16 +286,13 @@ public class WSDL2JavaMojo extends AbstractMojo {
     private List<WsdlOption> createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions()
         throws MojoExecutionException {
         List<WsdlOption> effectiveWsdlOptions = new ArrayList<WsdlOption>();
-        if (wsdlRoot != null && wsdlRoot.exists()) {
+        if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
             effectiveWsdlOptions.addAll(getWsdlOptionsFromDir(wsdlRoot, sourceRoot));
         }
-        if (testWsdlRoot != null && testWsdlRoot.exists()) {
+        if (testWsdlRoot != null && testWsdlRoot.exists() && !disableDirectoryScan) {
             effectiveWsdlOptions.addAll(getWsdlOptionsFromDir(testWsdlRoot, testSourceRoot));
         }
-
-        if (wsdlOptions != null) {
-            mergeOptions(effectiveWsdlOptions, wsdlOptions);
-        }
+        mergeOptions(effectiveWsdlOptions);
         downloadRemoteWsdls(effectiveWsdlOptions);
         return effectiveWsdlOptions;
     }
