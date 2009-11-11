@@ -49,7 +49,7 @@ public final class AddressFactory {
             return address;
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(PREFIX);
         sb.append(".");
         sb.append(NameUtil.capitalize(name));

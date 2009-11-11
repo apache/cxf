@@ -75,7 +75,7 @@ public class CommandLineParser {
     public CommandDocument parseArguments(String[] args) throws BadUsageException {
 
         if (LOG.isLoggable(Level.FINE)) {
-            StringBuffer debugMsg = new StringBuffer("Parsing arguments: ");
+            StringBuilder debugMsg = new StringBuilder("Parsing arguments: ");
 
             for (int i = 0; i < args.length; i++) {
                 debugMsg.append(args[i]).append(" ");
@@ -246,7 +246,7 @@ public class CommandLineParser {
             originalStrs[i] = str;
             i++;
         }
-        StringBuffer strbuffer = new StringBuffer();
+        StringBuilder strbuffer = new StringBuilder();
         for (int j = 0; j < length - 1; j = j + 2) {
             int optionLen = originalStrs[j].length();
             addWhiteNamespace(strbuffer, beforeOptSpan);
@@ -292,7 +292,7 @@ public class CommandLineParser {
 
         return strbuffer.toString();
     }
-    private int splitAndAppendText(StringBuffer buffer, String tmpStr, int idx, int lastIdx) {
+    private int splitAndAppendText(StringBuilder buffer, String tmpStr, int idx, int lastIdx) {
         int origLast = lastIdx;
         while (lastIdx > idx && !Character.isWhitespace(tmpStr.charAt(lastIdx))) {
             --lastIdx;
@@ -308,7 +308,7 @@ public class CommandLineParser {
         return lastIdx;
     }
 
-    private void addWhiteNamespace(StringBuffer strbuffer, int count) {
+    private void addWhiteNamespace(StringBuilder strbuffer, int count) {
 
         for (int i = 0; i < count; i++) {
             strbuffer.append(" ");

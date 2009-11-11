@@ -148,7 +148,7 @@ public final class PackageUtils {
     }
 
     private static String removeIllegalIdentifierChars(String token) {
-        StringBuffer newToken = new StringBuffer();
+        StringBuilder newToken = new StringBuilder();
         for (int i = 0; i < token.length(); i++) {
             char c = token.charAt(i);
 
@@ -195,7 +195,7 @@ public final class PackageUtils {
                 tokens[i] = tokenizer.nextToken();
             }
         }
-        StringBuffer namespace = new StringBuffer("http://");
+        StringBuilder namespace = new StringBuilder("http://");
         String dot = "";
         for (int i = 0; i < tokens.length; i++) {
             if (i == 1) {

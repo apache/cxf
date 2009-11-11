@@ -84,7 +84,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public String getSignature() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(javaReturn.getName());
         sb.append("#");
         sb.append(javaInterface.getPackageName());
@@ -315,7 +315,7 @@ public class JavaMethod implements JavaAnnotatable {
 
     public List<String> getParameterList(boolean includeAnnotation) {
         List<String> list = new ArrayList<String>();
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < parameters.size(); i++) {
             JavaParameter parameter = parameters.get(i);
             if (includeAnnotation && parameter.getAnnotations().size() > 0) {
@@ -343,7 +343,7 @@ public class JavaMethod implements JavaAnnotatable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("\n========================\n");
         sb.append("\nMethod:");
         sb.append(getName());

@@ -75,7 +75,7 @@ public final class URISupport {
         }
 
         public URI toURI() throws URISyntaxException {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             if (scheme != null) {
                 sb.append(scheme);
                 sb.append(':');
@@ -228,7 +228,7 @@ public final class URISupport {
     public static String createQueryString(Map options) throws URISyntaxException {
         try {
             if (options.size() > 0) {
-                StringBuffer rc = new StringBuffer();
+                StringBuilder rc = new StringBuilder();
                 boolean first = true;
                 for (Object o : options.keySet()) {
                     if (first) {

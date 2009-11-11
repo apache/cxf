@@ -417,7 +417,7 @@ public class DynamicClientFactory {
             return;
         }
         
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         boolean first = true;
         for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
             JPackage package1 = itr.next();

@@ -80,7 +80,7 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
         
     public ObjectName getObjectName() throws JMException {
         String busId = bus.getId();
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
         buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
         buffer.append(ManagementConstants.TYPE_PROP + "=" + "Bus.Service.Endpoint,");

@@ -138,7 +138,7 @@ public final class SoapTcpMessage {
     }
 
     public String getContent() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
 
         try {
             for (SoapTcpFrame frame : frames) {

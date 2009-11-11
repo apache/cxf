@@ -109,7 +109,7 @@ public class XsDateTimeFormat extends Format {
             throw new NullPointerException("The Calendar argument must not be null.");
         }
         if (pBuffer == null) {
-            throw new NullPointerException("The StringBuffer argument must not be null.");
+            throw new NullPointerException("The StringBuilder argument must not be null.");
         }
         if (pPos == null) {
             throw new NullPointerException("The FieldPosition argument must not be null.");

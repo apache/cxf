@@ -142,7 +142,7 @@ public class Java2WSMojo extends AbstractMojo {
     private Boolean attachWsdl;
     
     public void execute() throws MojoExecutionException {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (Object classpathElement : classpathElements) {
             buf.append(classpathElement.toString());
             buf.append(File.pathSeparatorChar);

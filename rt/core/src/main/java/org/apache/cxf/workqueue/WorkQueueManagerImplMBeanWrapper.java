@@ -52,7 +52,7 @@ public class WorkQueueManagerImplMBeanWrapper implements ManagedComponent {
     public ObjectName getObjectName() throws JMException {
         
         String busId = bus.getId();        
-        StringBuffer buffer = new StringBuffer();
+        StringBuilder buffer = new StringBuilder();
         buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
         buffer.append(ManagementConstants.BUS_ID_PROP + "=" + busId + ",");
         buffer.append("WorkQueueManager=" + NAME_VALUE);

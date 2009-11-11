@@ -30,14 +30,14 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 
 public class NamespacePrefixAccumulator {
-    private StringBuffer attributes;
+    private StringBuilder attributes;
     private Set<String> prefixes;
     private Map<String, String> fallbackNamespacePrefixMap;
     private int nsCounter;
     private SchemaCollection schemaCollection;
 
     public NamespacePrefixAccumulator(SchemaCollection schemaCollection) {
-        attributes = new StringBuffer();
+        attributes = new StringBuilder();
         prefixes = new HashSet<String>();
         fallbackNamespacePrefixMap = new HashMap<String, String>();
         nsCounter = 0;

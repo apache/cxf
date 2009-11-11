@@ -254,7 +254,7 @@ public abstract class AegisType {
 
     @Override
     public String toString() {
-        StringBuffer sb = new StringBuffer(getClass().getName());
+        StringBuilder sb = new StringBuilder(getClass().getName());
         sb.append("[class=");
         Type c = getTypeClass();
         if (c instanceof Class) {

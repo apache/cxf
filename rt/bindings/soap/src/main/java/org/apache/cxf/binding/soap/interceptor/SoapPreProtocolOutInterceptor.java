@@ -145,7 +145,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
         }
         
         if (!action.startsWith("\"")) {
-            action = new StringBuffer().append("\"").append(action).append("\"").toString();
+            action = new StringBuilder().append("\"").append(action).append("\"").toString();
         }
         
         return action;

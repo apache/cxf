@@ -52,7 +52,7 @@ public final class IdlAnonSequence extends IdlSequenceBase {
     }    
 
     private String seqName(String name) {
-        StringBuffer str = new StringBuffer();
+        StringBuilder str = new StringBuilder();
         str.append("sequence<" + name);
 
         int bnd = bound();

@@ -527,7 +527,7 @@ public class BenchClient {
     }
 
     private static String method2s(char direction, char method) {
-        StringBuffer sb = new StringBuffer(20);
+        StringBuilder sb = new StringBuilder(20);
         if (direction == 'e') {
             sb.append("echo");
         } else if (direction == 's') {

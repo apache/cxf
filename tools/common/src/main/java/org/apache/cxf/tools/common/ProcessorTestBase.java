@@ -76,7 +76,7 @@ public class ProcessorTestBase extends Assert {
 
     protected String getClassPath() throws URISyntaxException, IOException {
         ClassLoader loader = getClass().getClassLoader();
-        StringBuffer classPath = new StringBuffer();
+        StringBuilder classPath = new StringBuilder();
         if (loader instanceof URLClassLoader) {
             URLClassLoader urlLoader = (URLClassLoader)loader;
             for (URL url : urlLoader.getURLs()) {

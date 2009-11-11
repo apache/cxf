@@ -33,7 +33,7 @@ public final class WSDLServiceUtils {
 
     }
 
-    public static BindingFactory getBindingFactory(Binding binding, Bus bus, StringBuffer sb) {
+    public static BindingFactory getBindingFactory(Binding binding, Bus bus, StringBuilder sb) {
         BindingFactory factory = null;
         for (Object obj : binding.getExtensibilityElements()) {
             if (obj instanceof ExtensibilityElement) {

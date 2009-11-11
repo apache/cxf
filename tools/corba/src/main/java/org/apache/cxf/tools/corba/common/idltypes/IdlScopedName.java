@@ -53,7 +53,7 @@ public class IdlScopedName {
             return fullName();
         }
 
-        StringBuffer nm = new StringBuffer(fullName);
+        StringBuilder nm = new StringBuilder(fullName);
         String rel = relativeTo.fullName() + ToolCorbaConstants.MODULE_SEPARATOR;
 
         if (fullName.indexOf(rel) == 0) {

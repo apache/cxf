@@ -110,7 +110,7 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
             String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
             String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
             
-            StringBuffer buffer = new StringBuffer();
+            StringBuilder buffer = new StringBuilder();
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
             buffer.append(ManagementConstants.BUS_ID_PROP + "=" + bus.getId() + ",");
             if (isClient(message)) {

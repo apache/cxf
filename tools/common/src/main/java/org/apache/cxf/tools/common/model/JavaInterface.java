@@ -240,7 +240,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public String getFullClassName() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(getPackageName());
         sb.append(".");
         sb.append(getName());
@@ -248,7 +248,7 @@ public class JavaInterface implements JavaAnnotatable {
     }
 
     public String toString() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (JAnnotation anno : annotations) {
             sb.append(anno);
             sb.append("\n");

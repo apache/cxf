@@ -180,7 +180,7 @@ public class ErrorVisitor {
     }
 
     public String toString() {
-        StringBuffer res = new StringBuffer();
+        StringBuilder res = new StringBuilder();
 
         for (Iterator it = errors.iterator(); it.hasNext();) {
             res.append(it.next().toString()).append(System.getProperty("line.separator"));

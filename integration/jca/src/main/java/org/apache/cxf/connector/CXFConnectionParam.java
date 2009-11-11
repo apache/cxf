@@ -109,7 +109,7 @@ public class CXFConnectionParam {
     }  
 
     public String toString() {
-        StringBuffer buf = new StringBuffer(256);
+        StringBuilder buf = new StringBuilder(256);
         buf.append("Interface [" + getInterface() + "] ");
         buf.append("PortName [" + getPortName() + "] ");
         buf.append("ServiceName [" + getServiceName() + "] ");

@@ -67,7 +67,7 @@ public class ForkedCommand extends Thread {
         if (null == arguments) {
             return null;
         }
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         for (int i = 0; i < arguments.length; i++) {
             if (i > 0) {
                 buf.append(" ");
@@ -122,9 +122,8 @@ public class ForkedCommand extends Thread {
             if (environment == null) {
                 proc = rt.exec(arguments);
             } else {
-                StringBuffer msg = null;
                 if (LOG.isLoggable(Level.FINE)) {
-                    msg = new StringBuffer();
+                    StringBuilder msg = new StringBuilder();
                     msg.append("Process environment: ");
 
                     for (int i = 0; i < environment.length; i++) {

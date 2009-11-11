@@ -218,7 +218,7 @@ public class AddressingPropertiesImpl implements AddressingProperties {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("[");
         if (null != messageID) {
             if (buf.length() > 1) {

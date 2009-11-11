@@ -93,7 +93,7 @@ public final class Scope implements Comparable {
     }
     
     public String toString(String separator) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         Iterator<String> it = scope.iterator();
         while (it.hasNext()) {
             result.append(it.next());
@@ -109,7 +109,7 @@ public final class Scope implements Comparable {
     }
 
     public String toIDLRepositoryID() {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append(CorbaConstants.REPO_STRING);
         result.append(toString("/"));
         result.append(CorbaConstants.IDL_VERSION);

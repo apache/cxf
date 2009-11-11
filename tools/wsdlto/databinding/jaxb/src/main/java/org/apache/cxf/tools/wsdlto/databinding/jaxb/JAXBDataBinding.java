@@ -449,7 +449,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     }
     private String getPluginUsageString(Options opts) {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("\navaliable plugin options:\n");
         for (Plugin pl : opts.getAllPlugins()) {
             buf.append(pl.getUsage());

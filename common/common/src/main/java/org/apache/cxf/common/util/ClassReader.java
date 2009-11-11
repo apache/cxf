@@ -128,7 +128,7 @@ public class ClassReader extends ByteArrayInputStream {
     protected static String getSignature(Member method, Class[] paramTypes) {
         // compute the method descriptor
 
-        StringBuffer b = new StringBuffer((method instanceof Method) ? method.getName() : "<init>");
+        StringBuilder b = new StringBuilder((method instanceof Method) ? method.getName() : "<init>");
         b.append('(');
 
         for (int i = 0; i < paramTypes.length; i++) {
@@ -145,7 +145,7 @@ public class ClassReader extends ByteArrayInputStream {
         return b.toString();
     }
 
-    private static void addDescriptor(StringBuffer b, Class c) {
+    private static void addDescriptor(StringBuilder b, Class c) {
         if (c.isPrimitive()) {
             if (c == void.class) {
                 b.append('V');

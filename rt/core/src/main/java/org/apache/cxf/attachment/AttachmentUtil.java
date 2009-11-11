@@ -103,7 +103,7 @@ public final class AttachmentUtil {
     }
 
     public static String getAttachmentPartHeader(Attachment att) {
-        StringBuffer buffer = new StringBuffer(200);
+        StringBuilder buffer = new StringBuilder(200);
         buffer.append(HttpHeaderHelper.getHeaderKey(HttpHeaderHelper.CONTENT_TYPE) + ": "
                 + att.getDataHandler().getContentType() + ";\r\n");
         if (att.isXOP()) {

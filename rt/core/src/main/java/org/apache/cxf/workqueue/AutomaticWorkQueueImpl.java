@@ -92,7 +92,7 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         lowWaterMark = -1 == lowWaterMark ? Integer.MAX_VALUE : lowWaterMark;
         highWaterMark = -1 == highWaterMark ? Integer.MAX_VALUE : highWaterMark;
                 
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("Constructing automatic work queue with:\n");
         buf.append("max queue size: " + maxQueueSize + "\n");
         buf.append("initialThreads: " + initialThreads + "\n");
@@ -212,7 +212,7 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
     }
     
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append(super.toString());
         buf.append(" [queue size: ");
         buf.append(getSize());

@@ -88,7 +88,7 @@ public class JavaParameter extends JavaType implements JavaAnnotatable {
     }
 
     public String toString() {
-        final StringBuffer sb = new StringBuffer();
+        final StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
         if (holder) {
             sb.append("\nIS Holder: [Holder Name]:");

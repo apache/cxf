@@ -62,7 +62,7 @@ public class ASMHelper {
     }
     
     protected static String getMethodSignature(Method m) {
-        StringBuffer buf = new StringBuffer("(");
+        StringBuilder buf = new StringBuilder("(");
         for (Class<?> cl : m.getParameterTypes()) {
             buf.append(getClassCode(cl));
         }

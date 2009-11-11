@@ -209,7 +209,7 @@ public class WSDLToCorbaBinding {
     }
     
     private void throwMultipleMultipleTypeException(Map binds) throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         org.apache.cxf.common.i18n.Message msgDef = 
             new org.apache.cxf.common.i18n.Message("Multiple Bindings already defined in the wsdl", LOG);
         sb.append(msgDef.toString());

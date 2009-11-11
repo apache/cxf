@@ -99,7 +99,7 @@ public final class HttpUtils {
             return encoded;
         }
         Matcher m = ENCODE_PATTERN.matcher(encoded);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         int i = 0;
         while (m.find()) {
             String before = encoded.substring(i, m.start());

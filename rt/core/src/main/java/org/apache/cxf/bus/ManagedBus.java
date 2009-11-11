@@ -46,7 +46,7 @@ public class ManagedBus implements ManagedComponent {
     
     public ObjectName getObjectName() throws JMException {
         String busId = bus.getId();
-        StringBuffer buffer = new StringBuffer(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
+        StringBuilder buffer = new StringBuilder(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
         buffer.append(ManagementConstants.BUS_ID_PROP + "=" +  busId + ",");
         buffer.append(ManagementConstants.TYPE_PROP + "="  + TYPE_VALUE);
         

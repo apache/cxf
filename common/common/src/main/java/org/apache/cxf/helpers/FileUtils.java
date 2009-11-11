@@ -214,7 +214,7 @@ public final class FileUtils {
 
     public static String normalizeCRLF(InputStream instream) {
         BufferedReader in = new BufferedReader(new InputStreamReader(instream));
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String line = null;
 
         try {

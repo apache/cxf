@@ -68,7 +68,7 @@ public class EprMetaData {
     public String toString() {
         String ret = null;
         if (isValid()) {
-            StringBuffer b = new StringBuffer();
+            StringBuilder b = new StringBuilder();
             b.append('{');
             b.append(binding.getQName());
             b.append(',');

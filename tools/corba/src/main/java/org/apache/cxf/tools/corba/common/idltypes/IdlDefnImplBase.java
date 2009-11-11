@@ -25,7 +25,7 @@ import java.util.Vector;
 
 
 public abstract class IdlDefnImplBase implements IdlDefn {
-    private static StringBuffer indent = new StringBuffer();
+    private static StringBuilder indent = new StringBuilder();
     private IdlScopeBase parent;
     private IdlScopedName name;
 

@@ -61,7 +61,7 @@ public final class ServiceUtils {
     }
 
     public static String getMethodName(Method m) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(m.getDeclaringClass().getName());
         sb.append('.');
         sb.append(m.getName());

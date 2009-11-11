@@ -180,7 +180,7 @@ public class CXFConnectionSpec implements ConnectionRequestInfo {
     }
 
     public String toString() {
-        StringBuffer buf = new StringBuffer();
+        StringBuilder buf = new StringBuilder();
         buf.append("serviceName=" + serviceName);
         buf.append(",endpointName=" + endpointName);
         buf.append(",wsdlURL=" + wsdlURL);
