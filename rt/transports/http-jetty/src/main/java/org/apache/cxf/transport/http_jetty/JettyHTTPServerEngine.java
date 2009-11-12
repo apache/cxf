@@ -29,15 +29,19 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.management.MBeanServer;
 import javax.servlet.ServletContext;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
+import org.mortbay.component.Container;
 import org.mortbay.jetty.AbstractConnector;
 import org.mortbay.jetty.Connector;
 import org.mortbay.jetty.Handler;
@@ -297,6 +301,21 @@ public class JettyHTTPServerEngine
             DefaultHandler defaultHandler = null;
             // create a new jetty server instance if there is no server there            
             server = new Server();
+            if (bus != null && bus.getExtension(InstrumentationManager.class) != null) {
+                MBeanServer mbs =  bus.getExtension(InstrumentationManager.class).getMBeanServer();
+                if (mbs != null) {
+                    try {
+                        Class<?> cls = ClassLoaderUtils.loadClass("org.mortbay.management.MBeanContainer", 
+                                                              getClass());
+                        Container.Listener listener 
+                            = (Container.Listener)cls.getConstructor(MBeanServer.class).newInstance(mbs);
+                        server.getContainer().addEventListener(listener);
+                    } catch (Throwable ex) {
+                        //ignore - just won't instrument jetty.  Probably don't have the
+                        //jetty-management jar available
+                    }
+                }
+            }
             if (connector == null) {
                 connector = connectorFactory.createConnector(getHost(), getPort());
                 if (LOG.isLoggable(Level.FINER)) {
