@@ -737,13 +737,13 @@ public final class StaxUtils {
     }
 
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
-        Document doc = DOMUtils.createDocument();
-        readDocElements(doc, reader, true);
-        return doc;
+        return read(reader, false);
     }
     public static Document read(XMLStreamReader reader, boolean recordLoc) throws XMLStreamException {
         Document doc = DOMUtils.createDocument();
-        doc.setDocumentURI(reader.getLocation().getSystemId());
+        if (reader.getLocation().getSystemId() != null) {
+            doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+        }
         readDocElements(doc, doc, reader, true, recordLoc);
         return doc;
     }
@@ -751,7 +751,9 @@ public final class StaxUtils {
     public static Document read(DocumentBuilder builder, XMLStreamReader reader, boolean repairing) 
         throws XMLStreamException {
         Document doc = builder.newDocument();
-        doc.setDocumentURI(reader.getLocation().getSystemId());
+        if (reader.getLocation().getSystemId() != null) {
+            doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+        }
         readDocElements(doc, reader, repairing);
         return doc;
     }
@@ -893,34 +895,33 @@ public final class StaxUtils {
             }
         }
     }
-    private static void addLocation(final Document doc, Node node, 
-                                    XMLStreamReader reader, boolean recordLoc) {
+    private static void addLocation(Document doc, Node node, 
+                                    XMLStreamReader reader,
+                                    boolean recordLoc) {
         if (recordLoc) {
-            final Location loc = reader.getLocation();
+            Location loc = reader.getLocation();
             if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
+                final int charOffset = loc.getCharacterOffset();
+                final int colNum = loc.getColumnNumber();
+                final int linNum = loc.getLineNumber();
+                final String pubId = loc.getPublicId() == null ? doc.getDocumentURI() : loc.getPublicId();
+                final String sysId = loc.getSystemId() == null ? doc.getDocumentURI() : loc.getSystemId();
                 Location loc2 = new Location() {
                     public int getCharacterOffset() {
-                        return loc.getCharacterOffset();
+                        return charOffset;
                     }
                     public int getColumnNumber() {
-                        return loc.getColumnNumber();
+                        return colNum;
                     }
                     public int getLineNumber() {
-                        return loc.getLineNumber();
+                        return linNum;
                     }
                     public String getPublicId() {
-                        if (loc.getPublicId() == null) {
-                            return doc.getDocumentURI();
-                        }
-                        return loc.getPublicId();
+                        return pubId;
                     }
                     public String getSystemId() {
-                        if (loc.getSystemId() == null) {
-                            return doc.getDocumentURI();
-                        }
-                        return loc.getSystemId();
+                        return sysId;
                     }
-                    
                 };
                 node.setUserData("location", loc2, new UserDataHandler() {
                     public void handle(short operation, String key, Object data, Node src, Node dst) {
@@ -945,16 +946,18 @@ public final class StaxUtils {
         node.setAttributeNodeNS(attr);
     }
     public static XMLStreamReader createXMLStreamReader(InputSource src) {
+        String sysId = src.getSystemId() == null ? null : new String(src.getSystemId());
+        String pubId = src.getPublicId() == null ? null : new String(src.getPublicId());
         if (src.getByteStream() != null) {
             if (src.getEncoding() == null) {
-                StreamSource ss = new StreamSource(src.getByteStream(), src.getSystemId());
-                ss.setPublicId(src.getPublicId());
+                StreamSource ss = new StreamSource(src.getByteStream(), sysId);
+                ss.setPublicId(pubId);
                 return createXMLStreamReader(ss);
             }
             return createXMLStreamReader(src.getByteStream(), src.getEncoding());
         } else if (src.getCharacterStream() != null) {
-            StreamSource ss = new StreamSource(src.getCharacterStream(), src.getSystemId());
-            ss.setPublicId(src.getPublicId());
+            StreamSource ss = new StreamSource(src.getCharacterStream(), sysId);
+            ss.setPublicId(pubId);
             return createXMLStreamReader(ss);
         }
         throw new IllegalArgumentException("InputSource must have a ByteStream or CharacterStream");
