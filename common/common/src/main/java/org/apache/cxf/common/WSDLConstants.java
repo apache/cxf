@@ -103,9 +103,6 @@ public final class WSDLConstants {
     public static final String ATTR_PART_TYPE = "type";
     public static final String ATTR_TYPE = "type";
 
-    //For Stax2DOM getUserData(location)
-    public static final String NODE_LOCATION = "location";
-
     public static final int DOC_WRAPPED = 1;
     public static final int DOC_BARE = 2;
     public static final int RPC_WRAPPED = 3;
