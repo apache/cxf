@@ -22,6 +22,7 @@ import java.util.ArrayList;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
@@ -390,5 +391,14 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
 
     public String getPIData() {
         throw new UnsupportedOperationException();
+    }   
+    public Location getLocation() {
+        Object o = getCurrentNode().getUserData("location");
+        if (o instanceof Location) { 
+            return (Location)o;
+        }
+        return super.getLocation();
     }
+
+    
 }

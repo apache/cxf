@@ -330,7 +330,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             schemaCompiler.setDefaultPackageName(context.getPackageName());
         }  
         
-
         rawJaxbModelGenCode = schemaCompiler.bind();
 
         addedEnumClassToCollector(schemas, allocator);
@@ -398,7 +397,12 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setSystemId(key);
                 is.setPublicId(key);
                 opts.addGrammar(is);
-                schemaCompiler.parseSchema(key, ele);
+                try {
+                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele));
+                } catch (XMLStreamException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
@@ -443,7 +447,12 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setSystemId(key);
                 is.setPublicId(key);
                 opts.addGrammar(is);
-                schemaCompiler.parseSchema(key, ele);
+                try {
+                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele));
+                } catch (XMLStreamException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
             }
         }
 

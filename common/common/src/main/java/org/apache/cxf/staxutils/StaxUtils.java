@@ -33,6 +33,7 @@ import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.Location;
 import javax.xml.stream.StreamFilter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
@@ -50,6 +51,7 @@ import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXSource;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
@@ -62,6 +64,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.ProcessingInstruction;
 import org.w3c.dom.Text;
+import org.w3c.dom.UserDataHandler;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.XMLReader;
@@ -738,13 +741,18 @@ public final class StaxUtils {
         readDocElements(doc, reader, true);
         return doc;
     }
+    public static Document read(XMLStreamReader reader, boolean recordLoc) throws XMLStreamException {
+        Document doc = DOMUtils.createDocument();
+        doc.setDocumentURI(reader.getLocation().getSystemId());
+        readDocElements(doc, doc, reader, true, recordLoc);
+        return doc;
+    }
     
     public static Document read(DocumentBuilder builder, XMLStreamReader reader, boolean repairing) 
         throws XMLStreamException {
         Document doc = builder.newDocument();
-
+        doc.setDocumentURI(reader.getLocation().getSystemId());
         readDocElements(doc, reader, repairing);
-
         return doc;
     }
 
@@ -762,16 +770,19 @@ public final class StaxUtils {
      * @return
      * @throws XMLStreamException
      */
-    private static Element startElement(Node parent, XMLStreamReader reader, boolean repairing)
+    private static Element startElement(Document doc, 
+                                        Node parent, 
+                                        XMLStreamReader reader,
+                                        boolean repairing,
+                                        boolean recordLocation)
         throws XMLStreamException {
-        Document doc = getDocument(parent);
 
         Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
         if (reader.getPrefix() != null) {
             e.setPrefix(reader.getPrefix());
-        }
-
+        }       
         e = (Element)parent.appendChild(e);
+        addLocation(doc, e, reader, recordLocation);
 
         for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
             String uri = reader.getNamespaceURI(ns);
@@ -798,7 +809,7 @@ public final class StaxUtils {
 
         reader.next();
 
-        readDocElements(e, reader, repairing);
+        readDocElements(doc, e, reader, repairing, recordLocation);
 
         return e;
     }
@@ -821,21 +832,26 @@ public final class StaxUtils {
 
         return false;
     }
+    public static void readDocElements(Node parent, XMLStreamReader reader, boolean repairing) 
+        throws XMLStreamException {
+        Document doc = getDocument(parent);
+        readDocElements(doc, parent, reader, repairing, false);
+    }
 
     /**
      * @param parent
      * @param reader
      * @throws XMLStreamException
      */
-    public static void readDocElements(Node parent, XMLStreamReader reader, boolean repairing)
+    public static void readDocElements(Document doc, Node parent,
+                                       XMLStreamReader reader, boolean repairing, boolean recordLoc)
         throws XMLStreamException {
-        Document doc = getDocument(parent);
 
         int event = reader.getEventType();
         while (reader.hasNext()) {
             switch (event) {
             case XMLStreamConstants.START_ELEMENT:
-                startElement(parent, reader, repairing);
+                startElement(doc, parent, reader, repairing, recordLoc);
                 
                 if (parent instanceof Document) {
                     return;
@@ -849,27 +865,24 @@ public final class StaxUtils {
                 break;
             case XMLStreamConstants.CHARACTERS:
                 if (parent != null) {
-                    parent.appendChild(doc.createTextNode(reader.getText()));
+                    addLocation(doc, parent.appendChild(doc.createTextNode(reader.getText())),
+                                reader, recordLoc);
                 }
-
                 break;
             case XMLStreamConstants.COMMENT:
                 if (parent != null) {
                     parent.appendChild(doc.createComment(reader.getText()));
                 }
-
                 break;
             case XMLStreamConstants.CDATA:
-                parent.appendChild(doc.createCDATASection(reader.getText()));
-
+                addLocation(doc, parent.appendChild(doc.createCDATASection(reader.getText())),
+                            reader, recordLoc);
                 break;
             case XMLStreamConstants.PROCESSING_INSTRUCTION:
                 parent.appendChild(doc.createProcessingInstruction(reader.getPITarget(), reader.getPIData()));
-
                 break;
             case XMLStreamConstants.ENTITY_REFERENCE:
                 parent.appendChild(doc.createProcessingInstruction(reader.getPITarget(), reader.getPIData()));
-
                 break;
             default:
                 break;
@@ -877,6 +890,45 @@ public final class StaxUtils {
 
             if (reader.hasNext()) {
                 event = reader.next();
+            }
+        }
+    }
+    private static void addLocation(final Document doc, Node node, 
+                                    XMLStreamReader reader, boolean recordLoc) {
+        if (recordLoc) {
+            final Location loc = reader.getLocation();
+            if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
+                Location loc2 = new Location() {
+                    public int getCharacterOffset() {
+                        return loc.getCharacterOffset();
+                    }
+                    public int getColumnNumber() {
+                        return loc.getColumnNumber();
+                    }
+                    public int getLineNumber() {
+                        return loc.getLineNumber();
+                    }
+                    public String getPublicId() {
+                        if (loc.getPublicId() == null) {
+                            return doc.getDocumentURI();
+                        }
+                        return loc.getPublicId();
+                    }
+                    public String getSystemId() {
+                        if (loc.getSystemId() == null) {
+                            return doc.getDocumentURI();
+                        }
+                        return loc.getSystemId();
+                    }
+                    
+                };
+                node.setUserData("location", loc2, new UserDataHandler() {
+                    public void handle(short operation, String key, Object data, Node src, Node dst) {
+                        if (operation == NODE_CLONED) {
+                            dst.setUserData(key, data, this);
+                        }
+                    }
+                });
             }
         }
     }
@@ -892,7 +944,21 @@ public final class StaxUtils {
         attr.setValue(uri);
         node.setAttributeNodeNS(attr);
     }
-
+    public static XMLStreamReader createXMLStreamReader(InputSource src) {
+        if (src.getByteStream() != null) {
+            if (src.getEncoding() == null) {
+                StreamSource ss = new StreamSource(src.getByteStream(), src.getSystemId());
+                ss.setPublicId(src.getPublicId());
+                return createXMLStreamReader(ss);
+            }
+            return createXMLStreamReader(src.getByteStream(), src.getEncoding());
+        } else if (src.getCharacterStream() != null) {
+            StreamSource ss = new StreamSource(src.getCharacterStream(), src.getSystemId());
+            ss.setPublicId(src.getPublicId());
+            return createXMLStreamReader(ss);
+        }
+        throw new IllegalArgumentException("InputSource must have a ByteStream or CharacterStream");
+    }
     /**
      * @param in
      * @param encoding
@@ -1191,6 +1257,7 @@ public final class StaxUtils {
             //shouldn't get here
         }
     }
+
     public static String toString(Document doc) throws XMLStreamException {
         StringWriter sw = new StringWriter(1024);
         XMLStreamWriter writer = createXMLStreamWriter(sw);

@@ -30,6 +30,9 @@ public final class FailureLocation {
     public FailureLocation(Location loc, String docURI) {
         this.location = loc;
         this.documentURI = docURI;
+        if (documentURI == null) {
+            documentURI = loc.getSystemId();
+        }
     }
 
     public Location getLocation() {

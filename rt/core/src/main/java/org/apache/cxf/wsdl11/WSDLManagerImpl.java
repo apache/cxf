@@ -43,7 +43,10 @@ import javax.wsdl.xml.WSDLReader;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.xml.sax.InputSource;
 
 import com.ibm.wsdl.extensions.soap.SOAPHeaderImpl;
 import com.ibm.wsdl.extensions.soap.SOAPHeaderSerializer;
@@ -56,6 +59,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.PropertiesLoaderUtils;
 import org.apache.cxf.service.model.ServiceSchemaInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.cxf.wsdl.WSDLManager;
 
@@ -207,7 +211,16 @@ public class WSDLManagerImpl implements WSDLManager {
         ResourceManagerWSDLLocator wsdlLocator = new ResourceManagerWSDLLocator(url,
                                                                                 catLocator,
                                                                                 bus);
-        Definition def = reader.readWSDL(wsdlLocator);
+        InputSource src = wsdlLocator.getBaseInputSource();
+        Document doc;
+        try {
+            doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
+            doc.setDocumentURI(src.getSystemId());
+        } catch (Exception e) {
+            throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
+        }
+        
+        Definition def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
         synchronized (definitionsMap) {
             definitionsMap.put(url, def);
         }

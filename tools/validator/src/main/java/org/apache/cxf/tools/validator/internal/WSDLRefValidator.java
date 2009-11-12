@@ -220,7 +220,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
         for (Document doc : docs) {
             Node node = (Node) xpather.getValue(fNode.toString(), doc, XPathConstants.NODE);
             if (null != node) {
-                return new FailureLocation((Location)node.getUserData(WSDLConstants.NODE_LOCATION),
+                return new FailureLocation((Location)node.getUserData("location"),
                                            doc.getDocumentURI());
             }
         }
