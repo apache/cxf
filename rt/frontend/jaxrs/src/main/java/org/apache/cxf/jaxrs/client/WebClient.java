@@ -565,6 +565,8 @@ public class WebClient extends AbstractClient {
             MessageContentsList contents = new MessageContentsList(body);
             m.setContent(List.class, contents);
             m.getInterceptorChain().add(new BodyWriter());
+        } else if ("POST".equals(httpMethod)) {
+            m.put("org.apache.cxf.post.empty", "true");
         }
         
         try {
