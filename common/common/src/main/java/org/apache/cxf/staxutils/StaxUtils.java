@@ -737,9 +737,7 @@ public final class StaxUtils {
     }
 
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
-        Document doc = DOMUtils.createDocument();
-        readDocElements(doc, reader, true);
-        return doc;
+        return read(reader, false);
     }
     public static Document read(XMLStreamReader reader, boolean recordLoc) throws XMLStreamException {
         Document doc = DOMUtils.createDocument();
