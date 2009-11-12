@@ -54,10 +54,11 @@ public class HWDOMSourcePayloadXMLBindingProvider implements
     }
 
     public DOMSource invoke(DOMSource request) {
-        
-        QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
-        if (qn == null) {
-            throw new RuntimeException("No Operation Name");
+        if (request != null) {
+            QName qn = (QName)ctx.getMessageContext().get(MessageContext.WSDL_OPERATION);
+            if (qn == null) {
+                throw new RuntimeException("No Operation Name");
+            }
         }
         
         DocumentBuilderFactory factory;

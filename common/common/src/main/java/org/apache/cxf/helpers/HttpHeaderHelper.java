@@ -32,6 +32,7 @@ public final class HttpHeaderHelper {
     public static final String CONTENT_TYPE = "Content-Type";
     public static final String CONTENT_ID = "Content-ID";
     public static final String CONTENT_ENCODING = "Content-Encoding";
+    public static final String CONTENT_LENGTH = "Content-Length";
     public static final String CONTENT_TRANSFER_ENCODING = "Content-Transfer-Encoding";
     public static final String COOKIE = "Cookie";
     public static final String TRANSFER_ENCODING = "Transfer-Encoding";
@@ -55,13 +56,14 @@ public final class HttpHeaderHelper {
         internalHeaders.put("authorization", "Authorization");
         internalHeaders.put("soapaction", "SOAPAction");
         internalHeaders.put("accept", "Accept");
+        internalHeaders.put("content-length", "Content-Length");
     }
     
     private HttpHeaderHelper() {
         
     }
     
-    public static List getHeader(Map<String, List<String>> headerMap, String key) {
+    public static List<String> getHeader(Map<String, List<String>> headerMap, String key) {
         return headerMap.get(getHeaderKey(key));
     }
     

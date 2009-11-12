@@ -73,7 +73,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
 
         //if body is empty and we have BindingOperationInfo, we do not need to match 
         //operation anymore, just return
-        if (!StaxUtils.toNextElement(xmlReader) && bop != null) {
+        if (bop != null && !StaxUtils.toNextElement(xmlReader)) {
             // body may be empty for partial response to decoupled request
             return;
         }
@@ -84,7 +84,9 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         }
 
         if (bop == null) {
-            QName startQName = xmlReader.getName();
+            QName startQName = xmlReader == null 
+                ? new QName("http://cxf.apache.org/jaxws/provider", "invoke")
+                : xmlReader.getName();
             bop = getBindingOperationInfo(exchange, startQName, client);
         }
 
@@ -143,7 +145,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 operations = new ArrayList<OperationInfo>();
                 operations.addAll(si.getInterface().getOperations());
     
-                if (!StaxUtils.toNextElement(xmlReader)) {
+                if (xmlReader == null || !StaxUtils.toNextElement(xmlReader)) {
                     // empty input
     
                     // TO DO : check duplicate operation with no input

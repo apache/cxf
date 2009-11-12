@@ -52,14 +52,16 @@ public abstract class AbstractInvoker implements Invoker {
         try {
 
             BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
-            if (bop == null) {
+            MethodDispatcher md = (MethodDispatcher) 
+                exchange.get(Service.class).get(MethodDispatcher.class.getName());
+            Method m = md.getMethod(bop);
+            if (m == null && bop == null) {
                 LOG.severe(new Message("MISSING_BINDING_OPERATION", LOG).toString());
                 throw new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
                                              "No binding operation info", "unknown method", "unknown"));
             }
-            MethodDispatcher md = (MethodDispatcher) 
-                exchange.get(Service.class).get(MethodDispatcher.class.getName());
-            Method m = md.getMethod(bop);
+            
+            
             //Method m = (Method)bop.getOperationInfo().getProperty(Method.class.getName());
             m = matchMethod(m, serviceObject);
             
