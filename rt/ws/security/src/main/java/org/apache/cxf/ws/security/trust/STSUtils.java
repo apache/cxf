@@ -106,7 +106,9 @@ public final class STSUtils {
         ei.setName(epName == null ? iName : epName);
         ei.setAddress(location);
         si.addEndpoint(ei);
-        ei.addExtensor(policy);
+        if (policy != null) {
+            ei.addExtensor(policy);
+        }
         
         BindingOperationInfo boi = bi.getOperation(ioi);
         SoapOperationInfo soi = boi.getExtensor(SoapOperationInfo.class);
