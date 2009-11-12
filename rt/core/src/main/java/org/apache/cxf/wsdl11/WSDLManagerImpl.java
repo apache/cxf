@@ -222,7 +222,7 @@ public class WSDLManagerImpl implements WSDLManager {
         Document doc;
         try {
             doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
-            doc.setDocumentURI(src.getSystemId());
+            doc.setDocumentURI(new String(src.getSystemId()));
         } catch (Exception e) {
             throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
         }

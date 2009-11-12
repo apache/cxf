@@ -743,7 +743,7 @@ public final class StaxUtils {
     }
     public static Document read(XMLStreamReader reader, boolean recordLoc) throws XMLStreamException {
         Document doc = DOMUtils.createDocument();
-        doc.setDocumentURI(reader.getLocation().getSystemId());
+        doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
         readDocElements(doc, doc, reader, true, recordLoc);
         return doc;
     }
@@ -751,7 +751,7 @@ public final class StaxUtils {
     public static Document read(DocumentBuilder builder, XMLStreamReader reader, boolean repairing) 
         throws XMLStreamException {
         Document doc = builder.newDocument();
-        doc.setDocumentURI(reader.getLocation().getSystemId());
+        doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
         readDocElements(doc, reader, repairing);
         return doc;
     }
@@ -893,34 +893,33 @@ public final class StaxUtils {
             }
         }
     }
-    private static void addLocation(final Document doc, Node node, 
-                                    XMLStreamReader reader, boolean recordLoc) {
+    private static void addLocation(Document doc, Node node, 
+                                    XMLStreamReader reader,
+                                    boolean recordLoc) {
         if (recordLoc) {
-            final Location loc = reader.getLocation();
+            Location loc = reader.getLocation();
             if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
+                final int charOffset = loc.getCharacterOffset();
+                final int colNum = loc.getColumnNumber();
+                final int linNum = loc.getLineNumber();
+                final String pubId = loc.getPublicId() == null ? doc.getDocumentURI() : loc.getPublicId();
+                final String sysId = loc.getSystemId() == null ? doc.getDocumentURI() : loc.getSystemId();
                 Location loc2 = new Location() {
                     public int getCharacterOffset() {
-                        return loc.getCharacterOffset();
+                        return charOffset;
                     }
                     public int getColumnNumber() {
-                        return loc.getColumnNumber();
+                        return colNum;
                     }
                     public int getLineNumber() {
-                        return loc.getLineNumber();
+                        return linNum;
                     }
                     public String getPublicId() {
-                        if (loc.getPublicId() == null) {
-                            return doc.getDocumentURI();
-                        }
-                        return loc.getPublicId();
+                        return pubId;
                     }
                     public String getSystemId() {
-                        if (loc.getSystemId() == null) {
-                            return doc.getDocumentURI();
-                        }
-                        return loc.getSystemId();
+                        return sysId;
                     }
-                    
                 };
                 node.setUserData("location", loc2, new UserDataHandler() {
                     public void handle(short operation, String key, Object data, Node src, Node dst) {
