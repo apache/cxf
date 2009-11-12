@@ -130,6 +130,13 @@ public class WadlGeneratorTest extends Assert {
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
+        List<Element> docsEls = DOMUtils.getChildrenWithName(resource, 
+                WadlGenerator.WADL_NS, "doc");
+        assertEquals(1, docsEls.size());
+        assertEquals("book store resource", docsEls.get(0).getAttribute("title"));
+        assertEquals("en-us", 
+            docsEls.get(0).getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang"));
+        
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(6, resourceEls.size());        
