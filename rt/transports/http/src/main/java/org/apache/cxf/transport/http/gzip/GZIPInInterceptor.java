@@ -66,8 +66,8 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         Map<String, List<String>> protocolHeaders = CastUtils.cast((Map<?, ?>)message
             .get(Message.PROTOCOL_HEADERS));
         if (protocolHeaders != null) {
-            List<String> contentEncoding = CastUtils.cast(HttpHeaderHelper
-                .getHeader(protocolHeaders, HttpHeaderHelper.CONTENT_ENCODING));
+            List<String> contentEncoding = HttpHeaderHelper.getHeader(protocolHeaders, 
+                                                                      HttpHeaderHelper.CONTENT_ENCODING);
             if (contentEncoding != null
                 && (contentEncoding.contains("gzip") || contentEncoding.contains("x-gzip"))) {
                 try {

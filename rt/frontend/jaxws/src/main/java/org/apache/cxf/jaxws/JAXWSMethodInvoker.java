@@ -20,9 +20,11 @@
 package org.apache.cxf.jaxws;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.ws.Provider;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.helpers.CastUtils;
@@ -52,6 +54,9 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
         WebServiceContextImpl.setMessageContext(ctx);
         List<Object> res = null;
         try {
+            if ((params == null || params.isEmpty()) && m.getDeclaringClass().equals(Provider.class)) {
+                params = Collections.singletonList(null);
+            }
             res = CastUtils.cast((List)super.invoke(exchange, serviceObject, m, params));
             addHandlerProperties(ctx, handlerScopedStuff);
             //update the webservice response context

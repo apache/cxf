@@ -22,6 +22,7 @@ package org.apache.cxf.interceptor;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
@@ -31,6 +32,9 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -73,7 +77,22 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             throw new Fault(new org.apache.cxf.common.i18n.Message("INVALID_HTML_RESPONSETYPE",
                     LOG, (htmlMessage == null || htmlMessage.length() == 0) ? "(none)" : htmlMessage));
         }
-        
+        if (contentType == null) {
+            //if contentType is null, this is likely a an empty post/put/delete/similar, lets see if it's
+            //detectable at all
+            Map<String, List<String>> m = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
+            if (m != null) {
+                List<String> contentLen = HttpHeaderHelper
+                    .getHeader(m, HttpHeaderHelper.CONTENT_LENGTH);
+                List<String> contentTE = HttpHeaderHelper
+                    .getHeader(m, HttpHeaderHelper.CONTENT_TRANSFER_ENCODING);
+                if ((StringUtils.isEmpty(contentLen) || "0".equals(contentLen.get(0)))
+                    && StringUtils.isEmpty(contentTE)) {
+                    return;
+                }
+            }
+        }
+
         String encoding = (String)message.get(Message.ENCODING);
 
         XMLStreamReader reader;

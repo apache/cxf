@@ -63,6 +63,9 @@ public class XMLMessageInInterceptor extends AbstractInDatabindingInterceptor {
         Endpoint ep = message.getExchange().get(Endpoint.class);
 
         XMLStreamReader xsr = message.getContent(XMLStreamReader.class);
+        if (xsr == null) {
+            return;
+        }
         DepthXMLStreamReader reader = new DepthXMLStreamReader(xsr);
         if (!StaxUtils.toNextElement(reader)) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_OPERATION_ELEMENT", LOG));

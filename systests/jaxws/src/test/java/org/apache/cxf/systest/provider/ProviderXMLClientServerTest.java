@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.provider;
 
 import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -49,6 +50,16 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
                 launchServer(XMLServer.class));
     }
 
+    @Test
+    public void testEmptyPost() throws Exception {
+        URL url = new URL("http://localhost:9022/XMLService/XMLProviderPort");
+        HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+        connection.setRequestMethod("POST");
+        connection.setDoInput(true);
+        int i = connection.getResponseCode();
+        assertEquals(200, i);
+        assertTrue(connection.getContentType().indexOf("xml") != -1);
+    }
     @Test
     public void testDOMSourcePAYLOAD() throws Exception {
         URL wsdl = getClass().getResource("/wsdl/hello_world_xml_wrapped.wsdl");
