@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxws.context;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -38,6 +40,8 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 
 public class WrappedMessageContext implements MessageContext {
     public static final String SCOPES = WrappedMessageContext.class.getName() + ".SCOPES";
@@ -252,13 +256,66 @@ public class WrappedMessageContext implements MessageContext {
                 if (authPolicy != null) {
                     ret = authPolicy.getPassword();
                 }
+            } else if (Message.WSDL_OPERATION.equals(key)) {
+                BindingOperationInfo boi = getBindingOperationInfo(exchange);
+                if (boi != null) {
+                    ret = boi.getName();
+                }
+            } else if (Message.WSDL_SERVICE.equals(key)) {
+                BindingOperationInfo boi = getBindingOperationInfo(exchange);
+                if (boi != null) {
+                    ret = boi.getBinding().getService().getName();
+                }
+            } else if (Message.WSDL_INTERFACE.equals(key)) {
+                BindingOperationInfo boi = getBindingOperationInfo(exchange);
+                if (boi != null) {
+                    ret = boi.getBinding().getService().getInterface().getName();
+                }
+            } else if (Message.WSDL_PORT.equals(key)) {
+                EndpointInfo endpointInfo = getEndpointInfo(exchange);
+                if (endpointInfo != null) {
+                    ret = endpointInfo.getName();
+                }
+            } else if (Message.WSDL_DESCRIPTION.equals(key)) {
+                EndpointInfo endpointInfo = getEndpointInfo(exchange);
+                if (endpointInfo != null) {
+                    URI wsdlDescription = endpointInfo.getProperty("URI", URI.class);
+                    if (wsdlDescription == null) {
+                        String address = endpointInfo.getAddress();
+                        try {
+                            wsdlDescription = new URI(address + "?wsdl");
+                        } catch (URISyntaxException e) {
+                            // do nothing
+                        }
+                        endpointInfo.setProperty("URI", wsdlDescription);
+                    }
+                    ret = wsdlDescription;
+                }
             }
+
             
             if (ret == null && reqMessage != null) { 
                 ret = reqMessage.get(mappedkey);
             }
         }
         return ret;
+    }
+    
+    private static BindingOperationInfo getBindingOperationInfo(Exchange exchange) {
+        if (exchange != null && exchange.get(BindingOperationInfo.class) != null) {
+            return exchange.get(BindingOperationInfo.class);
+        }
+        return null;
+    }
+
+    private static EndpointInfo getEndpointInfo(Exchange exchange) {
+        if (exchange != null) {
+            Endpoint endpoint = exchange.get(Endpoint.class);
+            if (endpoint != null) {
+                return endpoint.getEndpointInfo();
+            }
+        }
+        return null;
     }
 
     private Message createResponseMessage() {
