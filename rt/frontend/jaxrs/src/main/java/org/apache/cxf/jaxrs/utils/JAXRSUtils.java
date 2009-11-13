@@ -747,7 +747,7 @@ public final class JAXRSUtils {
         List<String> values = new HttpHeadersImpl(m).getRequestHeader(HttpHeaders.COOKIE);
         String theValue = null;
         for (String s : values) {
-            if (s.startsWith(cookieName)) {
+            if (s.contains(cookieName + "=")) {
                 theValue = s;
                 break;
             }
