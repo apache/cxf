@@ -763,6 +763,10 @@ public class JSONProviderTest extends Assert {
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://tagsvo2", "ps1");
+        provider.setNamespaceMap(nsmap);
+        
         TagVO tag = new TagVO("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO.class, TagVO.class,
@@ -805,11 +809,14 @@ public class JSONProviderTest extends Assert {
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
         provider.setOutAppendElements(map);
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://tagsvo2", "ps1");
+        provider.setNamespaceMap(nsmap);
         TagVO2 tag = new TagVO2("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO2.class, TagVO2.class,
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
-        String expected = "{\"ps1.t\":{\"ns1.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
+        String expected = "{\"ps1.t\":{\"ns2.thetag\":{\"group\":\"B\",\"name\":\"A\"}}}";
         assertEquals(expected, bos.toString());
     }
     
@@ -818,6 +825,9 @@ public class JSONProviderTest extends Assert {
         JSONProvider provider = new JSONProvider();
         Map<String, String> map = new HashMap<String, String>();
         map.put("{http://tags}thetag", "{http://tagsvo2}t");
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://tagsvo2", "ns2");
+        provider.setNamespaceMap(nsmap);
         provider.setOutTransformElements(map);
         TagVO2 tag = new TagVO2("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -850,6 +860,9 @@ public class JSONProviderTest extends Assert {
         Map<String, String> map = new HashMap<String, String>();
         map.put("tagVO", "{http://tags}thetag");
         provider.setOutTransformElements(map);
+        Map<String, String> nsmap = new HashMap<String, String>();
+        nsmap.put("http://tags", "ps1");
+        provider.setNamespaceMap(nsmap);
         TagVO tag = new TagVO("A", "B");
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         provider.writeTo(tag, TagVO.class, TagVO.class,
