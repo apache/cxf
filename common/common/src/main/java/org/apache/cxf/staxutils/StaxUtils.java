@@ -382,7 +382,11 @@ public final class StaxUtils {
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         copy(reader, writer);
         Document d = writer.getDocument();
-        d.setDocumentURI(doc.getDocumentURI());
+        try {
+            d.setDocumentURI(doc.getDocumentURI());
+        } catch (Exception ex) {
+            //ignore - probably not DOM level 3
+        }
         return d;
     }
     public static void copy(Document doc, XMLStreamWriter writer) throws XMLStreamException {
@@ -742,7 +746,11 @@ public final class StaxUtils {
     public static Document read(XMLStreamReader reader, boolean recordLoc) throws XMLStreamException {
         Document doc = DOMUtils.createDocument();
         if (reader.getLocation().getSystemId() != null) {
-            doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+            try {
+                doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+            } catch (Exception e) {
+                //ignore - probably not DOM level 3
+            }
         }
         readDocElements(doc, doc, reader, true, recordLoc);
         return doc;
@@ -752,7 +760,11 @@ public final class StaxUtils {
         throws XMLStreamException {
         Document doc = builder.newDocument();
         if (reader.getLocation().getSystemId() != null) {
-            doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+            try {
+                doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
+            } catch (Exception e) {
+                //ignore - probably not DOM level 3
+            }
         }
         readDocElements(doc, reader, repairing);
         return doc;
@@ -784,7 +796,7 @@ public final class StaxUtils {
             e.setPrefix(reader.getPrefix());
         }       
         e = (Element)parent.appendChild(e);
-        addLocation(doc, e, reader, recordLocation);
+        recordLocation = addLocation(doc, e, reader, recordLocation);
 
         for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
             String uri = reader.getNamespaceURI(ns);
@@ -867,8 +879,9 @@ public final class StaxUtils {
                 break;
             case XMLStreamConstants.CHARACTERS:
                 if (parent != null) {
-                    addLocation(doc, parent.appendChild(doc.createTextNode(reader.getText())),
-                                reader, recordLoc);
+                    recordLoc = addLocation(doc, 
+                                            parent.appendChild(doc.createTextNode(reader.getText())),
+                                            reader, recordLoc);
                 }
                 break;
             case XMLStreamConstants.COMMENT:
@@ -877,8 +890,9 @@ public final class StaxUtils {
                 }
                 break;
             case XMLStreamConstants.CDATA:
-                addLocation(doc, parent.appendChild(doc.createCDATASection(reader.getText())),
-                            reader, recordLoc);
+                recordLoc = addLocation(doc, 
+                                        parent.appendChild(doc.createCDATASection(reader.getText())),
+                                        reader, recordLoc);
                 break;
             case XMLStreamConstants.PROCESSING_INSTRUCTION:
                 parent.appendChild(doc.createProcessingInstruction(reader.getPITarget(), reader.getPIData()));
@@ -895,43 +909,49 @@ public final class StaxUtils {
             }
         }
     }
-    private static void addLocation(Document doc, Node node, 
+    private static boolean addLocation(Document doc, Node node, 
                                     XMLStreamReader reader,
                                     boolean recordLoc) {
         if (recordLoc) {
             Location loc = reader.getLocation();
             if (loc != null && (loc.getColumnNumber() != 0 || loc.getLineNumber() != 0)) {
-                final int charOffset = loc.getCharacterOffset();
-                final int colNum = loc.getColumnNumber();
-                final int linNum = loc.getLineNumber();
-                final String pubId = loc.getPublicId() == null ? doc.getDocumentURI() : loc.getPublicId();
-                final String sysId = loc.getSystemId() == null ? doc.getDocumentURI() : loc.getSystemId();
-                Location loc2 = new Location() {
-                    public int getCharacterOffset() {
-                        return charOffset;
-                    }
-                    public int getColumnNumber() {
-                        return colNum;
-                    }
-                    public int getLineNumber() {
-                        return linNum;
-                    }
-                    public String getPublicId() {
-                        return pubId;
-                    }
-                    public String getSystemId() {
-                        return sysId;
-                    }
-                };
-                node.setUserData("location", loc2, new UserDataHandler() {
-                    public void handle(short operation, String key, Object data, Node src, Node dst) {
-                        if (operation == NODE_CLONED) {
-                            dst.setUserData(key, data, this);
+                try {
+                    final int charOffset = loc.getCharacterOffset();
+                    final int colNum = loc.getColumnNumber();
+                    final int linNum = loc.getLineNumber();
+                    final String pubId = loc.getPublicId() == null ? doc.getDocumentURI() : loc.getPublicId();
+                    final String sysId = loc.getSystemId() == null ? doc.getDocumentURI() : loc.getSystemId();
+                    Location loc2 = new Location() {
+                        public int getCharacterOffset() {
+                            return charOffset;
                         }
-                    }
-                });
+                        public int getColumnNumber() {
+                            return colNum;
+                        }
+                        public int getLineNumber() {
+                            return linNum;
+                        }
+                        public String getPublicId() {
+                            return pubId;
+                        }
+                        public String getSystemId() {
+                            return sysId;
+                        }
+                    };
+                    node.setUserData("location", loc2, new UserDataHandler() {
+                        public void handle(short operation, String key, Object data, Node src, Node dst) {
+                            if (operation == NODE_CLONED) {
+                                dst.setUserData(key, data, this);
+                            }
+                        }
+                    });
+                } catch (Exception ex) {
+                    //possibly not DOM level 3, won't be able to record this then
+                    return false;
+                }
             }
         }
+        return recordLoc;
     }
 
     private static void declare(Element node, String uri, String prefix) {

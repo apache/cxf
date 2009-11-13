@@ -216,7 +216,11 @@ public class WSDLManagerImpl implements WSDLManager {
         try {
             doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
             if (src.getSystemId() != null) {
-                doc.setDocumentURI(new String(src.getSystemId()));
+                try {
+                    doc.setDocumentURI(new String(src.getSystemId()));
+                } catch (Exception e) {
+                    // ignore - probably not DOM level 3
+                }
             }
         } catch (Exception e) {
             throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);

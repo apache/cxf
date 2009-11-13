@@ -390,7 +390,13 @@ public class JAXBDataBinding implements DataBindingProfile {
                 Element ele = docs[0].getDocumentElement();
                 ele = removeImportElement(ele);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele, docs[0].getDocumentURI());
+                    String uri = null;
+                    try {
+                        uri = docs[0].getDocumentURI();
+                    } catch (Exception ex) {
+                        //ignore - DOM level 3
+                    }
+                    validateSchema(ele, uri);
                 }           
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");

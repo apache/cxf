@@ -393,9 +393,13 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         throw new UnsupportedOperationException();
     }   
     public Location getLocation() {
-        Object o = getCurrentNode().getUserData("location");
-        if (o instanceof Location) { 
-            return (Location)o;
+        try {
+            Object o = getCurrentNode().getUserData("location");
+            if (o instanceof Location) { 
+                return (Location)o;
+            }
+        } catch (Exception ex) {
+            //ignore, probably not DOM level 3
         }
         return super.getLocation();
     }
