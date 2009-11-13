@@ -67,6 +67,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         = "http://localhost:9010/SecPolTestSignThenEncryptProvider";
     public static final String POLICY_SIGN_ADDRESS = "http://localhost:9010/SecPolTestSign";
     public static final String POLICY_XPATH_ADDRESS = "http://localhost:9010/SecPolTestXPath";
+    public static final String POLICY_SIGNONLY_ADDRESS = "http://localhost:9010/SecPolTestSignedOnly";
 
     
     public static class ServerPasswordCallback implements CallbackHandler {
@@ -138,6 +139,15 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNENC_PROVIDER_ADDRESS,
                                             new DoubleItProvider());
         
+        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("bob.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        
+        ep = (EndpointImpl)Endpoint.publish(POLICY_SIGNONLY_ADDRESS,
+                                            new DoubleItImplSignOnly());
         ei = ep.getServer().getEndpoint().getEndpointInfo(); 
         ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
         ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
@@ -219,6 +229,37 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             }
         }
 
+        
+    }
+    
+    @Test
+    public void testSignedOnlyWithUnsignedMessage() throws Exception {
+        //CXF-2244
+        DoubleItService service = new DoubleItService();
+        DoubleItPortType pt;
+
+        pt = service.getDoubleItPortSignedOnly();
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("bob.properties"));
+        //This should work as it should be properly signed.
+        assertEquals(BigInteger.valueOf(10), pt.doubleIt(BigInteger.valueOf(5)));
+        
+        //Try sending a message with the "TimestampOnly" policy into affect to the 
+        //service running the "signed only" policy.  This SHOULD fail as the
+        //body is then not signed.
+        pt = service.getDoubleItPortTimestampOnly();
+        ((BindingProvider)pt).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                      POLICY_SIGNONLY_ADDRESS);
+        try {
+            pt.doubleIt(BigInteger.valueOf(5));
+            fail("should have had a security/policy exception as the body wasn't signed");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().contains("policy alternatives"));
+        }
         
     }
     
@@ -316,6 +357,18 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
     public static class DoubleItImplXPath implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortSignedOnly",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+    public static class DoubleItImplSignOnly implements DoubleItPortType {
         /** {@inheritDoc}*/
         public BigInteger doubleIt(BigInteger numberToDouble) {
             return numberToDouble.multiply(new BigInteger("2"));
