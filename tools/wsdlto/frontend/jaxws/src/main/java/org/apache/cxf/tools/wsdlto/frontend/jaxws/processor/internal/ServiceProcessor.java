@@ -37,11 +37,9 @@ import javax.xml.namespace.QName;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -86,13 +84,14 @@ public class ServiceProcessor extends AbstractProcessor {
     private Object bindingObj;
     private ServiceInfo service;
 
-    private final JAXWSBinding jaxwsBinding = new JAXWSBinding();
+    private JAXWSBinding jaxwsBinding = new JAXWSBinding();
 
     public ServiceProcessor(ToolContext penv) {
         super(penv);
     }
 
     public void process(ServiceInfo si) throws ToolException {
+        jaxwsBinding = new JAXWSBinding();
         this.service = si;
         if (si.getName() == null) {
             processBindings(context.get(JavaModel.class));
@@ -194,7 +193,9 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (serviceBinding2.getJaxwsClass() != null
                     && serviceBinding2.getJaxwsClass().getClassName() != null) {
                     name = serviceBinding2.getJaxwsClass().getClassName();                
-                    sclz.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
+                }
+                if (serviceBinding2.getJaxwsClass().getComments() != null) {
+                    jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());
                 }
                 if (!serviceBinding2.getPackageJavaDoc().equals("")) {
                     sclz.setPackageJavaDoc(serviceBinding2.getPackageJavaDoc());
@@ -227,7 +228,7 @@ public class ServiceProcessor extends AbstractProcessor {
         Collection<EndpointInfo> ports = service.getEndpoints();
 
         for (EndpointInfo port : ports) {
-            JavaPort javaport = processPort(model, port);
+            JavaPort javaport = processPort(model, service, port);
             sclz.addPort(javaport);
         }
         
@@ -235,59 +236,22 @@ public class ServiceProcessor extends AbstractProcessor {
         model.addServiceClass(sclz.getName(), sclz);
     }
 
-    private JavaPort processPort(JavaModel model, EndpointInfo port) throws ToolException {
-        JavaPort jport = new JavaPort(NameUtil.mangleNameToClassName(port.getName().getLocalPart()));
-        jport.setPortName(port.getName().getLocalPart());
+    private JavaPort processPort(JavaModel model, ServiceInfo si, EndpointInfo port) throws ToolException {
         BindingInfo binding = port.getBinding();
+        String portType = binding.getInterface().getName().getLocalPart();
+        JavaInterface intf = PortTypeProcessor.getInterface(context, si, binding.getInterface());
+        JavaPort jport = new JavaPort(NameUtil.mangleNameToClassName(port.getName().getLocalPart()));
+        jport.setPackageName(intf.getPackageName());
+        
+        jport.setPortName(port.getName().getLocalPart());
         jport.setBindingAdress(port.getAddress());
         jport.setBindingName(binding.getName().getLocalPart());
 
-        String namespace = binding.getInterface().getName().getNamespaceURI();
-        String packageName = ProcessorUtil.parsePackageName(namespace, context.mapPackageName(namespace));
-        jport.setPackageName(packageName);
 
-        InterfaceInfo infInfo = binding.getInterface();
-
-        String portType = binding.getInterface().getName().getLocalPart();
         jport.setPortType(portType);
 
-        JAXWSBinding infBinding = infInfo.getExtensor(JAXWSBinding.class);
 
-        if (infBinding != null) {
-            if (infBinding.getJaxwsClass() != null
-                && !StringUtils.isEmpty(infBinding.getJaxwsClass().getClassName())) {
-                jport.setPortType(infBinding.getJaxwsClass().getClassName());
-                jaxwsBinding.setClassJavaDoc(infBinding.getJaxwsClass().getComments());
-            }
-
-            if (!infBinding.isEnableAsyncMapping()) {
-                jaxwsBinding.setEnableAsyncMapping(false);
-            }
-            if (!infBinding.isEnableWrapperStyle()) {
-                jaxwsBinding.setEnableWrapperStyle(false);
-            }
-
-            if (infBinding.getPackage() != null) {
-                jaxwsBinding.setPackage(infBinding.getPackage());
-            }
-            
-            if (!infBinding.getPackageJavaDoc().equals("")) {
-                jaxwsBinding.setPackageJavaDoc(infBinding.getPackageJavaDoc());
-            }
-        }
-
-        if (jaxwsBinding.getPackage() != null) {
-            jport.setPackageName(jaxwsBinding.getPackage());
-        }
-
-        if (infBinding != null && infBinding.getJaxwsClass() != null
-            && infBinding.getJaxwsClass().getClassName() != null) {
-            String className = NameUtil.mangleNameToClassName(infBinding.getJaxwsClass().getClassName());
-            jport.setInterfaceClass(className);
-        } else {
-            jport.setInterfaceClass(NameUtil.mangleNameToClassName(portType));
-        }
-
+        jport.setInterfaceClass(intf.getName());
         bindingType = getBindingType(binding);
 
         if (bindingType == null) {

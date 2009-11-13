@@ -36,6 +36,11 @@
            <jaxws:javadoc>this is class javadoc</jaxws:javadoc>
         </jaxws:class>
     </jaxws:bindings>
+    <jaxws:bindings node="wsdl:definitions/wsdl:service[@name='SOAPService']">
+        <jaxws:class name="SOAPService">
+           <jaxws:javadoc>this is service class javadoc</jaxws:javadoc>
+        </jaxws:class>
+    </jaxws:bindings>
 
     <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='Greeter']/wsdl:operation[@name='greetMe']">
         <!-- rename the generated java method name-->

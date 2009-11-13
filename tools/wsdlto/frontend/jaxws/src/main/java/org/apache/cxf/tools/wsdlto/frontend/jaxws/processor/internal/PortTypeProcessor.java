@@ -47,7 +47,9 @@ public class PortTypeProcessor extends AbstractProcessor {
         super(c);
     }
 
-    private JavaInterface getInterface(ServiceInfo serviceInfo,
+    public static JavaInterface getInterface(
+                                       ToolContext context,
+                                       ServiceInfo serviceInfo,
                                        InterfaceInfo interfaceInfo) throws ToolException {
         JavaInterface intf = interfaceInfo.getProperty("JavaInterface", JavaInterface.class);
         if (intf == null) {
@@ -105,7 +107,7 @@ public class PortTypeProcessor extends AbstractProcessor {
         if (interfaceInfo == null) {
             return;
         }
-        getInterface(serviceInfo, interfaceInfo);
+        getInterface(context, serviceInfo, interfaceInfo);
     }
 
     public void process(ServiceInfo serviceInfo) throws ToolException {
@@ -119,7 +121,7 @@ public class PortTypeProcessor extends AbstractProcessor {
             return;
         }
 
-        JavaInterface intf = getInterface(serviceInfo, interfaceInfo);
+        JavaInterface intf = getInterface(context, serviceInfo, interfaceInfo);
         intf.setJavaModel(jmodel);
 
         Element handler = (Element)context.get(ToolConstants.HANDLER_CHAIN);
