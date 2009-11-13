@@ -72,9 +72,15 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         XMLStreamWriter xmlWriter = origXmlWriter;
         CachingXmlEventWriter cache = null;
         
+        Object en = message.getContextualProperty(OUT_BUFFERING);
+        boolean allowBuffer = true;
+        boolean buffer = false;
+        if (en != null) {
+            buffer = Boolean.TRUE.equals(en) || "true".equals(en);
+            allowBuffer = !(Boolean.FALSE.equals(en) || "false".equals(en));
+        }
         // need to cache the events in case validation fails or buffering is enabled
-        if (shouldValidate(message) && !isRequestor(message)
-            || isBufferingEnabled(message)) {
+        if (buffer || (allowBuffer && shouldValidate(message) && !isRequestor(message))) {
             cache = new CachingXmlEventWriter();
             try {
                 cache.setNamespaceContext(origXmlWriter.getNamespaceContext());
@@ -126,11 +132,6 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
         }
     }
     
-    
-    protected boolean isBufferingEnabled(Message m) {
-        Object en = m.getContextualProperty(OUT_BUFFERING);
-        return Boolean.TRUE.equals(en) || "true".equals(en);
-    }
     
     protected boolean shouldValidate(Message m) {
         Object en = m.getContextualProperty(Message.SCHEMA_VALIDATION_ENABLED);
