@@ -970,12 +970,12 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
             if (str.contains("package javadoc")) {
                 match1 = true;
             }
-            if (str.contains("class javadoc")) {
+            if (str.contains("service class javadoc")) {
                 match2 = true;
             }
         }
-        assertTrue(match1);
-        assertTrue(match2);
+        assertTrue(results1.toString(), match1);
+        assertTrue(results2.toString(), match2);
         
     }
     
