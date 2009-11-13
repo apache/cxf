@@ -96,6 +96,12 @@ public class BookStore {
         System.out.println("PreDestroy called");
     }
     
+    @POST
+    @Path("emptypost")
+    public void emptypost() {
+        System.out.println("empty post");
+    }
+    
     @GET
     @Path("webappexception")
     public Book throwException() {

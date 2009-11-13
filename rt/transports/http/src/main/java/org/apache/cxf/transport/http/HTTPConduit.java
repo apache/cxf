@@ -1937,6 +1937,9 @@ public class HTTPConduit
                 && !"PUT".equals(connection.getRequestMethod())) {
                 return;
             }
+            if (outMessage.get("org.apache.cxf.post.empty") != null) {
+                return;
+            }
             
             // If we need to cache for retransmission, store data in a
             // CacheAndWriteOutputStream. Otherwise write directly to the output stream.

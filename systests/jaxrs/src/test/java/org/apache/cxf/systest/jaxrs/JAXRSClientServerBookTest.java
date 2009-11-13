@@ -55,7 +55,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class, true));
+                   launchServer(BookServer.class));
     }
     
     
@@ -204,6 +204,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue(values.contains("POST") && values.contains("GET")
                    && values.contains("DELETE") && values.contains("PUT"));
         assertEquals(0, ((InputStream)response.getEntity()).available());
+    }
+    
+    @Test
+    public void testEmptyPost() throws Exception {
+        WebClient wc = 
+            WebClient.create("http://localhost:9080/bookstore/emptypost");
+        Response response = wc.post(null);
+        assertEquals(204, response.getStatus());
     }
     
     @Test
