@@ -31,11 +31,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
+import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })
 @Produces({"application/xml", "application/json" })
+@Description(lang = "en-us", title = "book store resource", value = "super resource")
 public class BookStore {
 
     @GET 

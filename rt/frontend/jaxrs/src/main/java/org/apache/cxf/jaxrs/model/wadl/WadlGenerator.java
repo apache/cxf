@@ -19,7 +19,9 @@
 package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.StringWriter;
+import java.lang.annotation.Annotation;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -50,6 +52,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
@@ -58,10 +61,12 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
@@ -73,6 +78,7 @@ import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -87,6 +93,7 @@ public class WadlGenerator implements RequestHandler {
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
+    private static final String CLASSPATH_PREFIX = "classpath:";
     
     private boolean ignoreMessageWriters = true;
     
@@ -177,7 +184,7 @@ public class WadlGenerator implements RequestHandler {
                                 Set<ClassResourceInfo> visitedResources) {
         visitedResources.add(cri);
         sb.append("<resource path=\"").append(path).append("\">");
-        
+        handleDocs(cri.getServiceClass().getAnnotations(), sb);
         List<OperationResourceInfo> sortedOps = sortOperationsByPath(
             cri.getMethodDispatcher().getOperationResourceInfos());
         
@@ -206,6 +213,7 @@ public class WadlGenerator implements RequestHandler {
         boolean useResource = useResource(ori);
         if (useResource) {
             sb.append("<resource path=\"").append(path).append("\">");
+            handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
         }
         handleParams(sb, ori, ParameterType.PATH);
         handleParams(sb, ori, ParameterType.MATRIX);
@@ -605,5 +613,39 @@ public class WadlGenerator implements RequestHandler {
         this.ignoreMessageWriters = ignoreMessageWriters;
     }
 
+    private void handleDocs(Annotation[] anns, StringBuilder sb) {
+        for (Annotation a : anns) {
+            if (a.annotationType() == Description.class) {
+                Description d = (Description)a;
 
+                sb.append("<doc");
+                if (d.lang().length() > 0) {
+                    sb.append(" xml:lang=\"" + d.lang() + "\"");
+                }
+                if (d.title().length() > 0) {
+                    sb.append(" title=\"" + d.title() + "\"");
+                }
+                sb.append(">");
+                if (d.value().length() > 0) {
+                    sb.append(d.value());
+                } else if (d.docuri().length() > 0) {
+                    InputStream is = null;
+                    if (d.docuri().startsWith(CLASSPATH_PREFIX)) {
+                        String path = d.docuri().substring(CLASSPATH_PREFIX.length());
+                        is = ResourceUtils.getClasspathResourceStream(path, SchemaHandler.class,
+                            BusFactory.getDefaultBus());
+                        if (is != null) {
+                            try { 
+                                sb.append(IOUtils.toString(is));
+                            } catch (IOException ex) {
+                                // ignore
+                            }
+                        }
+                    }
+                }
+                sb.append("</doc>");
+            }
+        }
+    }
+    
 }
