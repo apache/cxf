@@ -44,6 +44,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingInterceptor;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -209,6 +210,13 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
                     nd = soapMessage.getSOAPBody().getFirstChild();
                 }
                 list.set(0, frag);
+                //No need to buffer this as we're already a DOM, 
+                //but only do so if someone hasn't actually configured this
+                Object buffer = message
+                    .getContextualProperty(AbstractOutDatabindingInterceptor.OUT_BUFFERING);
+                if (buffer == null) {
+                    message.put(AbstractOutDatabindingInterceptor.OUT_BUFFERING, Boolean.FALSE);
+                }
             } catch (Exception ex) {
                 throw new Fault(ex);
             }

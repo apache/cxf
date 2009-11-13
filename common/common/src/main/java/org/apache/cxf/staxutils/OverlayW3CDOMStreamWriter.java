@@ -19,6 +19,9 @@
 package org.apache.cxf.staxutils;
 
 
+import java.util.LinkedList;
+import java.util.List;
+
 import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
@@ -35,6 +38,9 @@ import org.apache.cxf.common.util.StringUtils;
  */
 public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
 
+    List<Boolean> isOverlaidStack = new LinkedList<Boolean>();
+    boolean isOverlaid = true;
+    
     public OverlayW3CDOMStreamWriter(Document document) {
         super(document);
     }
@@ -43,50 +49,14 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
         super(e);
     }
     
+    @Override
+    public void writeEndElement() throws XMLStreamException {
+        isOverlaid = isOverlaidStack.remove(0);
+        super.writeEndElement();
+    }
     public void writeStartElement(String local) throws XMLStreamException {
-        Element nd = getCurrentNode();
-        Node nd2 = null;
-        if (nd == null) {
-            nd2 = getDocument().getDocumentElement();
-        } else {
-            nd2 = nd.getFirstChild();
-        }
-        while (nd2 != null) {
-            if (nd2.getNodeType() == Node.ELEMENT_NODE 
-                && local.equals(nd2.getLocalName())
-                && StringUtils.isEmpty(nd2.getNamespaceURI())) {
-                setChild((Element)nd2, false);
-                return;
-            }
-            nd2 = nd2.getNextSibling();
-        }
-        super.writeStartElement(local);
-    }
-
-    public void writeStartElement(String namespace, String local) throws XMLStreamException {
-        Element nd = getCurrentNode();
-        Node nd2 = null;
-        if (nd == null) {
-            nd2 = getDocument().getDocumentElement();
-        } else {
-            nd2 = nd.getFirstChild();
-        }
-        while (nd2 != null) {
-            if (nd2.getNodeType() == Node.ELEMENT_NODE 
-                && local.equals(nd2.getLocalName())
-                && namespace.equals(nd2.getNamespaceURI())) {
-                setChild((Element)nd2, false);
-                return;
-            }
-            nd2 = nd2.getNextSibling();
-        }
-        super.writeStartElement(namespace, local);
-    }
-
-    public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
-        if (prefix == null || prefix.equals("")) {
-            writeStartElement(namespace, local);
-        } else {
+        isOverlaidStack.add(0, isOverlaid);
+        if (isOverlaid) {
             Element nd = getCurrentNode();
             Node nd2 = null;
             if (nd == null) {
@@ -94,7 +64,30 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
             } else {
                 nd2 = nd.getFirstChild();
             }
-            
+            while (nd2 != null) {
+                if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                    && local.equals(nd2.getLocalName())
+                    && StringUtils.isEmpty(nd2.getNamespaceURI())) {
+                    setChild((Element)nd2, false);
+                    return;
+                }
+                nd2 = nd2.getNextSibling();
+            }
+        }
+        isOverlaid = false;
+        super.writeStartElement(local);
+    }
+
+    public void writeStartElement(String namespace, String local) throws XMLStreamException {
+        isOverlaidStack.add(0, isOverlaid);
+        if (isOverlaid) {
+            Element nd = getCurrentNode();
+            Node nd2 = null;
+            if (nd == null) {
+                nd2 = getDocument().getDocumentElement();
+            } else {
+                nd2 = nd.getFirstChild();
+            }
             while (nd2 != null) {
                 if (nd2.getNodeType() == Node.ELEMENT_NODE 
                     && local.equals(nd2.getLocalName())
@@ -104,9 +97,39 @@ public class OverlayW3CDOMStreamWriter extends W3CDOMStreamWriter {
                 }
                 nd2 = nd2.getNextSibling();
             }
+        }
+        isOverlaid = false;
+        super.writeStartElement(namespace, local);
+    }
+
+    public void writeStartElement(String prefix, String local, String namespace) throws XMLStreamException {
+        if (prefix == null || prefix.equals("")) {
+            writeStartElement(namespace, local);
+        } else {
+            isOverlaidStack.add(0, isOverlaid);
+            if (isOverlaid) {
+    
+                Element nd = getCurrentNode();
+                Node nd2 = null;
+                if (nd == null) {
+                    nd2 = getDocument().getDocumentElement();
+                } else {
+                    nd2 = nd.getFirstChild();
+                }
+                
+                while (nd2 != null) {
+                    if (nd2.getNodeType() == Node.ELEMENT_NODE 
+                        && local.equals(nd2.getLocalName())
+                        && namespace.equals(nd2.getNamespaceURI())) {
+                        setChild((Element)nd2, false);
+                        return;
+                    }
+                    nd2 = nd2.getNextSibling();
+                }
+            }
+            isOverlaid = false;
             super.writeStartElement(prefix, local, namespace);
         }
     }
-
     
 }
