@@ -1,8 +1,8 @@
-Apache CXF 2.2.4 Release Notes
+Apache CXF 2.2.5 Release Notes
 
 1. Overview
  
-Apache CXF 2.2.4 delivers the third major version of 
+Apache CXF 2.2.5 delivers the third major version of 
 the Celtix project (http://celtix.objectweb.org) and the XFire project
 (http://xfire.codehaus.org) merge.  This release is a major update from 
 the 2.1.x series.   The major new additions include:
@@ -13,7 +13,7 @@ the 2.1.x series.   The major new additions include:
  * Initial support for JAX-RS 1.0 (not TCK compliant yet) including a 
    client API for accessing REST services   
 
-2.2.4 fixes over 50 JIRA issues reported by users and the community.
+2.2.5 fixes over 88 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -76,75 +76,109 @@ for caveats when upgrading from CXF 2.1.x to 2.2.x.
 
 6. Specific issues, features, and improvements fixed in this version
 
+Release Notes - CXF - Version 2.2.5
+
 
 ** Bug
-    * [CXF-2202] - Deploying REST service on CXF Transport for OSGi
-    * [CXF-2226] - Incorrect libraries listed on the User's Guide in section detailing how to setup a simple JAX-WS service
-    * [CXF-2301] - If a service is published with escaped address, it cannot be accessed from the service location in the WSDL.
-    * [CXF-2308] - Invalid signature of cxf.apache.org/javadoc/latest/org/apache/cxf/ws/addressing/AddressingProperties.html#setTo
-    * [CXF-2371] - WSSCTest fails with OutOfMemoryError with 64 bit jdk 5 on aix
-    * [CXF-2373] - Couple of issues with fault handling in JaxRS/REST
-    * [CXF-2374] - Handle possible number format exception when reading primitive param
-    * [CXF-2380] - Cannot use custom client TLS settings when creating javax.xml.ws.Service from "https://...?wsdl" URL when WSDL contains https imports
-    * [CXF-2381] - Attachments gone when in Multi-Threaded client
-    * [CXF-2384] - SOAPFaultExcption thrown instead of a WebServiceException
-    * [CXF-2390] - Enums using fromString() but jaxb creates fromValue()
-    * [CXF-2398] - JMS Connections are not closed when JCA recycles CXF proxy
-    * [CXF-2400] - NullPointerException with wsdl2js
-    * [CXF-2401] - JAX-RS code doesn't have enough visibility into parameterized types to work 
-    * [CXF-2402] - Aegis ignores mapping file attributes for services.
-    * [CXF-2404] - remove reference to the <list> node when defining an interceptor
-    * [CXF-2406] - HttpsToken RequireClientCertificate not working 
-    * [CXF-2408] - JAX-RS ClientProxy does not properly test consume types when setting request headers
-    * [CXF-2409] - ClientOutFaultObserver in ClientImpl not initialized (no callback on client code)
-    * [CXF-2411] - ClassCastException when initializing JAXB Databinding based on WSDL
-    * [CXF-2413] - Aegis ObjectType throws NullPointerException when reading value for an xs:any without xsi:type information
-    * [CXF-2415] - Dynamic client returns a T when it should return a List<T>
-    * [CXF-2417] - BeanTypeInfo does not ignore synthetic (bridge) methods to determine property types
-    * [CXF-2418] - SchemaCollection throws StackOverflowError when schema contains circular reference
-    * [CXF-2419] - WSDL2Java -allowElementReferences causes fatal errors in operation dispatching
-    * [CXF-2421] - Get the UnsupportedOperationException when reinstalling a cxf related bundle in OSGi platform
-    * [CXF-2425] - OSGi metadata does not handle well multiple versions of CXF bundle
-    * [CXF-2429] - wsdl2java tool generates client stub which always uses default (JAXB) databinding while another one style is specified in the command line (-db argument)
-    * [CXF-2431] - NullPointerException from wsdl2java with no explanation
-    * [CXF-2432] - subscriptionDurable is commented in JMSFactory
-    * [CXF-2436] - SEI should be able to implements java.rmi.Remote
-    * [CXF-2440] - GZIP and MTOM attachments does not work on client
-    * [CXF-2441] - http-conf.xsd causes validation error in cxf.xml
-    * [CXF-2442] - fail to create a service model from class when: BARE parameter style, XmlBeans data binding, XmlBeans' source is WSDL file
-    * [CXF-2444] - org.apache.cxf.service.model.InterfaceInfo attributes are not passed to the WSDL PortType during WSDL generation.
-    * [CXF-2447] - Invalid paths used in CXF for the xml files results in failures in java 6
-    * [CXF-2448] - IllegalArgumentException wrong number of arguments using CXF 2.2.3 in runtime test
-    * [CXF-2451] - Unable to call no-arg methods when using implicit headers - getting params [null]
-    * [CXF-2453] - Provider<DataSource>.invoke returning non-XML data causes error.
-    * [CXF-2455] - Unable to disable schema validation in 2.2.4-SNAPSHOT
-    * [CXF-2457] - MTOM byte arrays problem
+    * [CXF-758] - Support POST with empty bodies in http-centric Client API
+    * [CXF-806] - java2wsdl gives poor diagnosis of bad JAXB bean class
+    * [CXF-1027] - Multiple bean files don't work in java2ws
+    * [CXF-1148] - Scary INFO log entries in normal operation
+    * [CXF-1159] - Remove FixedExtensionDeserializer once XmlSchema delivers their fix
+    * [CXF-1266] - Nil value for nillable array element is default-constructed
+    * [CXF-1277] - JAXB schema validation fails for RPC
+    * [CXF-1282] - Can't set the excutor from JAXWS API
+    * [CXF-1283] - Forking another thread to invoke the service implementation in ServiceInvokerInterceptor is not working
+    * [CXF-1295] - Doc/Lit/Wrapped services fail schema validation at runtime with JAXB+JAX-WS
+    * [CXF-1309] - Aegis databinding failed to createHolderType
+    * [CXF-1500] - Very unhelpful error message for wsdl2java problem with documentation annotations
+    * [CXF-1536] - When a SOAP request is submitted without an enclosing </soapenv:Envelope> a successful response is returned.  I would think that this should generate a parsing error/exception.
+    * [CXF-1647] - Non-String Placeholders Fail to Validate
+    * [CXF-1725] - Don't create empty <details/> elements in SOAP fault messages.
+    * [CXF-1817] - wsdl2java RandomValueProvider gives StackOverflowException on bidirectional reference
+    * [CXF-1824] - JCA inbound-mdb* samples can't be compiled out-of-the-box
+    * [CXF-1850] - org.apache.cxf.endpoint.ServerImpl does not shut down destination in stop() when MultipleEndpointObserver is used.
+    * [CXF-1871] - I tried to configure <jaxrs:serviceFactory> that ends in a java.lang.IndexOutOfBoundsException: Index: 0, Size: 0 during the jaxrs initialazion.
+    * [CXF-1919] - Corba unit test demands unexpected count, perhaps working around XmlSchema bug
+    * [CXF-1939] - WSDLToJava doesn't generate Service interface class, when wsdl has 2 services names that differ for an underscore
+    * [CXF-2039] - -Dorg.apache.cxf.spring.validation.mode=VALIDATION_NONE has no effect
+    * [CXF-2244] - Server accepts an unsigned message when the policy requires a signed message.
+    * [CXF-2283] - Exposed Webservice disappear after a child spring app context closed
+    * [CXF-2305] - PerformanceCounter.Client reports incorrect response times for oneway invocations
+    * [CXF-2311] - client can't be used with different ws security users
+    * [CXF-2320] - Problems using restful client api in ServiceMix JBI component
+    * [CXF-2324] - HTTP Client ProxyServerPort shouldn't be an xs:int in the http-conf.xsd
+    * [CXF-2339] - wsdl_first_dynamic_client example doesn't work for complex wsdl
+    * [CXF-2368] - defaultOptions in cxf-codegen-plugin only works with wsdlRoot scanning
+    * [CXF-2370] - Error while parsing authorization header in DigestAuthSupplier
+    * [CXF-2437] - Host not set CXFJettySslSocketConnector
+    * [CXF-2445] - can't pass mulitple -xjc wsdlOption in cxf-codegen-plugin
+    * [CXF-2454] - <jaxws:client> does not support anonymous bean declaration
+    * [CXF-2462] - CXF REST is not parsing the header value correctly if a comma is specified in a parameter value.
+    * [CXF-2463] - SOAP 1.2 service return SOAP 1.2 Fault message in response to SOAP 1.1 request when exception is thrown
+    * [CXF-2468] - attribute namespace is missed in out message in  case of XmlBeans data binding
+    * [CXF-2470] - Invoke operation is incorrectly listed in Services List for JAX-WS Provider
+    * [CXF-2471] - The HttpServletResponse statuses is lost after is set in a service implementation (where the response is injected through @Context).
+    * [CXF-2473] - StaxDataBinding.write(Object, XMLStreamWriter) does not close an XMLStreamReader
+    * [CXF-2474] - DocLiteralInInterceptor.handleMessage(Message) does not handle use case where message part is an XMLStreamReader
+    * [CXF-2476] - NullpointerException when ServiceClass is not set on client
+    * [CXF-2478] - Incorrectly removing a parameter from the Message
+    * [CXF-2479] - Ommitting IncludeToken attribute results in exception
+    * [CXF-2480] - TransportBinding with UsernameToken client not validating response
+    * [CXF-2481] - Provider/Dispatch<SOAPMessage> adding "soap" prefix
+    * [CXF-2483] - STSClient should look for operations from wsdl based on element name if action isn't found
+    * [CXF-2487] - SecureConversationTokenFinderInterceptor stores the wrong token identifier
+    * [CXF-2488] - Mangled error message for JAX-RS missing writer
+    * [CXF-2489] - Exceptions are not properly handled by Performance.Counter MBean
+    * [CXF-2490] - Wrong content type for JAX-RS errors
+    * [CXF-2496] - WS-Addressing schema for the addressing feature missing the addressingRequired attribute
+    * [CXF-2497] - No timeouts are set for HTTP wsdl retrieval
+    * [CXF-2498] - Wrong parameter number exception with explicit soap headers
+    * [CXF-2499] - (EffectivePolicyImpl/PolicyEngineImpl) Policy engine for ws security policy (based on wsdl attachment) fails to apply message level policies
+    * [CXF-2502] - decoupled WS-A and WS-Sec does not result in faults back to clients
+    * [CXF-2503] - ConcurrentModificationException thrown by AttachmentDeserializer
+    * [CXF-2505] - Decoupled WS-A and PerformanceCounters result in double counting of invokations
+    * [CXF-2508] - generation of absolute path in WSDL2Java
+    * [CXF-2509] - java.lang.reflect.GenericSignatureFormatError within JAXBContextInitializer
+    * [CXF-2510] - XMLBEANS_NAMESPACE_HACK alternative is missing in case of XmlBeans data binding
+    * [CXF-2511] - The Soap11FaultOutInterceptor does not include the stacktrace even if FAULT_STACKTRACE_ENABLED is set
+    * [CXF-2513] - env:Header's confuse generate Javascript
+    * [CXF-2514] - Custom ContextResolver is not picked up for marshal/unmarshal calls for application/json and application/xml media types.
+    * [CXF-2515] - catalog.cat in some modules is incorrect
+    * [CXF-2516] - Schema resolution when Schemas in Jar separate from endpoint implementation
+    * [CXF-2517] - Exception shouldn't be considered as JBI ERROR,should use JBI FAULT instead
+    * [CXF-2520] - wrong handling in setNamespaceMap for AbstractDataBinding
+    * [CXF-2522] - wsdl2java not honoring jaxws:parameter extension for wrapped elements
+    * [CXF-2524] - STSClient requires Lifetime element in RSTR
+    * [CXF-2525] - Bug in TokenStoreCallbackHandler
+    * [CXF-2529] - processCookieParam only returns last cookie
+    * [CXF-2533] - Content disposition values don't have their quotes stripped
 
 ** Improvement
+    * [CXF-920] - Need system property for output client request and responses
+    * [CXF-1087] - Spring control of jetty server
     * [CXF-1459] - ClassCastException occurs on HTTPS web service call made by app deployed to BEA WebLogic 9.2
-    * [CXF-2197] - Support PerRequest resource classes registered from Spring
-    * [CXF-2270] - Attachments support in the RESTful client api
-    * [CXF-2313] - Enhance CXFNonSpringJaxrsServlet
-    * [CXF-2372] - Allow JMS XAResource to participate in J2EE transaction
-    * [CXF-2375] - CXF treats synthetic methods as web methods. In the strict sense, this is not against the JAX-WS spec, but it causes issues with AspectJ instrumented classes.
-    * [CXF-2397] - Make use of ControlledValidationXmlBeanDefinitionReader optional depending upon existence of FastInfoSet.jar
-    * [CXF-2407] - WS-RM Connecting to Oracle
-    * [CXF-2410] - Boolean getter plugin for xjc
-    * [CXF-2416] - wsdl2java generates compiler warning
-    * [CXF-2430] - Demo that would show how to set KeyStore and TrustStore would be nice
-    * [CXF-2434] - Set JMSConfig's reconnectionOnException default value to be true  
-    * [CXF-2449] - Spring Autowire by type doesn't work with jaxws:client
-    * [CXF-2460] - Allow configuration of JaxWsClientFactoryBean during port creation
+    * [CXF-1706] - Aegis binding behaves differently than JAXB in regards to MTOM support
+    * [CXF-1791] - Exception feedback
+    * [CXF-2472] - if exception in fault handling, throw fault instead of processing exception
+    * [CXF-2482] - Update JSON Provider to support Dojo JsonRestStore
+    * [CXF-2484] - STSClient should allow configuring of interceptors
+    * [CXF-2491] - Add TLS cert constraints support
+    * [CXF-2501] - Detect if SLF4J is logging to Log4J and log to Log4J as well if it is
+    * [CXF-2532] - On demand retrieval of JAX-WS MessageContext properties
 
 ** New Feature
-    * [CXF-2036] - Add option to retry a http request on socket error to http client
-    * [CXF-2276] - Maven plugins: Support attaching generated WSDLs to the Maven build
+    * [CXF-2015] - Add capability to configure per-request client interceptors
+    * [CXF-2439] - Support multiple class resource matching in JAXRS selection algorithm
 
-** Task
-    * [CXF-2424] - Fix problems in POMs
+
+
+
+
 
 ** Test
-    * [CXF-1970] - A test for WS-Sec UsernameToken + encryption
+    * [CXF-2493] - HTTPSClientTest.testPKCS12Endpoint fails on windows
+    * [CXF-2507] - Add some unit tests for the TLS cert constraints stuff
 
 
 
