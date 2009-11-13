@@ -151,12 +151,16 @@ public final class CustomizationParser {
         
         try {
             doc = DOMUtils.readXml(ins);
-            doc.setDocumentURI(uri);
         } catch (Exception e) {
             Message msg = new Message("CAN_NOT_READ_AS_ELEMENT", LOG, new Object[] {uri});
             throw new ToolException(msg, e);
         }
-
+        try {
+            doc.setDocumentURI(uri);
+        } catch (Exception ex) {
+            //ignore - probably not DOM level 3
+        }
+        
         if (doc != null) {
             return doc.getDocumentElement();
         }

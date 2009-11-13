@@ -528,7 +528,11 @@ public final class EndpointReferenceUtils {
                     
                     if (null != node) {
                         if (node instanceof Document) {
-                            ((Document)node).setDocumentURI(source.getSystemId());
+                            try {
+                                ((Document)node).setDocumentURI(source.getSystemId());
+                            } catch (Exception ex) {
+                                //ignore - not DOM level 3
+                            }
                             node =  node.getFirstChild();
                         }
                         
@@ -592,7 +596,12 @@ public final class EndpointReferenceUtils {
             try {
                 for (SchemaInfo si : serviceInfo.getSchemas()) {
                     Element el = si.getElement();
-                    String baseURI = el.getBaseURI();
+                    String baseURI = null;
+                    try {
+                        baseURI = el.getBaseURI();
+                    } catch (Exception ex) {
+                        //ignore - not DOM level 3
+                    }
                     if (baseURI == null) {
                         baseURI = si.getSystemId();
                     }

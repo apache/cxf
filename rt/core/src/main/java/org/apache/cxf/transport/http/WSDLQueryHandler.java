@@ -210,7 +210,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             }
             
             updateDoc(doc, base, mp, smp, endpointInfo);
-            String enc = doc.getXmlEncoding();
+            String enc = null;
+            try {
+                enc = doc.getXmlEncoding();
+            } catch (Exception ex) {
+                //ignore - not dom level 3
+            }
             if (enc == null) {
                 enc = "utf-8";
             }
@@ -287,8 +292,11 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 }
             }
         }
-        
-        doc.setXmlStandalone(true);
+        try {
+            doc.setXmlStandalone(true);
+        } catch (Exception ex) {
+            //likely not DOM level 3
+        }
     }
 
     static String resolveWithCatalogs(OASISCatalogManager catalogs, String start, String base) {

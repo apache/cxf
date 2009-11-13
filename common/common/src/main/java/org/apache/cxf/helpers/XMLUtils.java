@@ -165,7 +165,11 @@ public final class XMLUtils {
         String enc = null;
         if (src instanceof DOMSource
             && ((DOMSource)src).getNode() instanceof Document) {
-            enc = ((Document)((DOMSource)src).getNode()).getXmlEncoding();
+            try {
+                enc = ((Document)((DOMSource)src).getNode()).getXmlEncoding();
+            } catch (Exception ex) {
+                //ignore - not DOM level 3
+            }
         }
         writeTo(src, os, indent, enc, "no");
     }

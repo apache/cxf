@@ -251,11 +251,19 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartDocument(String version) throws XMLStreamException {
-        document.setXmlVersion(version);
+        try {
+            document.setXmlVersion(version);
+        } catch (Exception ex) {
+            //ignore - likely not DOM level 3
+        }
     }
 
     public void writeStartDocument(String encoding, String version) throws XMLStreamException {
-        document.setXmlVersion(version);
+        try {
+            document.setXmlVersion(version);
+        } catch (Exception ex) {
+            //ignore - likely not DOM level 3
+        }
     }
 
     public void writeCharacters(String text) throws XMLStreamException {
