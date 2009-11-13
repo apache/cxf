@@ -120,6 +120,35 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
+	<wsdl:binding name="DoubleItBindingSignedOnly" type="tns:DoubleItPortType">
+		<wsp:PolicyReference URI="#DoubleItSignedOnlyPolicy" />
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="DoubleIt">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<wsp:PolicyReference URI="#SignedOnlyMsgPolicy" />
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:binding name="DoubleItBindingTimestampOnly" type="tns:DoubleItPortType">
+		<wsp:PolicyReference URI="#DoubleItTimestampOnlyPolicy" />
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="DoubleIt">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
 	<wsdl:service name="DoubleItService">
 		<wsdl:port name="DoubleItPortHttps" binding="tns:DoubleItBinding">
 			<soap:address location="https://localhost:9009/SecPolTest" />
@@ -138,6 +167,12 @@
 		</wsdl:port>
 		<wsdl:port name="DoubleItPortXPath" binding="tns:DoubleItBindingXPath">
 			<soap:address location="http://localhost:9010/SecPolTestXPath" />
+		</wsdl:port>
+		<wsdl:port name="DoubleItPortSignedOnly" binding="tns:DoubleItBindingSignedOnly">
+			<soap:address location="http://localhost:9010/SecPolTestSignedOnly" />
+		</wsdl:port>
+		<wsdl:port name="DoubleItPortTimestampOnly" binding="tns:DoubleItBindingTimestampOnly">
+			<soap:address location="http://localhost:9010/SecPolTestTimestampOnly" />
 		</wsdl:port>
 	</wsdl:service>
 
@@ -381,7 +416,7 @@
 						</sp:AlgorithmSuite>
 						<sp:Layout>
 							<wsp:Policy>
-								<sp:Lax />
+								<sp:Lax />XPath
 							</wsp:Policy>
 						</sp:Layout>
 						<sp:IncludeTimestamp />
@@ -408,4 +443,104 @@
 		</wsp:ExactlyOne>
 	</wsp:Policy>
 
+
+
+   <wsp:Policy  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+             xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+             xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+             wsu:Id="DoubleItSignedOnlyPolicy">
+    <wsp:ExactlyOne>
+      <wsp:All>
+      <sp:AsymmetricBinding xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+           <wsp:Policy>
+             <sp:InitiatorToken>
+               <wsp:Policy>
+                 <sp:X509Token
+                   sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/AlwaysToRecipient">
+                   <wsp:Policy>
+                     <sp:WssX509V3Token10 />
+                     <sp:RequireThumbprintReference/> <!-- needed for V1 certs -->
+                   </wsp:Policy>
+                 </sp:X509Token>
+               </wsp:Policy>
+             </sp:InitiatorToken>
+             <sp:RecipientToken>
+               <wsp:Policy>
+                 <sp:X509Token sp:IncludeToken="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy/IncludeToken/Always">
+                   <wsp:Policy>
+                     <sp:WssX509V3Token10 />
+                     <sp:RequireThumbprintReference/>
+                   </wsp:Policy>
+                 </sp:X509Token>
+               </wsp:Policy>
+             </sp:RecipientToken>
+             <sp:AlgorithmSuite>
+               <wsp:Policy>
+                 <sp:TripleDesRsa15 />
+               </wsp:Policy>
+             </sp:AlgorithmSuite>
+             <sp:Layout>
+               <wsp:Policy>
+                 <sp:Strict />
+               </wsp:Policy>
+             </sp:Layout>
+             <sp:IncludeTimestamp />
+             <sp:OnlySignEntireHeadersAndBody /> 
+           </wsp:Policy>
+         </sp:AsymmetricBinding>
+         <sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+           <wsp:Policy>
+             <sp:MustSupportRefKeyIdentifier />
+             <sp:MustSupportRefIssuerSerial />
+           </wsp:Policy>
+         </sp:Wss10>
+      </wsp:All>
+    </wsp:ExactlyOne>
+  </wsp:Policy>
+
+   <wsp:Policy
+   	  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+   	  xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+   	  xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+   	  wsu:Id="SignedOnlyMsgPolicy">
+   	  <wsp:ExactlyOne>
+   	    <wsp:All>
+   	       <sp:SignedParts xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+   		      <sp:Body />
+   	       </sp:SignedParts>
+   	    </wsp:All>
+   	  </wsp:ExactlyOne>
+   </wsp:Policy>
+   <wsp:Policy  xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" 
+             xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy"
+             xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+             wsu:Id="DoubleItTimestampOnlyPolicy">
+		<wsp:ExactlyOne>
+			<wsp:All>
+				<wsaws:UsingAddressing xmlns:wsaws="http://www.w3.org/2006/05/addressing/wsdl" />
+				<sp:TransportBinding>
+					<wsp:Policy>
+						<sp:Layout>
+							<wsp:Policy>
+								<sp:Lax />
+							</wsp:Policy>
+						</sp:Layout>
+						<sp:IncludeTimestamp />
+						<sp:AlgorithmSuite>
+							<wsp:Policy>
+								<sp:Basic128 />
+							</wsp:Policy>
+						</sp:AlgorithmSuite>
+					</wsp:Policy>
+				</sp:TransportBinding>
+				<sp:Wss10>
+					<wsp:Policy>
+						<sp:MustSupportRefKeyIdentifier />
+					</wsp:Policy>
+				</sp:Wss10>
+			</wsp:All>
+		</wsp:ExactlyOne>
+	</wsp:Policy>
+  
+  
 </wsdl:definitions>

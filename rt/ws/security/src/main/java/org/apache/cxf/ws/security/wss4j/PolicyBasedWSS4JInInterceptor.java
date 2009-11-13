@@ -403,7 +403,6 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 SignedEncryptedParts p = (SignedEncryptedParts)ai.getAssertion();
                 if (p.isBody() && !contains(signed, msg.getVersion().getBody())) {
                     ai.setNotAsserted(msg.getVersion().getBody() + " not " + type);
-                    return;
                 }
                 for (Header h : p.getHeaders()) {
                     if (!contains(signed, h.getQName())) {
@@ -419,11 +418,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                         }
                         if (found) {
                             ai.setNotAsserted(h.getQName() + " not + " + type);
-                            return;
                         }
                     }
                 }
-                
             }
         }
     }
@@ -700,6 +697,10 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         return true;
     }
     private boolean assertTransportBinding(AssertionInfoMap aim) {
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais == null) {                       
+            return true;
+        }
         assertPolicy(aim, SP12Constants.TRANSPORT_TOKEN);
         assertPolicy(aim, SP12Constants.ENCRYPTED_PARTS);
         assertPolicy(aim, SP12Constants.SIGNED_PARTS);
