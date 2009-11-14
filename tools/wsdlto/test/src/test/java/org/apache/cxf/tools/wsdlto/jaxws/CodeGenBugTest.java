@@ -962,7 +962,7 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertTrue(results1.contains("     * this is method javadoc"));
         
         List<String> results2 = FileUtils.readLines(new File(output.getCanonicalPath(), 
-            "org/mypkg/SOAPService.java")); 
+            "org/mypkg/SOAPServiceTest1.java")); 
         
         boolean match1 = false;
         boolean match2 = false;
