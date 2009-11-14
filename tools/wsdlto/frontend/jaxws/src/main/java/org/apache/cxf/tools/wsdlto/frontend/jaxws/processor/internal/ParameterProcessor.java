@@ -297,7 +297,8 @@ public class ParameterProcessor extends AbstractProcessor {
                 } else if (isSamePart(inpart, outpart)) {
                     boolean found = false;
                     for (JavaParameter p : method.getParameters()) {
-                        if (p.getQName().equals(ProcessorUtil.getElementName(outpart))) {
+                        if (p.getQName().equals(ProcessorUtil.getElementName(outpart))
+                            && p.getPartName().equals(outpart.getName().getLocalPart())) {
                             p.setHolder(true);
                             p.setHolderName(javax.xml.ws.Holder.class.getName());
                             String holderClass = p.getClassName();
