@@ -44,6 +44,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     private Document document;
 
     private W3CNamespaceContext context;
+    
+    private String sysId;
 
     /**
      * @param element
@@ -54,6 +56,10 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
         newFrame(getCurrentFrame());
                 
         this.document = element.getOwnerDocument();
+    }
+    public W3CDOMStreamReader(Element element, String systemId) {
+        this(element);
+        sysId = systemId;
     }
     public W3CDOMStreamReader(Document doc) {
         super(new ElementFrame<Node, Node>(doc, false) {
@@ -80,7 +86,9 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     public Document getDocument() {
         return document;
     }
-
+    public String getSystemId() {
+        return sysId == null ? document.getDocumentURI() : sysId;
+    }
     /**
      * Find name spaces declaration in atrributes and move them to separate
      * collection.

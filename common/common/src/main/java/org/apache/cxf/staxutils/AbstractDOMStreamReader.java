@@ -325,6 +325,12 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
                 || currentEvent == COMMENT || currentEvent == SPACE;
     }
 
+    public String getSystemId() {
+        return null;
+    }
+    public String getPublicId() {
+        return null;
+    }
     public Location getLocation() {
         return new Location() {
 
@@ -341,11 +347,11 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
             }
 
             public String getPublicId() {
-                return null;
+                return AbstractDOMStreamReader.this.getPublicId();
             }
 
             public String getSystemId() {
-                return null;
+                return AbstractDOMStreamReader.this.getSystemId();
             }
 
         };
