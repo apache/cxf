@@ -1047,7 +1047,7 @@ public final class StaxUtils {
                 }
                 
                 if (null != el) {
-                    return new W3CDOMStreamReader(el);
+                    return new W3CDOMStreamReader(el, source.getSystemId());
                 }
             } else if ("javax.xml.transform.stax.StAXSource".equals(source.getClass().getName())) {
                 try {
@@ -1060,7 +1060,19 @@ public final class StaxUtils {
             
             XMLInputFactory factory = getXMLInputFactory();
             try {
-                return factory.createXMLStreamReader(source);
+                XMLStreamReader reader = factory.createXMLStreamReader(source);
+                if (reader == null && source instanceof StreamSource) {
+                    //createXMLStreamReader from Source is optional, we'll try and map it
+                    StreamSource ss = (StreamSource)source;
+                    if (ss.getInputStream() != null) {
+                        reader = factory.createXMLStreamReader(ss.getSystemId(),
+                                                               ss.getInputStream());
+                    } else {
+                        reader = factory.createXMLStreamReader(ss.getSystemId(),
+                                                               ss.getReader());
+                    }
+                }
+                return reader;
             } finally {
                 returnXMLInputFactory(factory);
             }
