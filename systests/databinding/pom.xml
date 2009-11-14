@@ -21,14 +21,14 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.1.8-SNAPSHOT</version>
+        <version>2.1.8</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-databinding</artifactId>
     <name>Apache CXF Databinding System Tests</name>
-    <version>2.1.8-SNAPSHOT</version>
+    <version>2.1.8</version>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>
