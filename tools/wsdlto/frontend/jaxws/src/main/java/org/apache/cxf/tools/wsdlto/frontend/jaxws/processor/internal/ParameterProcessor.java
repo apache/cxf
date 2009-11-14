@@ -295,7 +295,25 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                     continue;
                 } else if (isSamePart(inpart, outpart)) {
-                    addParameter(method, getParameterFromPart(method, outpart, JavaType.Style.INOUT));
+                    boolean found = false;
+                    for (JavaParameter p : method.getParameters()) {
+                        if (p.getQName().equals(ProcessorUtil.getElementName(outpart))) {
+                            p.setHolder(true);
+                            p.setHolderName(javax.xml.ws.Holder.class.getName());
+                            String holderClass = p.getClassName();
+                            if (JAXBUtils.holderClass(holderClass) != null) {
+                                holderClass = JAXBUtils.holderClass(holderClass).getName();
+                            }  
+                            p.setClassName(holderClass);
+                            p.getAnnotations().clear();
+                            p.setStyle(JavaType.Style.INOUT);
+                            p.annotate(new WebParamAnnotator());
+                            found = true;
+                        }
+                    }
+                    if (!found) {
+                        addParameter(method, getParameterFromPart(method, outpart, JavaType.Style.INOUT));
+                    }
                     continue;
                 } else if (!isSamePart(inpart, outpart)) {
                     if (oob) {
