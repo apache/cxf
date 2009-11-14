@@ -45,6 +45,7 @@ import org.junit.Test;
 /**
  * 
  */
+@Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
 public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     
     private static final QName SERVICE_NAME 
@@ -57,7 +58,6 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    @Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
     public void testCallFromClient() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf.xml");
