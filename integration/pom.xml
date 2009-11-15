@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-integration</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.9-SNAPSHOT</version>
+    <version>2.1.8</version>
     <name>Apache CXF Integration</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf</artifactId>
-        <version>2.1.9-SNAPSHOT</version>
+        <version>2.1.8</version>
     </parent>
 
 
