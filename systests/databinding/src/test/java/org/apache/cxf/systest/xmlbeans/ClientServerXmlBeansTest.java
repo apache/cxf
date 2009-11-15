@@ -44,6 +44,7 @@ import org.junit.Test;
 /**
  * 
  */
+@Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
 public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     
     private static final QName SERVICE_NAME 
