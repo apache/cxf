@@ -39,6 +39,7 @@ import org.apache.hello_world_soap_http.xmlbeans.Greeter;
 import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
 import org.apache.hello_world_soap_http.xmlbeans.SOAPService;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
