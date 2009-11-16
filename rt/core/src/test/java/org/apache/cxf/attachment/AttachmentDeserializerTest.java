@@ -25,6 +25,11 @@ import java.io.PushbackInputStream;
 import java.util.Collection;
 import java.util.Iterator;
 
+import javax.xml.parsers.SAXParser;
+import javax.xml.parsers.SAXParserFactory;
+
+import org.xml.sax.helpers.DefaultHandler;
+
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -298,5 +303,34 @@ public class AttachmentDeserializerTest extends Assert {
         assertEquals(10, m.read(new byte[1000]));
         assertEquals(-1, m.read(new byte[1000]));
         assertEquals(-1, m.read(new byte[1000]));
+    }
+    
+    @Test
+    public void testCXF2542() throws Exception {
+        StringBuffer buf = new StringBuffer();
+        buf.append("------=_Part_0_2180223.1203118300920\n");
+        buf.append("Content-Type: application/xop+xml; charset=UTF-8; type=\"text/xml\"\n");
+        buf.append("Content-Transfer-Encoding: 8bit\n");
+        buf.append("Content-ID: <soap.xml@xfire.codehaus.org>\n");
+        buf.append("\n");
+        buf.append("<soap:Envelope xmlns:soap=\"http://schemas.xmlsoap.org/soap/envelope/\" "
+                   + "xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" "
+                   + "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">"
+                   + "<soap:Body><getNextMessage xmlns=\"http://foo.bar\" /></soap:Body>"
+                   + "</soap:Envelope>\n");
+        buf.append("------=_Part_0_2180223.1203118300920--\n");
+
+        InputStream rawInputStream = new ByteArrayInputStream(buf.toString().getBytes());
+        MessageImpl message = new MessageImpl();
+        message.setContent(InputStream.class, rawInputStream);
+        message.put(Message.CONTENT_TYPE, 
+                    "multipart/related; type=\"application/xop+xml\"; "
+                    + "start=\"<soap.xml@xfire.codehaus.org>\"; "
+                    + "start-info=\"text/xml\"; boundary=\"----=_Part_0_2180223.1203118300920\"");
+        new AttachmentDeserializer(message).initializeAttachments();
+        InputStream inputStreamWithoutAttachments = message.getContent(InputStream.class);
+        SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
+        parser.parse(inputStreamWithoutAttachments, new DefaultHandler());
+        System.out.println("All done.");
     }
 }
