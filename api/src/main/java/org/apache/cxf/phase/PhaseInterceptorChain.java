@@ -35,8 +35,11 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.MessageObserver;
 
 /**
@@ -247,11 +250,27 @@ public class PhaseInterceptorChain implements InterceptorChain {
      
                         faultOccurred = true;
                                             
+                        StringBuilder description = new StringBuilder();
+                        if (message.getExchange() != null) {
+                            Exchange exchange = message.getExchange();
+                            Service service = exchange.get(Service.class);
+                            if (service != null) {
+                                description.append('\'');
+                                description.append(service.getName());
+                                OperationInfo opInfo = exchange.get(OperationInfo.class);
+                                if (opInfo != null) {
+                                    description.append("#").append(opInfo.getName());
+                                }
+                                description.append("\' ");
+                            }
+                        }
+                        
                         FaultMode mode = message.get(FaultMode.class);
                         if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
                             if (LOG.isLoggable(Level.FINE)) { 
                                 LogUtils.log(LOG, Level.FINE,
-                                             "Application has thrown exception, unwinding now", ex);
+                                             "Application " + description
+                                             + "has thrown exception, unwinding now", ex);
                             } else if (LOG.isLoggable(Level.INFO)) {
                                 Throwable t = ex;
                                 if (ex instanceof Fault
@@ -260,17 +279,20 @@ public class PhaseInterceptorChain implements InterceptorChain {
                                 }                            
                                 
                                 LogUtils.log(LOG, Level.INFO,
-                                             "Application has thrown exception, unwinding now: "
+                                             "Application " + description
+                                             + "has thrown exception, unwinding now: "
                                              + t.getClass().getName() 
                                              + ": " + ex.getMessage());
                             }
                         } else if (LOG.isLoggable(Level.WARNING)) {
                             if (mode == FaultMode.UNCHECKED_APPLICATION_FAULT) {
                                 LogUtils.log(LOG, Level.WARNING,
-                                             "Application has thrown exception, unwinding now", ex);
+                                             "Application " + description
+                                             + "has thrown exception, unwinding now", ex);
                             } else {
                                 LogUtils.log(LOG, Level.WARNING,
-                                             "Interceptor has thrown exception, unwinding now", ex);
+                                             "Interceptor for " + description
+                                             + "has thrown exception, unwinding now", ex);
                             }
                         }
     
