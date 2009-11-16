@@ -1981,12 +1981,19 @@ public class HTTPConduit
             try {
                 handleResponse();
             } catch (IOException e) {
+                String url = connection.getURL().toString();
+                String origMessage = e.getMessage();
+                if (origMessage != null && origMessage.contains(url)) {
+                    throw e;
+                }
                 throw mapException(e.getClass().getSimpleName() 
-                                   + " invoking " + connection.getURL(), e,
+                                   + " invoking " + connection.getURL() + ": "
+                                   + e.getMessage(), e,
                                    IOException.class);
             } catch (RuntimeException e) {
                 throw mapException(e.getClass().getSimpleName() 
-                                   + " invoking " + connection.getURL(), e,
+                                   + " invoking " + connection.getURL() + ": "
+                                   + e.getMessage(), e,
                                    RuntimeException.class);
             } finally {
                 if (cachingForRetransmission && cachedStream != null) {
@@ -1994,7 +2001,8 @@ public class HTTPConduit
                 }
             }
         }
-        private <T extends Exception> T mapException(String msg, T ex, Class<T> cls) {
+        private <T extends Exception> T mapException(String msg, 
+                                                     T ex, Class<T> cls) {
             T ex2 = ex;
             try {
                 ex2 = cls.cast(ex.getClass().getConstructor(String.class).newInstance(msg));
