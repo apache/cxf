@@ -77,8 +77,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                       effectivePolicy.getPolicy());
                 
-                List<Interceptor> interceptors = effectivePolicy.getInterceptors();
-                for (Interceptor i : interceptors) {            
+                List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+                for (Interceptor<? extends Message> i : interceptors) {            
                     msg.getInterceptorChain().add(i);
                     LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
                 }
@@ -92,8 +92,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
                 
-                List<Interceptor> interceptors = ep.getInterceptors();
-                for (Interceptor i : interceptors) {
+                List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
+                for (Interceptor<? extends Message> i : interceptors) {
                     msg.getInterceptorChain().add(i);
                 }
                 
@@ -110,8 +110,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 
                 EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi);
         
-                List<Interceptor> interceptors = ep.getInterceptors();
-                for (Interceptor i : interceptors) {
+                List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
+                for (Interceptor<? extends Message> i : interceptors) {
                     msg.getInterceptorChain().add(i);
                 }
                 // insert assertions of endpoint's vocabulary into message
@@ -128,8 +128,8 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             
             EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination);
             
-            List<Interceptor> interceptors = ep.getInterceptors();
-            for (Interceptor i : interceptors) {
+            List<Interceptor<? extends Message>> interceptors = ep.getInterceptors();
+            for (Interceptor<? extends Message> i : interceptors) {
                 msg.getInterceptorChain().add(i);
                 LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
             }

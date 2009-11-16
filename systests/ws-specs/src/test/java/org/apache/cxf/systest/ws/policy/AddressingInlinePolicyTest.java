@@ -32,6 +32,7 @@ import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
@@ -126,15 +127,15 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
     private static void testInterceptors(Bus b) {
         boolean hasServerIn = false;
         boolean hasServerOut = false;
-        List<Interceptor> inInterceptors = b.getInInterceptors();
-        for (Interceptor i : inInterceptors) {
+        List<Interceptor<? extends Message>> inInterceptors = b.getInInterceptors();
+        for (Interceptor<? extends Message> i : inInterceptors) {
             if (i instanceof PolicyInInterceptor) {
                 hasServerIn = true;
             }
         }
         assertTrue(hasServerIn);
         
-        for (Interceptor i : b.getOutInterceptors()) {
+        for (Interceptor<? extends Message> i : b.getOutInterceptors()) {
             if (i instanceof PolicyOutInterceptor) {
                 hasServerOut = true;
             }

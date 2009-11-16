@@ -63,7 +63,8 @@ public class OutFaultChainInitiatorObserver extends AbstractFaultChainInitiatorO
                 chain.add(p.getOutFaultInterceptors());
             }
         }
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.FAULT_OUT_INTERCEPTORS));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)m.get(Message.FAULT_OUT_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }

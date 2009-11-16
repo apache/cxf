@@ -42,10 +42,8 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
-//import org.apache.cxf.jaxws.EndpointImpl;
 
 
 @WebService(serviceName = "ControlService", 
@@ -67,8 +65,8 @@ public class ControlImpl  extends org.apache.cxf.greeter_control.ControlImpl {
             LOG.info("Initialised bus " + greeterBus + " with cfg file resource: " + cfgResource);
             LOG.fine("greeterBus inInterceptors: " + greeterBus.getInInterceptors());
 
-            Interceptor logIn = new LoggingInInterceptor();
-            Interceptor logOut = new LoggingOutInterceptor();
+            LoggingInInterceptor logIn = new LoggingInInterceptor();
+            LoggingOutInterceptor logOut = new LoggingOutInterceptor();
             greeterBus.getInInterceptors().add(logIn);
             greeterBus.getOutInterceptors().add(logOut);
             greeterBus.getOutFaultInterceptors().add(logOut);

@@ -31,6 +31,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
@@ -77,11 +78,11 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
         checkAddressInterceptors(client.getInInterceptors());
     }
     
-    private void checkAddressInterceptors(List<Interceptor> interceptors) {
+    private void checkAddressInterceptors(List<Interceptor<? extends Message>> interceptors) {
         boolean hasAg = false;
         boolean hasCodec = false;
         
-        for (Interceptor i : interceptors) {
+        for (Interceptor<? extends Message> i : interceptors) {
             if (i instanceof MAPAggregator) {
                 hasAg = true;
             } else if (i instanceof MAPCodec) {

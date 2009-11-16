@@ -34,6 +34,7 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -341,7 +342,7 @@ public class RMEndpointTest extends Assert {
         Collection<PolicyAssertion> alt = new ArrayList<PolicyAssertion>();
         EasyMock.expect(ep.getChosenAlternative()).andReturn(alt).times(2);
         PolicyInterceptorProviderRegistry reg = control.createMock(PolicyInterceptorProviderRegistry.class);
-        List<Interceptor> li = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> li = new ArrayList<Interceptor<? extends Message>>();
         EasyMock.expect(reg.getInterceptors(alt, true, false)).andReturn(li);
         Policy p = control.createMock(Policy.class);
         EasyMock.expect(ep.getPolicy()).andReturn(p);

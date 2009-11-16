@@ -37,6 +37,7 @@ import org.apache.cxf.greeter_control.types.FaultLocation;
 import org.apache.cxf.greeter_control.types.StartGreeterResponse;
 import org.apache.cxf.greeter_control.types.StopGreeterResponse;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 
 @WebService(serviceName = "ControlService", 
             portName = "ControlPort", 
@@ -112,7 +113,7 @@ public class ControlImpl implements Control {
     }
 
     public void setFaultLocation(FaultLocation fl) {
-        List<Interceptor> interceptors = greeterBus.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = greeterBus.getInInterceptors();
         FaultThrowingInterceptor fi = null;
         for (Interceptor i : interceptors) {
             if (i instanceof FaultThrowingInterceptor) {

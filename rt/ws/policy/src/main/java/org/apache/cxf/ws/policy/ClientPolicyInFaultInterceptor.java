@@ -78,9 +78,9 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);        
         LOG.fine("ep: " + ep);
         
-        List<Interceptor> faultInterceptors = ep.getFaultInterceptors();
+        List<Interceptor<? extends Message>> faultInterceptors = ep.getFaultInterceptors();
         LOG.fine("faultInterceptors: " + faultInterceptors);
-        for (Interceptor i : faultInterceptors) {
+        for (Interceptor<? extends Message> i : faultInterceptors) {
             msg.getInterceptorChain().add(i);
             LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
         }

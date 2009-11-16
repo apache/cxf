@@ -71,7 +71,7 @@ public final class ColocUtil {
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
         
         Endpoint ep = ex.get(Endpoint.class);
-        List<Interceptor> il = ep.getOutInterceptors();
+        List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
         }
@@ -104,7 +104,7 @@ public final class ColocUtil {
         PhaseInterceptorChain chain = new PhaseInterceptorChain(phases);
         
         Endpoint ep = ex.get(Endpoint.class);
-        List<Interceptor> il = ep.getInInterceptors();
+        List<Interceptor<? extends Message>> il = ep.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
         }
@@ -151,7 +151,8 @@ public final class ColocUtil {
             }
         }
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(key));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)m.get(key));
         if (is != null) {
             chain.add(is);
         }

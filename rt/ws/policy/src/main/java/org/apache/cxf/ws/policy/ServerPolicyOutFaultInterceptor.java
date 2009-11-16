@@ -89,8 +89,8 @@ public class ServerPolicyOutFaultInterceptor extends AbstractPolicyInterceptor {
         
         EffectivePolicy effectivePolicy = pe.getEffectiveServerFaultPolicy(ei, bfi, destination);
         
-        List<Interceptor> interceptors = effectivePolicy.getInterceptors();
-        for (Interceptor oi : interceptors) {
+        List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+        for (Interceptor<? extends Message> oi : interceptors) {
             msg.getInterceptorChain().add(oi);
             LOG.log(Level.FINE, "Added interceptor of type {0}", oi.getClass().getSimpleName());
         }

@@ -31,6 +31,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -99,19 +100,19 @@ public class WrappedService implements Service {
         wrappedService.setExecutor(arg0);
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return wrappedService.getInFaultInterceptors();
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         return wrappedService.getInInterceptors();
     }
 
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return wrappedService.getOutFaultInterceptors();
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         return wrappedService.getOutInterceptors();
     }
 

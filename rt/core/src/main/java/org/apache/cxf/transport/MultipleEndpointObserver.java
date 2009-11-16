@@ -45,8 +45,10 @@ public class MultipleEndpointObserver implements MessageObserver {
     public static final String ENDPOINTS = "multipleEndpointObserver.endpoints";
     
     protected Bus bus;
-    protected List<Interceptor> bindingInterceptors = new CopyOnWriteArrayList<Interceptor>();
-    protected List<Interceptor> routingInterceptors = new CopyOnWriteArrayList<Interceptor>();
+    protected List<Interceptor<? extends Message>> bindingInterceptors
+        = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
+    protected List<Interceptor<? extends Message>> routingInterceptors
+        = new CopyOnWriteArrayList<Interceptor<? extends Message>>();
     private Set<Endpoint> endpoints = new CopyOnWriteArraySet<Endpoint>();
     
     public MultipleEndpointObserver(Bus bus) {
@@ -109,11 +111,11 @@ public class MultipleEndpointObserver implements MessageObserver {
         }
     }
 
-    public List<Interceptor> getBindingInterceptors() {
+    public List<Interceptor<? extends Message>> getBindingInterceptors() {
         return bindingInterceptors;
     }
 
-    public List<Interceptor> getRoutingInterceptors() {
+    public List<Interceptor<? extends Message>> getRoutingInterceptors() {
         return routingInterceptors;
     }
 

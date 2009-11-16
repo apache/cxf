@@ -59,7 +59,6 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.CachedClass;
@@ -79,6 +78,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxb.attachment.JAXBAttachmentSchemaValidationHack;
 import org.apache.cxf.jaxb.io.DataReaderImpl;
 import org.apache.cxf.jaxb.io.DataWriterImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
@@ -226,10 +226,14 @@ public class JAXBDataBinding extends AbstractDataBinding
     private boolean qualifiedSchemas;
     private Service service;
     
-    private List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor<? extends Message>> in 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> out
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> inFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
 
     public JAXBDataBinding() {
     }
@@ -396,7 +400,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                     //will cause it to load automatically and we'll skip them later
                     schemas.addAll(bi);
                 } catch (IOException e) {
-                    throw new ServiceConstructionException(new Message("SCHEMA_GEN_EXC", LOG), e);
+                    throw new ServiceConstructionException("SCHEMA_GEN_EXC", LOG, e);
                 }
             }
             for (DOMSource r : schemas) {
@@ -906,19 +910,19 @@ public class JAXBDataBinding extends AbstractDataBinding
         return null;
     }   
     
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return inFault;
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         return in;
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         return out;
     }
 

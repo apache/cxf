@@ -30,9 +30,9 @@ import java.util.Set;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -53,8 +53,8 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     
     private Collection<PolicyAssertion> vocabulary;
     private Collection<PolicyAssertion> faultVocabulary;
-    private List<Interceptor> interceptors;
-    private List<Interceptor> faultInterceptors;
+    private List<Interceptor<? extends Message>> interceptors;
+    private List<Interceptor<? extends Message>> faultInterceptors;
     
     private EndpointInfo ei;
     private PolicyEngineImpl engine;
@@ -113,14 +113,14 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         return faultVocabulary;
     }    
     
-    public synchronized List<Interceptor> getInterceptors() {
+    public synchronized List<Interceptor<? extends Message>> getInterceptors() {
         if (interceptors == null) {
             initializeInterceptors();
         }
         return interceptors;
     }
     
-    public synchronized List<Interceptor> getFaultInterceptors() {
+    public synchronized List<Interceptor<? extends Message>> getFaultInterceptors() {
         if (interceptors == null) {
             initializeInterceptors();
         }
@@ -153,7 +153,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
             alternative = getSupportedAlternatives();
         }
         if (null == alternative) {
-            throw new PolicyException(new Message("NO_ALTERNATIVE_EXC", BUNDLE));
+            throw new PolicyException(new org.apache.cxf.common.i18n.Message("NO_ALTERNATIVE_EXC", BUNDLE));
         } else {
             setChosenAlternative(alternative);
         }
@@ -251,7 +251,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     }
 
     void initializeInterceptors(PolicyInterceptorProviderRegistry reg,
-                                Set<Interceptor> out,
+                                Set<Interceptor<? extends Message>> out,
                                 PolicyAssertion a, 
                                 boolean fault) {
         QName qn = a.getName();
@@ -275,7 +275,7 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         PolicyInterceptorProviderRegistry reg 
             = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
         
-        Set<Interceptor> out = new LinkedHashSet<Interceptor>();
+        Set<Interceptor<? extends Message>> out = new LinkedHashSet<Interceptor<? extends Message>>();
         if (getChosenAlternative() != null) {
             for (PolicyAssertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, false);
@@ -283,12 +283,12 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         }
 
         if (requestor) {
-            interceptors = new ArrayList<Interceptor>(out);
+            interceptors = new ArrayList<Interceptor<? extends Message>>(out);
             out.clear();
             for (PolicyAssertion a : getChosenAlternative()) {
                 initializeInterceptors(reg, out, a, true);
             }
-            faultInterceptors = new ArrayList<Interceptor>(out);
+            faultInterceptors = new ArrayList<Interceptor<? extends Message>>(out);
         } else if (ei != null && ei.getBinding() != null) {
             for (BindingOperationInfo boi : ei.getBinding().getOperations()) {
                 EffectivePolicy p = engine.getEffectiveServerRequestPolicy(ei, boi);
@@ -303,9 +303,9 @@ public class EndpointPolicyImpl implements EndpointPolicy {
                     }
                 }
             }
-            interceptors = new ArrayList<Interceptor>(out);
+            interceptors = new ArrayList<Interceptor<? extends Message>>(out);
         } else {
-            interceptors = new ArrayList<Interceptor>(out);            
+            interceptors = new ArrayList<Interceptor<? extends Message>>(out);            
         }
     }
     
@@ -327,11 +327,11 @@ public class EndpointPolicyImpl implements EndpointPolicy {
         faultVocabulary = v;
     }
     
-    void setInterceptors(List<Interceptor> in) {
+    void setInterceptors(List<Interceptor<? extends Message>> in) {
         interceptors = in;
     }
     
-    void setFaultInterceptors(List<Interceptor> inFault) {
+    void setFaultInterceptors(List<Interceptor<? extends Message>> inFault) {
         faultInterceptors = inFault;
     }
     

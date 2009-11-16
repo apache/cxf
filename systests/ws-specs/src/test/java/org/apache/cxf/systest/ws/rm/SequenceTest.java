@@ -722,7 +722,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         init(cfg);
         
-        class MessageNumberInterceptor extends AbstractPhaseInterceptor {
+        class MessageNumberInterceptor extends AbstractPhaseInterceptor<Message> {
             public MessageNumberInterceptor() {
                 super(Phase.USER_LOGICAL);
             }
@@ -788,7 +788,7 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     public void testUnknownSequence() throws Exception {
         init("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
         
-        class SequenceIdInterceptor extends AbstractPhaseInterceptor {
+        class SequenceIdInterceptor extends AbstractPhaseInterceptor<Message> {
             public SequenceIdInterceptor() {
                 super(Phase.USER_LOGICAL);
             }
@@ -1236,8 +1236,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         init("org/apache/cxf/systest/ws/rm/message-loss-server.xml", true);
         
         // avoid client side message loss
-        List<Interceptor> outInterceptors = greeterBus.getOutInterceptors();
-        for (Interceptor i : outInterceptors) {
+        List<Interceptor<? extends Message>> outInterceptors = greeterBus.getOutInterceptors();
+        for (Interceptor<? extends Message> i : outInterceptors) {
             if (i.getClass().equals(MessageLossSimulator.class)) {
                 outInterceptors.remove(i);
                 break;
@@ -1474,9 +1474,9 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         mr.awaitMessages(nExpectedOut, nExpectedIn, timeout);
     }
 
-    private void removeRMInterceptors(List<Interceptor> interceptors) {
-        for (Iterator<Interceptor> it = interceptors.iterator(); it.hasNext();) {
-            Interceptor i = it.next();
+    private void removeRMInterceptors(List<Interceptor<? extends Message>> interceptors) {
+        for (Iterator<Interceptor<? extends Message>> it = interceptors.iterator(); it.hasNext();) {
+            Interceptor<? extends Message> i = it.next();
             if (i instanceof RMSoapInterceptor
                 || i instanceof RMOutInterceptor
                 || i instanceof RMInInterceptor) {

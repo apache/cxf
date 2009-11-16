@@ -49,19 +49,19 @@ public abstract class AbstractPolicyInterceptorProvider extends AbstractAttribut
         return assertionTypes;
     }
 
-    public List<Interceptor> provideInFaultInterceptors(Message m) {
+    public List<Interceptor<? extends Message>> provideInFaultInterceptors(Message m) {
         return getInFaultInterceptors();
     }
 
-    public List<Interceptor> provideInInterceptors(Message m) {
+    public List<Interceptor<? extends Message>> provideInInterceptors(Message m) {
         return getInInterceptors();
     }
 
-    public List<Interceptor> provideOutFaultInterceptors(Message m) {
+    public List<Interceptor<? extends Message>> provideOutFaultInterceptors(Message m) {
         return getOutFaultInterceptors();
     }
 
-    public List<Interceptor> provideOutInterceptors(Message m) {
+    public List<Interceptor<? extends Message>> provideOutInterceptors(Message m) {
         return getOutInterceptors();
     } 
     

@@ -162,11 +162,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
     
-    public void add(Collection<Interceptor> newhandlers) {
+    public void add(Collection<Interceptor<? extends Message>> newhandlers) {
         add(newhandlers, false);
     }
 
-    public void add(Collection<Interceptor> newhandlers, boolean force) {
+    public void add(Collection<Interceptor<? extends Message>> newhandlers, boolean force) {
         if (newhandlers == null) {
             return;
         }

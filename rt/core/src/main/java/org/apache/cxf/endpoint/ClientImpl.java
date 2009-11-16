@@ -610,19 +610,19 @@ public class ClientImpl
         message.put(Message.INBOUND_MESSAGE, Boolean.TRUE);
         PhaseManager pm = bus.getExtension(PhaseManager.class);
 
-        List<Interceptor> i1 = bus.getInInterceptors();
+        List<Interceptor<? extends Message>> i1 = bus.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
         }
-        List<Interceptor> i2 = getInInterceptors();
+        List<Interceptor<? extends Message>> i2 = getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by client: " + i2);
         }
-        List<Interceptor> i3 = endpoint.getInInterceptors();
+        List<Interceptor<? extends Message>> i3 = endpoint.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + i2);
         }
-        List<Interceptor> i4 = endpoint.getBinding().getInInterceptors();
+        List<Interceptor<? extends Message>> i4 = endpoint.getBinding().getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by binding: " + i4);
         }
@@ -790,23 +790,23 @@ public class ClientImpl
 
         PhaseManager pm = bus.getExtension(PhaseManager.class);
 
-        List<Interceptor> i1 = bus.getOutInterceptors();
+        List<Interceptor<? extends Message>> i1 = bus.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
         }
-        List<Interceptor> i2 = getOutInterceptors();
+        List<Interceptor<? extends Message>> i2 = getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by client: " + i2);
         }
-        List<Interceptor> i3 = endpoint.getOutInterceptors();
+        List<Interceptor<? extends Message>> i3 = endpoint.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
-        List<Interceptor> i4 = endpoint.getBinding().getOutInterceptors();
+        List<Interceptor<? extends Message>> i4 = endpoint.getBinding().getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by binding: " + i4);
         }
-        List<Interceptor> i5 = null;
+        List<Interceptor<? extends Message>> i5 = null;
         if (endpoint.getService().getDataBinding() instanceof InterceptorProvider) {
             i5 = ((InterceptorProvider)endpoint.getService().getDataBinding()).getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
@@ -835,7 +835,8 @@ public class ClientImpl
             }
         }
         String key = in ? Message.IN_INTERCEPTORS : Message.OUT_INTERCEPTORS;
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)ctx.get(key));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)ctx.get(key));
         if (is != null) {
             chain.add(is);
         }

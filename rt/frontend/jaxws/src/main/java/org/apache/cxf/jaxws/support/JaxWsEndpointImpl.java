@@ -61,6 +61,7 @@ import org.apache.cxf.jaxws.interceptors.SwAInInterceptor;
 import org.apache.cxf.jaxws.interceptors.SwAOutInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassOutInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -105,8 +106,8 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
         createJaxwsBinding();
         
-        List<Interceptor> in = super.getInInterceptors();       
-        List<Interceptor> out = super.getOutInterceptors();
+        List<Interceptor<? extends Message>> in = super.getInInterceptors();       
+        List<Interceptor<? extends Message>> out = super.getOutInterceptors();
 
         boolean isProvider = implInfo != null && implInfo.isWebServiceProvider();
         Class<?> clazz = implInfo != null && isProvider ? implInfo.getProviderParameterType() : null;
@@ -153,14 +154,14 @@ public class JaxWsEndpointImpl extends EndpointImpl {
         }
         
         //Outbound fault chain
-        List<Interceptor> outFault = super.getOutFaultInterceptors();    
+        List<Interceptor<? extends Message>> outFault = super.getOutFaultInterceptors();    
         outFault.add(new LogicalHandlerFaultOutInterceptor(jaxwsBinding));
         if (getBinding() instanceof SoapBinding) {
             outFault.add(new SOAPHandlerFaultOutInterceptor(jaxwsBinding));
         }
 
         //Inbound fault chain
-        List<Interceptor> inFault = super.getInFaultInterceptors(); 
+        List<Interceptor<? extends Message>> inFault = super.getInFaultInterceptors(); 
         inFault.add(new LogicalHandlerFaultInInterceptor(jaxwsBinding));
         if (getBinding() instanceof SoapBinding) {
             inFault.add(new SOAPHandlerFaultInInterceptor(jaxwsBinding));

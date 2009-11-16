@@ -54,13 +54,13 @@ public class EffectivePolicyImpl implements EffectivePolicy {
     
     protected Policy policy;     
     protected Collection<PolicyAssertion> chosenAlternative;
-    protected List<Interceptor> interceptors;
+    protected List<Interceptor<? extends org.apache.cxf.message.Message>> interceptors;
     
     public Policy getPolicy() {
         return policy;        
     }
     
-    public List<Interceptor> getInterceptors() {
+    public List<Interceptor<? extends org.apache.cxf.message.Message>> getInterceptors() {
         return interceptors;
     }
     
@@ -161,11 +161,12 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (engine.getBus() != null) {
             PolicyInterceptorProviderRegistry reg 
                 = engine.getBus().getExtension(PolicyInterceptorProviderRegistry.class);
-            Set<Interceptor> out = new LinkedHashSet<Interceptor>();
+            Set<Interceptor<? extends org.apache.cxf.message.Message>> out 
+                = new LinkedHashSet<Interceptor<? extends org.apache.cxf.message.Message>>();
             for (PolicyAssertion a : getChosenAlternative()) {
                 initialiseInterceptors(reg, engine, out, a, useIn);
             }        
-            setInterceptors(new ArrayList<Interceptor>(out));
+            setInterceptors(new ArrayList<Interceptor<? extends  org.apache.cxf.message.Message>>(out));
         }
     }
     
@@ -184,7 +185,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
 
     void initialiseInterceptors(PolicyInterceptorProviderRegistry reg,
                                 PolicyEngineImpl engine,
-                                Set<Interceptor> out,
+                                Set<Interceptor<? extends org.apache.cxf.message.Message>> out,
                                 PolicyAssertion a,
                                 boolean usIn) {
         QName qn = a.getName();
@@ -210,7 +211,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         chosenAlternative = c;
     }
     
-    void setInterceptors(List<Interceptor> out) {
+    void setInterceptors(List<Interceptor<? extends org.apache.cxf.message.Message>> out) {
         interceptors = out;
     }
    

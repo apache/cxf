@@ -21,6 +21,8 @@ package org.apache.cxf.interceptor;
 
 import java.util.List;
 
+import org.apache.cxf.message.Message;
+
 /**
  * The <code>InterceptorProvider</code> interface is implemented by objects 
  * that have interceptor chains associated with them. The methods in this 
@@ -34,27 +36,27 @@ public interface InterceptorProvider {
      * chain of the object.
      * @return <code>List<Interceptor></code> incoming interceptor chain
      */
-    List<Interceptor> getInInterceptors();
+    List<Interceptor<? extends Message>> getInInterceptors();
     
     /**
      * Returns the list of interceptors attached to the outgoing interceptor
      * chain of the object.
      * @return <code>List<Interceptor></code> outgoing interceptor chain
      */
-    List<Interceptor> getOutInterceptors();
+    List<Interceptor<? extends Message>> getOutInterceptors();
     
     /**
      * Returns the list of interceptors attached to the incoming fault interceptor
      * chain of the object.
      * @return <code>List<Interceptor></code> incoming fault interceptor chain
      */
-    List<Interceptor> getInFaultInterceptors();
+    List<Interceptor<? extends Message>> getInFaultInterceptors();
 
     /**
      * Returns the list of interceptors attached to the outgoing fault interceptor
      * chain of the object.
      * @return <code>List<Interceptor></code> outgoing fault interceptor chain
      */
-    List<Interceptor> getOutFaultInterceptors();
+    List<Interceptor<? extends Message>> getOutFaultInterceptors();
     
 }

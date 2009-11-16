@@ -28,15 +28,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
 
 
-public class LogicalHandlerFaultInInterceptor<T extends Message> 
-    extends AbstractJAXWSHandlerInterceptor<T> {
+public class LogicalHandlerFaultInInterceptor 
+    extends AbstractJAXWSHandlerInterceptor<Message> {
 
     public LogicalHandlerFaultInInterceptor(Binding binding) {
         super(binding, Phase.PRE_PROTOCOL);
         addAfter(SOAPHandlerFaultInInterceptor.class.getName());       
     }
 
-    public void handleMessage(T message) {
+    public void handleMessage(Message message) {
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
@@ -60,7 +60,7 @@ public class LogicalHandlerFaultInInterceptor<T extends Message>
         }
     }
     
-    public void handleFault(T message) {
+    public void handleFault(Message message) {
         // TODO
     }
 }

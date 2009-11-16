@@ -33,6 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
@@ -370,10 +371,10 @@ public class PolicyEngineTest extends Assert {
         engine = new PolicyEngineImpl(enabled);
     
         Bus bus = control.createMock(Bus.class);
-        List<Interceptor> out = new ArrayList<Interceptor>();
-        List<Interceptor> in = new ArrayList<Interceptor>();
-        List<Interceptor> inFault = new ArrayList<Interceptor>();
-        List<Interceptor> outFault = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> out = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> in = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> inFault = new ArrayList<Interceptor<? extends Message>>();
+        List<Interceptor<? extends Message>> outFault = new ArrayList<Interceptor<? extends Message>>();
         if (enabled) {
             EasyMock.expect(bus.getOutInterceptors()).andReturn(out).times(1);
             EasyMock.expect(bus.getInInterceptors()).andReturn(in).times(1);
@@ -653,9 +654,9 @@ public class PolicyEngineTest extends Assert {
         assertSame(a, assertions.iterator().next());       
     }
         
-    private Set<String> getInterceptorIds(List<Interceptor> interceptors) {
+    private Set<String> getInterceptorIds(List<Interceptor<? extends Message>> interceptors) {
         Set<String> ids = new HashSet<String>();
-        for (Interceptor i : interceptors) {
+        for (Interceptor<? extends Message> i : interceptors) {
             ids.add(((PhaseInterceptor)i).getId());
         }
         return ids;

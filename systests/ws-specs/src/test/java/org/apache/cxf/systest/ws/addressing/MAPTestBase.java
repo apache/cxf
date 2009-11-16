@@ -37,6 +37,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
@@ -105,14 +106,14 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         staticBus.shutdown(true);
     }
     
-    private void addInterceptors(List<Interceptor> chain,
-                                     Interceptor[] interceptors) {
+    private void addInterceptors(List<Interceptor<? extends Message>> chain,
+                                 Interceptor<? extends Message>[] interceptors) {
         for (int i = 0; i < interceptors.length; i++) {
             chain.add(interceptors[i]);
         }
     }
-    private void removeInterceptors(List<Interceptor> chain,
-                                 Interceptor[] interceptors) {
+    private void removeInterceptors(List<Interceptor<? extends Message>> chain,
+                                 Interceptor<? extends Message>[] interceptors) {
         for (int i = 0; i < interceptors.length; i++) {
             chain.remove(interceptors[i]);
         }
@@ -133,7 +134,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         messageIDs.clear();
         mapVerifier = new MAPVerifier();
         headerVerifier = new HeaderVerifier();
-        Interceptor[] interceptors = {mapVerifier, headerVerifier };
+        Interceptor<?>[] interceptors = {mapVerifier, headerVerifier};
         addInterceptors(staticBus.getInInterceptors(), interceptors);
         addInterceptors(staticBus.getOutInterceptors(), interceptors);
         addInterceptors(staticBus.getOutFaultInterceptors(), interceptors);
@@ -158,7 +159,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     
     @After
     public void tearDown() throws Exception {
-        Interceptor[] interceptors = {mapVerifier, headerVerifier };
+        Interceptor<?>[] interceptors = {mapVerifier, headerVerifier };
         removeInterceptors(staticBus.getInInterceptors(), interceptors);
         removeInterceptors(staticBus.getOutInterceptors(), interceptors);
         removeInterceptors(staticBus.getOutFaultInterceptors(), interceptors);

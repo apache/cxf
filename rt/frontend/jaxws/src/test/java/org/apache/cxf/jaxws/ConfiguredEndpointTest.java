@@ -99,7 +99,7 @@ public class ConfiguredEndpointTest extends Assert {
                    !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
    
         // System.out.println("endpoint interceptors");
-        List<Interceptor> interceptors = endpoint.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         printInterceptors("in", interceptors);        
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
         interceptors = endpoint.getOutInterceptors();
@@ -183,7 +183,7 @@ public class ConfiguredEndpointTest extends Assert {
         
         org.apache.cxf.service.ServiceImpl svc = (org.apache.cxf.service.ServiceImpl)endpoint.getService();
         assertEquals("Unexpected bean name.", SERVICE_NAME.toString(), svc.getBeanName());
-        List<Interceptor> interceptors = svc.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = svc.getInInterceptors();
         assertEquals("Unexpected number of interceptors.", 1, interceptors.size());
         assertEquals("Unexpected interceptor id.", "service-in", 
                      findTestInterceptor(interceptors).getId());
@@ -232,7 +232,7 @@ public class ConfiguredEndpointTest extends Assert {
         assertTrue("Unexpected value for property validating", 
                    !Boolean.TRUE.equals(endpoint.get(Message.SCHEMA_VALIDATION_ENABLED)));
    
-        List<Interceptor> interceptors = endpoint.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
         interceptors = endpoint.getOutInterceptors();
         assertNull("Unexpected test interceptor", findTestInterceptor(interceptors));
@@ -289,7 +289,7 @@ public class ConfiguredEndpointTest extends Assert {
         assertEquals("Unexpected bean name", PORT_NAME.toString() + ".endpoint", endpoint.getBeanName());
         assertTrue("Unexpected value for property validating", 
                    Boolean.valueOf((String) ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED)));
-        List<Interceptor> interceptors = endpoint.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = endpoint.getInInterceptors();
         assertEquals("Unexpected number of interceptors.", 6, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-in", 
                      findTestInterceptor(interceptors).getId());
@@ -346,7 +346,7 @@ public class ConfiguredEndpointTest extends Assert {
     }
       
     
-    private TestInterceptor findTestInterceptor(List<Interceptor> interceptors) {
+    private TestInterceptor findTestInterceptor(List<Interceptor<? extends Message>> interceptors) {
         for (Interceptor i : interceptors) {
             if (i instanceof TestInterceptor) {
                 return (TestInterceptor)i;
@@ -356,7 +356,7 @@ public class ConfiguredEndpointTest extends Assert {
     }
     
     
-    private void printInterceptors(String type, List<Interceptor> interceptors) {
+    private void printInterceptors(String type, List<Interceptor<? extends Message>> interceptors) {
         //for (Interceptor i : interceptors) {
             //System.out.println("    " + type + ": " + i.getClass().getName());
         //}

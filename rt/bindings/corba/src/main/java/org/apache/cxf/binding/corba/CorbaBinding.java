@@ -53,11 +53,11 @@ public class CorbaBinding extends AbstractBasicInterceptorProvider implements Bi
         return new CorbaMessage(m);
     }
 
-    public List<Interceptor> getFaultInInterceptors() {
+    public List<Interceptor<? extends Message>> getFaultInInterceptors() {
         return this.getInFaultInterceptors();
     }
     
-    public List<Interceptor> getFaultOutInterceptors() {
+    public List<Interceptor<? extends Message>> getFaultOutInterceptors() {
         return this.getOutFaultInterceptors();
     }
 

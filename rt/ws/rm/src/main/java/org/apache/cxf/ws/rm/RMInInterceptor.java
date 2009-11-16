@@ -32,7 +32,7 @@ import org.apache.cxf.ws.addressing.MAPAggregator;
 /**
  * 
  */
-public class RMInInterceptor extends AbstractRMInterceptor {
+public class RMInInterceptor extends AbstractRMInterceptor<Message> {
     
     private static final Logger LOG = LogUtils.getL7dLogger(RMInInterceptor.class);
   

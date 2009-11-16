@@ -39,6 +39,7 @@ import org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassOutInterceptor;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.DefaultResourceManager;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
@@ -115,8 +116,8 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
         Object obj = super.create();
         Service service = getServiceFactory().getService();
         if (needWrapperClassInterceptor(service.getServiceInfos().get(0))) {
-            List<Interceptor> in = super.getInInterceptors();
-            List<Interceptor> out = super.getOutInterceptors();
+            List<Interceptor<? extends Message>> in = super.getInInterceptors();
+            List<Interceptor<? extends Message>> out = super.getOutInterceptors();
             in.add(new WrapperClassInInterceptor());
             in.add(new HolderInInterceptor());
             out.add(new WrapperClassOutInterceptor());

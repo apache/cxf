@@ -103,7 +103,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         PhaseInterceptorChain chain = new PhaseInterceptorChain(pm.getOutPhases());
         
         Endpoint ep = ex.get(Endpoint.class);
-        List<Interceptor> il = ep.getOutInterceptors();
+        List<Interceptor<? extends Message>> il = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + il);
         }
@@ -144,7 +144,8 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
                 chain.add(p.getOutInterceptors());
             }
         }
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.OUT_INTERCEPTORS));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)m.get(Message.OUT_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }
@@ -158,26 +159,26 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         
         Endpoint ep = ex.get(Endpoint.class);
         
-        List<Interceptor> i1 = bus.getOutInterceptors();
+        List<Interceptor<? extends Message>> i1 = bus.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by bus: " + i1);
         }
-        List<Interceptor> i2 = ep.getService().getOutInterceptors();
+        List<Interceptor<? extends Message>> i2 = ep.getService().getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by service: " + i2);
         }
-        List<Interceptor> i3 = ep.getOutInterceptors();
+        List<Interceptor<? extends Message>> i3 = ep.getOutInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
-        List<Interceptor> i4 = null;
+        List<Interceptor<? extends Message>> i4 = null;
         if (binding != null) {
             i4 = binding.getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("Interceptors contributed by binding: " + i4);
             }
         }
-        List<Interceptor> i5 = null;
+        List<Interceptor<? extends Message>> i5 = null;
         if (ep.getService().getDataBinding() instanceof InterceptorProvider) {
             i5 = ((InterceptorProvider)ep.getService().getDataBinding()).getOutInterceptors();
             if (LOG.isLoggable(Level.FINE)) {

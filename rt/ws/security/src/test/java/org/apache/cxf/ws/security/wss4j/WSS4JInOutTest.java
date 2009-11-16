@@ -47,6 +47,7 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
@@ -74,7 +75,7 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
         SortedSet<Phase> phases = new TreeSet<Phase>();
         phases.add(new Phase(Phase.PRE_PROTOCOL, 1));
         
-        List<Interceptor> lst = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> lst = new ArrayList<Interceptor<? extends Message>>();
         lst.add(new MustUnderstandInterceptor());
         lst.add(new WSS4JInInterceptor());
         lst.add(new SAAJInInterceptor());

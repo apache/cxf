@@ -515,17 +515,17 @@ public class AbstractClient implements Client {
     
     protected static PhaseInterceptorChain setupOutInterceptorChain(ClientConfiguration cfg) { 
         PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
-        List<Interceptor> i1 = cfg.getBus().getOutInterceptors();
-        List<Interceptor> i2 = cfg.getOutInterceptors();
-        List<Interceptor> i3 = cfg.getConduitSelector().getEndpoint().getOutInterceptors();
+        List<Interceptor<? extends Message>> i1 = cfg.getBus().getOutInterceptors();
+        List<Interceptor<? extends Message>> i2 = cfg.getOutInterceptors();
+        List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getOutInterceptors();
         return new PhaseChainCache().get(pm.getOutPhases(), i1, i2, i3);
     }
     
     protected static PhaseInterceptorChain setupInInterceptorChain(ClientConfiguration cfg) { 
         PhaseManager pm = cfg.getBus().getExtension(PhaseManager.class);
-        List<Interceptor> i1 = cfg.getBus().getInInterceptors();
-        List<Interceptor> i2 = cfg.getInInterceptors();
-        List<Interceptor> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
+        List<Interceptor<? extends Message>> i1 = cfg.getBus().getInInterceptors();
+        List<Interceptor<? extends Message>> i2 = cfg.getInInterceptors();
+        List<Interceptor<? extends Message>> i3 = cfg.getConduitSelector().getEndpoint().getInInterceptors();
         
         return new PhaseChainCache().get(pm.getInPhases(), i1, i2, i3);
     }

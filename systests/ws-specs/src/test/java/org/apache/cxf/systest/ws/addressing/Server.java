@@ -30,6 +30,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase implements VerificationCache {
@@ -56,15 +57,15 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         mapVerifier.verificationCache = this;
         HeaderVerifier headerVerifier = new HeaderVerifier();
         headerVerifier.verificationCache = this;
-        Interceptor[] interceptors = {mapVerifier, headerVerifier};
+        Interceptor<?>[] interceptors = {mapVerifier, headerVerifier};
         addInterceptors(getBus().getInInterceptors(), interceptors);
         addInterceptors(getBus().getInFaultInterceptors(), interceptors);
         addInterceptors(getBus().getOutInterceptors(), interceptors);
         addInterceptors(getBus().getOutFaultInterceptors(), interceptors);
     }
 
-    private void addInterceptors(List<Interceptor> chain,
-                                 Interceptor[] interceptors) {
+    private void addInterceptors(List<Interceptor<? extends Message>> chain,
+                                 Interceptor<? extends Message>[] interceptors) {
         for (int i = 0; i < interceptors.length; i++) {
             chain.add(interceptors[i]);
         }

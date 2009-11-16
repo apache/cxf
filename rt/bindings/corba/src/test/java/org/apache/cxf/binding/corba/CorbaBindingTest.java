@@ -57,13 +57,13 @@ public class CorbaBindingTest extends Assert {
     @Test
     public void testCorbaBinding() {
         CorbaBinding binding = new CorbaBinding();
-        List<Interceptor> in = binding.getInInterceptors();
+        List<Interceptor<? extends Message>> in = binding.getInInterceptors();
         assertNotNull(in);
-        List<Interceptor> out = binding.getOutInterceptors();
+        List<Interceptor<? extends Message>> out = binding.getOutInterceptors();
         assertNotNull(out);
-        List<Interceptor> infault = binding.getFaultInInterceptors();
+        List<Interceptor<? extends Message>> infault = binding.getInFaultInterceptors();
         assertNotNull(infault);
-        List<Interceptor> outfault = binding.getFaultOutInterceptors();
+        List<Interceptor<? extends Message>> outfault = binding.getFaultOutInterceptors();
         assertNotNull(outfault);
         Message message = binding.createMessage();
         message.put(ORB.class, orb);

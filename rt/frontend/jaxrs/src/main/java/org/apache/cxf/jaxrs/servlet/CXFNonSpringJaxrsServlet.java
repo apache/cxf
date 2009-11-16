@@ -44,6 +44,7 @@ import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 
 public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
@@ -121,6 +122,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         }
     }
     
+    @SuppressWarnings("unchecked")
     protected void setInterceptors(JAXRSServerFactoryBean bean, ServletConfig servletConfig,
                                    String paramName) {
         String value  = servletConfig.getInitParameter(paramName);
@@ -128,14 +130,14 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             return;
         }
         String[] values = value.split(" ");
-        List<Interceptor> list = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
         for (String interceptorVal : values) {
             String theValue = interceptorVal.trim();
             if (theValue.length() != 0) {
                 try {
                     Class<?> intClass = ClassLoaderUtils.loadClass(theValue,
                                                                    CXFNonSpringJaxrsServlet.class);
-                    list.add((Interceptor)intClass.newInstance());
+                    list.add((Interceptor<? extends Message>)intClass.newInstance());
                 } catch (ClassNotFoundException ex) {
                     LOG.warning("Interceptor class " + theValue + " can not be found");
                 } catch (InstantiationException ex) {

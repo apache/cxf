@@ -237,10 +237,13 @@ public class ColocOutInterceptorTest extends Assert {
         
         EasyMock.expect(ep.getBinding()).andReturn(bd);
         EasyMock.expect(bd.createMessage()).andReturn(new MessageImpl());
-        EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(ep.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
-        EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
-        EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(srv.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
+        EasyMock.expect(bus.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         
         control.replay();
         colocOut.invokeInboundChain(ex, ep);

@@ -47,19 +47,19 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.MessageObserver;
 
 
-public class LogicalHandlerOutInterceptor<T extends Message> 
-    extends AbstractJAXWSHandlerInterceptor<T> {
+public class LogicalHandlerOutInterceptor 
+    extends AbstractJAXWSHandlerInterceptor<Message> {
     
     public static final String ORIGINAL_WRITER 
         = LogicalHandlerOutInterceptor.class.getName() + ".original_writer";
-    private LogicalHandlerOutEndingInterceptor<T> ending;
+    private LogicalHandlerOutEndingInterceptor ending;
     
     public LogicalHandlerOutInterceptor(Binding binding) {
         super(binding, Phase.PRE_MARSHAL);
-        ending = new LogicalHandlerOutEndingInterceptor<T>(binding);
+        ending = new LogicalHandlerOutEndingInterceptor(binding);
     }
     
-    public void handleMessage(T message) throws Fault {
+    public void handleMessage(Message message) throws Fault {
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
@@ -82,7 +82,7 @@ public class LogicalHandlerOutInterceptor<T extends Message>
         }
     }
     @Override
-    public void handleFault(T message) {
+    public void handleFault(Message message) {
         super.handleFault(message);
         XMLStreamWriter os = (XMLStreamWriter)message.get(ORIGINAL_WRITER);
         if (os != null) {
@@ -90,14 +90,14 @@ public class LogicalHandlerOutInterceptor<T extends Message>
         }
     }
     
-    private class LogicalHandlerOutEndingInterceptor<X extends Message> 
-        extends AbstractJAXWSHandlerInterceptor<X> {
+    private class LogicalHandlerOutEndingInterceptor 
+        extends AbstractJAXWSHandlerInterceptor<Message> {
     
         public LogicalHandlerOutEndingInterceptor(Binding binding) {
             super(binding, Phase.POST_MARSHAL);
         }
     
-        public void handleMessage(X message) throws Fault {
+        public void handleMessage(Message message) throws Fault {
             W3CDOMStreamWriter domWriter = (W3CDOMStreamWriter)message.getContent(XMLStreamWriter.class);
             XMLStreamWriter origWriter = (XMLStreamWriter)message
                 .get(LogicalHandlerOutInterceptor.ORIGINAL_WRITER);  

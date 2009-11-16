@@ -19,6 +19,8 @@
 
 package org.apache.cxf.ws.security.trust;
 
+import java.util.logging.Logger;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -47,6 +49,13 @@ public class TrustException extends UncheckedException {
      */
     public TrustException(Throwable cause) {
         super(cause);
+    }
+    
+    public TrustException(String msg, Logger log) {
+        super(new Message(msg, log));
+    }
+    public TrustException(String msg, Logger log, Throwable t) {
+        super(new Message(msg, log), t);
     }
 
 }

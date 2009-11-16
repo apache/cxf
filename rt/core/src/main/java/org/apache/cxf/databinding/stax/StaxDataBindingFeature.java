@@ -28,6 +28,7 @@ import org.apache.cxf.interceptor.BareInInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.WrappedInInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptor;
 
 public class StaxDataBindingFeature extends AbstractFeature {
@@ -43,7 +44,7 @@ public class StaxDataBindingFeature extends AbstractFeature {
         removeDatabindingInterceptor(server.getEndpoint().getBinding().getInInterceptors());
     }
 
-    private void removeDatabindingInterceptor(List<Interceptor> inInterceptors) {
+    private void removeDatabindingInterceptor(List<Interceptor<? extends Message>> inInterceptors) {
         removeInterceptor(inInterceptors, DocLiteralInInterceptor.class.getName());
         removeInterceptor(inInterceptors, BareInInterceptor.class.getName());
         removeInterceptor(inInterceptors, WrappedInInterceptor.class.getName());
@@ -52,7 +53,7 @@ public class StaxDataBindingFeature extends AbstractFeature {
         inInterceptors.add(new StaxDataBindingInterceptor());
     }
 
-    private void removeInterceptor(List<Interceptor> inInterceptors, String name) {
+    private void removeInterceptor(List<Interceptor<? extends Message>> inInterceptors, String name) {
 
         for (Interceptor i : inInterceptors) {
             if (i instanceof PhaseInterceptor) {

@@ -39,8 +39,8 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 
-public class LogicalHandlerInInterceptor<T extends Message> 
-    extends AbstractJAXWSHandlerInterceptor<T> {
+public class LogicalHandlerInInterceptor 
+    extends AbstractJAXWSHandlerInterceptor<Message> {
 
     public LogicalHandlerInInterceptor(Binding binding) {
         super(binding, Phase.PRE_PROTOCOL);
@@ -49,7 +49,7 @@ public class LogicalHandlerInInterceptor<T extends Message>
         addAfter(SOAPHandlerInterceptor.class.getName());
     }
 
-    public void handleMessage(T message) {
+    public void handleMessage(Message message) {
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;
@@ -78,7 +78,7 @@ public class LogicalHandlerInInterceptor<T extends Message>
         }
     }
 
-    private void handleAbort(T message, W3CDOMStreamWriter writer) {
+    private void handleAbort(Message message, W3CDOMStreamWriter writer) {
         message.getInterceptorChain().abort();
 
         if (!message.getExchange().isOneWay()) {
@@ -101,7 +101,7 @@ public class LogicalHandlerInInterceptor<T extends Message>
         }        
     }
     
-    public void handleFault(T message) {
+    public void handleFault(Message message) {
         // TODO
     }
     

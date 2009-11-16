@@ -41,7 +41,7 @@ import org.apache.cxf.ws.rm.RetransmissionInterceptor;
 /**
  * 
  */
-public class OutMessageRecorder extends AbstractPhaseInterceptor {
+public class OutMessageRecorder extends AbstractPhaseInterceptor<Message> {
     
     private static final Logger LOG = LogUtils.getLogger(OutMessageRecorder.class);
     private List<byte[]> outbound;

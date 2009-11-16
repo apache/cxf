@@ -54,6 +54,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.spring.NamespaceHandler.SpringServerFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.http.WSDLQueryHandler;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.After;
@@ -185,10 +186,10 @@ public class SpringBeansTest extends Assert {
         EndpointImpl ep;
         ep = (EndpointImpl) ctx.getBean("epWithInterceptors");
         assertNotNull(ep);
-        List<Interceptor> inInterceptors = ep.getInInterceptors();
+        List<Interceptor<? extends Message>> inInterceptors = ep.getInInterceptors();
         boolean saaj = false;
         boolean logging = false;
-        for (Interceptor<?> i : inInterceptors) {
+        for (Interceptor<? extends Message> i : inInterceptors) {
             if (i instanceof SAAJInInterceptor) {
                 saaj = true;
             } else if (i instanceof LoggingInInterceptor) {
@@ -316,10 +317,10 @@ public class SpringBeansTest extends Assert {
         assertTrue("unexpected ConduitSelector",
                    client.getConduitSelector() instanceof NullConduitSelector);
 
-        List<Interceptor> inInterceptors = client.getInInterceptors();
+        List<Interceptor<? extends Message>> inInterceptors = client.getInInterceptors();
         boolean saaj = false;
         boolean logging = false;
-        for (Interceptor<?> i : inInterceptors) {
+        for (Interceptor<? extends Message> i : inInterceptors) {
             if (i instanceof SAAJInInterceptor) {
                 saaj = true;
             } else if (i instanceof LoggingInInterceptor) {

@@ -66,7 +66,8 @@ public class InFaultChainInitiatorObserver extends AbstractFaultChainInitiatorOb
                 chain.add(p.getInFaultInterceptors());
             }
         }
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.FAULT_IN_INTERCEPTORS));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)m.get(Message.FAULT_IN_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }

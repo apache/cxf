@@ -80,8 +80,8 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", 
                                   effectivePolicy.getPolicy());
             
-            List<Interceptor> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor i : interceptors) {            
+            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+            for (Interceptor<? extends Message> i : interceptors) {            
                 msg.getInterceptorChain().add(i);
                 LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
             }
@@ -111,8 +111,8 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             msg.put(EffectivePolicy.class, effectivePolicy);
             PolicyUtils.logPolicy(LOG, Level.FINEST, "Using effective policy: ", effectivePolicy.getPolicy());
             
-            List<Interceptor> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor i : interceptors) {            
+            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+            for (Interceptor<? extends Message> i : interceptors) {            
                 msg.getInterceptorChain().add(i);
                 LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
             }
@@ -139,8 +139,8 @@ public class PolicyOutInterceptor extends AbstractPolicyInterceptor {
             EffectivePolicy effectivePolicy = pe.getEffectiveServerResponsePolicy(ei, boi, destination);
             msg.put(EffectivePolicy.class, effectivePolicy);
             
-            List<Interceptor> interceptors = effectivePolicy.getInterceptors();
-            for (Interceptor oi : interceptors) {
+            List<Interceptor<? extends Message>> interceptors = effectivePolicy.getInterceptors();
+            for (Interceptor<? extends Message> oi : interceptors) {
                 msg.getInterceptorChain().add(oi);
                 LOG.log(Level.FINE, "Added interceptor of type {0}",
                         oi.getClass().getSimpleName());           

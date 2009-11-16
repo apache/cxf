@@ -39,7 +39,7 @@ import org.apache.cxf.ws.addressing.v200408.AttributedURI;
 /**
  * 
  */
-public class RMOutInterceptor extends AbstractRMInterceptor {
+public class RMOutInterceptor extends AbstractRMInterceptor<Message>  {
     
     private static final Logger LOG = LogUtils.getL7dLogger(RMOutInterceptor.class);
  

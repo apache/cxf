@@ -115,7 +115,7 @@ public class SpringBusFactoryTest extends Assert {
     
     private void checkCustomerConfiguration(Bus bus) {
         assertNotNull(bus);
-        List<Interceptor> interceptors = bus.getInInterceptors();
+        List<Interceptor<? extends Message>> interceptors = bus.getInInterceptors();
         assertEquals("Unexpected number of interceptors", 2, interceptors.size());
         assertEquals("Unexpected interceptor", "in-a", interceptors.get(0).toString());
         assertEquals("Unexpected interceptor", "in-b", interceptors.get(1).toString());

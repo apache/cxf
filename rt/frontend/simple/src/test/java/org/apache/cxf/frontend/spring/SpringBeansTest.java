@@ -36,6 +36,7 @@ import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.factory.HelloService;
 import org.apache.cxf.service.factory.HelloServiceImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -103,10 +104,10 @@ public class SpringBeansTest extends Assert {
         assertTrue("unexpected ConduitSelector",
                    client.getConduitSelector() instanceof NullConduitSelector);
 
-        List<Interceptor> inInterceptors = client.getInInterceptors();
+        List<Interceptor<? extends Message>> inInterceptors = client.getInInterceptors();
         boolean saaj = false;
         boolean logging = false;
-        for (Interceptor<?> i : inInterceptors) {
+        for (Interceptor<? extends Message> i : inInterceptors) {
             if (i instanceof SAAJInInterceptor) {
                 saaj = true;
             } else if (i instanceof LoggingInInterceptor) {

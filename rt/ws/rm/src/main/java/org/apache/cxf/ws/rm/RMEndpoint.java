@@ -42,6 +42,7 @@ import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
@@ -612,7 +613,7 @@ public class RMEndpoint {
     class EffectivePolicyImpl implements EffectivePolicy {
 
         private EndpointPolicy endpointPolicy;
-        private List<Interceptor> interceptors;
+        private List<Interceptor<? extends Message>> interceptors;
 
         EffectivePolicyImpl(EndpointPolicy ep, PolicyInterceptorProviderRegistry reg, boolean outbound,
                             boolean fault) {
@@ -624,7 +625,7 @@ public class RMEndpoint {
             return endpointPolicy.getChosenAlternative();
         }
 
-        public List<Interceptor> getInterceptors() {
+        public List<Interceptor<? extends Message>> getInterceptors() {
             return interceptors;
         }
 

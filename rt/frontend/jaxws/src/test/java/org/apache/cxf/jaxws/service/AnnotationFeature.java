@@ -32,7 +32,7 @@ public class AnnotationFeature extends AbstractFeature {
         provider.getOutInterceptors().add(new AnnotationFeatureInterceptor());
     }
     
-    public static class AnnotationFeatureInterceptor extends AbstractPhaseInterceptor {
+    public static class AnnotationFeatureInterceptor extends AbstractPhaseInterceptor<Message> {
         
         public AnnotationFeatureInterceptor() {
             super(Phase.SEND);

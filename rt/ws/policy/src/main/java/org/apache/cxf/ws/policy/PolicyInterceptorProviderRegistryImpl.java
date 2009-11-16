@@ -34,6 +34,7 @@ import org.apache.cxf.configuration.spring.MapProvider;
 import org.apache.cxf.extension.BusExtension;
 import org.apache.cxf.extension.RegistryImpl;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 
 /**
  * 
@@ -90,10 +91,10 @@ public class PolicyInterceptorProviderRegistryImpl
             }
         }
     }
-    public List<Interceptor> getInterceptors(Collection<PolicyAssertion> alternative, 
+    public List<Interceptor<? extends Message>> getInterceptors(Collection<PolicyAssertion> alternative, 
                                              boolean out, boolean fault) {
         loadDynamic();
-        List<Interceptor> interceptors = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> interceptors = new ArrayList<Interceptor<? extends Message>>();
         for (PolicyAssertion a : alternative) {
             if (a.isOptional()) {
                 continue;

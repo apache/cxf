@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.extension.Registry;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 
 
 /**
@@ -42,6 +43,7 @@ public interface PolicyInterceptorProviderRegistry
      */
     void register(PolicyInterceptorProvider provider);
     
-    List<Interceptor> getInterceptors(Collection<PolicyAssertion> alterative, boolean out, boolean fault);
+    List<Interceptor<? extends Message>> getInterceptors(Collection<PolicyAssertion> alterative, 
+                                                         boolean out, boolean fault);
 
 }

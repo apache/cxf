@@ -26,9 +26,9 @@ import java.util.ResourceBundle;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.feature.Features;
+import org.apache.cxf.message.Message;
 
 public class AnnotationInterceptors {
     
@@ -39,11 +39,7 @@ public class AnnotationInterceptors {
     public AnnotationInterceptors(Class<?> ... clz) {
         clazzes = clz;
     }
-    
-    public List<Interceptor> getInFaultInterceptors() {
-        return getAnnotationObject(InFaultInterceptors.class, Interceptor.class);
-    }
-    
+        
     private <T> List<T> getAnnotationObject(Class<? extends Annotation> annotationClazz, Class<T> type) {
         
         for (Class<?> cls : clazzes) {
@@ -80,34 +76,54 @@ public class AnnotationInterceptors {
                     object = ClassLoaderUtils.loadClass(annObjectName, this.getClass()).newInstance();
                     theAnnotationObjects.add(type.cast(object));
                 } catch (ClassNotFoundException e) {
-                    throw new Fault(new Message("COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                    throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
                                                     BUNDLE, annObjectName), e);
                 } catch (InstantiationException ie) {
-                    throw new Fault(new Message("COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                    throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
                                                     BUNDLE, annObjectName), ie);
                 } catch (IllegalAccessException iae) {
-                    throw new Fault(new Message("COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                    throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                                    "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
                                                     BUNDLE, annObjectName), iae);
                 } catch (ClassCastException ex) {
-                    throw new Fault(new Message("COULD_NOT_CREATE_ANNOTATION_OBJECT", 
+                    throw new Fault(new org.apache.cxf.common.i18n.Message(
+                                                "COULD_NOT_CREATE_ANNOTATION_OBJECT", 
                                                 BUNDLE, annObjectName), ex);
                 }
             }
         }
         return theAnnotationObjects;
     }
-
-
-    public List<Interceptor> getInInterceptors() {
-        return getAnnotationObject(InInterceptors.class, Interceptor.class);
+    
+    @SuppressWarnings("unchecked")
+    private List<Interceptor<? extends Message>> getAnnotationInterceptorList(Class<? extends Annotation> t) {
+        List<Interceptor> i = getAnnotationObject(t, Interceptor.class);
+        if (i == null) {
+            return null;
+        }
+        List<Interceptor<? extends Message>> m = new ArrayList<Interceptor<? extends Message>>();
+        for (Interceptor i2 : i) {
+            m.add(i2);
+        }
+        return m;
     }
 
-    public List<Interceptor> getOutFaultInterceptors() {
-        return getAnnotationObject(OutFaultInterceptors.class, Interceptor.class);
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
+        return getAnnotationInterceptorList(InFaultInterceptors.class);
     }
 
-    public List<Interceptor> getOutInterceptors() {
-        return getAnnotationObject(OutInterceptors.class, Interceptor.class);
+    public List<Interceptor<? extends Message>> getInInterceptors() {
+        return getAnnotationInterceptorList(InInterceptors.class);
+    }
+
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
+        return getAnnotationInterceptorList(OutFaultInterceptors.class);
+    }
+
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
+        return getAnnotationInterceptorList(OutInterceptors.class);
     }
         
     public List<AbstractFeature> getFeatures() {

@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.AegisElementProvider;
 import org.apache.cxf.jaxrs.provider.DataBindingJSONProvider;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.sdo.SDODataBinding;
 import org.apache.cxf.systest.jaxrs.sdo.SDOResource;
 import org.apache.cxf.systest.jaxrs.sdo.Structure;
@@ -89,7 +90,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         bean.setProvider(provider);
         bean.setAddress("http://localhost:9080/databinding/sdo");
         bean.setResourceClass(SDOResource.class);
-        List<Interceptor> list = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
         list.add(new LoggingInInterceptor());
         bean.setInInterceptors(list);
         SDOResource client = bean.create(SDOResource.class);

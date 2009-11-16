@@ -118,10 +118,13 @@ public class ColocUtilTest extends Assert {
         ex.put(Endpoint.class, ep);
         ex.put(Service.class, srv);
         
-        EasyMock.expect(ep.getOutInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(ep.getOutInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
-        EasyMock.expect(srv.getOutInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
-        EasyMock.expect(bus.getOutInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(srv.getOutInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
+        EasyMock.expect(bus.getOutInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         
         control.replay();
         InterceptorChain chain = ColocUtil.getOutInterceptorChain(ex, list);
@@ -148,10 +151,13 @@ public class ColocUtilTest extends Assert {
         ex.put(Service.class, srv);
         
         EasyMock.expect(bus.getExtension(PhaseManager.class)).andReturn(phaseMgr);
-        EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(ep.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         EasyMock.expect(ep.getService()).andReturn(srv).atLeastOnce();
-        EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
-        EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor>()).atLeastOnce();
+        EasyMock.expect(srv.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
+        EasyMock.expect(bus.getInInterceptors())
+            .andReturn(new ArrayList<Interceptor<? extends Message>>()).atLeastOnce();
         
         control.replay();
         InterceptorChain chain = ColocUtil.getInInterceptorChain(ex, list);

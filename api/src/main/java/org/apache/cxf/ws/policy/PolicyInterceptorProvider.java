@@ -40,12 +40,12 @@ public interface PolicyInterceptorProvider extends InterceptorProvider {
      */
     Collection<QName> getAssertionTypes();
     
-    List<Interceptor> provideInInterceptors(Message m);
+    List<Interceptor<? extends Message>> provideInInterceptors(Message m);
     
-    List<Interceptor> provideOutInterceptors(Message m);
+    List<Interceptor<? extends Message>> provideOutInterceptors(Message m);
     
-    List<Interceptor> provideOutFaultInterceptors(Message m);
+    List<Interceptor<? extends Message>> provideOutFaultInterceptors(Message m);
     
-    List<Interceptor> provideInFaultInterceptors(Message m);
+    List<Interceptor<? extends Message>> provideInFaultInterceptors(Message m);
     
 }

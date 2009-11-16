@@ -31,7 +31,6 @@ import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.interceptor.ResponseTimeMessageInInterceptor;
 import org.apache.cxf.management.interceptor.ResponseTimeMessageInvokerInterceptor;
@@ -68,9 +67,9 @@ public class CounterRepository {
     
     @PostConstruct
     void registerInterceptorsToBus() {
-        Interceptor in = new ResponseTimeMessageInInterceptor();
-        Interceptor invoker = new ResponseTimeMessageInvokerInterceptor();
-        Interceptor out = new ResponseTimeMessageOutInterceptor();
+        ResponseTimeMessageInInterceptor in = new ResponseTimeMessageInInterceptor();
+        ResponseTimeMessageInvokerInterceptor invoker = new ResponseTimeMessageInvokerInterceptor();
+        ResponseTimeMessageOutInterceptor out = new ResponseTimeMessageOutInterceptor();
         
         bus.getInInterceptors().add(in);
         bus.getInInterceptors().add(invoker);

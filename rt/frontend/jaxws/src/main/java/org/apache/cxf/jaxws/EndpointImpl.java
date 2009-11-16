@@ -43,7 +43,6 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
@@ -58,6 +57,7 @@ import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -96,10 +96,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     
     private List<String> schemaLocations;
     private List<AbstractFeature> features;
-    private List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor<? extends Message>> in 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> out 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outFault  
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> inFault
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
 
     public EndpointImpl(Object implementor) {
@@ -470,35 +474,35 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         return serverFactory.getDataBinding();
     }
 
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return inFault;
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         return in;
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         return out;
     }
 
-    public void setInInterceptors(List<Interceptor> interceptors) {
+    public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
         in = interceptors;
     }
 
-    public void setInFaultInterceptors(List<Interceptor> interceptors) {
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         inFault = interceptors;
     }
 
-    public void setOutInterceptors(List<Interceptor> interceptors) {
+    public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
         out = interceptors;
     }
 
-    public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outFault = interceptors;
     }
     public void setHandlers(List<Handler> h) {
@@ -558,12 +562,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         if (!isPublished()) {
-            throw new WebServiceException(new Message("ENDPOINT_NOT_PUBLISHED", LOG).toString());
+            throw new WebServiceException(new org.apache.cxf.common.i18n.Message("ENDPOINT_NOT_PUBLISHED",
+                                                                                 LOG).toString());
         }
 
         if (getBinding() instanceof HTTPBinding) {        
-            throw new UnsupportedOperationException(new Message("GET_ENDPOINTREFERENCE_UNSUPPORTED_BINDING",
-                                                                LOG).toString());
+            throw new UnsupportedOperationException(new org.apache.cxf.common.i18n.Message(
+                                                        "GET_ENDPOINTREFERENCE_UNSUPPORTED_BINDING",
+                                                        LOG).toString());
         }        
         
         W3CEndpointReferenceBuilder builder = new W3CEndpointReferenceBuilder();
@@ -585,7 +591,8 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         if (W3CEndpointReference.class.isAssignableFrom(clazz)) {
             return clazz.cast(getEndpointReference(referenceParameters));
         } else {
-            throw new WebServiceException(new Message("ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
+            throw new WebServiceException(new org.apache.cxf.common.i18n.Message(
+                "ENDPOINTREFERENCE_TYPE_NOT_SUPPORTED", LOG, clazz
                 .getName()).toString());
         }
     }

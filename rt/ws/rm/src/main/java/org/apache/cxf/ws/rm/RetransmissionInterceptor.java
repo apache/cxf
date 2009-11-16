@@ -32,7 +32,7 @@ import org.apache.cxf.phase.Phase;
 /**
  * 
  */
-public class RetransmissionInterceptor extends AbstractPhaseInterceptor {
+public class RetransmissionInterceptor extends AbstractPhaseInterceptor<Message> {
 
     RMManager manager;
 

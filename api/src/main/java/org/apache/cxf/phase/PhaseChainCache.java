@@ -27,6 +27,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 
 /**
  * The PhaseChainCache provides default interceptor chains for SOAP requests
@@ -41,52 +42,54 @@ public final class PhaseChainCache {
     
     @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
-                                     List<Interceptor> p1) {
+                                     List<Interceptor<? extends Message>> p1) {
         return getChain(phaseList, p1);
     }
 
     @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
-                                     List<Interceptor> p1,
-                                     List<Interceptor> p2) {
+                                     List<Interceptor<? extends Message>> p1,
+                                     List<Interceptor<? extends Message>> p2) {
         return getChain(phaseList, p1, p2);
     }
     @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
-                                     List<Interceptor> p1,
-                                     List<Interceptor> p2,
-                                     List<Interceptor> p3) {
+                                     List<Interceptor<? extends Message>> p1,
+                                     List<Interceptor<? extends Message>> p2,
+                                     List<Interceptor<? extends Message>> p3) {
         return getChain(phaseList, p1, p2, p3);
     }
     @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
-                                     List<Interceptor> p1,
-                                     List<Interceptor> p2,
-                                     List<Interceptor> p3,
-                                     List<Interceptor> p4) {
+                                     List<Interceptor<? extends Message>> p1,
+                                     List<Interceptor<? extends Message>> p2,
+                                     List<Interceptor<? extends Message>> p3,
+                                     List<Interceptor<? extends Message>> p4) {
         return getChain(phaseList, p1, p2, p3, p4);
     }
     @SuppressWarnings("unchecked")
     public PhaseInterceptorChain get(SortedSet<Phase> phaseList,
-                                     List<Interceptor> p1,
-                                     List<Interceptor> p2,
-                                     List<Interceptor> p3,
-                                     List<Interceptor> p4,
-                                     List<Interceptor> p5) {
+                                     List<Interceptor<? extends Message>> p1,
+                                     List<Interceptor<? extends Message>> p2,
+                                     List<Interceptor<? extends Message>> p3,
+                                     List<Interceptor<? extends Message>> p4,
+                                     List<Interceptor<? extends Message>> p5) {
         return getChain(phaseList, p1, p2, p3, p4, p5);
     }
     
-    private PhaseInterceptorChain getChain(SortedSet<Phase> phaseList, List<Interceptor> ... providers) {
+    private PhaseInterceptorChain getChain(SortedSet<Phase> phaseList,
+                                           List<Interceptor<? extends Message>> ... providers) {
         ChainHolder last = lastData.get();
         
         if (last == null 
             || !last.matches(providers)) {
             
             PhaseInterceptorChain chain = new PhaseInterceptorChain(phaseList);
-            List<ModCountCopyOnWriteArrayList<Interceptor>> copy 
-                = new ArrayList<ModCountCopyOnWriteArrayList<Interceptor>>(providers.length);
-            for (List<Interceptor> p : providers) {
-                copy.add(new ModCountCopyOnWriteArrayList<Interceptor>(p));
+            List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> copy 
+                = new ArrayList<ModCountCopyOnWriteArrayList<
+                    Interceptor<? extends Message>>>(providers.length);
+            for (List<Interceptor<? extends Message>> p : providers) {
+                copy.add(new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>(p));
                 chain.add(p);
             }
             last = new ChainHolder(chain, copy);
@@ -98,15 +101,16 @@ public final class PhaseChainCache {
     }
     
     private static class ChainHolder {
-        List<ModCountCopyOnWriteArrayList<Interceptor>> lists;
+        List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> lists;
         PhaseInterceptorChain chain;
         
-        ChainHolder(PhaseInterceptorChain c, List<ModCountCopyOnWriteArrayList<Interceptor>> l) {
+        ChainHolder(PhaseInterceptorChain c, 
+                    List<ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>> l) {
             lists = l;
             chain = c;
         }
         
-        boolean matches(List<Interceptor> ... providers) {
+        boolean matches(List<Interceptor<? extends Message>> ... providers) {
             if (lists.size() == providers.length) {
                 for (int x = 0; x < providers.length; x++) {
                     if (lists.get(x).size() != providers[x].size()) {
@@ -119,8 +123,8 @@ public final class PhaseChainCache {
                             return false;
                         }
                     } else {
-                        ListIterator<Interceptor> i1 = lists.get(x).listIterator();
-                        ListIterator<Interceptor> i2 = providers[x].listIterator();
+                        ListIterator<Interceptor<? extends Message>> i1 = lists.get(x).listIterator();
+                        ListIterator<Interceptor<? extends Message>> i2 = providers[x].listIterator();
                         
                         while (i1.hasNext()) {
                             if (i1.next() != i2.next()) {

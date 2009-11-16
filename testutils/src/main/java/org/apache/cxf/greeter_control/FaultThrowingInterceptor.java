@@ -32,7 +32,7 @@ import org.apache.cxf.phase.Phase;
 /**
  * 
  */
-public class FaultThrowingInterceptor extends AbstractPhaseInterceptor {
+public class FaultThrowingInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public static final MessageFormat MESSAGE_FORMAT
         = new MessageFormat("Interceptor fault in phase {0}.");

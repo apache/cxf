@@ -29,6 +29,8 @@ import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.message.Message;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,7 +41,7 @@ public class BusDefinitionParserTest extends Assert {
         String cfgFile = "org/apache/cxf/bus/spring/bus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
         
-        List<Interceptor> in = bus.getInInterceptors();
+        List<Interceptor<? extends Message>> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor i : in) {
             if (i instanceof LoggingInInterceptor) {

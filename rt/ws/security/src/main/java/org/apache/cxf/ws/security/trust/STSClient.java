@@ -50,7 +50,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
-import org.apache.cxf.common.i18n.Message;
+//import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.common.util.StringUtils;
@@ -68,6 +68,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -142,10 +143,14 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
-    List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
-    List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
-    List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
-    List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    List<Interceptor<? extends Message>> in 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    List<Interceptor<? extends Message>> out 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    List<Interceptor<? extends Message>> outFault  
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    List<Interceptor<? extends Message>> inFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     List<AbstractFeature> features;
 
     public STSClient(Bus b) {
@@ -721,7 +726,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         Element rstDec = rst;
         String id = findID(rar, rur, rstDec);
         if (StringUtils.isEmpty(id)) {
-            throw new TrustException(new Message("NO_ID", LOG));
+            throw new TrustException("NO_ID", LOG);
         }
         SecurityToken token = new SecurityToken(id, rstDec, lte);
         token.setAttachedReference(rar);
@@ -747,7 +752,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
                     secret = processor.getDecryptedBytes();
                 } catch (IOException e) {
-                    throw new TrustException(new Message("ENCRYPTED_KEY_ERROR", LOG), e);
+                    throw new TrustException("ENCRYPTED_KEY_ERROR", LOG, e);
                 }
             } else if (childQname.equals(new QName(namespace, "ComputedKey"))) {
                 // Handle the computed key
@@ -767,11 +772,11 @@ public class STSClient implements Configurable, InterceptorProvider {
                     try {
                         secret = psha1.createKey(requestorEntropy, serviceEntr, 0, length / 8);
                     } catch (ConversationException e) {
-                        throw new TrustException(new Message("DERIVED_KEY_ERROR", LOG), e);
+                        throw new TrustException("DERIVED_KEY_ERROR", LOG, e);
                     }
                 } else {
                     // Service entropy missing
-                    throw new TrustException(new Message("NO_ENTROPY", LOG));
+                    throw new TrustException("NO_ENTROPY", LOG);
                 }
             }
         } else if (requestorEntropy != null) {
@@ -890,47 +895,47 @@ public class STSClient implements Configurable, InterceptorProvider {
         template = rstTemplate;
     }
     
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         if (client != null) {
             return client.getOutFaultInterceptors();
         }
         return outFault;
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         if (client != null) {
             return client.getInFaultInterceptors();
         }
         return inFault;
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         if (client != null) {
             return client.getInInterceptors();
         }
         return in;
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         if (client != null) {
             return client.getOutInterceptors();
         }
         return out;
     }
 
-    public void setInInterceptors(List<Interceptor> interceptors) {
+    public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
         getInInterceptors().addAll(interceptors);
     }
 
-    public void setInFaultInterceptors(List<Interceptor> interceptors) {
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         getInFaultInterceptors().addAll(interceptors);
     }
 
-    public void setOutInterceptors(List<Interceptor> interceptors) {
+    public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
         getOutInterceptors().addAll(interceptors);
     }
 
-    public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         getOutFaultInterceptors().addAll(interceptors);
     }
     

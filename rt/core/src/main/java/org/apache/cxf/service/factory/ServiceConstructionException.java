@@ -19,6 +19,8 @@
 
 package org.apache.cxf.service.factory;
 
+import java.util.logging.Logger;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.i18n.UncheckedException;
 
@@ -34,6 +36,12 @@ public class ServiceConstructionException extends UncheckedException {
 
     public ServiceConstructionException(Throwable cause) {
         super(cause);
+    }
+    public ServiceConstructionException(String msg, Logger log) {
+        super(new Message(msg, log));
+    }
+    public ServiceConstructionException(String msg, Logger log, Throwable cause) {
+        super(new Message(msg, log), cause);
     }
 
 }

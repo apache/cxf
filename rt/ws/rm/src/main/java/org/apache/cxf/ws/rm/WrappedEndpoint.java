@@ -29,6 +29,7 @@ import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
@@ -87,19 +88,19 @@ public class WrappedEndpoint implements Endpoint {
         wrappedEndpoint.setOutFaultObserver(arg0);
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return wrappedEndpoint.getInFaultInterceptors();
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         return wrappedEndpoint.getInInterceptors();        
     }
 
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return wrappedEndpoint.getOutFaultInterceptors();
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         return wrappedEndpoint.getOutInterceptors();
     }
 

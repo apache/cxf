@@ -50,15 +50,15 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
      * 
      * @param i the interceptor to add
      */
-    void add(Interceptor i);
+    void add(Interceptor<? extends Message> i);
     
     /**
      * Adds multiple interceptors to the interceptor chain. 
      * @param i the interceptors to add to the chain
      */
-    void add(Collection<Interceptor> i);
+    void add(Collection<Interceptor<? extends Message>> i);
     
-    void remove(Interceptor i);
+    void remove(Interceptor<? extends Message> i);
     
     boolean doIntercept(Message message);
     

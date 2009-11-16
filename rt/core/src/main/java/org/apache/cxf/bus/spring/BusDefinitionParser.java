@@ -34,6 +34,7 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -102,35 +103,35 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             }
         }
         
-        public List<Interceptor> getOutFaultInterceptors() {
+        public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
             return bus.getOutFaultInterceptors();
         }
 
-        public List<Interceptor> getInFaultInterceptors() {
+        public List<Interceptor<? extends Message>> getInFaultInterceptors() {
             return bus.getInFaultInterceptors();
         }
 
-        public List<Interceptor> getInInterceptors() {
+        public List<Interceptor<? extends Message>> getInInterceptors() {
             return bus.getInInterceptors();
         }
 
-        public List<Interceptor> getOutInterceptors() {
+        public List<Interceptor<? extends Message>> getOutInterceptors() {
             return bus.getOutInterceptors();
         }
 
-        public void setInInterceptors(List<Interceptor> interceptors) {
+        public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
             bus.setInInterceptors(interceptors);
         }
 
-        public void setInFaultInterceptors(List<Interceptor> interceptors) {
+        public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             bus.setInFaultInterceptors(interceptors);
         }
 
-        public void setOutInterceptors(List<Interceptor> interceptors) {
+        public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
             bus.setOutInterceptors(interceptors);
         }
 
-        public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+        public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
             bus.setOutFaultInterceptors(interceptors);
         }
         

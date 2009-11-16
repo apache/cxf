@@ -27,6 +27,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
@@ -46,10 +47,10 @@ public class BookServer extends AbstractBusTestServerBase {
         providers.add(new GenericHandlerWriter());
         providers.add(new FaultyRequestHandler());
         sf.setProviders(providers);
-        List<Interceptor> outInts = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> outInts = new ArrayList<Interceptor<? extends Message>>();
         outInts.add(new CustomOutInterceptor());
         sf.setOutInterceptors(outInts);
-        List<Interceptor> outFaultInts = new ArrayList<Interceptor>();
+        List<Interceptor<? extends Message>> outFaultInts = new ArrayList<Interceptor<? extends Message>>();
         outFaultInts.add(new CustomOutFaultInterceptor());
         sf.setOutFaultInterceptors(outFaultInts);
         sf.setResourceProvider(BookStore.class,

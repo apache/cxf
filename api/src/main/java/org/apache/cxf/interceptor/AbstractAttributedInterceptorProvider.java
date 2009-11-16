@@ -23,44 +23,50 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
+import org.apache.cxf.message.Message;
 
 public abstract class AbstractAttributedInterceptorProvider extends HashMap<String, Object>
     implements InterceptorProvider {
 
-    private List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private List<Interceptor<? extends Message>> in 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> out 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> outFault  
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+    private List<Interceptor<? extends Message>> inFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
+
     
-    public List<Interceptor> getOutFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
 
-    public List<Interceptor> getInFaultInterceptors() {
+    public List<Interceptor<? extends Message>> getInFaultInterceptors() {
         return inFault;
     }
 
-    public List<Interceptor> getInInterceptors() {
+    public List<Interceptor<? extends Message>> getInInterceptors() {
         return in;
     }
 
-    public List<Interceptor> getOutInterceptors() {
+    public List<Interceptor<? extends Message>> getOutInterceptors() {
         return out;
     }
 
-    public void setInInterceptors(List<Interceptor> interceptors) {
+    public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
         in = interceptors;
     }
 
-    public void setInFaultInterceptors(List<Interceptor> interceptors) {
+    public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         inFault = interceptors;
     }
 
-    public void setOutInterceptors(List<Interceptor> interceptors) {
+    public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
         out = interceptors;
     }
 
-    public void setOutFaultInterceptors(List<Interceptor> interceptors) {
+    public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outFault = interceptors;
     }
 

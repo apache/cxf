@@ -29,6 +29,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -55,6 +56,15 @@ public class EffectivePolicyImplTest extends Assert {
         new Integer(4);
     } 
     
+    @SuppressWarnings("unchecked")
+    private List<Interceptor<? extends Message>> createMockInterceptorList() {
+        Interceptor i = control.createMock(Interceptor.class);
+        Interceptor<? extends Message> m = i;
+        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        a.add(m);
+        return a;
+    }
+    
     @Test
     public void testAccessors() {
         EffectivePolicyImpl effectivePolicy = new EffectivePolicyImpl();
@@ -65,8 +75,7 @@ public class EffectivePolicyImplTest extends Assert {
         Policy p = control.createMock(Policy.class);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);
         List<PolicyAssertion> la = Collections.singletonList(a);
-        Interceptor i = control.createMock(Interceptor.class);
-        List<Interceptor> li = Collections.singletonList(i);
+        List<Interceptor<? extends Message>> li = createMockInterceptorList();
         control.replay();
         effectivePolicy.setPolicy(p);
         assertSame(p, effectivePolicy.getPolicy());
@@ -259,6 +268,7 @@ public class EffectivePolicyImplTest extends Assert {
         control.verify();
     }
     
+    @SuppressWarnings("unchecked")
     @Test
     public void testInitialiseOutInterceptors() {
         EffectivePolicyImpl epi = new EffectivePolicyImpl();        
@@ -298,8 +308,10 @@ public class EffectivePolicyImplTest extends Assert {
         EasyMock.expect(a.getName()).andReturn(qn);        
         PolicyInterceptorProvider pp = control.createMock(PolicyInterceptorProvider.class);               
         EasyMock.expect(reg.get(qn)).andReturn(pp);
-        Interceptor pi = control.createMock(Interceptor.class);
-        EasyMock.expect(pp.getOutInterceptors()).andReturn(Collections.singletonList(pi));
+        Interceptor<Message> pi = control.createMock(Interceptor.class);
+        List<Interceptor<? extends Message>> m = new ArrayList<Interceptor<? extends Message>>();
+        m.add(pi);
+        EasyMock.expect(pp.getOutInterceptors()).andReturn(m);
         control.replay();
         epi.initialiseInterceptors(engine);
         assertEquals(1, epi.getInterceptors().size());

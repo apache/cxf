@@ -40,6 +40,7 @@ import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.Service;
@@ -81,8 +82,10 @@ public class TestBase extends Assert {
         BindingFactory bf = control.createMock(BindingFactory.class);
         Binding binding = control.createMock(Binding.class);
         expect(bf.createBinding(null)).andStubReturn(binding);
-        expect(binding.getInFaultInterceptors()).andStubReturn(new ArrayList<Interceptor>());
-        expect(binding.getOutFaultInterceptors()).andStubReturn(new ArrayList<Interceptor>());
+        expect(binding.getInFaultInterceptors())
+            .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
+        expect(binding.getOutFaultInterceptors())
+            .andStubReturn(new ArrayList<Interceptor<? extends Message>>());
         
         bfm.registerBindingFactory("http://schemas.xmlsoap.org/wsdl/soap/", bf);
 

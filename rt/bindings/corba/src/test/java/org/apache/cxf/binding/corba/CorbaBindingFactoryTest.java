@@ -89,9 +89,9 @@ public class CorbaBindingFactoryTest extends Assert {
         CorbaBinding binding = (CorbaBinding)factory.createBinding(bindingInfo);
         assertNotNull(binding);
         assertTrue(CorbaBinding.class.isInstance(binding));        
-        List<Interceptor> inInterceptors = binding.getInInterceptors();
+        List<Interceptor<? extends Message>> inInterceptors = binding.getInInterceptors();
         assertNotNull(inInterceptors);
-        List<Interceptor> outInterceptors = binding.getOutInterceptors();
+        List<Interceptor<? extends Message>> outInterceptors = binding.getOutInterceptors();
         assertNotNull(outInterceptors);
         assertEquals(2, inInterceptors.size());
         assertEquals(2, outInterceptors.size());        

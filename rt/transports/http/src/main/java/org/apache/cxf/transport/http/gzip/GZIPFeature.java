@@ -25,6 +25,7 @@ import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
+import org.apache.cxf.message.Message;
 
 /**
  * This class is used to control GZIP compression of messages.
@@ -81,7 +82,7 @@ public class GZIPFeature extends AbstractFeature {
         }
     }
 
-    private void remove(List<Interceptor> outInterceptors) {
+    private void remove(List<Interceptor<? extends Message>> outInterceptors) {
         int x = outInterceptors.size();
         while (x > 0) {
             --x;

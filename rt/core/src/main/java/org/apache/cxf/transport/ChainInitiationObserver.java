@@ -119,7 +119,8 @@ public class ChainInitiationObserver implements MessageObserver {
                 chain.add(p.getInInterceptors());
             }
         }
-        Collection<Interceptor> is = CastUtils.cast((Collection<?>)m.get(Message.IN_INTERCEPTORS));
+        Collection<Interceptor<? extends Message>> is 
+            = CastUtils.cast((Collection<?>)m.get(Message.IN_INTERCEPTORS));
         if (is != null) {
             chain.add(is);
         }

@@ -95,7 +95,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
             .andReturn(true);
 
         control.replay();
-        LogicalHandlerInInterceptor<Message> li = new LogicalHandlerInInterceptor<Message>(binding);
+        LogicalHandlerInInterceptor li = new LogicalHandlerInInterceptor(binding);
         assertEquals("unexpected phase", "pre-protocol", li.getPhase());
         li.handleMessage(message);
         control.verify();
@@ -142,7 +142,7 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
         control1.replay();
 
-        LogicalHandlerInInterceptor<Message> li = new LogicalHandlerInInterceptor<Message>(binding1);
+        LogicalHandlerInInterceptor li = new LogicalHandlerInInterceptor(binding1);
         li.handleMessage(outMessage);
         control1.verify();
     }

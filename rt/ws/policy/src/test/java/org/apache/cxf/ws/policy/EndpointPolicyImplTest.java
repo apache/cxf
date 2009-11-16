@@ -30,6 +30,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.neethi.All;
@@ -63,6 +64,15 @@ public class EndpointPolicyImplTest extends Assert {
         control = EasyMock.createNiceControl();
     } 
     
+    @SuppressWarnings("unchecked")
+    private List<Interceptor<? extends Message>> createMockInterceptorList() {
+        Interceptor i = control.createMock(Interceptor.class);
+        Interceptor<? extends Message> m = i;
+        List<Interceptor<? extends Message>> a = new ArrayList<Interceptor<? extends Message>>();
+        a.add(m);
+        return a;
+    }
+
     @Test
     public void testAccessors() {
         EndpointPolicyImpl epi = new EndpointPolicyImpl();
@@ -74,8 +84,7 @@ public class EndpointPolicyImplTest extends Assert {
         Policy p = control.createMock(Policy.class);
         PolicyAssertion a = control.createMock(PolicyAssertion.class);
         List<PolicyAssertion> la = Collections.singletonList(a);
-        Interceptor i = control.createMock(Interceptor.class);
-        List<Interceptor> li = Collections.singletonList(i);
+        List<Interceptor<? extends Message>> li = createMockInterceptorList();
         control.replay();
         epi.setPolicy(p);
         assertSame(p, epi.getPolicy());
@@ -255,12 +264,13 @@ public class EndpointPolicyImplTest extends Assert {
         
         PolicyInterceptorProvider app = control.createMock(PolicyInterceptorProvider.class);               
         EasyMock.expect(reg.get(aqn)).andReturn(app).anyTimes();
-        Interceptor api = control.createMock(Interceptor.class);
+        List<Interceptor<? extends Message>> li = createMockInterceptorList();
+        Interceptor<? extends Message> api = li.get(0);
         EasyMock.expect(app.getInInterceptors())
-            .andReturn(Collections.singletonList(api)).anyTimes();
+            .andReturn(li).anyTimes();
         if (requestor) {
             EasyMock.expect(app.getInFaultInterceptors())
-                .andReturn(Collections.singletonList(api)).anyTimes();
+                .andReturn(li).anyTimes();
         }
         
         control.replay();

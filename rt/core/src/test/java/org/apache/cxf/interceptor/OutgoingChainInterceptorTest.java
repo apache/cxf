@@ -27,6 +27,7 @@ import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseManager;
@@ -54,7 +55,7 @@ public class OutgoingChainInterceptorTest extends Assert {
     private BindingMessageInfo bmInfo;
     private MessageInfo mInfo;
     private List<Phase> phases;
-    private List<Interceptor> empty;
+    private List<Interceptor<? extends Message>> empty;
     private Binding binding;
 
     @Before
@@ -64,7 +65,7 @@ public class OutgoingChainInterceptorTest extends Assert {
 
         phases = new ArrayList<Phase>();
         phases.add(new Phase(Phase.SEND, 1000));
-        empty = new ArrayList<Interceptor>();
+        empty = new ArrayList<Interceptor<? extends Message>>();
 
         bus = control.createMock(Bus.class);
         PhaseManager pm = new PhaseManagerImpl();

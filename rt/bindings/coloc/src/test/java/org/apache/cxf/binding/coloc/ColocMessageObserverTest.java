@@ -128,9 +128,9 @@ public class ColocMessageObserverTest extends Assert {
         EasyMock.expect(
             bus.getExtension(PhaseManager.class)).andReturn(
                                       new PhaseManagerImpl()).times(2);
-        EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor>());
-        EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor>());
-        EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor>());
+        EasyMock.expect(bus.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
+        EasyMock.expect(ep.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
+        EasyMock.expect(srv.getInInterceptors()).andReturn(new ArrayList<Interceptor<? extends Message>>());
 
         control.replay();
         observer.onMessage(msg);
@@ -163,8 +163,8 @@ public class ColocMessageObserverTest extends Assert {
             exchange.put(OperationInfo.class, oi);
         }
         
-        protected List<Interceptor> addColocInterceptors() {
-            return new ArrayList<Interceptor>();
+        protected List<Interceptor<? extends Message>> addColocInterceptors() {
+            return new ArrayList<Interceptor<? extends Message>>();
         }
     }
 }
