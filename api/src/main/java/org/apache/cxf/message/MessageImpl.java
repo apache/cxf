@@ -110,7 +110,7 @@ public class MessageImpl extends StringMapImpl implements Message {
         Object val = get(key);
         
         Exchange ex = getExchange();
-        if (val == null) {
+        if (val == null && ex != null) {
             val = ex.get(key);
         }
         
@@ -121,7 +121,7 @@ public class MessageImpl extends StringMapImpl implements Message {
             }
         }
         
-        if (val == null) {
+        if (val == null && ex != null) {
             Endpoint ep = ex.get(Endpoint.class); 
             if (ep != null) {
                 val = ep.get(key);
@@ -135,19 +135,17 @@ public class MessageImpl extends StringMapImpl implements Message {
                 }
 
             }
-        }
-        
-        if (val == null) {
-            Service ep = ex.get(Service.class); 
-            if (ep != null) {
-                val = ep.get(key);
-            }
-        }
-        
-        if (val == null) {
-            Bus bus = ex.get(Bus.class);
-            if (bus != null) {
-                val = bus.getProperty(key);
+            if (val == null) {
+                Service sv = ex.get(Service.class); 
+                if (sv != null) {
+                    val = sv.get(key);
+                }
+                if (val == null) {
+                    Bus bus = ex.get(Bus.class);
+                    if (bus != null) {
+                        val = bus.getProperty(key);
+                    }
+                }
             }
         }
         
