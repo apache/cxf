@@ -77,6 +77,13 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            try {
+                greeter.greetMe("Return sayHi");
+                fail("Should have thrown an exception");
+            } catch (Exception ex) {
+                //expected 
+                assertTrue(ex.getMessage().contains("sayHiResponse"));
+            }
             for (int idx = 0; idx < 2; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
@@ -89,6 +96,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }
+        
     }
 
 }

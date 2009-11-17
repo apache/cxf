@@ -30,7 +30,10 @@ import javax.xml.ws.Service;
 import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import org.apache.cxf.helpers.DOMUtils;
 
 //The following wsdl file is used.
 //wsdlLocation = "/trunk/testutils/src/main/resources/wsdl/hello_world.wsdl"
@@ -72,7 +75,13 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
             if (n.getLocalName().equals(sayHi.getLocalPart())) {
                 response = sayHiResponse;
             } else if (n.getLocalName().equals(greetMe.getLocalPart())) {
-                response = greetMeResponse;
+                Element el = DOMUtils.getFirstElement(n);
+                String v = DOMUtils.getContent(el);
+                if (v.contains("Return sayHi")) {
+                    response = sayHiResponse;
+                } else {
+                    response = greetMeResponse;
+                }
             }
         } catch (Exception ex) {
             ex.printStackTrace();
