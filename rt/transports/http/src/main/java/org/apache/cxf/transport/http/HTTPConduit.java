@@ -1937,13 +1937,32 @@ public class HTTPConduit
             }
             try {
                 handleResponse();
+            } catch (IOException e) {
+                throw mapException(e.getClass().getSimpleName() 
+                                   + " invoking " + connection.getURL(), e,
+                                   IOException.class);
+            } catch (RuntimeException e) {
+                throw mapException(e.getClass().getSimpleName() 
+                                   + " invoking " + connection.getURL(), e,
+                                   RuntimeException.class);
             } finally {
                 if (cachingForRetransmission && cachedStream != null) {
                     cachedStream.close();
                 }
             }
         }
-        
+        private <T extends Exception> T mapException(String msg, T ex, Class<T> cls) {
+            T ex2 = ex;
+            try {
+                ex2 = cls.cast(ex.getClass().getConstructor(String.class).newInstance(msg));
+                ex2.initCause(ex);
+            } catch (Throwable e) {
+                ex2 = ex;
+            }
+            
+            
+            return ex2;
+        }
         
         /**
          * This procedure handles all retransmits, if any.
@@ -2060,7 +2079,8 @@ public class HTTPConduit
         
             
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
-                throw new IOException(connection.getResponseMessage());
+                throw new IOException("HTTP response '" + responseCode + ": " 
+                        + connection.getResponseMessage() + "'");
             }
 
             
