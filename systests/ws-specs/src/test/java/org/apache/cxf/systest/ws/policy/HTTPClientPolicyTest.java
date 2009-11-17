@@ -153,7 +153,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             greeter.greetMe("cxf");
             fail("Didn't get the exception");
         } catch (Exception ex) {
-            ex.printStackTrace();
+            //ex.printStackTrace();
             assertTrue(ex.getCause().getClass().getName(), ex.getCause() instanceof SocketTimeoutException);
         }
      
