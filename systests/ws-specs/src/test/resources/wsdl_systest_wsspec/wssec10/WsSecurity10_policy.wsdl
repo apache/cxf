@@ -113,12 +113,13 @@
 						<sp:OnlySignEntireHeadersAndBody/>
 					</wsp:Policy>
 				</sp:AsymmetricBinding>
-				<sp:Wss10 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
+				<sp:Wss11 xmlns:sp="http://schemas.xmlsoap.org/ws/2005/07/securitypolicy">
 					<wsp:Policy>
 						<sp:MustSupportRefKeyIdentifier/>
 						<sp:MustSupportRefIssuerSerial/>
+						<sp:RequireSignatureConfirmation/>
 					</wsp:Policy>
-				</sp:Wss10>
+				</sp:Wss11>
 			</wsp:All>
 		</wsp:ExactlyOne>
 	</wsp:Policy>

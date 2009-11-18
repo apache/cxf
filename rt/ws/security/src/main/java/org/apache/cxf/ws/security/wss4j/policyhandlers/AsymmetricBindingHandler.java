@@ -373,6 +373,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
                 // Do signature
                 dkSign.computeSignature();
+                signatures.add(dkSign.getSignatureValue());
 
                 // Add elements to header
                 addDerivedKeyElement(dkSign.getdktElement());
@@ -393,6 +394,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
+            signatures.add(sig.getSignatureValue());
 
             insertBeforeBottomUp(sig.getSignatureElement());            
             mainSigId = addWsuIdToElement(sig.getSignatureElement());
