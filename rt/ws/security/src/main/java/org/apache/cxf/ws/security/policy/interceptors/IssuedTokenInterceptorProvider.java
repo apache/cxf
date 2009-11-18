@@ -203,8 +203,8 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                             found = true;
                         }
                     }
-                    if (!found) {
-                        ais.iterator().next().setAsserted(false);
+                    for (AssertionInfo inf : ais) {
+                        inf.setAsserted(found);
                     }
                 } else {
                     //client side should be checked on the way out

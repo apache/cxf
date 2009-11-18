@@ -455,7 +455,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             action = checkSymetricBinding(aim, action, message);
             action = checkTransportBinding(aim, action, message);
             
-            //stuff we can default to asserted an un-assert if a condition isn't met
+            //stuff we can default to asserted and un-assert if a condition isn't met
             assertPolicy(aim, SP12Constants.KEYVALUE_TOKEN);
             assertPolicy(aim, SP12Constants.X509_TOKEN);
 
