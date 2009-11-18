@@ -24,4 +24,7 @@
         <file-match-pattern match-pattern="^src[/\\]test[/\\]generated[/\\]." include-pattern="false"/>
         <file-match-pattern match-pattern="^src[/\\]main[/\\]release[/\\]samples[/\\]jax_rs[/\\]basic_https[/\\]contrib[/\\]." include-pattern="false"/>
     </fileset>
+    <filter name="FileTypesFilter" enabled="true">
+        <filter-data value="java"/>
+    </filter>
 </fileset-config>
