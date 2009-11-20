@@ -193,29 +193,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
     private ArtifactResolver artifactResolver;
 
     /**
-     * Create WsdlOption objects for each wsdl file found in the root dir. includes, excludes filter which
-     * files are considered. The defaultOptions will be applied.
-     * 
-     * @param root Base directory to search
-     * @param output
-     * @return
-     * @throws MojoExecutionException
-     */
-    private List<WsdlOption> getWsdlOptionsFromDir(final File root, final File output)
-        throws MojoExecutionException {
-        List<WsdlOption> options = new ArrayList<WsdlOption>();
-        for (WsdlOption o : new WsdlOptionLoader().load(root, includes, excludes, defaultOptions)) {
-            if (o.getOutputDir() == null) {
-                o.setOutputDir(output);
-            }
-            if (!options.contains(o)) {
-                options.add(o);
-            }
-        }
-        return options;
-    }
-
-    /**
      * Try to find a file matching the given wsdlPath (either absolutely, relatively to the current dir or to
      * the project base dir)
      * 
@@ -287,10 +264,14 @@ public class WSDL2JavaMojo extends AbstractMojo {
         throws MojoExecutionException {
         List<WsdlOption> effectiveWsdlOptions = new ArrayList<WsdlOption>();
         if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
-            effectiveWsdlOptions.addAll(getWsdlOptionsFromDir(wsdlRoot, sourceRoot));
+            effectiveWsdlOptions.addAll(WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes,
+                                                                                  excludes, defaultOptions,
+                                                                                  sourceRoot));
         }
         if (testWsdlRoot != null && testWsdlRoot.exists() && !disableDirectoryScan) {
-            effectiveWsdlOptions.addAll(getWsdlOptionsFromDir(testWsdlRoot, testSourceRoot));
+            effectiveWsdlOptions.addAll(WsdlOptionLoader.loadWsdlOptionsFromFiles(testWsdlRoot, includes,
+                                                                                  excludes, defaultOptions,
+                                                                                  testSourceRoot));
         }
         mergeOptions(effectiveWsdlOptions);
         downloadRemoteWsdls(effectiveWsdlOptions);
@@ -298,7 +279,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
     }
     
     @SuppressWarnings("unchecked")
-    public Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact) 
+    private Artifact resolveRemoteWsdlArtifact(List remoteRepos, Artifact artifact)
         throws MojoExecutionException {
         
         /**
@@ -333,7 +314,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         return artifact;
     }
 
-    public void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
+    private void downloadRemoteWsdls(List<WsdlOption> effectiveWsdlOptions) throws MojoExecutionException {
         List remoteRepos;
         try {
             remoteRepos = ProjectUtils.buildArtifactRepositories(repositories, artifactRepositoryFactory,

@@ -19,6 +19,9 @@
 
 package org.apache.cxf.maven_plugin;
 
+/**
+ * Represents a wsdl file that is stored in a maven repository
+ */
 public class WsdlArtifact {
     private String groupId;
     private String artifactId;
