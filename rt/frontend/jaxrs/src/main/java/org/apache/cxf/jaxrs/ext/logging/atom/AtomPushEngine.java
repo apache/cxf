@@ -28,7 +28,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
 
 /**
- * ATOM push-style realization class. Engine enqueues log records as they are {@link #publish(LogRecord)
+ * Package private ATOM push-style engine. Engine enqueues log records as they are {@link #publish(LogRecord)
  * published}. After queue size exceeds {@link #getBatchSize() batch size} processing of collection of these
  * records (in size of batch size) is triggered.
  * <p>
@@ -44,7 +44,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
  * reliable deliverer or use wrapping {@link RetryingDeliverer}.
  */
 // TODO add internal diagnostics - log messages somewhere except for logger :D
-public class AtomPushEngine {
+final class AtomPushEngine {
     private List<LogRecord> queue = new ArrayList<LogRecord>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private int batchSize = 1;

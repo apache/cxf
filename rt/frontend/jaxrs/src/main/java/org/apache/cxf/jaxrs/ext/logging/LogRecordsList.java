@@ -33,12 +33,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  * List of {@link LogRecord}s. Necessary wrapper for {@link List} used in JAXB context.
  */
-@XmlRootElement(namespace = "zzz")
+@XmlRootElement(namespace = "http://cxf.apache.org/jaxrs/log")
 public class LogRecordsList {
 
     private List<LogRecord> logRecords = new ArrayList<LogRecord>();
-    
-    @XmlElement(name = "logRecord", namespace = "zzz")
+
+    @XmlElement(name = "logRecord", namespace = "http://cxf.apache.org/jaxrs/log")
     public List<LogRecord> getLogRecords() {
         return logRecords;
     }
@@ -47,7 +47,7 @@ public class LogRecordsList {
         Validate.notNull(logRecords, "logRecords is null");
         this.logRecords = logRecords;
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         return EqualsBuilder.reflectionEquals(obj, this);
@@ -61,5 +61,5 @@ public class LogRecordsList {
     @Override
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
-    }    
+    }
 }

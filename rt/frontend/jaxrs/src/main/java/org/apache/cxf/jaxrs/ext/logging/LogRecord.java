@@ -39,7 +39,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * LogRecord are never null; if some attributes are not set (e.g. logger name, or rendered cause taken from
  * Throwable) empty strings are returned.
  */
-@XmlRootElement
+@XmlRootElement(namespace = "http://cxf.apache.org/jaxrs/log")
 public class LogRecord {
 
     private Date eventTimestamp = new Date();
@@ -77,7 +77,7 @@ public class LogRecord {
         return record;
     }
 
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public Date getEventTimestamp() {
         return eventTimestamp;
     }
@@ -87,7 +87,7 @@ public class LogRecord {
         this.eventTimestamp = eventTimestamp;
     }
 
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public LogLevel getLevel() {
         return level;
     }
@@ -100,7 +100,7 @@ public class LogRecord {
     /**
      * Formatted message with parameters filled in.
      */
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public String getMessage() {
         return message;
     }
@@ -110,7 +110,7 @@ public class LogRecord {
         this.message = renderedMessage;
     }
 
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public String getLoggerName() {
         return loggerName;
     }
@@ -120,7 +120,7 @@ public class LogRecord {
         this.loggerName = loggerName;
     }
 
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public String getThreadName() {
         return threadName;
     }
@@ -133,7 +133,7 @@ public class LogRecord {
     /**
      * Full stack trace of {@link Throwable} associated with log record.
      */
-    @XmlElement
+    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
     public String getThrowable() {
         return throwable;
     }

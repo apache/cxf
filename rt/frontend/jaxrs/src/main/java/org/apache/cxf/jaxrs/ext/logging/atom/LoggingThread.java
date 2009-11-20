@@ -26,7 +26,7 @@ package org.apache.cxf.jaxrs.ext.logging.atom;
  * Other approach than using thread local storage would be scanning of stack trace of current thread to see if
  * root of call comes from same package as package of handler - it's less effective so TLS is using here.
  */
-public final class LoggingThread {
+final class LoggingThread {
 
     private static ThreadLocal<LoggingThread> threadLocal = new ThreadLocal<LoggingThread>() {
         @Override

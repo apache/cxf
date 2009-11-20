@@ -24,5 +24,8 @@
  * to this implementation applying <a href="www.slf4j.org">SLF4J</a> 
  * that JAXRS already depends on.
  */
+@javax.xml.bind.annotation.XmlSchema(xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://cxf.apache.org/jaxrs/log", prefix = "log")
+            })
 package org.apache.cxf.jaxrs.ext.logging;
 

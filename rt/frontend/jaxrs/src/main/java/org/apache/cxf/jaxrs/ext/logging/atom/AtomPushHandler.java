@@ -18,7 +18,6 @@
  */
 package org.apache.cxf.jaxrs.ext.logging.atom;
 
-import java.lang.reflect.Constructor;
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
@@ -73,7 +72,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
  */
 public final class AtomPushHandler extends Handler {
 
-    private AtomPushEngine engine = new AtomPushEngine();
+    private AtomPushEngine engine;
     private boolean lazyConfig;
 
     /**
@@ -93,9 +92,19 @@ public final class AtomPushHandler extends Handler {
      * @param deliverer deliverer pushing ATOM elements to client
      */
     public AtomPushHandler(int batchSize, Converter converter, Deliverer deliverer) {
+        engine = new AtomPushEngine();
         engine.setBatchSize(batchSize);
         engine.setConverter(converter);
         engine.setDeliverer(deliverer);
+    }
+
+    /**
+     * Creates handler using (package private).
+     * 
+     * @param engine configured engine.
+     */
+    AtomPushHandler(AtomPushEngine engine) {
+        this.engine = engine;
     }
 
     @Override
@@ -107,7 +116,7 @@ public final class AtomPushHandler extends Handler {
         try {
             if (lazyConfig) {
                 lazyConfig = false;
-                configure();
+                configure2();
             }
             LogRecord rec = LogRecord.fromJUL(record);
             engine.publish(rec);
@@ -132,84 +141,97 @@ public final class AtomPushHandler extends Handler {
      * does not allow to iterate over configuration properties to make interpretation automated (e.g. using
      * commons-beanutils)
      */
-    private void configure() {
+    // private void configure() {
+    // LogManager manager = LogManager.getLogManager();
+    // String cname = getClass().getName();
+    // String url = manager.getProperty(cname + ".url");
+    // if (url == null) {
+    // // cannot proceed
+    // return;
+    // }
+    // String deliverer = manager.getProperty(cname + ".deliverer");
+    // if (deliverer != null) {
+    // engine.setDeliverer(createDeliverer(deliverer, url));
+    // } else {
+    // // default
+    // engine.setDeliverer(new WebClientDeliverer(url));
+    // }
+    // String converter = manager.getProperty(cname + ".converter");
+    // if (converter != null) {
+    // engine.setConverter(createConverter(converter));
+    // } else {
+    // // default
+    // engine.setConverter(new ContentSingleEntryConverter());
+    // }
+    // engine.setBatchSize(toInt(manager.getProperty(cname + ".batchSize"), 1, 1));
+    // String retryType = manager.getProperty(cname + ".retry.pause");
+    // if (retryType != null) {
+    // int timeout = toInt(manager.getProperty(cname + ".retry.timeout"), 0, 0);
+    // int pause = toInt(manager.getProperty(cname + ".retry.pause.time"), 1, 30);
+    // boolean linear = !retryType.equalsIgnoreCase("exponential");
+    // Deliverer wrapped = new RetryingDeliverer(engine.getDeliverer(), timeout, pause, linear);
+    // engine.setDeliverer(wrapped);
+    // }
+    // }
+    private void configure2() {
         LogManager manager = LogManager.getLogManager();
         String cname = getClass().getName();
-        String url = manager.getProperty(cname + ".url");
-        if (url == null) {
-            // cannot proceed
-            return;
-        }
-        String deliverer = manager.getProperty(cname + ".deliverer");
-        if (deliverer != null) {
-            engine.setDeliverer(createDeliverer(deliverer, url));
-        } else {
-            // default
-            engine.setDeliverer(new WebClientDeliverer(url));
-        }
-        String converter = manager.getProperty(cname + ".converter");
-        if (converter != null) {
-            engine.setConverter(createConverter(converter));
-        } else {
-            // default
-            engine.setConverter(new ContentSingleEntryConverter());
-        }
-        engine.setBatchSize(toInt(manager.getProperty(cname + ".batchSize"), 1, 1));
-        String retryType = manager.getProperty(cname + ".retry.pause");
-        if (retryType != null) {
-            int timeout = toInt(manager.getProperty(cname + ".retry.timeout"), 0, 0);
-            int pause = toInt(manager.getProperty(cname + ".retry.pause.time"), 1, 30);
-            boolean linear = !retryType.equalsIgnoreCase("exponential");
-            Deliverer wrapped = new RetryingDeliverer(engine.getDeliverer(), timeout, pause, linear);
-            engine.setDeliverer(wrapped);
-        }
+        AtomPushEngineConfigurator conf = new AtomPushEngineConfigurator();
+        conf.setUrl(manager.getProperty(cname + ".url"));
+        conf.setDelivererClass(manager.getProperty(cname + ".deliverer"));
+        conf.setConverterClass(manager.getProperty(cname + ".converter"));
+        conf.setBatchSize(manager.getProperty(cname + ".batchSize"));
+        conf.setRetryPauseType(manager.getProperty(cname + ".retry.pause"));
+        conf.setRetryPauseTime(manager.getProperty(cname + ".retry.pause.time"));
+        conf.setRetryTimeout(manager.getProperty(cname + ".retry.timeout"));
+        engine = conf.createEngine();
     }
 
-    private int toInt(String property, int defaultValue) {
-        try {
-            return Integer.parseInt(property);
-        } catch (NumberFormatException e) {
-            return defaultValue;
-        }
-    }
-
-    private int toInt(String property, int lessThan, int defaultValue) {
-        int ret = toInt(property, defaultValue);
-        if (ret < lessThan) {
-            ret = defaultValue;
-        }
-        return ret;
-    }
-
-    private Deliverer createDeliverer(String clazz, String url) {
-        try {
-            Constructor<?> ctor = loadClass(clazz).getConstructor(String.class);
-            return (Deliverer)ctor.newInstance(url);
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private Converter createConverter(String clazz) {
-        try {
-            Constructor<?> ctor = loadClass(clazz).getConstructor();
-            return (Converter)ctor.newInstance();
-        } catch (Exception e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
-
-    private Class<?> loadClass(String clazz) throws ClassNotFoundException {
-        try {
-            return getClass().getClassLoader().loadClass(clazz);
-        } catch (ClassNotFoundException e) {
-            try {
-                // clazz could be shorted (stripped package name) retry
-                String clazz2 = getClass().getPackage().getName() + "." + clazz;
-                return getClass().getClassLoader().loadClass(clazz2);
-            } catch (Exception e1) {
-                throw new ClassNotFoundException(e.getMessage() + " or " + e1.getMessage());
-            }
-        }
-    }
+//    private int toInt(String property, int defaultValue) {
+//        try {
+//            return Integer.parseInt(property);
+//        } catch (NumberFormatException e) {
+//            return defaultValue;
+//        }
+//    }
+//
+//    private int toInt(String property, int lessThan, int defaultValue) {
+//        int ret = toInt(property, defaultValue);
+//        if (ret < lessThan) {
+//            ret = defaultValue;
+//        }
+//        return ret;
+//    }
+//
+//    private Deliverer createDeliverer(String clazz, String url) {
+//        try {
+//            Constructor<?> ctor = loadClass(clazz).getConstructor(String.class);
+//            return (Deliverer)ctor.newInstance(url);
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException(e);
+//        }
+//    }
+//
+//    private Converter createConverter(String clazz) {
+//        try {
+//            Constructor<?> ctor = loadClass(clazz).getConstructor();
+//            return (Converter)ctor.newInstance();
+//        } catch (Exception e) {
+//            throw new IllegalArgumentException(e);
+//        }
+//    }
+//
+//    private Class<?> loadClass(String clazz) throws ClassNotFoundException {
+//        try {
+//            return getClass().getClassLoader().loadClass(clazz);
+//        } catch (ClassNotFoundException e) {
+//            try {
+//                // clazz could be shorted (stripped package name) retry
+//                String clazz2 = getClass().getPackage().getName() + "." + clazz;
+//                return getClass().getClassLoader().loadClass(clazz2);
+//            } catch (Exception e1) {
+//                throw new ClassNotFoundException(e.getMessage() + " or " + e1.getMessage());
+//            }
+//        }
+//    }
 }

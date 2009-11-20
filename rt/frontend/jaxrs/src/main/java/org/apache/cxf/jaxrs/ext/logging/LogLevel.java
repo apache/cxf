@@ -38,29 +38,52 @@ import javax.xml.bind.annotation.XmlTransient;
  */
 @XmlEnum
 public enum LogLevel {
+    ALL,
     FATAL,
     ERROR,
     WARN,
     INFO,
     DEBUG,
-    TRACE;
-    
-    @XmlTransient
-    private static Map<Level, LogLevel> julLogLevels = new HashMap<Level, LogLevel>();
+    TRACE,
+    OFF;
 
-    static {
-        julLogLevels.put(Level.SEVERE, LogLevel.ERROR);
-        julLogLevels.put(Level.WARNING, LogLevel.WARN);
-        julLogLevels.put(Level.INFO, LogLevel.INFO);
-        julLogLevels.put(Level.FINE, LogLevel.DEBUG);
-        julLogLevels.put(Level.FINER, LogLevel.DEBUG);
-        julLogLevels.put(Level.FINEST, LogLevel.TRACE);
+    @XmlTransient
+    private static Map<Level, LogLevel> fromJul = new HashMap<Level, LogLevel>();
+
+    @XmlTransient
+    private static Map<LogLevel, Level> toJul = new HashMap<LogLevel, Level>();
+
+    static {        
+        fromJul.put(Level.ALL, LogLevel.ALL);
+        fromJul.put(Level.SEVERE, LogLevel.ERROR);
+        fromJul.put(Level.WARNING, LogLevel.WARN);
+        fromJul.put(Level.INFO, LogLevel.INFO);
+        fromJul.put(Level.FINE, LogLevel.DEBUG);
+        fromJul.put(Level.FINER, LogLevel.DEBUG);
+        fromJul.put(Level.FINEST, LogLevel.TRACE);
+        fromJul.put(Level.OFF, LogLevel.OFF);
+
+        toJul.put(LogLevel.ALL, Level.ALL);
+        toJul.put(LogLevel.FATAL, Level.SEVERE);
+        toJul.put(LogLevel.ERROR, Level.SEVERE);
+        toJul.put(LogLevel.WARN, Level.WARNING);
+        toJul.put(LogLevel.INFO, Level.INFO);
+        toJul.put(LogLevel.DEBUG, Level.FINE);
+        toJul.put(LogLevel.TRACE, Level.FINEST);
+        toJul.put(LogLevel.OFF, Level.OFF);
     }
-    
+
     /**
      * Creates this enum from JUL {@link Level}.
      */
     public static LogLevel fromJUL(Level level) {
-        return julLogLevels.get(level);
+        return fromJul.get(level);
+    }
+
+    /**
+     * Creates this JUL {@link Level} from this enum.
+     */
+    public static Level toJUL(LogLevel level) {
+        return toJul.get(level);
     }
 }
