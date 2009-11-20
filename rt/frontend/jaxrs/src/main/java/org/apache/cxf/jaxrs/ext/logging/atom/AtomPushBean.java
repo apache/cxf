@@ -25,6 +25,7 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.Validate;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.logging.LogLevel;
 
 /**
@@ -196,7 +197,7 @@ public final class AtomPushBean {
         initialized = true;
         Handler h = new AtomPushHandler(conf.createEngine());
         for (int i = 0; i < loggers.size(); i++) {
-            Logger l = Logger.getLogger(loggers.get(i).getLogger());
+            Logger l = LogUtils.getL7dLogger(AtomPushBean.class, null, loggers.get(i).getLogger());
             l.addHandler(h);
             l.setLevel(LogLevel.toJUL(LogLevel.valueOf(loggers.get(i).getLevel())));
         }
