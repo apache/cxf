@@ -22,7 +22,6 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -192,34 +191,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
      */
     private ArtifactResolver artifactResolver;
 
-    /**
-     * Try to find a file matching the given wsdlPath (either absolutely, relatively to the current dir or to
-     * the project base dir)
-     * 
-     * @param wsdlPath
-     * @return wsdl file
-     */
-    private File getFileFromWsdlPath(String wsdlPath) {
-        if (wsdlPath == null) {
-            return null;
-        }
-        File file = null;
-        try {
-            URI uri = new URI(wsdlPath);
-            if (uri.isAbsolute()) {
-                file = new File(uri);
-            }
-        } catch (Exception e) {
-            // ignore
-        }
-        if (file == null || !file.exists()) {
-            file = new File(wsdlPath);
-        }
-        if (!file.exists()) {
-            file = new File(project.getBasedir(), wsdlPath);
-        }
-        return file;
-    }
+
 
     /**
      * Merge WsdlOptions that point to the same file by adding the extraargs to the first option and deleting
@@ -240,11 +212,11 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 o.setOutputDir(outputDirFile);
             }
 
-            File file = getFileFromWsdlPath(o.getWsdl());
+            File file = o.getWsdlFile(project.getBasedir());
             if (file != null && file.exists()) {
                 file = file.getAbsoluteFile();
                 for (WsdlOption o2 : effectiveWsdlOptions) {
-                    File file2 = getFileFromWsdlPath(o2.getWsdl());
+                    File file2 = o2.getWsdlFile(project.getBasedir());
                     if (file2 != null && file2.exists() && file2.getAbsoluteFile().equals(file)) {
                         o.getExtraargs().addAll(0, o2.getExtraargs());
                         effectiveWsdlOptions.remove(o2);
@@ -365,7 +337,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
             for (WsdlOption o : effectiveWsdlOptions) {
-                processWsdl(o);
+                callWsdl2Java(o);
 
                 File dirs[] = o.getDeleteDirs();
                 if (dirs != null) {
@@ -393,34 +365,63 @@ public class WSDL2JavaMojo extends AbstractMojo {
         System.gc();
     }
 
-    private void processWsdl(WsdlOption wsdlOption) throws MojoExecutionException {
-
+    private void callWsdl2Java(WsdlOption wsdlOption) throws MojoExecutionException {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
 
         String wsdlLocation = wsdlOption.getWsdl();
         File wsdlFile = new File(wsdlLocation);
         URI basedir = project.getBasedir().toURI();
-        URI wsdlURI;
-        if (wsdlFile.exists()) {
-            wsdlURI = wsdlFile.toURI();
-        } else {
-            wsdlURI = basedir.resolve(wsdlLocation);
-        }
+        URI wsdlURI = wsdlFile.exists() ? wsdlFile.toURI() : basedir.resolve(wsdlLocation);
+        File doneFile = getDoneFile(basedir, wsdlURI);
 
+        if (!shouldRun(wsdlOption, doneFile, wsdlURI)) {
+            return;
+        }
+        
+        doneFile.delete();
+        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, 
+                                                           getLog().isDebugEnabled());
+        getLog().debug("Calling wsdl2java with args: " + list);
+        try {
+            new WSDLToJava((String[])list.toArray(new String[list.size()])).run(new ToolContext());
+        } catch (Throwable e) {
+            getLog().debug(e);
+            throw new MojoExecutionException(e.getMessage(), e);
+        }
+        try {
+            doneFile.createNewFile();
+        } catch (Throwable e) {
+            getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
+            getLog().debug(e);
+        }
+    }
+
+    private File getDoneFile(URI basedir, URI wsdlURI) {
         String doneFileName = wsdlURI.toString();
+        
+        // Strip the basedir from the doneFileName
         if (doneFileName.startsWith(basedir.toString())) {
             doneFileName = doneFileName.substring(basedir.toString().length());
         }
 
         // If URL to WSDL, replace ? and & since they're invalid chars for file names
         // Not to mention slashes.
-
         doneFileName = doneFileName.replace('?', '_').replace('&', '_').replace('/', '_').replace('\\', '_')
             .replace(':', '_');
 
-        File doneFile = new File(markerDirectory, "." + doneFileName + ".DONE");
+        return new File(markerDirectory, "." + doneFileName + ".DONE");
+    }
 
+    /**
+     * Determine if code should be generated from the given wsdl
+     * 
+     * @param wsdlOption
+     * @param doneFile
+     * @param wsdlURI
+     * @return
+     */
+    private boolean shouldRun(WsdlOption wsdlOption, File doneFile, URI wsdlURI) {
         long timestamp = 0;
         if ("file".equals(wsdlURI.getScheme())) {
             timestamp = new File(wsdlURI).lastModified();
@@ -431,13 +432,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 // ignore
             }
         }
-
         boolean doWork = false;
         if (!doneFile.exists()) {
             doWork = true;
         } else if (timestamp > doneFile.lastModified()) {
             doWork = true;
-        } else if (isDefServiceName(wsdlOption)) {
+        } else if (wsdlOption.isDefServiceName()) {
             doWork = true;
         } else {
             File files[] = wsdlOption.getDependencies();
@@ -449,140 +449,15 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 }
             }
         }
-
-        if (doWork) {
-            doneFile.delete();
-
-            List<String> list = generateCommandLine(wsdlOption, outputDirFile, basedir, wsdlURI);
-
-            getLog().debug("Calling wsdl2java with args: " + list);
-            try {
-                new WSDLToJava((String[])list.toArray(new String[list.size()])).run(new ToolContext());
-            } catch (Throwable e) {
-                getLog().debug(e);
-                throw new MojoExecutionException(e.getMessage(), e);
-            }
-            try {
-                doneFile.createNewFile();
-            } catch (Throwable e) {
-                getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
-                getLog().debug(e);
-            }
-        }
+        return doWork;
     }
 
-    private List<String> generateCommandLine(WsdlOption wsdlOption, File outputDirFile, URI basedir,
-                                             URI wsdlURI) {
-        List<String> list = new ArrayList<String>();
-        if (wsdlOption.getPackagenames() != null) {
-            Iterator<String> it = wsdlOption.getPackagenames().iterator();
-            while (it.hasNext()) {
-                list.add("-p");
-                list.add(it.next());
-            }
-        }
-        if (wsdlOption.getNamespaceExcludes() != null) {
-            Iterator<String> it = wsdlOption.getNamespaceExcludes().iterator();
-            while (it.hasNext()) {
-                list.add("-nexclude");
-                list.add(it.next());
-            }
-        }
-
-        // -d specify the dir for generated source code
-        list.add("-d");
-        list.add(outputDirFile.toString());
-
-        for (String binding : wsdlOption.getBindingFiles()) {
-            File bindingFile = new File(binding);
-            URI bindingURI;
-            if (bindingFile.exists()) {
-                bindingURI = bindingFile.toURI();
-            } else {
-                bindingURI = basedir.resolve(binding);
-            }
-            list.add("-b");
-            list.add(bindingURI.toString());
-        }
-        if (wsdlOption.getFrontEnd() != null) {
-            list.add("-fe");
-            list.add(wsdlOption.getFrontEnd());
-        }
-        if (wsdlOption.getDataBinding() != null) {
-            list.add("-db");
-            list.add(wsdlOption.getDataBinding());
-        }
-        if (wsdlOption.getWsdlVersion() != null) {
-            list.add("-wv");
-            list.add(wsdlOption.getWsdlVersion());
-        }
-        if (wsdlOption.getCatalog() != null) {
-            list.add("-catalog");
-            list.add(wsdlOption.getCatalog());
-        }
-        if (wsdlOption.isExtendedSoapHeaders()) {
-            list.add("-exsh");
-            list.add("true");
-        }
-        if (wsdlOption.isAllowElementRefs()) {
-            list.add("-allowElementRefs");
-        }
-        if (wsdlOption.isValidateWsdl()) {
-            list.add("-validate");
-        }
-        if (wsdlOption.getDefaultExcludesNamespace() != null) {
-            list.add("-dex");
-            list.add(wsdlOption.getDefaultExcludesNamespace().toString());
-        }
-        if (wsdlOption.getDefaultNamespacePackageMapping() != null) {
-            list.add("-dns");
-            list.add(wsdlOption.getDefaultNamespacePackageMapping().toString());
-        }
-        if (wsdlOption.getServiceName() != null) {
-            list.add("-sn");
-            list.add(wsdlOption.getServiceName());
-        }
-        if (wsdlOption.isAutoNameResolution()) {
-            list.add("-autoNameResolution");
-        }
-        if (wsdlOption.isNoAddressBinding()) {
-            list.add("-noAddressBinding");
-        }
-        if (wsdlOption.getXJCargs() != null) {
-            
-            for (String value : wsdlOption.getXJCargs()) {
-                if (value == null) {
-                    value = ""; // Maven makes empty tags into null
-                                // instead of empty strings.
-                }
-                list.add("-xjc" + value);
-            }
-        }
-        if (wsdlOption.getExtraargs() != null) {
-            Iterator<String> it = wsdlOption.getExtraargs().iterator();
-            while (it.hasNext()) {
-                Object value = it.next();
-                if (value == null) {
-                    value = ""; // Maven makes empty tags into null
-                    // instead of empty strings.
-                }
-                list.add(value.toString());
-            }
-        }
-        if (wsdlOption.isSetWsdlLocation()) {
-            list.add("-wsdlLocation");
-            list.add(wsdlOption.getWsdlLocation() == null ? "" : wsdlOption.getWsdlLocation());
-        }
-        if (wsdlOption.isWsdlList()) {
-            list.add("-wsdlList");
-        }
-        if (getLog().isDebugEnabled() && !list.contains("-verbose")) {
-            list.add("-verbose");
-        }
-        list.add(wsdlURI.toString());
-        return list;
-    }
-
+    /**
+     * Recursively delete the given directory
+     * 
+     * @param f
+     * @return
+     */
     private boolean deleteDir(File f) {
         if (f.isDirectory()) {
             File files[] = f.listFiles();
@@ -596,20 +471,6 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
 
         return true;
-    }
-
-    private boolean isDefServiceName(WsdlOption wsdlOption) {
-        List<String> args = wsdlOption.extraargs;
-        if (args == null) {
-            return false;
-        }
-        for (int i = 0; i < args.size(); i++) {
-            if ("-sn".equalsIgnoreCase(args.get(i))) {
-                return true;
-            }
-        }
-        return false;
-
     }
 
 }
