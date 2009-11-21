@@ -187,7 +187,34 @@ public final class AtomPushBean {
         Validate.notNull(batchSize, "batchSize is null");
         conf.setBatchSize(batchSize);
     }
+    
+    /**
+     * Retry pause calculation strategy, either "linear" or "exponential".
+     */
+    public void setRetryPause(String retryPause) {
+        checkInit();
+        Validate.notNull(retryPause, "retryPause is null");
+        conf.setRetryPause(retryPause);
+    }
 
+    /**
+     * Retry pause time (in seconds).
+     */
+    public void setRetryPauseTime(String time) {
+        checkInit();
+        Validate.notNull(time, "time is null");
+        conf.setRetryPauseTime(time);
+    }
+
+    /**
+     * Retry timeout (in seconds).
+     */
+    public void setRetryTimeout(String timeout) {
+        checkInit();
+        Validate.notNull(timeout, "timeout is null");
+        conf.setRetryTimeout(timeout);
+    }
+    
     /**
      * Initializes bean; creates ATOM push handler based on current properties state, and attaches handler to
      * logger(s).

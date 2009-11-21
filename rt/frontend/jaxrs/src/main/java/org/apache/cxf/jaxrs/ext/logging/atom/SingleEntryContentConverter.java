@@ -37,12 +37,12 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecordsList;
 /**
  * Single entry in feed with content set to list of log records.
  */
-public class ContentSingleEntryConverter implements Converter {
+public class SingleEntryContentConverter implements Converter {
 
     private Factory factory;
     private Marshaller marsh;
 
-    public ContentSingleEntryConverter() {
+    public SingleEntryContentConverter() {
         factory = Abdera.getNewFactory();
         try {
             marsh = JAXBContext.newInstance(LogRecordsList.class).createMarshaller();

@@ -29,11 +29,18 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 
+/**
+ * Marshaling and delivering based on JAXRS' WebClient.
+ */
 public class WebClientDeliverer implements Deliverer {
     private WebClient wc;
 
+    @SuppressWarnings("unchecked")
     public WebClientDeliverer(String deliveryAddress) {
-        this.wc = create(deliveryAddress);
+        Validate.notEmpty(deliveryAddress, "deliveryAddress is empty or null");
+        List<?> providers = Arrays.asList(new AtomFeedProvider(), new AtomEntryProvider());
+        wc = WebClient.create(deliveryAddress, providers);
+        wc.type("application/atom+xml");
     }
 
     public WebClientDeliverer(WebClient wc) {
@@ -45,14 +52,5 @@ public class WebClientDeliverer implements Deliverer {
         Response res = wc.post(element);
         int status = res.getStatus();
         return status >= 200 && status <= 299;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static WebClient create(String baseAddress) {
-        Validate.notEmpty(baseAddress, "baseAddress is empty or null");
-        List<?> providers = Arrays.asList(new AtomFeedProvider(), new AtomEntryProvider());
-        WebClient wc = WebClient.create(baseAddress, providers);
-        wc.type("application/atom+xml");
-        return wc;
     }
 }

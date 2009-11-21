@@ -34,7 +34,7 @@ final class AtomPushEngineConfigurator {
     private String batchSize;
     private String delivererUrl;
     private String retryTimeout;
-    private String retryPauseType;
+    private String retryPause;
     private String retryPauseTime;
 
     public void setUrl(String url) {
@@ -45,8 +45,8 @@ final class AtomPushEngineConfigurator {
         this.retryTimeout = retryTimeout;
     }
 
-    public void setRetryPauseType(String retryPauseType) {
-        this.retryPauseType = retryPauseType;
+    public void setRetryPause(String retryPause) {
+        this.retryPause = retryPause;
     }
 
     public void setRetryPauseTime(String retryPauseTime) {
@@ -93,14 +93,14 @@ final class AtomPushEngineConfigurator {
             if (converterClass != null) {
                 c = createConverter(converterClass);
             } else {
-                c = new ContentSingleEntryConverter();
+                c = new SingleEntryContentConverter();
             }
         }
         batch = parseInt(batchSize, 1, 1);
-        if (retryPauseType != null) {
+        if (retryPause != null) {
             int timeout = parseInt(retryTimeout, 0, 0);
             int pause = parseInt(retryPauseTime, 1, 30);
-            boolean linear = !retryPauseType.equalsIgnoreCase("exponential");
+            boolean linear = !retryPause.equalsIgnoreCase("exponential");
             d = new RetryingDeliverer(d, timeout, pause, linear);
         }
         AtomPushEngine engine = new AtomPushEngine();

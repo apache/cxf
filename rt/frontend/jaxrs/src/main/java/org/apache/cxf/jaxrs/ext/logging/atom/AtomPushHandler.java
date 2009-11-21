@@ -34,7 +34,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
  * <li><b>converter</b> - name of class implementing {@link Converter} class. For classes from this package
  * only class name can be given e.g. instead of
  * "org.apache.cxf.jaxrs.ext.logging.atom.ContentSingleEntryConverter" one can specify
- * "ContentSingleEntryConverter". If parameter is not set {@link ContentSingleEntryConverter} is used.</li>
+ * "ContentSingleEntryConverter". If parameter is not set {@link SingleEntryContentConverter} is used.</li>
  * <li><b>deliverer</b> - name of class implementing {@link Deliverer} class. For classes from this package
  * only class name can be given e.g. instead of "org.apache.cxf.jaxrs.ext.logging.atom.WebClientDeliverer" one
  * can specify "WebClientDeliverer". If parameter is not set {@link WebClientDeliverer} is used.</li>
@@ -116,7 +116,7 @@ public final class AtomPushHandler extends Handler {
         try {
             if (lazyConfig) {
                 lazyConfig = false;
-                configure2();
+                configure();
             }
             LogRecord rec = LogRecord.fromJUL(record);
             engine.publish(rec);
@@ -141,39 +141,7 @@ public final class AtomPushHandler extends Handler {
      * does not allow to iterate over configuration properties to make interpretation automated (e.g. using
      * commons-beanutils)
      */
-    // private void configure() {
-    // LogManager manager = LogManager.getLogManager();
-    // String cname = getClass().getName();
-    // String url = manager.getProperty(cname + ".url");
-    // if (url == null) {
-    // // cannot proceed
-    // return;
-    // }
-    // String deliverer = manager.getProperty(cname + ".deliverer");
-    // if (deliverer != null) {
-    // engine.setDeliverer(createDeliverer(deliverer, url));
-    // } else {
-    // // default
-    // engine.setDeliverer(new WebClientDeliverer(url));
-    // }
-    // String converter = manager.getProperty(cname + ".converter");
-    // if (converter != null) {
-    // engine.setConverter(createConverter(converter));
-    // } else {
-    // // default
-    // engine.setConverter(new ContentSingleEntryConverter());
-    // }
-    // engine.setBatchSize(toInt(manager.getProperty(cname + ".batchSize"), 1, 1));
-    // String retryType = manager.getProperty(cname + ".retry.pause");
-    // if (retryType != null) {
-    // int timeout = toInt(manager.getProperty(cname + ".retry.timeout"), 0, 0);
-    // int pause = toInt(manager.getProperty(cname + ".retry.pause.time"), 1, 30);
-    // boolean linear = !retryType.equalsIgnoreCase("exponential");
-    // Deliverer wrapped = new RetryingDeliverer(engine.getDeliverer(), timeout, pause, linear);
-    // engine.setDeliverer(wrapped);
-    // }
-    // }
-    private void configure2() {
+    private void configure() {
         LogManager manager = LogManager.getLogManager();
         String cname = getClass().getName();
         AtomPushEngineConfigurator conf = new AtomPushEngineConfigurator();
@@ -181,57 +149,9 @@ public final class AtomPushHandler extends Handler {
         conf.setDelivererClass(manager.getProperty(cname + ".deliverer"));
         conf.setConverterClass(manager.getProperty(cname + ".converter"));
         conf.setBatchSize(manager.getProperty(cname + ".batchSize"));
-        conf.setRetryPauseType(manager.getProperty(cname + ".retry.pause"));
+        conf.setRetryPause(manager.getProperty(cname + ".retry.pause"));
         conf.setRetryPauseTime(manager.getProperty(cname + ".retry.pause.time"));
         conf.setRetryTimeout(manager.getProperty(cname + ".retry.timeout"));
         engine = conf.createEngine();
     }
-
-//    private int toInt(String property, int defaultValue) {
-//        try {
-//            return Integer.parseInt(property);
-//        } catch (NumberFormatException e) {
-//            return defaultValue;
-//        }
-//    }
-//
-//    private int toInt(String property, int lessThan, int defaultValue) {
-//        int ret = toInt(property, defaultValue);
-//        if (ret < lessThan) {
-//            ret = defaultValue;
-//        }
-//        return ret;
-//    }
-//
-//    private Deliverer createDeliverer(String clazz, String url) {
-//        try {
-//            Constructor<?> ctor = loadClass(clazz).getConstructor(String.class);
-//            return (Deliverer)ctor.newInstance(url);
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException(e);
-//        }
-//    }
-//
-//    private Converter createConverter(String clazz) {
-//        try {
-//            Constructor<?> ctor = loadClass(clazz).getConstructor();
-//            return (Converter)ctor.newInstance();
-//        } catch (Exception e) {
-//            throw new IllegalArgumentException(e);
-//        }
-//    }
-//
-//    private Class<?> loadClass(String clazz) throws ClassNotFoundException {
-//        try {
-//            return getClass().getClassLoader().loadClass(clazz);
-//        } catch (ClassNotFoundException e) {
-//            try {
-//                // clazz could be shorted (stripped package name) retry
-//                String clazz2 = getClass().getPackage().getName() + "." + clazz;
-//                return getClass().getClassLoader().loadClass(clazz2);
-//            } catch (Exception e1) {
-//                throw new ClassNotFoundException(e.getMessage() + " or " + e1.getMessage());
-//            }
-//        }
-//    }
 }
