@@ -37,7 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler;
-import org.apache.cxf.jaxrs.ext.logging.atom.ContentSingleEntryConverter;
+import org.apache.cxf.jaxrs.ext.logging.atom.SingleEntryContentConverter;
 import org.apache.cxf.jaxrs.ext.logging.atom.WebClientDeliverer;
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
@@ -144,7 +144,7 @@ public class JAXRSLoggingAtomPushTest {
     public void testPrivateLogger() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
-        Handler h = new AtomPushHandler(2, new ContentSingleEntryConverter(),
+        Handler h = new AtomPushHandler(2, new SingleEntryContentConverter(),
                                         new WebClientDeliverer("http://localhost:9080"));
         log.addHandler(h);
         log.setLevel(Level.ALL);
