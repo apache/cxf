@@ -35,7 +35,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
 import org.apache.cxf.jaxrs.ext.logging.LogRecordsList;
 
 /**
- * Multiple entries in feed, each entry content with one log record from list.
+ * Multiple entries in feed, each entry with one log record from list embedded as XML content.
  */
 public class MultiEntryContentConverter implements Converter {
 
@@ -56,16 +56,13 @@ public class MultiEntryContentConverter implements Converter {
         for (LogRecord record : records) {
             Entry entry = factory.newEntry();
             feed.addEntry(entry);
-            Content content = factory.newContent();
-            content.setContentType(Content.Type.XML);
-            entry.setContent(content);
             StringWriter writer = new StringWriter();
             try {
                 marsh.marshal(record, writer);
             } catch (JAXBException e) {
                 throw new RuntimeException(e);
             }
-            content.setValue(writer.toString());
+            entry.setContent(writer.toString(), Content.Type.XML);
         }
         return feed;
     }
