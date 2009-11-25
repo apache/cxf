@@ -89,7 +89,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <bean id="atomstore2" class="org.apache.cxf.systest.jaxrs.AtomBookStore2"/>
   <bean id="atomstore3" class="org.apache.cxf.systest.jaxrs.AtomBookStore3"/>
   
-  <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider"/>
+  <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
+      <property name="formattedOutput" value="true"/>
+  </bean>
   <bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"/>
   
 </beans>

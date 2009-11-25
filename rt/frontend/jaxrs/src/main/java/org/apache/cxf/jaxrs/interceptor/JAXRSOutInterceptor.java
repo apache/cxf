@@ -113,8 +113,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             Response response = null;
             if (objs.get(0) instanceof Response) {
                 response = (Response)responseObj;
-            } else {    
-                response = Response.ok(responseObj).build();
+            } else {
+                int status = getStatus(message, 200);
+                response = Response.status(status).entity(responseObj).build();
             }
             
             Exchange exchange = message.getExchange();
@@ -137,10 +138,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             serializeMessage(message, response, ori, true);        
             
         } else {
-            Object customStatus = message.getExchange().get(Message.RESPONSE_CODE);
-            int status = customStatus == null ? 204 : (Integer)customStatus;
+            int status = getStatus(message, 204);
             message.put(Message.RESPONSE_CODE, status);
         }
+    }
+
+    private int getStatus(Message message, int defaultValue) {
+        Object customStatus = message.getExchange().get(Message.RESPONSE_CODE);
+        return customStatus == null ? defaultValue : (Integer)customStatus;
     }
     
     @SuppressWarnings("unchecked")

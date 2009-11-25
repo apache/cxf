@@ -218,7 +218,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
     }    
     
     
-    private Object createSingletonInstance(Class<?> cls, ServletConfig sc) throws ServletException {
+    protected Object createSingletonInstance(Class<?> cls, ServletConfig sc) throws ServletException {
         Constructor c = ResourceUtils.findResourceConstructor(cls, false);
         if (c == null) {
             throw new ServletException("No valid constructor found for " + cls.getName());
@@ -233,7 +233,9 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         Object[] values = isDefault ? new Object[]{} 
             : new Object[]{c.getParameterTypes()[0] == ServletConfig.class ? sc : sc.getServletContext()}; 
         try {
-            return c.newInstance(values);
+            Object instance = c.newInstance(values);
+            configureSingleton(instance);
+            return instance;
         } catch (InstantiationException ex) {
             ex.printStackTrace();
             throw new ServletException("Resource class " + cls.getName()
@@ -247,6 +249,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
             throw new ServletException("Resource class " + cls.getName()
                                        + " can not be instantiated due to InvocationTargetException"); 
         }
+    }
+    
+    protected void configureSingleton(Object instance) {
+        
     }
     
     protected void createServerFromApplication(String cName) throws ServletException {
