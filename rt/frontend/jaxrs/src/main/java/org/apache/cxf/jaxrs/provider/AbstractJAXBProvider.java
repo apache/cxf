@@ -74,7 +74,6 @@ import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -110,7 +109,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     protected List<String> inDropElements;
     protected Map<String, String> inElementsMap;
     protected Map<String, String> inAppendMap;
-    protected Map<String, String> inAppendAttributesMap;
     private boolean attributesToElements;
     
     private MessageContext mc;
@@ -569,10 +567,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         this.inAppendMap = inElements;
     }
     
-    public void setInAppendAttributes(Map<String, String> inElements) {
-        this.inAppendAttributesMap = inElements;
-    }
-    
     public void setInTransformElements(Map<String, String> inElements) {
         this.inElementsMap = inElements;
     }
@@ -606,9 +600,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             reader = StaxUtils.createFilteredReader(createNewReaderIfNeeded(reader, is),
                                                new StaxStreamFilter(dropElements.toArray(new QName[]{})));    
         }
-        if (inElementsMap != null || inAppendMap != null || inAppendAttributesMap != null) {
+        if (inElementsMap != null || inAppendMap != null) {
             reader = new InTransformReader(createNewReaderIfNeeded(reader, is),
-                                           inElementsMap, inAppendMap, inAppendAttributesMap);
+                                           inElementsMap, inAppendMap);
         }
         return reader;
     }
@@ -864,24 +858,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
-    private static class AttributeValue {
-        private String name;
-        private String value;
-        
-        public AttributeValue(String n, String v) {
-            this.name = n;
-            this.value = v;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-        public String getValue() {
-            return value;
-        }
-    }
-    
     protected static class InTransformReader extends DepthXMLStreamReader {
         
         private static final String INTERN_NAMES = "org.codehaus.stax2.internNames";
@@ -890,64 +866,19 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         private Map<QName, QName> inElementsMap = new HashMap<QName, QName>(5);
         private Map<QName, QName> inAppendMap = new HashMap<QName, QName>(5);
         private Map<String, String> nsMap = new HashMap<String, String>(5);
-        private MultivaluedMap<QName, AttributeValue> inAttributes;
         private QName currentQName;
         private QName previousQName;
-        private List<AttributeValue> currentAttributes;
         private int previousDepth = -1;
         
         public InTransformReader(XMLStreamReader reader, 
                                  Map<String, String> inMap,
-                                 Map<String, String> appendMap,
-                                 Map<String, String> appendAttrMap) {
+                                 Map<String, String> appendMap) {
             super(reader);
             convertToMapOfQNames(inMap, inElementsMap, nsMap);
             convertToMapOfQNames(appendMap, inAppendMap, null);
-            convertToMapOfAttributes(appendAttrMap);
         }
         
-        private void convertToMapOfAttributes(Map<String, String> map) {
-            if (map != null) {
-                inAttributes = new MetadataMap<QName, AttributeValue>();
-                for (Map.Entry<String, String> entry : map.entrySet()) {
-                    QName lname = convertStringToQName(entry.getKey());
-                    String[] values = entry.getValue().split(":");
-                    inAttributes.add(lname, new AttributeValue(values[0], values[1]));
-                }
-            }
-        }
-        
-        public int getAttributeCount() {
-            return currentAttributes == null ? super.getAttributeCount() 
-                : currentAttributes.size() + super.getAttributeCount();
-        }
-
-        public String getAttributeLocalName(int ind) {
-            if (currentAttributes == null) {
-                return super.getAttributeLocalName(ind);
-            } else {
-                int count = super.getAttributeCount();
-                return ind < count ? super.getAttributeLocalName(ind) 
-                    : currentAttributes.get(ind - count).getName(); 
-            }
-        }
-
-        public String getAttributeNamespace(int ind) {
-            return currentAttributes == null ? reader.getAttributeNamespace(ind) : "";
-        }
-
-        public String getAttributeValue(int ind) {
-            if (currentAttributes == null) {
-                return super.getAttributeValue(ind);
-            } else {
-                int count = super.getAttributeCount();
-                return ind < count ? super.getAttributeValue(ind) 
-                    : currentAttributes.get(ind - count).getValue(); 
-            }
-        }
-
         public int next() throws XMLStreamException {
-            currentAttributes = null;
             if (currentQName != null) {
                 return XMLStreamConstants.START_ELEMENT;
             } else if (previousDepth != -1 && previousDepth == getDepth() + 1) {
@@ -993,9 +924,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         public String getNamespaceURI() {
          
             QName theName = readCurrentElement();
-            if (inAttributes != null) {
-                currentAttributes = inAttributes.remove(theName);
-            }
             QName appendQName = inAppendMap.remove(theName);
             if (appendQName != null) {
                 previousDepth = getDepth();

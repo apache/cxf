@@ -33,6 +33,8 @@ import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
+import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
+import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
 
 @Path("/bookstore/{id}")
 @Consumes({"application/xml", "application/json" })

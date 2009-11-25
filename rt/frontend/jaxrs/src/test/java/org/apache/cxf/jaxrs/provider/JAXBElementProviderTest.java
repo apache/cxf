@@ -395,25 +395,6 @@ public class JAXBElementProviderTest extends Assert {
         assertEquals("b", tag.getGroup());
     }
     
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testInAppendAttributes() throws Exception {
-        String data = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<ns1:tagholder xmlns:ns1=\"http://tags\">"
-            + "<ns1:thetag><group>B</group><name>A</name></ns1:thetag></ns1:tagholder>";
-        JAXBElementProvider provider = new JAXBElementProvider();
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("{http://tags}tagholder", "attr:custom");
-        provider.setInAppendAttributes(map);
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
-                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
-        TagVO2Holder holder = (TagVO2Holder)o;
-        assertEquals("custom", holder.getAttribute());
-        TagVO2 tag2 = holder.getTagValue();
-        assertEquals("A", tag2.getName());
-        assertEquals("B", tag2.getGroup());
-    }
     
     @Test
     @SuppressWarnings("unchecked")

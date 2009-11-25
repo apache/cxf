@@ -24,11 +24,29 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Can be used to document resource classes and methods
+ * 
+ * See {@link <a href="http://www.w3.org/Submission/wadl/#x3-80002.3">WADL Documentation</a>}.
+ */
 @Target({ElementType.TYPE, ElementType.METHOD })
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Description {
+    /**
+     * This value, if set, will be set as WADL doc content
+     */
     String value() default "";
+    /**
+     * Maps to WADL doc/@xml:lang attribute 
+     **/
     String lang() default "";
+    /**
+     * Maps to WADL doc/@title attribute 
+     **/
     String title() default "";
+    /**
+     * This uri, if set, will be used to retrieve 
+     * the content which will be set as WADL doc content
+     */
     String docuri() default "";
 }

@@ -54,7 +54,7 @@ import org.apache.cxf.jaxrs.resources.Tags;
 import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
-//CHECKSTYLE:OFF
+
 public class JSONProviderTest extends Assert {
 
     @Test
@@ -602,29 +602,6 @@ public class JSONProviderTest extends Assert {
         readTagVOAfterTransform(data, "{http://bar}thetag2");
     }
     
-    @Test
-    @SuppressWarnings("unchecked")
-    public void testInAppendAttributes() throws Exception {
-        String data = "{t.tagholder:{t.thetag:{\"group\":\"B\",\"name\":\"A\"}}}";
-        JSONProvider provider = new JSONProvider();
-        Map<String, String> nsmap = new HashMap<String, String>();
-        nsmap.put("http://tags", "t");
-        provider.setNamespaceMap(nsmap);
-        Map<String, String> map = new HashMap<String, String>();
-        map.put("{http://tags}tagholder", "attr:custom");
-        provider.setInAppendAttributes(map);
-        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
-                      new Annotation[0], MediaType.APPLICATION_JSON_TYPE, 
-                      new MetadataMap<String, String>(), is);
-        TagVO2Holder holder = (TagVO2Holder)o;
-        assertEquals("custom", holder.getAttribute());
-        TagVO2 tag2 = holder.getTagValue();
-        assertEquals("A", tag2.getName());
-        assertEquals("B", tag2.getGroup());
-    }
-    
-    
     @SuppressWarnings("unchecked")
     private void readTagVO2AfterTransform(String data, String keyValue) throws Exception {
         JSONProvider provider = new JSONProvider();
@@ -946,4 +923,3 @@ public class JSONProviderTest extends Assert {
     }
 
 }
-//CHECKSTYLE:ON

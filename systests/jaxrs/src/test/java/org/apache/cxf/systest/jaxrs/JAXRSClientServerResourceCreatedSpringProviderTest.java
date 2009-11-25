@@ -36,6 +36,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -86,16 +87,16 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         WebClient client = WebClient.create(requestURI + "?_wadl&_type=xml");
         Document doc = DOMUtils.readXml(new InputStreamReader(client.get(InputStream.class), "UTF-8"));
         Element root = doc.getDocumentElement();
-        assertEquals("http://research.sun.com/wadl/2006/10", root.getNamespaceURI());
+        assertEquals(WadlGenerator.WADL_NS, root.getNamespaceURI());
         assertEquals("application", root.getLocalName());
         List<Element> resourcesEls = DOMUtils.getChildrenWithName(root, 
-                                            "http://research.sun.com/wadl/2006/10", "resources");
+                                                                  WadlGenerator.WADL_NS, "resources");
         assertEquals(1, resourcesEls.size());
         Element resourcesEl =  resourcesEls.get(0);
         assertEquals(baseURI, resourcesEl.getAttribute("base"));
         List<Element> resourceEls = 
             DOMUtils.getChildrenWithName(resourcesEl, 
-                                                "http://research.sun.com/wadl/2006/10", "resource");
+                                         WadlGenerator.WADL_NS, "resource");
         assertEquals(size, resourceEls.size());
         return resourceEls;
     }
