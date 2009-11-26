@@ -22,30 +22,36 @@ import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
 
 /**
- * Handler pushing log records in batches as Atom Feeds to registered client. Handler responsibility is to
- * adapt to JUL framework while most of job is delegated to {@link AtomPushEngine}.
+ * Handler pushing log records in batches as Atom Feeds or Entries to registered client. Handler
+ * responsibility is to adapt to JUL framework while most of job is delegated to {@link AtomPushEngine}.
  * <p>
  * For simple configuration using properties file (one global root-level handler of this class) following
- * properties prefixed with full class name can be used:
+ * properties prefixed with full name of this class can be used:
  * <ul>
  * <li><b>url</b> - URL where feeds will be pushed (mandatory parameter)</li>
- * <li><b>converter</b> - name of class implementing {@link Converter} class. For classes from this package
- * only class name can be given e.g. instead of
- * "org.apache.cxf.jaxrs.ext.logging.atom.ContentSingleEntryConverter" one can specify
- * "ContentSingleEntryConverter". If parameter is not set {@link SingleEntryContentConverter} is used.</li>
- * <li><b>deliverer</b> - name of class implementing {@link Deliverer} class. For classes from this package
- * only class name can be given e.g. instead of "org.apache.cxf.jaxrs.ext.logging.atom.WebClientDeliverer" one
- * can specify "WebClientDeliverer". If parameter is not set {@link WebClientDeliverer} is used.</li>
  * <li><b>batchSize</b> - integer number specifying minimal number of published log records that trigger
  * processing and pushing ATOM document. If parameter is not set, is not greater than zero or is not a number,
  * batch size is set to 1.</li>
  * </ul>
- * Family of <tt>retry</tt> parameters below; availability of any of this parameters enables delivery retrying
- * (e.g. for default non-reliable deliverers) with {@link RetryingDeliverer} that can be combined with
- * provided non-reliable deliverers. Detailed explanation of these parameter, see {@link RetryingDeliverer}
- * class description.
+ * Conversion of log records into ATOM Elements can be tuned up using following parameters. Note that not all
+ * combinations are meaningful, see {@link org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter}
+ * for details:
+ * <ul>
+ * <li><b>output</b> - ATOM Element type pushed out, either "feed" or "entry"; when not specified or invalid
+ * value provided "feed" is used.</li>
+ * <li><b>multiplicity</b> - multiplicity of subelement(entries in feed for output=="feed" or log records in
+ * entry for output=="entry"), either "one" or "many"; when not specified or invalid value provided "one" is
+ * used.</li>
+ * <li><b>format</b> - method of embedding data in entry, either "content" or "extension"; when not specified
+ * or invalid value provided "content" is used.</li>
+ * </ul>
+ * By default delivery is served by WebClientDeliverer which does not support reliability of transport.
+ * Availability of any of this parameters enables retrying of default delivery. Detailed explanation of these
+ * parameter, see {@link org.apache.cxf.jaxrs.ext.logging.atom.deliverer.RetryingDeliverer} class description.
  * <ul>
  * <li><b>retry.pause</b> - pausing strategy of delivery retries, either <b>linear</b> or <b>exponential</b>
  * value (mandatory parameter). If mispelled linear is used.</li>
@@ -54,19 +60,37 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
  * <li><b>retry.timeout</b> - maximum time (in seconds) retrying will be continued. If not set timeout is not
  * set (infinite loop of retries).</li>
  * </ul>
+ * Ultimate control on conversion and delivery is obtained specifying own implementation classes:
+ * <ul>
+ * <li><b>converter</b> - name of class implementing {@link Converter} class replacing default conversion and
+ * its specific parameters ("output", "multiplicity" and "format") are ignored. For classes located in same
+ * package as Converter interface only class name can be given e.g. instead of
+ * "org.apache.cxf.jaxrs.ext.logging.atom.converter.FooBarConverter" one can specify "FooBarConverter".</li>
+ * <li><b>deliverer</b> - name of class implementing {@link Deliverer} class replacing default delivery and
+ * its specific parameters ("retry.Xxx") are ignored. For classes located in same package as Deliverer
+ * interface only class name can be given e.g. instead of
+ * "org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer" one can specify 
+ * "WebClientDeliverer".</li>
+ * </ul>
  * Example:
  * 
  * <pre>
  * handlers = org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler, java.util.logging.ConsoleHandler
  * .level = INFO
- * ...
+ * 
+ * # deliver to given URL triggering after each batch of 10 log records
  * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.url = http://localhost:9080
  * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.batchSize = 10
- * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.deliverer = WebClientDeliverer 
- * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.converter = foo.bar.MyConverter
+ * 
+ * # enable retrying delivery every 10 seconds for 5 minutes
  * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.retry.pause = linear
  * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.retry.pause.time = 10
- * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.retry.timeout = 360
+ * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.retry.timeout = 300
+ * 
+ * # output for AtomPub: push entries not feeds, each entry with one log record as &quot;atom:extension&quot; 
+ * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.output = entry
+ * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.multiplicity = one
+ * org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler.format = extension
  * ...
  * </pre>
  */
@@ -152,6 +176,9 @@ public final class AtomPushHandler extends Handler {
         conf.setRetryPause(manager.getProperty(cname + ".retry.pause"));
         conf.setRetryPauseTime(manager.getProperty(cname + ".retry.pause.time"));
         conf.setRetryTimeout(manager.getProperty(cname + ".retry.timeout"));
+        conf.setOutput(manager.getProperty(cname + ".output"));
+        conf.setMultiplicity(manager.getProperty(cname + ".multiplicity"));
+        conf.setFormat(manager.getProperty(cname + ".format"));
         engine = conf.createEngine();
     }
 }

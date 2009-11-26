@@ -26,6 +26,8 @@ import java.util.concurrent.Executors;
 import org.apache.abdera.model.Element;
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
 
 /**
  * Package private ATOM push-style engine. Engine enqueues log records as they are {@link #publish(LogRecord)
@@ -41,7 +43,8 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecord;
  * is taken from queue only when currently processed batch finishes and queue has enough elements to proceed.
  * <p>
  * First failure of any delivery shuts engine down. To avoid this situation engine must have registered
- * reliable deliverer or use wrapping {@link RetryingDeliverer}.
+ * reliable deliverer or use wrapping
+ * {@link org.apache.cxf.jaxrs.ext.logging.atom.deliverer.RetryingDeliverer}.
  */
 // TODO add internal diagnostics - log messages somewhere except for logger :D
 final class AtomPushEngine {
@@ -101,10 +104,13 @@ final class AtomPushEngine {
                     // syncing for safe converter/deliverer on the fly replacement
                     synchronized (this) {
                         // TODO diagnostic output here: System.out.println(element.toString());
-                        Element element = converter.convert(batch);
-                        if (!deliverer.deliver(element)) {
-                            System.err.println("Delivery failed, shutting engine down");
-                            executor.shutdownNow();
+                        List<? extends Element> elements = converter.convert(batch);
+                        for (Element element : elements) {
+                            if (!deliverer.deliver(element)) {
+                                System.err.println("Delivery failed, shutting engine down");
+                                executor.shutdownNow();
+                                break;
+                            }
                         }
                     }
                 } catch (InterruptedException e) {

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.jaxrs.ext.logging.atom.deliverer;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -30,7 +30,7 @@ import org.apache.commons.lang.Validate;
  * is configurable strategy. Two predefined strategies are given: each time pause same amount of time (linear)
  * and each next time pause time doubles (exponential).
  */
-public class RetryingDeliverer implements Deliverer {
+public final class RetryingDeliverer implements Deliverer {
 
     private Deliverer deliverer;
     private PauseCalculator pauser;
@@ -83,16 +83,22 @@ public class RetryingDeliverer implements Deliverer {
             if (timeout == 0 || timeoutDate.after(cal.getTime())) {
                 Thread.sleep(sleep * 1000);
             } else {
+                pauser.reset();
                 return false;
             }
         }
+        pauser.reset();
         return true;
     }
 
     /** Calculates time of subsequent pauses between delivery attempts. */
     public interface PauseCalculator {
+
         /** Time of next pause (in seconds). */
         int nextPause();
+
+        /** Restarts calculation. */
+        void reset();
     }
 
     private static class ConstantPause implements PauseCalculator {
@@ -105,19 +111,28 @@ public class RetryingDeliverer implements Deliverer {
         public int nextPause() {
             return pause;
         }
+
+        public void reset() {
+        }
     }
 
     private static class ExponentialPause implements PauseCalculator {
         private int pause;
+        private int current;
 
         public ExponentialPause(int pause) {
             this.pause = pause;
+            current = pause;
         }
 
         public int nextPause() {
-            int curr = pause;
-            pause *= 2;
-            return curr;
+            int c = current;
+            current *= 2;
+            return c;
+        }
+
+        public void reset() {
+            current = pause;
         }
     }
 

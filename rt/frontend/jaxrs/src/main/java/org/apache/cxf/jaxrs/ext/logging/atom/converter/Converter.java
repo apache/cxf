@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.jaxrs.ext.logging.atom.converter;
 
 import java.util.List;
 
@@ -24,16 +24,15 @@ import org.apache.abdera.model.Element;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
 
 /**
- * Converts batch of log records into ATOM element to deliver. Represents strategies of conversion e.g. as
- * ATOM format extensions, as Entry content etc.
+ * Converts batch of log records into one or more ATOM Elements to deliver.
  */
 public interface Converter {
 
     /**
-     * Converts collection of log records into ATOM element.
+     * Converts given collection.
      * 
      * @param records not-null collection of records
-     * @return ATOM document representing records
+     * @return non-empty collection of ATOM Elements that represent log records
      */
-    Element convert(List<LogRecord> records);
+    List<? extends Element> convert(List<LogRecord> records);
 }

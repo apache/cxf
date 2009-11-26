@@ -20,6 +20,15 @@ package org.apache.cxf.jaxrs.ext.logging.atom;
 
 import java.lang.reflect.Constructor;
 
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.RetryingDeliverer;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer;
+
 /**
  * Package private interpreter of incomplete input of engine configuration. Used commonly by
  * {@link AtomPushHandler properties file} and {@link AtomPushBean spring} configuration schemes.
@@ -36,6 +45,9 @@ final class AtomPushEngineConfigurator {
     private String retryTimeout;
     private String retryPause;
     private String retryPauseTime;
+    private String output;
+    private String multiplicity;
+    private String format;
 
     public void setUrl(String url) {
         this.delivererUrl = url;
@@ -73,10 +85,21 @@ final class AtomPushEngineConfigurator {
         this.converterClass = converterClass;
     }
 
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
+    public void setMultiplicity(String multiplicity) {
+        this.multiplicity = multiplicity;
+    }
+
+    public void setFormat(String format) {
+        this.format = format;
+    }
+
     public AtomPushEngine createEngine() {
         Deliverer d = deliverer;
         Converter c = converter;
-        int batch = 1;
         if (d == null) {
             if (delivererUrl != null) {
                 if (delivererClass != null) {
@@ -93,10 +116,13 @@ final class AtomPushEngineConfigurator {
             if (converterClass != null) {
                 c = createConverter(converterClass);
             } else {
-                c = new SingleEntryContentConverter();
+                Output out = parseEnum(output, Output.FEED);
+                Multiplicity mul = parseEnum(multiplicity, Multiplicity.ONE);
+                Format form = parseEnum(format, Format.CONTENT);
+                c = new StandardConverter(out, mul, form);
             }
         }
-        batch = parseInt(batchSize, 1, 1);
+        int batch = parseInt(batchSize, 1, 1);
         if (retryPause != null) {
             int timeout = parseInt(retryTimeout, 0, 0);
             int pause = parseInt(retryPauseTime, 1, 30);
@@ -112,8 +138,8 @@ final class AtomPushEngineConfigurator {
 
     private Deliverer createDeliverer(String clazz, String url) {
         try {
-            Constructor<?> ctor = loadClass(clazz).getConstructor(String.class);
-            return (Deliverer)ctor.newInstance(url);
+            Constructor<Deliverer> ctor = loadClass(clazz, Deliverer.class).getConstructor(String.class);
+            return ctor.newInstance(url);
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
@@ -121,22 +147,24 @@ final class AtomPushEngineConfigurator {
 
     private Converter createConverter(String clazz) {
         try {
-            Constructor<?> ctor = loadClass(clazz).getConstructor();
-            return (Converter)ctor.newInstance();
+            Constructor<Converter> ctor = loadClass(clazz, Converter.class).getConstructor();
+            return ctor.newInstance();
         } catch (Exception e) {
             throw new IllegalArgumentException(e);
         }
     }
 
-    private Class<?> loadClass(String clazz) throws ClassNotFoundException {
+    @SuppressWarnings("unchecked")
+    private <T> Class<T> loadClass(String clazz, Class<T> ifaceClass) throws ClassNotFoundException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         try {
-            return cl.loadClass(clazz);
+            return (Class<T>)cl.loadClass(clazz);
         } catch (ClassNotFoundException e) {
             try {
-                // clazz could be shorted (stripped package name) retry
-                String clazz2 = getClass().getPackage().getName() + "." + clazz;
-                return cl.loadClass(clazz2);
+                // clazz could be shorted (stripped package name) retry for interface location
+                String pkg = ifaceClass.getPackage().getName();
+                String clazz2 = pkg + "." + clazz;
+                return (Class<T>)cl.loadClass(clazz2);
             } catch (Exception e1) {
                 throw new ClassNotFoundException(e.getMessage() + " or " + e1.getMessage());
             }
@@ -157,5 +185,17 @@ final class AtomPushEngineConfigurator {
             ret = defaultValue;
         }
         return ret;
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends Enum<T>> T parseEnum(String value, T defaultValue) {
+        if (value == null | "".equals(value)) {
+            return defaultValue;
+        }
+        try {
+            return (T)Enum.valueOf(defaultValue.getClass(), value.toUpperCase());
+        } catch (Exception e) {
+            return defaultValue;
+        }
     }
 }

@@ -31,14 +31,19 @@ import java.util.logging.Logger;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
-import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler;
-import org.apache.cxf.jaxrs.ext.logging.atom.SingleEntryContentConverter;
-import org.apache.cxf.jaxrs.ext.logging.atom.WebClientDeliverer;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer;
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 
@@ -53,7 +58,8 @@ import static org.junit.Assert.assertEquals;
 public class JAXRSLoggingAtomPushTest {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
     private static Server server;
-    private static List<Element> received;
+    private static List<Feed> feeds = new ArrayList<Feed>();
+    private static List<Entry> entries = new ArrayList<Entry>();
 
     @Ignore
     @Path("/")
@@ -61,7 +67,14 @@ public class JAXRSLoggingAtomPushTest {
         @POST
         public void consume(Feed feed) {
             System.out.println(feed);
-            received.add(feed);
+            feeds.add(feed);
+        }
+
+        @POST
+        @Path("/atomPub")
+        public void consume(Entry entry) {
+            System.out.println(entry);
+            entries.add(entry);
         }
     }
 
@@ -118,7 +131,8 @@ public class JAXRSLoggingAtomPushTest {
 
     @Before
     public void before() throws Exception {
-        received = new ArrayList<Element>();
+        feeds.clear();
+        entries.clear();
     }
 
     @Test
@@ -126,8 +140,8 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush.properties");
         logSixEvents(LOG);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
-        assertEquals("Different logged events count;", 6, received.size());
+        Thread.sleep(1000);
+        assertEquals("Different logged events count;", 6, feeds.size());
     }
 
     @Test
@@ -135,23 +149,35 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush_batch.properties");
         logSixEvents(LOG);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         // 6 events / 3 element batch = 2 feeds expected
-        assertEquals("Different logged events count;", 2, received.size());
+        assertEquals("Different logged events count;", 2, feeds.size());
     }
 
     @Test
     public void testPrivateLogger() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
-        Handler h = new AtomPushHandler(2, new SingleEntryContentConverter(),
-                                        new WebClientDeliverer("http://localhost:9080"));
+        Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT);
+        Deliverer d = new WebClientDeliverer("http://localhost:9080");
+        Handler h = new AtomPushHandler(2, c, d);
         log.addHandler(h);
         log.setLevel(Level.ALL);
         logSixEvents(log);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
+        Thread.sleep(1000);
         // 6 events / 2 element batch = 3 feeds expected
-        assertEquals("Different logged events count;", 3, received.size());
+        assertEquals("Different logged events count;", 3, feeds.size());
     }
+
+    @Test
+    public void testAtomPubEntries() throws Exception {
+        configureLogging("resources/logging_atompush_atompub.properties");
+        logSixEvents(LOG);
+        // need to wait: multithreaded and client-server journey
+        Thread.sleep(1000);
+        // 6 events logged as entries
+        assertEquals("Different logged events count;", 6, entries.size());
+    }
+
 }

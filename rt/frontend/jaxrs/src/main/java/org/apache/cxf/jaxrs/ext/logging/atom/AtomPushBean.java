@@ -27,6 +27,8 @@ import java.util.logging.Logger;
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.ext.logging.LogLevel;
+import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
+import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
 
 /**
  * Bean used to configure {@link AtomPushHandler JUL handler} with Spring instead of properties file. Next to
@@ -81,6 +83,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogLevel;
  *   &lt;/bean&gt;
  * </pre>
  */
+// TODO add support for conversion setup (output, entries, logs, format)
 public final class AtomPushBean {
 
     private AtomPushEngineConfigurator conf = new AtomPushEngineConfigurator();
@@ -187,7 +190,7 @@ public final class AtomPushBean {
         Validate.notNull(batchSize, "batchSize is null");
         conf.setBatchSize(batchSize);
     }
-    
+
     /**
      * Retry pause calculation strategy, either "linear" or "exponential".
      */
@@ -214,7 +217,7 @@ public final class AtomPushBean {
         Validate.notNull(timeout, "timeout is null");
         conf.setRetryTimeout(timeout);
     }
-    
+
     /**
      * Initializes bean; creates ATOM push handler based on current properties state, and attaches handler to
      * logger(s).

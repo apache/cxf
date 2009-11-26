@@ -28,6 +28,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 
+import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
@@ -40,7 +41,7 @@ import org.junit.Test;
 
 public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase {
 
-    private static List<Feed> retrieved = new ArrayList<Feed>();
+    private static List<Element> retrieved = new ArrayList<Element>();
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -97,7 +98,6 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
             // System.out.println(feed);
             retrieved.add(feed);
         }
-
     }
 
     @Test

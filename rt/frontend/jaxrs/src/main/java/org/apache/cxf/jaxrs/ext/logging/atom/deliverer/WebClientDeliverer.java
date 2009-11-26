@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.jaxrs.ext.logging.atom.deliverer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,7 +32,7 @@ import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 /**
  * Marshaling and delivering based on JAXRS' WebClient.
  */
-public class WebClientDeliverer implements Deliverer {
+public final class WebClientDeliverer implements Deliverer {
     private WebClient wc;
 
     @SuppressWarnings("unchecked")

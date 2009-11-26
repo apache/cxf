@@ -16,21 +16,26 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.jaxrs.ext.logging.atom.deliverer;
 
 import org.apache.abdera.model.Element;
+import org.apache.commons.lang.Validate;
 
 /**
- * ATOM element deliverer. Represents transport strategy e.g. using
- * {@link org.apache.cxf.jaxrs.client.WebClient}, SOAP reliable messaging etc.
+ * Fires delivery of wrapper deliverer and forgets about status always assuming success. Fire-and-forget works
+ * only for regular flow, runtime and interrupted exceptions are not handled.
  */
-public interface Deliverer {
+public final class FireAndForgetDeliverer implements Deliverer {
 
-    /**
-     * Delivers ATOM element.
-     * 
-     * @param element element to deliver.
-     * @return true if delivery successful, false otherwise.
-     */
-    boolean deliver(Element element) throws InterruptedException;
+    private Deliverer deliverer;
+
+    public FireAndForgetDeliverer(Deliverer worker) {
+        Validate.notNull(worker, "worker is null");
+        deliverer = worker;
+    }
+
+    public boolean deliver(Element element) throws InterruptedException {
+        deliverer.deliver(element);
+        return true;
+    }
 }
