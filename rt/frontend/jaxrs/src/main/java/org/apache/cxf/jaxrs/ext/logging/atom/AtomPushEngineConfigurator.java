@@ -100,6 +100,7 @@ final class AtomPushEngineConfigurator {
     public AtomPushEngine createEngine() {
         Deliverer d = deliverer;
         Converter c = converter;
+        int batch = parseInt(batchSize, 1, 1);
         if (d == null) {
             if (delivererUrl != null) {
                 if (delivererClass != null) {
@@ -120,14 +121,13 @@ final class AtomPushEngineConfigurator {
                 Multiplicity mul = parseEnum(multiplicity, Multiplicity.ONE);
                 Format form = parseEnum(format, Format.CONTENT);
                 c = new StandardConverter(out, mul, form);
+                if (retryPause != null) {
+                    int timeout = parseInt(retryTimeout, 0, 0);
+                    int pause = parseInt(retryPauseTime, 1, 30);
+                    boolean linear = !retryPause.equalsIgnoreCase("exponential");
+                    d = new RetryingDeliverer(d, timeout, pause, linear);
+                }
             }
-        }
-        int batch = parseInt(batchSize, 1, 1);
-        if (retryPause != null) {
-            int timeout = parseInt(retryTimeout, 0, 0);
-            int pause = parseInt(retryPauseTime, 1, 30);
-            boolean linear = !retryPause.equalsIgnoreCase("exponential");
-            d = new RetryingDeliverer(d, timeout, pause, linear);
         }
         AtomPushEngine engine = new AtomPushEngine();
         engine.setDeliverer(d);

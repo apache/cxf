@@ -31,9 +31,9 @@ import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
 import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
 
 /**
- * Bean used to configure {@link AtomPushHandler JUL handler} with Spring instead of properties file. Next to
- * configuration of handler, Spring bean offers simple configuration of associated loggers that share ATOM
- * push-style handler.
+ * Bean used to configure {@link AtomPushHandler JUL handler} with Spring instead of properties file. See
+ * {@link AtomPushHandler} class for detailed description of parameters. Next to configuration of handler,
+ * Spring bean offers simple configuration of associated loggers that share ATOM push-style handler.
  * <p>
  * General rules:
  * <ul>
@@ -83,7 +83,6 @@ import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
  *   &lt;/bean&gt;
  * </pre>
  */
-// TODO add support for conversion setup (output, entries, logs, format)
 public final class AtomPushBean {
 
     private AtomPushEngineConfigurator conf = new AtomPushEngineConfigurator();
@@ -216,6 +215,33 @@ public final class AtomPushBean {
         checkInit();
         Validate.notNull(timeout, "timeout is null");
         conf.setRetryTimeout(timeout);
+    }
+
+    /**
+     * Conversion output type: "feed" or "entry".
+     */
+    public void setOutput(String output) {
+        checkInit();
+        Validate.notNull(output, "output is null");
+        conf.setOutput(output);
+    }
+
+    /**
+     * Multiplicity of subelement of output: "one" or "many".
+     */
+    public void setMultiplicity(String multiplicity) {
+        checkInit();
+        Validate.notNull(multiplicity, "multiplicity is null");
+        conf.setMultiplicity(multiplicity);
+    }
+
+    /**
+     * Entry data format: "content" or "extension".
+     */
+    public void setFormat(String format) {
+        checkInit();
+        Validate.notNull(format, "format is null");
+        conf.setFormat(format);
     }
 
     /**
