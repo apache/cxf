@@ -23,7 +23,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -45,7 +48,7 @@ import org.apache.cxf.jaxrs.ext.logging.LogRecordsList;
  * Converter producing ATOM Feeds on standalone Entries with LogRecords or LogRecordsLists embedded as content
  * or extension. For configuration details see constructor documentation.
  */
-public class StandardConverter implements Converter {
+public final class StandardConverter implements Converter {
 
     /** Conversion output */
     public enum Output {
@@ -65,14 +68,27 @@ public class StandardConverter implements Converter {
         EXTENSION
     }
 
+    /**
+     * Post-processing for feeds/entries properties customization eg setup of dates, titles, author etc.
+     */
+    public interface Postprocessor {
+
+        /** Called after entry creation for given log records. */
+        void afterEntry(Entry entry, List<LogRecord> records);
+
+        /** Called after feed creation; at this stage feed has associated entries. */
+        void afterFeed(Feed feed);
+    }
+
     private Factory factory;
     private Marshaller marsh;
     private DateFormat df;
     private Converter worker;
+    private Postprocessor postprocessor;
 
     /**
-     * Creates configured converter. Regardless of "format", combination of "output" and "multiplicity" flags
-     * can be interpreted as follow:
+     * Creates configured converter with custom feeds/entries post-processor. Regardless of "format",
+     * combination of "output" and "multiplicity" flags can be interpreted as follow:
      * <ul>
      * <li>ENTRY ONE - for each log record one entry is produced, converter returns list of entries</li>
      * <li>ENTRY MANY - list of log records is packed in one entry, converter return one entry.</li>
@@ -86,12 +102,16 @@ public class StandardConverter implements Converter {
      * @param multiplicity for output==FEED it is multiplicity of entities in feed for output==ENTITY it is
      *            multiplicity of log records in entity.
      * @param format log records embedded as entry content or extension.
+     * @param postprocessor custom feeds/entries post-processor.
      */
-    public StandardConverter(Output output, Multiplicity multiplicity, Format format) {
+    public StandardConverter(Output output, Multiplicity multiplicity, Format format,
+                             Postprocessor postprocessor) {
         Validate.notNull(output, "output is null");
         Validate.notNull(multiplicity, "multiplicity is null");
         Validate.notNull(format, "format is null");
+        Validate.notNull(postprocessor, "interceptor is null");
         configure(output, multiplicity, format);
+        this.postprocessor = postprocessor;
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         factory = Abdera.getNewFactory();
         try {
@@ -99,6 +119,14 @@ public class StandardConverter implements Converter {
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * Creates configured converter with default post-processing of feeds/entries mandatory properties. See
+     * {@link #StandardConverter(Output, Multiplicity, Format, Postprocessor)} for description.
+     */
+    public StandardConverter(Output output, Multiplicity multiplicity, Format format) {
+        this(output, multiplicity, format, new DefaultPostprocessor());
     }
 
     public List<? extends Element> convert(List<LogRecord> records) {
@@ -112,11 +140,14 @@ public class StandardConverter implements Converter {
                     // produces many entries, each entry with one log record
                     List<Element> ret = new ArrayList<Element>();
                     for (LogRecord record : records) {
+                        Entry e;
                         if (format == Format.CONTENT) {
-                            ret.add(createEntry(createContent(record)));
+                            e = createEntry(createContent(record));
                         } else {
-                            ret.add(createEntry(createExtension(record)));
+                            e = createEntry(createExtension(record));
                         }
+                        ret.add(e);
+                        postprocessor.afterEntry(e, Collections.singletonList(record));
                     }
                     return ret;
                 }
@@ -126,11 +157,14 @@ public class StandardConverter implements Converter {
             worker = new Converter() {
                 public List<? extends Element> convert(List<LogRecord> records) {
                     // produces one entry with list of all log records
+                    Entry e;
                     if (format == Format.CONTENT) {
-                        return Arrays.asList(createEntry(createContent(records)));
+                        e = createEntry(createContent(records));
                     } else {
-                        return Arrays.asList(createEntry(createExtension(records)));
+                        e = createEntry(createExtension(records));
                     }
+                    postprocessor.afterEntry(e, records);
+                    return Arrays.asList(e);
                 }
             };
         }
@@ -138,11 +172,16 @@ public class StandardConverter implements Converter {
             worker = new Converter() {
                 public List<? extends Element> convert(List<LogRecord> records) {
                     // produces one feed with one entry with list of all log records
+                    Entry e;
                     if (format == Format.CONTENT) {
-                        return Arrays.asList(createFeed(createEntry(createContent(records))));
+                        e = createEntry(createContent(records));
                     } else {
-                        return Arrays.asList(createFeed(createEntry(createExtension(records))));
+                        e = createEntry(createExtension(records));
                     }
+                    postprocessor.afterEntry(e, records);
+                    Feed f = createFeed(e);
+                    postprocessor.afterFeed(f);
+                    return Arrays.asList(f);
                 }
             };
         }
@@ -152,13 +191,18 @@ public class StandardConverter implements Converter {
                     // produces one feed with many entries, each entry with one log record
                     List<Entry> entries = new ArrayList<Entry>();
                     for (LogRecord record : records) {
+                        Entry e;
                         if (format == Format.CONTENT) {
-                            entries.add(createEntry(createContent(record)));
+                            e = createEntry(createContent(record));
                         } else {
-                            entries.add(createEntry(createExtension(record)));
+                            e = createEntry(createExtension(record));
                         }
+                        entries.add(e);
+                        postprocessor.afterEntry(e, Collections.singletonList(record));
                     }
-                    return Arrays.asList(createFeed(entries));
+                    Feed f = createFeed(entries);
+                    postprocessor.afterFeed(f);
+                    return Arrays.asList(f);
                 }
             };
         }
@@ -249,5 +293,23 @@ public class StandardConverter implements Converter {
             feed.addEntry(entry);
         }
         return feed;
+    }
+
+    private static class DefaultPostprocessor implements Postprocessor {
+        public void afterEntry(Entry entry, List<LogRecord> records) {
+            // required fields (see RFC 4287)
+            entry.setId("uuid:" + UUID.randomUUID().toString());
+            entry.addAuthor("CXF");
+            entry.setTitle(String.format("Entry with %d log record(s)", records.size()));
+            entry.setUpdated(new Date());
+        }
+
+        public void afterFeed(Feed feed) {
+            // required fields (see RFC 4287)
+            feed.setId("uuid:" + UUID.randomUUID().toString());
+            feed.addAuthor("CXF");
+            feed.setTitle(String.format("Feed with %d entry(ies)", feed.getEntries().size()));
+            feed.setUpdated(new Date());
+        }
     }
 }
