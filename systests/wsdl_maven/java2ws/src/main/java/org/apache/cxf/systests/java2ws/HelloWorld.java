@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systests.java2ws;
 
+import java.util.Date;
+
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
@@ -28,5 +30,5 @@ import org.apache.cxf.annotations.WSDLDocumentation;
 @WSDLDocumentation(value = "A simple service with only one method")
 public interface HelloWorld {
     @WSDLDocumentation(value = "Simply return the given text")
-    String sayHi(@WebParam(name = "text") String text);
+    String sayHi(@WebParam(name = "text") String text, @WebParam(name = "date") Date date);
 }
