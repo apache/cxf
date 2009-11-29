@@ -25,6 +25,8 @@ import java.util.List;
 
 
 public class Option {
+    static final String DEFAULT_BINDING_FILE_PATH = "src" + File.separator + "main"
+        + File.separator + "resources" + File.separator + "defaultBinding.xml";
 
     /**
      * As maven will set null for an empty parameter we need
@@ -36,7 +38,7 @@ public class Option {
     /**
      * 
      */
-    protected List<String> packagenames;
+    protected List<String> packagenames = new ArrayList<String>();
 
     /**
      * Extra arguments to pass to the command-line code generator. For compatibility as well as to
@@ -60,7 +62,7 @@ public class Option {
      * Also, optionally specifies the Java package name used by types described in the excluded 
      * namespace(s) using schema-namespace[=java-packagename]
      */
-    List<String> namespaceExcludes;
+    List<String> namespaceExcludes = new ArrayList<String>();
 
     /**
      * Enables or disables the loading of the default excludes namespace mapping. Default is true.
@@ -225,7 +227,14 @@ public class Option {
         String tmp[] = new String[bindingFiles.length + 1];
         System.arraycopy(bindingFiles, 0, tmp, 0, bindingFiles.length);
         bindingFiles = tmp;
-        bindingFiles[bindingFiles.length - 1] = file.toURI().toString();
+        bindingFiles[bindingFiles.length - 1] = file.getAbsolutePath();
+    }
+    
+    public void addDefaultBindingFileIfExists(File baseDir) {
+        File defaultBindingFile = new File(baseDir, DEFAULT_BINDING_FILE_PATH);
+        if (defaultBindingFile.exists()) {
+            addBindingFile(defaultBindingFile);
+        }
     }
 
     public void setWsdlLocation(String s) {
@@ -369,65 +378,35 @@ public class Option {
         }
         destination.setWsdlVersion(getWsdlVersion());
     }
+    
+    private void setIfNull(Object dest, Object source) {
+        if (dest == null) {
+            dest = source;
+        }
+    }
+    
     public void merge(Option defaultOptions) {
-        if (wsdlList == null) {
-            wsdlList = defaultOptions.wsdlList;
-        }
-        if (extendedSoapHeaders == null) {
-            extendedSoapHeaders = defaultOptions.extendedSoapHeaders;
-        }
-        if (validateWsdl == null) {
-            validateWsdl = defaultOptions.validateWsdl;
-        }
-        if (autoNameResolution == null) {
-            autoNameResolution = defaultOptions.autoNameResolution;
-        }
-        if (noAddressBinding == null) {
-            noAddressBinding = defaultOptions.noAddressBinding;
-        }
-        if (allowElementRefs == null) {
-            allowElementRefs = defaultOptions.allowElementRefs;
-        }
-        if (defaultExcludesNamespace == null) {
-            defaultExcludesNamespace = defaultOptions.defaultExcludesNamespace;
-        }
-        if (defaultNamespacePackageMapping == null) {
-            defaultNamespacePackageMapping = defaultOptions.defaultNamespacePackageMapping;
-        }
-        if (frontEnd == null) {
-            frontEnd = defaultOptions.frontEnd;
-        }
-        if (dataBinding == null) {
-            dataBinding = defaultOptions.dataBinding;
-        }
-        if (wsdlVersion == null) {
-            wsdlVersion = defaultOptions.wsdlVersion;
-        }
-        if (catalog == null) {
-            catalog = defaultOptions.catalog;
-        }
-        if (serviceName == null) {
-            serviceName = defaultOptions.serviceName;
-        }
-        if (outputDir == null) {
-            outputDir = defaultOptions.outputDir;
-        }
+        setIfNull(wsdlList, defaultOptions.wsdlList);
+        setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
+        setIfNull(validateWsdl, defaultOptions.validateWsdl);
+        setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
+        setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
+        setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
+        setIfNull(defaultExcludesNamespace, defaultOptions.defaultExcludesNamespace);
+        setIfNull(defaultNamespacePackageMapping, defaultOptions.defaultNamespacePackageMapping);
+        setIfNull(frontEnd, defaultOptions.frontEnd);
+        setIfNull(dataBinding, defaultOptions.dataBinding);
+        setIfNull(wsdlVersion, defaultOptions.wsdlVersion);
+        setIfNull(catalog, defaultOptions.catalog);
+        setIfNull(serviceName, defaultOptions.serviceName);
+        setIfNull(outputDir, defaultOptions.outputDir);
         extraargs.addAll(defaultOptions.extraargs);
         xjcargs.addAll(defaultOptions.xjcargs);
-        
         bindingFiles = mergeList(bindingFiles, defaultOptions.bindingFiles, String.class);
         dependencies = mergeList(dependencies, defaultOptions.dependencies, File.class);
         redundantDirs = mergeList(redundantDirs, defaultOptions.redundantDirs, File.class);
-        if (packagenames == null) {
-            packagenames = defaultOptions.packagenames;
-        } else {
-            packagenames.addAll(defaultOptions.packagenames);
-        }
-        if (namespaceExcludes == null) {
-            namespaceExcludes = defaultOptions.namespaceExcludes;
-        } else {
-            namespaceExcludes.addAll(defaultOptions.namespaceExcludes);
-        }
+        packagenames.addAll(defaultOptions.packagenames);
+        namespaceExcludes.addAll(defaultOptions.namespaceExcludes);
     }
     
     @SuppressWarnings("unchecked")

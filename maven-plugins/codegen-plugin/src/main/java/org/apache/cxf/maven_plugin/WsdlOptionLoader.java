@@ -24,16 +24,52 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.project.MavenProject;
 
 public final class WsdlOptionLoader {
+    private static final String WSDL_TYPE = "wsdl";
     private static final String WSDL_OPTIONS = "-options$";
     private static final String WSDL_BINDINGS = "-binding-?\\d*.xml$";
     
     private WsdlOptionLoader() {
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static List<WsdlOption> loadWsdlOptionsFromDependencies(MavenProject project, 
+                                                                   Option defaultOptions, File outputDir) {
+        List<WsdlOption> options = new ArrayList<WsdlOption>();
+        Set<Artifact> dependencies = project.getDependencyArtifacts();
+        for (Artifact artifact : dependencies) {
+            WsdlOption option = generateWsdlOptionFromArtifact(artifact, outputDir);
+            if (option != null) {
+                if (defaultOptions != null) {
+                    option.merge(defaultOptions);
+                }
+                options.add(option);
+            }
+        }
+        return options;
+    }
+
+    private static WsdlOption generateWsdlOptionFromArtifact(Artifact artifact, File outputDir) {
+        if (!WSDL_TYPE.equals(artifact.getType())) {
+            return null;
+        }
+        WsdlOption option = new WsdlOption();
+        WsdlArtifact wsdlArtifact = new WsdlArtifact();
+        wsdlArtifact.setArtifactId(artifact.getArtifactId());
+        wsdlArtifact.setGroupId(artifact.getGroupId());
+        wsdlArtifact.setType(artifact.getType());
+        wsdlArtifact.setVersion(artifact.getVersion());
+        option.setWsdlArtifact(wsdlArtifact);
+        option.setOutputDir(outputDir);
+        return option;
     }
 
     /**

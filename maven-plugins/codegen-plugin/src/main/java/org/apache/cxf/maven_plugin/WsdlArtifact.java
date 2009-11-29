@@ -57,4 +57,9 @@ public class WsdlArtifact {
         this.type = type;
     }
     
+    public boolean doesMatch(WsdlArtifact artifact) {
+        return type.equals(artifact.getType()) && groupId.equals(artifact.getGroupId())
+              && artifactId.equals(artifact.getArtifactId()) 
+              && (version == null || version.equals(artifact.getVersion()));
+    }
 }

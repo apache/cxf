@@ -79,6 +79,12 @@ public class WsdlOption extends Option {
         }
         return file;
     }
+    
+    public URI getWsdlURI(URI baseURI) {
+        String wsdlLocation = getWsdl();
+        File wsdlFile = new File(wsdlLocation);
+        return wsdlFile.exists() ? wsdlFile.toURI() : baseURI.resolve(wsdlLocation);
+    }
 
     public boolean isDefServiceName() {
         if (extraargs == null) {
