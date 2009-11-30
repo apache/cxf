@@ -44,4 +44,21 @@ public interface FailoverStrategy {
      * @return the selected endpoint
      */
     Endpoint selectAlternateEndpoint(List<Endpoint> alternates);
+
+    /**
+     * Get the alternate addresses for this invocation.
+     * These addresses over-ride any addresses specified in the WSDL.
+     * 
+     * @param exchange the current Exchange     
+     * @return a failover endpoint if one is available
+     */
+    List<String> getAlternateAddresses(Exchange exchange);
+
+    /**
+     * Select one of the alternate addresses for a retried invocation.
+     * 
+     * @param alternates List of alternate addresses if available
+     * @return the selected address
+     */
+    String selectAlternateAddress(List<String> addresses);
 }

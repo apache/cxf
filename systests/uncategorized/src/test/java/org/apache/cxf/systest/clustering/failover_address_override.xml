@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:jaxws="http://cxf.apache.org/jaxws"
+       xmlns:clustering="http://cxf.apache.org/clustering"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
+http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    <util:list id="addressList">
+        <value>http://localhost:9051/SoapContext/ReplicatedPortA</value>
+        <value>http://localhost:9052/SoapContext/ReplicatedPortB</value>
+        <value>http://localhost:9053/SoapContext/ReplicatedPortC</value>
+    </util:list>
+
+    <bean id="SequentialAddresses" class="org.apache.cxf.clustering.SequentialStrategy">
+        <property name="alternateAddresses">
+            <ref bean="addressList"/>
+        </property>
+    </bean>
+
+    <bean id="RandomAddresses" class="org.apache.cxf.clustering.RandomStrategy">
+        <property name="alternateAddresses">
+            <ref bean="addressList"/>
+        </property>
+    </bean>
+
+    <bean id="UnreachableAddresses" class="org.apache.cxf.clustering.SequentialStrategy">
+        <property name="alternateAddresses">
+            <list>        
+                <value>http://localhost:9050/SoapContext/ReplicatedPortA</value>
+                <value>http://localhost:9053/SoapContext/ReplicatedPortC</value>
+            </list>
+        </property>
+    </bean>
+
+    <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortA"
+                  createdFromAPI="true">
+        <jaxws:features>
+            <clustering:failover>
+                <clustering:strategy>
+                    <ref bean="SequentialAddresses"/>
+                </clustering:strategy>
+            </clustering:failover>
+        </jaxws:features>
+    </jaxws:client>
+
+    <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortC"
+                  createdFromAPI="true">
+        <jaxws:features>
+            <clustering:failover>
+                <clustering:strategy>
+                    <ref bean="RandomAddresses"/>
+                </clustering:strategy>
+            </clustering:failover>
+        </jaxws:features>
+    </jaxws:client>
+
+    <jaxws:client name="{http://cxf.apache.org/greeter_control}ReplicatedPortB"
+                  address="http://localhost:15555/SoapContext/ReplicatedPortB"
+                  createdFromAPI="true">
+        <jaxws:features>
+            <clustering:failover>
+                <clustering:strategy>
+                    <ref bean="UnreachableAddresses"/>
+                </clustering:strategy>
+            </clustering:failover>
+        </jaxws:features>
+    </jaxws:client>
+    
+</beans>
