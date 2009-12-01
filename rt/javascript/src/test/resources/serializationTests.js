@@ -39,6 +39,7 @@ function serializeTestBean1_1()
  	var a = [];
  	a.push(543);
  	bean1.setOptionalIntArrayItem(a);
+ 	bean1.setEnum2('Mineral');
 	return bean1.serialize(jsutils, "testBean1");
 } 
 

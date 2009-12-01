@@ -76,4 +76,7 @@ public interface SimpleDocLitWrapped {
     
     @WebMethod 
     void inheritanceTestFunction(@WebParam(name = "d") InheritanceTestDerived d);
+    
+    @WebMethod
+    AnEnum enumEcho(@WebParam(name = "ev") AnEnum value);
 }

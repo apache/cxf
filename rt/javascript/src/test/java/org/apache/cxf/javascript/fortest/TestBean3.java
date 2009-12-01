@@ -123,7 +123,7 @@ public class TestBean3 {
     @Override
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        builder.append("TestBean1");
+        builder.append("TestBean3");
         builder.append(" stringItem ");
         builder.append(stringItem == null ? "Null" : stringItem);
         builder.append(" intItem ");

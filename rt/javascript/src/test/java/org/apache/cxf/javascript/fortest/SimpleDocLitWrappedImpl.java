@@ -163,4 +163,8 @@ public class SimpleDocLitWrappedImpl implements SimpleDocLitWrapped {
         return lastInheritanceTestDerived;
     }
 
+    public AnEnum enumEcho(AnEnum value) {
+        return value;
+    }
+
 }
