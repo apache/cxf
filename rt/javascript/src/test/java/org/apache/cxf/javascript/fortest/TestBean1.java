@@ -22,11 +22,13 @@ package org.apache.cxf.javascript.fortest;
 import java.util.Arrays;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 /**
  * Bean with a selection of elements suitable for testing the JavaScript client.
  */
+@XmlRootElement(namespace = "uri:org.apache.cxf.javascript.testns")
 @XmlType(namespace = "uri:org.apache.cxf.javascript.testns")
 public class TestBean1 {
     
@@ -35,6 +37,7 @@ public class TestBean1 {
         doubleItem = -1.0;
         beanTwoItem = new TestBean2("required=true");
         beanTwoNotRequiredItem = null;
+        enumeration = AnEnum.Animal;
     }
     
     //CHECKSTYLE:OFF
@@ -56,12 +59,11 @@ public class TestBean1 {
     public TestBean2 beanTwoItem;
     @XmlElement(required = false)
     public TestBean2 beanTwoNotRequiredItem;
+    @XmlElement(defaultValue = "Animal", required = true)
     public AnEnum enumeration;
+    @XmlElement 
+    public AnEnum enum2;
     //CHECKSTYLE:ON
-    
-    public AnEnum getEnumeration() {
-        return enumeration;
-    }
     
     @Override
     public boolean equals(Object obj) {

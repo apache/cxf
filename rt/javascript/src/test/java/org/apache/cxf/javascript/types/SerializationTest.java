@@ -43,7 +43,6 @@ import org.apache.cxf.javascript.NameManager;
 import org.apache.cxf.javascript.NamespacePrefixAccumulator;
 import org.apache.cxf.javascript.fortest.TestBean1;
 import org.apache.cxf.javascript.fortest.TestBean2;
-import org.apache.cxf.javascript.fortest.TestBean3;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.service.model.SchemaInfo;
@@ -86,15 +85,15 @@ public class SerializationTest extends AbstractCXFSpringTest {
     public void testDeserialization() throws Exception {
         setupClientAndRhino("simple-dlwu-proxy-factory");
         testUtilities.readResourceIntoRhino("/deserializationTests.js");
-        DataBinding dataBinding = new JAXBDataBinding(TestBean3.class, TestBean2.class);
+        DataBinding dataBinding = new JAXBDataBinding(TestBean1.class, TestBean2.class);
         assertNotNull(dataBinding);
-        TestBean3 bean = new TestBean3();
+        TestBean1 bean = new TestBean1();
         bean.stringItem = "bean1>stringItem";
         bean.doubleItem = -1.0;
         String serialized = serializeObject(dataBinding, bean);
         testUtilities.rhinoCallInContext("deserializeTestBean3_1", serialized);
 
-        bean = new TestBean3();
+        bean = new TestBean1();
         bean.stringItem = null;
         bean.intItem = 21;
         bean.longItem = 200000001;
@@ -109,7 +108,7 @@ public class SerializationTest extends AbstractCXFSpringTest {
         testUtilities.rhinoCallInContext("deserializeTestBean3_2", serialized);
     }
 
-    private String serializeObject(DataBinding dataBinding, TestBean3 bean) throws XMLStreamException {
+    private String serializeObject(DataBinding dataBinding, TestBean1 bean) throws XMLStreamException {
         DataWriter<XMLStreamWriter> writer = dataBinding.createWriter(XMLStreamWriter.class);
         StringWriter stringWriter = new StringWriter();
         XMLStreamWriter xmlStreamWriter = xmlOutputFactory.createXMLStreamWriter(stringWriter);
