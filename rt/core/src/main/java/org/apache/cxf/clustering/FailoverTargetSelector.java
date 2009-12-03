@@ -102,7 +102,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     }
 
     /**
-     * Called on completion of the MEP for which the Conduit was required.
+     * Called on completion of the MEP for which the Condit was required.
      * 
      * @param exchange represents the completed MEP
      */
@@ -116,7 +116,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         if (requiresFailover(exchange)) {
             Endpoint failoverTarget = getFailoverTarget(exchange, invocation);
             if (failoverTarget != null) {
-                endpoint = failoverTarget;
+                setEndpoint(failoverTarget);
                 selectedConduit.close();
                 selectedConduit = null;
                 Exception prevExchangeFault =
@@ -146,12 +146,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
                     }
                 }
             } else {
-                if (endpoint != invocation.getOriginalEndpoint()) {
-                    endpoint = invocation.getOriginalEndpoint();
-                    getLogger().log(Level.INFO,
-                                    "REVERT_TO_ORIGINAL_TARGET",
-                                    endpoint.getEndpointInfo().getName());
-                }
+                setEndpoint(invocation.retrieveOriginalEndpoint(endpoint));
             }
         }
         if (!failover) {
@@ -225,16 +220,39 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      * @return a failover endpoint if one is available
      */
     private Endpoint getFailoverTarget(Exchange exchange,
-                                       InvocationContext invocation) {        
-        if (invocation.getAlternateTargets() == null) {
+                                       InvocationContext invocation) {
+        List<String> alternateAddresses = null;
+        if (!invocation.hasAlternates()) {
             // no previous failover attempt on this invocation
             //
-            invocation.setAlternateTargets(
-                getStrategy().getAlternateEndpoints(exchange));
-        } 
+            alternateAddresses = 
+                getStrategy().getAlternateAddresses(exchange);
+            if (alternateAddresses != null) {
+                invocation.setAlternateAddresses(alternateAddresses);
+            } else {
+                invocation.setAlternateEndpoints(
+                    getStrategy().getAlternateEndpoints(exchange));
+            }
+        } else {
+            alternateAddresses = invocation.getAlternateAddresses();
+        }
 
-        return getStrategy().selectAlternateEndpoint(
-                   invocation.getAlternateTargets());
+        Endpoint failoverTarget = null;
+        if (alternateAddresses != null) {
+            String alternateAddress = 
+                getStrategy().selectAlternateAddress(alternateAddresses);
+            if (alternateAddress != null) {
+                // re-use current endpoint
+                //
+                failoverTarget = getEndpoint();
+
+                failoverTarget.getEndpointInfo().setAddress(alternateAddress);
+            }
+        } else {
+            failoverTarget = getStrategy().selectAlternateEndpoint(
+                                 invocation.getAlternateEndpoints());
+        }
+        return failoverTarget;
     }
     
     /**
@@ -282,24 +300,38 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
     /**
      * Records the context of an invocation.
      */
-    private static class InvocationContext {
+    private class InvocationContext {
         private Endpoint originalEndpoint;
+        private String originalAddress;
         private BindingOperationInfo bindingOperationInfo;
         private Object[] params; 
         private Map<String, Object> context;
-        private List<Endpoint> alternateTargets;
+        private List<Endpoint> alternateEndpoints;
+        private List<String> alternateAddresses;
         
         InvocationContext(Endpoint endpoint,
                           BindingOperationInfo boi,
                           Object[] prms, 
                           Map<String, Object> ctx) {
             originalEndpoint = endpoint;
+            originalAddress = endpoint.getEndpointInfo().getAddress();
             bindingOperationInfo = boi;
             params = prms;
             context = ctx;
         }
 
-        Endpoint getOriginalEndpoint() {
+        Endpoint retrieveOriginalEndpoint(Endpoint endpoint) {
+            if (endpoint != originalEndpoint) {
+                getLogger().log(Level.INFO,
+                                "REVERT_TO_ORIGINAL_TARGET",
+                                endpoint.getEndpointInfo().getName());
+            }
+            if (!endpoint.getEndpointInfo().getAddress().equals(originalAddress)) {
+                endpoint.getEndpointInfo().setAddress(originalAddress);
+                getLogger().log(Level.INFO,
+                                "REVERT_TO_ORIGINAL_ADDRESS",
+                                endpoint.getEndpointInfo().getAddress());
+            }
             return originalEndpoint;
         }
         
@@ -315,12 +347,24 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
             return context;
         }
         
-        List<Endpoint> getAlternateTargets() {
-            return alternateTargets;
+        List<Endpoint> getAlternateEndpoints() {
+            return alternateEndpoints;
         }
 
-        void setAlternateTargets(List<Endpoint> alternates) {
-            alternateTargets = alternates;
+        List<String> getAlternateAddresses() {
+            return alternateAddresses;
+        }
+
+        void setAlternateEndpoints(List<Endpoint> alternates) {
+            alternateEndpoints = alternates;
+        }
+
+        void setAlternateAddresses(List<String> alternates) {
+            alternateAddresses = alternates;
+        }
+
+        boolean hasAlternates() {
+            return !(alternateEndpoints == null && alternateAddresses == null);
         }
     }    
 }

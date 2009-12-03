@@ -21,8 +21,6 @@ package org.apache.cxf.clustering;
 
 import java.util.List;
 
-import org.apache.cxf.endpoint.Endpoint;
-
 /**
  * Failover strategy based on a sequential walk through the
  * static cluster represented by multiple endpoints associated 
@@ -36,7 +34,7 @@ public class SequentialStrategy extends AbstractStaticFailoverStrategy {
      * @param alternates non-empty List of alternate endpoints 
      * @return
      */
-    protected Endpoint getNextAlternate(List<Endpoint> alternates) {
+    protected <T> T getNextAlternate(List<T> alternates) {
         return alternates.remove(0);
     }
 }

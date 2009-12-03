@@ -38,10 +38,47 @@ import org.apache.cxf.service.model.ServiceInfo;
  * multiple endpoints associated with the same service instance.
  */
 public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy {
-    
     private static final Logger LOG =
         LogUtils.getL7dLogger(AbstractStaticFailoverStrategy.class);
-    
+
+    private List<String> alternateAddresses;
+
+
+    public void setAlternateAddresses(List<String> alternateAddresses) {
+        this.alternateAddresses = alternateAddresses;
+    }
+   
+    /**
+     * Get the alternate addresses for this invocation.
+     * 
+     * @param exchange the current Exchange
+     * @return a List of alternate addresses if available
+     */
+    public List<String> getAlternateAddresses(Exchange exchange) {
+        return alternateAddresses != null
+               ? new ArrayList<String>(alternateAddresses)
+               : null;
+    }
+
+    /**
+     * Select one of the alternate addresses for a retried invocation.
+     * 
+     * @param a List of alternate addresses if available
+     * @return the selected address
+     */
+    public String selectAlternateAddress(List<String> alternates) {
+        String selected = null;
+        if (alternates != null && alternates.size() > 0) {
+            selected = getNextAlternate(alternates);
+            LOG.log(Level.WARNING,
+                    "FAILING_OVER_TO_ADDRESS_OVERRIDE",
+                    selected);
+        } else {
+            LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
+        }
+        return selected;
+    }
+
     /**
      * Get the alternate endpoints for this invocation.
      * 
@@ -50,6 +87,26 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
      */
     public List<Endpoint> getAlternateEndpoints(Exchange exchange) {
         return getEndpoints(exchange, false);
+    }
+    
+    /**
+     * Select one of the alternate endpoints for a retried invocation.
+     * 
+     * @param a List of alternate endpoints if available
+     * @return the selected endpoint
+     */
+    public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
+        Endpoint selected = null;
+        if (alternates != null && alternates.size() > 0) {
+            selected = getNextAlternate(alternates);
+            LOG.log(Level.WARNING,
+                    "FAILING_OVER_TO_ALTERNATE_ENDPOINT",
+                     new Object[] {selected.getEndpointInfo().getName(),
+                                   selected.getEndpointInfo().getAddress()});
+        } else {
+            LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
+        }
+        return selected;
     }
     
     /**
@@ -91,30 +148,10 @@ public abstract class AbstractStaticFailoverStrategy implements FailoverStrategy
     }
 
     /**
-     * Select one of the alternate endpoints for a retried invocation.
-     * 
-     * @param a List of alternate endpoints if available
-     * @return the selected endpoint
-     */
-    public Endpoint selectAlternateEndpoint(List<Endpoint> alternates) {
-        Endpoint selected = null;
-        if (alternates != null && alternates.size() > 0) {
-            selected = getNextAlternate(alternates);
-            LOG.log(Level.WARNING,
-                    "FAILING_OVER_TO",
-                     new Object[] {selected.getEndpointInfo().getName(),
-                                   selected.getEndpointInfo().getAddress()});
-        } else {
-            LOG.warning("NO_ALTERNATE_TARGETS_REMAIN");
-        }
-        return selected;
-    }
-    
-    /**
      * Get next alternate endpoint.
      * 
      * @param alternates non-empty List of alternate endpoints 
      * @return
      */
-    protected abstract Endpoint getNextAlternate(List<Endpoint> alternates);
+    protected abstract <T> T getNextAlternate(List<T> alternates);
 }
