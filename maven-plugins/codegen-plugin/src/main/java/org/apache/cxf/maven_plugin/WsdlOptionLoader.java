@@ -32,9 +32,47 @@ import org.apache.maven.plugin.MojoExecutionException;
 public final class WsdlOptionLoader {
     private static final String WSDL_OPTIONS = "-options$";
     private static final String WSDL_BINDINGS = "-binding-?\\d*.xml$";
-
     
-    private String getIncludeExcludeString(String[] arr) {
+    private WsdlOptionLoader() {
+    }
+
+    /**
+     * Scan files in a directory and generate one wsdlOption per file found. Extra args for code generation
+     * can be defined in a file that is named like the wsdl file and ends in -options. Binding files can be
+     * defined in files named like the wsdl file and end in -binding-*.xml
+     * 
+     * @param wsdlBasedir
+     * @param includes file name patterns to include
+     * @param excludes file name patterns to exclude
+     * @param defaultOptions options that should be used if no special file is given
+     * @return list of one WsdlOption object for each wsdl found
+     * @throws MojoExecutionException
+     */
+    public static List<WsdlOption> loadWsdlOptionsFromFiles(File wsdlBasedir, String includes[],
+                                                            String excludes[], Option defaultOptions,
+                                                            File defaultOutputDir)
+        throws MojoExecutionException {
+
+        if (wsdlBasedir == null) {
+            return new ArrayList<WsdlOption>();
+        }
+
+        if (!wsdlBasedir.exists()) {
+            throw new MojoExecutionException(wsdlBasedir + " does not exist");
+        }
+
+        List<File> wsdlFiles = getWsdlFiles(wsdlBasedir, includes, excludes);
+        List<WsdlOption> wsdlOptions = new ArrayList<WsdlOption>();
+        for (File wsdl : wsdlFiles) {
+            WsdlOption wsdlOption = generateWsdlOptionFromFile(wsdl, defaultOptions, defaultOutputDir);
+            if (wsdlOption != null) {
+                wsdlOptions.add(wsdlOption);
+            }
+        }
+        return wsdlOptions;
+    }
+
+    private static String joinWithComma(String[] arr) {
         if (arr == null) {
             return "";
         }
@@ -50,40 +88,19 @@ public final class WsdlOptionLoader {
         }
         return str.toString();
     }
-    
-    public List<WsdlOption> load(String wsdlRoot) throws MojoExecutionException {
-        return load(new File(wsdlRoot), new String[] {"*.wsdl"}, null, null);
-    }
 
-    public List<WsdlOption> load(File wsdlBasedir,
-                                 String includes[],
-                                 String excludes[],
-                                 Option defaultOptions)
+    private static List<File> getWsdlFiles(File dir, String includes[], String excludes[])
         throws MojoExecutionException {
-        
-        if (wsdlBasedir == null) {
-            return new ArrayList<WsdlOption>();
-        }
 
-        if (!wsdlBasedir.exists()) {
-            throw new MojoExecutionException(wsdlBasedir + " does not exist");
-        }
-
-        return findJobs(wsdlBasedir, getWsdlFiles(wsdlBasedir, includes, excludes), defaultOptions);
-    }
-
-    private List<File> getWsdlFiles(File dir, String includes[], String excludes[])
-        throws MojoExecutionException {
-        
         List<String> exList = new ArrayList<String>();
         if (excludes != null) {
             exList.addAll(Arrays.asList(excludes));
         }
         exList.addAll(Arrays.asList(org.codehaus.plexus.util.FileUtils.getDefaultExcludes()));
-        
-        String inc = getIncludeExcludeString(includes);
-        String ex = getIncludeExcludeString(exList.toArray(new String[exList.size()]));
-        
+
+        String inc = joinWithComma(includes);
+        String ex = joinWithComma(exList.toArray(new String[exList.size()]));
+
         try {
             List newfiles = org.codehaus.plexus.util.FileUtils.getFiles(dir, inc, ex);
             return CastUtils.cast(newfiles);
@@ -92,69 +109,68 @@ public final class WsdlOptionLoader {
         }
     }
 
-    private File getOptions(File dir, String pattern) {
-        List<File> files = FileUtils.getFiles(dir, pattern);
-        if (files.size() > 0) {
-            return files.iterator().next();
+    private static String[] readOptionsFromFile(File dir, String wsdlName) throws MojoExecutionException {
+        String[] noOptions = new String[] {};
+        List<File> files = FileUtils.getFiles(dir, wsdlName + WSDL_OPTIONS);
+        if (files.size() <= 0) {
+            return noOptions;
         }
-        return null;
-    }
-
-    private List<File> getBindingFiles(File dir, String pattern) {
-        return FileUtils.getFiles(dir, pattern);
-    }
-
-    protected List<WsdlOption> findJobs(File dir, List<File> wsdlFiles, Option defaultOptions) {
-        List<WsdlOption> jobs = new ArrayList<WsdlOption>();
-
-        for (File wsdl : wsdlFiles) {
-            if (wsdl == null || !wsdl.exists()) {
-                continue;
-            }
-
-            String wsdlName = wsdl.getName();
-            int idx = wsdlName.toLowerCase().lastIndexOf(".wsdl");
-            if (idx == -1) {
-                idx = wsdlName.lastIndexOf('.');
-            }
-            if (idx != -1) {
-                wsdlName = wsdlName.substring(0, idx);
-                File options = getOptions(dir, wsdlName + WSDL_OPTIONS);
-                List<File> bindings = getBindingFiles(dir, wsdlName + WSDL_BINDINGS);
-    
-                jobs.add(generateWsdlOption(wsdl, bindings, options, defaultOptions));
-            }
+        File optionsFile = files.iterator().next();
+        if (optionsFile == null || !optionsFile.exists()) {
+            return noOptions;
         }
-        return jobs;
+        try {
+            List<String> lines = FileUtils.readLines(optionsFile);
+            if (lines.size() <= 0) {
+                return noOptions;
+            }
+            return lines.iterator().next().split(" ");
+        } catch (Exception e) {
+            throw new MojoExecutionException("Error reading options from file "
+                                             + optionsFile.getAbsolutePath(), e);
+        }
     }
 
-    protected WsdlOption generateWsdlOption(final File wsdl, 
-                                            final List<File> bindingFiles, 
-                                            final File options,
-                                            final Option defaultOptions) {
-        WsdlOption wsdlOption = new WsdlOption();
+    protected static WsdlOption generateWsdlOptionFromFile(final File wsdl, final Option defaultOptions,
+                                                           File defaultOutputDir)
+        throws MojoExecutionException {
 
-        if (options != null && options.exists()) {
-            try {
-                List<String> lines = FileUtils.readLines(options);
-                if (lines.size() > 0) {
-                    wsdlOption.getExtraargs().addAll(Arrays.asList(lines.iterator().next().split(" ")));
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        if (wsdl == null || !wsdl.exists()) {
+            return null;
+        }
+
+        final String wsdlFileName = wsdl.getName();
+        int idx = wsdlFileName.toLowerCase().lastIndexOf(".wsdl");
+        if (idx == -1) {
+            idx = wsdlFileName.lastIndexOf('.');
+        }
+        if (idx == -1) {
+            return null;
+        }
+
+        final WsdlOption wsdlOption = new WsdlOption();
+        final String wsdlName = wsdlFileName.substring(0, idx);
+
+        final String[] options = readOptionsFromFile(wsdl.getParentFile(), wsdlName);
+        if (options.length > 0) {
+            wsdlOption.getExtraargs().addAll(Arrays.asList(options));
         } else if (defaultOptions != null) {
             // no options specified use the defaults
             defaultOptions.copyOptions(wsdlOption);
         }
-        
+
+        List<File> bindingFiles = FileUtils.getFiles(wsdl.getParentFile(), wsdlName + WSDL_BINDINGS);
         if (bindingFiles != null) {
             for (File binding : bindingFiles) {
                 wsdlOption.addBindingFile(binding);
             }
         }
         wsdlOption.setWsdl(wsdl.toURI().toString());
-        
+
+        if (wsdlOption.getOutputDir() == null) {
+            wsdlOption.setOutputDir(defaultOutputDir);
+        }
+
         return wsdlOption;
     }
 }
