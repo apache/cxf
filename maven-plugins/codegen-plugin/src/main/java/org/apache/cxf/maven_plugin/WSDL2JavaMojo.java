@@ -50,6 +50,8 @@ import org.apache.maven.project.ProjectUtils;
  * @requiresDependencyResolution test
  */
 public class WSDL2JavaMojo extends AbstractMojo {
+    private static final String TEMPBINDINGS_DIR = "tempbindings";
+
     /**
      * @parameter expression="${cxf.testSourceRoot}"
      */
@@ -81,7 +83,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * 
      * @parameter
      */
-    Option defaultOptions;
+    Option defaultOptions = new Option();
 
     /**
      * @parameter
@@ -123,6 +125,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @parameter expression="${cxf.disableDirectoryScan}" default-value="false"
      */
     boolean disableDirectoryScan;
+
+    /**
+     * By default all maven dependencies of type "wsdl" are added to the effective wsdlOptions. Setting this
+     * parameter to true disables this functionality
+     */
+    boolean disableDependencyScan;
 
     /**
      * A list of wsdl files to include. Can contain ant-style wildcards and double wildcards. Defaults to
@@ -232,21 +240,32 @@ public class WSDL2JavaMojo extends AbstractMojo {
      * @return effective WsdlOptions
      * @throws MojoExecutionException
      */
-    private List<WsdlOption> createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions()
+    private List<WsdlOption> createWsdlOptionsFromScansAndExplicitWsdlOptions() 
         throws MojoExecutionException {
         List<WsdlOption> effectiveWsdlOptions = new ArrayList<WsdlOption>();
+        List<WsdlOption> temp;
         if (wsdlRoot != null && wsdlRoot.exists() && !disableDirectoryScan) {
-            effectiveWsdlOptions.addAll(WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes,
-                                                                                  excludes, defaultOptions,
-                                                                                  sourceRoot));
+            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(wsdlRoot, includes, excludes, defaultOptions,
+                                                             sourceRoot);
+            effectiveWsdlOptions.addAll(temp);
         }
         if (testWsdlRoot != null && testWsdlRoot.exists() && !disableDirectoryScan) {
-            effectiveWsdlOptions.addAll(WsdlOptionLoader.loadWsdlOptionsFromFiles(testWsdlRoot, includes,
-                                                                                  excludes, defaultOptions,
-                                                                                  testSourceRoot));
+            temp = WsdlOptionLoader.loadWsdlOptionsFromFiles(testWsdlRoot, includes, excludes,
+                                                             defaultOptions, testSourceRoot);
+            effectiveWsdlOptions.addAll(temp);
+        }
+        if (!disableDependencyScan) {
+            temp = WsdlOptionLoader.loadWsdlOptionsFromDependencies(project, defaultOptions, sourceRoot);
+            effectiveWsdlOptions.addAll(temp);
         }
         mergeOptions(effectiveWsdlOptions);
         downloadRemoteWsdls(effectiveWsdlOptions);
+        String buildDir = project.getBuild().getDirectory();
+        File tempBindingDir = new File(buildDir, TEMPBINDINGS_DIR);
+        for (WsdlOption o : effectiveWsdlOptions) {
+            BindingFileHelper.setWsdlLocationInBindingsIfNotSet(project.getBasedir(), tempBindingDir, o,
+                                                                getLog());
+        }
         return effectiveWsdlOptions;
     }
     
@@ -300,9 +319,9 @@ public class WSDL2JavaMojo extends AbstractMojo {
             if (wsdlA == null) {
                 return;
             }
-            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA
-                                                               .getArtifactId(), wsdlA.getVersion(), 
-                                                               Artifact.SCOPE_COMPILE, wsdlA.getType());
+            Artifact wsdlArtifact = artifactFactory.createArtifact(wsdlA.getGroupId(), wsdlA.getArtifactId(),
+                                                                   wsdlA.getVersion(),
+                                                                   Artifact.SCOPE_COMPILE, wsdlA.getType());
             wsdlArtifact = resolveRemoteWsdlArtifact(remoteRepos, wsdlArtifact);
             if (wsdlArtifact != null) {
                 String path = wsdlArtifact.getFile().getAbsolutePath();
@@ -318,12 +337,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
                 "*.wsdl"
             };
         }
-
+        defaultOptions.addDefaultBindingFileIfExists(project.getBasedir());
         File classesDir = new File(classesDirectory);
         classesDir.mkdirs();
         markerDirectory.mkdirs();
 
-        List<WsdlOption> effectiveWsdlOptions = createWsdlOptionsFromWsdlFilesAndExplicitWsdlOptions();
+        List<WsdlOption> effectiveWsdlOptions = createWsdlOptionsFromScansAndExplicitWsdlOptions();
 
         if (effectiveWsdlOptions.size() == 0) {
             getLog().info("Nothing to generate");
@@ -368,11 +387,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
     private void callWsdl2Java(WsdlOption wsdlOption) throws MojoExecutionException {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
-
-        String wsdlLocation = wsdlOption.getWsdl();
-        File wsdlFile = new File(wsdlLocation);
         URI basedir = project.getBasedir().toURI();
-        URI wsdlURI = wsdlFile.exists() ? wsdlFile.toURI() : basedir.resolve(wsdlLocation);
+        URI wsdlURI = wsdlOption.getWsdlURI(basedir);
         File doneFile = getDoneFile(basedir, wsdlURI);
 
         if (!shouldRun(wsdlOption, doneFile, wsdlURI)) {
@@ -380,11 +396,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
         
         doneFile.delete();
-        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, 
-                                                           getLog().isDebugEnabled());
-        getLog().debug("Calling wsdl2java with args: " + list);
+        List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
+            .isDebugEnabled());
+        String[] args = (String[])list.toArray(new String[list.size()]);
+        getLog().debug("Calling wsdl2java with args: " + args);
         try {
-            new WSDLToJava((String[])list.toArray(new String[list.size()])).run(new ToolContext());
+            new WSDLToJava(args).run(new ToolContext());
         } catch (Throwable e) {
             getLog().debug(e);
             throw new MojoExecutionException(e.getMessage(), e);
