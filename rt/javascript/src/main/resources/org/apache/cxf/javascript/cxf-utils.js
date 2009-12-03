@@ -715,11 +715,14 @@ function org_apache_cxf_client_request(url, requestXML, method, sync, headers)
 		this.req.setRequestHeader("Content-Type", "text/xml;charset=utf-8");
 	}
 
-	if (headers) { // must be array indexed by header field.
-		for (var h in headers) {
-			this.req.setRequestHeader(h, headers[h]);
-		}
-	}
+    if (headers) { // must be array indexed by header field.
+        // avoid extra properties on the headers.
+        for (var h in headers) {
+            if(headers.hasOwnProperty(h)) {
+                this.req.setRequestHeader(h, headers[h]);
+            }
+        }
+    }	
 
 	this.req.setRequestHeader("SOAPAction", this.soapAction);
 	this.req.setRequestHeader("MessageType", this.messageType);
