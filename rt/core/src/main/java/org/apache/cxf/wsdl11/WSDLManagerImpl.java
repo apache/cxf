@@ -212,21 +212,26 @@ public class WSDLManagerImpl implements WSDLManager {
                                                                                 catLocator,
                                                                                 bus);
         InputSource src = wsdlLocator.getBaseInputSource();
-        Document doc;
-        try {
-            doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
-            if (src.getSystemId() != null) {
-                try {
-                    doc.setDocumentURI(new String(src.getSystemId()));
-                } catch (Exception e) {
-                    // ignore - probably not DOM level 3
+        Definition def = null;
+        if (src.getByteStream() != null || src.getCharacterStream() != null) {
+            Document doc;
+            try {
+                doc = StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
+                if (src.getSystemId() != null) {
+                    try {
+                        doc.setDocumentURI(new String(src.getSystemId()));
+                    } catch (Exception e) {
+                        //ignore - probably not DOM level 3
+                    }
                 }
+            } catch (Exception e) {
+                throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
             }
-        } catch (Exception e) {
-            throw new WSDLException(WSDLException.PARSER_ERROR, e.getMessage(), e);
+            def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
+        } else {
+            def = reader.readWSDL(wsdlLocator);
         }
         
-        Definition def = reader.readWSDL(wsdlLocator, doc.getDocumentElement());
         synchronized (definitionsMap) {
             definitionsMap.put(url, def);
         }
