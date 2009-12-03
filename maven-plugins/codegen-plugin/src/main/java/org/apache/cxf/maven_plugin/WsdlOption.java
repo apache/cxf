@@ -19,6 +19,10 @@
 
 package org.apache.cxf.maven_plugin;
 
+import java.io.File;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class WsdlOption extends Option {
 
@@ -26,7 +30,7 @@ public class WsdlOption extends Option {
      * The WSDL file to process.
      */
     String wsdl;
-    
+
     /**
      * Alternatively to the wsdl string an artifact can be specified
      */
@@ -48,6 +52,47 @@ public class WsdlOption extends Option {
         this.wsdlArtifact = wsdlArtifact;
     }
     
+    /**
+     * Try to find a file matching the wsdl path (either absolutely, relatively to the current dir or to
+     * the project base dir)
+     * 
+     * @return wsdl file
+     */
+    public File getWsdlFile(File baseDir) {
+        if (wsdl == null) {
+            return null;
+        }
+        File file = null;
+        try {
+            URI uri = new URI(wsdl);
+            if (uri.isAbsolute()) {
+                file = new File(uri);
+            }
+        } catch (Exception e) {
+            // ignore
+        }
+        if (file == null || !file.exists()) {
+            file = new File(wsdl);
+        }
+        if (!file.exists()) {
+            file = new File(baseDir, wsdl);
+        }
+        return file;
+    }
+
+    public boolean isDefServiceName() {
+        if (extraargs == null) {
+            return false;
+        }
+        for (int i = 0; i < extraargs.size(); i++) {
+            if ("-sn".equalsIgnoreCase(extraargs.get(i))) {
+                return true;
+            }
+        }
+        return false;
+
+    }
+
     public int hashCode() {
         if (wsdl != null) {
             return wsdl.hashCode();
@@ -59,11 +104,11 @@ public class WsdlOption extends Option {
         if (!(obj instanceof WsdlOption)) {
             return false;
         }
-        
-        WsdlOption t = (WsdlOption) obj;
+
+        WsdlOption t = (WsdlOption)obj;
         return t.getWsdl().equals(getWsdl());
     }
-    
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         builder.append("WSDL: ").append(wsdl).append('\n');
@@ -73,6 +118,74 @@ public class WsdlOption extends Option {
         builder.append("Packagenames: ").append(packagenames).append('\n');
         builder.append('\n');
         return builder.toString();
+    }
+
+    public List<String> generateCommandLine(File outputDirFile, URI basedir, URI wsdlURI, boolean debug) {
+        List<String> list = new ArrayList<String>();
+        addList(list, "-p", true, getPackagenames());
+        addList(list, "-nexclude", true, getNamespaceExcludes());
+        addIfNotNull(list, outputDirFile, "-d");
+        for (String binding : getBindingFiles()) {
+            File bindingFile = new File(binding);
+            URI bindingURI = bindingFile.exists() ? bindingFile.toURI() : basedir.resolve(binding);
+            list.add("-b");
+            list.add(bindingURI.toString());
+        }
+        addIfNotNull(list, getFrontEnd(), "-fe");
+        addIfNotNull(list, getDataBinding(), "-db");
+        addIfNotNull(list, getWsdlVersion(), "-wv");
+        addIfNotNull(list, getCatalog(), "-catalog");
+        if (isExtendedSoapHeaders()) {
+            list.add("-exsh");
+            list.add("true");
+        }
+        addIfTrue(list, isAllowElementRefs(), "-allowElementRefs");
+        addIfTrue(list, isValidateWsdl(), "-validate");
+        addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
+        addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
+        addIfNotNull(list, getServiceName(), "-sn");
+        addIfTrue(list, isAutoNameResolution(), "-autoNameResolution");
+        addIfTrue(list, isNoAddressBinding(), "-noAddressBinding");
+        addList(list, "-xjc", false, getXJCargs());
+        addList(list, "", false, getExtraargs());
+        if (isSetWsdlLocation()) {
+            list.add("-wsdlLocation");
+            list.add(getWsdlLocation() == null ? "" : getWsdlLocation());
+        }
+        addIfTrue(list, isWsdlList(), "-wsdlList");
+        addIfTrue(list, debug && !list.contains("-verbose"), "-verbose");
+        list.add(wsdlURI.toString());
+        return list;
+    }
+
+    private static void addIfTrue(List<String> list, boolean expression, String key) {
+        if (expression) {
+            list.add(key);
+        }
+    }
+
+    private static void addIfNotNull(List<String> list, Object value, String key) {
+        if (value != null) {
+            list.add(key);
+            list.add(value.toString());
+        }
+    }
+
+    private static void addList(List<String> destList, String key, boolean keyAsOwnElement,
+                                List<String> sourceList) {
+        if (sourceList == null) {
+            return;
+        }
+        for (String value : sourceList) {
+            if (keyAsOwnElement) {
+                destList.add(key);
+                destList.add(value);
+            } else {
+                // Maven makes empty tags into null
+                // instead of empty strings. so replace null by ""
+                destList.add(key + ((value == null) ? "" : value));
+            }
+        }
     }
 
 }
