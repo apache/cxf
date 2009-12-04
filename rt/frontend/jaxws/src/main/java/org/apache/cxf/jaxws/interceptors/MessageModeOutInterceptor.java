@@ -147,6 +147,9 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
     
     private void doSoap(Message message) {
         MessageContentsList list = (MessageContentsList)message.getContent(List.class);
+        if (list == null || list.isEmpty()) {
+            return;
+        }
         Object o = list.get(0);
         if (o instanceof SOAPMessage) {
             SOAPMessage soapMessage = (SOAPMessage)o;
