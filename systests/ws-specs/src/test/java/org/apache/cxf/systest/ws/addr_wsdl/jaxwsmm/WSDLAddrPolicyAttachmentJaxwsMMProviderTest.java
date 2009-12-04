@@ -91,8 +91,8 @@ public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClie
     private static void testInterceptors(Bus b) {
         boolean hasServerIn = false;
         boolean hasServerOut = false;
-        List<Interceptor<? extends Message>> inInterceptors = b.getInInterceptors();
-        for (Interceptor<? extends Message> i : inInterceptors) {
+        List<Interceptor> inInterceptors = b.getInInterceptors();
+        for (Interceptor i : inInterceptors) {
             if (i instanceof PolicyInInterceptor) {
                 hasServerIn = true;
             }
