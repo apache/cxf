@@ -1,0 +1,43 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:jee="http://www.springframework.org/schema/jee"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:http="http://cxf.apache.org/transports/http/configuration"
+	xmlns:jaxws="http://cxf.apache.org/jaxws"
+	xmlns:wsa="http://cxf.apache.org/ws/addressing"
+	xmlns:wsrm-mgr="http://cxf.apache.org/ws/rm/manager"
+	xmlns:camel-transport="http://cxf.apache.org/transports/camel"
+
+	xsi:schemaLocation="
+	    http://www.springframework.org/schema/beans
+	    http://www.springframework.org/schema/beans/spring-beans.xsd
+		http://www.springframework.org/schema/jee
+		http://www.springframework.org/schema/jee/spring-jee.xsd
+	    http://cxf.apache.org/core
+	    http://cxf.apache.org/schemas/core.xsd
+	    http://cxf.apache.org/transports/http/configuration
+	    http://cxf.apache.org/schemas/configuration/http-conf.xsd
+	    http://cxf.apache.org/jaxws
+		http://cxf.apache.org/schemas/jaxws.xsd
+	    http://cxf.apache.org/ws/addressing
+	    http://cxf.apache.org/schemas/ws-addr-conf.xsd
+	    http://cxf.apache.org/ws/rm/manager
+	    http://cxf.apache.org/schemas/configuration/wsrm-manager.xsd
+		http://cxf.apache.org/transports/camel
+		http://cxf.apache.org/transports/camel.xsd
+	">
+
+	<import resource="classpath:META-INF/cxf/cxf.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-xml.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-addr.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
+	<import resource="classpath:META-INF/cxf/cxf-extension-policy.xml" />
+
+	<jaxws:endpoint
+		id="asyncMessagingProvider"
+		implementor="org.apache.cxf.systest.ws.addr_wsdl.jaxwsmm.MessageProviderWithAddressingPolicy"
+		createdFromAPI="true"
+	/>
+</beans>
