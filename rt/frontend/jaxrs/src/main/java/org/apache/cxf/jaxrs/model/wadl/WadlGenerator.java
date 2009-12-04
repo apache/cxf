@@ -88,7 +88,7 @@ public class WadlGenerator implements RequestHandler {
 
     public static final String WADL_QUERY = "_wadl"; 
     public static final MediaType WADL_TYPE = MediaType.valueOf("application/vnd.sun.wadl+xml"); 
-    public static final String WADL_NS = "http://wadl.dev.java.net/2009/02";    
+    public static final String WADL_NS = "http://research.sun.com/wadl/2006/10";    
     
     private static final Logger LOG = LogUtils.getL7dLogger(WadlGenerator.class);
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
