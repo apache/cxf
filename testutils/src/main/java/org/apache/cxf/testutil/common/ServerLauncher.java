@@ -343,7 +343,7 @@ public class ServerLauncher {
         if (Boolean.getBoolean("java.awt.headless")) {
             cmd.add("-Djava.awt.headless=true");
         }
-        String vmargs = System.getProperty("surefire.fork.vmargs");
+        String vmargs = System.getProperty("server.launcher.vmargs");
         if (StringUtils.isEmpty(vmargs)) {
             cmd.add("-ea");
         } else {
