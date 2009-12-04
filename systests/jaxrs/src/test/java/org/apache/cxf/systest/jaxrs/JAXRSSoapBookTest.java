@@ -26,6 +26,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -174,6 +175,22 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         } catch (BookNotFoundFault ex) {
             assertEquals("No Book with id 356 is available", ex.getMessage());
         }
+    }
+    
+    @Test
+    public void testNoBook357WebClient() throws Exception {
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        Map<String, Object> properties = new HashMap<String, Object>();
+        properties.put("org.apache.cxf.http.throw_io_exceptions", Boolean.TRUE);
+        bean.setProperties(properties);
+        bean.setAddress("http://localhost:9092/test/services/rest/bookstore/356");
+        WebClient wc = bean.createWebClient();
+        Response response = wc.get();
+        assertEquals(404, response.getStatus());
+        String msg = IOUtils.readStringFromStream((InputStream)response.getEntity());
+        assertEquals("No Book with id 356 is available", msg);
+        
     }
     
     @Test

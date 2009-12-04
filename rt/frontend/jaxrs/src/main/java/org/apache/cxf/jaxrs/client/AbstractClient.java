@@ -371,7 +371,7 @@ public class AbstractClient implements Client {
 
         InputStream inputStream = (InputStream)r.getEntity();
         if (inputStream == null) {
-            return cls == Response.class ? cls : null;
+            return cls == Response.class ? r : null;
         }
         try {
             int status = conn.getResponseCode();
@@ -379,7 +379,7 @@ public class AbstractClient implements Client {
                 Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
                 if (length == null || Integer.parseInt(length.toString()) == 0
                     || status >= 400) {
-                    return cls == Response.class ? cls : null;
+                    return cls == Response.class ? r : cls == InputStream.class ? inputStream : null;
                 }
             }
         } catch (IOException ex) {
@@ -549,7 +549,6 @@ public class AbstractClient implements Client {
         m.put(Message.REQUEST_URI, currentURI.toString());
         
         m.put(Message.CONTENT_TYPE, headers.getFirst(HttpHeaders.CONTENT_TYPE));
-        
         
         Exchange exchange = new ExchangeImpl();
         exchange.setSynchronous(true);

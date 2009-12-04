@@ -41,6 +41,7 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyWriter;
+import javax.ws.rs.ext.Provider;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -48,6 +49,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 @Produces("text/html")
+@Provider
 public class RequestDispatcherProvider extends AbstractConfigurableProvider
     implements MessageBodyWriter<Object> {
     

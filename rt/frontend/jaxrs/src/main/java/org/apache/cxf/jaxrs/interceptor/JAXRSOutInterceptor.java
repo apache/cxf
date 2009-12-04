@@ -232,10 +232,19 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             LOG.fine("Response content type is: " + responseType.toString());
             message.put(Message.CONTENT_TYPE, responseType.toString());
             
+            Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
+            
+            long size = writer.getSize(entity, targetType, genericType, annotations, responseType);
+            if (size > 0) {
+                LOG.fine("Setting ContentLength to " + size + " as requested by " 
+                         + writer.getClass().getName());
+                responseHeaders.putSingle(HttpHeaders.CONTENT_LENGTH, Long.toString(size));
+            }
+            
             LOG.fine("Response EntityProvider is: " + writer.getClass().getName());
             try {
                 writer.writeTo(entity, targetType, genericType, 
-                               invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
+                               annotations, 
                                responseType, 
                                responseHeaders, 
                                message.getContent(OutputStream.class));

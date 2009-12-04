@@ -29,6 +29,7 @@ import javax.jws.WebMethod;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 import javax.xml.ws.WebServiceContext;
@@ -85,9 +86,13 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
                 details.setId(id);
                 throw new BookNotFoundFault(details);
             }
-            Response r = Response.status(returnCode).header("BOOK-HEADER", 
-                "No Book with id " + id + " is available").build();
-            throw new WebApplicationException(r);
+            String msg = "No Book with id " + id + " is available";
+            ResponseBuilder builder = Response.status(returnCode).header("BOOK-HEADER", msg);
+            
+            if (returnCode == 404) {
+                builder.type("text/plain").entity(msg);
+            }
+            throw new WebApplicationException(builder.build());
         }
         
         if (!invocationInProcess) {

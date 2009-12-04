@@ -302,7 +302,7 @@ public class WebClient extends AbstractClient {
      * @param memberClass expected type of collection member class
      * @return typed collection
      */
-    public <T> Collection<T> invokeAndGetCollection(String httpMethod, Object body, 
+    public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
                                                     Class<T> memberClass) {
         
         Response r = doInvoke(httpMethod, body, Collection.class, memberClass);
