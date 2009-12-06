@@ -104,7 +104,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
     }
 
 
-    //@Test
+    @Test
     public void testOverriddenSequentialStrategy() throws Exception {
         startTarget(REPLICA_C);
         setupGreeterA();
@@ -117,7 +117,7 @@ public class FailoverAddressOverrideTest extends AbstractBusClientServerTestBase
         stopTarget(REPLICA_C);
     }
     
-    //@Test
+    @Test
     public void testOverriddenRandomStrategy() throws Exception {
         startTarget(REPLICA_B);
         setupGreeterC();
