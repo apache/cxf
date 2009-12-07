@@ -57,7 +57,7 @@
         <msv.version>2009.1</msv.version>
         <rhino.version>1.7R1</rhino.version>
         <saaj.version>1.3</saaj.version>
-        <spring.version>2.5.5</spring.version>
+        <spring.version>2.5.6</spring.version>
         <spring.mock>spring-test</spring.mock>
         <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
         <stax.impl.artifactId>wstx-asl</stax.impl.artifactId>
