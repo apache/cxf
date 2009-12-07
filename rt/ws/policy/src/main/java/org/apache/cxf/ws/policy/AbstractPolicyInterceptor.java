@@ -67,7 +67,7 @@ public abstract class AbstractPolicyInterceptor extends AbstractPhaseInterceptor
     
     protected BindingFaultInfo getBindingFaultInfo(Message msg, Exception ex, BindingOperationInfo boi) {
         BindingFaultInfo bfi = msg.get(BindingFaultInfo.class);        
-        if (null == bfi) {
+        if (null == bfi && ex != null) {
             Throwable cause = ex.getCause();
             if (null == cause) {
                 return null;
