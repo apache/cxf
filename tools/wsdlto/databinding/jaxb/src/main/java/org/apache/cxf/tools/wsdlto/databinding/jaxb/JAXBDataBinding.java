@@ -99,6 +99,7 @@ public class JAXBDataBinding implements DataBindingProfile {
 
     public class LocationFilterReader extends StreamReaderDelegate implements XMLStreamReader {
         boolean isImport;
+        boolean isInclude;
         int locIdx = -1;
         LocationFilterReader(XMLStreamReader read) {
             super(read);
@@ -108,6 +109,10 @@ public class JAXBDataBinding implements DataBindingProfile {
             int i = super.next();
             if (i == XMLStreamReader.START_ELEMENT) {
                 QName qn = super.getName();
+                isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
+                if (isInclude) {
+                    return nextTag();
+                }
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
@@ -124,7 +129,13 @@ public class JAXBDataBinding implements DataBindingProfile {
         public int nextTag() throws XMLStreamException {
             int i = super.nextTag();
             if (i == XMLStreamReader.START_ELEMENT) {
-                isImport = super.getName().equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
+                QName qn = super.getName();
+                isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
+                if (isInclude) {
+                    return super.nextTag();
+                }
+
+                isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
                 } else {
@@ -145,10 +156,6 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
             }
         }
-        public String getAttributeValue(String namespaceURI, String localName) {
-            return super.getAttributeValue(namespaceURI, localName);
-        }
-    
         public int getAttributeCount() {
             int i = super.getAttributeCount();
             if (locIdx != -1) {
@@ -163,7 +170,22 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
             return index;
         }
-    
+        public String getAttributeValue(String namespaceURI, String localName) {
+            if (isInclude && "schemaLocation".equals(localName)) {
+                return null;
+            }
+            return super.getAttributeValue(namespaceURI, localName);
+        }
+        public String getAttributeValue(int index) {
+            if (isInclude) {
+                String n = getAttributeLocalName(index);
+                if ("schemaLocation".equals(n)) {
+                    return null;
+                }
+            }
+            return super.getAttributeValue(mapIdx(index));
+        }
+
         public QName getAttributeName(int index) {
             return super.getAttributeName(mapIdx(index));
         }
@@ -184,16 +206,10 @@ public class JAXBDataBinding implements DataBindingProfile {
             return super.getAttributeType(mapIdx(index));
         }
     
-        public String getAttributeValue(int index) {
-            return super.getAttributeValue(mapIdx(index));
-        }
     
         public boolean isAttributeSpecified(int index) {
             return super.isAttributeSpecified(mapIdx(index));
         }
-
-        
-
     }
 
 
@@ -378,7 +394,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 continue;
             }
             
-            if (!key.startsWith("file:")) {
+            if (!key.startsWith("file:") && !key.startsWith("jar:")) {
                 XmlSchemaSerializer xser = new XmlSchemaSerializer();
                 xser.setExtReg(schemaCollection.getExtReg());
                 Document[] docs;
@@ -393,21 +409,25 @@ public class JAXBDataBinding implements DataBindingProfile {
                     String uri = null;
                     try {
                         uri = docs[0].getDocumentURI();
-                    } catch (Exception ex) {
+                    } catch (Throwable ex) {
                         //ignore - DOM level 3
                     }
                     validateSchema(ele, uri);
                 }           
+                try {
+                    docs[0].setDocumentURI(key);
+                } catch (Throwable t) {
+                    //ignore - DOM level 3
+                }
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
                 is.setSystemId(key);
                 is.setPublicId(key);
                 opts.addGrammar(is);
                 try {
-                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele));
+                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele, key));
                 } catch (XMLStreamException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new ToolException(e);
                 }
             }
         }
@@ -419,10 +439,15 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (ids.contains(key)) {
                 continue;
             }
-            if (key.startsWith("file:")) {
+            if (key.startsWith("file:") || key.startsWith("jar:")) {
+                InputStream in = null;
                 try {
-                    FileInputStream fin = new FileInputStream(new File(new URI(key)));
-                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, fin);
+                    if (key.startsWith("file:")) {
+                        in = new FileInputStream(new File(new URI(key)));
+                    } else {
+                        in = new URL(key).openStream();
+                    }
+                    XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, in);
                     reader = new LocationFilterReader(reader);
                     InputSource is = new InputSource(key);
                     opts.addGrammar(is);
@@ -432,6 +457,14 @@ public class JAXBDataBinding implements DataBindingProfile {
                     throw ex;
                 } catch (Exception ex) {
                     throw new RuntimeException(ex);
+                } finally {
+                    if (in != null) {
+                        try {
+                            in.close();
+                        } catch (IOException e) {
+                            //ignore
+                        }
+                    }
                 }
             }
         }
@@ -454,7 +487,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 is.setPublicId(key);
                 opts.addGrammar(is);
                 try {
-                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele));
+                    schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele, key));
                 } catch (XMLStreamException e) {
                     // TODO Auto-generated catch block
                     e.printStackTrace();
@@ -587,21 +620,34 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private Element removeImportElement(Element element) {
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+        List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                                      ToolConstants.SCHEMA_URI, 
                                                                      "import");
-        if (elemList.size() == 0) {
+        List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                                     ToolConstants.SCHEMA_URI, 
+                                                                     "include");
+        if (impElemList.size() == 0 && incElemList.size() == 0) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+        List<Node> ns = new ArrayList<Node>();
+        
+        impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                        ToolConstants.SCHEMA_URI, 
                                                        "import");
-        List<Node> ns = new ArrayList<Node>();
-        for (Element elem : elemList) {
+        for (Element elem : impElemList) {
             Node importNode = elem;
             ns.add(importNode);
         }
+        incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                       ToolConstants.SCHEMA_URI, 
+                                                       "include");
+        for (Element elem : incElemList) {
+            Node importNode = elem;
+            ns.add(importNode);
+        }
+        
+        
         for (Node item : ns) {
             Node schemaNode = item.getParentNode();
             schemaNode.removeChild(item);
