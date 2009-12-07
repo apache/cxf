@@ -1034,6 +1034,13 @@ public final class StaxUtils {
     public static XMLStreamReader createXMLStreamReader(Document doc) {
         return new W3CDOMStreamReader(doc.getDocumentElement());
     }
+    public static XMLStreamReader createXMLStreamReader(Element el, String sysId) {
+        return new W3CDOMStreamReader(el, sysId);
+    }
+    public static XMLStreamReader createXMLStreamReader(Document doc, String sysId) {
+        return new W3CDOMStreamReader(doc.getDocumentElement(), sysId);
+    }
+    
     public static XMLStreamReader createXMLStreamReader(Source source) {
         try {
             if (source instanceof DOMSource) {
