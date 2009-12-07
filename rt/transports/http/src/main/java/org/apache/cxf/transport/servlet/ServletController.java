@@ -217,7 +217,11 @@ public class ServletController extends AbstractServletController {
                                        + request.getRequestURI() + "/?stylesheet=1\">");            
         }
         response.getWriter().write("<meta http-equiv=content-type content=\"text/html; charset=UTF-8\">");
-        response.getWriter().write("<title>CXF - Service list</title>");
+        if (title != null) {
+            response.getWriter().write("<title>" + title + "</title>");
+        } else {
+            response.getWriter().write("<title>CXF - Service list</title>");
+        }
         response.getWriter().write("</head><body>");
         
         List<ServletDestination> destinations = getServletDestinations();
