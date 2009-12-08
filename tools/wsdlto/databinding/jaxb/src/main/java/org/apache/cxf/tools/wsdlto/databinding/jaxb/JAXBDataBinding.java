@@ -83,8 +83,8 @@ import org.apache.cxf.tools.wsdlto.core.DefaultValueProvider;
 import org.apache.cxf.tools.wsdlto.core.RandomValueProvider;
 
 
-
 public class JAXBDataBinding implements DataBindingProfile {
+
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
     
     private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<String>();
@@ -376,21 +376,34 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private Element removeImportElement(Element element) {
-        List<Element> elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+        List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                                      ToolConstants.SCHEMA_URI, 
                                                                      "import");
-        if (elemList.size() == 0) {
+        List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                                     ToolConstants.SCHEMA_URI, 
+                                                                     "include");
+        if (impElemList.size() == 0 && incElemList.size() == 0) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
-        elemList = DOMUtils.findAllElementsByTagNameNS(element, 
+        List<Node> ns = new ArrayList<Node>();
+        
+        impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                        ToolConstants.SCHEMA_URI, 
                                                        "import");
-        List<Node> ns = new ArrayList<Node>();
-        for (Element elem : elemList) {
+        for (Element elem : impElemList) {
             Node importNode = elem;
             ns.add(importNode);
         }
+        incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
+                                                       ToolConstants.SCHEMA_URI, 
+                                                       "include");
+        for (Element elem : incElemList) {
+            Node importNode = elem;
+            ns.add(importNode);
+        }
+        
+        
         for (Node item : ns) {
             Node schemaNode = item.getParentNode();
             schemaNode.removeChild(item);
