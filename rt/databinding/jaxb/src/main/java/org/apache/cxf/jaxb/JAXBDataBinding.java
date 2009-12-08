@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -826,11 +828,23 @@ public class JAXBDataBinding extends AbstractDataBinding
             if (setMethod != null
                 && JAXBElement.class.isAssignableFrom(setMethod.getParameterTypes()[0])) {
                 
+                Type t = setMethod.getGenericParameterTypes()[0];
+                Class<?> pcls = null;
+                if (t instanceof ParameterizedType) {
+                    t = ((ParameterizedType)t).getActualTypeArguments()[0];
+                }
+                if (t instanceof Class) {
+                    pcls = (Class)t;
+                }
+                
                 String methodName = "create" + wrapperType.getSimpleName()
                     + setMethod.getName().substring(3);
 
                 for (Method m : allOFMethods) {
-                    if (m.getName().equals(methodName)) {
+                    if (m.getName().equals(methodName)
+                        && m.getParameterTypes().length == 1
+                        && (pcls == null
+                            || pcls.equals(m.getParameterTypes()[0]))) {
                         jaxbMethods.add(m);
                     }
                 }
