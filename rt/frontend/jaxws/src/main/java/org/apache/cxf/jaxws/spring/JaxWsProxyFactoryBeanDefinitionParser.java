@@ -56,6 +56,8 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
     public static class JAXWSSpringClientProxyFactoryBean extends JaxWsProxyFactoryBean
         implements ApplicationContextAware, FactoryBean {
 
+        private Object obj;
+
         public JAXWSSpringClientProxyFactoryBean() {
             super();
         }
@@ -70,14 +72,17 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
                 setBus(bus);
             }
         }
-        public Object getObject() throws Exception {
-            return create();
+        public synchronized Object getObject() throws Exception {
+            if (obj == null) {
+                obj = create();
+            }
+            return obj;
         }
         public Class getObjectType() {
             return this.getServiceClass();
         }
         public boolean isSingleton() {
-            return false;
+            return true;
         }
     }
 }

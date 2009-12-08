@@ -309,7 +309,10 @@ public class SpringBeansTest extends Assert {
         assertNotNull(bean);
 
         Greeter greeter = (Greeter) ctx.getBean("client1");
+        Greeter greeter2 = (Greeter) ctx.getBean("client1");
         assertNotNull(greeter);
+        assertNotNull(greeter2);
+        assertSame(greeter, greeter2);
 
         Client client = ClientProxy.getClient(greeter);
         assertNotNull("expected ConduitSelector", client.getConduitSelector());
