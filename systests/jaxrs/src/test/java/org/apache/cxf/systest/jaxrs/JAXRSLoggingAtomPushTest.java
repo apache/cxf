@@ -66,14 +66,12 @@ public class JAXRSLoggingAtomPushTest {
     public static class Resource {
         @POST
         public void consume(Feed feed) {
-            System.out.println(feed);
             feeds.add(feed);
         }
 
         @POST
         @Path("/atomPub")
         public void consume(Entry entry) {
-            System.out.println(entry);
             entries.add(entry);
         }
     }
