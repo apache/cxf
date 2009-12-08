@@ -217,7 +217,6 @@ public class SchemaJavascriptBuilder {
                                   final String elementPrefix, 
                                   String typeObjectName, 
                                   ItemInfo itemInfo) {
-
             
         String accessorSuffix = StringUtils.capitalize(itemInfo.getJavascriptName());
 
@@ -274,6 +273,7 @@ public class SchemaJavascriptBuilder {
             // application code is responsible for this.
             utils.appendLine("this._" + itemInfo.getJavascriptName() + " = null;");
         } else {
+
             if (itemInfo.getDefaultValue() == null) {
                 itemInfo.setDefaultValue(utils.getDefaultValueForSimpleType(itemInfo.getType()));
             }

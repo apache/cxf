@@ -189,7 +189,15 @@ public final class ParticleInfo implements ItemInfo {
             // with elements with identical local names and different
             // namespaces.
             elementInfo.javascriptName = elementQName.getLocalPart();
-            elementInfo.defaultValue = element.getDefaultValue();
+            String schemaDefaultValue = element.getDefaultValue();
+            /*
+             * Schema default values are carried as strings. 
+             * In javascript, for actual strings, we need quotes, but not for
+             * numbers. The following is a trick.
+             */
+            schemaDefaultValue = protectDefaultValue(schemaDefaultValue);
+
+            elementInfo.defaultValue = schemaDefaultValue;
             factorySetupType(element, schemaCollection, elementInfo);
         } else { // any
             elementInfo.any = true;
@@ -199,6 +207,40 @@ public final class ParticleInfo implements ItemInfo {
             elementInfo.type = null; // runtime for any.
 
         }
+    }
+
+    private static String protectDefaultValue(String schemaDefaultValue) {
+        if (schemaDefaultValue == null) {
+            return null;
+        }
+        boolean leaveAlone = false;
+        try {
+            Long.parseLong(schemaDefaultValue);
+            leaveAlone = true;
+        } catch (NumberFormatException nfe) {
+            try {
+                Double.parseDouble(schemaDefaultValue);
+                leaveAlone = true;
+            } catch (NumberFormatException nfe2) {
+                //
+            }
+        }
+        if (!leaveAlone) {
+            StringBuilder builder = new StringBuilder();
+            builder.append("'");
+            for (char c : schemaDefaultValue.toCharArray()) {
+                if (c == '\'') {
+                    builder.append("\\'");
+                } else if (c == '\\') {
+                    builder.append("\\\\");
+                } else {
+                    builder.append(c);
+                }
+            }
+            builder.append('\'');
+            schemaDefaultValue = builder.toString(); 
+        }
+        return schemaDefaultValue;
     }
 
     private static void factorySetupType(XmlSchemaElement element, SchemaCollection schemaCollection,
@@ -349,5 +391,10 @@ public final class ParticleInfo implements ItemInfo {
      */
     public boolean isGlobal() {
         return global;
+    }
+
+    @Override
+    public String toString() {
+        return "ItemInfo: " + javascriptName;
     }
 }
