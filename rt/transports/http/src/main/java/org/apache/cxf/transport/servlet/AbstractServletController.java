@@ -31,6 +31,7 @@ public abstract class AbstractServletController {
     protected boolean disableAddressUpdates;
     protected String forcedBaseAddress;
     protected String serviceListStyleSheet;
+    protected String title;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
     
     protected AbstractServletController() {
@@ -58,6 +59,9 @@ public abstract class AbstractServletController {
     public void setServiceListStyleSheet(String serviceListStyleSheet) {
         this.serviceListStyleSheet = serviceListStyleSheet;
     }
+    public void setTitle(String t) {
+        title = t;
+    }
     
     private void init(ServletConfig servletConfig) {
         if (servletConfig == null) {
@@ -83,6 +87,10 @@ public abstract class AbstractServletController {
         String serviceListPath = servletConfig.getInitParameter("service-list-path");
         if (serviceListPath != null) {
             serviceListRelativePath = serviceListPath;
+        }
+        String configTitle = servletConfig.getInitParameter("service-list-title");
+        if (configTitle != null) {
+            title = configTitle;
         }
     }
     
