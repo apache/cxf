@@ -87,7 +87,6 @@ public class PolicyVerificationInFaultInterceptor extends AbstractPolicyIntercep
         if (null == ex) {
             ex = exchange.get(Exception.class);
         }
-        assert null != ex;
         
         BindingFaultInfo bfi = getBindingFaultInfo(message, ex, boi);
         if (null == bfi) {
