@@ -44,6 +44,7 @@ import org.apache.cxf.databinding.DataReader;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
@@ -58,6 +59,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamReader;
  * @author Dan Diephouse
  */
 public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
+    public static final String DISABLE_FAULT_MAPPING = "disable-fault-mapping";
     private static final Logger LOG = LogUtils.getLogger(ClientFaultConverter.class);
 
     public ClientFaultConverter() {
@@ -70,7 +72,10 @@ public class ClientFaultConverter extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message msg) {
         Fault fault = (Fault) msg.getContent(Exception.class);
 
-        if (fault.getDetail() != null) {
+        if (fault.getDetail() != null 
+            && !MessageUtils.getContextualBoolean(msg,
+                                                 DISABLE_FAULT_MAPPING,
+                                                 false)) {
             processFaultDetail(fault, msg);
             setStackTrace(fault, msg);
         }
