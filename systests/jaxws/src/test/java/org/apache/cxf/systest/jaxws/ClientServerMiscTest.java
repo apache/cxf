@@ -49,12 +49,15 @@ import org.apache.cxf.anonymous_complex_type.RefSplitNameResponse;
 import org.apache.cxf.anonymous_complex_type.SplitName;
 import org.apache.cxf.anonymous_complex_type.SplitNameResponse.Names;
 import org.apache.cxf.binding.soap.Soap11;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.util.ASMHelper;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest_Service;
+import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder_Service;
@@ -715,5 +718,27 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                 + "/xs:element[@nillable='true']",
                                 doc, XPathConstants.NODE);
         assertNotNull(ct);
+    }
+    
+    @Test
+    public void testDynamicClientExceptions() throws Exception {
+        JaxWsDynamicClientFactory dcf = 
+            JaxWsDynamicClientFactory.newInstance();
+        URL wsdlURL = new URL(ServerMisc.DOCLIT_CODEFIRST_URL + "?wsdl");
+        Client client = dcf.createClient(wsdlURL);
+        try {
+            client.invoke("throwException", -2);
+        } catch (Exception ex) {
+            Object o = ex.getClass().getMethod("getFaultInfo").invoke(ex);
+            assertNotNull(o);
+        }
+        
+        try {
+            client.getRequestContext().put("disable-fault-mapping", true);
+            client.invoke("throwException", -2);
+        } catch (SoapFault ex) {
+            //expected
+        }
+       
     }
 }
