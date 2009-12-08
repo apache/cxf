@@ -152,9 +152,9 @@ public class JAXRSAtomBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBooksWithCustomProvider() throws Exception {
         String endpointAddress =
-            "http://localhost:9081/bookstore/bookstore4/books/feed"; 
+            "http://localhost:9080/bookstore/bookstore4/books/feed"; 
         Feed feed = getFeed(endpointAddress, null);
-        assertEquals("http://localhost:9081/bookstore/bookstore4/books/feed", 
+        assertEquals("http://localhost:9080/bookstore/bookstore4/books/feed", 
                      feed.getBaseUri().toString());
         assertEquals("Collection of Books", feed.getTitle());
     }
