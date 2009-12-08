@@ -45,6 +45,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.SchemaFactory;
 
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -70,6 +71,8 @@ import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -101,8 +104,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         boolean isImport;
         boolean isInclude;
         int locIdx = -1;
-        LocationFilterReader(XMLStreamReader read) {
+        OASISCatalogManager catalog;
+        
+        LocationFilterReader(XMLStreamReader read, OASISCatalogManager catalog) {
             super(read);
+            this.catalog = catalog;
         }
 
         public int next() throws XMLStreamException {
@@ -110,9 +116,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (i == XMLStreamReader.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
-                if (isInclude) {
-                    return nextTag();
-                }
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
@@ -131,10 +134,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (i == XMLStreamReader.START_ELEMENT) {
                 QName qn = super.getName();
                 isInclude = qn.equals(WSDLConstants.QNAME_SCHEMA_INCLUDE);
-                if (isInclude) {
-                    return super.nextTag();
-                }
-
                 isImport = qn.equals(WSDLConstants.QNAME_SCHEMA_IMPORT);
                 if (isImport) {
                     findLocation();
@@ -170,9 +169,14 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
             return index;
         }
+        
+        private String mapSchemaLocation(String target) {
+            return JAXBDataBinding.mapSchemaLocation(target, this.getLocation().getSystemId(), catalog);
+        }
+        
         public String getAttributeValue(String namespaceURI, String localName) {
             if (isInclude && "schemaLocation".equals(localName)) {
-                return null;
+                return mapSchemaLocation(super.getAttributeValue(namespaceURI, localName));
             }
             return super.getAttributeValue(namespaceURI, localName);
         }
@@ -180,7 +184,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (isInclude) {
                 String n = getAttributeLocalName(index);
                 if ("schemaLocation".equals(n)) {
-                    return null;
+                    return mapSchemaLocation(super.getAttributeValue(index));
                 }
             }
             return super.getAttributeValue(mapIdx(index));
@@ -385,6 +389,8 @@ public class JAXBDataBinding implements DataBindingProfile {
                 ids.add(key);
             }
         }
+        Bus bus = context.get(Bus.class);
+        OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
             if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
                 continue;
@@ -393,7 +399,6 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (ids.contains(key)) {
                 continue;
             }
-            
             if (!key.startsWith("file:") && !key.startsWith("jar:")) {
                 XmlSchemaSerializer xser = new XmlSchemaSerializer();
                 xser.setExtReg(schemaCollection.getExtReg());
@@ -404,7 +409,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     throw new RuntimeException(e);
                 }
                 Element ele = docs[0].getDocumentElement();
-                ele = removeImportElement(ele);
+                ele = removeImportElement(ele, key, catalog);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                     String uri = null;
                     try {
@@ -447,8 +452,9 @@ public class JAXBDataBinding implements DataBindingProfile {
                     } else {
                         in = new URL(key).openStream();
                     }
+                    
                     XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, in);
-                    reader = new LocationFilterReader(reader);
+                    reader = new LocationFilterReader(reader, catalog);
                     InputSource is = new InputSource(key);
                     opts.addGrammar(is);
                     schemaCompiler.parseSchema(key, reader);
@@ -477,7 +483,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 }
                 ids.add(key);
                 Element ele = sci.getElement();
-                ele = removeImportElement(ele);
+                ele = removeImportElement(ele, key, catalog);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                     validateSchema(ele, sci.getSystemId());
                 }           
@@ -619,7 +625,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         return null;
     }
 
-    private Element removeImportElement(Element element) {
+    private Element removeImportElement(Element element, String sysId, OASISCatalogManager catalog) {
         List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                                      ToolConstants.SCHEMA_URI, 
                                                                      "import");
@@ -639,18 +645,17 @@ public class JAXBDataBinding implements DataBindingProfile {
             Node importNode = elem;
             ns.add(importNode);
         }
+        for (Node item : ns) {
+            Node schemaNode = item.getParentNode();
+            schemaNode.removeChild(item);
+        }
+        
         incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                        ToolConstants.SCHEMA_URI, 
                                                        "include");
         for (Element elem : incElemList) {
-            Node importNode = elem;
-            ns.add(importNode);
-        }
-        
-        
-        for (Node item : ns) {
-            Node schemaNode = item.getParentNode();
-            schemaNode.removeChild(item);
+            Attr val = elem.getAttributeNode("schemaLocation");
+            val.setNodeValue(mapSchemaLocation(val.getNodeValue(), sysId, catalog));
         }
         return element;
     }
@@ -985,6 +990,35 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
     }
-
+    private static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
+        if (catalog != null) {
+            try {
+                String resolvedLocation = catalog.resolveSystem(target);
+                
+                if (resolvedLocation == null) {
+                    resolvedLocation = catalog.resolveURI(target);
+                }
+                if (resolvedLocation == null) {
+                    resolvedLocation = catalog.resolvePublic(target, base);
+                }
+                if (resolvedLocation != null) {
+                    return resolvedLocation;
+                }
+                
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+        try {
+            //JAXB xjc cannot properly do this for "jar" URL's so we'll go ahead and do
+            //the resolving ourselves.
+            URL url = new URL(base);
+            url = new URL(url, target);
+            return url.toString();            
+        } catch (Exception ex) {
+            //ignore
+        }
+        return target;
+    }
 
 }
