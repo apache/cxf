@@ -37,6 +37,7 @@
         <surefire.format>brief</surefire.format>
         <surefire.usefile>false</surefire.usefile>
         <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
+        <server.launcher.vmargs>-ea</server.launcher.vmargs>
         <surefire.extra.sysprop.name1>None</surefire.extra.sysprop.name1>
         <surefire.extra.sysprop.value1>None</surefire.extra.sysprop.value1>
         <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
@@ -294,8 +295,8 @@
                                 <value>${spring.validation.mode}</value>
                             </property>
                             <property>
-                                <name>surefire.fork.vmargs</name>
-                                <value>${surefire.fork.vmargs}</value>
+                                <name>server.launcher.vmargs</name>
+                                <value>${server.launcher.vmargs}</value>
                             </property>
                             <property>
                                 <name>${extra.surefire.syspropery.name}</name>
