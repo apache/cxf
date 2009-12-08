@@ -105,7 +105,7 @@ public class CounterRepository {
                 im.register(counter);
             } catch (JMException e) {
                 LOG.log(Level.WARNING, "INSTRUMENTATION_REGISTER_FAULT_MSG",
-                        new Object[]{e});
+                        new Object[]{on, e});
             }
         }    
         return counter;
