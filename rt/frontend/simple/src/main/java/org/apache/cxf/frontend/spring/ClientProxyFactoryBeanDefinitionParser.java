@@ -93,6 +93,8 @@ public class ClientProxyFactoryBeanDefinitionParser
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
         implements ApplicationContextAware, FactoryBean {
 
+        private Object obj;
+        
         public SpringClientProxyFactoryBean() {
             super();
         }
@@ -107,14 +109,17 @@ public class ClientProxyFactoryBeanDefinitionParser
                 setBus(bus);
             }
         }
-        public Object getObject() throws Exception {
-            return create();
+        public synchronized Object getObject() throws Exception {
+            if (obj == null) {
+                obj = create();
+            }
+            return obj;
         }
         public Class getObjectType() {
             return this.getServiceClass();
         }
         public boolean isSingleton() {
-            return false;
+            return true;
         }
     }
 }
