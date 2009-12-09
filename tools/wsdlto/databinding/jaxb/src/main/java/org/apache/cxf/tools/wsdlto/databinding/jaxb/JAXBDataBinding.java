@@ -40,6 +40,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.SchemaFactory;
 
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -65,7 +66,8 @@ import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
 
-
+import org.apache.cxf.Bus;
+import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -242,7 +244,9 @@ public class JAXBDataBinding implements DataBindingProfile {
                             Map<String, Element> schemaLists) {
         for (String key : schemaLists.keySet()) {
             Element ele = schemaLists.get(key);
-            ele = removeImportElement(ele);
+            Bus bus = context.get(Bus.class);
+            OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
+            ele = removeImportElement(ele, key, catalog);
             if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                 validateSchema(ele);
             }           
@@ -375,7 +379,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         return null;
     }
 
-    private Element removeImportElement(Element element) {
+    private Element removeImportElement(Element element, String sysId, OASISCatalogManager catalog) {
         List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                                      ToolConstants.SCHEMA_URI, 
                                                                      "import");
@@ -395,18 +399,17 @@ public class JAXBDataBinding implements DataBindingProfile {
             Node importNode = elem;
             ns.add(importNode);
         }
+        for (Node item : ns) {
+            Node schemaNode = item.getParentNode();
+            schemaNode.removeChild(item);
+        }
+        
         incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                        ToolConstants.SCHEMA_URI, 
                                                        "include");
         for (Element elem : incElemList) {
-            Node importNode = elem;
-            ns.add(importNode);
-        }
-        
-        
-        for (Node item : ns) {
-            Node schemaNode = item.getParentNode();
-            schemaNode.removeChild(item);
+            Attr val = elem.getAttributeNode("schemaLocation");
+            val.setNodeValue(mapSchemaLocation(val.getNodeValue(), sysId, catalog));
         }
         return element;
     }
@@ -741,6 +744,35 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
     }
-
+    private static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
+        if (catalog != null) {
+            try {
+                String resolvedLocation = catalog.getCatalog().resolveSystem(target);
+                
+                if (resolvedLocation == null) {
+                    resolvedLocation = catalog.getCatalog().resolveURI(target);
+                }
+                if (resolvedLocation == null) {
+                    resolvedLocation = catalog.getCatalog().resolvePublic(target, base);
+                }
+                if (resolvedLocation != null) {
+                    return resolvedLocation;
+                }
+                
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+        try {
+            //JAXB xjc cannot properly do this for "jar" URL's so we'll go ahead and do
+            //the resolving ourselves.
+            URL url = new URL(base);
+            url = new URL(url, target);
+            return url.toString();            
+        } catch (Exception ex) {
+            //ignore
+        }
+        return target;
+    }
 
 }
