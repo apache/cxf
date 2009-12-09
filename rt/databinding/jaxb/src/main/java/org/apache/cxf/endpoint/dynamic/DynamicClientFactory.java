@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -589,6 +590,16 @@ public class DynamicClientFactory {
                             }                         
                         }     
                     }
+                }
+            } else if (tcl.getClass().getName().contains("weblogic")) {
+                // CXF-2549: Wrong classpath for dynamic client compilation in Weblogic
+                try {
+                    Method method = tcl.getClass().getMethod("getClassPath");
+                    Object weblogicClassPath = method.invoke(tcl);
+                    classPath.append(weblogicClassPath)
+                        .append(System.getProperty("path.separator")); 
+                } catch (Exception e) {
+                    LOG.log(Level.FINE, "unsuccessfully tried getClassPath method", e);
                 }
             }
             tcl = tcl.getParent();
