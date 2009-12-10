@@ -77,22 +77,22 @@ public final class FormUtils {
             for (String part : parts) {
                 String[] keyValue = part.split("=");
                 // Change to add blank string if key but not value is specified
+                String name = HttpUtils.urlDecode(keyValue[0]);
                 if (keyValue.length == 2) {
                     if (decode) {
-                        params.add(keyValue[0], 
-                            HttpUtils.urlDecode(keyValue[1]));
+                        params.add(name, HttpUtils.urlDecode(keyValue[1]));
                     } else {
-                        params.add(keyValue[0], keyValue[1]);
+                        params.add(name, keyValue[1]);
                     }
                 } else {
-                    params.add(keyValue[0], "");
+                    params.add(name, "");
                 }
             }
         } else if (request != null) {
             for (Enumeration en = request.getParameterNames(); en.hasMoreElements();) {
                 String paramName = en.nextElement().toString();
                 String[] values = request.getParameterValues(paramName);
-                params.put(paramName, Arrays.asList(values));
+                params.put(HttpUtils.urlDecode(paramName), Arrays.asList(values));
             }
         }
     }
@@ -110,7 +110,8 @@ public final class FormUtils {
             String name = cd.getParameter("name").replace("\"", "").replace("'", "");
             try {
                 String value = IOUtils.toString(a.getDataHandler().getInputStream());
-                params.add(name, decode ? HttpUtils.urlDecode(value) : value);
+                params.add(HttpUtils.urlDecode(name),
+                           decode ? HttpUtils.urlDecode(value) : value);
             } catch (IOException ex) {
                 throw new WebApplicationException(415);
             }
