@@ -63,6 +63,7 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Destination;
@@ -2132,9 +2133,11 @@ public class HTTPConduit
             }
         
             
-            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND) {
+            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND
+                && !MessageUtils.isTrue(outMessage.getContextualProperty(
+                    "org.apache.cxf.http.no_io_exceptions"))) {
                 throw new IOException("HTTP response '" + responseCode + ": " 
-                        + connection.getResponseMessage() + "'");
+                    + connection.getResponseMessage() + "'");
             }
 
             
@@ -2190,12 +2193,13 @@ public class HTTPConduit
                 List<String> cookies = connection.getHeaderFields().get("Set-Cookie");
                 Cookie.handleSetCookie(sessionCookies, cookies);
             }
-
-            in = in == null
-                 ? connection.getErrorStream() == null
-                   ? connection.getInputStream()
-                   : connection.getErrorStream()
-                 : in;
+            if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
+                in = in == null
+                     ? connection.getErrorStream() == null
+                       ? connection.getInputStream()
+                       : connection.getErrorStream()
+                     : in;
+            }
                    
             // if (in == null) : it's perfectly ok for non-soap http services
             // have no response body : those interceptors which do need it will check anyway        
