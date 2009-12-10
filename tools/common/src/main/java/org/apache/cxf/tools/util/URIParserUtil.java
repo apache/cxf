@@ -30,6 +30,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+
 public final class URIParserUtil {
     private static final Set<String> KEYWORDS = new HashSet<String>(Arrays
         .asList(new String[] {"abstract", "boolean", "break", "byte", "case", "catch", "char", "class",
@@ -222,6 +224,14 @@ public final class URIParserUtil {
             return url.toString().replace("\\", "/");
         } catch (MalformedURLException e1) {
             try {
+                if (uri.startsWith("classpath:")) {
+                    
+                    url = ClassLoaderUtils.getResource(uri.substring(10), URIParserUtil.class);
+                    if (url != null) {
+                        return url.toExternalForm();
+                    }
+                    return uri;
+                }
                 File file = new File(uri);
                 if (file.exists()) {
                     return file.toURI().normalize().toString();
