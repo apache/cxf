@@ -545,4 +545,19 @@ public class JMSDestinationTest extends AbstractJMSTester {
         destination.shutdown();
     }
 
+    @Test
+    public void testGetSpringSingleConnectionFactoryFromWSDL() throws Exception {
+        setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
+                         "HelloWorldServiceSpringICF", "HelloWorldPortSpringICF");
+        final JMSDestination destination = setupJMSDestination(true);
+        // set up the conduit send to be true
+        JMSConduit conduit = setupJMSConduit(true, false);
+        final Message outMessage = new MessageImpl();
+        setupMessageHeader(outMessage, null);
+        sendoutMessage(conduit, outMessage, true);
+        waitForReceiveDestMessage();
+        conduit.close();
+        destination.shutdown();
+    }
+
 }
