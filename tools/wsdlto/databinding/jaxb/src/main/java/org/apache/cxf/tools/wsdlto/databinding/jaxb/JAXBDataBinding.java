@@ -68,6 +68,7 @@ import com.sun.tools.xjc.api.XJC;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -745,10 +746,12 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
     }
     private static String mapSchemaLocation(String target, String base, OASISCatalogManager catalog) {
+        if (base != null) {
+            base = mapSchemaLocation(base, null, catalog);
+        }
         if (catalog != null) {
             try {
                 String resolvedLocation = catalog.getCatalog().resolveSystem(target);
-                
                 if (resolvedLocation == null) {
                     resolvedLocation = catalog.getCatalog().resolveURI(target);
                 }
@@ -756,6 +759,13 @@ public class JAXBDataBinding implements DataBindingProfile {
                     resolvedLocation = catalog.getCatalog().resolvePublic(target, base);
                 }
                 if (resolvedLocation != null) {
+                    if (resolvedLocation.startsWith("classpath:")) {
+                        URL url = ClassLoaderUtils.getResource(resolvedLocation.substring(10),
+                                                               JAXBDataBinding.class);
+                        if (url != null) {
+                            resolvedLocation = url.toExternalForm();
+                        }
+                    }
                     return resolvedLocation;
                 }
                 
@@ -771,6 +781,13 @@ public class JAXBDataBinding implements DataBindingProfile {
             return url.toString();            
         } catch (Exception ex) {
             //ignore
+        }
+        if (target.startsWith("classpath:")) {
+            URL url = ClassLoaderUtils.getResource(target.substring(10),
+                                                  JAXBDataBinding.class);
+            if (url != null) {
+                target = url.toExternalForm();
+            }
         }
         return target;
     }
