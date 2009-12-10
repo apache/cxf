@@ -73,14 +73,15 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong query value", qps.getFirst("n"), "1%202");
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar", 
-                                        "n=1%202&n=3&b=2"),
+                                        "n=1%202&n=3&b=2&a%2Eb=ab"),
                             null);
 
         qps = u.getQueryParameters();
-        assertEquals("Number of queiries is wrong", 2, qps.size());
+        assertEquals("Number of queiries is wrong", 3, qps.size());
         assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
         assertEquals("Wrong query value", qps.get("n").get(1), "3");
         assertEquals("Wrong query value", qps.get("b").get(0), "2");
+        assertEquals("Wrong query value", qps.get("a.b").get(0), "ab");
     }
     
     @Test

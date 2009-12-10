@@ -111,6 +111,7 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
             // ok, now the namespace map has all the prefixes.
             
             XMLStreamWriter xmlStreamWriter = createStreamWriter(aegisType.getSchemaType(), os);
+            xmlStreamWriter.writeStartDocument();
             StaxUtils.copy(dom, xmlStreamWriter);
             // Jettison needs, and StaxUtils.copy doesn't do it.
             xmlStreamWriter.writeEndDocument();

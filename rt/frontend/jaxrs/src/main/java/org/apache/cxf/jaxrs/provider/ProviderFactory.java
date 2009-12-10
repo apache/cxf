@@ -221,10 +221,19 @@ public final class ProviderFactory {
                 for (int i = 0; i < args.length; i++) {
                     Type arg = args[i];
                     if (arg instanceof TypeVariable) {
-                        // give or take wildcards, this implies that the provider is generic, and 
-                        // is willing to take whatever we throw at it. We could, I suppose,
-                        // do wildcard analysis. It would be more correct to look at the bounds
-                        // and check that they are Object or compatible.
+                        TypeVariable var = (TypeVariable)arg;
+                        Type[] bounds = var.getBounds();
+                        boolean isResolved = false;
+                        for (int j = 0; j < bounds.length; j++) {
+                            Class<?> cls = InjectionUtils.getRawType(bounds[j]);
+                            if (cls != null && cls.isAssignableFrom(expectedType)) {
+                                isResolved = true;
+                                break;
+                            }
+                        }
+                        if (!isResolved) {
+                            return;
+                        }
                         if (m != null) {
                             InjectionUtils.injectContextFields(em.getProvider(), em, m);
                             InjectionUtils.injectContextMethods(em.getProvider(), em, m);
