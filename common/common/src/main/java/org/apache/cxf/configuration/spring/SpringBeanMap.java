@@ -52,7 +52,7 @@ public class SpringBeanMap<V>
         for (int i = 0; i < beanNames.length; i++) {
             BeanDefinition def = ctxt.getBeanFactory().getBeanDefinition(beanNames[i]);
 
-            if (!def.isSingleton() || def.isAbstract()) {
+            if (!beanFactory.isSingleton(beanNames[i]) || def.isAbstract()) {
                 continue;
             }
 
