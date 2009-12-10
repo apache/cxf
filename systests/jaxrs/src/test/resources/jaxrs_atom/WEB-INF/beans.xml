@@ -85,12 +85,26 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:properties>
   </jaxrs:server>
   
+  <jaxrs:server id="atomservice4" address="/bookstore4">
+    <jaxrs:serviceBeans>
+      <ref bean="atomstore"/>
+    </jaxrs:serviceBeans>
+    <jaxrs:providers>
+        <ref bean="feed2"/>
+    </jaxrs:providers>	
+  </jaxrs:server>
+  
   <bean id="atomstore" class="org.apache.cxf.systest.jaxrs.AtomBookStore"/>
   <bean id="atomstore2" class="org.apache.cxf.systest.jaxrs.AtomBookStore2"/>
   <bean id="atomstore3" class="org.apache.cxf.systest.jaxrs.AtomBookStore3"/>
   
   <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
       <property name="formattedOutput" value="true"/>
+  </bean>
+  <bean id="feed2" class="org.apache.cxf.systest.jaxrs.CustomAtomFeedProvider">
+  <!--
+      <property name="formattedOutput" value="true"/>
+  -->    
   </bean>
   <bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"/>
   
