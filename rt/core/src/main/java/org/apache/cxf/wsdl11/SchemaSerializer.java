@@ -31,11 +31,12 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.Node;
+
+import org.apache.cxf.helpers.XMLUtils;
 
 /**
  * A custom Schema serializer because WSDL4J's is buggy.
@@ -52,9 +53,7 @@ public class SchemaSerializer implements ExtensionSerializer {
     }
 
     private void writeXml(Node n, PrintWriter pw) throws TransformerException {
-        TransformerFactory tf = TransformerFactory.newInstance();
-
-        Transformer t = tf.newTransformer();
+        Transformer t = XMLUtils.newTransformer(2);
         t.setOutputProperty(OutputKeys.INDENT, "yes");
         t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
         t.transform(new DOMSource(n), new StreamResult(pw));
