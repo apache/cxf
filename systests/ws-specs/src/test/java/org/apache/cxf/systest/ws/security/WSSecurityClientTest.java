@@ -20,7 +20,9 @@
 package org.apache.cxf.systest.ws.security;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.OutputKeys;
@@ -39,7 +41,10 @@ import javax.xml.ws.http.HTTPBinding;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -88,6 +93,41 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             // set this to false to fork
             launchServer(Server.class, true)
         );
+    }
+    
+    @Test
+    public void testUsernameToken() {
+        final javax.xml.ws.Service svc 
+            = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
+        final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
+        
+        Client client = ClientProxy.getClient(greeter);
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put("action", "UsernameToken");
+        props.put("user", "alice");
+        WSS4JOutInterceptor wss4jOut = new WSS4JOutInterceptor(props);
+        
+        client.getOutInterceptors().add(wss4jOut);
+
+        ((BindingProvider)greeter).getRequestContext().put("password", "password");
+        String s = greeter.greetMe("CXF");
+        assertEquals("Hello CXF", s);
+        
+        try {
+            ((BindingProvider)greeter).getRequestContext().put("password", "foo");
+            greeter.greetMe("CXF");
+            fail("should fail");
+        } catch (Exception ex) {
+            //expected
+        }
+        try {
+            props.put("passwordType", "PasswordText");
+            ((BindingProvider)greeter).getRequestContext().put("password", "password");
+            greeter.greetMe("CXF");
+            fail("should fail");
+        } catch (Exception ex) {
+            //expected
+        }
     }
 
     @Test
@@ -172,11 +212,6 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     }
 
     private static Dispatch<Source> createUsernameTokenDispatcher() {
-        //
-        // Set up the client (stolen from JAX-RS system test)
-        //
-        // TODO This could really be done more simply with an HTTPURLConnection
-        //
         final Service service = Service.create(
             GREETER_SERVICE_QNAME
         );
