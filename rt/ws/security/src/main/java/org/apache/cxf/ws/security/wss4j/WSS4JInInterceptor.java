@@ -61,6 +61,7 @@ import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.WSUsernameTokenPrincipal;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -328,7 +329,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
     }
     protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
-        throws SOAPException, XMLStreamException {
+        throws SOAPException, XMLStreamException, WSSecurityException {
         /*
          * All ok up to this point. Now construct and setup the security result
          * structure. The service may fetch this and check it.
@@ -353,6 +354,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             i++;
         }
         msg.setContent(XMLStreamReader.class, reader);
+        String pwType = (String)getProperty(msg, "passwordType");
+        if ("PasswordDigest".equals(pwType)) {
+            //CXF-2150 - we need to check the UsernameTokens
+            for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
+                Integer actInt = (Integer)o.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt == WSConstants.UT) {
+                    WSUsernameTokenPrincipal princ 
+                        = (WSUsernameTokenPrincipal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                    if (!princ.isPasswordDigest()) {
+                        LOG.warning("Non-digest UsernameToken found, but digest required");
+                        throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                    }
+                }
+            }            
+        }
         
         for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
