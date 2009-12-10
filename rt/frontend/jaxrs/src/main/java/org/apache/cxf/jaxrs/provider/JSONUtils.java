@@ -176,7 +176,9 @@ public final class JSONUtils {
         
         private boolean writeXsiType;
         private QName ignoredQName;
-        
+        private boolean rootDropped;
+        private int index; 
+                
         public IgnoreContentJettisonWriter(XMLStreamWriter writer, boolean writeXsiType, QName qname) {
             super(writer);
             this.writeXsiType = writeXsiType;
@@ -194,11 +196,22 @@ public final class JSONUtils {
         
         @Override
         public void writeStartElement(String prefix, String local, String uri) throws XMLStreamException {
+            index++;
             if (ignoredQName != null && ignoredQName.getLocalPart().equals(local) 
                 && ignoredQName.getNamespaceURI().equals(uri)) {
+                rootDropped = true;
                 return;
             }
             super.writeStartElement(prefix, local, uri);
+        }
+        
+        @Override
+        public void writeEndElement() throws XMLStreamException {
+            index--;
+            if (rootDropped && index == 0) {
+                return;
+            }
+            super.writeEndElement();
         }
     }
     

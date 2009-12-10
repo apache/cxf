@@ -528,7 +528,7 @@
             <dependency>
                 <groupId>org.codehaus.jettison</groupId>
                 <artifactId>jettison</artifactId>
-                <version>1.1</version>
+                <version>1.2-SNAPSHOT</version>
                 <exclusions>
                     <exclusion>
                         <groupId>stax</groupId>
@@ -1396,6 +1396,14 @@
             </build>
         </profile>
     </profiles>
+    <repositories>
+        <repository>
+            <id>Codehaus Snapshots</id>
+            <name>Codehaus Snapshots Repository</name>
+            <url>http://snapshots.repository.codehaus.org</url>
+        </repository> 
+    </repositories>
+
 
 </project>
 

@@ -40,6 +40,7 @@ import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisJSONProviderTest extends Assert {
@@ -175,6 +176,7 @@ public class AegisJSONProviderTest extends Assert {
     }
     
     @Test
+    @Ignore
     public void testManyTags() throws Exception {
         AegisJSONProvider p = new AegisJSONProvider();
         p.setWriteXsiType(false);

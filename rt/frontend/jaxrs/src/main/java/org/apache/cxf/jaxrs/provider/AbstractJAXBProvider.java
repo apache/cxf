@@ -747,7 +747,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                     writtenUris.add(uri);
                 }
                 appendedElements.add(appendQName);
-                appendedIndexes.add(currentDepth - 2);
+                appendedIndexes.add(currentDepth - 1);
             }
             
             if (dropElements.contains(currentQName)) {

@@ -923,7 +923,7 @@ public final class JAXRSUtils {
                 } else {
                     value = values[1];
                 }
-                queries.add(values[0], value);
+                queries.add(HttpUtils.urlDecode(values[0]), value);
             }
         }
         return queries;
