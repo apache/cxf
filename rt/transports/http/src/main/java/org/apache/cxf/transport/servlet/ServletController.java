@@ -101,8 +101,14 @@ public class ServletController {
         for (String path : paths) {
             ServletDestination d2 = transport.getDestinationForPath(path);
             String ad = d2.getEndpointInfo().getAddress();
-            if (ad.equals(path)
-                || ad.equals(lastBase + path)) {
+            if (ad == null 
+                && d2.getAddress() != null
+                && d2.getAddress().getAddress() != null) {
+                ad = d2.getAddress().getAddress().getValue();
+            }
+            if (ad != null 
+                && (ad.equals(path)
+                || ad.equals(lastBase + path))) {
                 d2.getEndpointInfo().setAddress(base + path);
                 if (d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
                     d2.getEndpointInfo().getExtensor(AddressType.class).setLocation(base + path);
