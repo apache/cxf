@@ -27,6 +27,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.wsdl.Definition;
@@ -35,7 +36,12 @@ import javax.wsdl.WSDLException;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLWriter;
 
+import org.w3c.dom.Element;
+
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.generator.AbstractGenerator;
@@ -93,8 +99,10 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
 
             for (Map.Entry<String, SchemaInfo> imp : imports.entrySet()) {
                 File impfile = new File(file.getParentFile(), imp.getKey());
+                Element el = imp.getValue().getElement();
+                updateImports(el, imports);
                 os = FileWriterUtil.getWriter(impfile);
-                imp.getValue().getSchema().write(os);
+                XMLUtils.writeTo(el, os, 2);
                 os.close();
             }
 
@@ -107,6 +115,20 @@ public class WSDL11Generator extends AbstractGenerator<Definition> {
             e.printStackTrace();
         }
         return def;
+    }
+
+    private void updateImports(Element el, Map<String, SchemaInfo> imports) {
+        List<Element> imps = DOMUtils.getChildrenWithName(el,
+                                                          WSDLConstants.NS_SCHEMA_XSD, 
+                                                          "import");
+        for (Element e : imps) {
+            String ns = e.getAttribute("namespace");
+            for (Map.Entry<String, SchemaInfo> ent : imports.entrySet()) {
+                if (ent.getValue().getNamespaceURI().equals(ns)) {
+                    e.setAttribute("schemaLocation", ent.getKey());
+                }
+            }
+        }
     }
 
     private void customizing(final File outputdir,

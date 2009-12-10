@@ -21,14 +21,21 @@ package org.apache.cxf.tools.java2wsdl.processor;
 
 import java.io.File;
 import java.net.URI;
+import java.util.List;
 
 import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.Service;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.WSDLHelper;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
@@ -49,6 +56,7 @@ public class JavaToProcessorTest extends ProcessorTestBase {
     public void startUp() throws Exception {
         env = new ToolContext();
         env.put(ToolConstants.CFG_WSDL, ToolConstants.CFG_WSDL);
+
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
     }
@@ -328,9 +336,38 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
         URI expectedFile = getClass().getResource("expected/xml-bare-expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), new File(output, "/xml-bare.wsdl"));
-
     }
+    @Test
+    public void testXSDImports() throws Exception {
+        //Testcase for CXF-1818
+        env.put(ToolConstants.CFG_OUTPUTFILE, output.getPath() + "/xml-bare.wsdl");
+        env.put(ToolConstants.CFG_CLASSNAME, "org.apache.xml_bare.Greeter");
+        env.put(ToolConstants.CFG_CREATE_XSD_IMPORTS, ToolConstants.CFG_CREATE_XSD_IMPORTS);
+        processor.setEnvironment(env);
+        processor.process();
 
+        File xsd1 = new File(output, "xml-bare_schema1.xsd");
+        File xsd2 = new File(output, "xml-bare_schema2.xsd");
+        assertTrue("Generate xsd1 Fail", xsd1.exists());
+        assertTrue("Generate xsd2 Fail", xsd2.exists());
+        Document doc1 = XMLUtils.parse(xsd1);
+        Document doc2 = XMLUtils.parse(xsd2);
+        String imp = findImport(doc2);
+        if (StringUtils.isEmpty(imp)) {
+            imp = findImport(doc1);
+        }
+        assertNotNull(imp);
+        assertTrue(imp.contains("xml-bare_schema"));
+    }
+    private String findImport(Document doc) {
+        List<Element> lst = DOMUtils.getChildrenWithName(doc.getDocumentElement(),
+                                                         WSDLConstants.NS_SCHEMA_XSD, 
+                                                         "import");
+        for (Element el : lst) {
+            return el.getAttribute("schemaLocation");
+        }
+        return null;
+    }
 
     @Test
     public void testFault() throws Exception {
