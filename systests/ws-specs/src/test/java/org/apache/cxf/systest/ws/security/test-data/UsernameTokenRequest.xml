@@ -3,10 +3,10 @@
     <wss:Security xmlns:wss="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd">
         <wss:UsernameToken>
             <wss:Username>alice</wss:Username>
-            <wss:Password 
-                Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordText"
-            >password</wss:Password>
-         </wss:UsernameToken>
+            <wss:Password Type="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-username-token-profile-1.0#PasswordDigest">FPqPsaAp7hWASdknPsbfZxIoDVI=</wss:Password>
+            <wss:Nonce EncodingType="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary">OJBNzEGDmTiD/lbeA+UDeg==</wss:Nonce>
+            <wsu:Created xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">2009-12-10T21:12:59.100Z</wsu:Created>
+        </wss:UsernameToken>
     </wss:Security>
   </soap:Header>
   <soap:Body>
