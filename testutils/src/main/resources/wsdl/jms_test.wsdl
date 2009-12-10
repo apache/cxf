@@ -583,6 +583,20 @@
         </port>
     </service>
 
+    <service name="HelloWorldServiceSpringICF">
+           <port binding="tns:HelloWorldPortBinding" name="HelloWorldPortSpringICF">
+               <jms:clientConfig useConduitIdSelector="false"/>
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory" 
+                   jmsDestinationName="dynamicQueues/test.jmstransport.text">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.xbean.spring.jndi.SpringInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="classpath:/jms_test_jndi.xml"/>
+               </jms:address>
+            
+               <jms:server durableSubscriberName="CXF_subscriber"/>
+           </port>
+    </service>        
+
 </definitions>
 
 
