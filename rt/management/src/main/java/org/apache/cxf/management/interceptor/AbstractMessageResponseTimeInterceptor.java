@@ -101,14 +101,22 @@ public abstract class AbstractMessageResponseTimeInterceptor extends AbstractPha
         if (null == cr) {
             LOG.log(Level.WARNING, "NO_COUNTER_REPOSITORY");
             return;
-        } else {            
+        } else {
             Service service = ex.get(Service.class);            
-            OperationInfo opInfo = ex.get(OperationInfo.class);
             Endpoint endpoint = ex.get(Endpoint.class);
             
             String serviceName = "\"" + service.getName() + "\"";            
             String portName = "\"" + endpoint.getEndpointInfo().getName().getLocalPart() + "\"";
+            
+            OperationInfo opInfo = ex.get(OperationInfo.class);
             String operationName = opInfo == null ? null : "\"" + opInfo.getName().getLocalPart() + "\"";
+            
+            if (operationName == null) {
+                Object nameProperty = ex.get("org.apache.cxf.management.operation.name");
+                if (nameProperty != null) {
+                    operationName = "\"" + nameProperty.toString() + "\"";
+                }
+            }
             
             StringBuilder buffer = new StringBuilder();
             buffer.append(ManagementConstants.DEFAULT_DOMAIN_NAME + ":");
