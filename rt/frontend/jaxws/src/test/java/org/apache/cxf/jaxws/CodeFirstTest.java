@@ -24,8 +24,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.Executor;
 
+import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
 import javax.wsdl.Definition;
 import javax.wsdl.factory.WSDLFactory;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -327,10 +333,82 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     }
     
     public static class GenericsServiceImpl implements GenericsService<Entity<String>, QuerySummary> {
-
         public QueryResult<Entity<String>, QuerySummary> read(String query, String uc) {
             return null;
         }
+    }
+    
+    @Test
+    public void testCXF1510() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean(); 
+        factory.setServiceClass(NoRootBare.class); 
+        factory.setServiceBean(new NoRootBareImpl()); 
+        factory.setAddress("local://localhost/testNoRootBare"); 
+        Server server = factory.create();
+        server.start();
         
+        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "NoRootBareService");
+        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "NoRootBarePort");
+
+        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/",
+                        "local://localhost/testNoRootBare"); 
+        
+        NoRootBare proxy = service.getPort(portName, NoRootBare.class);
+        assertEquals("hello", proxy.echoString(new NoRootRequest("hello")).getMessage());
+    }
+    
+    @WebService
+    @SOAPBinding(parameterStyle = SOAPBinding.ParameterStyle.BARE)
+    public static interface NoRootBare {
+        NoRootResponse echoString(NoRootRequest request);
+    }
+    
+    @WebService
+    public static class NoRootBareImpl implements NoRootBare {
+        public NoRootResponse echoString(NoRootRequest request) {
+            return new NoRootResponse(request.getMessage());
+        }
+    }
+    
+    @XmlType(name = "")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class NoRootRequest {
+        @XmlElement
+        private String message;
+
+        public NoRootRequest() {
+        }
+        public NoRootRequest(String m) {
+            message = m;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+    }
+    @XmlType(name = "")
+    @XmlAccessorType(XmlAccessType.FIELD)
+    public static class NoRootResponse {
+        @XmlElement
+        private String message;
+        
+        public NoRootResponse() {
+        }
+        public NoRootResponse(String m) {
+            message = m;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }
