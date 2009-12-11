@@ -158,7 +158,8 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
         }
         if (clazz != null) {
-            if (clazz.getAnnotation(XmlRootElement.class) == null
+            if (!isFromWrapper 
+                && clazz.getAnnotation(XmlRootElement.class) == null
                 && clazz.getAnnotation(XmlType.class) != null
                 && StringUtils.isEmpty(clazz.getAnnotation(XmlType.class).name())) {
                 createTypeReference(part.getName(), clazz);
