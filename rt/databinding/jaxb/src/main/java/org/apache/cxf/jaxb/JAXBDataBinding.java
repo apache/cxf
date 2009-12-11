@@ -61,6 +61,7 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.CachedClass;
@@ -212,6 +213,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     JAXBContext context;
     Set<Class<?>> contextClasses;
+    Collection<Object> typeRefs = new ArrayList<Object>();
 
     Class<?> cls;
 
@@ -320,7 +322,8 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         contextClasses = new LinkedHashSet<Class<?>>();
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            JAXBContextInitializer initializer = new JAXBContextInitializer(serviceInfo, contextClasses);
+            JAXBContextInitializer initializer 
+                = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs);
             initializer.walk();
             if (serviceInfo.getProperty("extra.class") != null) {
                 Set<Class<?>> exClasses = serviceInfo.getProperty("extra.class", Set.class);
@@ -503,30 +506,84 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
 
         CachedContextAndSchemas cachedContextAndSchemas = null;
-        synchronized (JAXBCONTEXT_CACHE) {
-            cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
+        if (typeRefs.isEmpty()) {
+            synchronized (JAXBCONTEXT_CACHE) {
+                cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
+            }
         }
         if (cachedContextAndSchemas == null) {
-            JAXBContext ctx;
-            try {
-                ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-            } catch (JAXBException ex) {
-                if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
-                    && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
-                    map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
-                            map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
-                    ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
-                } else {
-                    throw ex;
-                }
-            }
+            JAXBContext ctx = createContext(classes, map);
             cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
             synchronized (JAXBCONTEXT_CACHE) {
-                JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
+                if (typeRefs.isEmpty()) {
+                    JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
+                }
             }
         }
 
         return cachedContextAndSchemas;
+    }
+    
+    private JAXBContext createContext(Set<Class<?>> classes, 
+                                      Map<String, Object> map)
+        throws JAXBException {
+        JAXBContext ctx;
+        if (!typeRefs.isEmpty()) {
+            Class<?> fact = null;
+            String pfx = "com.sun.xml.bind.";
+            try {
+                fact = ClassLoaderUtils.loadClass("com.sun.xml.bind.v2.ContextFactory",
+                                                  getClass());
+            } catch (Throwable t) {
+                try {
+                    fact = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.v2.ContextFactory",
+                                                      getClass());
+                    pfx = "com.sun.xml.internal.bind.";
+                } catch (Throwable t2) {
+                    //ignore
+                }
+            }
+            if (fact != null) {
+                for (Method m : fact.getMethods()) {
+                    if ("createContext".equals(m.getName())
+                        && m.getParameterTypes().length == 9) {
+                        try {
+                            return (JAXBContext)m.invoke(null, 
+                                     classes.toArray(new Class[classes.size()]),
+                                     typeRefs,
+                                     map.get(pfx + "subclassReplacements"),
+                                     map.get(pfx + "defaultNamespaceRemap"),
+                                     map.get(pfx + "c14n") == null
+                                         ? Boolean.FALSE 
+                                             : map.get(pfx + "c14n"),
+                                     map.get(pfx + "v2.model.annotation.RuntimeAnnotationReader"),
+                                     map.get(pfx + "XmlAccessorFactory") == null 
+                                         ? Boolean.FALSE 
+                                             : map.get(pfx + "XmlAccessorFactory"),
+                                     map.get(pfx + "treatEverythingNillable") == null
+                                         ? Boolean.FALSE : map.get(pfx + "treatEverythingNillable"),
+                                     map.get("retainReferenceToInfo") == null 
+                                         ? Boolean.FALSE : map.get("retainReferenceToInfo")); 
+                        } catch (Throwable e) {
+                            //ignore
+                        }
+                    }
+                }
+            }
+        }
+        try {
+            ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+        } catch (JAXBException ex) {
+            if (map.containsKey("com.sun.xml.bind.defaultNamespaceRemap")
+                && ex.getMessage().contains("com.sun.xml.bind.defaultNamespaceRemap")) {
+                map.put("com.sun.xml.internal.bind.defaultNamespaceRemap",
+                        map.remove("com.sun.xml.bind.defaultNamespaceRemap"));
+                ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]), map);
+            } else {
+                throw ex;
+            }
+        }
+        return ctx;
     }
     
     private boolean checkObjectFactoryNamespaces(Class<?> clz) {

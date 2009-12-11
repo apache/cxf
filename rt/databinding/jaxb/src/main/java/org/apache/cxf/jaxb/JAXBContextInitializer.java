@@ -35,11 +35,16 @@ import java.util.Set;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSeeAlso;
 import javax.xml.bind.annotation.XmlTransient;
+import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
@@ -53,10 +58,14 @@ import org.apache.cxf.service.model.UnwrappedOperationInfo;
 class JAXBContextInitializer extends ServiceModelVisitor {
 
     private Set<Class<?>> classes;
+    private Collection<Object> typeReferences;
 
-    public JAXBContextInitializer(ServiceInfo serviceInfo, Set<Class<?>> classes) {
+    public JAXBContextInitializer(ServiceInfo serviceInfo,
+                                  Set<Class<?>> classes,
+                                  Collection<Object> typeReferences) {
         super(serviceInfo);
         this.classes = classes;
+        this.typeReferences = typeReferences;
     }
 
     @Override
@@ -149,7 +158,37 @@ class JAXBContextInitializer extends ServiceModelVisitor {
             }
         }
         if (clazz != null) {
+            if (!isFromWrapper 
+                && clazz.getAnnotation(XmlRootElement.class) == null
+                && clazz.getAnnotation(XmlType.class) != null
+                && StringUtils.isEmpty(clazz.getAnnotation(XmlType.class).name())) {
+                createTypeReference(part.getName(), clazz);
+            }
+            
             addClass(clazz);
+        }
+    }
+    
+    private void createTypeReference(QName n, Class<?> cls) {
+        Class<?> refClass = null;
+        try {
+            refClass = ClassLoaderUtils.loadClass("com.sun.xml.bind.api.TypeReference", this.getClass());
+        } catch (Throwable ex) {
+            try {
+                refClass = ClassLoaderUtils.loadClass("com.sun.xml.internal.bind.api.TypeReference",
+                                                      this.getClass());
+            } catch (Throwable ex2) {
+                //ignore
+            }
+        }
+        if (refClass != null) {
+            try {
+                Object o =  refClass.getConstructor(QName.class, Type.class, new Annotation[0].getClass())
+                    .newInstance(n, cls, new Annotation[0]);
+                typeReferences.add(o);
+            } catch (Throwable e) {
+                //ignore
+            }
         }
     }
 
