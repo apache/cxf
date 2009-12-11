@@ -50,16 +50,18 @@ public class BookStore {
     
     @POST
     @Path("books/{bookid}")
+    //CHECKSTYLE:OFF
     public Book addBook(@PathParam("id") int id,
                         @PathParam("bookid") int bookId,
                         @MatrixParam("mid") int matrixId,
                         @HeaderParam("hid") int headerId,
                         @CookieParam("cid") int cookieId,
+                        @QueryParam("provider.bar") int queryParam,
                         @Context HttpHeaders headers,
                         Book b) {
         return new Book(1);
     }
-    
+    //CHECKSTYLE:ON
     @Path("booksubresource")
     public Book getBook() {
         return new Book(1);
@@ -83,6 +85,50 @@ public class BookStore {
     }
     
     public static class QueryBean {
+        private int a;
+        private int b;
+        private QueryBean2 bean;
+        
+        public int getA() {
+            return a;
+        }
+        
+        public int getB() {
+            return b;
+        }
+        
+        public QueryBean2 getC() {
+            return bean;
+        }
+        
+        public void setC(QueryBean2 c) {
+            bean = c;
+        }
+    }
+    
+    public static class QueryBean2 {
+        private int a;
+        private int b;
+        private QueryBean3 bean;
+        
+        public int getA() {
+            return a;
+        }
+        
+        public int getB() {
+            return b;
+        }
+        
+        public QueryBean3 getD() {
+            return bean;
+        }
+        
+        public void setD(QueryBean3 d) {
+            bean = d;
+        }
+    }
+    
+    public static class QueryBean3 {
         private int a;
         private int b;
         

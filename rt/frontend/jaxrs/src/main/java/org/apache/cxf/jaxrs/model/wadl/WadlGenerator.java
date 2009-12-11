@@ -309,18 +309,30 @@ public class WadlGenerator implements RequestHandler {
     private void writeParam(StringBuilder sb, Parameter pm, OperationResourceInfo ori) {
         Class<?> type = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
         if (!"".equals(pm.getName())) {
-            doWriteParam(sb, pm, type);
+            doWriteParam(sb, pm, type, pm.getName());
         } else {
-            Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType());
-            for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {   
-                doWriteParam(sb, entry.getKey(), entry.getValue());
+            doWriteBeanParam(sb, type, pm, null);
+        }
+    }
+    
+    private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName) {
+        Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType());
+        for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
+            String name = entry.getKey().getName();
+            if (parentName != null) {
+                name = parentName + "." + name;
+            }
+            if (InjectionUtils.isPrimitive(entry.getValue())) {
+                doWriteParam(sb, entry.getKey(), entry.getValue(), name);
+            } else {
+                doWriteBeanParam(sb, entry.getValue(), entry.getKey(), name);
             }
         }
     }
     
-    private void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type) {
+    private void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
         
-        sb.append("<param name=\"").append(pm.getName()).append("\" ");
+        sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template" 
                        : ParameterType.FORM == pm.getType() ? "query"
                        : pm.getType().toString().toLowerCase();
