@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -82,14 +84,14 @@ public class WadlGeneratorTest extends Assert {
         assertNotNull(r);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-//        File f = new File("test.xml");
-//        f.delete();
-//        f.createNewFile();
-//        System.out.println(f.getAbsolutePath());
-//        FileOutputStream fos = new FileOutputStream(f);
-//        fos.write(r.getEntity().toString().getBytes());
-//        fos.flush();
-//        fos.close();
+        File f = new File("test.xml");
+        f.delete();
+        f.createNewFile();
+        System.out.println(f.getAbsolutePath());
+        FileOutputStream fos = new FileOutputStream(f);
+        fos.write(r.getEntity().toString().getBytes());
+        fos.flush();
+        fos.close();
     }
     
     @Test
@@ -165,9 +167,13 @@ public class WadlGeneratorTest extends Assert {
         
         paramsEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
                                                  WadlGenerator.WADL_NS, "param");
-        assertEquals(2, paramsEls.size());
+        assertEquals(6, paramsEls.size());
         checkParameter(paramsEls.get(0), "a", "query");
         checkParameter(paramsEls.get(1), "b", "query");
+        checkParameter(paramsEls.get(2), "c.a", "query");
+        checkParameter(paramsEls.get(3), "c.b", "query");
+        checkParameter(paramsEls.get(4), "c.d.a", "query");
+        checkParameter(paramsEls.get(5), "c.d.b", "query");
         
         paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
                                                                WadlGenerator.WADL_NS, "param");
