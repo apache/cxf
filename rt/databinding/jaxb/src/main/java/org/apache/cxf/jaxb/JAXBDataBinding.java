@@ -60,8 +60,8 @@ import org.w3c.dom.Node;
 
 import org.xml.sax.SAXException;
 
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.CacheMap;
 import org.apache.cxf.common.util.CachedClass;
