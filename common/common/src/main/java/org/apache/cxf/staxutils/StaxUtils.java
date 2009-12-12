@@ -290,12 +290,15 @@ public final class StaxUtils {
             writer.writeStartElement(prefix, name, namespace);
             if (prefix.length() > 0) {
                 writer.writeNamespace(prefix, namespace);
+                writer.setPrefix(prefix, namespace);
             } else {
                 writer.writeDefaultNamespace(namespace);
+                writer.setDefaultNamespace(namespace);
             }
         } else {
             writer.writeStartElement(name);
             writer.writeDefaultNamespace("");
+            writer.setDefaultNamespace("");
         }
     }
 
@@ -501,8 +504,10 @@ public final class StaxUtils {
 
             if (nsPrefix.length() == 0) {
                 writer.writeDefaultNamespace(nsURI);
+                writer.setDefaultNamespace(nsURI);
             } else {
                 writer.writeNamespace(nsPrefix, nsURI);
+                writer.setPrefix(nsPrefix, nsURI);
             }
 
             if (nsURI.equals(uri) && nsPrefix.equals(prefix)) {
@@ -516,8 +521,10 @@ public final class StaxUtils {
         if (writeElementNS) {
             if (prefix == null || prefix.length() == 0) {
                 writer.writeDefaultNamespace(uri);
+                writer.setDefaultNamespace(uri);
             } else {
                 writer.writeNamespace(prefix, uri);
+                writer.setPrefix(prefix, uri);
             }
         }        
         
@@ -544,6 +551,7 @@ public final class StaxUtils {
                 }
                 if (writeNs) {
                     writer.writeNamespace(nsPrefix, ns);
+                    writer.setPrefix(nsPrefix, ns);
                 }
                 writer.writeAttribute(reader.getAttributePrefix(i), reader.getAttributeNamespace(i), reader
                     .getAttributeLocalName(i), reader.getAttributeValue(i));
@@ -655,12 +663,14 @@ public final class StaxUtils {
 //                System.out.println("WriteNamespace is called for prefix : " 
 //                + name + " namespace :" + attr.getNodeValue());
                 writer.writeNamespace(name, attr.getNodeValue());
+                writer.setPrefix(name, attr.getNodeValue());
                 if (name.equals(prefix) && attr.getNodeValue().equals(ns)) {
                     declareNamespace = false;
                 }
             } else {
                 if ("xmlns".equals(name) && "".equals(attrPrefix)) {
-                    writer.writeNamespace("", attr.getNodeValue());
+                    writer.writeDefaultNamespace(attr.getNodeValue());
+                    writer.setDefaultNamespace(attr.getNodeValue());
                     if (attr.getNodeValue().equals(ns)) {
                         declareNamespace = false;
                     } else if (StringUtils.isEmpty(attr.getNodeValue())
@@ -684,8 +694,10 @@ public final class StaxUtils {
         if (declareNamespace && repairing) {
             if (ns == null) {
                 writer.writeNamespace(prefix, "");
+                writer.setPrefix(prefix, "");
             } else {
                 writer.writeNamespace(prefix, ns);
+                writer.setPrefix(prefix, ns);
             }
         }
 
@@ -1268,9 +1280,12 @@ public final class StaxUtils {
         case XMLEvent.NAMESPACE:
             if (((Namespace)event).isDefaultNamespaceDeclaration()) {
                 writer.writeDefaultNamespace(((Namespace)event).getNamespaceURI());
+                writer.setDefaultNamespace(((Namespace)event).getNamespaceURI());
             } else {
                 writer.writeNamespace(((Namespace)event).getPrefix(),
                                       ((Namespace)event).getNamespaceURI());
+                writer.setPrefix(((Namespace)event).getPrefix(),
+                                 ((Namespace)event).getNamespaceURI()); 
             }
             break;
         case XMLEvent.COMMENT:
