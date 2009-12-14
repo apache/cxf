@@ -18,8 +18,6 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -80,18 +78,39 @@ public class WadlGeneratorTest extends Assert {
         
     }
     
+    @Test
+    public void testRootResourceWithSingleSlash() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStoreWithSingleSlash.class, 
+                                                  BookStoreWithSingleSlash.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        List<Element> rootEls = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        assertEquals(1, rootEls.size());
+        Element resource = rootEls.get(0);
+        assertEquals("/", resource.getAttribute("path"));
+        List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
+                                                                 WadlGenerator.WADL_NS, "resource");
+        assertEquals(1, resourceEls.size());        
+        assertEquals("book", resourceEls.get(0).getAttribute("path"));
+    }
+    
     private void checkResponse(Response r) throws Exception {
         assertNotNull(r);
         assertEquals(WadlGenerator.WADL_TYPE.toString(),
                      r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
-        File f = new File("test.xml");
-        f.delete();
-        f.createNewFile();
-        System.out.println(f.getAbsolutePath());
-        FileOutputStream fos = new FileOutputStream(f);
-        fos.write(r.getEntity().toString().getBytes());
-        fos.flush();
-        fos.close();
+//        File f = new File("test.xml");
+//        f.delete();
+//        f.createNewFile();
+//        System.out.println(f.getAbsolutePath());
+//        FileOutputStream fos = new FileOutputStream(f);
+//        fos.write(r.getEntity().toString().getBytes());
+//        fos.flush();
+//        fos.close();
     }
     
     @Test
