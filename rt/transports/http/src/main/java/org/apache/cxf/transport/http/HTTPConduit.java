@@ -297,7 +297,8 @@ public class HTTPConduit
             fromEndpointReferenceType = true;
         }
 
-        initializeConfig();                                    
+        initializeConfig();
+        CXFAuthenticator.addAuthenticator();
     }
 
     /**
