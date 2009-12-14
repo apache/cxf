@@ -212,6 +212,13 @@ public class WadlGenerator implements RequestHandler {
         String path = ori.getURITemplate().getValue();
         boolean useResource = useResource(ori);
         if (useResource) {
+            URITemplate template = ori.getClassResourceInfo().getURITemplate();
+            if (template != null) {
+                String parentPath = template.getValue();
+                if (parentPath.endsWith("/") && path.startsWith("/") && path.length() > 1) {
+                    path = path.substring(1); 
+                }
+            }
             sb.append("<resource path=\"").append(path).append("\">");
             handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
         }
