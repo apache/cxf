@@ -410,31 +410,29 @@ public class ParameterProcessor extends AbstractProcessor {
         if (outputWrapElement.size() == 1 && inputWrapElement != null) {
             QName outElement = outputWrapElement.iterator().next();
             boolean sameWrapperChild = false;
-            if (outputWrapElement.size() > 1) {
-                for (QName inElement : inputWrapElement) {
-                    if (isSameWrapperChild(inElement, outElement)) {
-                        JavaParameter jpIn = null;
-                        for (JavaParameter j : method.getParameters()) {
-                            if (inElement.equals(j.getQName())) {
-                                jpIn = j;
-                            }
+            for (QName inElement : inputWrapElement) {
+                if (isSameWrapperChild(inElement, outElement)) {
+                    JavaParameter jpIn = null;
+                    for (JavaParameter j : method.getParameters()) {
+                        if (inElement.equals(j.getQName())) {
+                            jpIn = j;
                         }
-                        JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
-                                                                 JavaType.Style.INOUT, outputPart);
-                        if (!qualified) {
-                            jp.setTargetNamespace("");
-                        }
-                        if (!jpIn.getClassName().equals(jp.getClassName())) {
-                            jp.setStyle(JavaType.Style.OUT);
-                        } 
-                        addParameter(method, jp);
-                        sameWrapperChild = true;
-
-                        if (method.getReturn() == null) {
-                            addVoidReturn(method);
-                        }
-                        break;
                     }
+                    JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
+                                                             JavaType.Style.INOUT, outputPart);
+                    if (!qualified) {
+                        jp.setTargetNamespace("");
+                    }
+                    if (!jpIn.getClassName().equals(jp.getClassName())) {
+                        jp.setStyle(JavaType.Style.OUT);
+                    } 
+                    addParameter(method, jp);
+                    sameWrapperChild = true;
+
+                    if (method.getReturn() == null) {
+                        addVoidReturn(method);
+                    }
+                    break;
                 }
             }
             if (!sameWrapperChild) {
