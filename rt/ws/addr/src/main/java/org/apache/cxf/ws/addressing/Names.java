@@ -40,6 +40,8 @@ public final class Names {
 
     public static final String WSA_NAMESPACE_WSDL_NAME_OLD = 
         "http://www.w3.org/2005/02/addressing/wsdl";
+    public static final String WSA_NAMESPACE_WSDL_METADATA = 
+        "http://www.w3.org/2007/05/addressing/metadata";
     public static final String WSA_NAMESPACE_PATTERN = "/addressing";
 
     public static final String WSA_REFERENCE_PARAMETERS_NAME = 

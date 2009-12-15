@@ -24,7 +24,8 @@ under the License.
 	     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
 	     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
 	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl">
+	     xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	     xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata">
     <types>
 	<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" 
 		    elementFormDefault="qualified" 
@@ -90,9 +91,9 @@ under the License.
 <!-- 	    <fault name="addNumbersFault" message="tns:addNumbersFault"/> -->
 	</operation>
 	<operation name="addNumbers3">
-	    <input message="tns:addNumbers3" wsaw:Action="3in"/>
-	    <output message="tns:addNumbers3Response" wsaw:Action="3out"/>
-	    <fault name="addNumbersFault" message="tns:addNumbersFault" wsaw:Action="3fault"/>
+	    <input message="tns:addNumbers3" wsam:Action="3in"/>
+	    <output message="tns:addNumbers3Response" wsam:Action="3out"/>
+	    <fault name="addNumbersFault" message="tns:addNumbersFault" wsam:Action="3fault"/>
 	</operation>
     </portType>
     <binding name="AddNumbersBinding" type="tns:AddNumbersPortType">

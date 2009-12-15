@@ -790,6 +790,10 @@ public final class ContextUtils {
     public static String getAction(Extensible ext) {
         Object o = ext.getExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME);
         if (o == null) {
+            o = ext.getExtensionAttributes().get(new QName(Names.WSA_NAMESPACE_WSDL_METADATA,
+                                                           Names.WSAW_ACTION_NAME));
+        }
+        if (o == null) {
             o = ext.getExtensionAttributes().get(new QName(Names.WSA_NAMESPACE_WSDL_NAME_OLD,
                                                    Names.WSAW_ACTION_NAME));
         }
