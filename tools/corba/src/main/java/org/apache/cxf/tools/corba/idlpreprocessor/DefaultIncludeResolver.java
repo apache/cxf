@@ -23,6 +23,7 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 
 /**
  * @author lk
@@ -64,7 +65,8 @@ public class DefaultIncludeResolver implements IncludeResolver {
                 return url;
             } catch (MalformedURLException e) {
                 final PreprocessingException preprocessingException = new PreprocessingException(
-                        "Unable to resolve user include '" + spec + "' in '" + userIdlDirs + "'", null, 0);
+                    "Unable to resolve user include '" + spec + "' in '"
+                        + Arrays.toString(userIdlDirs) + "'", null, 0);
                 preprocessingException.initCause(e);
                 throw preprocessingException;
             }
