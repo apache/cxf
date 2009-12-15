@@ -23,9 +23,9 @@
     <version>1.0</version>
     <name>JAX-RS Basic Demo</name>
     <properties>
-            <cxf.version>[2,)</cxf.version>
-            <httpclient.version>3.1</httpclient.version>
-            <jsr311.version>0.8</jsr311.version>
+        <cxf.version>[2,)</cxf.version>
+        <httpclient.version>3.1</httpclient.version>
+        <jsr311.version>0.8</jsr311.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -43,20 +43,20 @@
                     <execution>
                         <id>copyxmlfiles</id>
                         <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
-	    	</executions>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
+                                <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -110,23 +110,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -137,14 +134,6 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-            <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

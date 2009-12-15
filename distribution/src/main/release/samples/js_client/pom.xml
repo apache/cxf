@@ -23,8 +23,8 @@
     <version>1.0</version>
     <name>Hello World Client Demo using JavaScript</name>
     <properties>
-            <cxf.version>[2,)</cxf.version>
-            <rhino.version>1.6R7</rhino.version>
+        <cxf.version>[2,)</cxf.version>
+        <rhino.version>1.6R7</rhino.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -56,9 +56,9 @@
                         </goals>
                     </execution>
                 </executions>
-            </plugin>      
+            </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -118,23 +118,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -145,14 +142,6 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-            <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>       
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -175,9 +164,9 @@
             <version>${cxf.version}</version>
         </dependency>
         <dependency>
-           <groupId>rhino</groupId>
-           <artifactId>js</artifactId>
-           <version>${rhino.version}</version>
-        </dependency>        
+            <groupId>rhino</groupId>
+            <artifactId>js</artifactId>
+            <version>${rhino.version}</version>
+        </dependency>
     </dependencies>
 </project>
