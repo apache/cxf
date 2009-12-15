@@ -23,10 +23,14 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jms.ConnectionFactory;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+import org.apache.cxf.transport.jms.JMSConfigFeature;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
@@ -78,10 +82,35 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
         assertNotNull(service);
 
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        doService(greeter, true);
+    }
+    @Test
+    public void testNonAopTransaction() throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(Greeter.class);
+        factory.setAddress("jms://");
+
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+        ConnectionFactory connectionFactory
+            = new org.apache.activemq.ActiveMQConnectionFactory("tcp://localhost:61500");
+        jmsConfig.setConnectionFactory(connectionFactory);
+        jmsConfig.setTargetDestination("greeter.queue.noaop");
+        jmsConfig.setPubSubDomain(false);
+        jmsConfig.setUseJms11(true);
+
+        JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
+        jmsConfigFeature.setJmsConfig(jmsConfig);
+        factory.getFeatures().add(jmsConfigFeature);
+
+        Greeter greeter = (Greeter)factory.create();
+        doService(greeter, false);
+    }    
+    public void doService(Greeter greeter, boolean doEx) throws Exception {
+
         String response1 = new String("Hello ");
         
         try {
-            Greeter greeter = service.getPort(portName, Greeter.class);
                           
             String greeting = greeter.greetMe("Good guy");
             assertNotNull("No response received from service", greeting);
@@ -93,12 +122,14 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             exResponse = response1 + "[Bad guy]";
             assertEquals("Get unexcpeted result", exResponse, greeting);
             
-            try {
-                greeter.pingMe();
-                fail("Should have thrown FaultException");
-            } catch (PingMeFault ex) {
-                assertNotNull(ex.getFaultInfo());
-            }  
+            if (doEx) {
+                try {
+                    greeter.pingMe();
+                    fail("Should have thrown FaultException");
+                } catch (PingMeFault ex) {
+                    assertNotNull(ex.getFaultInfo());
+                }
+            }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
         }

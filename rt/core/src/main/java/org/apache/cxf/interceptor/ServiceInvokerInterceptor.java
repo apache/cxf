@@ -104,24 +104,22 @@ public class ServiceInvokerInterceptor extends AbstractPhaseInterceptor<Message>
             };
             synchronized (o) {
                 executor.execute(o);
-                if (!exchange.isOneWay()) {
-                    if (!o.isDone()) {
-                        try {
-                            o.wait();
-                        } catch (InterruptedException e) {
-                            //IGNORE
-                        }
-                    }
+                if (!o.isDone()) {
                     try {
-                        o.get();
+                        o.wait();
                     } catch (InterruptedException e) {
-                        throw new Fault(e);
-                    } catch (ExecutionException e) {
-                        if (e.getCause() instanceof RuntimeException) {
-                            throw (RuntimeException)e.getCause();
-                        } else {
-                            throw new Fault(e.getCause());
-                        }
+                        //IGNORE
+                    }
+                }
+                try {
+                    o.get();
+                } catch (InterruptedException e) {
+                    throw new Fault(e);
+                } catch (ExecutionException e) {
+                    if (e.getCause() instanceof RuntimeException) {
+                        throw (RuntimeException)e.getCause();
+                    } else {
+                        throw new Fault(e.getCause());
                     }
                 }
             }
