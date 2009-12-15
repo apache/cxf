@@ -18,69 +18,103 @@
   under the License.
 -->
 <wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/w2j/hello_world_holder" xmlns:x1="http://cxf.apache.org/w2j/hello_world_holder/types" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://cxf.apache.org/w2j/hello_world_holder" name="HelloWorld">
-	<wsdl:types>
-		<schema targetNamespace="http://cxf.apache.org/w2j/hello_world_holder/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
-			<element name="sayHi">
-				<complexType>
-					<sequence>
-						<element name="responseType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="sayHiResponse">
-				<complexType>
-					<sequence>
-						<element name="responseType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="greetMe">
-				<complexType>
-					<sequence>
-						<element name="requestType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-			<element name="greetMeResponse">
-				<complexType>
-					<sequence>
-						<element name="responseType" type="xsd:string"/>
-					</sequence>
-				</complexType>
-			</element>
-		</schema>
-	</wsdl:types>
-	<wsdl:message name="sayHi">
-		<wsdl:part name="sayIn" element="x1:sayHi"/>
-		<wsdl:part name="sayHeader" element="x1:greetMe"/>
-	</wsdl:message>
-	<wsdl:message name="sayHiResponse">
-		<wsdl:part name="sayIn" element="x1:sayHi"/>
-		<wsdl:part name="sayHeader" element="x1:greetMeResponse"/>
-	</wsdl:message>
-	<wsdl:portType name="Greeter">
-		<wsdl:operation name="sayHi">
-			<wsdl:input name="sayHiRequest" message="tns:sayHi"/>
-			<wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
-		</wsdl:operation>
-	</wsdl:portType>
-	<wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
-		<soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
-		<wsdl:operation name="sayHi">
-			<soap:operation style="document"/>
-			<wsdl:input>
-				<soap:body use="literal"/>
-				<soap:header message="tns:sayHi" part="sayHeader" use="literal"/>
-			</wsdl:input>
-			<wsdl:output>
-				<soap:body use="literal"/>
-				<soap:header message="tns:sayHiResponse" part="sayHeader" use="literal"/>
-			</wsdl:output>
-		</wsdl:operation>
-	</wsdl:binding>
-	<wsdl:service name="SOAPService">
-		<wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
-			<soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
-		</wsdl:port>
-	</wsdl:service>
+    <wsdl:types>
+        <schema targetNamespace="http://cxf.apache.org/w2j/hello_world_holder/types" xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+            <element name="sayHi">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="sayHiResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMe">
+                <complexType>
+                    <sequence>
+                        <element name="requestType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="greetMeResponse">
+                <complexType>
+                    <sequence>
+                        <element name="responseType" type="xsd:string"/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="testInOut">
+                <complexType>
+                    <sequence>
+                        <element minOccurs='0' name='val' type='xsd:int'/>
+                        <element name='num' type='xsd:int'/>
+                    </sequence>
+                </complexType>
+            </element>
+            <element name="testInOutResponse">
+                <complexType>
+                    <sequence>
+                        <element minOccurs='0' name='val' type='xsd:int'/>
+                    </sequence>
+                </complexType>
+            </element>
+        </schema>
+    </wsdl:types>
+    <wsdl:message name="sayHi">
+        <wsdl:part name="sayIn" element="x1:sayHi"/>
+        <wsdl:part name="sayHeader" element="x1:greetMe"/>
+    </wsdl:message>
+    <wsdl:message name="sayHiResponse">
+        <wsdl:part name="sayIn" element="x1:sayHi"/>
+        <wsdl:part name="sayHeader" element="x1:greetMeResponse"/>
+    </wsdl:message>
+    <wsdl:message name="testInOut">
+        <wsdl:part name="testInOut" element="x1:testInOut"/>
+    </wsdl:message>
+    <wsdl:message name="testInOutResponse">
+        <wsdl:part name="testInOutResponse" element="x1:testInOutResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="Greeter">
+        <wsdl:operation name="sayHi">
+            <wsdl:input name="sayHiRequest" message="tns:sayHi"/>
+            <wsdl:output name="sayHiResponse" message="tns:sayHiResponse"/>
+        </wsdl:operation>
+        <wsdl:operation name="testInOut">
+            <wsdl:input name="testInOut" message="tns:testInOut"/>
+            <wsdl:output name="testInOutResponse" message="tns:testInOutResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+        <wsdl:operation name="sayHi">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+                <soap:header message="tns:sayHi" part="sayHeader" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+                <soap:header message="tns:sayHiResponse" part="sayHeader" use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+        <wsdl:operation name="testInOut">
+            <soap:operation style="document"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="SOAPService">
+        <wsdl:port name="SoapPort" binding="tns:Greeter_SOAPBinding">
+            <soap:address location="http://localhost:9000/SoapContext/SoapPort"/>
+        </wsdl:port>
+    </wsdl:service>
 </wsdl:definitions>

@@ -831,16 +831,21 @@ public class CodeGenTest extends AbstractCodeGenTest {
         processor.execute();
 
         Class<?> clz = classLoader.loadClass("org.apache.cxf.w2j.hello_world_holder.Greeter");
-        assertEquals(1, clz.getMethods().length);
-
-        SOAPBinding soapBindingAnno = AnnotationUtil.getPrivClassAnnotation(clz, SOAPBinding.class);
-        assertEquals("BARE", soapBindingAnno.parameterStyle().name());
-        assertEquals("LITERAL", soapBindingAnno.use().name());
-        assertEquals("DOCUMENT", soapBindingAnno.style().name());
+        assertEquals(2, clz.getMethods().length);
 
         Class<?> para = classLoader.loadClass("org.apache.cxf.w2j.hello_world_holder.types.GreetMe");
         Method method = clz.getMethod("sayHi", new Class[] {Holder.class, para});
         assertEquals("GreetMeResponse", method.getReturnType().getSimpleName());
+
+        SOAPBinding soapBindingAnno = AnnotationUtil.getPrivClassAnnotation(clz, SOAPBinding.class);
+        if (soapBindingAnno == null) {
+            soapBindingAnno = method.getAnnotation(SOAPBinding.class);
+        }
+        assertNotNull(soapBindingAnno);
+        assertEquals("BARE", soapBindingAnno.parameterStyle().name());
+        assertEquals("LITERAL", soapBindingAnno.use().name());
+        assertEquals("DOCUMENT", soapBindingAnno.style().name());
+
 
         WebParam webParamAnno = AnnotationUtil.getWebParam(method, "greetMe");
         assertEquals(true, webParamAnno.header());
@@ -848,6 +853,7 @@ public class CodeGenTest extends AbstractCodeGenTest {
         webParamAnno = AnnotationUtil.getWebParam(method, "sayHi");
         assertEquals("INOUT", webParamAnno.mode().name());
 
+        method = clz.getMethod("testInOut", Holder.class, Integer.TYPE);
     }
 
     @Test
