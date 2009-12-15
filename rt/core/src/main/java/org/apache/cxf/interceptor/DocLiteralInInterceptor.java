@@ -100,7 +100,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 // Determine if there is a wrapper class
                 if (msgInfo.getMessageParts().get(0).getTypeClass() != null) {
                     QName startQName = xmlReader.getName();
-                    if (client && !msgInfo.getMessageParts().get(0).getConcreteName().equals(startQName)) {
+                    if (!msgInfo.getMessageParts().get(0).getConcreteName().equals(startQName)) {
                         throw new Fault("UNEXPECTED_WRAPPER_ELEMENT", LOG, null, startQName,
                                         msgInfo.getMessageParts().get(0).getConcreteName());
                     }

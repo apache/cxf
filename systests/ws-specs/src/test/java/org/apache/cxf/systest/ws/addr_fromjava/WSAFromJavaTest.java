@@ -150,4 +150,20 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         return service.getAddNumberImplPort();
     }
+    
+    @Test 
+    public void testUnmatchedActions() throws Exception {
+        AddNumberImpl port = getPort();
+
+        BindingProvider bp = (BindingProvider)port;
+        java.util.Map<String, Object> requestContext = bp.getRequestContext();
+        requestContext.put(BindingProvider.SOAPACTION_URI_PROPERTY,
+                           "http://cxf.apache.org/input4");
+        try {
+            //CXF-2035 
+            port.addNumbers3(-1, -1); 
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Unexpected wrapper"));
+        }
+    }
 }
