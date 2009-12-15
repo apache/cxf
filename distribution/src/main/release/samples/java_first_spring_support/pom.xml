@@ -23,7 +23,7 @@
     <version>1.0</version>
     <name>Spring HTTP Sample</name>
     <properties>
-            <cxf.version>[2,)</cxf.version>
+        <cxf.version>[2,)</cxf.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -47,13 +47,13 @@
                         <configuration>
                             <tasks>
                                 <copy file="${basedir}/src/demo/spring/client/client-beans.xml" todir="${basedir}/target/classes/demo/spring/client"/>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
+                            </tasks>
+                        </configuration>
+                    </execution>
                 </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -107,23 +107,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -134,14 +131,6 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-            <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

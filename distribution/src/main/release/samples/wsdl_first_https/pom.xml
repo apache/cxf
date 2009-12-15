@@ -31,7 +31,7 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source> 
+                    <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
             </plugin>
@@ -54,32 +54,32 @@
                             <goal>wsdl2java</goal>
                         </goals>
                     </execution>
-               </executions>
-           </plugin>
-           <plugin>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copyxmlfiles</id>
                         <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/hw_https/server/CherryServer.xml" todir="${basedir}/target/classes/demo/hw_https/server"/>
-	    	               <copy file="${basedir}/src/demo/hw_https/client/WibbleClient.xml" todir="${basedir}/target/classes/demo/hw_https/client"/>
-	    	               <copy file="${basedir}/src/demo/hw_https/client/InsecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client"/>
-	    	               <copy todir="${basedir}/target/classes/certs">
-	    	                   <fileset dir="${basedir}/certs"/>
-	    	               </copy>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
-	    	</executions>
-            </plugin>           
-       </plugins>
-    </build>   
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/demo/hw_https/server/CherryServer.xml" todir="${basedir}/target/classes/demo/hw_https/server"/>
+                                <copy file="${basedir}/src/demo/hw_https/client/WibbleClient.xml" todir="${basedir}/target/classes/demo/hw_https/client"/>
+                                <copy file="${basedir}/src/demo/hw_https/client/InsecureClient.xml" todir="${basedir}/target/classes/demo/hw_https/client"/>
+                                <copy todir="${basedir}/target/classes/certs">
+                                    <fileset dir="${basedir}/certs"/>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -128,13 +128,13 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>insecure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>insecure.client.non.spring</id>
@@ -155,13 +155,13 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>insecure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>secure.client</id>
@@ -182,13 +182,13 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>secure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>secure.client.non.spring</id>
@@ -209,54 +209,45 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>secure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>snapshots</id>
+            <repositories>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <name>Apache SNAPSHOT Repository</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache-snapshots</id>
+                    <name>Apache Maven Plugin Snapshots</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache SNAPSHOT Repository</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-        <repository>
-	    <id>apache-incubating</id>
-	    <name>Apache Incubating Repository</name>
-	    <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-	</repository>
-	<!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-plugin-snapshots</id>
-            <name>Apache Maven Plugin Snapshots</name>
-            <url>http://people.apache.org/repo/m2-snapshot-repository</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-        <pluginRepository>
-            <id>apache-plugin-incubating</id>
-            <name>Apache Plugin Incubating Repository</name>
-            <url>http://people.apache.org/repo/m2-incubating-repository/</url>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -269,9 +260,9 @@
             <version>${cxf.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.apache.cxf</groupId>
-             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-             <version>${cxf.version}</version>
-       </dependency>
-   </dependencies>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+    </dependencies>
 </project>

@@ -144,12 +144,36 @@
                 </plugins>
             </build>
         </profile>
+        <profile>
+            <id>snapshots</id>
+            <repositories>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <name>Apache SNAPSHOT Repository</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache-snapshots</id>
+                    <name>Apache Maven Plugin Snapshots</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
     </profiles>
-    
-
-
-
-
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

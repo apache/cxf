@@ -23,14 +23,14 @@
     <name>JAX-RS Basic Demo With HTTPS communications</name>
     <version>1.0</version>
     <properties>
-            <cxf.version>[2,)</cxf.version>
-            <httpclient.version>3.1</httpclient.version>
-            <jsr311.version>1.0</jsr311.version>
+        <cxf.version>[2,)</cxf.version>
+        <httpclient.version>3.1</httpclient.version>
+        <jsr311.version>1.0</jsr311.version>
     </properties>
 
     <build>
-         <sourceDirectory>src</sourceDirectory>
-         <plugins>
+        <sourceDirectory>src</sourceDirectory>
+        <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -44,42 +44,42 @@
                     <execution>
                         <id>copyResources</id>
                         <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
-                               <copy file="${basedir}/CherryServer.xml" todir="${basedir}/target/classes"/>
-                               <copy todir="${basedir}/src">
-                                  <fileset dir="${basedir}/contrib">
-                                     <include name="*.java"/> 
-                                  </fileset>
-                               </copy>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
+                                <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
+                                <copy file="${basedir}/CherryServer.xml" todir="${basedir}/target/classes"/>
+                                <copy todir="${basedir}/src">
+                                    <fileset dir="${basedir}/contrib">
+                                        <include name="*.java"/>
+                                    </fileset>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
                     <execution>
                         <id>removeContribFromSrc</id>
                         <phase>process-classes</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <delete>
-                                   <fileset dir="${basedir}/src">
-                                     <include name="*.java"/> 
-                                  </fileset> 
-                               </delete>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
- 	    	</executions>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <delete>
+                                    <fileset dir="${basedir}/src">
+                                        <include name="*.java"/>
+                                    </fileset>
+                                </delete>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -99,10 +99,10 @@
                                     <mainClass>demo.jaxrs.server.Server</mainClass>
                                     <systemProperties>
                                         <property>
-                                           <key>cxf.config.file</key>
-                                           <value>CherryServer.xml</value>
-                                         </property>
-                                    </systemProperties> 
+                                            <key>cxf.config.file</key>
+                                            <value>CherryServer.xml</value>
+                                        </property>
+                                    </systemProperties>
                                 </configuration>
                             </execution>
                         </executions>
@@ -126,10 +126,10 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.jaxrs.client.Client</mainClass>
-                                    <arguments>  
-                                      <argument>${basedir}/certs/wibble.jks</argument> 
-                                      <argument>${basedir}/certs/truststore.jks</argument> 
-                                    </arguments> 
+                                    <arguments>
+                                        <argument>${basedir}/certs/wibble.jks</argument>
+                                        <argument>${basedir}/certs/truststore.jks</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -143,23 +143,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -170,14 +167,6 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-            <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
