@@ -117,6 +117,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         this.implInfo = implInfo;
         initConfiguration(implInfo);
         this.serviceClass = implInfo.getEndpointClass();
+        this.serviceType = implInfo.getSEIType();
         loadWSFeatureAnnotation(implInfo.getSEIClass(), implInfo.getImplementorClass());
     }
     
@@ -192,6 +193,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
         setJaxWsImplementorInfo(new JaxWsImplementorInfo(serviceClass));
         super.setServiceClass(getJaxWsImplementorInfo().getEndpointClass());
+        super.setServiceType(getJaxWsImplementorInfo().getSEIType());
     }
     @Override
     protected void checkServiceClassAnnotations(Class<?> sc) {
