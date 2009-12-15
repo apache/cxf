@@ -297,12 +297,14 @@ public class PhaseInterceptorChain implements InterceptorChain {
                         }
     
                         message.setContent(Exception.class, ex);
+                        boolean isOneWay = false;
                         if (message.getExchange() != null) {
                             message.getExchange().put(Exception.class, ex);
+                            isOneWay = message.getExchange().isOneWay();
                         }                    
                         unwind(message);
                         
-                        if (faultObserver != null && !message.getExchange().isOneWay()) {
+                        if (faultObserver != null && !isOneWay) {
                             faultObserver.onMessage(message);
                         }
                     }
