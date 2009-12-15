@@ -26,6 +26,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
@@ -41,6 +42,8 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.ExtensibleElement;
 import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.Validate;
+import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
+import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
 import org.apache.cxf.jaxrs.ext.logging.LogRecordsList;
 
@@ -68,18 +71,6 @@ public final class StandardConverter implements Converter {
         EXTENSION
     }
 
-    /**
-     * Post-processing for feeds/entries properties customization eg setup of dates, titles, author etc.
-     */
-    public interface Postprocessor {
-
-        /** Called after entry creation for given log records. */
-        void afterEntry(Entry entry, List<LogRecord> records);
-
-        /** Called after feed creation; at this stage feed has associated entries. */
-        void afterFeed(Feed feed);
-    }
-
     private Factory factory;
     private Marshaller marsh;
     private DateFormat df;
@@ -87,8 +78,8 @@ public final class StandardConverter implements Converter {
     private Postprocessor postprocessor;
 
     /**
-     * Creates configured converter with custom feeds/entries post-processor. Regardless of "format",
-     * combination of "output" and "multiplicity" flags can be interpreted as follow:
+     * Creates configured converter with default post-processing of feeds/entries mandatory properties.
+     * Regardless of "format", combination of "output" and "multiplicity" flags can be interpreted as follow:
      * <ul>
      * <li>ENTRY ONE - for each log record one entry is produced, converter returns list of entries</li>
      * <li>ENTRY MANY - list of log records is packed in one entry, converter return one entry.</li>
@@ -102,10 +93,23 @@ public final class StandardConverter implements Converter {
      * @param multiplicity for output==FEED it is multiplicity of entities in feed for output==ENTITY it is
      *            multiplicity of log records in entity.
      * @param format log records embedded as entry content or extension.
-     * @param postprocessor custom feeds/entries post-processor.
+     */
+    public StandardConverter(Output output, Multiplicity multiplicity, Format format) {
+        this(output, multiplicity, format, new DefaultPostprocessor());
+    }
+
+    /**
+     * Creates configured converter with feeds/entries post-processing based on data provided by feed and
+     * entry builders.
      */
     public StandardConverter(Output output, Multiplicity multiplicity, Format format,
-                             Postprocessor postprocessor) {
+                             AbstractFeedBuilder<List<LogRecord>> feedBuilder,
+                             AbstractEntryBuilder<List<LogRecord>> entryBuilder) {
+        this(output, multiplicity, format, new BuilderPostprocessor(feedBuilder, entryBuilder));
+    }
+
+    private StandardConverter(Output output, Multiplicity multiplicity, Format format,
+                              Postprocessor postprocessor) {
         Validate.notNull(output, "output is null");
         Validate.notNull(multiplicity, "multiplicity is null");
         Validate.notNull(format, "format is null");
@@ -119,14 +123,6 @@ public final class StandardConverter implements Converter {
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
-    }
-
-    /**
-     * Creates configured converter with default post-processing of feeds/entries mandatory properties. See
-     * {@link #StandardConverter(Output, Multiplicity, Format, Postprocessor)} for description.
-     */
-    public StandardConverter(Output output, Multiplicity multiplicity, Format format) {
-        this(output, multiplicity, format, new DefaultPostprocessor());
     }
 
     public List<? extends Element> convert(List<LogRecord> records) {
@@ -180,7 +176,7 @@ public final class StandardConverter implements Converter {
                     }
                     postprocessor.afterEntry(e, records);
                     Feed f = createFeed(e);
-                    postprocessor.afterFeed(f);
+                    postprocessor.afterFeed(f, records);
                     return Arrays.asList(f);
                 }
             };
@@ -201,7 +197,7 @@ public final class StandardConverter implements Converter {
                         postprocessor.afterEntry(e, Collections.singletonList(record));
                     }
                     Feed f = createFeed(entries);
-                    postprocessor.afterFeed(f);
+                    postprocessor.afterFeed(f, records);
                     return Arrays.asList(f);
                 }
             };
@@ -295,6 +291,18 @@ public final class StandardConverter implements Converter {
         return feed;
     }
 
+    /**
+     * Post-processing for feeds/entries properties customization eg setup of dates, titles, author etc.
+     */
+    private interface Postprocessor {
+
+        /** Called after entry creation for given log records. */
+        void afterEntry(Entry entry, List<LogRecord> records);
+
+        /** Called after feed creation; at this stage feed has associated entries. */
+        void afterFeed(Feed feed, List<LogRecord> records);
+    }
+
     private static class DefaultPostprocessor implements Postprocessor {
         public void afterEntry(Entry entry, List<LogRecord> records) {
             // required fields (see RFC 4287)
@@ -304,12 +312,67 @@ public final class StandardConverter implements Converter {
             entry.setUpdated(new Date());
         }
 
-        public void afterFeed(Feed feed) {
+        public void afterFeed(Feed feed, List<LogRecord> records) {
             // required fields (see RFC 4287)
             feed.setId("uuid:" + UUID.randomUUID().toString());
             feed.addAuthor("CXF");
             feed.setTitle(String.format("Feed with %d entry(ies)", feed.getEntries().size()));
             feed.setUpdated(new Date());
+        }
+    }
+
+    private static class BuilderPostprocessor implements Postprocessor {
+        private AbstractFeedBuilder<List<LogRecord>> feedBuilder;
+        private AbstractEntryBuilder<List<LogRecord>> entryBuilder;
+
+        public BuilderPostprocessor(AbstractFeedBuilder<List<LogRecord>> feedBuilder,
+                                    AbstractEntryBuilder<List<LogRecord>> entryBuilder) {
+            Validate.notNull(feedBuilder, "feedBuilder is null");
+            Validate.notNull(entryBuilder, "entryBuilder is null");
+            this.feedBuilder = feedBuilder;
+            this.entryBuilder = entryBuilder;
+        }
+
+        public void afterEntry(Entry entry, List<LogRecord> records) {
+            entry.setId(entryBuilder.getId(records));
+            entry.addAuthor(entryBuilder.getAuthor(records));
+            entry.setTitle(entryBuilder.getTitle(records));
+            entry.setUpdated(entryBuilder.getUpdated(records));
+            entry.setBaseUri(entryBuilder.getBaseUri(records));
+            List<String> categories = entryBuilder.getCategories(records);
+            if (categories != null) {
+                for (String category : categories) {
+                    entry.addCategory(category);
+                }
+            }
+            Map<String, String> links = entryBuilder.getLinks(records);
+            if (links != null) {
+                for (java.util.Map.Entry<String, String> mapEntry : links.entrySet()) {
+                    entry.addLink(mapEntry.getKey(), mapEntry.getValue());
+                }
+            }
+            entry.setPublished(entryBuilder.getPublished(records));
+            entry.setSummary(entryBuilder.getSummary(records));
+        }
+
+        public void afterFeed(Feed feed, List<LogRecord> records) {
+            feed.setId(feedBuilder.getId(records));
+            feed.addAuthor(feedBuilder.getAuthor(records));
+            feed.setTitle(feedBuilder.getTitle(records));
+            feed.setUpdated(feedBuilder.getUpdated(records));
+            feed.setBaseUri(feedBuilder.getBaseUri(records));
+            List<String> categories = feedBuilder.getCategories(records);
+            if (categories != null) {
+                for (String category : categories) {
+                    feed.addCategory(category);
+                }
+            }
+            Map<String, String> links = feedBuilder.getLinks(records);
+            if (links != null) {
+                for (java.util.Map.Entry<String, String> mapEntry : links.entrySet()) {
+                    feed.addLink(mapEntry.getKey(), mapEntry.getValue());
+                }
+            }
         }
     }
 }

@@ -36,6 +36,8 @@ import org.apache.abdera.model.Feed;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
+import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
 import org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
@@ -157,6 +159,36 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
         Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT);
+        Deliverer d = new WebClientDeliverer("http://localhost:9080");
+        Handler h = new AtomPushHandler(2, c, d);
+        log.addHandler(h);
+        log.setLevel(Level.ALL);
+        logSixEvents(log);
+        // need to wait: multithreaded and client-server journey
+        Thread.sleep(1000);
+        // 6 events / 2 element batch = 3 feeds expected
+        assertEquals("Different logged events count;", 3, feeds.size());
+    }
+
+    @Test
+    public void testPrivateLoggerCustomBuilders() throws Exception {
+        configureLogging("resources/logging_atompush_disabled.properties");
+        Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
+        AbstractFeedBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>> fb = 
+            new AbstractFeedBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>>() {
+                @Override
+                public String getAuthor(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> pojo) {
+                    return "custom author";
+                }
+            };
+        AbstractEntryBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>> eb = 
+            new AbstractEntryBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>>() {
+                @Override
+                public String getSummary(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> pojo) {
+                    return "custom summary";
+                }
+            };
+        Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT, fb, eb);
         Deliverer d = new WebClientDeliverer("http://localhost:9080");
         Handler h = new AtomPushHandler(2, c, d);
         log.addHandler(h);
