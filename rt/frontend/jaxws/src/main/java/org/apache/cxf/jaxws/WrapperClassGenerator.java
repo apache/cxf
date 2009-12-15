@@ -181,10 +181,18 @@ public final class WrapperClassGenerator extends ASMHelper {
         }
         
         def = findClass(className, method.getDeclaringClass());
-        if (def != null) {
-            wrapperPart.setTypeClass(def);
-            wrapperBeans.add(def);
-            return;
+        String origClassName = className;
+        int count = 0;
+        while (def != null) {
+            Boolean b = messageInfo.getProperty("parameterized", Boolean.class);
+            if (b != null && b) {
+                className = origClassName + (++count);
+                def = findClass(className, method.getDeclaringClass());
+            } else {
+                wrapperPart.setTypeClass(def);
+                wrapperBeans.add(def);
+                return;
+            }
         }
         String classFileName = periodToSlashes(className);
         cw.visit(Opcodes.V1_5, Opcodes.ACC_PUBLIC + Opcodes.ACC_SUPER, classFileName, null,

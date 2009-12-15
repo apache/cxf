@@ -20,6 +20,9 @@
 package org.apache.cxf.jaxws;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Type;
+import java.lang.reflect.TypeVariable;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.i18n.Message;
@@ -71,8 +74,32 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
         
         if (!endpointClass.isAssignableFrom(method.getDeclaringClass())) {
             try {
-                method = endpointClass.getMethod(method.getName(), 
+                Method m2 = endpointClass.getMethod(method.getName(), 
                                                  (Class[])method.getParameterTypes());
+                if (Modifier.isVolatile(m2.getModifiers())) {
+                    //bridge method, need to map the generics
+                    Class params[] = method.getParameterTypes();
+                    for (Type t : method.getGenericParameterTypes()) {
+                        if (t instanceof TypeVariable) {
+                            TypeVariable tv = (TypeVariable)t;
+                            for (int x = 0; x < implInfo.getSEIClass().getTypeParameters().length; x++) {
+                                TypeVariable t2 = implInfo.getSEIClass().getTypeParameters()[x];
+                                if (t2.getName().equals(tv.getName())) {
+                                    params[x] = (Class)implInfo.getSEIType().getActualTypeArguments()[x];
+                                }
+                            }
+                        }
+                    }
+                    method = endpointClass.getMethod(method.getName(),
+                                                     params);
+                } else {
+                    method = m2;
+                }
+                try {
+                    method.setAccessible(true);
+                } catch (Throwable t) {
+                    //ignore
+                }                
             } catch (SecurityException e) {
                 throw new ServiceConstructionException(e);
             }

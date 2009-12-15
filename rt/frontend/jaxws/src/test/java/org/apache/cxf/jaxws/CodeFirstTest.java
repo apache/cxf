@@ -47,6 +47,7 @@ import org.apache.cxf.jaxws.service.ArrayServiceImpl;
 import org.apache.cxf.jaxws.service.Entity;
 import org.apache.cxf.jaxws.service.FooServiceImpl;
 import org.apache.cxf.jaxws.service.GenericsService;
+import org.apache.cxf.jaxws.service.GenericsService2;
 import org.apache.cxf.jaxws.service.Hello;
 import org.apache.cxf.jaxws.service.HelloInterface;
 import org.apache.cxf.jaxws.service.QueryResult;
@@ -335,6 +336,63 @@ public class CodeFirstTest extends AbstractJaxWsTest {
     public static class GenericsServiceImpl implements GenericsService<Entity<String>, QuerySummary> {
         public QueryResult<Entity<String>, QuerySummary> read(String query, String uc) {
             return null;
+        }
+    }
+    
+    @Test
+    public void testCXF1758() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean(); 
+        factory.setServiceBean(new GenericsService2Impl()); 
+        factory.setAddress("local://localhost/test"); 
+        Server server = null;
+        server = factory.create();
+        Document doc = getWSDLDocument(server);
+        org.apache.cxf.helpers.XMLUtils.printDOM(doc);
+        assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element[@type='xs:int']",
+                    doc);
+        
+        factory = new JaxWsServerFactoryBean(); 
+        factory.setServiceBean(new GenericsService2<Float, Double>() {
+            public Double convert(Float t) {
+                return t.doubleValue();
+            }
+
+            public GenericsService2.Value<Double> convert2(GenericsService2.Value<Float> in) {
+                return new GenericsService2.Value<Double>(in.getValue().doubleValue());
+            }
+        });
+        factory.setAddress("local://localhost/test2"); 
+        server = factory.create();
+        Document doc2 = getWSDLDocument(server);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(doc2);
+        assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/"
+                    + "xsd:element[@type='xs:float']",
+                    doc2);
+        
+        QName serviceName = new QName("http://service.jaxws.cxf.apache.org/", "Generics2");
+        QName portName = new QName("http://service.jaxws.cxf.apache.org/", "Generics2Port");
+
+        ServiceImpl service = new ServiceImpl(getBus(), (URL)null, serviceName, null);
+        service.addPort(portName, "http://schemas.xmlsoap.org/soap/",
+                        "local://localhost/test2"); 
+        
+        GenericsService2Typed proxy = service.getPort(portName,
+                                                      GenericsService2Typed.class);
+        assertEquals("", 3.14d, proxy.convert(3.14f), 0.00001);
+        assertEquals("", 3.14d, proxy.convert2(new GenericsService2.Value<Float>(3.14f)).getValue(), 0.00001);
+
+    }
+
+    public static interface GenericsService2Typed extends GenericsService2<Float, Double> {
+        
+    }
+    public static class GenericsService2Impl implements GenericsService2<Integer, String> {
+        public String convert(Integer t) {
+            return t.toString();
+        }
+
+        public GenericsService2.Value<String> convert2(GenericsService2.Value<Integer> in) {
+            return new GenericsService2.Value<String>(in.getValue().toString());
         }
     }
     
