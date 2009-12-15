@@ -22,6 +22,7 @@ package org.apache.cxf.maven_plugin;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -399,7 +400,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
             .isDebugEnabled());
         String[] args = (String[])list.toArray(new String[list.size()]);
-        getLog().debug("Calling wsdl2java with args: " + args);
+        getLog().debug("Calling wsdl2java with args: " + Arrays.toString(args));
         try {
             new WSDLToJava(args).run(new ToolContext());
         } catch (Throwable e) {
