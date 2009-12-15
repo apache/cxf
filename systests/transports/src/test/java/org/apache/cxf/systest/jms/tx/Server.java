@@ -18,8 +18,14 @@
  */
 package org.apache.cxf.systest.jms.tx;
 
+import javax.jms.ConnectionFactory;
+
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.jms.JMSConfigFeature;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jms.connection.JmsTransactionManager;
 
 public class Server extends AbstractBusTestServerBase {
 
@@ -29,6 +35,25 @@ public class Server extends AbstractBusTestServerBase {
         ClassPathXmlApplicationContext context = 
             new ClassPathXmlApplicationContext("org/apache/cxf/systest/jms/tx/jms_server_config.xml");
         context.start();
+        
+        EndpointImpl endpoint = new EndpointImpl(new GreeterImplWithTransaction());
+        endpoint.setAddress("jms://");
+        JMSConfiguration jmsConfig = new JMSConfiguration();
+
+        ConnectionFactory connectionFactory
+            = (ConnectionFactory)context.getBean("jmsConnectionFactory", ConnectionFactory.class);
+        jmsConfig.setConnectionFactory(connectionFactory);
+        jmsConfig.setTargetDestination("greeter.queue.noaop");
+        jmsConfig.setSessionTransacted(true);
+        jmsConfig.setPubSubDomain(false);
+        jmsConfig.setUseJms11(true);
+        jmsConfig.setTransactionManager(new JmsTransactionManager(connectionFactory));
+        jmsConfig.setCacheLevel(3);
+
+        JMSConfigFeature jmsConfigFeature = new JMSConfigFeature();
+        jmsConfigFeature.setJmsConfig(jmsConfig);
+        endpoint.getFeatures().add(jmsConfigFeature);
+        endpoint.publish();
     }
 
 
