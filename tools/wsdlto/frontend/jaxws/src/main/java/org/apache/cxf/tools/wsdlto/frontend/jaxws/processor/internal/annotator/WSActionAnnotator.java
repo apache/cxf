@@ -27,6 +27,7 @@ import javax.xml.ws.Action;
 import javax.xml.ws.FaultAction;
 
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.service.model.AbstractMessageContainer;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -41,10 +42,28 @@ import org.apache.cxf.tools.common.model.JavaMethod;
 public final class WSActionAnnotator implements Annotator {
     private static final QName WSAW_ACTION_QNAME = new QName("http://www.w3.org/2006/05/addressing/wsdl", 
                                                              "Action");    
+    private static final QName WSAM_ACTION_QNAME = new QName("http://www.w3.org/2007/05/addressing/metadata", 
+                                                             "Action");    
+    private static final QName WSAW_OLD_ACTION_QNAME 
+        = new QName("http://www.w3.org/2005/02/addressing/wsdl", "Action");    
     private OperationInfo operation;
 
     public WSActionAnnotator(final OperationInfo op) {
         this.operation = op;
+    }
+    
+    private String getAction(AbstractMessageContainer mi) {
+        QName action = (QName)mi.getExtensionAttribute(WSAW_ACTION_QNAME);
+        if (action == null) {
+            action = (QName)mi.getExtensionAttribute(WSAM_ACTION_QNAME);
+        }
+        if (action == null) {
+            action = (QName)mi.getExtensionAttribute(WSAW_OLD_ACTION_QNAME);
+        }
+        if (action != null) {
+            return action.getLocalPart();
+        } 
+        return null;
     }
     
     public void annotate(JavaAnnotatable ja) {
@@ -52,7 +71,7 @@ public final class WSActionAnnotator implements Annotator {
         if (ja instanceof JavaMethod) {
             method = (JavaMethod) ja;
         } else {
-            throw new RuntimeException("RequestWrapper and ResponseWrapper can only annotate JavaMethod");
+            throw new RuntimeException("Action can only annotate JavaMethod");
         }
 
         boolean required = false;
@@ -64,19 +83,19 @@ public final class WSActionAnnotator implements Annotator {
 
         JAnnotation actionAnnotation = new JAnnotation(Action.class);
         if (inputMessage.getExtensionAttributes() != null) {
-            QName inputAction = (QName)inputMessage.getExtensionAttribute(WSAW_ACTION_QNAME);
+            String inputAction = getAction(inputMessage);
             if (inputAction != null) {
                 actionAnnotation.addElement(new JAnnotationElement("input", 
-                                                                          inputAction.getLocalPart()));
+                                                                   inputAction));
                 required = true;
             }
         }
 
         if (outputMessage != null && outputMessage.getExtensionAttributes() != null) {
-            QName outputAction = (QName)outputMessage.getExtensionAttribute(WSAW_ACTION_QNAME);
+            String outputAction = getAction(outputMessage);
             if (outputAction != null) {
                 actionAnnotation.addElement(new JAnnotationElement("output", 
-                                                                          outputAction.getLocalPart()));
+                                                                   outputAction));
                 required = true;
             }
         }
@@ -84,7 +103,7 @@ public final class WSActionAnnotator implements Annotator {
             List<JAnnotation> faultAnnotations = new ArrayList<JAnnotation>();
             for (FaultInfo faultInfo : operation.getFaults()) {
                 if (faultInfo.getExtensionAttributes() != null) {
-                    QName faultAction = (QName)faultInfo.getExtensionAttribute(WSAW_ACTION_QNAME);
+                    String faultAction = getAction(faultInfo);
                     if (faultAction == null) {
                         continue;
                     }
@@ -98,7 +117,7 @@ public final class WSActionAnnotator implements Annotator {
                     JAnnotation faultAnnotation = new JAnnotation(FaultAction.class);
                     faultAnnotation.addElement(new JAnnotationElement("className", exceptionClass));
                     faultAnnotation.addElement(new JAnnotationElement("value", 
-                                                                             faultAction.getLocalPart()));
+                                                                      faultAction));
                     faultAnnotations.add(faultAnnotation);
                     required = true;
                 }
