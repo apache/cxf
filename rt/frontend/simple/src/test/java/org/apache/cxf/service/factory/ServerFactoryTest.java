@@ -55,8 +55,32 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         assertTrue(server.getDestination() instanceof CustomDestination);
     }
     
-        
-    @SuppressWarnings("unchecked")
+    public static interface TestService<P> {
+        int open(P args);
+        void close(int handle);
+    }
+
+    public static class TestServiceImpl<P> implements TestService<P> {
+        public void close(int handle) {
+        }
+
+        public int open(P args) { 
+            return 0;
+        }
+    }
+    
+    @Test
+    public void testCXF1758() throws Exception {
+        ServerFactoryBean svrBean = new ServerFactoryBean();
+        svrBean.setAddress("http://localhost/Generics");
+        svrBean.setServiceBean(new TestServiceImpl<String>() { });
+        svrBean.setBus(getBus());
+        ServerImpl server = (ServerImpl)svrBean.create();
+        //XMLUtils.printDOM(getWSDLDocument(server));
+        assertValid("//xsd:schema/xsd:complexType[@name='open']/xsd:sequence/"
+                    + "xsd:element[@type='xsd:string']",
+                    getWSDLDocument(server));
+    }
     @Test
     public void testJaxbExtraClass() throws Exception {
         ServerFactoryBean svrBean = new ServerFactoryBean();
@@ -64,7 +88,7 @@ public class ServerFactoryTest extends AbstractSimpleFrontendTest {
         svrBean.setServiceClass(HelloServiceImpl.class);
         svrBean.setBus(getBus());
 
-        Map props = svrBean.getProperties();
+        Map<String, Object> props = svrBean.getProperties();
         if (props == null) {
             props = new HashMap<String, Object>();
         }
