@@ -400,8 +400,8 @@ public class HTTPConduit
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "Conduit '" + getConduitName()
                     + "' has been configured for TLS "
-                    + "keyManagers " + tlsClientParameters.getKeyManagers()
-                    + "trustManagers " + tlsClientParameters.getTrustManagers()
+                    + "keyManagers " + Arrays.toString(tlsClientParameters.getKeyManagers())
+                    + "trustManagers " + Arrays.toString(tlsClientParameters.getTrustManagers())
                     + "secureRandom " + tlsClientParameters.getSecureRandom()
                     + "Disable Common Name (CN) Check: " + tlsClientParameters.isDisableCNCheck());
             }
@@ -1345,8 +1345,8 @@ public class HTTPConduit
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.log(Level.FINE, "Conduit '" + getConduitName()
                     + "' has been (re) configured for TLS "
-                    + "keyManagers " + tlsClientParameters.getKeyManagers()
-                    + "trustManagers " + tlsClientParameters.getTrustManagers()
+                    + "keyManagers " + Arrays.toString(tlsClientParameters.getKeyManagers())
+                    + "trustManagers " + Arrays.toString(tlsClientParameters.getTrustManagers())
                     + "secureRandom " + tlsClientParameters.getSecureRandom());
             }
         } else {

@@ -22,6 +22,7 @@ package org.apache.cxf.endpoint;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -438,7 +439,7 @@ public class ClientImpl
             Map<String, Object> reqContext = null;
             Map<String, Object> resContext = null;
             if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Invoke, operation info: " + oi + ", params: " + params);
+                LOG.fine("Invoke, operation info: " + oi + ", params: " + Arrays.toString(params));
             }
             Message message = endpoint.getBinding().createMessage();
             if (null != context) {
