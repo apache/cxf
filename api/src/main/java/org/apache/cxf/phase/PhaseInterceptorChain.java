@@ -302,7 +302,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
                         }                    
                         unwind(message);
                         
-                        if (faultObserver != null) {
+                        if (faultObserver != null && !message.getExchange().isOneWay()) {
                             faultObserver.onMessage(message);
                         }
                     }

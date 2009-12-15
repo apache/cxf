@@ -63,15 +63,20 @@ import org.apache.cxf.transport.jms.continuations.JMSContinuation;
 import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.springframework.jms.connection.JmsResourceHolder;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
+import org.springframework.jms.listener.SessionAwareMessageListener;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-public class JMSDestination extends AbstractMultiplexDestination implements MessageListener,
-    JMSExchangeSender {
+public class JMSDestination extends AbstractMultiplexDestination 
+    implements SessionAwareMessageListener, MessageListener, JMSExchangeSender {
 
     private static final Logger LOG = LogUtils.getL7dLogger(JMSDestination.class);
 
@@ -172,6 +177,9 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
      * @throws IOException
      */
     public void onMessage(javax.jms.Message message) {
+        onMessage(message, null);
+    }
+    public void onMessage(javax.jms.Message message, Session session) {
         try {
             getLogger().log(Level.FINE, "server received request: ", message);
              // Build CXF message from JMS message
@@ -201,9 +209,32 @@ public class JMSDestination extends AbstractMultiplexDestination implements Mess
                 inMessage.setContent(MessageEndpoint.class, ep);
                 JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.remove();
             }
-            
+
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
+            
+            //need to propagate any exceptions back to Spring container 
+            //so transactions can occur
+            if (inMessage.getContent(Exception.class) != null && session != null) {
+                PlatformTransactionManager m = jmsConfig.getTransactionManager();
+                if (m != null) {
+                    TransactionStatus status = m.getTransaction(null);
+                    JmsResourceHolder resourceHolder =
+                        (JmsResourceHolder) TransactionSynchronizationManager
+                            .getResource(jmsConfig.getConnectionFactory());
+                    boolean trans = resourceHolder == null 
+                        || !resourceHolder.containsSession(session);
+                    if (status != null && !status.isCompleted() && trans) {
+                        Exception ex = inMessage.getContent(Exception.class);
+                        if (ex.getCause() instanceof RuntimeException) {
+                            throw (RuntimeException)ex.getCause();
+                        } else {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                }
+            }
+            
         } catch (SuspendedInvocationException ex) {
             getLogger().log(Level.FINE, "Request message has been suspended");
         } catch (UnsupportedEncodingException ex) {

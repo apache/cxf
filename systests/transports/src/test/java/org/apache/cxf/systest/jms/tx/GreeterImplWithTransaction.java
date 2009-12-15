@@ -20,9 +20,12 @@ package org.apache.cxf.systest.jms.tx;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import javax.jws.WebService;
+
 
 import org.apache.cxf.systest.jms.GreeterImplDocBase;
 
+@WebService(endpointInterface = "org.apache.hello_world_doc_lit.Greeter")
 public class GreeterImplWithTransaction extends GreeterImplDocBase {
     private AtomicBoolean flag = new AtomicBoolean(true);
        
