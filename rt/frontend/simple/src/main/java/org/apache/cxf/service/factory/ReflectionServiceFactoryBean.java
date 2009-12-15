@@ -2272,7 +2272,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         }
     }
     protected void processTypes(Class sc, Type tp) {
-        if (tp != null && tp instanceof ParameterizedType) { 
+        if (tp instanceof ParameterizedType) { 
             ParameterizedType ptp = (ParameterizedType)tp;
             Type c = (Class)ptp.getRawType();
             Map<String, Class<?>> m = new HashMap<String, Class<?>>();
