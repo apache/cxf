@@ -88,7 +88,7 @@
                                         <extraarg>SOAPService3</extraarg>
                                     </extraargs>
                                 </wsdlOption>
-                             </wsdlOptions>
+                            </wsdlOptions>
                         </configuration>
                         <goals>
                             <goal>wsdl2java</goal>
@@ -102,25 +102,27 @@
                     <execution>
                         <id>copyxmlfiles</id>
                         <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq1.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-	    	               <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq2.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-	    	               <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq3.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-	    	               <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp1.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
-			       <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp2.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
-			       <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp3.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq1.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq2.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq3.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp1.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp2.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp3.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
 	    	            
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
-	    	</executions>
+
+
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -139,7 +141,7 @@
                                 <configuration>
                                     <mainClass>demo.hwDispatch.server.Server</mainClass>
                                     <arguments>
-				        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -180,23 +182,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -207,14 +206,6 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-        <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>

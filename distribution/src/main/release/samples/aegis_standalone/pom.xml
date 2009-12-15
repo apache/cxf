@@ -23,7 +23,7 @@
     <version>1.0</version>
     <name>CXF sample using the Aegis Binding without any webservice</name>
     <properties>
-            <cxf.version>[2,)</cxf.version>
+        <cxf.version>[2,)</cxf.version>
     </properties>
     <build>
         <sourceDirectory>src</sourceDirectory>
@@ -36,9 +36,9 @@
                 </configuration>
             </plugin>
         </plugins>
-    </build>   
+    </build>
     <profiles>
-      <profile>
+        <profile>
             <id>write</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -54,9 +54,9 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>org.apache.cxf.demo.aegis.commands.WriteZoo</mainClass>
-						            <arguments>
-            							<argument>zoo.xml</argument>
-            						</arguments>
+                                    <arguments>
+                                        <argument>zoo.xml</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -64,7 +64,7 @@
                 </plugins>
             </build>
         </profile>
-         <profile>
+        <profile>
             <id>read</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -80,9 +80,9 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>org.apache.cxf.demo.aegis.commands.ReadZoo</mainClass>
-						            <arguments>
-            							<argument>zoo.xml</argument>
-            						</arguments>
+                                    <arguments>
+                                        <argument>zoo.xml</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
@@ -96,23 +96,20 @@
                 <repository>
                     <id>apache-snapshots</id>
                     <name>Apache SNAPSHOT Repository</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository/</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <snapshots>
                         <enabled>true</enabled>
                     </snapshots>
-                </repository>
-                    <!-- for jaxb-impl -->
-                <repository>
-                    <id>java.net</id>
-                    <url>http://download.java.net/maven/1/</url>
-                    <layout>legacy</layout>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
                 </repository>
             </repositories>
             <pluginRepositories>
                 <pluginRepository>
-                    <id>apache-plugin-snapshots</id>
+                    <id>apache-snapshots</id>
                     <name>Apache Maven Plugin Snapshots</name>
-                    <url>http://people.apache.org/repo/m2-snapshot-repository</url>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
                     <releases>
                         <enabled>false</enabled>
                     </releases>
@@ -123,30 +120,22 @@
             </pluginRepositories>
         </profile>
     </profiles>
-    <repositories>
-            <!-- for jaxb-impl -->
-        <repository>
-            <id>java.net</id>
-            <url>http://download.java.net/maven/1/</url>
-            <layout>legacy</layout>
-        </repository>
-    </repositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-	<dependency>
-	  <groupId>net.java.dev.stax-utils</groupId>
-	  <artifactId>stax-utils</artifactId>
-	  <version>20060502</version>
-	  <exclusions>
-	    <exclusion>
-	      <groupId>com.bea.xml</groupId>
-	      <artifactId>jsr173-ri</artifactId>
-	    </exclusion>
-	  </exclusions>
-	</dependency>
+        <dependency>
+            <groupId>net.java.dev.stax-utils</groupId>
+            <artifactId>stax-utils</artifactId>
+            <version>20060502</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.bea.xml</groupId>
+                    <artifactId>jsr173-ri</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 </project>

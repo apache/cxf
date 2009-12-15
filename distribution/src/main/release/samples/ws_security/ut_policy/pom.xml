@@ -31,7 +31,7 @@
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
-                    <source>1.5</source> 
+                    <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
             </plugin>
@@ -54,31 +54,31 @@
                             <goal>wsdl2java</goal>
                         </goals>
                     </execution>
-               </executions>
-           </plugin>
-           <plugin>
+                </executions>
+            </plugin>
+            <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
                 <executions>
                     <execution>
                         <id>copyxmlfiles</id>
                         <phase>generate-sources</phase>
-	    	        <goals>
-	    	            <goal>run</goal>
-	    	        </goals>
-	    	        <configuration>
-	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/wssec/server/wssec.xml" todir="${basedir}/target/classes/demo/wssec/server"/>
-	    	               <copy file="${basedir}/src/demo/wssec/client/wssec.xml" todir="${basedir}/target/classes/demo/wssec/client"/>
-	    	               <copy todir="${basedir}/target/classes/certs">
-	    	                   <fileset dir="${basedir}/certs"/>
-	    	               </copy>
-	    	            </tasks>
-	    	        </configuration>
-	    	    </execution>
-	    	</executions>
-            </plugin>           
-       </plugins>
-    </build>   
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <tasks>
+                                <copy file="${basedir}/src/demo/wssec/server/wssec.xml" todir="${basedir}/target/classes/demo/wssec/server"/>
+                                <copy file="${basedir}/src/demo/wssec/client/wssec.xml" todir="${basedir}/target/classes/demo/wssec/client"/>
+                                <copy todir="${basedir}/target/classes/certs">
+                                    <fileset dir="${basedir}/certs"/>
+                                </copy>
+                            </tasks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
     <profiles>
         <profile>
             <id>server</id>
@@ -127,13 +127,13 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world.wsdl</argument>
                                         <argument>secure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
         <profile>
             <id>client.unauthenticated</id>
@@ -154,41 +154,44 @@
                                     <arguments>
                                         <argument>${basedir}/wsdl/hello_world_no_policy.wsdl</argument>
                                         <argument>secure</argument>
-                                   </arguments>
-                               </configuration>
-                           </execution>
-                       </executions>
-                   </plugin>
-               </plugins>
-           </build>
-        </profile>        
+                                    </arguments>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>snapshots</id>
+            <repositories>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <name>Apache SNAPSHOT Repository</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache-snapshots</id>
+                    <name>Apache Maven Plugin Snapshots</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>apache-snapshots</id>
-            <name>Apache Snapshot Repository</name>
-            <url>http://repository.apache.org/content/groups/snapshots-group/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
-    <pluginRepositories>
-        <pluginRepository>
-            <id>apache-plugin-snapshots</id>
-            <name>Apache Maven Plugin Snapshots</name>
-            <url>http://repository.apache.org/content/groups/snapshots-group/</url>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </pluginRepository>
-    </pluginRepositories>
     <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -201,12 +204,13 @@
             <version>${cxf.version}</version>
         </dependency>
         <dependency>
-             <groupId>org.apache.cxf</groupId>
-             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-             <version>${cxf.version}</version>
-       </dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http-jetty</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
        
-       <dependency>
+
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
             <version>${cxf.version}</version>
@@ -217,5 +221,7 @@
             <version>${cxf.version}</version>
         </dependency>
         
-   </dependencies>
+
+    </dependencies>
 </project>
+
