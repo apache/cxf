@@ -86,6 +86,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         doService(greeter, true);
     }
     @Test
+    @org.junit.Ignore("does't work with the version of spring on 2.1.x")
     public void testNonAopTransaction() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(Greeter.class);
