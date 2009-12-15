@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -335,7 +336,7 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
             if (null == content) {                
                 content = message.getContent(byte[].class); 
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("Using saved byte array: " + content);
+                    LOG.fine("Using saved byte array: " + Arrays.toString(content));
                 }
             } else {
                 if (LOG.isLoggable(Level.FINE)) {
