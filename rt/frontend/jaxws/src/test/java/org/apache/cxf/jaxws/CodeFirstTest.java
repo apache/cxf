@@ -347,7 +347,7 @@ public class CodeFirstTest extends AbstractJaxWsTest {
         Server server = null;
         server = factory.create();
         Document doc = getWSDLDocument(server);
-        org.apache.cxf.helpers.XMLUtils.printDOM(doc);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(doc);
         assertValid("//xsd:schema/xsd:complexType[@name='convert']/xsd:sequence/xsd:element[@type='xs:int']",
                     doc);
         
