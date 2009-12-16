@@ -19,7 +19,9 @@
 
 package org.apache.cxf.ws.policy;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -30,12 +32,14 @@ import javax.xml.xpath.XPathConstants;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.annotations.Policies;
 import org.apache.cxf.annotations.Policy;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 
@@ -49,11 +53,28 @@ public class PolicyAnnotationTest extends Assert {
 
     @org.junit.Test
     public void testAnnotations() throws Exception {
+        Bus bus = BusFactory.getDefaultBus();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setBus(bus);
         factory.setServiceBean(new TestImpl());
         factory.setStart(false);
+        List<String> tp = Arrays.asList(
+            "http://schemas.xmlsoap.org/soap/http",
+            "http://schemas.xmlsoap.org/wsdl/http/",
+            "http://schemas.xmlsoap.org/wsdl/soap/http",
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+            "http://cxf.apache.org/transports/http/configuration",
+            "http://cxf.apache.org/bindings/xformat");
+        
+        LocalTransportFactory f = new LocalTransportFactory();
+        f.getUriPrefixes().add("http");
+        f.setTransportIds(tp);
+        f.setBus(bus);
+        f.register();
+        
+        
         Server s = factory.create();
-        Bus bus = factory.getBus();
+
         try {
             ServiceWSDLBuilder builder = new ServiceWSDLBuilder(bus,
                                                                 s.getEndpoint().getService()
