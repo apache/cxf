@@ -60,10 +60,11 @@ public class LocalTransportFactory extends AbstractTransportFactory
     }
     
     private Map<String, Destination> destinations = new HashMap<String, Destination>();
+    private Bus bus;
 
     private Set<String> messageFilterProperties;
     private Set<String> messageIncludeProperties;
-    private Set<String> uriPrefixes = new HashSet<String>(URI_PREFIXES);
+    private Set<String> uriPrefixes = URI_PREFIXES;
     
     public LocalTransportFactory() {
         super();
@@ -84,9 +85,13 @@ public class LocalTransportFactory extends AbstractTransportFactory
     
     @Resource(name = "cxf")
     public void setBus(Bus b) {
-        super.setBus(b);
+        bus = b;
     }
 
+    public Bus getBus() {
+        return bus;
+    }
+    
     public Destination getDestination(EndpointInfo ei) throws IOException {
         return getDestination(ei, createReference(ei));
     }
