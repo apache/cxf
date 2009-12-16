@@ -24,9 +24,10 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.apache.cxf.aegis.type.java5.XmlFlattenedArray;
+
 @XmlRootElement(name = "Tags")
 public class Tags {
-    @XmlElement
     private List<TagVO> list = new ArrayList<TagVO>();
     
     public Tags() {
@@ -41,6 +42,8 @@ public class Tags {
         list.add(tag);
     }
     
+    @XmlFlattenedArray
+    @XmlElement(name = "list")
     public List<TagVO> getTags() {
         return list;
     }

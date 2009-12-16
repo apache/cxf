@@ -87,7 +87,7 @@ public class AegisXMLStreamDataReader extends AbstractAegisIoImpl implements Aeg
                                 ArrayType arrayType, QName concreteName) throws Exception {
         setupReaderPosition(input);
         ElementReader elReader = new ElementReader(input);
-        return arrayType.readObject(elReader, concreteName, context);
+        return arrayType.readObject(elReader, concreteName, context, true);
         
     }
 }

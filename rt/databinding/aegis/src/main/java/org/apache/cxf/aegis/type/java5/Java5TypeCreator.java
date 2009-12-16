@@ -121,7 +121,7 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         info.setType(genericType); // override basicClassInfo's of the type.
         info.setAnnotations(pd.getReadMethod().getAnnotations());
         info.setAegisTypeClass(castToAegisTypeClass(annotationReader.getType(pd.getReadMethod())));
-
+        info.setFlat(annotationReader.isFlat(pd.getReadMethod().getAnnotations()));
         return info;
     }
 

@@ -110,5 +110,25 @@ public class FlatArrayTest extends AbstractAegisTest {
         client.takeBeanWithFlatArray(bwfa);
         assertArrayEquals(INT_ARRAY, service.beanWithFlatArrayValue.getValues());
     }
+    @Test
+    public void testFlatCollection() throws Exception {
+        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
+        proxyFac.setDataBinding(new AegisDatabinding());
+        proxyFac.setAddress("local://FlatArray");
+        proxyFac.setServiceClass(FlatArrayServiceInterface.class);
+        proxyFac.setBus(getBus());
+
+        Object proxyObj = proxyFac.create();
+        FlatArrayServiceInterface client = (FlatArrayServiceInterface)proxyObj;
+        BeanWithFlatCollection bwfc = new BeanWithFlatCollection();
+        bwfc.getValues().add(1);
+        bwfc.getValues().add(2);
+        bwfc.getValues().add(3);
+        bwfc = client.echoBeanWithFlatCollection(bwfc);
+        assertEquals(3, bwfc.getValues().size());
+        assertEquals(Integer.valueOf(1), bwfc.getValues().get(0));
+        assertEquals(Integer.valueOf(2), bwfc.getValues().get(1));
+        assertEquals(Integer.valueOf(3), bwfc.getValues().get(2));
+    }
 
 }

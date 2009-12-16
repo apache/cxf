@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.InvalidPropertiesFormatException;
@@ -45,7 +46,6 @@ import org.apache.cxf.jaxrs.resources.Tags;
 
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class AegisJSONProviderTest extends Assert {
@@ -261,12 +261,12 @@ public class AegisJSONProviderTest extends Assert {
     }
     
     @Test
-    @Ignore("Aegis copies duplicate ns1:tags elements into DOM which is exposed by a new Jettison writer")
     public void testManyTags() throws Exception {
         AegisJSONProvider<ManyTags> p = new AegisJSONProvider<ManyTags>();
         p.setWriteXsiType(false);
         AbstractAegisProvider.clearContexts();
         p.setSerializeAsArray(true);
+        p.setArrayKeys(Arrays.asList("ns1.tags"));
         
         Tags tags = new Tags();
         tags.addTag(createTag("a", "b"));
@@ -277,13 +277,11 @@ public class AegisJSONProviderTest extends Assert {
         
         p.writeTo(many, ManyTags.class, ManyTags.class, ManyTags.class.getAnnotations(), 
                   MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
-        
         String s = os.toString();
-        System.out.println(s);
-        String data1 = "{\"ns1.ManyTags\":[{\"ns1.tags\":[{\"ns1.TagVO\""
-            + ":{\"ns1.group\":\"b\",\"ns1.name\":\"a\"}}]}]}";
-        String data2 = "{\"ns1.ManyTags\":[{\"ns1.tags\":[{\"ns1.TagVO\""
-            + ":{\"ns1.name\":\"a\",\"ns1.group\":\"b\"}}]}]}";
+        String data1 = "{\"ns1.ManyTags\":{\"ns1.tags\":[{\"ns1.list\""
+            + ":{\"ns1.group\":\"b\",\"ns1.name\":\"a\"}}]}}";
+        String data2 = "{\"ns1.ManyTags\":{\"ns1.tags\":[{\"ns1.list\""
+            + ":{\"ns1.name\":\"a\",\"ns1.group\":\"b\"}}]}}";
         assertTrue(data1.equals(s) || data2.equals(s));
     }
     

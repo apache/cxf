@@ -22,7 +22,8 @@ public class FlatArrayService implements FlatArrayServiceInterface {
     
     String[] stringArrayValue;
     BeanWithFlatArray beanWithFlatArrayValue;
-
+    BeanWithFlatCollection beanWithFlatCollection;
+    
     public FlatArrayService() {
     }
     
@@ -39,5 +40,10 @@ public class FlatArrayService implements FlatArrayServiceInterface {
     /** {@inheritDoc}*/
     public void takeBeanWithFlatArray(BeanWithFlatArray bwfa) {
         beanWithFlatArrayValue = bwfa;
+    }
+    
+    public BeanWithFlatCollection echoBeanWithFlatCollection(BeanWithFlatCollection c) {
+        beanWithFlatCollection = c;
+        return c;
     }
 }

@@ -257,7 +257,7 @@ public abstract class AbstractTypeCreator implements TypeCreator {
         if (info.getMaxOccurs() != -1) {
             type.setMaxOccurs(info.getMaxOccurs());
         }
-
+        
         type.setFlat(info.isFlat());
 
         return type;

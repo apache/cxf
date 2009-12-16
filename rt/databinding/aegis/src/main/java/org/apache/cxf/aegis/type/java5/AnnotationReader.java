@@ -372,4 +372,16 @@ public class AnnotationReader {
         }
     }
 
+    public boolean isFlat(Annotation[] annotations) {
+        if (annotations != null) {
+            for (Annotation a : annotations) {
+                if (a instanceof XmlFlattenedArray) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+
 }

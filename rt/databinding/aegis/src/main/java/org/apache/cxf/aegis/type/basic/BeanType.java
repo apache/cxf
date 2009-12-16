@@ -27,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
@@ -43,6 +44,7 @@ import org.apache.cxf.aegis.xml.MessageReader;
 import org.apache.cxf.aegis.xml.MessageWriter;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAny;
@@ -164,7 +166,9 @@ public class BeanType extends AegisType {
                         Object writeObj;
                         if (type.isFlatArray()) {
                             ArrayType aType = (ArrayType) type;
-                            writeObj = aType.readObject(childReader, name, context);
+                            PropertyDescriptor desc = inf.getPropertyDescriptorFromMappedName(name);
+                            boolean isList =  List.class.isAssignableFrom(desc.getPropertyType());
+                            writeObj = aType.readObject(childReader, name, context, !isList);
                         } else {
                             writeObj = type.readObject(childReader, context);
                         }
@@ -272,7 +276,13 @@ public class BeanType extends AegisType {
                 if (getTypeClass().isInterface()) {
                     m = getWriteMethodFromImplClass(impl, desc);
                 }
-
+                if (m == null && property instanceof List) {
+                    m = desc.getReadMethod();
+                    List<Object> l = CastUtils.cast((List<?>)m.invoke(object));
+                    List<Object> p = CastUtils.cast((List<?>)property);
+                    l.addAll(p);
+                    return;
+                }
                 if (m == null) {
                     throw new DatabindingException("No write method for property " + name + " in "
                                                    + object.getClass());

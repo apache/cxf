@@ -16,16 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+
 package org.apache.cxf.aegis.type.array;
 
-public interface FlatArrayServiceInterface {
+import java.util.ArrayList;
+import java.util.List;
 
-    String[] getStringArrayValue();
+import org.apache.cxf.aegis.type.java5.XmlFlattenedArray;
 
-    void submitStringArray(String[] array);
+/**
+ * Test bean for flat='true'
+ */
+public class BeanWithFlatCollection {
+    List<Integer> values = new ArrayList<Integer>();
 
-    void takeBeanWithFlatArray(BeanWithFlatArray bwfa);
-    
-    BeanWithFlatCollection echoBeanWithFlatCollection(BeanWithFlatCollection c);
+    @XmlFlattenedArray
+    public List<Integer> getValues() {
+        return values;
+    }
+
 }
-

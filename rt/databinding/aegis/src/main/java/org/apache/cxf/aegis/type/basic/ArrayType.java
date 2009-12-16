@@ -57,11 +57,15 @@ public class ArrayType extends AegisType {
     public ArrayType() {
     }
     
-    public Object readObject(MessageReader reader, QName flatElementName, Context context) 
+    public Object readObject(MessageReader reader, QName flatElementName,
+                             Context context, boolean asArray) 
         throws DatabindingException {
         try {
             Collection values = readCollection(reader, flatElementName, context);
-            return makeArray(getComponentType().getTypeClass(), values);
+            if (asArray) {
+                return makeArray(getComponentType().getTypeClass(), values);
+            }
+            return values;
         } catch (IllegalArgumentException e) {
             throw new DatabindingException("Illegal argument.", e);
         }
@@ -72,7 +76,7 @@ public class ArrayType extends AegisType {
      */
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
-        return readObject(reader, null, context);
+        return readObject(reader, null, context, true);
     }
 
     protected Collection<Object> createCollection() {
@@ -221,6 +225,10 @@ public class ArrayType extends AegisType {
         boolean forceXsiWrite = false;
         if (values == null) {
             return;
+        }
+        if (values instanceof Collection) {
+            Collection c = (Collection)values;
+            values = c.toArray();
         }
 
         AegisType type = getComponentType();

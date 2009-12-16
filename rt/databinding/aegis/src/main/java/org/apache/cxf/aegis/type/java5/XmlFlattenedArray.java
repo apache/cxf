@@ -16,16 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.aegis.type.array;
 
-public interface FlatArrayServiceInterface {
+package org.apache.cxf.aegis.type.java5;
 
-    String[] getStringArrayValue();
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-    void submitStringArray(String[] array);
+/**
+ * 
+ */
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.METHOD)
+public @interface XmlFlattenedArray {
 
-    void takeBeanWithFlatArray(BeanWithFlatArray bwfa);
-    
-    BeanWithFlatCollection echoBeanWithFlatCollection(BeanWithFlatCollection c);
 }
-
