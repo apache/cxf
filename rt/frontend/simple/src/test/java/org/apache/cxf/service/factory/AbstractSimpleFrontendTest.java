@@ -48,6 +48,7 @@ public abstract class AbstractSimpleFrontendTest extends AbstractCXFTest {
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/", soapTF);
 
         LocalTransportFactory localTransport = new LocalTransportFactory();
+        localTransport.getUriPrefixes().add("http");
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
 

@@ -67,10 +67,10 @@
             <artifactId>cxf-rt-bindings-xml</artifactId>
             <version>${pom.version}</version>
             <exclusions>
-               <exclusion>
-                  <groupId>org.apache.cxf</groupId>
-                  <artifactId>cxf-rt-databinding-jaxb</artifactId>
-               </exclusion>
+                <exclusion>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-databinding-jaxb</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
 
@@ -100,7 +100,7 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
-            <version>${abdera.version}</version>  
+            <version>${abdera.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
@@ -128,7 +128,7 @@
                     <artifactId>stax-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-servlet_2.5_spec</artifactId>
@@ -149,18 +149,23 @@
             <artifactId>cxf-rt-transports-local</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${project.version}</version>
             <scope>test</scope>
-        </dependency> 
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
             <version>${project.version}</version>
-            <scope>test</scope> 
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -168,15 +173,7 @@
             <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
-<!--
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-rt-databinding-sdo</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
-        </dependency> 
--->
-	<dependency>
             <groupId>org.apache.xmlbeans</groupId>
             <artifactId>xmlbeans</artifactId>
         </dependency>
