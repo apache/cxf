@@ -67,8 +67,7 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
                                                                                             true)));
         Collections.reverse(list);
         for (String s : list) {
-            Class<? extends T> c = context.getType(s);
-            if (listener.loadBean(s, c)) {
+            if (listener.loadBean(s, type)) {
                 Object o = context.getBean(s);
                 if (listener.beanLoaded(s, type.cast(o))) {
                     return true;
