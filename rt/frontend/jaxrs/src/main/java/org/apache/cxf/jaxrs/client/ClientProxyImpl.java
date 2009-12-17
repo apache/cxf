@@ -413,15 +413,17 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             }
             outMessage.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
         }
-        
+        outMessage.setContent(OperationResourceInfo.class, ori);
+        setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
         boolean isForm = types.containsKey(ParameterType.FORM);
         if (bodyIndex != -1 || isForm) {
-            outMessage.setContent(OperationResourceInfo.class, ori);
             outMessage.put("BODY_INDEX", bodyIndex);
             Object body = isForm ? handleForm(types, params) : params[bodyIndex];
             MessageContentsList contents = new MessageContentsList(new Object[]{body});
             outMessage.setContent(List.class, contents);
             outMessage.getInterceptorChain().add(new BodyWriter());
+        } else {
+            setEmptyRequestProperty(outMessage, ori.getHttpMethod());
         }
         
         // execute chain    

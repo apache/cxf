@@ -39,11 +39,17 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.PutMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.AbstractPhaseInterceptor;
+import org.apache.cxf.phase.Phase;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -212,6 +218,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             WebClient.create("http://localhost:9080/bookstore/emptypost");
         Response response = wc.post(null);
         assertEquals(204, response.getStatus());
+    }
+    
+    @Test
+    public void testEmptyPostProxy() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean(); 
+        bean.setAddress("http://localhost:9080");
+        bean.setResourceClass(BookStore.class);
+        BookStore store = bean.create(BookStore.class);
+        store.emptypost();
+        assertEquals(204, WebClient.client(store).getResponse().getStatus());
     }
     
     @Test
@@ -1106,4 +1122,22 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         return bos.getOut().toString();        
     }
 
+    @Ignore
+    public class EmptyPostOutInterceptor extends AbstractPhaseInterceptor<Message> {
+                
+        public EmptyPostOutInterceptor() {
+             super(Phase.PRE_MARSHAL);
+            
+        } 
+
+        public void handleMessage(Message message) throws Fault {
+            OperationResourceInfo ori = message.getContent(OperationResourceInfo.class);
+            if (ori != null && ori.getMethodToInvoke().getName().equals("emptypost")) {
+                message.put("org.apache.cxf.post.empty", true);
+            }
+        }
+        
+        
+
+    }
 }
