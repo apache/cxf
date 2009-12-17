@@ -29,7 +29,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 
 	<bean class="org.apache.cxf.jaxws.spring.ClientHolderBean" id="greeters"
-		autowire="autodetect">
+		autowire="default">
 		<property name="greet1">
 			<jaxws:client
 				serviceClass="org.apache.hello_world_soap_http.Greeter" serviceName="s:SOAPService"
