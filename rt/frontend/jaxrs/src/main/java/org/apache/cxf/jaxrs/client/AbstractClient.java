@@ -67,6 +67,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseChainCache;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
@@ -574,8 +575,19 @@ public class AbstractClient implements Client {
         
         //setup conduit selector
         prepareConduitSelector(m);
+        exchange.put(Service.class, cfg.getConduitSelector().getEndpoint().getService());
         
         return m;
     }
 
+    protected void setEmptyRequestProperty(Message outMessage, String httpMethod) {
+        if ("POST".equals(httpMethod)) {
+            outMessage.put("org.apache.cxf.post.empty", true);
+        }
+    }
+    
+    protected void setPlainOperationNameProperty(Message outMessage, String name) {
+        outMessage.put("org.apache.cxf.resource.operation.name", name);
+    }
+    
 }

@@ -209,7 +209,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                       MultivaluedMap<String, String> values) {
         message.getExchange().put(OperationResourceInfo.class, ori);
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
-        message.getExchange().put("org.apache.cxf.management.operation.name", 
+        message.getExchange().put("org.apache.cxf.resource.operation.name", 
                                   ori.getMethodToInvoke().getName());
     }
 }

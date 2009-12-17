@@ -170,7 +170,7 @@ public class ResponseTimeMessageInInterceptor2Test extends AbstractMessageRespon
     @Override
     protected void setupOperationForMessage() {
         EasyMock.expect(exchange.get(OperationInfo.class)).andReturn(null);
-        EasyMock.expect(exchange.get("org.apache.cxf.management.operation.name"))
+        EasyMock.expect(exchange.get("org.apache.cxf.resource.operation.name"))
             .andReturn(OPERATION_NAME.getLocalPart());
     }
 }

@@ -40,6 +40,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
 
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.CastUtils;
@@ -559,15 +560,17 @@ public class WebClient extends AbstractClient {
     protected Response doChainedInvocation(String httpMethod, 
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass, Type genericType) {
         
-        Message m = createMessage(httpMethod, headers, getCurrentURI());
+        URI uri = getCurrentURI();
+        Message m = createMessage(httpMethod, headers, uri);
         m.put(URITemplate.TEMPLATE_PARAMETERS, templates);
         if (body != null) {
             MessageContentsList contents = new MessageContentsList(body);
             m.setContent(List.class, contents);
             m.getInterceptorChain().add(new BodyWriter());
-        } else if ("POST".equals(httpMethod)) {
-            m.put("org.apache.cxf.post.empty", "true");
+        } else {
+            setEmptyRequestProperty(m, httpMethod);
         }
+        setPlainOperationNameProperty(m, httpMethod + ":" + uri.toString());
         
         try {
             m.getInterceptorChain().doIntercept(m);
