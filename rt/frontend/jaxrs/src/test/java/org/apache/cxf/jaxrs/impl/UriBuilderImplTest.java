@@ -111,6 +111,38 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testEncodedPathWithAsteriscs() throws Exception {
+        URI uri = new URI("http://bar/foo/");
+        URI newUri = new UriBuilderImpl(uri).path("*").buildFromEncoded();   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/foo/*", newUri.toString());
+    }
+    
+    @Test
+    public void testPathWithAsteriscs() throws Exception {
+        URI uri = new URI("http://bar/foo/");
+        URI newUri = new UriBuilderImpl(uri).path("*").build();   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/foo/*", newUri.toString());
+    }
+    
+    @Test
+    public void testEncodedPathWithTwoAsteriscs() throws Exception {
+        URI uri = new URI("http://bar/foo/");
+        URI newUri = new UriBuilderImpl(uri).path("**").buildFromEncoded();   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/foo/**", newUri.toString());
+    }
+    
+    @Test
+    public void testPathWithTwoAsteriscs() throws Exception {
+        URI uri = new URI("http://bar/foo/");
+        URI newUri = new UriBuilderImpl(uri).path("**").build();   
+        assertEquals("URI is not built correctly", 
+                     "http://bar/foo/**", newUri.toString());
+    }
+    
+    @Test
     public void testEncodedAddedQuery() throws Exception {
         URI uri = new URI("http://bar");
         URI newUri = new UriBuilderImpl(uri).queryParam("q", "a+b%20%2B").buildFromEncoded();   

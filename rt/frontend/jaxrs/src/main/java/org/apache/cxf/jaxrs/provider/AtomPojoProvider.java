@@ -90,6 +90,23 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         for (AbstractAtomElementBuilder builder : atomBuilders.values()) {
             builder.setMessageContext(context);
         }
+        for (AtomElementWriter writer : atomWriters.values()) {
+            tryInjectMessageContext(writer);
+        }
+        for (AtomElementReader reader : atomReaders.values()) {
+            tryInjectMessageContext(reader);
+        }
+    }
+    
+    protected void tryInjectMessageContext(Object handler) {
+        try {
+            Method m = handler.getClass().getMethod("setMessageContext",
+                                                    new Class[]{MessageContext.class});
+            InjectionUtils.injectThroughMethod(handler, m, mc);
+        } catch (Throwable t) {
+            LOG.warning("Message context can not be injected into " + handler.getClass().getName() 
+                        + " : " + t.getMessage());
+        }
     }
     
     public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
@@ -199,7 +216,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     protected boolean buildFeed(Feed feed, Object o) {
         AtomElementWriter<?, ?> builder = atomWriters.get(o.getClass().getName());
         if (builder != null) {
-            ((AtomElementWriter)builder).writeTo(feed, o, mc);
+            ((AtomElementWriter)builder).writeTo(feed, o);
             return true;
         }
         return false;
@@ -313,7 +330,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
     protected boolean buildEntry(Entry entry, Object o) {
         AtomElementWriter<?, ?> builder = atomWriters.get(o.getClass().getName());
         if (builder != null) {
-            ((AtomElementWriter)builder).writeTo(entry, o, mc);
+            ((AtomElementWriter)builder).writeTo(entry, o);
             return true;
         }
         return false;
@@ -466,7 +483,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         
         AtomElementReader<?, ?> reader = atomReaders.get(cls.getName());
         if (reader != null) {
-            return ((AtomElementReader)reader).readFrom(feed, mc);
+            return ((AtomElementReader)reader).readFrom(feed);
         }
         Object instance = null;
         try {
@@ -493,7 +510,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         
         AtomElementReader<?, ?> reader = atomReaders.get(cls.getName());
         if (reader != null) {
-            return ((AtomElementReader)reader).readFrom(entry, mc);
+            return ((AtomElementReader)reader).readFrom(entry);
         }
         try {
             Unmarshaller um = 
