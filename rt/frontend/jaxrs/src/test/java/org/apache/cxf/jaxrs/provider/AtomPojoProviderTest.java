@@ -31,7 +31,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AtomElementReader;
@@ -42,7 +41,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
 
 public class AtomPojoProviderTest extends Assert {
 
@@ -165,7 +163,7 @@ public class AtomPojoProviderTest extends Assert {
  
     public static class CustomFeedWriter implements AtomElementWriter<Feed, Books> {
 
-        public void writeTo(Feed feed, Books pojoFeed, MessageContext context) {
+        public void writeTo(Feed feed, Books pojoFeed) {
             feed.setTitle("Books");
         }
         
@@ -173,7 +171,7 @@ public class AtomPojoProviderTest extends Assert {
     
     public static class CustomEntryWriter implements AtomElementWriter<Entry, Book> {
 
-        public void writeTo(Entry entry, Book pojoEntry, MessageContext context) {
+        public void writeTo(Entry entry, Book pojoEntry) {
             entry.setTitle(pojoEntry.getName());
         }
         
@@ -181,7 +179,7 @@ public class AtomPojoProviderTest extends Assert {
     
     public static class CustomEntryReader implements AtomElementReader<Entry, Book> {
 
-        public Book readFrom(Entry element, MessageContext mc) {
+        public Book readFrom(Entry element) {
             try {
                 String s = element.getContent();
                                 
@@ -198,12 +196,12 @@ public class AtomPojoProviderTest extends Assert {
     
     public static class CustomFeedReader implements AtomElementReader<Feed, Books> {
 
-        public Books readFrom(Feed element, MessageContext mc) {
+        public Books readFrom(Feed element) {
             Books books = new Books();
             List<Book> list = new ArrayList<Book>();
             CustomEntryReader entryReader = new CustomEntryReader();
             for (Entry e : element.getEntries()) {
-                list.add(entryReader.readFrom(e, mc));
+                list.add(entryReader.readFrom(e));
             }
             books.setBooks(list);
             return books;

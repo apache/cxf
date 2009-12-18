@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.ext.atom;
 
 import org.apache.abdera.model.Element;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 
 /**
  * A callback-style interface which can be used to deserialize an Atom Feed or Entry into a custom object
@@ -32,8 +31,7 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 public interface AtomElementReader<T extends Element, E> {
     /**
      * @param element Feed or Entry instance 
-     * @param context current MessageContext
      * @return pojoElement 
      */
-    E readFrom(T element, MessageContext mc);
+    E readFrom(T element);
 }

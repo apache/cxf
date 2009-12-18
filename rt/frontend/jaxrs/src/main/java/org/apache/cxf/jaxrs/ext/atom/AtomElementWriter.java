@@ -19,7 +19,6 @@
 package org.apache.cxf.jaxrs.ext.atom;
 
 import org.apache.abdera.model.Element;
-import org.apache.cxf.jaxrs.ext.MessageContext;
 
 /**
  * A callback-style interface which can be used to map an object to an Atom Feed or Entry
@@ -33,8 +32,6 @@ public interface AtomElementWriter<T extends Element, E> {
     /**
      * @param element Feed or Entry instance 
      * @param pojoElement An object which needs to be mapped to the feed or entry
-     * @param context modifiable output headers
-     * @param context MessageContext which can be used for adding properties related to the current URI, etc
      */
-    void writeTo(T element, E pojoElement, MessageContext mc);
+    void writeTo(T element, E pojoElement);
 }
