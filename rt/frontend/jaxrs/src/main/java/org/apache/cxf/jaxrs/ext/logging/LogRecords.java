@@ -33,12 +33,12 @@ import org.apache.commons.lang.builder.ToStringStyle;
 /**
  * List of {@link LogRecord}s. Necessary wrapper for {@link List} used in JAXB context.
  */
-@XmlRootElement(namespace = "http://cxf.apache.org/jaxrs/log")
-public class LogRecordsList {
+@XmlRootElement(namespace = "http://cxf.apache.org/log")
+public class LogRecords {
 
     private List<LogRecord> logRecords = new ArrayList<LogRecord>();
 
-    @XmlElement(name = "logRecord", namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(name = "logRecord", namespace = "http://cxf.apache.org/log")
     public List<LogRecord> getLogRecords() {
         return logRecords;
     }

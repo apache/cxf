@@ -19,9 +19,10 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -60,12 +61,14 @@ import static org.junit.Assert.assertEquals;
 public class JAXRSLoggingAtomPushTest {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
     private static Server server;
-    private static List<Feed> feeds = new ArrayList<Feed>();
-    private static List<Entry> entries = new ArrayList<Entry>();
-
+    
     @Ignore
     @Path("/")
     public static class Resource {
+        
+        private static Queue<Feed> feeds = new ConcurrentLinkedQueue<Feed>();
+        private static Queue<Entry> entries = new ConcurrentLinkedQueue<Entry>();
+        
         @POST
         public void consume(Feed feed) {
             feeds.add(feed);
@@ -75,6 +78,11 @@ public class JAXRSLoggingAtomPushTest {
         @Path("/atomPub")
         public void consume(Entry entry) {
             entries.add(entry);
+        }
+        
+        public static void clear() {
+            feeds.clear();
+            entries.clear();
         }
     }
 
@@ -131,8 +139,7 @@ public class JAXRSLoggingAtomPushTest {
 
     @Before
     public void before() throws Exception {
-        feeds.clear();
-        entries.clear();
+        Resource.clear();
     }
 
     @Test
@@ -140,8 +147,8 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush.properties");
         logSixEvents(LOG);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(1000);
-        assertEquals("Different logged events count;", 6, feeds.size());
+        Thread.sleep(3000);
+        assertEquals("Different logged events count;", 6, Resource.feeds.size());
     }
 
     @Test
@@ -149,9 +156,9 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush_batch.properties");
         logSixEvents(LOG);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         // 6 events / 3 element batch = 2 feeds expected
-        assertEquals("Different logged events count;", 2, feeds.size());
+        assertEquals("Different logged events count;", 2, Resource.feeds.size());
     }
 
     @Test
@@ -165,9 +172,9 @@ public class JAXRSLoggingAtomPushTest {
         log.setLevel(Level.ALL);
         logSixEvents(log);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         // 6 events / 2 element batch = 3 feeds expected
-        assertEquals("Different logged events count;", 3, feeds.size());
+        assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
 
     @Test
@@ -195,9 +202,9 @@ public class JAXRSLoggingAtomPushTest {
         log.setLevel(Level.ALL);
         logSixEvents(log);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         // 6 events / 2 element batch = 3 feeds expected
-        assertEquals("Different logged events count;", 3, feeds.size());
+        assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
 
     @Test
@@ -205,9 +212,9 @@ public class JAXRSLoggingAtomPushTest {
         configureLogging("resources/logging_atompush_atompub.properties");
         logSixEvents(LOG);
         // need to wait: multithreaded and client-server journey
-        Thread.sleep(1000);
+        Thread.sleep(3000);
         // 6 events logged as entries
-        assertEquals("Different logged events count;", 6, entries.size());
+        assertEquals("Different logged events count;", 6, Resource.entries.size());
     }
 
 }

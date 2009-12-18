@@ -31,7 +31,6 @@ import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 
 import org.apache.abdera.Abdera;
@@ -45,7 +44,7 @@ import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
-import org.apache.cxf.jaxrs.ext.logging.LogRecordsList;
+import org.apache.cxf.jaxrs.ext.logging.LogRecords;
 
 /**
  * Converter producing ATOM Feeds on standalone Entries with LogRecords or LogRecordsLists embedded as content
@@ -72,10 +71,11 @@ public final class StandardConverter implements Converter {
     }
 
     private Factory factory;
-    private Marshaller marsh;
+    private JAXBContext context;
     private DateFormat df;
     private Converter worker;
-    private Postprocessor postprocessor;
+    private AbstractFeedBuilder<List<LogRecord>> feedBuilder;
+    private AbstractEntryBuilder<List<LogRecord>> entryBuilder;
 
     /**
      * Creates configured converter with default post-processing of feeds/entries mandatory properties.
@@ -95,7 +95,7 @@ public final class StandardConverter implements Converter {
      * @param format log records embedded as entry content or extension.
      */
     public StandardConverter(Output output, Multiplicity multiplicity, Format format) {
-        this(output, multiplicity, format, new DefaultPostprocessor());
+        this(output, multiplicity, format, null, null);
     }
 
     /**
@@ -105,21 +105,17 @@ public final class StandardConverter implements Converter {
     public StandardConverter(Output output, Multiplicity multiplicity, Format format,
                              AbstractFeedBuilder<List<LogRecord>> feedBuilder,
                              AbstractEntryBuilder<List<LogRecord>> entryBuilder) {
-        this(output, multiplicity, format, new BuilderPostprocessor(feedBuilder, entryBuilder));
-    }
-
-    private StandardConverter(Output output, Multiplicity multiplicity, Format format,
-                              Postprocessor postprocessor) {
         Validate.notNull(output, "output is null");
         Validate.notNull(multiplicity, "multiplicity is null");
         Validate.notNull(format, "format is null");
-        Validate.notNull(postprocessor, "interceptor is null");
+        this.feedBuilder = feedBuilder;
+        this.entryBuilder = entryBuilder;
+        
         configure(output, multiplicity, format);
-        this.postprocessor = postprocessor;
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         factory = Abdera.getNewFactory();
         try {
-            marsh = JAXBContext.newInstance(LogRecordsList.class).createMarshaller();
+            context = JAXBContext.newInstance(LogRecords.class, LogRecord.class);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -132,73 +128,32 @@ public final class StandardConverter implements Converter {
     private void configure(final Output output, final Multiplicity multiplicity, final Format format) {
         if (output == Output.ENTRY && multiplicity == Multiplicity.ONE) {
             worker = new Converter() {
-                public List<? extends Element> convert(List<LogRecord> records) {
-                    // produces many entries, each entry with one log record
-                    List<Element> ret = new ArrayList<Element>();
-                    for (LogRecord record : records) {
-                        Entry e;
-                        if (format == Format.CONTENT) {
-                            e = createEntry(createContent(record));
-                        } else {
-                            e = createEntry(createExtension(record));
-                        }
-                        ret.add(e);
-                        postprocessor.afterEntry(e, Collections.singletonList(record));
-                    }
-                    return ret;
+                public List<Entry> convert(List<LogRecord> records) {
+                    return createEntries(format, records);
                 }
             };
         }
         if (output == Output.ENTRY && multiplicity == Multiplicity.MANY) {
             worker = new Converter() {
-                public List<? extends Element> convert(List<LogRecord> records) {
+                public List<Entry> convert(List<LogRecord> records) {
                     // produces one entry with list of all log records
-                    Entry e;
-                    if (format == Format.CONTENT) {
-                        e = createEntry(createContent(records));
-                    } else {
-                        e = createEntry(createExtension(records));
-                    }
-                    postprocessor.afterEntry(e, records);
-                    return Arrays.asList(e);
+                    return Arrays.asList(createEntryFromList(format, records));
                 }
             };
         }
         if (output == Output.FEED && multiplicity == Multiplicity.ONE) {
             worker = new Converter() {
-                public List<? extends Element> convert(List<LogRecord> records) {
+                public List<Feed> convert(List<LogRecord> records) {
                     // produces one feed with one entry with list of all log records
-                    Entry e;
-                    if (format == Format.CONTENT) {
-                        e = createEntry(createContent(records));
-                    } else {
-                        e = createEntry(createExtension(records));
-                    }
-                    postprocessor.afterEntry(e, records);
-                    Feed f = createFeed(e);
-                    postprocessor.afterFeed(f, records);
-                    return Arrays.asList(f);
+                    return Arrays.asList(createFeedWithSingleEntry(format, records));
                 }
             };
         }
         if (output == Output.FEED && multiplicity == Multiplicity.MANY) {
             worker = new Converter() {
-                public List<? extends Element> convert(List<LogRecord> records) {
+                public List<Feed> convert(List<LogRecord> records) {
                     // produces one feed with many entries, each entry with one log record
-                    List<Entry> entries = new ArrayList<Entry>();
-                    for (LogRecord record : records) {
-                        Entry e;
-                        if (format == Format.CONTENT) {
-                            e = createEntry(createContent(record));
-                        } else {
-                            e = createEntry(createExtension(record));
-                        }
-                        entries.add(e);
-                        postprocessor.afterEntry(e, Collections.singletonList(record));
-                    }
-                    Feed f = createFeed(entries);
-                    postprocessor.afterFeed(f, records);
-                    return Arrays.asList(f);
+                    return Arrays.asList(createFeed(format, records));
                 }
             };
         }
@@ -207,10 +162,38 @@ public final class StandardConverter implements Converter {
         }
     }
 
+    private List<Entry> createEntries(Format format, List<LogRecord> records) {
+        List<Entry> entries = new ArrayList<Entry>();
+        for (LogRecord record : records) {
+            entries.add(createEntryFromRecord(format, record));
+        }
+        return entries;
+    }
+    
+    private Entry createEntryFromList(Format format, List<LogRecord> records) {
+        Entry e = createEntry(records);
+        if (format == Format.CONTENT) {
+            setEntryContent(e, createContent(records));
+        } else {
+            setEntryContent(e, createExtension(records));
+        }
+        return e;
+    }
+    
+    private Entry createEntryFromRecord(Format format, LogRecord record) {
+        Entry e = createEntry(Collections.singletonList(record));
+        if (format == Format.CONTENT) {
+            setEntryContent(e, createContent(record));
+        } else {
+            setEntryContent(e, createExtension(record));
+        }
+        return e;
+    }
+    
     private String createContent(LogRecord record) {
         StringWriter writer = new StringWriter();
         try {
-            marsh.marshal(record, writer);
+            context.createMarshaller().marshal(record, writer);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -219,10 +202,10 @@ public final class StandardConverter implements Converter {
 
     private String createContent(List<LogRecord> records) {
         StringWriter writer = new StringWriter();
-        LogRecordsList list = new LogRecordsList();
+        LogRecords list = new LogRecords();
         list.setLogRecords(records);
         try {
-            marsh.marshal(list, writer);
+            context.createMarshaller().marshal(list, writer);
         } catch (JAXBException e) {
             throw new RuntimeException(e);
         }
@@ -254,86 +237,80 @@ public final class StandardConverter implements Converter {
     }
 
     private QName qn(String name) {
-        return new QName("http://cxf.apache.org/jaxrs/log", name, "log");
+        return new QName("http://cxf.apache.org/log", name, "log");
     }
 
     private ExtensibleElement createExtension(List<LogRecord> records) {
-        ExtensibleElement list = factory.newExtensionElement(qn("logRecordsList"));
+        ExtensibleElement list = factory.newExtensionElement(qn("logRecords"));
         for (LogRecord rec : records) {
             list.addExtension(createExtension(rec));
         }
         return list;
     }
 
-    private Entry createEntry(String content) {
+    private Entry createEntry(List<LogRecord> records) {
         Entry entry = factory.newEntry();
-        entry.setContent(content, Content.Type.XML);
+        setDefaultEntryProperties(entry, records);
+        
         return entry;
     }
-
-    private Entry createEntry(ExtensibleElement ext) {
-        Entry entry = factory.newEntry();
-        entry.addExtension(ext);
-        return entry;
+    
+    private void setEntryContent(Entry e, String content) {
+        e.setContent(content, Content.Type.XML);
     }
 
-    private Feed createFeed(Entry entry) {
+    private void setEntryContent(Entry e, ExtensibleElement ext) {
+        e.addExtension(ext);
+    }
+
+    private Feed createFeedWithSingleEntry(Format format, List<LogRecord> records) {
+        
         Feed feed = factory.newFeed();
-        feed.addEntry(entry);
+        feed.addEntry(createEntryFromList(format, records));
+        setDefaultFeedProperties(feed, records);
         return feed;
     }
-
-    private Feed createFeed(List<Entry> entries) {
+    
+    private Feed createFeed(Format format, List<LogRecord> records) {
+        
         Feed feed = factory.newFeed();
+        List<Entry> entries = createEntries(format, records);
         for (Entry entry : entries) {
             feed.addEntry(entry);
         }
+        setDefaultFeedProperties(feed, records);
         return feed;
     }
 
-    /**
-     * Post-processing for feeds/entries properties customization eg setup of dates, titles, author etc.
-     */
-    private interface Postprocessor {
-
-        /** Called after entry creation for given log records. */
-        void afterEntry(Entry entry, List<LogRecord> records);
-
-        /** Called after feed creation; at this stage feed has associated entries. */
-        void afterFeed(Feed feed, List<LogRecord> records);
-    }
-
-    private static class DefaultPostprocessor implements Postprocessor {
-        public void afterEntry(Entry entry, List<LogRecord> records) {
-            // required fields (see RFC 4287)
-            entry.setId("uuid:" + UUID.randomUUID().toString());
-            entry.addAuthor("CXF");
-            entry.setTitle(String.format("Entry with %d log record(s)", records.size()));
-            entry.setUpdated(new Date());
-        }
-
-        public void afterFeed(Feed feed, List<LogRecord> records) {
-            // required fields (see RFC 4287)
+    protected void setDefaultFeedProperties(Feed feed, List<LogRecord> records) {
+        if (feedBuilder != null) {
+            feed.setId(feedBuilder.getId(records));
+            feed.addAuthor(feedBuilder.getAuthor(records));
+            feed.setTitle(feedBuilder.getTitle(records));
+            feed.setUpdated(feedBuilder.getUpdated(records));
+            feed.setBaseUri(feedBuilder.getBaseUri(records));
+            List<String> categories = feedBuilder.getCategories(records);
+            if (categories != null) {
+                for (String category : categories) {
+                    feed.addCategory(category);
+                }
+            }
+            Map<String, String> links = feedBuilder.getLinks(records);
+            if (links != null) {
+                for (java.util.Map.Entry<String, String> mapEntry : links.entrySet()) {
+                    feed.addLink(mapEntry.getKey(), mapEntry.getValue());
+                }
+            }            
+        } else {
             feed.setId("uuid:" + UUID.randomUUID().toString());
             feed.addAuthor("CXF");
             feed.setTitle(String.format("Feed with %d entry(ies)", feed.getEntries().size()));
             feed.setUpdated(new Date());
         }
     }
-
-    private static class BuilderPostprocessor implements Postprocessor {
-        private AbstractFeedBuilder<List<LogRecord>> feedBuilder;
-        private AbstractEntryBuilder<List<LogRecord>> entryBuilder;
-
-        public BuilderPostprocessor(AbstractFeedBuilder<List<LogRecord>> feedBuilder,
-                                    AbstractEntryBuilder<List<LogRecord>> entryBuilder) {
-            Validate.notNull(feedBuilder, "feedBuilder is null");
-            Validate.notNull(entryBuilder, "entryBuilder is null");
-            this.feedBuilder = feedBuilder;
-            this.entryBuilder = entryBuilder;
-        }
-
-        public void afterEntry(Entry entry, List<LogRecord> records) {
+    
+    protected void setDefaultEntryProperties(Entry entry, List<LogRecord> records) {
+        if (entryBuilder != null) {
             entry.setId(entryBuilder.getId(records));
             entry.addAuthor(entryBuilder.getAuthor(records));
             entry.setTitle(entryBuilder.getTitle(records));
@@ -353,26 +330,13 @@ public final class StandardConverter implements Converter {
             }
             entry.setPublished(entryBuilder.getPublished(records));
             entry.setSummary(entryBuilder.getSummary(records));
-        }
-
-        public void afterFeed(Feed feed, List<LogRecord> records) {
-            feed.setId(feedBuilder.getId(records));
-            feed.addAuthor(feedBuilder.getAuthor(records));
-            feed.setTitle(feedBuilder.getTitle(records));
-            feed.setUpdated(feedBuilder.getUpdated(records));
-            feed.setBaseUri(feedBuilder.getBaseUri(records));
-            List<String> categories = feedBuilder.getCategories(records);
-            if (categories != null) {
-                for (String category : categories) {
-                    feed.addCategory(category);
-                }
-            }
-            Map<String, String> links = feedBuilder.getLinks(records);
-            if (links != null) {
-                for (java.util.Map.Entry<String, String> mapEntry : links.entrySet()) {
-                    feed.addLink(mapEntry.getKey(), mapEntry.getValue());
-                }
-            }
+        } else {    
+            entry.setId("uuid:" + UUID.randomUUID().toString());
+            entry.addAuthor("CXF");
+            entry.setTitle(String.format("Entry with %d log record(s)", 
+                                         records.size()));
+            entry.setUpdated(new Date());
         }
     }
+    
 }

@@ -18,14 +18,14 @@
  */
 
 /**
- * JAX-RS specific logging support. Based on <tt>java.util.logging</tt> (JUL)
+ * CXF specific logging support. Based on <tt>java.util.logging</tt> (JUL)
  * with use of different logging frameworks factored out; assumes that client 
  * with source code logging to other systems, like Log4J, can bridge 
  * to this implementation applying <a href="www.slf4j.org">SLF4J</a> 
  * that JAXRS already depends on.
  */
 @javax.xml.bind.annotation.XmlSchema(xmlns = {
-        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://cxf.apache.org/jaxrs/log", prefix = "log")
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://cxf.apache.org/log", prefix = "log")
             })
 package org.apache.cxf.jaxrs.ext.logging;
 

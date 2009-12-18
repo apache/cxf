@@ -24,6 +24,7 @@ import java.util.List;
 import javax.ws.rs.core.Response;
 
 import org.apache.abdera.model.Element;
+import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
@@ -40,7 +41,6 @@ public final class WebClientDeliverer implements Deliverer {
         Validate.notEmpty(deliveryAddress, "deliveryAddress is empty or null");
         List<?> providers = Arrays.asList(new AtomFeedProvider(), new AtomEntryProvider());
         wc = WebClient.create(deliveryAddress, providers);
-        wc.type("application/atom+xml");
     }
 
     public WebClientDeliverer(WebClient wc) {
@@ -49,8 +49,14 @@ public final class WebClientDeliverer implements Deliverer {
     }
 
     public boolean deliver(Element element) {
+        String type = element instanceof Feed ? "application/atom+xml" : "application/atom+xml;type=entry";
+        wc.type(type);
         Response res = wc.post(element);
         int status = res.getStatus();
         return status >= 200 && status <= 299;
+    }
+    
+    public String getEndpointAddress() {
+        return wc.getBaseURI().toString();
     }
 }

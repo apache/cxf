@@ -41,6 +41,7 @@ final class AtomPushEngineConfigurator {
     private String delivererClass;
     private String converterClass;
     private String batchSize;
+    private String batchCleanupTime;
     private String delivererUrl;
     private String retryTimeout;
     private String retryPause;
@@ -65,6 +66,10 @@ final class AtomPushEngineConfigurator {
         this.retryPauseTime = retryPauseTime;
     }
 
+    public void setBatchCleanupTime(String cleanupTime) {
+        this.batchCleanupTime = cleanupTime;
+    }
+    
     public void setBatchSize(String batchSize) {
         this.batchSize = batchSize;
     }
@@ -101,6 +106,7 @@ final class AtomPushEngineConfigurator {
         Deliverer d = deliverer;
         Converter c = converter;
         int batch = parseInt(batchSize, 1, 1);
+        int batchTime = parseInt(batchCleanupTime, 0);
         if (d == null) {
             if (delivererUrl != null) {
                 if (delivererClass != null) {
@@ -118,9 +124,15 @@ final class AtomPushEngineConfigurator {
                 c = createConverter(converterClass);
             } else {
                 Output out = parseEnum(output, Output.FEED);
-                Multiplicity mul = parseEnum(multiplicity, Multiplicity.ONE);
+                Multiplicity defaultMul = out == Output.FEED ? Multiplicity.MANY
+                    : batch > 1 ? Multiplicity.MANY : Multiplicity.ONE; 
+                Multiplicity mul = parseEnum(multiplicity, defaultMul);
                 Format form = parseEnum(format, Format.CONTENT);
-                c = new StandardConverter(out, mul, form);
+                if (out == Output.FEED) {
+                    c = new StandardConverter(out, mul, form);
+                } else {
+                    c = new StandardConverter(out, mul, form);
+                }
                 if (retryPause != null) {
                     int timeout = parseInt(retryTimeout, 0, 0);
                     int pause = parseInt(retryPauseTime, 1, 30);
@@ -133,6 +145,7 @@ final class AtomPushEngineConfigurator {
         engine.setDeliverer(d);
         engine.setConverter(c);
         engine.setBatchSize(batch);
+        engine.setBatchTime(batchTime);
         return engine;
     }
 
@@ -145,6 +158,7 @@ final class AtomPushEngineConfigurator {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private Converter createConverter(String clazz) {
         try {
             Constructor<Converter> ctor = loadClass(clazz, Converter.class).getConstructor();

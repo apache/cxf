@@ -136,4 +136,8 @@ public final class RetryingDeliverer implements Deliverer {
         }
     }
 
+    public String getEndpointAddress() {
+        return deliverer.getEndpointAddress();
+    }
+
 }

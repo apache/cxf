@@ -19,7 +19,10 @@
 package org.apache.cxf.jaxrs.ext.logging.atom;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,9 +54,11 @@ final class AtomPushEngine {
     private List<LogRecord> queue = new ArrayList<LogRecord>();
     private ExecutorService executor = Executors.newSingleThreadExecutor();
     private int batchSize = 1;
+    private int batchTime;
     private Converter converter;
     private Deliverer deliverer;
-
+    private Timer timer;
+    
     /**
      * Put record to publishing queue. Engine accepts published records only if is in proper state - is
      * properly configured (has deliverer and converter registered) and is not shot down; otherwise calls to
@@ -64,19 +69,33 @@ final class AtomPushEngine {
     public synchronized void publish(LogRecord record) {
         Validate.notNull(record, "record is null");
         if (isValid()) {
+            if (batchSize > 1 && batchTime > 0 && timer == null) {
+                createTimerTask(batchTime * 60 * 1000);
+            }
             queue.add(record);
             if (queue.size() >= batchSize) {
-                publishBatch(queue);
-                queue = new ArrayList<LogRecord>();
+                publishAndReset();
             }
+        } else {
+            handleUndeliveredRecords(Collections.singletonList(record), 
+                                     deliverer == null ? "" : deliverer.getEndpointAddress());
         }
+    }
+    
+    protected synchronized void publishAndReset() {
+        publishBatch(queue, deliverer, converter);
+        queue = new ArrayList<LogRecord>();
     }
 
     /**
      * Shuts engine down.
      */
     public synchronized void shutdown() {
-        executor.shutdownNow();
+        cancelTimerTask();
+        if (isValid() && queue.size() > 0) {
+            publishAndReset();
+        }
+        executor.shutdown();
     }
 
     private boolean isValid() {
@@ -96,25 +115,36 @@ final class AtomPushEngine {
         return true;
     }
 
-    private void publishBatch(final List<LogRecord> batch) {
+    private void publishBatch(final List<LogRecord> batch,
+                              final Deliverer d,
+                              final Converter c) {
         executor.execute(new Runnable() {
             public void run() {
                 try {
                     LoggingThread.markSilent(true);
-                    // syncing for safe converter/deliverer on the fly replacement
-                    synchronized (this) {
-                        // TODO diagnostic output here: System.out.println(element.toString());
-                        List<? extends Element> elements = converter.convert(batch);
-                        for (Element element : elements) {
-                            if (!deliverer.deliver(element)) {
-                                System.err.println("Delivery failed, shutting engine down");
-                                executor.shutdownNow();
-                                break;
+                    List<? extends Element> elements = c.convert(batch);
+                    for (int i = 0; i < elements.size(); i++) {
+                        Element element = elements.get(i);
+                        if (!d.deliver(element)) {
+                            System.err.println("Delivery to " + d.getEndpointAddress() 
+                                + " failed, shutting engine down");
+                            List<LogRecord> undelivered = null;
+                            if (i == 0) {
+                                undelivered = batch;
+                            } else {
+                                int index = (batch.size() / elements.size()) * i;
+                                // should not happen but just in case :-)
+                                if (index < batch.size()) {
+                                    undelivered = batch.subList(index, batch.size());
+                                }
                             }
+                            handleUndeliveredRecords(undelivered, d.getEndpointAddress());
+                            shutdown();
+                            break;
                         }
                     }
                 } catch (InterruptedException e) {
-                    // no action on executor.shutdownNow();
+                    // no action
                 } finally {
                     LoggingThread.markSilent(false);
                 }
@@ -122,6 +152,14 @@ final class AtomPushEngine {
         });
     }
 
+    protected void handleUndeliveredRecords(List<LogRecord> records, String address) {
+        // TODO : save them to some transient storage perhaps ?
+        System.err.println("The following records have been undelivered to " + address + " : ");
+        for (LogRecord r : records) {
+            System.err.println(r.toString());
+        }
+    }
+    
     public int getBatchSize() {
         return batchSize;
     }
@@ -130,8 +168,36 @@ final class AtomPushEngine {
         Validate.isTrue(batchSize > 0, "batch size is not greater than zero");
         this.batchSize = batchSize;
     }
+    
+    public void setBatchTime(int batchTime) {
+        this.batchTime = batchTime;
+    }
 
-    public Converter getConverter() {
+    /**
+     * Creates a timer task which will periodically flush the batch queue
+     * thus ensuring log records won't become too 'stale'. 
+     * Ex, if we have a batch size 10 and only WARN records need to be delivered
+     * then without the periodic cleanup the consumers may not get prompt notifications
+     *  
+     * @param timeout
+     */
+    protected void createTimerTask(long timeout) {
+        timer = new Timer();
+        timer.schedule(new TimerTask() {
+            public void run() {
+                publishAndReset();
+            }
+        }, timeout);
+    }
+    
+    protected void cancelTimerTask() {
+        if (timer != null) {
+            timer.cancel();
+            timer = null;
+        }
+    }
+    
+    public synchronized Converter getConverter() {
         return converter;
     }
 
@@ -140,7 +206,7 @@ final class AtomPushEngine {
         this.converter = converter;
     }
 
-    public Deliverer getDeliverer() {
+    public synchronized Deliverer getDeliverer() {
         return deliverer;
     }
 

@@ -189,6 +189,15 @@ public final class AtomPushBean {
         Validate.notNull(batchSize, "batchSize is null");
         conf.setBatchSize(batchSize);
     }
+    
+    /**
+     * Batch cleanup time in minutes
+     */
+    public void setBatchCleanupTime(String batchCleanupTime) {
+        checkInit();
+        Validate.notNull(batchCleanupTime, "batchCleanup is null");
+        conf.setBatchCleanupTime(batchCleanupTime);
+    }
 
     /**
      * Retry pause calculation strategy, either "linear" or "exponential".

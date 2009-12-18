@@ -173,6 +173,7 @@ public final class AtomPushHandler extends Handler {
         conf.setDelivererClass(manager.getProperty(cname + ".deliverer"));
         conf.setConverterClass(manager.getProperty(cname + ".converter"));
         conf.setBatchSize(manager.getProperty(cname + ".batchSize"));
+        conf.setBatchCleanupTime(manager.getProperty(cname + ".batchCleanupTime"));
         conf.setRetryPause(manager.getProperty(cname + ".retry.pause"));
         conf.setRetryPauseTime(manager.getProperty(cname + ".retry.pause.time"));
         conf.setRetryTimeout(manager.getProperty(cname + ".retry.timeout"));

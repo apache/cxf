@@ -33,4 +33,10 @@ public interface Deliverer {
      * @return true if delivery successful, false otherwise.
      */
     boolean deliver(Element element) throws InterruptedException;
+    
+    /**
+     * Returns the address of the remote endpoint this deliverer send elements to
+     * @return
+     */
+    String getEndpointAddress();
 }

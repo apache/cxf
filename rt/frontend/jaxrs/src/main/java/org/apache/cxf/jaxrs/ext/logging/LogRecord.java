@@ -39,7 +39,7 @@ import org.apache.commons.lang.builder.ToStringStyle;
  * LogRecord are never null; if some attributes are not set (e.g. logger name, or rendered cause taken from
  * Throwable) empty strings are returned.
  */
-@XmlRootElement(namespace = "http://cxf.apache.org/jaxrs/log")
+@XmlRootElement(namespace = "http://cxf.apache.org/log")
 public class LogRecord {
 
     private Date eventTimestamp = new Date();
@@ -77,7 +77,7 @@ public class LogRecord {
         return record;
     }
 
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public Date getEventTimestamp() {
         return eventTimestamp;
     }
@@ -87,7 +87,7 @@ public class LogRecord {
         this.eventTimestamp = eventTimestamp;
     }
 
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public LogLevel getLevel() {
         return level;
     }
@@ -100,7 +100,7 @@ public class LogRecord {
     /**
      * Formatted message with parameters filled in.
      */
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public String getMessage() {
         return message;
     }
@@ -110,7 +110,7 @@ public class LogRecord {
         this.message = renderedMessage;
     }
 
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public String getLoggerName() {
         return loggerName;
     }
@@ -120,7 +120,7 @@ public class LogRecord {
         this.loggerName = loggerName;
     }
 
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public String getThreadName() {
         return threadName;
     }
@@ -133,7 +133,7 @@ public class LogRecord {
     /**
      * Full stack trace of {@link Throwable} associated with log record.
      */
-    @XmlElement(namespace = "http://cxf.apache.org/jaxrs/log")
+    @XmlElement(namespace = "http://cxf.apache.org/log")
     public String getThrowable() {
         return throwable;
     }

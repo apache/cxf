@@ -25,12 +25,14 @@
 	-->
 <beans xmlns="http://www.springframework.org/schema/beans"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jaxrs="http://cxf.apache.org/jaxrs"
-	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:util="http://www.springframework.org/schema/util"
 	xsi:schemaLocation="
 http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
-http://cxf.apache.org/jaxrs
-http://cxf.apache.org/schemas/jaxrs.xsd">
+http://cxf.apache.org/jaxrs 
+http://cxf.apache.org/schemas/jaxrs.xsd
+http://www.springframework.org/schema/util 
+http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<import resource="classpath:META-INF/cxf/cxf.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
@@ -38,13 +40,109 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
 	<bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
 		init-method="init">
-		<property name="url" value="http://localhost:9080/feed" />
-		<!-- Mind the '$' instead of '.' for inner classes! -->
+		<property name="multiplicity" value="one"/>
 		<property name="loggers"
 			value="
 			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource:ALL,
 			namedLogger:WARN" />
+		<property name="deliverer">
+			<ref bean="webDeliverer" />
+		</property>	
 	</bean>
+
+    <bean id="webDeliverer" class="org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer">
+        <constructor-arg ref="webClient"/>
+    </bean>
+
+    <bean id="webClient" class="org.apache.cxf.jaxrs.client.WebClient"
+factory-method="create">
+        <constructor-arg type="java.lang.String" value="http://localhost:9080/root/feeds" />
+        <constructor-arg ref="feedProvider" />
+    </bean> 
+
+    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+		init-method="init">
+		<property name="batchSize" value="4"/>
+		<property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource2:ALL,
+			namedLogger:WARN" />
+		<property name="url" value="http://localhost:9080/batch/feeds"/>	
+	</bean>
+
+    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+		init-method="init">
+		<property name="output" value="entry"/>
+		<property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource3:ALL,
+			namedLogger:WARN" />
+		<property name="deliverer">
+			<ref bean="webDeliverer3" />
+		</property>	
+	</bean>
+
+    <bean id="webDeliverer3" class="org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer">
+        <constructor-arg ref="webClient3"/>
+    </bean>
+
+    <bean id="webClient3" class="org.apache.cxf.jaxrs.client.WebClient"
+factory-method="create">
+        <constructor-arg type="java.lang.String" value="http://localhost:9080/entries/entries" />
+        <constructor-arg ref="entryProvider" />
+    </bean> 
+
+    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+		init-method="init">
+		<property name="output" value="entry"/>
+		<property name="multiplicity" value="many"/>
+		<property name="batchSize" value="2"/>
+		<property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource4:ALL,
+			namedLogger:WARN" />
+		<property name="url" value="http://localhost:9080/entriesMany/entries"/>
+	</bean>
+
+    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+		init-method="init">
+		<property name="multiplicity" value="one"/>
+		<property name="format" value="extension"/>
+		<property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource5:ALL,
+			namedLogger:WARN" />
+		<property name="url" value="http://localhost:9080/extensions/feeds"/>
+	</bean>
+
+    <util:list id="feedProvider">
+      <ref bean="feed"/>
+    </util:list>
+    
+    <util:list id="entryProvider">
+      <ref bean="entry"/>
+    </util:list>        
+
+	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
+	    <property name="formattedOutput" value="true"/>
+	</bean>
+	<bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"> 
+	    <property name="formattedOutput" value="true"/>
+	</bean>
+
+	<jaxrs:server id="atomserver" address="/">
+		<jaxrs:serviceBeans>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource2"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource3"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource4"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource5"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+			<ref bean="entry" />
+		</jaxrs:providers>
+	</jaxrs:server>
 
 	<!--  
 	Other config samples:
@@ -69,23 +167,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 			  org.apache.cxf.bus:WARNING" />
 		<property name="batchSize" value="10" />
 	</bean>
- 	-->
- 	
-	<jaxrs:server id="atomserver" address="/">
-		<jaxrs:serviceBeans>
-			<ref bean="atombean" />
-		</jaxrs:serviceBeans>
-		<jaxrs:providers>
-			<ref bean="feed" />
-			<ref bean="entry" />
-		</jaxrs:providers>
-	</jaxrs:server>
-
-	<!-- Mind the '$' instead of '.' for inner classes! -->
-	<bean id="atombean"
-		class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource" />
-	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider" />
-	<bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider" />
+ 	--> 
 
 </beans>
 	<!-- END SNIPPET: beans -->
