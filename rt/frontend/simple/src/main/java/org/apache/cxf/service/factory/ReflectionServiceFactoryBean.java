@@ -219,7 +219,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             JAXBDataBinding db = new JAXBDataBinding(getQualifyWrapperSchema());
             Map props = this.getProperties();
             if (props != null && props.get("jaxb.additionalContextClasses") != null) {
-                Class[] extraClass = (Class[])this.getProperties().get("jaxb.additionalContextClasses");
+                Object o = this.getProperties().get("jaxb.additionalContextClasses");
+                if (o instanceof Class) {
+                    o = new Class[] {(Class)o};
+                } 
+                Class[] extraClass = (Class[])o;
                 db.setExtraClass(extraClass);
             }
             retVal = db;

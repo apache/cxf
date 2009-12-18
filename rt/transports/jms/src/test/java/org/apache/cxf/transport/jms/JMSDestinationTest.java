@@ -206,10 +206,12 @@ public class JMSDestinationTest extends AbstractJMSTester {
     public void testOneWayDestination() throws Exception {
         setupServiceInfo("http://cxf.apache.org/hello_world_jms", "/wsdl/jms_test.wsdl",
                          "HWStaticReplyQBinMsgService", "HWStaticReplyQBinMsgPort");
+        JMSDestination destination = setupJMSDestination(true);
+        
         JMSConduit conduit = setupJMSConduit(true, false);
         Message outMessage = new MessageImpl();
         setupMessageHeader(outMessage);
-        JMSDestination destination = setupJMSDestination(true);
+        
         sendoutMessage(conduit, outMessage, true);
         // wait for the message to be get from the destination
         waitForReceiveDestMessage();
