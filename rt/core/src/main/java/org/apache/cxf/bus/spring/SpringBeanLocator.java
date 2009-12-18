@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.cxf.configuration.ConfiguredBeanLocator;
+import org.apache.cxf.helpers.CastUtils;
 import org.springframework.beans.Mergeable;
 import org.springframework.beans.PropertyValue;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -54,12 +55,10 @@ public class SpringBeanLocator implements ConfiguredBeanLocator {
     }
 
     /** {@inheritDoc}*/
-    @SuppressWarnings("unchecked")
     public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
-        return context.getBeansOfType(type, false, true).values();
+        return CastUtils.cast(context.getBeansOfType(type, false, true).values());
     }
 
-    @SuppressWarnings("unchecked")
     public <T> boolean loadBeansOfType(Class<T> type,
                                        BeanLoaderListener<T> listener) {
         List<String> list = new ArrayList<String>(Arrays.asList(context.getBeanNamesForType(type, 

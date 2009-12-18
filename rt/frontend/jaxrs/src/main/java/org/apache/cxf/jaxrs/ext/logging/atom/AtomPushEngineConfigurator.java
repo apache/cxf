@@ -158,7 +158,6 @@ final class AtomPushEngineConfigurator {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private Converter createConverter(String clazz) {
         try {
             Constructor<Converter> ctor = loadClass(clazz, Converter.class).getConstructor();
