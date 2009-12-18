@@ -99,7 +99,6 @@ public class JMSConfiguration implements InitializingBean {
     
     public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
         if (targetDestination == null ||  getOrCreateWrappedConnectionFactory() == null) {
-            System.out.println("targetDestination " + targetDestination);
             throw new ConfigurationException(msg);
         }
     }

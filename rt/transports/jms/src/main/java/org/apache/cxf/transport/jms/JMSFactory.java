@@ -222,6 +222,7 @@ public final class JMSFactory {
             jmsListener.setDestination(dest);
         }
         jmsListener.initialize();
+        jmsListener.start();
         return jmsListener;
     }
 
