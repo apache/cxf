@@ -129,12 +129,13 @@ public class JMSDestination extends AbstractMultiplexDestination
     }
 
     private Destination resolveDestinationName(final JmsTemplate jmsTemplate, final String name) {
-        return (Destination)jmsTemplate.execute(new SessionCallback() {
+        SessionCallback sc = new SessionCallback() {
             public Object doInJms(Session session) throws JMSException {
                 DestinationResolver resolv = jmsTemplate.getDestinationResolver();
                 return resolv.resolveDestinationName(session, name, jmsConfig.isPubSubDomain());
             }
-        });
+        };
+        return (Destination)jmsTemplate.execute(sc);
     }
 
     public Destination getReplyToDestination(JmsTemplate jmsTemplate, Message inMessage) throws JMSException {

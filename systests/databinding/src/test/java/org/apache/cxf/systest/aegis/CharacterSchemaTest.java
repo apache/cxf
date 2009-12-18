@@ -30,23 +30,24 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.type.basic.CharacterAsStringType;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.test.TestUtilities;
+
+import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
+
 
 /**
  * 
  */
-public class CharacterSchemaTest extends AbstractDependencyInjectionSpringContextTests {
+@ContextConfiguration(locations = { "classpath:aegisSportsServiceBeans.xml" })
+public class CharacterSchemaTest extends AbstractJUnit4SpringContextTests {
     
     private TestUtilities testUtilities;
     
     public CharacterSchemaTest() {
         testUtilities = new TestUtilities(getClass());
-    }
-    
-    @Override
-    protected String[] getConfigLocations() {
-        return new String[] {"classpath:aegisSportsServiceBeans.xml"};
     }
     
     @Test
@@ -57,9 +58,9 @@ public class CharacterSchemaTest extends AbstractDependencyInjectionSpringContex
         Server s = testUtilities.
             getServerForService(new QName("http://aegis.systest.cxf.apache.org/", 
                                           "SportsService"));
-        assertNotNull(s);
+        Assert.assertNotNull(s);
         Document wsdl = testUtilities.getWSDLDocument(s); 
-        assertNotNull(wsdl);
+        Assert.assertNotNull(wsdl);
         NodeList typeAttrList = 
             testUtilities.assertValid("//xsd:complexType[@name='BeanWithCharacter']/xsd:sequence"
                                       + "/xsd:element[@name='character']"
@@ -69,11 +70,11 @@ public class CharacterSchemaTest extends AbstractDependencyInjectionSpringContex
         String typeAttrValue = typeAttr.getValue();
         // now, this thing is a qname with a :, and we have to work out if it's correct.
         String[] pieces = typeAttrValue.split(":");
-        assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getLocalPart(),
+        Assert.assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getLocalPart(),
                      pieces[1]);
         Node elementNode = typeAttr.getOwnerElement();
         String url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
-        assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getNamespaceURI(),
+        Assert.assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME.getNamespaceURI(),
                      url);
     }
 }

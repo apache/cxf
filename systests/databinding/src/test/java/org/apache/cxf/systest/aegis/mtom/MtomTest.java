@@ -39,13 +39,18 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.DataHandlerBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
 import org.apache.cxf.test.TestUtilities;
+
+import org.junit.Assert;
 import org.junit.Test;
-import org.springframework.test.AbstractDependencyInjectionSpringContextTests;
+
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
  * 
  */
-public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
+@ContextConfiguration(locations = { "classpath:mtomTestBeans.xml" })
+public class MtomTest extends AbstractJUnit4SpringContextTests {
     
     private org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl impl;
     private org.apache.cxf.systest.aegis.mtom.fortest.MtomTest client;
@@ -53,11 +58,6 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
     
     public MtomTest() {
         testUtilities = new TestUtilities(getClass());
-    }
-    
-    @Override
-    protected String[] getConfigLocations() {
-        return new String[] {"classpath:mtomTestBeans.xml"};
     }
     
     private void setupForTest(boolean enableClientMTOM) throws Exception {
@@ -82,8 +82,8 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
     public void testMtomReply() throws Exception {
         setupForTest(true);
         DataHandlerBean dhBean = client.produceDataHandlerBean();
-        assertNotNull(dhBean);
-        assertEquals(MtomTestImpl.STRING_DATA, dhBean.getDataHandler().getContent());
+        Assert.assertNotNull(dhBean);
+        Assert.assertEquals(MtomTestImpl.STRING_DATA, dhBean.getDataHandler().getContent());
     }
 
     @Test 
@@ -97,10 +97,10 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
         dhBean.setDataHandler(dataHandler);
         client.acceptDataHandler(dhBean);
         DataHandlerBean accepted = impl.getLastDhBean();
-        assertNotNull(accepted);
+        Assert.assertNotNull(accepted);
         String data = (String) accepted.getDataHandler().getContent();
-        assertNotNull(data);
-        assertEquals("This is the cereal shot from guns.", data);
+        Assert.assertNotNull(data);
+        Assert.assertEquals("This is the cereal shot from guns.", data);
     }
 
     @Test 
@@ -114,10 +114,10 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
         dhBean.setDataHandler(dataHandler);
         client.acceptDataHandler(dhBean);
         DataHandlerBean accepted = impl.getLastDhBean();
-        assertNotNull(accepted);
+        Assert.assertNotNull(accepted);
         Object data = accepted.getDataHandler().getContent();
-        assertNotNull(data);
-        assertEquals("This is the cereal shot from guns.", data);
+        Assert.assertNotNull(data);
+        Assert.assertEquals("This is the cereal shot from guns.", data);
     }
 
     @Test
@@ -129,7 +129,7 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
             getServerForService(new QName("http://fortest.mtom.aegis.systest.cxf.apache.org/", 
                                           "MtomTest"));
         Document wsdl = testUtilities.getWSDLDocument(s); 
-        assertNotNull(wsdl);
+        Assert.assertNotNull(wsdl);
         NodeList typeAttrList = 
             testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
                                       + "xsd:element[@name='dataHandler']/"
@@ -139,14 +139,14 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
         String typeAttrValue = typeAttr.getValue();
         // now, this thing is a qname with a :, and we have to work out if it's correct.
         String[] pieces = typeAttrValue.split(":");
-        assertEquals("base64Binary", pieces[1]);
+        Assert.assertEquals("base64Binary", pieces[1]);
         Node elementNode = typeAttr.getOwnerElement();
         String url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
-        assertEquals(SOAPConstants.XSD, url);
+        Assert.assertEquals(SOAPConstants.XSD, url);
         
         s = testUtilities.getServerForAddress("http://localhost:9002/mtomXmime");
         wsdl = testUtilities.getWSDLDocument(s); 
-        assertNotNull(wsdl);
+        Assert.assertNotNull(wsdl);
         typeAttrList = 
             testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
                                       + "xsd:element[@name='dataHandler']/"
@@ -156,10 +156,10 @@ public class MtomTest extends AbstractDependencyInjectionSpringContextTests {
         typeAttrValue = typeAttr.getValue();
         // now, this thing is a qname with a :, and we have to work out if it's correct.
         pieces = typeAttrValue.split(":");
-        assertEquals("base64Binary", pieces[1]);
+        Assert.assertEquals("base64Binary", pieces[1]);
         elementNode = typeAttr.getOwnerElement();
         url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
-        assertEquals(AbstractXOPType.XML_MIME_NS, url);
+        Assert.assertEquals(AbstractXOPType.XML_MIME_NS, url);
         
         /* when I add a test for a custom mapping.
         testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
