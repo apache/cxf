@@ -160,14 +160,59 @@ public final class JMSFactory {
         return createJmsListener(jmsListener,
                                  jmsConfig,
                                  listenerHandler,
-                                 destinationName);            
+                                 destinationName,
+                                 null, null, false);            
     }
-    
+    /**
+     * Create and start listener using configuration information from jmsConfig. Uses
+     * resolveOrCreateDestination to determine the destination for the listener.
+     * 
+     * @param jmsConfig configuration information
+     * @param listenerHandler object to be called when a message arrives
+     * @param destinationName null for temp dest or a destination name
+     * @param messageSelectorPrefix prefix for the messageselector
+     * @return
+     */
+    public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
+                                                                    MessageListener listenerHandler,
+                                                                    Destination destination, 
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
+        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
+            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 null,
+                                 destination, 
+                                 messageSelectorPrefix,
+                                 userCID);    
+    }
+    public static DefaultMessageListenerContainer createJmsListener(JMSConfiguration jmsConfig,
+                                                                    MessageListener listenerHandler,
+                                                                    String destination, 
+                                                                    String messageSelectorPrefix,
+                                                                    boolean userCID) {
+        DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
+            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+        
+        return createJmsListener(jmsListener,
+                                 jmsConfig,
+                                 listenerHandler,
+                                 destination,
+                                 null, 
+                                 messageSelectorPrefix,
+                                 userCID);    
+    }
     public static DefaultMessageListenerContainer createJmsListener(
                           DefaultMessageListenerContainer jmsListener,
                           JMSConfiguration jmsConfig,
                           MessageListener listenerHandler,
-                          String destinationName) {
+                          String destinationName,
+                          Destination destination,
+                          String messageSelectorPrefix,
+                          boolean userCID) {
         
         jmsListener.setConcurrentConsumers(jmsConfig.getConcurrentConsumers());
         jmsListener.setMaxConcurrentConsumers(jmsConfig.getMaxConcurrentConsumers());
@@ -202,18 +247,24 @@ public final class JMSFactory {
             jmsListener.setAcceptMessagesWhileStopping(jmsConfig.isAcceptMessagesWhileStopping());
         }
         String staticSelectorPrefix = jmsConfig.getConduitSelectorPrefix();
-        if (staticSelectorPrefix.length() > 0) {
+        if (!userCID && messageSelectorPrefix != null && jmsConfig.isUseConduitIdSelector()) {
+            jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
+                                        + staticSelectorPrefix 
+                                        + messageSelectorPrefix + "%'");
+        } else if (staticSelectorPrefix.length() > 0) {
             jmsListener.setMessageSelector("JMSCorrelationID LIKE '" 
                                         + staticSelectorPrefix +  "%'");
         }
+        
         if (jmsConfig.getDestinationResolver() != null) {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
         }
         if (jmsConfig.getTaskExecutor() != null) {
             jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
         } 
-        
-        if (jmsConfig.isAutoResolveDestination()) {
+        if (destination != null) {
+            jmsListener.setDestination(destination);
+        } else if (jmsConfig.isAutoResolveDestination()) {
             jmsListener.setDestinationName(destinationName);
         } else {
             JmsTemplate jmsTemplate = createJmsTemplate(jmsConfig, null);

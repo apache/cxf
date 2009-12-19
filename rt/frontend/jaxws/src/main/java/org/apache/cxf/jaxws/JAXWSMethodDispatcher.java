@@ -23,7 +23,10 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.lang.reflect.TypeVariable;
+import java.util.concurrent.Future;
 import java.util.logging.Logger;
+
+import javax.xml.ws.Response;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -49,8 +52,16 @@ public class JAXWSMethodDispatcher extends SimpleMethodDispatcher {
         int i = 0;
         for (Method m : methods) {
             try {
-                newMethods[i++] = getImplementationMethod(m);
+                newMethods[i] = getImplementationMethod(m);
+                i++;
             } catch (NoSuchMethodException e) {
+                if (m.getName().endsWith("Async")
+                    && (Future.class.equals(m.getReturnType())
+                        || Response.class.equals(m.getReturnType()))) {
+                    newMethods[i] = m;
+                    i++;
+                    continue;
+                }
                 Class endpointClass = implInfo.getImplementorClass();
                 Message msg = new Message("SEI_METHOD_NOT_FOUND", LOG, 
                                           m.getName(), endpointClass.getName());

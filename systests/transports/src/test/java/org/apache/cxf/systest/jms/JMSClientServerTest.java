@@ -25,14 +25,18 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.activation.DataHandler;
 import javax.jms.DeliveryMode;
 import javax.xml.namespace.QName;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
+import javax.xml.ws.Response;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
@@ -153,8 +157,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     fail("Should have thrown FaultException");
                 } catch (PingMeFault ex) {
                     assertNotNull(ex.getFaultInfo());
-                }                
-              
+                }
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -205,6 +208,117 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
+    public void testAsyncCall() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+            "HelloWorldService"));
+        QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        assertNotNull(wsdl);
+        
+        HelloWorldService service = new HelloWorldService(wsdl, serviceName);
+        assertNotNull(service);
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        final Thread thread = Thread.currentThread(); 
+        
+        class TestAsyncHandler implements AsyncHandler<String> {
+            String expected;
+            
+            public TestAsyncHandler(String x) {
+                expected = x;
+            }
+            
+            public String getExpected() {
+                return expected;
+            }
+            public void handleResponse(Response<String> response) {
+                try {
+                    Thread thread2 = Thread.currentThread();
+                    assertNotSame(thread, thread2);
+                    assertEquals("Hello " + expected, response.get());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        TestAsyncHandler h1 = new TestAsyncHandler("Homer");
+        TestAsyncHandler h2 = new TestAsyncHandler("Maggie");
+        TestAsyncHandler h3 = new TestAsyncHandler("Bart");
+        TestAsyncHandler h4 = new TestAsyncHandler("Lisa");
+        TestAsyncHandler h5 = new TestAsyncHandler("Marge");
+        
+        Future<?> f1 = greeter.greetMeAsync("Santa's Little Helper", 
+                                            new TestAsyncHandler("Santa's Little Helper"));
+        f1.get();
+        f1 = greeter.greetMeAsync("PauseForTwoSecs Santa's Little Helper", 
+                                  new TestAsyncHandler("Santa's Little Helper"));
+        long start = System.currentTimeMillis();
+        f1 = greeter.greetMeAsync("PauseForTwoSecs " + h1.getExpected(), h1);
+        Future<?> f2 = greeter.greetMeAsync("PauseForTwoSecs " + h2.getExpected(), h2);
+        Future<?> f3 = greeter.greetMeAsync("PauseForTwoSecs " + h3.getExpected(), h3);
+        Future<?> f4 = greeter.greetMeAsync("PauseForTwoSecs " + h4.getExpected(), h4);
+        Future<?> f5 = greeter.greetMeAsync("PauseForTwoSecs " + h5.getExpected(), h5);
+        long mid = System.currentTimeMillis();
+        assertEquals("Hello " + h1.getExpected(), f1.get());
+        assertEquals("Hello " + h2.getExpected(), f2.get());
+        assertEquals("Hello " + h3.getExpected(), f3.get());
+        assertEquals("Hello " + h4.getExpected(), f4.get());
+        assertEquals("Hello " + h5.getExpected(), f5.get());
+        long end = System.currentTimeMillis();
+
+        assertTrue("Time too long: " + (mid - start), (mid - start) < 1000);
+        assertTrue((end - mid) > 1000);
+        f1 = null;
+        f2 = null;
+        f3 = null;
+        f4 = null;
+        f5 = null;
+
+        /*
+        int count = 20;
+        TestAsyncHandler handlers[] = new TestAsyncHandler[count];
+        Future<?> futures[] = new Future<?>[count];
+        for (int x = 0; x < count; x++) {
+            handlers[x] = new TestAsyncHandler("Handler" + x);
+            futures[x] = greeter.greetMeAsync("PauseForTwoSecs " + handlers[x].getExpected(),
+                                              handlers[x]);
+            //intersperse some sync calls in there....
+            if (x == 2 || x == 5) {
+                assertEquals("Hello World", greeter.greetMe("World"));
+            }
+            if (x == 10) {
+                assertEquals("Hello World", greeter.greetMe("PauseForTwoSecs World"));                
+            }
+        }
+        int countDone = 0;
+        for (int x = 0; x < count; x++) {
+            if (futures[x].isDone()) {
+                countDone++;
+            }
+        }
+        assertTrue("Should not all be done.", countDone < count);
+        for (int x = 0; x < count; x++) {
+            assertEquals("Hello " + handlers[x].getExpected(), futures[x].get());
+        }
+        countDone = 0;
+        for (int x = 0; x < count; x++) {
+            if (futures[x].isDone()) {
+                countDone++;
+            }
+        }
+        assertEquals(count, countDone);
+        */
+        
+        greeter = null;
+        service = null;
+        
+        System.gc();
+        System.gc();
+        System.gc();
+    }
+    
+    @Test
     public void testBasicConnection() throws Exception {
         QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
                                  "HelloWorldService"));
@@ -243,11 +357,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     assertNotNull(nslf.getFaultInfo());
                     assertNotNull(nslf.getFaultInfo().getCode());
                 } 
+                
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
-        } catch (Exception t) {
-            throw t;
         }
     }
     
