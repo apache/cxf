@@ -50,6 +50,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:client>
    
   <jaxrs:client id="setHeaderClient" 
+    xmlns:s="http://books.com" serviceName="s:BookService"
     serviceClass="org.apache.cxf.jaxrs.resources.BookStore"
     address="http://localhost:8080/simpleWithAddress"
     username="username"

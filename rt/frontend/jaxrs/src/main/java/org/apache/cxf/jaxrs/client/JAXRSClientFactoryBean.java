@@ -103,7 +103,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     
     public WebClient createWebClient() {
         
-        Service service = new JAXRSServiceImpl(getAddress());
+        Service service = new JAXRSServiceImpl(getAddress(), getServiceName());
         getServiceFactory().setService(service);
         
         try {

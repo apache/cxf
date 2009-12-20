@@ -64,6 +64,7 @@
           <xsd:attribute name="bindingId" type="xsd:string" />          
           <xsd:attribute name="staticSubresourceResolution" type="xsd:boolean"/>          
           <xsd:attribute name="beanNames" type="xsd:string"/>
+          <xsd:attribute name="serviceName" type="xsd:QName"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>
@@ -99,6 +100,7 @@
           <xsd:attribute name="modelRef" type="xsd:string" />
           <xsd:attribute name="username" type="xsd:string"/>
           <xsd:attribute name="password" type="xsd:string"/>
+          <xsd:attribute name="serviceName" type="xsd:QName"/>
         </xsd:extension>
       </xsd:complexContent>
     </xsd:complexType>

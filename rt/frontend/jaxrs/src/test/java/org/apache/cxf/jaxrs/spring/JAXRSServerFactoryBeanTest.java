@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.spring;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.resources.BookStore;
@@ -49,6 +51,8 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         assertEquals("Get a wrong address", "http://localhost:8080/rs", sfb.getAddress());
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong resource class", BookStore.class, sfb.getResourceClasses().get(0));
+        assertEquals(new QName("http://books.com", "BookService"), 
+                     sfb.getServiceName());
         
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineServiceBeans");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
