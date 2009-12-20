@@ -38,7 +38,9 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
       </property>
   </bean>
   
-  <jaxrs:server id="simple" serviceClass="org.apache.cxf.jaxrs.resources.BookStore"         
+  <jaxrs:server xmlns:s="http://books.com" serviceName="s:BookService" 
+        id="simple" 
+        serviceClass="org.apache.cxf.jaxrs.resources.BookStore"         
         address="http://localhost:8080/rs"/>
   
   <jaxrs:server id="inlineServiceBeans" address="http://localhost:8080/simpleWithAddress10">

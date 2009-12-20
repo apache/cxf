@@ -148,7 +148,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                     ori = JAXRSUtils.findTargetMethod(resource, 
                         message, httpMethod, values, 
                         requestContentType, acceptContentTypes, false);
-                    setMessageProperties(message, ori, values);
+                    setMessageProperties(message, ori, values, resources.size());
                 } catch (WebApplicationException ex) {
                     operChecked = true;
                 }
@@ -178,7 +178,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             try {                
                 ori = JAXRSUtils.findTargetMethod(resource, message, 
                                             httpMethod, values, requestContentType, acceptContentTypes, true);
-                setMessageProperties(message, ori, values);
+                setMessageProperties(message, ori, values, resources.size());
             } catch (WebApplicationException ex) {
                 if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
                     && "OPTIONS".equalsIgnoreCase(httpMethod)) {
@@ -198,7 +198,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         LOG.fine("Accept contentType is: " + acceptTypes);
         
         LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
-        setMessageProperties(message, ori, values);  
+        setMessageProperties(message, ori, values, resources.size());  
       
         //Process parameters
         List<Object> params = JAXRSUtils.processParameters(ori, values, message);
@@ -206,10 +206,16 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     private void setMessageProperties(Message message, OperationResourceInfo ori, 
-                                      MultivaluedMap<String, String> values) {
+                                      MultivaluedMap<String, String> values,
+                                      int numberOfResources) {
         message.getExchange().put(OperationResourceInfo.class, ori);
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
-        message.getExchange().put("org.apache.cxf.resource.operation.name", 
-                                  ori.getMethodToInvoke().getName());
+        
+        String plainOperationName = ori.getMethodToInvoke().getName();
+        if (numberOfResources > 1) {
+            plainOperationName = ori.getClassResourceInfo().getServiceClass().getSimpleName()
+                + "#" + plainOperationName;
+        }
+        message.getExchange().put("org.apache.cxf.resource.operation.name", plainOperationName);    
     }
 }

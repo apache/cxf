@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.namespace.QName;
+
 import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
@@ -63,6 +65,9 @@ public class JAXRSServerFactoryBeanDefinitionParser extends AbstractBeanDefiniti
                 }
             }
             bean.addPropertyValue("tempResourceProviders", tempFactories);
+        } else if ("serviceName".equals(name)) {
+            QName q = parseQName(e, val);
+            bean.addPropertyValue(name, q);
         } else {
             mapToProperty(bean, name, val);
         }

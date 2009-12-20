@@ -59,22 +59,26 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     private Map<QName, Endpoint> endpoints = new HashMap<QName, Endpoint>();
     private String address;
     private boolean createServiceModel;
+    private QName serviceName;
     
-    public JAXRSServiceImpl() {
-    }
-    
-    public JAXRSServiceImpl(String address) {
+    public JAXRSServiceImpl(String address, QName qname) {
         this.address = address;
+        this.serviceName = qname;
     }
 
-    public JAXRSServiceImpl(List<ClassResourceInfo> cri) {
+    public JAXRSServiceImpl(List<ClassResourceInfo> cri, QName qname) {
         this.classResourceInfos = cri;
         executor = SynchronousExecutor.getInstance();    
+        this.serviceName = qname;
     }
     
-    public JAXRSServiceImpl(List<ClassResourceInfo> cri, boolean createModel) {
-        this(cri);
-        this.createServiceModel = createModel;
+    public JAXRSServiceImpl(List<ClassResourceInfo> cri) {
+        this(cri, null);
+    }
+    
+    public JAXRSServiceImpl(List<ClassResourceInfo> cri, boolean create) {
+        this(cri, null);
+        createServiceModel = true;
     }
     
     public void setCreateServiceModel(boolean create) {
@@ -86,6 +90,9 @@ public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider impl
     }
 
     public QName getName() {
+        if (serviceName != null) {
+            return serviceName;
+        }
         if (address == null) {
             Class primaryClass = classResourceInfos.get(0).getServiceClass();
             String ns = PackageUtils.getNamespace(PackageUtils.getPackageName(primaryClass));
