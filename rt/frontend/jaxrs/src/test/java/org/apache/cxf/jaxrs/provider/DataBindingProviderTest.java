@@ -60,7 +60,7 @@ public class DataBindingProviderTest extends Assert {
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
-        DataBindingProvider p = new DataBindingProvider(binding);
+        DataBindingProvider<Book> p = new DataBindingProvider<Book>(binding);
         Book b = new Book("CXF", 127L);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         p.writeTo(b, Book.class, Book.class,
@@ -96,7 +96,7 @@ public class DataBindingProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
-        DataBindingProvider p = new DataBindingProvider(binding);
+        DataBindingProvider<Book> p = new DataBindingProvider<Book>(binding);
         Book b = new Book("CXF", 127L);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         p.writeTo(b, Book.class, Book.class,
@@ -105,18 +105,17 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(bos.toString(), data);
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testJAXBRead() throws Exception {
         String data = "<Book><id>127</id><name>CXF</name><state></state></Book>";
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
-        DataBindingProvider p = new DataBindingProvider(binding);
+        DataBindingProvider<Book> p = new DataBindingProvider<Book>(binding);
         ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
-        Book book = (Book)p.readFrom((Class)Book.class, Book.class,
-                                      new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
-                                      new MetadataMap<String, String>(), is);
+        Book book = p.readFrom(Book.class, Book.class,
+                               new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
+                               new MetadataMap<String, String>(), is);
         assertEquals("CXF", book.getName());
         assertEquals(127L, book.getId());
     }

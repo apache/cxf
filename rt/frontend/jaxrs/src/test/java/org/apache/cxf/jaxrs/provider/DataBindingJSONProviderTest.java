@@ -60,7 +60,7 @@ public class DataBindingJSONProviderTest extends Assert {
         Service s = new JAXRSServiceImpl(Collections.singletonList(c), true);
         DataBinding binding = new JAXBDataBinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Book> p = new DataBindingJSONProvider<Book>();
         p.setDataBinding(binding);
         Book b = new Book("CXF", 127L);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -93,7 +93,7 @@ public class DataBindingJSONProviderTest extends Assert {
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Book> p = new DataBindingJSONProvider<Book>();
         p.setDataBinding(binding);
         Book b = new Book("CXF", 127L);
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
@@ -109,7 +109,7 @@ public class DataBindingJSONProviderTest extends Assert {
         s.put("writeXsiType", true);
         AegisDatabinding binding = new AegisDatabinding();
         binding.initialize(s);
-        DataBindingJSONProvider p = new DataBindingJSONProvider();
+        DataBindingJSONProvider<List<Book>> p = new DataBindingJSONProvider<List<Book>>();
         p.setDataBinding(binding);
         
         Book b = new Book("CXF", 127L);
