@@ -84,7 +84,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         DataBinding db = new SDODataBinding();
         bean.setDataBinding(db);
-        DataBindingJSONProvider provider = new DataBindingJSONProvider();
+        DataBindingJSONProvider<Structure> provider = new DataBindingJSONProvider<Structure>();
         provider.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
         provider.setDataBinding(db);
         bean.setProvider(provider);

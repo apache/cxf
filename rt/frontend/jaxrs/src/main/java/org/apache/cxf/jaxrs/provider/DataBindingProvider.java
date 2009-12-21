@@ -43,7 +43,7 @@ import org.apache.cxf.staxutils.StaxUtils;
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml" })
-public class DataBindingProvider implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
+public class DataBindingProvider<T> implements MessageBodyReader<T>, MessageBodyWriter<T> {
 
     private DataBinding binding;
     
@@ -62,13 +62,14 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
         return true;
     }
 
-    public Object readFrom(Class<Object> clazz, Type genericType, Annotation[] annotations, MediaType type, 
-                       MultivaluedMap<String, String> headers, InputStream is)
+    public T readFrom(Class<T> clazz, Type genericType, Annotation[] annotations, MediaType type, 
+                      MultivaluedMap<String, String> headers, InputStream is)
         throws IOException {
         try {
             XMLStreamReader reader = createReader(clazz, genericType, is);
             DataReader<XMLStreamReader> dataReader = binding.createReader(XMLStreamReader.class);
-            return dataReader.read(null, reader, clazz);
+            Object o = dataReader.read(null, reader, clazz);
+            return o == null ? null : clazz.cast(o);
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
         }
@@ -79,7 +80,7 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
         return StaxUtils.createXMLStreamReader(is);
     }
     
-    public long getSize(Object t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
+    public long getSize(T t, Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         if (byte[].class.isAssignableFrom(t.getClass())) {
             return ((byte[])t).length;
         }
@@ -90,7 +91,7 @@ public class DataBindingProvider implements MessageBodyReader<Object>, MessageBo
         return true;
     }
 
-    public void writeTo(Object o, Class<?> clazz, Type genericType, Annotation[] annotations, 
+    public void writeTo(T o, Class<?> clazz, Type genericType, Annotation[] annotations, 
                         MediaType type, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         try {
