@@ -28,7 +28,7 @@ import org.apache.cxf.phase.Phase;
 public class ResponseTimeMessageInInterceptor extends AbstractMessageResponseTimeInterceptor {
     
     public ResponseTimeMessageInInterceptor() {
-        super(Phase.RECEIVE);
+        super(Phase.POST_LOGICAL);
     }
     
     public void handleMessage(Message message) throws Fault {
