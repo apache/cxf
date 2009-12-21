@@ -27,6 +27,7 @@ import java.util.List;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOutput;
 import javax.wsdl.Definition;
+import javax.wsdl.Import;
 import javax.wsdl.Part;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
@@ -61,6 +62,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.BareOutInterceptor;
@@ -412,16 +414,52 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             SchemaCollection schemas = serviceInfo.getXmlSchemaCollection();
 
             if (def != null && schemas != null) {
-                javax.wsdl.Message msg = def.getMessage(header.getMessage());
+                QName qn = header.getMessage();
+                
+                javax.wsdl.Message msg = findMessage(qn, def);
                 if (msg != null) {
                     addOutOfBandParts(bop, msg, schemas, isInput, header.getPart());
                     serviceInfo.refresh();
                 } else {
                     throw new RuntimeException("Problem with WSDL: soap:header element" 
-                        + " is referring to an undefined wsdl:message element.");
+                        + " for operation " + bop.getName()
+                        + " is referring to an undefined wsdl:message element: " + qn);
                 }
             }
         }
+    }
+    private javax.wsdl.Message findMessage(QName qn, Definition def) {
+        javax.wsdl.Message msg = def.getMessage(qn);
+        if (msg == null) {
+            msg = findMessage(qn, def, new ArrayList<Definition>());
+        }
+        return msg;
+    }
+    private javax.wsdl.Message findMessage(QName qn, Definition def, List<Definition> done) {
+        javax.wsdl.Message msg = def.getMessage(qn);
+        if (msg == null) {
+            if (done.contains(def)) {
+                return null;
+            }
+            done.add(def);
+            Collection<List<Import>> ilist = CastUtils.cast(def.getImports().values());
+            for (List<Import> list : ilist) {
+                for (Import i : list) {
+                    if (qn.getNamespaceURI().equals(i.getDefinition().getTargetNamespace())) {
+                        return i.getDefinition().getMessage(qn);
+                    }
+                }
+            }
+            for (List<Import> list : ilist) {
+                for (Import i : list) {
+                    msg = findMessage(qn, i.getDefinition(), done);
+                    if (msg != null) {
+                        return msg;
+                    }
+                }
+            }
+        }
+        return msg;
     }
 
     private void addOutOfBandParts(final BindingOperationInfo bop, final javax.wsdl.Message msg,
