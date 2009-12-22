@@ -415,6 +415,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         }
         outMessage.setContent(OperationResourceInfo.class, ori);
         setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
+        outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
         boolean isForm = types.containsKey(ParameterType.FORM);
         if (bodyIndex != -1 || isForm) {
             outMessage.put("BODY_INDEX", bodyIndex);

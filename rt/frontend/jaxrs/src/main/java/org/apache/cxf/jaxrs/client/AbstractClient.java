@@ -587,7 +587,7 @@ public class AbstractClient implements Client {
     }
     
     protected void setPlainOperationNameProperty(Message outMessage, String name) {
-        outMessage.put("org.apache.cxf.resource.operation.name", name);
+        outMessage.getExchange().put("org.apache.cxf.resource.operation.name", name);
     }
     
 }
