@@ -22,6 +22,7 @@ package org.apache.cxf.jaxb;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -47,7 +48,6 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementDecl;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamReader;
@@ -57,8 +57,6 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
-
-import org.xml.sax.SAXException;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
@@ -108,15 +106,15 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                                                XMLStreamWriter.class};
 
     private static final class CachedContextAndSchemas {
-        private JAXBContext context;
+        private WeakReference<JAXBContext> context;
         private Collection<DOMSource> schemas;
 
         CachedContextAndSchemas(JAXBContext context) {
-            this.context = context;
+            this.context = new WeakReference<JAXBContext>(context);
         }
 
         public JAXBContext getContext() {
-            return context;
+            return context.get();
         }
 
         public Collection<DOMSource> getSchemas() {
@@ -148,11 +146,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                 BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/02/addressing/wsdl", dr);
                 resolver.unresolve();
             }
-        } catch (IOException e) {
-            //IGNORE
-        } catch (ParserConfigurationException e) {
-            //IGNORE
-        } catch (SAXException e) {
+        } catch (Exception e) {
             //IGNORE
         }
         try {
@@ -165,11 +159,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                 BUILT_IN_SCHEMAS.put("http://www.w3.org/2005/08/addressing", dr);
                 resolver.unresolve();
             }
-        } catch (IOException e) {
-            //IGNORE
-        } catch (ParserConfigurationException e) {
-            //IGNORE
-        } catch (SAXException e) {
+        } catch (Exception e) {
             //IGNORE
         }
         try {
@@ -182,11 +172,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                 BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
                 resolver.unresolve();
             }
-        } catch (IOException e) {
-            //IGNORE
-        } catch (ParserConfigurationException e) {
-            //IGNORE
-        } catch (SAXException e) {
+        } catch (Exception e) {
             //IGNORE
         }
         try {
@@ -199,15 +185,10 @@ public class JAXBDataBinding extends AbstractDataBinding
                 BUILT_IN_SCHEMAS.put("http://schemas.xmlsoap.org/ws/2005/02/rm", dr);
                 resolver.unresolve();
             }
-        } catch (IOException e) {
-            //IGNORE
-        } catch (ParserConfigurationException e) {
-            //IGNORE
-        } catch (SAXException e) {
+        } catch (Exception e) {
             //IGNORE
         }
     }
-    
 
     Class[] extraClass;
 
@@ -357,7 +338,7 @@ public class JAXBDataBinding extends AbstractDataBinding
             } else {
                 synchronized (JAXBCONTEXT_CACHE) {
                     JAXBCONTEXT_CACHE.put(contextClasses, cachedContextAndSchemas);
-                }                
+                } 
             }
         }
         ctx = cachedContextAndSchemas.getContext();
@@ -484,6 +465,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
 
         JAXBUtils.scanPackages(classes, OBJECT_FACTORY_CACHE);
+        //JAXBUtils.scanPackages(classes, new HashMap<Package, CachedClass>());
         addWsAddressingTypes(classes);
 
         for (Class<?> clz : classes) {
@@ -511,9 +493,12 @@ public class JAXBDataBinding extends AbstractDataBinding
                 cachedContextAndSchemas = JAXBCONTEXT_CACHE.get(classes);
             }
         }
-        if (cachedContextAndSchemas == null) {
-            JAXBContext ctx = createContext(classes, map);
-            cachedContextAndSchemas = new CachedContextAndSchemas(ctx);
+        if (cachedContextAndSchemas != null) {
+            context = cachedContextAndSchemas.getContext();
+        }
+        if (context == null) {
+            context = createContext(classes, map);
+            cachedContextAndSchemas = new CachedContextAndSchemas(context);
             synchronized (JAXBCONTEXT_CACHE) {
                 if (typeRefs.isEmpty()) {
                     JAXBCONTEXT_CACHE.put(classes, cachedContextAndSchemas);
