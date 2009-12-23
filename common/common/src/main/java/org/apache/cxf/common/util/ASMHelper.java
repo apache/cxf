@@ -19,6 +19,7 @@
 
 package org.apache.cxf.common.util;
 
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
@@ -36,8 +37,8 @@ public class ASMHelper {
     protected static final Map<Class<?>, String> PRIMITIVE_MAP = new HashMap<Class<?>, String>();
     protected static final Map<Class<?>, String> NONPRIMITIVE_MAP = new HashMap<Class<?>, String>();
     
-    protected static final Map<Class<?>, TypeHelperClassLoader> LOADER_MAP 
-        = new WeakIdentityHashMap<Class<?>, TypeHelperClassLoader>();
+    protected static final Map<Class<?>, WeakReference<TypeHelperClassLoader>> LOADER_MAP 
+        = new WeakIdentityHashMap<Class<?>, WeakReference<TypeHelperClassLoader>>();
     
     protected static boolean oldASM;
     
@@ -191,10 +192,13 @@ public class ASMHelper {
     }
     
     private static synchronized TypeHelperClassLoader getTypeHelperClassLoader(Class<?> l) {
-        TypeHelperClassLoader ret = LOADER_MAP.get(l);
-        if (ret == null) {
+        WeakReference<TypeHelperClassLoader> ref = LOADER_MAP.get(l);
+        TypeHelperClassLoader ret;
+        if (ref == null || ref.get() == null) {
             ret = new TypeHelperClassLoader(l.getClassLoader());
-            LOADER_MAP.put(l, ret);
+            LOADER_MAP.put(l, new WeakReference<TypeHelperClassLoader>(ret));
+        } else {
+            ret = ref.get();
         }
         return ret;
     }

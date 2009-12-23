@@ -60,7 +60,11 @@ public class ServletContextResourceResolver implements ResourceResolver {
         try {
             if (entryName != null) {
                 InitialContext ic = new InitialContext();
-                obj = ic.lookup(entryName);
+                try {
+                    obj = ic.lookup(entryName);
+                } finally {
+                    ic.close();
+                }
             }
         } catch (NamingException e) {
             //do nothing
