@@ -95,7 +95,10 @@ public class WadlGenerator implements RequestHandler {
     private static final String JAXB_DEFAULT_NAME = "##default";
     private static final String CLASSPATH_PREFIX = "classpath:";
     
+    private String wadlNamespace;
     private boolean ignoreMessageWriters = true;
+    private boolean singleResourceMultipleMethods = true;
+    private boolean useSingleSlashResource = true;
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -109,7 +112,7 @@ public class WadlGenerator implements RequestHandler {
         }
         
         StringBuilder sbMain = new StringBuilder();
-        sbMain.append("<application xmlns=\"").append(WADL_NS)
+        sbMain.append("<application xmlns=\"").append(getNamespace())
               .append("\" xmlns:xs=\"").append(XmlSchemaConstants.XSD_NAMESPACE_URI).append("\"");
         StringBuilder sbGrammars = new StringBuilder();
         sbGrammars.append("<grammars>");
@@ -129,8 +132,11 @@ public class WadlGenerator implements RequestHandler {
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
         Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
-            handleResource(sbResources, jaxbTypes, proxy, clsMap,
-                           cri, cri.getURITemplate().getValue(), visitedResources);
+            String path = cri.getURITemplate().getValue();
+            sbResources.append("<resource path=\"").append(path).append("\">");
+            handleDocs(cri.getServiceClass().getAnnotations(), sbResources);
+            handleResource(sbResources, jaxbTypes, proxy, clsMap, cri, visitedResources);
+            sbResources.append("</resource>");
         }
         sbResources.append("</resources>");
         
@@ -180,38 +186,52 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy,
-                                Map<Class<?>, QName> clsMap, ClassResourceInfo cri, String path,
+                                Map<Class<?>, QName> clsMap, ClassResourceInfo cri, 
                                 Set<ClassResourceInfo> visitedResources) {
         visitedResources.add(cri);
-        sb.append("<resource path=\"").append(path).append("\">");
-        handleDocs(cri.getServiceClass().getAnnotations(), sb);
         List<OperationResourceInfo> sortedOps = sortOperationsByPath(
             cri.getMethodDispatcher().getOperationResourceInfos());
         
-        for (OperationResourceInfo ori : sortedOps) {
+        boolean resourceTagOpened = false;
+        for (int i = 0; i < sortedOps.size(); i++) {
+            OperationResourceInfo ori = sortedOps.get(i); 
             
             if (ori.getHttpMethod() == null) {
                 Class<?> cls = ori.getMethodToInvoke().getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null && !visitedResources.contains(subcri)) {
+                    String path = ori.getURITemplate().getValue();
+                    sb.append("<resource path=\"").append(path).append("\">");
+                    handleDocs(cri.getServiceClass().getAnnotations(), sb);
+                    handlePathAndMatrixParams(sb, ori);
                     handleResource(sb, jaxbTypes, jaxbProxy, clsMap, subcri, 
-                                   ori.getURITemplate().getValue(), visitedResources);
+                                   visitedResources);
+                    sb.append("</resource>");
                 } else {
                     handleDynamicSubresource(sb, jaxbTypes, jaxbProxy, clsMap, ori, subcri);
                 }
                 continue;
             }
-            handleOperation(sb, jaxbTypes, jaxbProxy, clsMap, ori);
+            OperationResourceInfo nextOp = i + 1 < sortedOps.size() ? sortedOps.get(i + 1) : null;
+            resourceTagOpened = handleOperation(sb, jaxbTypes, jaxbProxy, clsMap, ori, nextOp, 
+                                                resourceTagOpened, i);
         }
-        sb.append("</resource>");
     }
     
-    private void handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy, 
-                                 Map<Class<?>, QName> clsMap, OperationResourceInfo ori) {
+    //CHECKSTYLE:OFF
+    private boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes, 
+                                 JAXBContextProxy jaxbProxy, 
+                                 Map<Class<?>, QName> clsMap, 
+                                 OperationResourceInfo ori,
+                                 OperationResourceInfo nextOp,
+                                 boolean resourceTagOpened,
+                                 int index) {
+    //CHECKSTYLE:ON    
+        boolean samePathOperationFollows = singleResourceMultipleMethods && compareOperations(ori, nextOp);
         
         String path = ori.getURITemplate().getValue();
-        boolean useResource = useResource(ori);
-        if (useResource) {
+        if (!resourceTagOpened && openResource(path)) {
+            resourceTagOpened = true;
             URITemplate template = ori.getClassResourceInfo().getURITemplate();
             if (template != null) {
                 String parentPath = template.getValue();
@@ -220,12 +240,13 @@ public class WadlGenerator implements RequestHandler {
                 }
             }
             sb.append("<resource path=\"").append(path).append("\">");
-            handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
+            handlePathAndMatrixParams(sb, ori);
+        } else if (index == 0) {
+            handlePathAndMatrixParams(sb, ori);
         }
-        handleParams(sb, ori, ParameterType.PATH);
-        handleParams(sb, ori, ParameterType.MATRIX);
         
         sb.append("<method name=\"").append(ori.getHttpMethod()).append("\">");
+        handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
             sb.append("<request>");
             if (isFormRequest(ori)) {
@@ -237,11 +258,12 @@ public class WadlGenerator implements RequestHandler {
             }
             sb.append("</request>");
         }
+        sb.append("<response");
         boolean isVoid = void.class == ori.getMethodToInvoke().getReturnType();
         if (isVoid) {
-            sb.append("<!-- Only status code is returned -->");
+            sb.append(" status=\"204\"");
         }
-        sb.append("<response>");
+        sb.append(">");
         if (void.class != ori.getMethodToInvoke().getReturnType()) {
             handleRepresentation(sb, jaxbTypes, jaxbProxy, clsMap, ori,
                                  ori.getMethodToInvoke().getReturnType(), false);
@@ -250,20 +272,44 @@ public class WadlGenerator implements RequestHandler {
         
         sb.append("</method>");
         
-        if (useResource) {
+        if (resourceTagOpened && !samePathOperationFollows) {
             sb.append("</resource>");
+            resourceTagOpened = false;
         }
+        return resourceTagOpened;
     }
     
-    private boolean useResource(OperationResourceInfo ori) {
-        String path = ori.getURITemplate().getValue();
-        if ("/".equals(path)) {
-            for (Parameter pm : ori.getParameters()) {
-                if (pm.getType() == ParameterType.PATH || pm.getType() == ParameterType.MATRIX) {
-                    return true;
-                }
-            }
+    private boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
+        if (ori1 == null || ori2 == null
+            || !ori1.getURITemplate().getValue().equals(ori2.getURITemplate().getValue())) {
             return false;
+        }
+        int ori1PathParams = 0;
+        int ori1MatrixParams = 0;
+        for (Parameter p : ori1.getParameters()) {
+            if (p.getType() == ParameterType.PATH) {
+                ori1PathParams++;
+            } else if (p.getType() == ParameterType.MATRIX) {
+                ori1MatrixParams++;
+            }
+        }
+        
+        int ori2PathParams = 0;
+        int ori2MatrixParams = 0;
+        for (Parameter p : ori2.getParameters()) {
+            if (p.getType() == ParameterType.PATH) {
+                ori2PathParams++;
+            } else if (p.getType() == ParameterType.MATRIX) {
+                ori2MatrixParams++;
+            }
+        }
+        
+        return ori1PathParams == ori2PathParams && ori1MatrixParams == ori2MatrixParams;
+    }
+    
+    private boolean openResource(String path) {
+        if ("/".equals(path)) {
+            return useSingleSlashResource;
         }
         return true;
     }
@@ -278,14 +324,13 @@ public class WadlGenerator implements RequestHandler {
             sb.append("<!-- Dynamic subresource -->");    
         }
         sb.append("<resource path=\"").append(ori.getURITemplate().getValue()).append("\">");
-        if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
-            sb.append("<request>");
-            for (Parameter p : ori.getParameters()) {        
-                handleParameter(sb, jaxbTypes, jaxbProxy, clsMap, ori, p);             
-            }
-            sb.append("</request>");
-        }
+        handlePathAndMatrixParams(sb, ori);
         sb.append("</resource>");
+    }
+    
+    private void handlePathAndMatrixParams(StringBuilder sb, OperationResourceInfo ori) {
+        handleParams(sb, ori, ParameterType.PATH);
+        handleParams(sb, ori, ParameterType.MATRIX);
     }
     
     
@@ -400,7 +445,11 @@ public class WadlGenerator implements RequestHandler {
                 }
                 URITemplate ut1 = op1.getURITemplate();
                 URITemplate ut2 = op2.getURITemplate();
-                return ut1.getValue().compareTo(ut2.getValue());
+                int result = ut1.getValue().compareTo(ut2.getValue());
+                if (result == 0) {
+                    result = op1.getHttpMethod().compareTo(op2.getHttpMethod());
+                }
+                return result;
             }
             
         });        
@@ -668,5 +717,21 @@ public class WadlGenerator implements RequestHandler {
             }
         }
     }
+
+    private String getNamespace() {
+        return wadlNamespace != null ? wadlNamespace : WADL_NS;
+    }
     
+    public void setWadlNamespace(String namespace) {
+        this.wadlNamespace = namespace;
+    }
+
+    public void setSingleResourceMultipleMethods(boolean singleResourceMultipleMethods) {
+        this.singleResourceMultipleMethods = singleResourceMultipleMethods;
+    }
+
+    public void setUseSingleSlashResource(boolean useSingleSlashResource) {
+        this.useSingleSlashResource = useSingleSlashResource;
+    }
+
 }

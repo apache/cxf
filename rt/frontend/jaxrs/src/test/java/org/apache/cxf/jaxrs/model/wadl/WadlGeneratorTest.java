@@ -160,20 +160,22 @@ public class WadlGeneratorTest extends Assert {
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(6, resourceEls.size());        
+        assertEquals(7, resourceEls.size());        
         assertEquals("/", resourceEls.get(0).getAttribute("path"));
         assertEquals("/book2", resourceEls.get(1).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(2).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(3).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/books/{bookid}", resourceEls.get(4).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(6).getAttribute("path"));
         
         
         List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
                                                                WadlGenerator.WADL_NS, "method");
         
-        assertEquals(1, methodEls.size());
+        assertEquals(2, methodEls.size());
         assertEquals("GET", methodEls.get(0).getAttribute("name"));
+        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
         
         List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
                                                                WadlGenerator.WADL_NS, "param");
@@ -203,13 +205,27 @@ public class WadlGeneratorTest extends Assert {
         
         methodEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
                                                  WadlGenerator.WADL_NS, "method");
-        assertEquals(1, methodEls.size());
+        assertEquals(2, methodEls.size());
+        
         assertEquals("POST", methodEls.get(0).getAttribute("name"));
+        
+        requestEls = DOMUtils.getChildrenWithName(methodEls.get(1), 
+                                                                WadlGenerator.WADL_NS, "request");
+        assertEquals(1, requestEls.size());
+        List<Element> repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
+                                                            WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, repEls.size());
+        assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));
+        assertEquals("prefix1:thebook", repEls.get(0).getAttribute("element"));
+        assertEquals("application/json", repEls.get(1).getAttribute("mediaType"));
+        assertEquals("", repEls.get(1).getAttribute("element"));
+        
+        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
         
         requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
                                                                 WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
-        List<Element> repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
+        repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
                                                             WadlGenerator.WADL_NS, "representation");
         assertEquals(2, repEls.size());
         assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));

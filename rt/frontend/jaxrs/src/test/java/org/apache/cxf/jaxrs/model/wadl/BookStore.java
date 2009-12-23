@@ -24,6 +24,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.MatrixParam;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -48,8 +49,21 @@ public class BookStore {
         return "store";
     }
     
+    @PUT 
+    @Consumes("text/plain")
+    public void setName(@PathParam("id") Long id, String name) {
+    }
+    
+    @Path("books/{bookid}")
+    public Object addBook(@PathParam("id") int id,
+                        @PathParam("bookid") int bookId,
+                        @MatrixParam("mid") int matrixId) {
+        return new Book(1);
+    }
+    
     @POST
     @Path("books/{bookid}")
+    @Description("Update the books collection")
     //CHECKSTYLE:OFF
     public Book addBook(@PathParam("id") int id,
                         @PathParam("bookid") int bookId,
@@ -61,9 +75,20 @@ public class BookStore {
                         Book b) {
         return new Book(1);
     }
+    
+    @PUT
+    @Path("books/{bookid}")
+    @Description("Update the book")
+    public void addBook(@PathParam("id") int id,
+                        @PathParam("bookid") int bookId,
+                        @MatrixParam("mid") int matrixId,
+                        Book b) {
+    }
+    
     //CHECKSTYLE:ON
     @Path("booksubresource")
-    public Book getBook() {
+    public Book getBook(@PathParam("id") int id,
+                        @MatrixParam("mid") int matrixId) {
         return new Book(1);
     }
     
