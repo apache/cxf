@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first</artifactId>
     <version>1.0</version>
+    <packaging>war</packaging>
     <name>WSDL first demo using Document/Literal Style</name>
     <properties>
         <cxf.version>[2,)</cxf.version>
@@ -34,14 +35,40 @@
                 <directory>src/main/resources</directory>
             </resource>
         </resources>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-war-plugin</artifactId>
+                    <configuration>
+                        <webXml>../../etc/web.xml</webXml>
+                        <webResources>
+                            <resource>
+                                <directory>wsdl</directory>
+                                <targetPath>WEB-INF</targetPath>
+                                <includes>
+                                    <include>*.wsdl</include>
+                                </includes>
+                            </resource>
+                            <resource>
+                                <directory>src/main/resources</directory>
+                                <targetPath>WEB-INF</targetPath>
+                                <includes>
+                                    <include>**.*</include>
+                                </includes>
+                            </resource>
+                        </webResources>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>1.5</source>
+                        <target>1.5</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
-            <plugin>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
