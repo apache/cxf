@@ -142,21 +142,45 @@ public class WadlGeneratorTest extends Assert {
                                                           XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
         assertEquals(1, schemasEls.size());
         assertEquals("http://superbooks", schemasEls.get(0).getAttribute("targetNamespace"));
-        assertEquals(3, DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                       XmlSchemaConstants.XSD_NAMESPACE_URI, "element").size());
-        assertEquals(3, DOMUtils.getChildrenWithName(schemasEls.get(0), 
-                       XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType").size());
+        List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
+                            XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+        assertEquals(3, elementEls.size());
+        assertTrue(checkElement(elementEls, "thebook", "tns:book"));
+        assertTrue(checkElement(elementEls, "thebook2", "tns:book2"));
+        assertTrue(checkElement(elementEls, "thechapter", "tns:chapter"));
+        
+        List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
+                                        XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
+        assertEquals(3, complexTypesEls.size());
+        
+        assertTrue(checkComplexType(complexTypesEls, "book"));
+        assertTrue(checkComplexType(complexTypesEls, "book2"));
+        assertTrue(checkComplexType(complexTypesEls, "chapter"));
+    }
+    
+    private boolean checkComplexType(List<Element> els, String name) {
+        for (Element e : els) {
+            if (name.equals(e.getAttribute("name"))) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean checkElement(List<Element> els, String name, String type) {
+        for (Element e : els) {
+            if (name.equals(e.getAttribute("name"))
+                && type.equals(e.getAttribute("type"))) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
-        List<Element> docsEls = DOMUtils.getChildrenWithName(resource, 
-                WadlGenerator.WADL_NS, "doc");
-        assertEquals(1, docsEls.size());
-        assertEquals("book store resource", docsEls.get(0).getAttribute("title"));
-        assertEquals("en-us", 
-            docsEls.get(0).getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang"));
+        checkRootDocs(resource);
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
@@ -169,75 +193,178 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
         assertEquals("/itself", resourceEls.get(6).getAttribute("path"));
         
-        
-        List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
-                                                               WadlGenerator.WADL_NS, "method");
-        
-        assertEquals(2, methodEls.size());
-        assertEquals("GET", methodEls.get(0).getAttribute("name"));
-        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
-        
+        // verify repource starting with "/"
+        // must have a single template parameter
         List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
                                                                WadlGenerator.WADL_NS, "param");
         assertEquals(1, paramsEls.size());
-        checkParameter(paramsEls.get(0), "id", "template");
+        checkParameter(paramsEls.get(0), "id", "template", "xs:long");
         
+        // must have 2 methods, GET and PUT
+        List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
+                                                               WadlGenerator.WADL_NS, "method");
+        assertEquals(2, methodEls.size());
+        
+        // verify GET
+        assertEquals("GET", methodEls.get(0).getAttribute("name"));
+        assertEquals(0, DOMUtils.getChildrenWithName(methodEls.get(0), 
+                        WadlGenerator.WADL_NS, "param").size());
+        // check request 
         List<Element> requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
                                                                WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
         
+        // 6 parameters are expected
         paramsEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
                                                  WadlGenerator.WADL_NS, "param");
         assertEquals(6, paramsEls.size());
-        checkParameter(paramsEls.get(0), "a", "query");
-        checkParameter(paramsEls.get(1), "b", "query");
-        checkParameter(paramsEls.get(2), "c.a", "query");
-        checkParameter(paramsEls.get(3), "c.b", "query");
-        checkParameter(paramsEls.get(4), "c.d.a", "query");
-        checkParameter(paramsEls.get(5), "c.d.b", "query");
+        checkParameter(paramsEls.get(0), "a", "query", "xs:int");
+        checkParameter(paramsEls.get(1), "b", "query", "xs:int");
+        checkParameter(paramsEls.get(2), "c.a", "query", "xs:int");
+        checkParameter(paramsEls.get(3), "c.b", "query", "xs:int");
+        checkParameter(paramsEls.get(4), "c.d.a", "query", "xs:int");
+        checkParameter(paramsEls.get(5), "c.d.b", "query", "xs:int");
+        assertEquals(0, DOMUtils.getChildrenWithName(requestEls.get(0), 
+                         WadlGenerator.WADL_NS, "representation").size());
+        //check response
+        verifyPlainRepresentation(methodEls.get(0), "response");
         
+        // verify PUT
+        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
+        verifyPlainRepresentation(methodEls.get(1), "request");
+        
+        verifyResponseWithStatus(methodEls.get(1), "204");
+        
+        // verify resource starting with /book2
+        verifyGetResourceMethod(resourceEls.get(1), "prefix1:thebook2");
+        
+        //verify resource starting with /books/{bookid}
         paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
                                                                WadlGenerator.WADL_NS, "param");
+        // should have 3 parameters
         assertEquals(3, paramsEls.size());
-        checkParameter(paramsEls.get(0), "id", "template");
-        checkParameter(paramsEls.get(1), "bookid", "template");
-        checkParameter(paramsEls.get(2), "mid", "matrix");
+        checkParameter(paramsEls.get(0), "id", "template", "xs:int");
+        checkParameter(paramsEls.get(1), "bookid", "template", "xs:int");
+        checkParameter(paramsEls.get(2), "mid", "matrix", "xs:int");
         
+        // and 2 methods
         methodEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
                                                  WadlGenerator.WADL_NS, "method");
         assertEquals(2, methodEls.size());
         
+        // POST 
         assertEquals("POST", methodEls.get(0).getAttribute("name"));
         
+        requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
+                                             WadlGenerator.WADL_NS, "request");
+        assertEquals(1, requestEls.size());
+        paramsEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
+                                                 WadlGenerator.WADL_NS, "param");
+        // should have 2 parameters
+        assertEquals(2, paramsEls.size());
+        checkParameter(paramsEls.get(0), "hid", "header", "xs:int");
+        checkParameter(paramsEls.get(1), "provider.bar", "query", "xs:int");
+        verifyXmlJsonRepresentations(requestEls.get(0), "prefix1:thebook");
+        
+        // PUT
+        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
         requestEls = DOMUtils.getChildrenWithName(methodEls.get(1), 
                                                                 WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
-        List<Element> repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
-                                                            WadlGenerator.WADL_NS, "representation");
-        assertEquals(2, repEls.size());
-        assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));
-        assertEquals("prefix1:thebook", repEls.get(0).getAttribute("element"));
-        assertEquals("application/json", repEls.get(1).getAttribute("mediaType"));
-        assertEquals("", repEls.get(1).getAttribute("element"));
+        verifyXmlJsonRepresentations(requestEls.get(0), "prefix1:thebook");
+        verifyResponseWithStatus(methodEls.get(1), "204");
         
-        assertEquals("PUT", methodEls.get(1).getAttribute("name"));
+        // verify resource starting with /chapter
+        verifyGetResourceMethod(resourceEls.get(3), "prefix1:thechapter");
         
-        requestEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
-                                                                WadlGenerator.WADL_NS, "request");
-        assertEquals(1, requestEls.size());
-        repEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
-                                                            WadlGenerator.WADL_NS, "representation");
-        assertEquals(2, repEls.size());
-        assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));
-        assertEquals("prefix1:thebook", repEls.get(0).getAttribute("element"));
-        assertEquals("application/json", repEls.get(1).getAttribute("mediaType"));
-        assertEquals("", repEls.get(1).getAttribute("element"));
+        // verify resource starting from /booksubresource
+        // should have 2 parameters
+        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
+                         WadlGenerator.WADL_NS, "param");
+        assertEquals(2, paramsEls.size());
+        checkParameter(paramsEls.get(0), "id", "template", "xs:int");
+        checkParameter(paramsEls.get(1), "mid", "matrix", "xs:int");
         
+        // should have 4 child resources
+        List<Element> subResourceEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
+                                         WadlGenerator.WADL_NS, "resource");
+        assertEquals(4, subResourceEls.size());        
+        assertEquals("/book", subResourceEls.get(0).getAttribute("path"));
+        assertEquals("/form1", subResourceEls.get(1).getAttribute("path"));
+        assertEquals("/form2", subResourceEls.get(2).getAttribute("path"));
+        assertEquals("/chapter/{cid}", subResourceEls.get(3).getAttribute("path"));
+        // verify subresource /book
+        // GET 
+        verifyGetResourceMethod(subResourceEls.get(0), "prefix1:thebook");
+        
+        // verify subresource /chapter/{id}
+        List<Element> chapterMethodEls = DOMUtils.getChildrenWithName(subResourceEls.get(3), 
+                                                                    WadlGenerator.WADL_NS, "resource");
+        assertEquals(1, chapterMethodEls.size());        
+        assertEquals("/id", chapterMethodEls.get(0).getAttribute("path"));
+        paramsEls = DOMUtils.getChildrenWithName(subResourceEls.get(3), 
+                                                 WadlGenerator.WADL_NS, "param");
+        assertEquals(1, paramsEls.size());
+        checkParameter(paramsEls.get(0), "cid", "template", "xs:int");
+        // GET
+        verifyGetResourceMethod(chapterMethodEls.get(0), "prefix1:thechapter");
     }
     
-    private void checkParameter(Element paramEl, String name, String type) {
+    private void checkRootDocs(Element el) {
+        List<Element> docsEls = DOMUtils.getChildrenWithName(el, 
+                                                             WadlGenerator.WADL_NS, "doc");
+        assertEquals(1, docsEls.size());
+        assertEquals("book store resource", docsEls.get(0).getAttribute("title"));
+        assertEquals("en-us", 
+            docsEls.get(0).getAttributeNS("http://www.w3.org/XML/1998/namespace", "lang"));
+    }
+    
+    private void verifyGetResourceMethod(Element element, String type) {
+        List<Element> methodEls = DOMUtils.getChildrenWithName(element, WadlGenerator.WADL_NS, "method");
+        assertEquals(1, methodEls.size());
+        assertEquals("GET", methodEls.get(0).getAttribute("name"));
+        assertEquals(0, DOMUtils.getChildrenWithName(methodEls.get(0), 
+                      WadlGenerator.WADL_NS, "request").size());
+        List<Element> responseEls = DOMUtils.getChildrenWithName(methodEls.get(0), 
+                                WadlGenerator.WADL_NS, "response");
+        assertEquals(1, responseEls.size());
+        verifyXmlJsonRepresentations(responseEls.get(0), type);
+    }
+    
+    private void verifyResponseWithStatus(Element element, String status) {
+        List<Element> responseEls = DOMUtils.getChildrenWithName(element, 
+                                       WadlGenerator.WADL_NS, "response");
+        assertEquals(1, responseEls.size());
+        assertEquals(status, responseEls.get(0).getAttribute("status"));
+        assertEquals(0, DOMUtils.getChildrenWithName(responseEls.get(0), 
+            WadlGenerator.WADL_NS, "representation").size());
+    }
+    
+    private void verifyPlainRepresentation(Element element, String name) {
+        List<Element> responseEls = DOMUtils.getChildrenWithName(element, 
+                                 WadlGenerator.WADL_NS, name);
+        assertEquals(1, responseEls.size());
+        List<Element> representationEls = DOMUtils.getChildrenWithName(responseEls.get(0), 
+                    WadlGenerator.WADL_NS, "representation"); 
+        assertEquals(1, representationEls.size());
+        assertEquals("text/plain", representationEls.get(0).getAttribute("mediaType"));
+        assertEquals("", representationEls.get(0).getAttribute("element"));
+    }
+    
+    private void verifyXmlJsonRepresentations(Element element, String type) {
+        List<Element> repEls = DOMUtils.getChildrenWithName(element, 
+                                                            WadlGenerator.WADL_NS, "representation");
+        assertEquals(2, repEls.size());
+        assertEquals("application/xml", repEls.get(0).getAttribute("mediaType"));
+        assertEquals(type, repEls.get(0).getAttribute("element"));
+        assertEquals("application/json", repEls.get(1).getAttribute("mediaType"));
+        assertEquals("", repEls.get(1).getAttribute("element"));
+    }
+    
+    private void checkParameter(Element paramEl, String name, String style, String type) {
         assertEquals(name, paramEl.getAttribute("name"));
-        assertEquals(type, paramEl.getAttribute("style"));    
+        assertEquals(style, paramEl.getAttribute("style"));
+        assertEquals(type, paramEl.getAttribute("type"));
     }
     
     private List<Element> getWadlResourcesInfo(Document doc, String baseURI, int size) throws Exception {

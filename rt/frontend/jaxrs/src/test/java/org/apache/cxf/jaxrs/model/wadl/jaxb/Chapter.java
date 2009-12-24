@@ -20,11 +20,15 @@ package org.apache.cxf.jaxrs.model.wadl.jaxb;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.cxf.jaxrs.ext.Description;
+
 @XmlRootElement(name = "thechapter", namespace = "http://superbooks")
 @XmlType(name = "chapter", namespace = "http://superbooks")
+@Description("Chapter subresource")
 public class Chapter {
 
     private int id;
@@ -36,12 +40,18 @@ public class Chapter {
     
     @GET
     @Path("/id")
-    public int getId() {
-        return id;
+    @Produces({"application/xml", "application/json" })
+    @Description("Get the chapter")
+    public Chapter getIt() {
+        return this;
     }
     
     public void setId(int ident) {
         id = ident;
+    }
+    
+    public int getId() {
+        return id;
     }
 
 }

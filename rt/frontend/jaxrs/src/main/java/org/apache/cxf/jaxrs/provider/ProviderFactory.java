@@ -280,15 +280,26 @@ public final class ProviderFactory {
                                                         parameterAnnotations, mediaType, m);
     }
     
-    
-    
     public List<ProviderInfo<RequestHandler>> getRequestHandlers() {
         List<ProviderInfo<RequestHandler>> handlers = null;
         if (requestHandlers.size() == 0) {
             handlers = SHARED_FACTORY.requestHandlers;
         } else {
-            handlers = new ArrayList<ProviderInfo<RequestHandler>>(SHARED_FACTORY.requestHandlers);
+            handlers = new ArrayList<ProviderInfo<RequestHandler>>();
+            boolean customWADLHandler = false;
+            for (int i = 0; i < requestHandlers.size(); i++) {
+                if (requestHandlers.get(i).getProvider() instanceof WadlGenerator) {
+                    customWADLHandler = true;
+                    break;
+                }
+            }
+            if (!customWADLHandler) {
+                // TODO : this works only because we know we only have a single 
+                // system handler which is a default WADLGenerator, think of a better approach
+                handlers.addAll(SHARED_FACTORY.requestHandlers);    
+            }
             handlers.addAll(requestHandlers);
+            
         }
         return Collections.unmodifiableList(handlers);
     }
