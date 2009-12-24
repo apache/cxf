@@ -202,7 +202,7 @@ public class WadlGenerator implements RequestHandler {
                 if (subcri != null && !visitedResources.contains(subcri)) {
                     String path = ori.getURITemplate().getValue();
                     sb.append("<resource path=\"").append(path).append("\">");
-                    handleDocs(cri.getServiceClass().getAnnotations(), sb);
+                    handleDocs(subcri.getServiceClass().getAnnotations(), sb);
                     handlePathAndMatrixParams(sb, ori);
                     handleResource(sb, jaxbTypes, jaxbProxy, clsMap, subcri, 
                                    visitedResources);

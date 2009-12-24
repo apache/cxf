@@ -52,8 +52,11 @@ import org.apache.cxf.jaxrs.Customer;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
+import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.message.Exchange;
@@ -79,6 +82,49 @@ public class ProviderFactoryTest extends Assert {
         assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getSharedInstance());
         assertSame(ProviderFactory.getSharedInstance(), ProviderFactory.getSharedInstance());
         assertNotSame(ProviderFactory.getInstance(), ProviderFactory.getInstance());
+    }
+    
+    @Test
+    public void testCustomWadlHandler() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        assertEquals(1, pf.getRequestHandlers().size());
+        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        
+        WadlGenerator wg = new WadlGenerator();
+        pf.setUserProviders(Collections.singletonList(wg));
+        assertEquals(1, pf.getRequestHandlers().size());
+        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        assertSame(wg, pf.getRequestHandlers().get(0).getProvider());
+    }
+    
+    @Test
+    public void testCustomTestHandler() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        assertEquals(1, pf.getRequestHandlers().size());
+        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        
+        TestHandler th = new TestHandler();
+        pf.setUserProviders(Collections.singletonList(th));
+        assertEquals(2, pf.getRequestHandlers().size());
+        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        assertSame(th, pf.getRequestHandlers().get(1).getProvider());
+    }
+    
+    @Test
+    public void testCustomTestAndWadlHandler() {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        assertEquals(1, pf.getRequestHandlers().size());
+        assertTrue(pf.getRequestHandlers().get(0).getProvider() instanceof WadlGenerator);
+        
+        List<Object> providers = new ArrayList<Object>();
+        WadlGenerator wg = new WadlGenerator();
+        providers.add(wg);
+        TestHandler th = new TestHandler();
+        providers.add(th);
+        pf.setUserProviders(providers);
+        assertEquals(2, pf.getRequestHandlers().size());
+        assertSame(wg, pf.getRequestHandlers().get(0).getProvider());
+        assertSame(th, pf.getRequestHandlers().get(1).getProvider());
     }
     
     @Test
@@ -556,4 +602,11 @@ public class ProviderFactoryTest extends Assert {
         
     }
     
+    private static class TestHandler implements RequestHandler {
+
+        public Response handleRequest(Message m, ClassResourceInfo resourceClass) {
+            return null;
+        }
+        
+    }
 }

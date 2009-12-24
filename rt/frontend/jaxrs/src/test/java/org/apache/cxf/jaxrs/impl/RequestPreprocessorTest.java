@@ -24,9 +24,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
+
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.jaxrs.JAXRSServiceImpl;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.jaxrs.provider.ProviderFactory;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.servlet.ServletDestination;
 import org.easymock.classextension.EasyMock;
@@ -65,6 +78,20 @@ public class RequestPreprocessorTest extends Assert {
     }
     
     @Test
+    public void testWadlQuery() {
+        Message m = mockMessage("http://localhost:8080/bar", "/bar", "_wadl", "GET");
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(TestResource.class, TestResource.class, true, true);
+        m.getExchange().put(Service.class, new JAXRSServiceImpl(Collections.singletonList(cri)));
+        RequestPreprocessor sqh = new RequestPreprocessor();
+        sqh.preprocess(m, new UriInfoImpl(m, null));
+        Response r = m.getExchange().get(Response.class);
+        assertNotNull(r);
+        assertEquals(WadlGenerator.WADL_TYPE.toString(),
+                     r.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE));
+    }
+    
+    @Test
     public void testTypeQuery() {
         Message m = mockMessage("http://localhost:8080", "/bar", "_type=xml", "POST");
         RequestPreprocessor sqh = new RequestPreprocessor();
@@ -86,12 +113,15 @@ public class RequestPreprocessorTest extends Assert {
                                 String method,
                                 String methodHeader) {
         Message m = new MessageImpl();
-        control.reset();
-        Exchange e = control.createMock(Exchange.class);
+        Exchange e = new ExchangeImpl();
         m.setExchange(e);
+        control.reset();
+        Endpoint endp = control.createMock(Endpoint.class);
+        e.put(Endpoint.class, endp);
+        endp.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).anyTimes();
         ServletDestination d = control.createMock(ServletDestination.class);
-        e.getDestination();
-        EasyMock.expectLastCall().andReturn(d).anyTimes();
+        e.setDestination(d);
         EndpointInfo epr = new EndpointInfo(); 
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
@@ -106,5 +136,13 @@ public class RequestPreprocessorTest extends Assert {
         m.put(Message.PROTOCOL_HEADERS, headers);
         control.replay();
         return m;
+    }
+    
+    @Path("/test")
+    private static class TestResource {
+        @GET
+        public String get() {
+            return "test";
+        }
     }
 }
