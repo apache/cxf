@@ -49,4 +49,6 @@ public interface CollectionServiceInterface {
     void method1(List<String> headers1);
     
     void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam); 
+    
+    Collection<double[]> returnCollectionOfPrimitiveArrays();
 }

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.aegis.type;
 
+import java.lang.reflect.Array;
+import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.logging.Logger;
@@ -248,6 +250,16 @@ public final class TypeUtil {
         if (type instanceof ParameterizedType) {
             ParameterizedType pType = (ParameterizedType) type;
             return getTypeRelatedClass(pType.getRawType());
+        }
+        
+        if (type instanceof GenericArrayType) {
+            GenericArrayType gat = (GenericArrayType) type;
+            Type compType = gat.getGenericComponentType();
+            Class<?> arrayBaseType = getTypeRelatedClass(compType);
+            // belive it or not, this seems to be the only way to get the
+            // Class object for an array of primitive type.
+            Object instance = Array.newInstance(arrayBaseType, 0);
+            return instance.getClass();
         }
         return null;
     }
