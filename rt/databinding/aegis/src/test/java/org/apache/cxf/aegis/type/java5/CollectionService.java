@@ -27,6 +27,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.Stack;
 
+import org.w3c.dom.DocumentFragment;
+
 public class CollectionService implements CollectionServiceInterface {
     
     private Map<String, Map<String, BeanWithGregorianDate>> lastComplexMap;
@@ -92,6 +94,10 @@ public class CollectionService implements CollectionServiceInterface {
         dataArray = new double[] {-666.6, 3.14, 2.0, 0 };
         data.add(dataArray);
         return data;
+    }
+
+    public Collection<DocumentFragment[]> returnCollectionOfDOMFragments() {
+        return null;
     }
 
 }
