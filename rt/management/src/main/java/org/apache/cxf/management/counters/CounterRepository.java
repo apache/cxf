@@ -89,6 +89,9 @@ public class CounterRepository {
             counters.put(on, counter);
         }
         counter.increase(mhtr);        
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Increase counter " + on + " with " + mhtr);
+        }
     }
     
     //find a counter

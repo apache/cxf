@@ -70,4 +70,14 @@ public class MessageHandlingTimeRecorder {
     public void setFaultMode(FaultMode faultMode) {
         this.faultMode = faultMode;
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("MessageHandlingTimeRecorder@").append(Integer.toHexString(hashCode())).append("[");
+        sb.append("beginTime: ").append(beginTime).append(", ");
+        sb.append("endTime: ").append(endTime).append(", ");
+        sb.append("faultMode: ").append(faultMode).append("]");
+        return sb.toString();
+    }
 }
