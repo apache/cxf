@@ -28,8 +28,13 @@ public class EntityTagHeaderProvider implements HeaderDelegate<EntityTag> {
     
     public EntityTag fromString(String header) {
         
+        
         if (header == null) {
             throw new IllegalArgumentException("ETag value can not be null");
+        }
+        
+        if ("*".equals(header)) {
+            return new EntityTag("*");
         }
         
         String tag = null;
