@@ -117,6 +117,11 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
                 = new LoggingMessage("Outbound Message\n---------------------------",
                                      id);
             
+            Integer responseCode = (Integer)message.get(Message.RESPONSE_CODE);
+            if (responseCode != null) {
+                buffer.getResponseCode().append(responseCode);
+            }
+            
             String encoding = (String)message.get(Message.ENCODING);
 
             if (encoding != null) {
