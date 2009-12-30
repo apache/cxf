@@ -123,11 +123,11 @@ final class AtomPushEngineConfigurator {
             if (converterClass != null) {
                 c = createConverter(converterClass);
             } else {
-                Output out = parseEnum(output, Output.FEED);
+                Output out = parseEnum(output, Output.FEED, Output.class);
                 Multiplicity defaultMul = out == Output.FEED ? Multiplicity.MANY
                     : batch > 1 ? Multiplicity.MANY : Multiplicity.ONE; 
-                Multiplicity mul = parseEnum(multiplicity, defaultMul);
-                Format form = parseEnum(format, Format.CONTENT);
+                Multiplicity mul = parseEnum(multiplicity, defaultMul, Multiplicity.class);
+                Format form = parseEnum(format, Format.CONTENT, Format.class);
                 if (out == Output.FEED) {
                     c = new StandardConverter(out, mul, form);
                 } else {
@@ -201,12 +201,12 @@ final class AtomPushEngineConfigurator {
     }
 
     @SuppressWarnings("unchecked")
-    private <T extends Enum<T>> T parseEnum(String value, T defaultValue) {
+    private <T extends Enum<T>> T parseEnum(String value, T defaultValue, Class<T> enumClass) {
         if (value == null | "".equals(value)) {
             return defaultValue;
         }
         try {
-            return (T)Enum.valueOf(defaultValue.getClass(), value.toUpperCase());
+            return (T)Enum.valueOf(enumClass, value.toUpperCase());
         } catch (Exception e) {
             return defaultValue;
         }
