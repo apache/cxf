@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.interceptor;
 
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -191,13 +192,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             }
         }
 
-        
-        LOG.fine("Request path is: " + rawPath);
-        LOG.fine("Request HTTP method is: " + httpMethod);
-        LOG.fine("Request contentType is: " + requestContentType);
-        LOG.fine("Accept contentType is: " + acceptTypes);
-        
-        LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Request path is: " + rawPath);
+            LOG.fine("Request HTTP method is: " + httpMethod);
+            LOG.fine("Request contentType is: " + requestContentType);
+            LOG.fine("Accept contentType is: " + acceptTypes);
+
+            LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
+        }
         setMessageProperties(message, ori, values, resources.size());  
       
         //Process parameters
