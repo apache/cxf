@@ -200,13 +200,12 @@ final class AtomPushEngineConfigurator {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
     private <T extends Enum<T>> T parseEnum(String value, T defaultValue, Class<T> enumClass) {
         if (value == null | "".equals(value)) {
             return defaultValue;
         }
         try {
-            return (T)Enum.valueOf(enumClass, value.toUpperCase());
+            return Enum.valueOf(enumClass, value.toUpperCase());
         } catch (Exception e) {
             return defaultValue;
         }

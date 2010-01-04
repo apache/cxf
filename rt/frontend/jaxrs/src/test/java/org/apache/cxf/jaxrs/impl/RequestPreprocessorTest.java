@@ -140,6 +140,10 @@ public class RequestPreprocessorTest extends Assert {
     
     @Path("/test")
     private static class TestResource {
+        //suppress the unused get method warning in eclipse.   The class is private
+        //so nothing really calls the "get" method, but this is needed for the
+        //test case
+        @SuppressWarnings("unused") 
         @GET
         public String get() {
             return "test";
