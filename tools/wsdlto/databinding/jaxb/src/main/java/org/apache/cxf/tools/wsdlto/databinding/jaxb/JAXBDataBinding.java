@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.wsdlto.databinding.jaxb;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Writer;
@@ -43,6 +44,9 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.SchemaFactory;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
 
 
 import org.w3c.dom.Attr;
@@ -51,6 +55,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
@@ -81,15 +86,19 @@ import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
+import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.util.JAXBUtils;
+import org.apache.cxf.tools.util.URIParserUtil;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.DefaultValueProvider;
 import org.apache.cxf.tools.wsdlto.core.RandomValueProvider;
@@ -331,9 +340,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         
         addSchemas(opts, schemaCompiler, schemas);
-        for (InputSource binding : jaxbBindings) {
-            opts.addBindFile(binding);
-        }
+        addBindingFiles(opts, jaxbBindings, schemas);
 
                        
         for (String ns : context.getNamespacePackageMap().keySet()) {
@@ -372,7 +379,66 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         initialized = true;
     }
-
+    private void addBindingFiles(Options opts, List<InputSource> jaxbBindings, SchemaCollection schemas) {
+        for (InputSource binding : jaxbBindings) {
+            XMLStreamReader r = StaxUtils.createXMLStreamReader(binding);
+            try {
+                StaxUtils.toNextTag(r);
+                String s = r.getAttributeValue(null, "schemaLocation");
+                if (StringUtils.isEmpty(s)) {
+                    Document d = StaxUtils.read(r);
+                    XPath p = XPathUtils.getFactory().newXPath();
+                    p.setNamespaceContext(new W3CNamespaceContext(d.getDocumentElement()));
+                    XPathExpression xpe = p.compile(d.getDocumentElement().getAttribute("node"));
+                    for (XmlSchema schema : schemas.getXmlSchemas()) {
+                        if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(schema.getTargetNamespace())) {
+                            continue;
+                        }
+                        Object src = getSchemaNode(schema, schemas);
+                        NodeList nodes = (NodeList)xpe.evaluate(src, XPathConstants.NODESET);
+                        if (nodes.getLength() > 0) {
+                            String key = schema.getSourceURI();
+                            binding = convertToTmpInputSource(d.getDocumentElement(), key);
+                            opts.addBindFile(binding);
+                            binding = null;
+                        }
+                    }
+                } 
+            } catch (Exception ex) {
+                //ignore, just pass to jaxb
+            } finally {
+                try {
+                    r.close();
+                } catch (Exception ex) {
+                    //ignore
+                }
+            }
+            if (binding != null) {
+                opts.addBindFile(binding);
+            }
+        }
+    }
+    private Object getSchemaNode(XmlSchema schema, SchemaCollection schemaCollection) {
+        XmlSchemaSerializer xser = new XmlSchemaSerializer();
+        xser.setExtReg(schemaCollection.getExtReg());
+        Document[] docs;
+        try {
+            docs = xser.serializeSchema(schema, false);
+        } catch (XmlSchemaSerializerException e) {
+            throw new RuntimeException(e);
+        }
+        return docs[0].getDocumentElement();
+    }
+    private InputSource convertToTmpInputSource(Element ele, String schemaLoc) throws Exception {
+        InputSource result = null;
+        ele.setAttribute("schemaLocation", schemaLoc);
+        File tmpFile = FileUtils.createTempFile("jaxbbinding", ".xml");
+        XMLUtils.writeTo(ele, new FileOutputStream(tmpFile));
+        result = new InputSource(URIParserUtil.getAbsoluteURI(tmpFile.getAbsolutePath()));
+        tmpFile.deleteOnExit();
+        return result;
+    }
+    
     @SuppressWarnings("unchecked")
     private void addSchemas(Options opts, 
                             SchemaCompiler schemaCompiler,

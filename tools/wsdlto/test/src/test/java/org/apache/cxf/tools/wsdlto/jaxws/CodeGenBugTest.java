@@ -828,7 +828,6 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
     }
     
     // See CXF-2135
-    @org.junit.Ignore
     @Test
     public void testReuseJaxbBindingFile1() throws Exception {
         env.put(ToolConstants.CFG_WSDLURL, 

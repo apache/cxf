@@ -379,9 +379,6 @@ public final class CustomizationParser {
             }
 
         }
-
-        
-        
         Element element = DOMUtils.getFirstElement(bindings);
         while (element != null) {
             if (element.getNamespaceURI().equals(ToolConstants.JAXWS_BINDINGS.getNamespaceURI())) {
@@ -389,9 +386,6 @@ public final class CustomizationParser {
             }
             element = DOMUtils.getNextElement(element);
         }
-        
-        
-
         Node cloneNode = ProcessorUtil.cloneNode(node.getOwnerDocument(), bindings, true);
         Node firstChild = DOMUtils.getChild(node, "jaxws:bindings");
         if (firstChild == null && cloneNode.getNodeName().indexOf("bindings") == -1) {
