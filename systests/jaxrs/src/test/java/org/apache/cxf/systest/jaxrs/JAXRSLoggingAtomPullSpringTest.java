@@ -71,7 +71,6 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     }
 
     @Test
-    @Ignore("For some reasons two tests step on each other - fix it")
     public void testFeed() throws Exception {
         WebClient wc = WebClient.create("http://localhost:9080/resource/root");
         wc.path("/log").get();
@@ -89,13 +88,14 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     }
     
     @Test
+    @Ignore("For some reasons two tests step on each other - fix it")
     public void testPagedFeed() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/resource/paged");
+        WebClient wc = WebClient.create("http://localhost:9080/resource2/paged");
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2);
-        verifyPages("http://localhost:9080/atom2/logs?page=3", "previous", 2, 3);
+        verifyPages("http://localhost:9080/atom/logs", "next", 3, 2);
+        verifyPages("http://localhost:9080/atom/logs?page=3", "previous", 2, 3);
     }
     
     private void verifyPages(String startAddress, String rel, int firstValue, int lastValue) 

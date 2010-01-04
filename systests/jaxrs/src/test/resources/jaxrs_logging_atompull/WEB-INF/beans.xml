@@ -58,6 +58,14 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
+	<jaxrs:server id="resource2Server" address="/resource2">
+		<jaxrs:serviceBeans>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource2"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
 
 
     <jaxrs:server id="atomServer" address="/atom">
