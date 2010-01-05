@@ -56,9 +56,14 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.ls.LSInput;
+import org.w3c.dom.ls.LSResourceResolver;
 
+import org.xml.sax.Attributes;
 import org.xml.sax.InputSource;
+import org.xml.sax.Locator;
 import org.xml.sax.SAXException;
+import org.xml.sax.helpers.XMLFilterImpl;
 
 import com.sun.codemodel.ClassType;
 import com.sun.codemodel.JClass;
@@ -67,6 +72,7 @@ import com.sun.codemodel.JDefinedClass;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.BadCommandLineException;
+import com.sun.tools.xjc.ErrorReceiver;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.Plugin;
 import com.sun.tools.xjc.api.Mapping;
@@ -75,6 +81,10 @@ import com.sun.tools.xjc.api.S2JJAXBModel;
 import com.sun.tools.xjc.api.SchemaCompiler;
 import com.sun.tools.xjc.api.TypeAndAnnotation;
 import com.sun.tools.xjc.api.XJC;
+import com.sun.tools.xjc.reader.internalizer.AbstractReferenceFinderImpl;
+import com.sun.tools.xjc.reader.internalizer.DOMForest;
+import com.sun.tools.xjc.reader.xmlschema.parser.LSInputSAXWrapper;
+import com.sun.tools.xjc.reader.xmlschema.parser.XMLSchemaInternalizationLogic;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.catalog.OASISCatalogManager;
@@ -88,6 +98,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -268,8 +279,11 @@ public class JAXBDataBinding implements DataBindingProfile {
         this.context = c;
         
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
+        Bus bus = context.get(Bus.class);
+        OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
+        hackInNewInternalizationLogic(schemaCompiler, catalog);
+        
         ClassCollector classCollector = context.get(ClassCollector.class);
-        //installResolverIntoSchemaCompiler(schemaCompiler);
         
         ClassNameAllocatorImpl allocator 
             = new ClassNameAllocatorImpl(classCollector,
@@ -379,6 +393,50 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         initialized = true;
     }
+    
+    private static final class ReferenceFinder extends AbstractReferenceFinderImpl {
+        private Locator locator;
+        private OASISCatalogManager catalog;
+        
+        ReferenceFinder(DOMForest parent, OASISCatalogManager cat) {
+            super(parent);
+            catalog = cat;
+        }
+        
+        public void setDocumentLocator(Locator loc) {
+            super.setDocumentLocator(loc);
+            this.locator = loc;
+        }
+        protected String findExternalResource(String nsURI, String localName, Attributes atts) {
+            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(nsURI) 
+                && ("import".equals(localName) 
+                    || "include".equals(localName))) {
+                String s = atts.getValue("schemaLocation");
+                if (!StringUtils.isEmpty(s)) {
+                    s = JAXBDataBinding.mapSchemaLocation(s, locator.getSystemId(), catalog);
+                }
+                return s;
+            }
+            return null;
+        }
+    }
+    private void hackInNewInternalizationLogic(SchemaCompiler schemaCompiler,
+                                               final OASISCatalogManager catalog) {
+        try {
+            Field f = schemaCompiler.getClass().getDeclaredField("forest");
+            f.setAccessible(true);
+            DOMForest forest = new DOMForest(new XMLSchemaInternalizationLogic() {
+                public XMLFilterImpl createExternalReferenceFinder(DOMForest parent) {
+                    return new ReferenceFinder(parent, catalog);
+                }
+
+            });
+            forest.setErrorHandler((ErrorReceiver)schemaCompiler);
+            f.set(schemaCompiler, forest);
+        } catch (Throwable ex)  {
+            //ignore
+        }
+    }
     private void addBindingFiles(Options opts, List<InputSource> jaxbBindings, SchemaCollection schemas) {
         for (InputSource binding : jaxbBindings) {
             XMLStreamReader r = StaxUtils.createXMLStreamReader(binding);
@@ -483,7 +541,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     } catch (Throwable ex) {
                         //ignore - DOM level 3
                     }
-                    validateSchema(ele, uri);
+                    validateSchema(ele, uri, catalog);
                 }           
                 try {
                     docs[0].setDocumentURI(key);
@@ -551,7 +609,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 Element ele = sci.getElement();
                 ele = removeImportElement(ele, key, catalog);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
-                    validateSchema(ele, sci.getSystemId());
+                    validateSchema(ele, sci.getSystemId(), catalog);
                 }           
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
@@ -772,8 +830,19 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     
-    public void validateSchema(Element ele, String uri) throws ToolException {
+    public void validateSchema(Element ele, String uri, 
+                               final OASISCatalogManager catalog) throws ToolException {
         SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
+        schemaFact.setResourceResolver(new LSResourceResolver() {
+            public LSInput resolveResource(String type,  
+                                           String namespaceURI,
+                                           String publicId,
+                                           String systemId, 
+                                           String baseURI) {
+                String s = JAXBDataBinding.mapSchemaLocation(systemId, baseURI, catalog);
+                return new LSInputSAXWrapper(new InputSource(s));
+            }
+        });
         DOMSource domSrc = new DOMSource(ele, uri);
         try {
             schemaFact.newSchema(domSrc);
@@ -1075,15 +1144,15 @@ public class JAXBDataBinding implements DataBindingProfile {
                 //ignore
             }
         }
+
         try {
-            //JAXB xjc cannot properly do this for "jar" URL's so we'll go ahead and do
-            //the resolving ourselves.
-            URL url = new URL(base);
-            url = new URL(url, target);
-            return url.toString();            
+            URIResolver resolver = new URIResolver(base, target);
+            if (resolver.isResolved()) {
+                target = resolver.getURI().toString();
+            }
         } catch (Exception ex) {
             //ignore
-        }
+        }        
         return target;
     }
 
