@@ -255,7 +255,7 @@ public final class TypeUtil {
             GenericArrayType gat = (GenericArrayType) type;
             java.lang.reflect.Type compType = gat.getGenericComponentType();
             Class<?> arrayBaseType = getTypeRelatedClass(compType);
-            // belive it or not, this seems to be the only way to get the
+            // believe it or not, this seems to be the only way to get the
             // Class object for an array of primitive type.
             Object instance = Array.newInstance(arrayBaseType, 0);
             return instance.getClass();
