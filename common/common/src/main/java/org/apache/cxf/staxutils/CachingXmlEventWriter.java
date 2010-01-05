@@ -147,7 +147,7 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
     }
     
     public void setDefaultNamespace(String ns) throws XMLStreamException {
-        writeNamespace("", ns);
+        curContext.addNs("", ns);
     }
 
     

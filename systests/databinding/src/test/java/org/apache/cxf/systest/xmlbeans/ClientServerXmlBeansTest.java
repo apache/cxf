@@ -35,21 +35,22 @@ import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http.xmlbeans.GreetMeFault;
 import org.apache.hello_world_soap_http.xmlbeans.Greeter;
 import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
 import org.apache.hello_world_soap_http.xmlbeans.SOAPService;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * 
  */
-@Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
+//@org.junit.Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
 public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
     
     private static final QName SERVICE_NAME 
         = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SOAPService");
+    
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -71,11 +72,18 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
         resp = port.sayHi();
-        assertEquals("We should get the right response", resp, "Bonjour");        
+        assertEquals("We should get the right response", "Bonjour", resp);        
         
         resp = port.greetMe("Willem");
-        assertEquals("We should get the right response", resp, "Hello Willem");
-        
+        assertEquals("We should get the right response", "Hello Willem", resp);
+
+        try {
+            port.greetMe("fault");
+            fail("Should have been a fault");
+        } catch (GreetMeFault ex) {
+            assertEquals("Some fault detail", ex.getFaultInfo().getStringValue());
+        }
+
         try {
             resp = port.greetMe("Invoking greetMe with invalid length string, expecting exception...");
             fail("We expect exception here");
@@ -85,8 +93,6 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
                        indexOf("string length (67) is greater than maxLength facet (30)") >= 0);
         }
         
-        port.greetMeOneWay(System.getProperty("user.name"));
-        
         try {
             port.pingMe();
             fail("We expect exception here");
@@ -95,7 +101,8 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
             FaultDetail detail = detailDocument.getFaultDetail();
             assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
             assertEquals("Wrong faultDetail minor", detail.getMinor(), 1);             
-        }          
+        }
+        
     }
     
     @Test
@@ -128,8 +135,6 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
                        indexOf("string length (67) is greater than maxLength facet (30)") >= 0);
         }
         
-        port.greetMeOneWay(System.getProperty("user.name"));
-        
         try {
             port.pingMe();
             fail("We expect exception here");
@@ -138,7 +143,14 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
             FaultDetail detail = detailDocument.getFaultDetail();
             assertEquals("Wrong faultDetail major", detail.getMajor(), 2);
             assertEquals("Wrong faultDetail minor", detail.getMinor(), 1);             
-        }          
+        }  
+        try {
+            port.greetMe("fault");
+            fail("Should have been a fault");
+        } catch (GreetMeFault ex) {
+            assertEquals("Some fault detail", ex.getFaultInfo().getStringValue());
+        }
+
     }
 
 }
