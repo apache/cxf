@@ -21,24 +21,14 @@ package org.apache.cxf.aegis.type.java5;
 import java.beans.Introspector;
 import java.beans.PropertyDescriptor;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.SortedSet;
-import java.util.Stack;
-import java.util.TreeSet;
 
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.aegis.AbstractAegisTest;
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
 import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.Type;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
@@ -48,7 +38,6 @@ import org.apache.cxf.aegis.type.java5.dto.CollectionDTO;
 import org.apache.cxf.aegis.type.java5.dto.DTOService;
 import org.apache.cxf.aegis.type.java5.dto.ObjectDTO;
 import org.apache.cxf.common.util.SOAPConstants;
-import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -231,32 +220,7 @@ public class CollectionTest extends AbstractAegisTest {
                       doc);
     }
     
-    @Test
-    public void testListTypes() throws Exception {
-        createService(CollectionServiceInterface.class, new CollectionService(), null);
-        
-        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
-        proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
-                                                              new XFireCompatibilityServiceConfiguration());
-        proxyFac.setServiceClass(CollectionServiceInterface.class);
-        proxyFac.setDataBinding(new AegisDatabinding());
-        proxyFac.setAddress("local://CollectionServiceInterface");
-        proxyFac.setBus(getBus());
 
-        CollectionServiceInterface csi = (CollectionServiceInterface)proxyFac.create();
-        SortedSet<String> strings = new TreeSet<String>();
-        strings.add("Able");
-        strings.add("Baker");
-        String first = csi.takeSortedStrings(strings);
-        assertEquals("Able", first);
-        
-        //CHECKSTYLE:OFF
-        HashSet<String> hashedSet = new HashSet<String>();
-        hashedSet.addAll(strings);
-        String countString = csi.takeUnsortedSet(hashedSet);
-        assertEquals("2", countString);
-        //CHECKSTYLE:ON
-    }
     
     @Test
     public void testNestedMapType() throws Exception {
@@ -268,102 +232,5 @@ public class CollectionTest extends AbstractAegisTest {
         MapType mapType = (MapType) type;
         Type valueType = mapType.getValueType();
         assertFalse(valueType.getSchemaType().getLocalPart().contains("any"));
-    }
-    
-    /**
-     * CXF-2017
-     * @throws Exception
-     */
-    @Test
-    public void testNestedMap() throws Exception {
-        CollectionService impl = new CollectionService();
-        createService(CollectionServiceInterface.class, impl, null);
-        
-        ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
-        proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
-                                                              new XFireCompatibilityServiceConfiguration());
-        proxyFac.setServiceClass(CollectionServiceInterface.class);
-        proxyFac.setDataBinding(new AegisDatabinding());
-        proxyFac.setAddress("local://CollectionServiceInterface");
-        proxyFac.setBus(getBus());
-
-        CollectionServiceInterface csi = (CollectionServiceInterface)proxyFac.create();
-        
-        Map<String, Map<String, BeanWithGregorianDate>> complexMap;
-        complexMap = new HashMap<String, Map<String, BeanWithGregorianDate>>();
-        Map<String, BeanWithGregorianDate> innerMap = new HashMap<String, BeanWithGregorianDate>();
-        BeanWithGregorianDate bean = new BeanWithGregorianDate();
-        bean.setName("shem bean");
-        bean.setId(42);
-        innerMap.put("firstBean", bean);
-        complexMap.put("firstKey", innerMap);
-        csi.mapOfMapWithStringAndPojo(complexMap);
-        
-        Map<String, Map<String, BeanWithGregorianDate>> gotMap = impl.getLastComplexMap();
-        assertTrue(gotMap.containsKey("firstKey"));
-        Map<String, BeanWithGregorianDate> v = gotMap.get("firstKey");
-        BeanWithGregorianDate b = v.get("firstBean");
-        assertNotNull(b);
-        
-    }
-
-    public class CollectionService implements CollectionServiceInterface {
-        
-        private Map<String, Map<String, BeanWithGregorianDate>> lastComplexMap;
-        
-        /** {@inheritDoc}*/
-        public Collection<String> getStrings() {
-            return null;
-        }
-
-        /** {@inheritDoc}*/
-        public void setLongs(Collection<Long> longs) {
-        }
-
-        /** {@inheritDoc}*/
-        public Collection getUnannotatedStrings() {
-            return null;
-        }
-
-        /** {@inheritDoc}*/
-        public Collection<Collection<String>> getStringCollections() {
-            return null;
-        }
-        
-        /** {@inheritDoc}*/
-        public void takeDoubleList(List<Double> doublesList) {
-        }
-        
-        /** {@inheritDoc}*/
-        public String takeSortedStrings(SortedSet<String> strings) {
-            return strings.first();
-        }
-
-        public void method1(List<String> headers1) {
-            // do nothing, this is purely for schema issues.
-        }
-
-        public String takeStack(Stack<String> strings) {
-            return strings.firstElement();
-        }
-
-        //CHECKSTYLE:OFF
-        public String takeUnsortedSet(HashSet<String> strings) {
-            return Integer.toString(strings.size());
-        }
-
-        public String takeArrayList(ArrayList<String> strings) {
-            return strings.get(0);
-        }
-        //CHECKSTYLE:ON
-
-        public void mapOfMapWithStringAndPojo(Map<String, Map<String, BeanWithGregorianDate>> bigParam) {
-            lastComplexMap = bigParam;
-        }
-
-        protected Map<String, Map<String, BeanWithGregorianDate>> getLastComplexMap() {
-            return lastComplexMap;
-        }
-
     }
 }
