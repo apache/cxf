@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -991,6 +992,15 @@ public final class StaxUtils {
             StreamSource ss = new StreamSource(src.getCharacterStream(), sysId);
             ss.setPublicId(pubId);
             return createXMLStreamReader(ss);
+        } else {
+            try {
+                URL url = new URL(sysId);
+                StreamSource ss = new StreamSource(url.openStream(), sysId);
+                ss.setPublicId(pubId);
+                return createXMLStreamReader(ss);
+            } catch (Exception ex) {
+                //ignore - not a valid URL
+            }
         }
         throw new IllegalArgumentException("InputSource must have a ByteStream or CharacterStream");
     }

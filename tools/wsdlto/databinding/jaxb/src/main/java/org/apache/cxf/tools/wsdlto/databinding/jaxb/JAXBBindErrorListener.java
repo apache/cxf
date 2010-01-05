@@ -38,7 +38,7 @@ public class JAXBBindErrorListener implements ErrorListener {
                                     + " of schema " + exception.getSystemId(), exception);
            
         }
-        throw new ToolException(prefix + exception.getLocalizedMessage(), exception);
+        throw new ToolException(prefix + mapMessage(exception.getLocalizedMessage()), exception);
 
     }
 
@@ -59,5 +59,17 @@ public class JAXBBindErrorListener implements ErrorListener {
             System.err.println("JAXB parsing schema warning " + exception.toString()
                                + " in schema " + exception.getSystemId());
         }
+    }
+    
+    private String mapMessage(String msg) {
+        //this is kind of a hack to map the JAXB error message into
+        //something more appropriate for CXF.  If JAXB changes their
+        //error messages, this will break
+        if (msg.contains("Use a class customization to resolve")
+            && msg.contains("with the same name")) {
+            int idx = msg.lastIndexOf("class customization") + 19;
+            msg = msg.substring(0, idx) + " or the -autoNameResolution option" + msg.substring(idx);
+        }
+        return msg;
     }
 }
