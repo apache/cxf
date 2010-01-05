@@ -141,7 +141,15 @@
                             org.junit*;resolution:=optional,
                             org.mortbay*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
-                            org.springframework*;resolution:=optional,
+                            org.springframework*;resolution:=optional;version="[2.0,4)",
+                            javax.activation;version="[0.0,2)",
+                            javax.annotation;version="[0.0,2)",
+                            javax.jms;resolution:=optional;version="[0.0,2)",
+                            javax.jws*;version="[0.0,3)",
+                            javax.mail*;version="[0.0,2)",
+                            javax.servlet.*;version="[0.0,3)",
+                            javax.xml.stream*;version="[0.0,2)",
+                            javax.xml.ws*;version="[0.0,3)",
                             *
                         </Import-Package>
                         <Export-Package>
