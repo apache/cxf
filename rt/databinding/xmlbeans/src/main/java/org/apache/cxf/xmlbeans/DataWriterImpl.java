@@ -144,8 +144,13 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                     reader = source.newCursor().newXMLStreamReader(options);                    
                 }
                 SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
-
-                if (st != null && !st.isDocumentType()) {
+                int i = reader.getEventType();
+                if (i == XMLStreamReader.START_DOCUMENT) {
+                    i = reader.next();
+                }
+                
+                if (st != null && !st.isDocumentType()
+                    || reader.getEventType() == XMLStreamReader.CHARACTERS) {
                     if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) {
                         output.writeStartElement(part.getConcreteName().getLocalPart());
                         

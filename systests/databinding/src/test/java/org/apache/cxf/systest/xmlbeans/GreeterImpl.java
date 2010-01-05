@@ -24,6 +24,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
+import org.apache.hello_world_soap_http.xmlbeans.GreetMeFault;
 import org.apache.hello_world_soap_http.xmlbeans.Greeter;
 import org.apache.hello_world_soap_http.xmlbeans.PingMeFault;
 
@@ -37,7 +38,12 @@ public class GreeterImpl implements Greeter {
     /* (non-Javadoc)
      * @see org.apache.hello_world_soap_http.Greeter#greetMe(java.lang.String)
      */
-    public String greetMe(String me) {
+    public String greetMe(String me) throws GreetMeFault {
+        if ("fault".equals(me)) {
+            org.apache.xmlbeans.XmlString st = org.apache.xmlbeans.XmlString.Factory.newInstance();
+            st.setStringValue("Some fault detail");
+            throw new GreetMeFault("Fault String", st);
+        }
         LOG.info("Executing operation greetMe");        
         return "Hello " + me;
     }

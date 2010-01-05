@@ -17,23 +17,23 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http/xmlbeans" 
-    xmlns="http://schemas.xmlsoap.org/wsdl/" 
-    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+<wsdl:definitions name="HelloWorld" targetNamespace="http://apache.org/hello_world_soap_http/xmlbeans"
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
     xmlns:tns="http://apache.org/hello_world_soap_http/xmlbeans"
     xmlns:x1="http://apache.org/hello_world_soap_http/xmlbeans/types"
-    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema">
     <wsdl:types>
-        <schema targetNamespace="http://apache.org/hello_world_soap_http/xmlbeans/types" 
+        <schema targetNamespace="http://apache.org/hello_world_soap_http/xmlbeans/types"
             xmlns="http://www.w3.org/2001/XMLSchema"
-	    xmlns:tns="http://apache.org/hello_world_soap_http/xmlbeans/types"
+        xmlns:tns="http://apache.org/hello_world_soap_http/xmlbeans/types"
             elementFormDefault="qualified">
-	    <simpleType name="MyStringType">
-		<restriction base="string">
-		    <maxLength value="30" />
-		</restriction>
-	    </simpleType>
+            <simpleType name="MyStringType">
+                <restriction base="string">
+                    <maxLength value="30" />
+                </restriction>
+            </simpleType>
 
             <element name="sayHi">
                 <complexType/>
@@ -80,6 +80,7 @@
                     </sequence>
                 </complexType>
             </element>
+            <element name="greetMeFaultDetail" type="string"/>
         </schema>
     </wsdl:types>
     <wsdl:message name="sayHiRequest">
@@ -102,22 +103,29 @@
     </wsdl:message>
     <wsdl:message name="pingMeResponse">
         <wsdl:part name="out" element="x1:pingMeResponse"/>
-    </wsdl:message>		
+    </wsdl:message>
     <wsdl:message name="pingMeFault">
         <wsdl:part name="faultDetail" element="x1:faultDetail"/>
     </wsdl:message>
-    
+    <wsdl:message name="greetMeFault">
+        <wsdl:part name="greetMeFault" element="x1:greetMeFaultDetail"/>
+    </wsdl:message>
+
+
     <wsdl:portType name="Greeter">
         <wsdl:operation name="sayHi">
             <wsdl:input message="tns:sayHiRequest" name="sayHiRequest"/>
             <wsdl:output message="tns:sayHiResponse" name="sayHiResponse"/>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMe">
             <wsdl:input message="tns:greetMeRequest" name="greetMeRequest"/>
             <wsdl:output message="tns:greetMeResponse" name="greetMeResponse"/>
+            <wsdl:fault name="greetMeFault" message="tns:greetMeFault"/>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMeOneWay">
             <wsdl:input message="tns:greetMeOneWayRequest" name="greetMeOneWayRequest"/>
         </wsdl:operation>
@@ -126,11 +134,12 @@
             <wsdl:input name="pingMeRequest" message="tns:pingMeRequest"/>
             <wsdl:output name="pingMeResponse" message="tns:pingMeResponse"/>
             <wsdl:fault name="pingMeFault" message="tns:pingMeFault"/>
-        </wsdl:operation> 
+        </wsdl:operation>
     </wsdl:portType>
     <wsdl:binding name="Greeter_SOAPBinding" type="tns:Greeter">
         <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
         
+
         <wsdl:operation name="sayHi">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="sayHiRequest">
@@ -141,6 +150,7 @@
             </wsdl:output>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMe">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeRequest">
@@ -149,8 +159,12 @@
             <wsdl:output name="greetMeResponse">
                 <soap:body use="literal"/>
             </wsdl:output>
+            <wsdl:fault name="greetMeFault">
+                <soap:fault name="greetMeFault" use="literal"/>
+            </wsdl:fault>
         </wsdl:operation>
         
+
         <wsdl:operation name="greetMeOneWay">
             <soap:operation soapAction="" style="document"/>
             <wsdl:input name="greetMeOneWayRequest">
@@ -171,6 +185,7 @@
             </wsdl:fault>
         </wsdl:operation>
         
+
     </wsdl:binding>
     <wsdl:service name="SOAPService">
         <wsdl:port binding="tns:Greeter_SOAPBinding" name="SoapPort">
