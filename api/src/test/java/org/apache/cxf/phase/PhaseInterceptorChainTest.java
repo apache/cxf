@@ -30,6 +30,8 @@ import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.logging.FaultLogger;
+import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -208,6 +210,36 @@ public class PhaseInterceptorChainTest extends Assert {
     public void testSingleInterceptorFail() throws Exception {
         AbstractPhaseInterceptor p = setUpPhaseInterceptor("phase1", "p1");
         setUpPhaseInterceptorInvocations(p, true, true);
+        control.replay();
+        chain.add(p);
+        chain.doIntercept(message);
+    }
+
+    @Test
+    public void testSingleInterceptorFailWithCustomLogger() throws Exception {
+        AbstractPhaseInterceptor p = setUpPhaseInterceptor("phase1", "p1");
+        setUpPhaseInterceptorInvocations(p, true, true);
+        setUpCustomLogger(true, true, false);
+        control.replay();
+        chain.add(p);
+        chain.doIntercept(message);
+    }
+
+    @Test
+    public void testSingleInterceptorFailWithCustomLoggerAndDefaultLogging() throws Exception {
+        AbstractPhaseInterceptor p = setUpPhaseInterceptor("phase1", "p1");
+        setUpPhaseInterceptorInvocations(p, true, true);
+        setUpCustomLogger(true, true, true);
+        control.replay();
+        chain.add(p);
+        chain.doIntercept(message);
+    }
+
+    @Test
+    public void testSingleInterceptorFailWithoutCustomLogger() throws Exception {
+        AbstractPhaseInterceptor p = setUpPhaseInterceptor("phase1", "p1");
+        setUpPhaseInterceptorInvocations(p, true, true);
+        setUpCustomLogger(false, true, false);
         control.replay();
         chain.add(p);
         chain.doIntercept(message);
@@ -411,6 +443,33 @@ public class PhaseInterceptorChainTest extends Assert {
             EasyMock.expectLastCall();
         }
     }
+
+    private void setUpCustomLogger(boolean useCustomLogger, 
+                                   boolean expectFault, 
+                                   boolean returnFromCustomLogger) {
+        if (useCustomLogger) {
+            FaultLogger customLogger = control.createMock(FaultLogger.class);
+            message.getContextualProperty(FaultLogger.class.getName());
+            EasyMock.expectLastCall().andReturn(customLogger);
+            if (expectFault) {
+                customLogger.log(EasyMock.isA(Exception.class),
+                                 EasyMock.isA(String.class), 
+                                 EasyMock.isA(Message.class));
+                EasyMock.expectLastCall().andReturn(returnFromCustomLogger);
+                if (returnFromCustomLogger) {
+                    //default logging should also be invoked
+                    //not too beautiful way to verify that defaultLogging was invoked.
+                    message.get(FaultMode.class);
+                    EasyMock.expectLastCall().andReturn(FaultMode.RUNTIME_FAULT);
+                }
+            }
+        } else {
+            message.getContextualProperty(FaultLogger.class.getName());
+            EasyMock.expectLastCall().andReturn(null);
+        }
+
+    }
+
 
     public class InsertingPhaseInterceptor extends
             AbstractPhaseInterceptor<Message> {
