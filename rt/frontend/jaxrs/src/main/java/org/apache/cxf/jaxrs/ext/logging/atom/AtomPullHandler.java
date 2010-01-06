@@ -37,8 +37,16 @@ public final class AtomPullHandler extends Handler {
 
     @Override
     public void publish(java.util.logging.LogRecord record) {
-        LogRecord rec = LogRecord.fromJUL(record);
-        engine.publish(rec);
+        if (LoggingThread.isSilent()) {
+            return;
+        }
+        LoggingThread.markSilent(true);
+        try {
+            LogRecord rec = LogRecord.fromJUL(record);
+            engine.publish(rec);
+        } finally {
+            LoggingThread.markSilent(false);
+        }
     }
 
     @Override

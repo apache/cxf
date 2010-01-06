@@ -81,21 +81,20 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         
         resetCounters();
         for (Entry e : feed.getEntries()) {
-            updateCounters(readLogRecord(e.getContent()), "Resource");
+            updateCounters(readLogRecord(e.getContent()), "Resource", "namedLogger");
         }
         
         verifyCounters();
     }
     
     @Test
-    @Ignore("For some reasons two tests step on each other - fix it")
     public void testPagedFeed() throws Exception {
         WebClient wc = WebClient.create("http://localhost:9080/resource2/paged");
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        verifyPages("http://localhost:9080/atom/logs", "next", 3, 2);
-        verifyPages("http://localhost:9080/atom/logs?page=3", "previous", 2, 3);
+        verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2);
+        verifyPages("http://localhost:9080/atom2/logs?page=3", "previous", 2, 3);
     }
     
     private void verifyPages(String startAddress, String rel, int firstValue, int lastValue) 
@@ -109,7 +108,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         
         resetCounters();
         for (Entry e : entries) {
-            updateCounters(readLogRecord(e.getContent()), "Resource2");
+            updateCounters(readLogRecord(e.getContent()), "Resource2", "theNamedLogger");
         }
         verifyCounters();
     }
@@ -146,7 +145,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         @GET
         @Path("/log")
         public void doLogging() {
-            doLog(LOG1, LOG2);
+            doLog(Resource.LOG1, Resource.LOG2);
         }
 
     }
@@ -155,12 +154,12 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     @Path("/paged")
     public static class Resource2 {
         private static final Logger LOG1 = LogUtils.getL7dLogger(Resource2.class);
-        private static final Logger LOG2 = LogUtils.getL7dLogger(Resource2.class, null, "namedLogger");
+        private static final Logger LOG2 = LogUtils.getL7dLogger(Resource2.class, null, "theNamedLogger");
         
         @GET
         @Path("/log")
         public void doLogging() {
-            doLog(LOG1, LOG2);
+            doLog(Resource2.LOG1, Resource2.LOG2);
         }
 
     }
@@ -186,6 +185,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         l2.severe("severe message2");
         l2.info("info message - should not pass!");
         l2.finer("finer message - should not pass!");
+        
     }
     
     private org.apache.cxf.jaxrs.ext.logging.LogRecord readLogRecord(String value) throws Exception {
@@ -194,12 +194,14 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     }
     
     
-    private void updateCounters(org.apache.cxf.jaxrs.ext.logging.LogRecord record, String clsName) {
+    private void updateCounters(org.apache.cxf.jaxrs.ext.logging.LogRecord record, 
+                                String clsName,
+                                String namedLoggerName) {
         String name = record.getLoggerName();
         if (name != null && name.length() > 0) {
             if (("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$" + clsName).equals(name)) {
                 resourceLogger++;      
-            } else if ("namedLogger".equals(name)) {
+            } else if (namedLoggerName.equals(name)) {
                 namedLogger++;      
             } else if ("faky-logger".equals(name)) {
                 fakyLogger++;      

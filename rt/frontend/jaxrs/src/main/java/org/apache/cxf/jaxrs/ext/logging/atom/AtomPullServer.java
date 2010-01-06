@@ -119,7 +119,7 @@ public class AtomPullServer extends AbstractAtomBean {
             }
             
             if (page * (pageSize + 1) < records.size()) {
-                feed.addLink(uri + "?page=" + (page + 2), "last");
+                feed.addLink(uri + "?page=" + (records.size() / pageSize + 1), "last");
             }
             
             if (page > 1) {
@@ -162,7 +162,7 @@ public class AtomPullServer extends AbstractAtomBean {
     }
     
     public void close() {
-        // save records somehow
+        
     }
     
     public void setPageSize(int size) {

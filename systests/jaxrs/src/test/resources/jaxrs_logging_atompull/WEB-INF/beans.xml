@@ -44,6 +44,16 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			value="
 			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource:ALL,
 			namedLogger:WARN" />
+	</bean>
+	
+	<bean id = "atomPullServer2" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	      init-method="init">
+	      <property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource2:ALL,
+			theNamedLogger:WARN" />
+		  <property name="pageSize" value="3"/>	
+		  	
 	</bean>      
 
 	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
@@ -58,6 +68,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
+	
 	<jaxrs:server id="resource2Server" address="/resource2">
 		<jaxrs:serviceBeans>
 			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource2"/>
@@ -71,6 +82,15 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
     <jaxrs:server id="atomServer" address="/atom">
 		<jaxrs:serviceBeans>
 			<ref bean="atomPullServer"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
+	
+	<jaxrs:server id="atomServer2" address="/atom2">
+		<jaxrs:serviceBeans>
+			<ref bean="atomPullServer2"/>
 		</jaxrs:serviceBeans>
 		<jaxrs:providers>
 			<ref bean="feed" />
