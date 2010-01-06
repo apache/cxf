@@ -30,7 +30,7 @@ import org.apache.cxf.common.util.SortedArraySet;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.logging.FaultLogger;
+import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.easymock.classextension.EasyMock;
@@ -448,11 +448,11 @@ public class PhaseInterceptorChainTest extends Assert {
                                    boolean expectFault, 
                                    boolean returnFromCustomLogger) {
         if (useCustomLogger) {
-            FaultLogger customLogger = control.createMock(FaultLogger.class);
-            message.getContextualProperty(FaultLogger.class.getName());
+            FaultListener customLogger = control.createMock(FaultListener.class);
+            message.getContextualProperty(FaultListener.class.getName());
             EasyMock.expectLastCall().andReturn(customLogger);
             if (expectFault) {
-                customLogger.log(EasyMock.isA(Exception.class),
+                customLogger.faultOccurred(EasyMock.isA(Exception.class),
                                  EasyMock.isA(String.class), 
                                  EasyMock.isA(Message.class));
                 EasyMock.expectLastCall().andReturn(returnFromCustomLogger);
@@ -464,7 +464,7 @@ public class PhaseInterceptorChainTest extends Assert {
                 }
             }
         } else {
-            message.getContextualProperty(FaultLogger.class.getName());
+            message.getContextualProperty(FaultListener.class.getName());
             EasyMock.expectLastCall().andReturn(null);
         }
 
