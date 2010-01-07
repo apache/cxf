@@ -64,6 +64,7 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.Destination;
@@ -2090,10 +2091,9 @@ public class HTTPConduit
                         try {
                             handleResponseInternal();
                         } catch (Exception e) {
-                            Message inMessage = new MessageImpl();
-                            inMessage.setExchange(outMessage.getExchange());
-                            inMessage.setContent(Exception.class, e);
-                            incomingObserver.onMessage(inMessage);
+                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
+                            outMessage.setContent(Exception.class, e);
+                            outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
                         }
                     }
                 };

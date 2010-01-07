@@ -20,19 +20,30 @@
 package org.apache.cxf.systest.ws.addr_wsdl;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.net.URL;
+import java.util.concurrent.ExecutionException;
+
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
+import javax.xml.ws.Response;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
+import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.ws.addressing.soap.MAPCodec;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,7 +67,8 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
     public void testBasicInvocation() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
-
+        
+        Response<AddNumbersResponse> resp;
         AddNumbersPortType port = getPort();
 
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
@@ -70,6 +82,25 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
+        
+        
+        resp = port.addNumbers3Async(1, 2);
+        assertEquals(3, resp.get().getReturn());
+
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                        "http://localhost:9094/doesntexist");
+        resp = port.addNumbers3Async(1, 2);
+        try {
+            resp.get();
+        } catch (ExecutionException ex) {
+            assertTrue(ex.getCause() instanceof IOException);
+            Client c = ClientProxy.getClient(port);
+            for (Interceptor<? extends Message> m : c.getOutInterceptors()) {
+                if (m instanceof MAPCodec) {
+                    assertTrue(((MAPCodec)m).getUncorrelatedExchanges().isEmpty());
+                }
+            }
+        }
     }
     @Test
     public void testProviderEndpoint() throws Exception {

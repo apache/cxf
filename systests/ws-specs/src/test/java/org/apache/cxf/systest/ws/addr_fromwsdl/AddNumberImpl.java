@@ -19,11 +19,16 @@
 
 package org.apache.cxf.systest.ws.addr_fromwsdl;
 
+import java.util.concurrent.Future;
+
 import javax.jws.WebService;
+import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Response;
 
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault_Exception;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
+import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 
 // Jax-WS 2.1 WS-Addressing FromWsdl
 
@@ -52,5 +57,32 @@ public class AddNumberImpl implements AddNumbersPortType {
         }
 
         return number1 + number2;
+    }
+
+    public Response<AddNumbersResponse> addNumbers2Async(int number1, int number2) {
+        return null;
+    }
+
+    public Future<?> addNumbers2Async(int number1, int number2, 
+                                      AsyncHandler<AddNumbersResponse> asyncHandler) {
+        return null;
+    }
+
+    public Response<AddNumbersResponse> addNumbers3Async(int number1, int number2) {
+        return null;
+    }
+
+    public Future<?> addNumbers3Async(int number1, int number2, 
+                                      AsyncHandler<AddNumbersResponse> asyncHandler) {
+        return null;
+    }
+
+    public Response<AddNumbersResponse> addNumbersAsync(int number1, int number2) {
+        return null;
+    }
+
+    public Future<?> addNumbersAsync(int number1, int number2,
+                                     AsyncHandler<AddNumbersResponse> asyncHandler) {
+        return null;
     }
 }
