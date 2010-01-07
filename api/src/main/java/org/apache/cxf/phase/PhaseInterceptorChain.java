@@ -390,7 +390,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
     
     @SuppressWarnings("unchecked")
-    private void unwind(Message message) {
+    public void unwind(Message message) {
         while (iterator.hasPrevious()) {
             Interceptor currentInterceptor = iterator.previous();
             if (isFineLogging) {
