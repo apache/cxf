@@ -25,6 +25,7 @@ import java.util.concurrent.RejectedExecutionException;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -59,6 +60,25 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             
             message.put(OneWayProcessorInterceptor.class, this);
             final InterceptorChain chain = message.getInterceptorChain();
+
+            Object o = message.getContextualProperty(USE_ORIGINAL_THREAD);
+            if (o == null) {
+                o = Boolean.FALSE;
+            } else if (o instanceof String) {
+                o = Boolean.valueOf((String)o);
+            }
+
+            
+            if (Boolean.FALSE.equals(o)) {
+                //need to suck in all the data from the input stream as
+                //the transport might discard any data on the stream when this 
+                //thread unwinds or when the empty response is sent back
+                DelegatingInputStream in = message.get(DelegatingInputStream.class);
+                if (in != null) {
+                    in.cacheInput();
+                }
+            }
+
             
             try {
                 Message partial = createMessage(message.getExchange());
@@ -71,12 +91,6 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
                 //IGNORE
             }
             
-            Object o = message.getContextualProperty(USE_ORIGINAL_THREAD);
-            if (o == null) {
-                o = Boolean.FALSE;
-            } else if (o instanceof String) {
-                o = Boolean.valueOf((String)o);
-            }
             if (Boolean.FALSE.equals(o)) {
                 chain.pause();
                 try {
