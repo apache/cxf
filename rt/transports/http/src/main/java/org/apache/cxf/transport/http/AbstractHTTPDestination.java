@@ -537,8 +537,11 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
          */
         public void prepare(Message message) throws IOException {
             message.put(HTTP_RESPONSE, response);
-            message.setContent(OutputStream.class, 
+            OutputStream os = message.getContent(OutputStream.class);
+            if (os == null) {
+                message.setContent(OutputStream.class, 
                                new WrappedOutputStream(message, response));
+            }
         }
     }
 
