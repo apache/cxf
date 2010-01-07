@@ -33,7 +33,8 @@ import org.apache.cxf.phase.Phase;
  * 
  */
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
-   
+    private static final String LOG_SETUP = LoggingOutInterceptor.class.getName() + ".log-setup";
+    
     public LoggingOutInterceptor(String phase) {
         super(phase);
         addBefore(StaxOutInterceptor.class.getName());
@@ -59,9 +60,13 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
         }
         if (LOG.isLoggable(Level.INFO) || writer != null) {
             // Write the output while caching it for the log message
-            final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
-            message.setContent(OutputStream.class, newOut);
-            newOut.registerCallback(new LoggingCallback(message, os));
+            boolean hasLogged = message.containsKey(LOG_SETUP);
+            if (!hasLogged) {
+                message.put(LOG_SETUP, Boolean.TRUE);
+                final CacheAndWriteOutputStream newOut = new CacheAndWriteOutputStream(os);
+                message.setContent(OutputStream.class, newOut);
+                newOut.registerCallback(new LoggingCallback(message, os));
+            }
         }
     }
     
