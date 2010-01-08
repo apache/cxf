@@ -279,7 +279,7 @@ public class WadlGenerator implements RequestHandler {
         return resourceTagOpened;
     }
     
-    private boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
+    protected boolean compareOperations(OperationResourceInfo ori1, OperationResourceInfo ori2) {
         if (ori1 == null || ori2 == null
             || !ori1.getURITemplate().getValue().equals(ori2.getURITemplate().getValue())) {
             return false;
@@ -314,7 +314,7 @@ public class WadlGenerator implements RequestHandler {
         return true;
     }
     
-    private void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes, 
+    protected void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes, 
                  JAXBContextProxy jaxbProxy, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
                  ClassResourceInfo subcri) {
         
@@ -382,7 +382,7 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
+    protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
         
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template" 
@@ -431,7 +431,7 @@ public class WadlGenerator implements RequestHandler {
         }
     }
     
-    private List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {
+    protected List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {
         List<OperationResourceInfo> opsWithSamePath = new LinkedList<OperationResourceInfo>(ops);
         Collections.sort(opsWithSamePath, new Comparator<OperationResourceInfo>() {
 
