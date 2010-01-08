@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.databinding;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.Collection;
 import java.util.HashMap;
@@ -40,6 +41,7 @@ import org.apache.cxf.aegis.type.TypeClassInfo;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
 import org.apache.cxf.aegis.type.TypeCreator;
 import org.apache.cxf.aegis.type.TypeMapping;
+import org.apache.cxf.aegis.type.java5.AnnotationReader;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
@@ -350,16 +352,34 @@ public class AegisDatabinding
                 }
             }
             
-            // The concept of type.isNillable is questionable: how are types nillable? 
+            Annotation[] anns = part.getProperty("parameter.annotations", Annotation[].class);
+
+            long miValue = -1;
+            if (type.hasMinOccurs()) {
+                miValue = type.getMinOccurs();
+            }
+            Integer i = AnnotationReader.getMinOccurs(anns);
+            if (i != null) {
+                miValue = i;
+            }
+            if (miValue > 0) {
+                part.setProperty("minOccurs", Long.toString(miValue));
+            }
+
+            
+            // The concept of type.isNillable is questionable: how are types nillable?
             // However, this if at least allow .aegis.xml files to get control.
             if (part.getProperty("nillable") == null) {
-                part.setProperty("nillable", Boolean.valueOf(type.isNillable()));
-            }
-            if (type.hasMinOccurs()) {
-                long miValue = type.getMinOccurs();
-                if (miValue != 0) {
-                    part.setProperty("minOccurs", Long.toString(miValue));
+                boolean isNil = type.isNillable();
+                Boolean b = AnnotationReader.isNillable(anns);
+                if (b != null || (miValue != 0 && isNil)) {
+                    part.setProperty("nillable", b == null ? isNil : b);
                 }
+                /*
+                if (miValue == -1 && (b == null ? isNil : b)) {
+                    part.setProperty("minOccurs", "1");
+                }
+                */
             }
             if (type.hasMaxOccurs()) {
                 String moValue;
@@ -369,6 +389,7 @@ public class AegisDatabinding
                     part.setProperty("maxOccurs", moValue);
                 }
             }
+            
 
             part2Type.put(part, type);
 

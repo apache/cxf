@@ -43,6 +43,7 @@ public interface AegisJaxWs {
     Map<Integer, Item> getItemsMapSpecified();
 
     @WebMethod
+    @org.apache.cxf.aegis.type.java5.XmlElement(nillable = false, minOccurs = "1")
     Item getItemByKey(@WebParam(name = "key1")
                       String key1, @WebParam(name = "key2")
                       String key2);

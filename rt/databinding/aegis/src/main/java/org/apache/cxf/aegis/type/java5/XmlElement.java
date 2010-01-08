@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
 import org.apache.cxf.aegis.type.Type;
 
 @Retention(RetentionPolicy.RUNTIME)
-@Target(ElementType.METHOD)
+@Target({ ElementType.METHOD, ElementType.PARAMETER })
 public @interface XmlElement {
     Class type() default Type.class;
 
