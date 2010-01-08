@@ -42,6 +42,7 @@ import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
@@ -127,6 +128,9 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     @Override
     public void handleFault(SoapMessage message) {
         super.handleFault(message);
+        //need to clear these so the fault writing will work correctly
+        message.removeContent(SOAPMessage.class);
+        message.remove(SoapOutInterceptor.WROTE_ENVELOPE_START);
         XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
         if (writer != null) {
             message.setContent(XMLStreamWriter.class, writer);
