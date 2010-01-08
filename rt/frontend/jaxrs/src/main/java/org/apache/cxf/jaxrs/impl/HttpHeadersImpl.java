@@ -53,6 +53,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     private static final Set<String> HEADERS_WITH_POSSIBLE_QUOTES;
     static {
         HEADERS_WITH_POSSIBLE_QUOTES = new HashSet<String>();
+        HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.CONTENT_TYPE);
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.CACHE_CONTROL);
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.ETAG);
         HEADERS_WITH_POSSIBLE_QUOTES.add(HttpHeaders.IF_MATCH);
