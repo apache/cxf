@@ -172,10 +172,11 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 
                 XMLStreamWriter writer = (XMLStreamWriter)message.get(ORIGINAL_XML_WRITER);
                 try {
-                    StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
-                    writer.flush();
-                    message.setContent(XMLStreamWriter.class, writer);
-
+                    if (writer != null) {
+                        StaxUtils.copy(new W3CDOMStreamReader(soapMessage.getSOAPPart()), writer);
+                        writer.flush();
+                        message.setContent(XMLStreamWriter.class, writer);
+                    }
                 } catch (XMLStreamException e) {
                     throw new SoapFault(new Message("SOAPEXCEPTION", BUNDLE), e, message.getVersion()
                                         .getSender());
