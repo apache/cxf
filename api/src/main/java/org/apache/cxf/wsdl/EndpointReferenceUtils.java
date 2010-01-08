@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -154,6 +155,23 @@ public final class EndpointReferenceUtils {
                 impl.setByteStream(new ByteArrayInputStream(ds));
                 done.add(newId + ":" + namespaceURI);
                 return impl;                
+            }
+
+            // handle case where given systemId is null (so that
+            // direct key lookup fails) by scanning through map
+            // searching for a namespace match
+            //
+            for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
+                if (ent.getKey().endsWith(namespaceURI)) {
+                    schemas.remove(ent.getKey());
+                    LSInputImpl impl = new LSInputImpl();
+                    impl.setSystemId(newId);
+                    impl.setBaseURI(newId);
+                    impl.setCharacterStream(
+                        new InputStreamReader(
+                            new ByteArrayInputStream(ent.getValue())));
+                    return impl;
+                }
             }
                 
             //REVIST - we need to get catalogs in here somehow  :-(
