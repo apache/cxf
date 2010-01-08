@@ -92,6 +92,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
         transformer = new VersionTransformer(this);
     } 
 
+    public Map<String, Exchange> getUncorrelatedExchanges() {
+        return uncorrelatedExchanges;
+    }
+    
     /**
      * @return the set of SOAP headers understood by this handler 
      */
