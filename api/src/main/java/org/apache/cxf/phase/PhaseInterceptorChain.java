@@ -35,7 +35,7 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
-import org.apache.cxf.logging.FaultLogger;
+import org.apache.cxf.logging.FaultListener;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
@@ -269,11 +269,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
                             }
                         }
 
-                        FaultLogger flogger = (FaultLogger)
-                                message.getContextualProperty(FaultLogger.class.getName());
+                        FaultListener flogger = (FaultListener)
+                                message.getContextualProperty(FaultListener.class.getName());
                         boolean useDefaultLogging = true;
                         if (flogger != null) {
-                            useDefaultLogging = flogger.log(ex, description.toString(), message);
+                            useDefaultLogging = flogger.faultOccurred(ex, description.toString(), message);
                         }
                         if (useDefaultLogging) {
                             doDefaultLogging(message, ex, description);
