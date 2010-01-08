@@ -93,7 +93,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         try {
             resp.get();
         } catch (ExecutionException ex) {
-            assertTrue(ex.getCause() instanceof IOException);
+            assertTrue("Found " + ex.getCause().getClass(), ex.getCause() instanceof IOException);
             Client c = ClientProxy.getClient(port);
             for (Interceptor<? extends Message> m : c.getOutInterceptors()) {
                 if (m instanceof MAPCodec) {
