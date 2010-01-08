@@ -46,7 +46,7 @@ public class HttpHeadersImpl implements HttpHeaders {
 
     // TODO : it can be optimized, "Mastering Regular Expressions" has the answers
     private static final String COMPLEX_HEADER_EXPRESSION = 
-        "((\"(([^\"])|(?<=\\\\)\")*\")|([^\",]*))(;[\\w]+)?";
+        "(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+))(;(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+)))?";
     private static final Pattern COMPLEX_HEADER_PATTERN =
         Pattern.compile(COMPLEX_HEADER_EXPRESSION);
     private static final String QUOTE = "\"";
