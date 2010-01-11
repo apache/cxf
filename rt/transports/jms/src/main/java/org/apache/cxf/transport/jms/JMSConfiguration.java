@@ -88,6 +88,7 @@ public class JMSConfiguration implements InitializingBean {
     private String cacheLevelName;
     private boolean enforceSpec = true;
     private boolean acceptMessagesWhileStopping;
+    private boolean jmsProviderTibcoEms;
 
     private ConnectionFactory wrappedConnectionFactory;
     
@@ -492,5 +493,18 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setMessageListenerContainer(AbstractMessageListenerContainer messageListenerContainer) {
         this.messageListenerContainer = messageListenerContainer;
+    }
+
+    /** * @return Returns the jmsProviderTibcoEms.
+     */
+    public boolean isJmsProviderTibcoEms() {
+        return jmsProviderTibcoEms;
+    }
+
+    /**
+     * @param jmsProviderTibcoEms The jmsProviderTibcoEms to set.
+     */
+    public void setJmsProviderTibcoEms(boolean jmsProviderTibcoEms) {
+        this.jmsProviderTibcoEms = jmsProviderTibcoEms;
     }
 }

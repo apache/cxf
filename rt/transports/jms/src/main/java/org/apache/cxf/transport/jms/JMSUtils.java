@@ -134,7 +134,8 @@ public final class JMSUtils {
     }
 
     public static void populateIncomingContext(javax.jms.Message message,
-                                               org.apache.cxf.message.Message inMessage, String headerType)
+                                               org.apache.cxf.message.Message inMessage, 
+                                               String headerType, JMSConfiguration jmsConfig)
         throws UnsupportedEncodingException {
         try {
             JMSMessageHeadersType headers = null;
@@ -183,7 +184,7 @@ public final class JMSUtils {
             }
             inMessage.put(org.apache.cxf.message.Message.PROTOCOL_HEADERS, protHeaders);
 
-            SecurityContext securityContext = buildSecurityContext(message);
+            SecurityContext securityContext = buildSecurityContext(message, jmsConfig);
             inMessage.put(SecurityContext.class, securityContext);
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
@@ -191,7 +192,8 @@ public final class JMSUtils {
     }
 
     /**
-     * Extract the property JMSXUserID from the jms message and create a SecurityContext from it. 
+     * Extract the property JMSXUserID or JMS_TIBCO_SENDER from the jms message and 
+     * create a SecurityContext from it. 
      * For more info see Jira Issue CXF-2055
      * {@link https://issues.apache.org/jira/browse/CXF-2055}
      * 
@@ -199,11 +201,17 @@ public final class JMSUtils {
      * @return SecurityContext that contains the user of the producer of the message as the Principal
      * @throws JMSException if something goes wrong
      */
-    private static SecurityContext buildSecurityContext(javax.jms.Message message) throws JMSException {
-        final String jmsUserName = message.getStringProperty("JMSXUserID");
-        if (jmsUserName == null) {
+    private static SecurityContext buildSecurityContext(javax.jms.Message message, 
+                                                        JMSConfiguration config) throws JMSException {
+        String tempUserName = message.getStringProperty("JMSXUserID");
+        if (tempUserName == null && config.isJmsProviderTibcoEms()) {
+            tempUserName = message.getStringProperty("JMS_TIBCO_SENDER");
+        }
+        if (tempUserName == null) {
             return null;
         }
+        final String jmsUserName = tempUserName;
+
         final Principal principal = new Principal() {
             public String getName() {
                 return jmsUserName;
