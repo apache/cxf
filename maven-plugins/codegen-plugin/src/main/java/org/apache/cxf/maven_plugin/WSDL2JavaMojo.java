@@ -51,7 +51,6 @@ import org.apache.maven.project.ProjectUtils;
  * @requiresDependencyResolution test
  */
 public class WSDL2JavaMojo extends AbstractMojo {
-    private static final String TEMPBINDINGS_DIR = "tempbindings";
 
     /**
      * @parameter expression="${cxf.testSourceRoot}"
@@ -261,12 +260,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
         }
         mergeOptions(effectiveWsdlOptions);
         downloadRemoteWsdls(effectiveWsdlOptions);
-        String buildDir = project.getBuild().getDirectory();
-        File tempBindingDir = new File(buildDir, TEMPBINDINGS_DIR);
-        for (WsdlOption o : effectiveWsdlOptions) {
-            BindingFileHelper.setWsdlLocationInBindingsIfNotSet(project.getBasedir(), tempBindingDir, o,
-                                                                getLog());
-        }
+//        String buildDir = project.getBuild().getDirectory();
+//        File tempBindingDir = new File(buildDir, TEMPBINDINGS_DIR);
+//        for (WsdlOption o : effectiveWsdlOptions) {
+//            BindingFileHelper.setWsdlLocationInBindingsIfNotSet(project.getBasedir(), tempBindingDir, o,
+//                                                                getLog());
+//        }
         return effectiveWsdlOptions;
     }
     
