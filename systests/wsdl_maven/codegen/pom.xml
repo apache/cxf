@@ -43,9 +43,16 @@
                 <version>${project.version}</version>
                 <executions>
                     <execution>
+                        <!-- Codegen with default settings.
+                             This test shows some of the defaults that work without configuration.  
+                             In this case the wsdl dependency to the service "cxf-systests-java2ws"
+                             will be processed.
+                             As we have a file named defaultBinding.xml in the classpath
+                             this binding will be applied.
+                             The binding file contains an empty wsdlLocation. This means that
+                             the binding will be applied to the wsdl currently processed.  -->
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
-
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
@@ -60,7 +67,7 @@
             <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
             <artifactId>cxf-systests-java2ws</artifactId>
             <version>${project.version}</version>
-	  <type>wsdl</type>
+	        <type>wsdl</type>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
