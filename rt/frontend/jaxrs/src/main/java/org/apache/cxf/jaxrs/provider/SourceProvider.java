@@ -58,13 +58,18 @@ public class SourceProvider implements
     }
     
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
-        return Source.class.isAssignableFrom(type) || XMLSource.class.isAssignableFrom(type);
+        return Source.class.isAssignableFrom(type) 
+               || XMLSource.class.isAssignableFrom(type)
+               || Document.class.isAssignableFrom(type);
     }
     
     public Object readFrom(Class<Object> source, Type genericType, Annotation[] annotations, MediaType m,  
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
-        if (DOMSource.class.isAssignableFrom(source)) {
+        if (DOMSource.class.isAssignableFrom(source) || Document.class.isAssignableFrom(source)) {
+            
+            boolean docRequired = Document.class.isAssignableFrom(source);
+            
             Document doc = null;
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder;
@@ -77,7 +82,7 @@ public class SourceProvider implements
                 throw ioex;
             }
     
-            return new DOMSource(doc);
+            return docRequired ? doc : new DOMSource(doc);
         } else if (StreamSource.class.isAssignableFrom(source)
                    || Source.class.isAssignableFrom(source)) {
             return new StreamSource(is);

@@ -29,6 +29,8 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
 
+import org.w3c.dom.Document;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -57,6 +59,7 @@ public class SourceProviderTest extends Assert {
         assertSame(StreamSource.class, verifyRead(p, StreamSource.class).getClass());
         assertSame(StreamSource.class, verifyRead(p, Source.class).getClass());
         assertSame(DOMSource.class, verifyRead(p, DOMSource.class).getClass());
+        assertTrue(Document.class.isAssignableFrom(verifyRead(p, Document.class).getClass()));
     }
     
     @Test

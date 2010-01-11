@@ -193,6 +193,10 @@ public final class HttpUtils {
     public static String getPathToMatch(String path, String address, boolean addSlash) {
         
         int ind = path.indexOf(address);
+        if (ind == -1 && address.equals(path + "/")) {
+            path += "/";
+            ind = 0;
+        }
         if (ind == 0) {
             path = path.substring(ind + address.length());
         }

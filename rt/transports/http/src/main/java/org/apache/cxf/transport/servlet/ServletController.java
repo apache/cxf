@@ -55,7 +55,7 @@ public class ServletController extends AbstractServletController {
     private ServletContext servletContext;
     private ServletConfig servletConfig;
     private Bus bus;
-    private String lastBase = "";
+    private volatile String lastBase = "";
     
     public ServletController(ServletTransportFactory df,
                              ServletConfig config,
@@ -141,7 +141,9 @@ public class ServletController extends AbstractServletController {
                 }
             } else {
                 ei = d.getEndpointInfo();
-                if (null != request.getQueryString() 
+                
+                if ("GET".equals(request.getMethod())
+                    && null != request.getQueryString() 
                     && request.getQueryString().length() > 0
                     && bus.getExtension(QueryHandlerRegistry.class) != null) {                    
                     
@@ -149,10 +151,8 @@ public class ServletController extends AbstractServletController {
                     String baseUri = request.getRequestURL().toString() 
                         + "?" + request.getQueryString();
                     // update the EndPoint Address with request url
-                    if ("GET".equals(request.getMethod())) {
-                        updateDests(request);
-                    }
-
+                    updateDests(request);
+                    
                     for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers()) {
                         if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
                             
@@ -171,6 +171,8 @@ public class ServletController extends AbstractServletController {
                             return;
                         }   
                     }
+                } else if ("/".equals(address) || address.length() == 0) {
+                    updateDests(request);
                 }
                 
                 invokeDestination(request, res, d);
