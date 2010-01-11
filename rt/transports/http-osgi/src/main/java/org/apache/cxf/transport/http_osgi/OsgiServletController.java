@@ -54,7 +54,7 @@ import org.apache.cxf.wsdl.http.AddressType;
 public class OsgiServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
     
-    private String lastBase = "";
+    private volatile String lastBase = "";
     private OsgiServlet servlet;
     public OsgiServletController(OsgiServlet servlet) {
         super(servlet.getServletConfig());
@@ -67,9 +67,10 @@ public class OsgiServletController extends AbstractServletController {
         }
         String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
 
-        //if (base.equals(lastBase)) {
-        //    return;
-        //}
+        if (base.equals(lastBase)) {
+            return;
+        }
+        
         Set<String> paths = servlet.getTransport().getDestinationsPaths();
         for (String path : paths) {
             OsgiDestination d2 = servlet.getTransport().getDestinationForPath(path);
@@ -144,7 +145,9 @@ public class OsgiServletController extends AbstractServletController {
                             }
                         }
                     }
-                } 
+                } else if ("/".equals(address) || address.length() == 0) {
+                    updateDests(request);
+                }
                 invokeDestination(request, res, d);
                 
             }

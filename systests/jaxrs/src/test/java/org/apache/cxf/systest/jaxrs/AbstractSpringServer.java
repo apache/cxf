@@ -47,7 +47,7 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
     
     protected AbstractSpringServer(String path, String cPath, int portNumber) {
         resourcePath = path;
-        contextPath = "/";
+        contextPath = cPath;
         port = portNumber;
     }
     
