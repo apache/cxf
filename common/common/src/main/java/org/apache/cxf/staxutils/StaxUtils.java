@@ -1088,7 +1088,13 @@ public final class StaxUtils {
             
             XMLInputFactory factory = getXMLInputFactory();
             try {
-                XMLStreamReader reader = factory.createXMLStreamReader(source);
+                XMLStreamReader reader = null;
+            
+                try {
+                    reader = factory.createXMLStreamReader(source);
+                } catch (UnsupportedOperationException e) {
+                    //ignore
+                }
                 if (reader == null && source instanceof StreamSource) {
                     //createXMLStreamReader from Source is optional, we'll try and map it
                     StreamSource ss = (StreamSource)source;
