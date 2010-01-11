@@ -47,6 +47,11 @@ public class WSSecurity112Test extends WSSecurity11Common {
                     launchServer(Server.class, true)
             );
         } else {
+            if (WSSecurity11Common.isIBMJDK16()) {
+                System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
+                return;
+            }
+
             assertTrue(
                     "Server failed to launch",
                     // run the server in the same process
@@ -58,6 +63,12 @@ public class WSSecurity112Test extends WSSecurity11Common {
 
     @Test
     public void testClientServer() {
+        if ((!unrestrictedPoliciesInstalled) 
+                && (WSSecurity11Common.isIBMJDK16())) {
+            System.out.println("Not running as there is a problem with 1.6 jdk and restricted jars");
+            return;
+        }
+
         String[] argv = null;
         if (unrestrictedPoliciesInstalled) {
             argv = new String[] {
