@@ -48,7 +48,7 @@ public class RetransmissionCallback implements CachedOutputStreamCallback {
     }
     public void onClose(CachedOutputStream cos) {
    
-        //REVISIT - would be nice to keep the cache on disk intead of in-memory 
+        //REVISIT - would be nice to keep the cache on disk instead of in-memory 
         byte bytes[] = null;
         try {
             bytes = cos.getBytes();
