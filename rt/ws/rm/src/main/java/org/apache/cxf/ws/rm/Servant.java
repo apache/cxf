@@ -27,7 +27,11 @@ import java.util.logging.Logger;
 
 import javax.xml.datatype.Duration;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxb.DatatypeFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
@@ -52,6 +56,25 @@ public class Servant implements Invoker {
         reliableEndpoint = rme;
     }
     
+    private void throwSequenceFault(SequenceFault sf, Exchange exchange) {
+        Endpoint e = exchange.get(Endpoint.class);
+        Binding b = null;
+        if (null != e) {
+            b = e.getBinding();
+        }
+        Bus bus = exchange.get(Bus.class);
+        if (null != b && bus != null) {
+            RMManager m = bus.getExtension(RMManager.class);
+            LOG.fine("Manager: " + m);
+            BindingFaultFactory bff = m.getBindingFaultFactory(b);
+            Fault f = bff.createFault(sf);
+            LogUtils.log(LOG, Level.SEVERE, "SEQ_FAULT_MSG", bff.toString(f));
+            throw f;
+        }
+        throw new Fault(sf);
+    }
+    
+    
     public Object invoke(Exchange exchange, Object o) {
         LOG.fine("Invoking on RM Endpoint");
         OperationInfo oi = exchange.get(OperationInfo.class);
@@ -60,16 +83,14 @@ public class Servant implements Invoker {
             return null;
         }
         
-        // TODO: throw Fault, see AbstractRMInterceptor
-        
         if (RMConstants.getCreateSequenceOperationName().equals(oi.getName())
             || RMConstants.getCreateSequenceOnewayOperationName().equals(oi.getName())) {
             try {
                 return Collections.singletonList(createSequence(exchange.getInMessage()));
             } catch (SequenceFault ex) {
-                ex.printStackTrace();
+                throwSequenceFault(ex, exchange);
             } catch (Exception ex) {
-                ex.printStackTrace();
+                throw new Fault(ex);
             }
         } else if (RMConstants.getCreateSequenceResponseOnewayOperationName().equals(oi.getName())) {
             CreateSequenceResponseType createResponse = 
@@ -77,15 +98,15 @@ public class Servant implements Invoker {
             try {
                 createSequenceResponse(createResponse);
             } catch (SequenceFault ex) {
-                ex.printStackTrace();
+                throwSequenceFault(ex, exchange);
             }
         } else if (RMConstants.getTerminateSequenceOperationName().equals(oi.getName())) {            
             try {
                 terminateSequence(exchange.getInMessage());
             } catch (SequenceFault ex) {
-                ex.printStackTrace();
+                throwSequenceFault(ex, exchange);
             } catch (RMException ex) {
-                ex.printStackTrace();
+                throw new Fault(ex);
             }
         }
         
