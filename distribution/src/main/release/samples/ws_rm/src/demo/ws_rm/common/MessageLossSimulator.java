@@ -68,6 +68,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
             return;
         }
         
+        
         // discard even-numbered message
         InterceptorChain chain = message.getInterceptorChain();
         ListIterator it = chain.getIterator();
@@ -75,7 +76,7 @@ public class MessageLossSimulator extends AbstractPhaseInterceptor<Message> {
             PhaseInterceptor pi = (PhaseInterceptor)it.next();
             if (MessageSenderInterceptor.class.getName().equals(pi.getId())) {
                 chain.remove(pi);
-                LOG.fine("Removed MessageSenderInterceptor from interceptor chain.");
+                LOG.info("Removed MessageSenderInterceptor from interceptor chain.");
                 break;
             }
         }
