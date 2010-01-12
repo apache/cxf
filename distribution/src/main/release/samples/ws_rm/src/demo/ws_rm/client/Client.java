@@ -23,6 +23,7 @@ import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.hello_world_soap_http.Greeter;
 import org.apache.cxf.hello_world_soap_http.GreeterService;
@@ -31,8 +32,6 @@ import demo.ws_rm.common.MessageLossSimulator;
 
 
 public final class Client {
-
-    private static final String USER_NAME = System.getProperty("user.name");
 
     private Client() {
     }
@@ -43,16 +42,19 @@ public final class Client {
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("ws_rm.xml");
             Bus bus = bf.createBus(busFile.toString());
-            bf.setDefaultBus(bus);
+            BusFactory.setDefaultBus(bus);
 
             bus.getOutInterceptors().add(new MessageLossSimulator());
 
             GreeterService service = new GreeterService();
             Greeter port = service.getGreeterPort();
 
-            String[] names = new String[] {"Anne", "Bill", "Chris", "Daisy"};
-            // make a sequence of 4 invocations
-            for (int i = 0; i < 4; i++) {
+            String[] names = new String[] {"Anne",
+                                           "Bill",
+                                           "Chris",
+                                           "Daisy"};
+            // make a sequence of invocations
+            for (int i = 0; i < names.length; i++) {
                 System.out.println("Invoking greetMeOneWay...");
                 port.greetMeOneWay(names[i]);
                 System.out.println("No response as method is OneWay\n");

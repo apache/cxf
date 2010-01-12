@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package demos.ws_rm.common;
+package demo.ws_rm.common;
 
 import java.util.logging.LogRecord;
 import java.util.logging.SimpleFormatter;
