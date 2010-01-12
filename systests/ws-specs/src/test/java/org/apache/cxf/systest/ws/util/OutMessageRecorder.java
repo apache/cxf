@@ -20,8 +20,8 @@
 package org.apache.cxf.systest.ws.util;
 
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,12 +48,13 @@ public class OutMessageRecorder extends AbstractPhaseInterceptor {
 
     public OutMessageRecorder() {
         super(Phase.PRE_STREAM);
-        outbound = new ArrayList<byte[]>();
+        outbound = new CopyOnWriteArrayList<byte[]>();
         addAfter(RetransmissionInterceptor.class.getName());
         addBefore(StaxOutInterceptor.class.getName());
     }
     
     public void handleMessage(Message message) throws Fault {
+        
         OutputStream os = message.getContent(OutputStream.class);
         if (null == os) {
             return;

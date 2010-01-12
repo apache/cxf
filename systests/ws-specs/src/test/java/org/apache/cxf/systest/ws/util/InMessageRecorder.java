@@ -20,8 +20,8 @@ package org.apache.cxf.systest.ws.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -40,7 +40,7 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
 
     public InMessageRecorder() {
         super(Phase.RECEIVE);
-        inbound = new ArrayList<byte[]>();
+        inbound = new CopyOnWriteArrayList<byte[]>();
     }
 
     public void handleMessage(Message message) throws Fault {
