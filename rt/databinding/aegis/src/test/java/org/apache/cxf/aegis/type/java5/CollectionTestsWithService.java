@@ -26,6 +26,8 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.w3c.dom.Document;
+
 import org.apache.cxf.aegis.AbstractAegisTest;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.databinding.XFireCompatibilityServiceConfiguration;
@@ -120,6 +122,12 @@ public class CollectionTestsWithService extends AbstractAegisTest {
         assertEquals(-666.6, data[1][0], .0001);
         assertEquals(3.14, data[1][1], .0001);
         assertEquals(2.0, data[1][2], .0001);
+    }
+    
+    @Test
+    public void returnValueIsCollectionOfArraysOfAny() {
+        Collection<Document[]> r = csi.returnCollectionOfDOMFragments();
+        assertEquals(2, r.size());
     }
 
 }

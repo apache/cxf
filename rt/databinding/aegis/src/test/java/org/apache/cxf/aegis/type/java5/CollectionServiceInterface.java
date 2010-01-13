@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.type.java5;
 
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -26,7 +27,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.Stack;
 
-import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.Document;
 
 public interface CollectionServiceInterface {
 
@@ -54,5 +55,5 @@ public interface CollectionServiceInterface {
     
     Collection<double[]> returnCollectionOfPrimitiveArrays();
     
-    Collection<DocumentFragment[]> returnCollectionOfDOMFragments();
+    Collection<Document[]> returnCollectionOfDOMFragments();
 }

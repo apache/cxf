@@ -27,7 +27,12 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.Stack;
 
-import org.w3c.dom.DocumentFragment;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class CollectionService implements CollectionServiceInterface {
     
@@ -96,8 +101,26 @@ public class CollectionService implements CollectionServiceInterface {
         return data;
     }
 
-    public Collection<DocumentFragment[]> returnCollectionOfDOMFragments() {
-        return null;
+    public Collection<Document[]> returnCollectionOfDOMFragments() {
+        try {
+            DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            Document d1 = builder.newDocument();
+            Element e = d1.createElement("Horse");
+            e.setAttribute("cover", "feathers");
+            d1.appendChild(e);
+            Document d2 = builder.newDocument();
+            e = d2.createElement("Cantelope");
+            d2.appendChild(e);
+            e.setAttribute("not-an", "ungulate");
+            Document[] da = new Document[] {d1, d2};
+            List<Document[]> l = new ArrayList<Document[]>();
+            l.add(da);
+            da = new Document[] {d2, d1};
+            l.add(da);
+            return l;
+        } catch (ParserConfigurationException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 }
