@@ -43,11 +43,11 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String OUTPUT_STREAM_HOLDER = StaxOutInterceptor.class.getName() + ".outputstream";
     public static final String FORCE_START_DOCUMENT = "org.apache.cxf.stax.force-start-document";
+    public static final StaxOutEndingInterceptor ENDING = new StaxOutEndingInterceptor();
     
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(StaxOutInterceptor.class);
     private static Map<Object, XMLOutputFactory> factories = new HashMap<Object, XMLOutputFactory>();
 
-    private StaxOutEndingInterceptor ending = new StaxOutEndingInterceptor();
     
     public StaxOutInterceptor() {
         super(Phase.PRE_STREAM);
@@ -83,7 +83,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         message.setContent(XMLStreamWriter.class, writer);
 
         // Add a final interceptor to write end elements
-        message.getInterceptorChain().add(ending);
+        message.getInterceptorChain().add(ENDING);
     }
     @Override
     public void handleFault(Message message) {
@@ -150,7 +150,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         return null;
     }
     
-    public class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static class StaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
         public StaxOutEndingInterceptor() {
             super(Phase.PRE_STREAM_ENDING);
             getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
