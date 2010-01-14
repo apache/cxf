@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
@@ -77,16 +76,12 @@ import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.ws.rm.RMConstants;
 import org.apache.cxf.ws.rm.RMContextUtils;
-import org.apache.cxf.ws.rm.RMInInterceptor;
 import org.apache.cxf.ws.rm.RMManager;
-import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.RMProperties;
-import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
 
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
@@ -1424,17 +1419,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     private void awaitMessages(int nExpectedOut, int nExpectedIn, int timeout) {
         MessageRecorder mr = new MessageRecorder(outRecorder, inRecorder);
         mr.awaitMessages(nExpectedOut, nExpectedIn, timeout);
-    }
-
-    private void removeRMInterceptors(List<Interceptor> interceptors) {
-        for (Iterator<Interceptor> it = interceptors.iterator(); it.hasNext();) {
-            Interceptor i = it.next();
-            if (i instanceof RMSoapInterceptor
-                || i instanceof RMOutInterceptor
-                || i instanceof RMInInterceptor) {
-                it.remove();
-            }
-        }
     }
 
     private DOMSource getDOMRequest(String n) throws Exception {
