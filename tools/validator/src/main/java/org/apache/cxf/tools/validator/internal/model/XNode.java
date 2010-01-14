@@ -24,6 +24,10 @@ import java.util.Map;
 import java.util.Stack;
 import javax.xml.namespace.QName;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+
 import org.apache.cxf.common.util.StringUtils;
 
 public class XNode {
@@ -164,5 +168,54 @@ public class XNode {
         sb.append(getXPath());
         nsMap.put(prefix, name.getNamespaceURI());
         return sb.toString();
+    }
+
+    
+    private boolean matches(Element el) { 
+        if (el.getLocalName().equals(name.getLocalPart())
+            && el.getNamespaceURI().equals(name.getNamespaceURI())) {
+            if (!StringUtils.isEmpty(attributeName) && !StringUtils.isEmpty(attributeValue)) {
+                String v = el.getAttribute(attributeName);
+                if (attributeValue.equals(v) || (StringUtils.isEmpty(v) && isDefaultAttributeValue)) {
+                    return true;
+                }
+            } else {
+                return true;
+            }
+        }
+        return false;
+    }
+    private boolean matches(Element el, Stack<XNode> stack) {
+        if (matches(el)) {
+            if (stack.isEmpty()) {
+                return true;
+            }
+            XNode next = stack.pop();
+            Node nd = el.getFirstChild();
+            while (nd != null) {
+                if (nd instanceof Element) {
+                    el = (Element)nd;
+                    if (next.matches(el, stack)) {
+                        return true;
+                    }
+                }
+                nd = nd.getNextSibling();
+            }
+            stack.push(next);
+        }
+        return false;
+    }
+    
+    public boolean matches(Document doc) {
+        Stack<XNode> nodes = new Stack<XNode>();
+        nodes.push(this);
+        XNode pNode = getParentNode();
+        while (pNode != null) {
+            nodes.push(pNode);
+            pNode = pNode.getParentNode();
+        }
+        pNode = nodes.pop();
+        return pNode.matches(doc.getDocumentElement(), nodes);
+        
     }
 }
