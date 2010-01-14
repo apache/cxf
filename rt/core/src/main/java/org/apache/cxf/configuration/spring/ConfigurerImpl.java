@@ -207,7 +207,7 @@ public class ConfigurerImpl extends BeanConfigurerSupport
         }
         
         if (null == beanName) {
-            LogUtils.log(LOG, Level.INFO, "COULD_NOT_DETERMINE_BEAN_NAME_MSG",
+            LogUtils.log(LOG, Level.FINE, "COULD_NOT_DETERMINE_BEAN_NAME_MSG",
                          beanInstance.getClass().getName());
         }
       

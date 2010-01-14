@@ -401,8 +401,6 @@ public class ServiceImpl extends ServiceDelegate {
         if (wsdlURL != null) {
             proxyFac.setWsdlURL(wsdlURL);
         }
-        
-        configureObject(clientFac);
         if (portName == null) {
             QName portTypeName = getPortTypeName(serviceEndpointInterface);
             
