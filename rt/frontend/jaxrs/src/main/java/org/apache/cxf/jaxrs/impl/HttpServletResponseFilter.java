@@ -19,9 +19,6 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -46,31 +43,6 @@ public class HttpServletResponseFilter extends HttpServletResponseWrapper {
     @Override
     public ServletOutputStream getOutputStream() throws IOException {
         return new ServletOutputStreamFilter(super.getOutputStream(), m);
-    }
-    
-    @Override
-    public void setHeader(String name, String value) {
-        setHeaderInternal(name, value, false);
-    }
-    
-    @Override
-    public void addHeader(String name, String value) {
-        setHeaderInternal(name, value, true);
-    }
-    
-    @SuppressWarnings("unchecked")
-    private void setHeaderInternal(String name, String value, boolean add) {
-        Map<String, List<String>> headers = 
-            (Map<String, List<String>>)m.get(Message.PROTOCOL_HEADERS);
-        List<String> values = headers.get(name);
-        if (values == null) {
-            values = new ArrayList<String>();
-            headers.put(name, values);
-        }
-        if (!add) {
-            values.clear();
-        }
-        values.add(value);
     }
 }
 

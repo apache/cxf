@@ -478,9 +478,11 @@ public class BookStore {
     @Path("/books/customstatus")
     @Produces("text/xml")
     @Consumes("text/xml")
-    public Response addBookCustomFailure(Book book, @Context HttpServletResponse response) {
+    public Book addBookCustomFailure(Book book, @Context HttpServletResponse response) {
         response.setStatus(333);
-        return null;
+        response.addHeader("CustomHeader", "CustomValue");
+        book.setId(888);
+        return book;
     }
     
     @POST
