@@ -684,21 +684,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddBookCustomFailureStatus() throws Exception {
         String endpointAddress = "http://localhost:9080/bookstore/books/customstatus";
-
-        File input = new File(getClass().getResource("resources/update_book.txt").toURI());
-        PostMethod put = new PostMethod(endpointAddress);
-        RequestEntity entity = new FileRequestEntity(input, "text/xml; charset=ISO-8859-1");
-        put.setRequestEntity(entity);
-        HttpClient httpclient = new HttpClient();
-
-        try {
-            int result = httpclient.executeMethod(put);
-            assertEquals(333, result);
-        } finally {
-            // Release current connection to the connection pool once you are
-            // done
-            put.releaseConnection();
-        }
+        WebClient client = WebClient.create(endpointAddress);
+        Book book = client.type("text/xml").accept("text/xml").post(new Book(), Book.class);
+        assertEquals(888L, book.getId());
+        Response r = client.getResponse();
+        assertEquals("CustomValue", r.getMetadata().getFirst("CustomHeader"));
+        assertEquals(333, r.getStatus());
     }
     
     @Test
