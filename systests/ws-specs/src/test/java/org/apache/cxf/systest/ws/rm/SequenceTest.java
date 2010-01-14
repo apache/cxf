@@ -143,50 +143,6 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         Thread.sleep(100);
     }
 
-    /** 
-      * Server is configured with RM interceptors, client without;
-      * Addressing interceptors are installed on either side.
-      * The (oneway) application request should be dispatched straight to the
-      * implementor.
-      */
-    @Test
-    @Ignore
-    public void testRMServerPlainClient() throws Exception {
-
-        SpringBusFactory bf = new SpringBusFactory();
-        
-        controlBus = bf.createBus();
-        BusFactory.setDefaultBus(controlBus);
-
-        ControlService cs = new ControlService();
-        control = cs.getControlPort();
-
-        assertTrue("Failed to start greeter",
-            control.startGreeter("org/apache/cxf/systest/ws/rm/rminterceptors.xml"));
-
-        greeterBus = bf.createBus("org/apache/cxf/systest/ws/rm/rminterceptors.xml");
-        BusFactory.setDefaultBus(greeterBus);
-        removeRMInterceptors(greeterBus.getOutInterceptors());
-        removeRMInterceptors(greeterBus.getOutFaultInterceptors());
-        removeRMInterceptors(greeterBus.getInInterceptors());
-        removeRMInterceptors(greeterBus.getInFaultInterceptors());
-        LOG.fine("Initialised greeter bus with addressing but without RM interceptors");
-
-        outRecorder = new OutMessageRecorder();
-        greeterBus.getOutInterceptors().add(outRecorder);
-        inRecorder = new InMessageRecorder();
-        greeterBus.getInInterceptors().add(inRecorder);
-
-        GreeterService gs = new GreeterService();
-        greeter = gs.getGreeterPort();
-        LOG.fine("Created greeter client.");
-
-        ConnectionHelper.setKeepAliveConnection(greeter, true);
-
-        greeter.greetMeOneWay("once");
-
-    }
-
     // --- tests ---
     @Test
     public void testOnewayAnonymousAcks() throws Exception {
