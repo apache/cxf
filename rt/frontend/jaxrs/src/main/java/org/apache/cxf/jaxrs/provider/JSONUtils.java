@@ -86,11 +86,11 @@ public final class JSONUtils {
         if (serializeAsArray) {
             if (arrayKeys != null) {
                 for (String key : arrayKeys) {
-                    xsw.seriliazeAsArray(key);
+                    xsw.serializeAsArray(key);
                 }
             } else {
                 String key = getKey(convention, qname);
-                xsw.seriliazeAsArray(key);
+                xsw.serializeAsArray(key);
             }
         }
         XMLStreamWriter writer = !writeXsiType || dropRootElement 
