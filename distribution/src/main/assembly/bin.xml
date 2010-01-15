@@ -154,8 +154,16 @@
             <unpack>false</unpack>
             <excludes>
                 <exclude>org.apache.cxf:*</exclude>
-                <exclude>org.apache.cxf.xjcplugins:*</exclude>
             </excludes>
+            <scope>runtime</scope>
+        </dependencySet>
+        <dependencySet>
+            <outputDirectory>apache-cxf-${cxf.version}/lib</outputDirectory>
+            <unpack>false</unpack>
+            <includes>
+                <include>org.apache.cxf:cxf-xjc-ts</include>
+                <include>org.apache.cxf:cxf-xjc-dv</include>
+            </includes>
             <scope>runtime</scope>
         </dependencySet>
         <dependencySet>
