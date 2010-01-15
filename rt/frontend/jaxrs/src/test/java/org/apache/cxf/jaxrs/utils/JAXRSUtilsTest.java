@@ -61,7 +61,9 @@ import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.impl.RequestImpl;
 import org.apache.cxf.jaxrs.impl.SecurityContextImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
@@ -1212,13 +1214,14 @@ public class JAXRSUtilsTest extends Assert {
         
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri); 
-        
-        
-        JAXRSUtils.handleSetters(ori, c, new MessageImpl());
+        Message message = new MessageImpl();
+        JAXRSUtils.handleSetters(ori, c, message);
         assertNotNull(c.getUriInfo());
         assertSame(ThreadLocalUriInfo.class, c.getUriInfo().getClass());
         assertSame(UriInfoImpl.class, 
                    ((ThreadLocalProxy)c.getUriInfo()).get().getClass());
+        assertSame(ThreadLocalServletConfig.class, c.getSuperServletConfig().getClass());
+        assertSame(ThreadLocalHttpServletRequest.class, c.getHttpServletRequest().getClass());
     }
     
     @Test
@@ -1229,10 +1232,13 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri);
         Message m = new MessageImpl();
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.add("AHeader2", "theAHeader2");
+        m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "a=aValue&query2=b");
         JAXRSUtils.handleSetters(ori, c, m);
         assertEquals("aValue", c.getQueryParam());
-        
+        assertEquals("theAHeader2", c.getAHeader2());
     }
     
     @Test
@@ -1243,10 +1249,13 @@ public class JAXRSUtilsTest extends Assert {
         OperationResourceInfo ori = new OperationResourceInfo(Customer.class.getMethods()[0],
                                                               cri);
         Message m = new MessageImpl();
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.add("AHeader", "theAHeader");
+        m.put(Message.PROTOCOL_HEADERS, headers);
         m.put(Message.QUERY_STRING, "b=bValue");
         JAXRSUtils.handleSetters(ori, c, m);
         assertEquals("bValue", c.getB());
-        
+        assertEquals("theAHeader", c.getAHeader());
     }
 
     @Test

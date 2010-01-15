@@ -56,9 +56,9 @@ public abstract class AbstractResourceInfo {
         this.serviceClass = serviceClass;
         this.resourceClass = resourceClass;
         root = isRoot;
-        if (root) {
-            initContextFields();
-            initContextSetterMethods();
+        if (root && resourceClass != null) {
+            findContextFields(serviceClass);
+            findContextSetterMethods(serviceClass);
         }
     }
     
@@ -68,13 +68,6 @@ public abstract class AbstractResourceInfo {
     
     public Class<?> getServiceClass() {
         return serviceClass;
-    }
-    
-    private void initContextFields() {
-        if (resourceClass == null || !root) {
-            return;
-        }
-        findContextFields(serviceClass);
     }
     
     private void findContextFields(Class<?> cls) {
@@ -108,9 +101,9 @@ public abstract class AbstractResourceInfo {
         findContextFields(cls.getSuperclass());
     }
     
-    private void initContextSetterMethods() {
+    private void findContextSetterMethods(Class<?> cls) {
         
-        for (Method m : getServiceClass().getMethods()) {
+        for (Method m : cls.getMethods()) {
         
             if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
                 continue;
@@ -121,6 +114,10 @@ public abstract class AbstractResourceInfo {
                     break;
                 }
             }
+        }
+        Class<?>[] interfaces = cls.getInterfaces();
+        for (Class<?> i : interfaces) {
+            findContextSetterMethods(i);
         }
     }
     
