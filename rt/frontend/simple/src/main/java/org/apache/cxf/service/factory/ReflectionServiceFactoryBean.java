@@ -1190,6 +1190,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     mpi.setElementQName(newName);
                     mpi.setConcreteName(newName); 
                     XmlSchemaUtils.setElementQName(el, newName);
+                    el.setForm(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
                 }
                 
                 if (Collection.class.isAssignableFrom(mpi.getTypeClass())
