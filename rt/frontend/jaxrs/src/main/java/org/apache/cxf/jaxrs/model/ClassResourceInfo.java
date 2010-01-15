@@ -93,20 +93,15 @@ public class ClassResourceInfo extends AbstractResourceInfo {
                              boolean theRoot, boolean enableStatic) {
         super(theResourceClass, theServiceClass, theRoot);
         this.enableStatic = enableStatic;
-        if (theRoot) {
-            initParamFields();
-            initParamMethods();
+        if (root && resourceClass != null) {
+            setParamField(serviceClass);
+            setParamMethods(serviceClass);
         }
     }
     
     public ClassResourceInfo(Class<?> theResourceClass, Class<?> theServiceClass, 
                              boolean theRoot, boolean enableStatic, boolean createdFromModel) {
-        super(theResourceClass, theServiceClass, theRoot);
-        this.enableStatic = enableStatic;
-        if (theRoot) {
-            initParamFields();
-            initParamMethods();
-        }
+        this(theResourceClass, theServiceClass, theRoot, enableStatic);
         this.createdFromModel = createdFromModel;
     }
     
@@ -154,13 +149,11 @@ public class ClassResourceInfo extends AbstractResourceInfo {
         return methods;
     }
     
-    private void initParamFields() {
-        if (getResourceClass() == null || !isRoot()) {
+    private void setParamField(Class<?> cls) {
+        if (Object.class == cls || cls == null) {
             return;
         }
-        
-        
-        for (Field f : getServiceClass().getDeclaredFields()) {
+        for (Field f : cls.getDeclaredFields()) {
             for (Annotation a : f.getAnnotations()) {
                 if (AnnotationUtils.isParamAnnotationClass(a.annotationType())) {
                     if (paramFields == null) {
@@ -170,11 +163,12 @@ public class ClassResourceInfo extends AbstractResourceInfo {
                 }
             }
         }
+        setParamField(cls.getSuperclass());
     }
     
-    private void initParamMethods() {
+    private void setParamMethods(Class<?> cls) {
         
-        for (Method m : getServiceClass().getMethods()) {
+        for (Method m : cls.getMethods()) {
         
             if (!m.getName().startsWith("set") || m.getParameterTypes().length != 1) {
                 continue;
@@ -185,6 +179,10 @@ public class ClassResourceInfo extends AbstractResourceInfo {
                     break;
                 }
             }
+        }
+        Class<?>[] interfaces = cls.getInterfaces();
+        for (Class<?> i : interfaces) {
+            setParamMethods(i);
         }
     }
 

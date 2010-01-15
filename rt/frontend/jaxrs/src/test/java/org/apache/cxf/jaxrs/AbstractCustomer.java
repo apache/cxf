@@ -19,14 +19,57 @@
 
 package org.apache.cxf.jaxrs;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.HeaderParam;
 import javax.ws.rs.core.Context;
 
 public class AbstractCustomer {
+    
+    @HeaderParam("AHeader")
+    private String aHeaderValue;
+    
+    private String aHeaderValue2;
+    
     @Context 
     private ServletContext sContext;
+    
+    private ServletConfig sConfig;
+    private HttpServletRequest request;
     
     public ServletContext getSuperServletContext() {
         return sContext;
     }
+    
+    @Context
+    public void setServletConfig(ServletConfig context) {
+        sConfig = context;
+    }
+    
+    public ServletConfig getSuperServletConfig() {
+        return sConfig;
+    }
+    
+    public String getAHeader() {
+        return aHeaderValue;
+    }
+    
+    @HeaderParam("AHeader2")
+    public void setAHeader2(String value) {
+        this.aHeaderValue2 = value;
+    }
+        
+    public String getAHeader2() {
+        return aHeaderValue2;
+    }
+    
+    public void setHttpServletRequest(HttpServletRequest r) {
+        request = r;    
+    }
+    
+    public HttpServletRequest getHttpServletRequest() {
+        return request;
+    }
+    
 };
