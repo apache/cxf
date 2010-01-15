@@ -201,10 +201,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     }
 
     private boolean isExist(List<Document> docs, XNode vNode) {
-        XPathUtils xpather = new XPathUtils(vNode.getNSMap());
-        String expression = vNode.toString();
         for (Document doc : docs) {
-            if (xpather.isExist(expression, doc, XPathConstants.NODE)) {
+            if (vNode.matches(doc)) {
                 return true;
             }
         }
@@ -235,8 +233,8 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
 
             List<Document> wsdlDocs = getWSDLDocuments();
             for (XNode vNode : vNodes) {
-
                 if (!isExist(wsdlDocs, vNode)) {
+                    //System.out.println("Fail: " + vNode.getXPath());
                     FailureLocation loc = getFailureLocation(wsdlDocs, vNode.getFailurePoint());
 
                     vResults.addError(new Message("FAILED_AT_POINT",
