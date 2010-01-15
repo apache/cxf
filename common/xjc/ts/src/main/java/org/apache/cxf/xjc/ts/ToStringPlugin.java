@@ -37,18 +37,13 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxb.JAXBToStringBuilder;
-import org.apache.cxf.jaxb.JAXBToStringStyle;
-
-
 /**
  * Modifies the JAXB code model to override the Object.toString() method with an 
  * implementation that provides a String representation of the xml content.
  */
 public class ToStringPlugin {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(ToStringPlugin.class);
+    private static final Logger LOG = Logger.getLogger(ToStringPlugin.class.getName()); //NOPMD
 
     private String styleFieldName = "DEFAULT_STYLE";
     public String getOptionName() {
@@ -58,7 +53,7 @@ public class ToStringPlugin {
     public String getUsage() {
         return "  -Xts                 : Activate plugin to add a toString() method to generated classes\n"
             +  "  -Xts:style:multiline : Have toString produce multi line output\n"
-            +  "  -Xts:style:simple    : Have toString produce single line terse output\n";
+            +  "  -Xts:style:simple    : Have toString produce single line terse output";
     }
 
     public int parseArgument(Options opt, String[] args, int index, com.sun.tools.xjc.Plugin plugin) 
@@ -80,8 +75,9 @@ public class ToStringPlugin {
     public boolean run(Outline outline, Options opt, ErrorHandler errorHandler) {
         LOG.fine("Running toString() plugin.");
         
-        final JClass toStringDelegateImpl = outline.getCodeModel().ref(JAXBToStringBuilder.class);
-        final JClass styleClass = outline.getCodeModel().ref(JAXBToStringStyle.class);
+        final JClass toStringDelegateImpl = outline.getCodeModel()
+            .ref("org.apache.cxf.jaxb.JAXBToStringBuilder");
+        final JClass styleClass = outline.getCodeModel().ref("org.apache.cxf.jaxb.JAXBToStringStyle");
         final JFieldRef toStringDelegateStyleParam = styleClass.staticRef(styleFieldName);
         
         for (ClassOutline co : outline.getClasses()) {

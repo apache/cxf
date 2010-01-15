@@ -53,15 +53,13 @@ import com.sun.xml.xsom.XSTerm;
 import com.sun.xml.xsom.XSType;
 import com.sun.xml.xsom.XmlString;
 
-import org.apache.cxf.common.logging.LogUtils;
-
 /**
  * Modifies the JAXB code model to initialize fields mapped from schema elements 
  * with their default value.
  */
 public class DefaultValuePlugin {
     
-    private static final Logger LOG = LogUtils.getL7dLogger(DefaultValuePlugin.class);
+    private static final Logger LOG = Logger.getLogger(DefaultValuePlugin.class.getName()); //NOPMD
     
     public DefaultValuePlugin() {
     }
@@ -237,7 +235,7 @@ public class DefaultValuePlugin {
                 .arg(qn.getLocalPart())
                 .arg(qn.getPrefix());
         } else if ("javax.xml.datatype.Duration".equals(typeName)) {
-            dv = outline.getCodeModel().ref(org.apache.cxf.jaxb.DatatypeFactory.class)
+            dv = outline.getCodeModel().ref("org.apache.cxf.jaxb.DatatypeFactory")
                 .staticInvoke("createDuration").arg(defaultValue);
         } else if (type instanceof JDefinedClass) {
             JDefinedClass cls = (JDefinedClass)type;

@@ -42,7 +42,7 @@ public class Bug671Plugin {
     }
 
     public String getUsage() {
-        return "  -Xbug671             : Activate plugin to map package names that contain keywords\n";
+        return "  -Xbug671             : Activate plugin to map package names that contain keywords";
     }
 
     public void onActivated(Options opt) throws BadCommandLineException {

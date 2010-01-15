@@ -28,7 +28,6 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-import org.apache.cxf.common.logging.LogUtils;
 
 /**
  * Generate getters named getXXX() for Booleans instead of isXXX(). Useful to use generated beans with tools
@@ -36,7 +35,7 @@ import org.apache.cxf.common.logging.LogUtils;
  */
 public class BooleanGetterPlugin {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(BooleanGetterPlugin.class);
+    private static final Logger LOG = Logger.getLogger(BooleanGetterPlugin.class.getName()); //NOPMD
 
     public BooleanGetterPlugin() {
     }
