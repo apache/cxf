@@ -35,7 +35,9 @@ public class TLSServerParametersConfig
     public TLSServerParametersConfig(TLSServerParametersType params) 
         throws GeneralSecurityException,
                IOException {
-        
+        if (params.isSetSecureSocketProtocol()) {
+            this.setSecureSocketProtocol(params.getSecureSocketProtocol());
+        }
         if (params.isSetCipherSuitesFilter()) {
             this.setCipherSuitesFilter(params.getCipherSuitesFilter());
         }
