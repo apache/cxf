@@ -36,6 +36,7 @@ import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
@@ -58,6 +59,28 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         super(Phase.UNMARSHAL);
     }
 
+    @Override
+    public void handleFault(Message message) {
+        super.handleFault(message);
+        
+        LOG.fine("Cleanup thread local variables");
+        
+        Object rootInstance = message.getExchange().remove(JAXRSUtils.ROOT_INSTANCE);
+        Object rootProvider = message.getExchange().remove(JAXRSUtils.ROOT_PROVIDER);
+        if (rootInstance != null && rootProvider != null) {
+            try {
+                ((ResourceProvider)rootProvider).releaseInstance(message, rootInstance);
+            } catch (Throwable tex) {
+                LOG.warning("Exception occurred during releasing the service instance, " + tex.getMessage());
+            }
+        }
+        ProviderFactory.getInstance(message).clearThreadLocalProxies();
+        ClassResourceInfo cri = (ClassResourceInfo)message.getExchange().get(JAXRSUtils.ROOT_RESOURCE_CLASS);
+        if (cri != null) {
+            cri.clearThreadLocalProxies();
+        }
+    }
+    
     public void handleMessage(Message message) {
         
         try {
