@@ -1055,6 +1055,8 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                int expectedStatus) throws Exception {
         GetMethod get = new GetMethod(address);
         get.setRequestHeader("Accept", acceptType);
+        get.addRequestHeader("Cookie", "a=b,c=d");
+        get.addRequestHeader("Cookie", "e=f");
         get.setRequestHeader("Accept-Language", "da;q=0.8,en");
         get.setRequestHeader("Book", "1,2,3");
         HttpClient httpClient = new HttpClient();

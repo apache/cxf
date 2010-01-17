@@ -49,6 +49,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -238,7 +239,13 @@ public class BookStore {
             || !"da".equals(locales.get(1).getLanguage())) {
             throw new WebApplicationException();
         }
-        
+        Map<String, Cookie> cookies = httpHeaders.getCookies();
+        if (cookies.size() != 3
+            || !cookies.containsKey("a")
+            || !cookies.containsKey("c")
+            || !cookies.containsKey("e")) {
+            throw new WebApplicationException();
+        }
         return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }
     
