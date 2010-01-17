@@ -82,11 +82,21 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public Map<String, Cookie> getCookies() {
-        List<String> cs = getListValues(HttpHeaders.COOKIE);
-        Map<String, Cookie> cl = new HashMap<String, Cookie>(); 
-        for (String c : cs) {
-            Cookie cookie = Cookie.valueOf(c);
-            cl.put(cookie.getName(), cookie);
+        List<String> values = headers.get(HttpHeaders.COOKIE);
+        if (values == null || values.isEmpty()) {
+            return Collections.emptyMap();
+        }
+        
+        Map<String, Cookie> cl = new HashMap<String, Cookie>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+            List<String> cs = getHeaderValues(HttpHeaders.COOKIE, value);
+            for (String c : cs) {
+                Cookie cookie = Cookie.valueOf(c);
+                cl.put(cookie.getName(), cookie);
+            }
         }
         return cl;
     }

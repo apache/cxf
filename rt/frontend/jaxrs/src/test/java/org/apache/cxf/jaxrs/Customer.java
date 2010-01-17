@@ -41,6 +41,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
@@ -333,7 +334,8 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     }
     
     public void testMultipleCookieParam(@CookieParam("c1") String c1,
-                                        @CookieParam("c2") String c2) {
+                                        @CookieParam("c2") String c2,
+                                        @CookieParam("c3") Cookie c3) {
         // complete
     }
     

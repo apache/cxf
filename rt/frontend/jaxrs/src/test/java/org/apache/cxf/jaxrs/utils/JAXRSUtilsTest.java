@@ -33,6 +33,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -559,18 +560,20 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testMultipleCookieParameters() throws Exception {
-        Class[] argType = {String.class, String.class};
+        Class[] argType = {String.class, String.class, Cookie.class};
         Method m = Customer.class.getMethod("testMultipleCookieParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-        headers.add("Cookie", "c1=c1Value, c2=c2Value, c3=c3Value");
+        headers.add("Cookie", "c1=c1Value, c2=c2Value");
+        headers.add("Cookie", "c3=c3Value");
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
                                                            messageImpl);
-        assertEquals(params.size(), 2);
+        assertEquals(params.size(), 3);
         assertEquals("c1Value", params.get(0));
         assertEquals("c2Value", params.get(1));
+        assertEquals("c3Value", ((Cookie)params.get(2)).getValue());
     }
     
     @Test
