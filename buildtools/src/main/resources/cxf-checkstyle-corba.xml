@@ -94,7 +94,7 @@
 		<module name="UnusedImports" />
 		<module name="ImportOrder">
 			<property name="groups"
-				value="java,javax,org.w3c,org.xml,junit" />
+				value="java,javax,org.w3c,org.xml,junit,antlr,com,net,org,org.junit" />
 			<property name="ordered" value="true" />
 		</module>
 		<!--
