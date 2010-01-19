@@ -42,8 +42,8 @@ cxf-rt-bindings-object
 cxf-rt-bindings-xml
 cxf-rt-bindings-http
 cxf-rt-frontend-js
-cxf-rt-frontend-jaxrs
 cxf-rt-javascript
+cxf-rt-transports-http-osgi
 
 If your code depends on any of the above modules then please use 
 an all-inclusive cxf-bundle bundle or cxf-bundle-jaxrs bundle instead,
