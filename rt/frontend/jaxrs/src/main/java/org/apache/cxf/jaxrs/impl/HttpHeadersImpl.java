@@ -26,6 +26,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -44,7 +45,11 @@ import org.apache.cxf.message.Message;
 
 public class HttpHeadersImpl implements HttpHeaders {
 
-    // TODO : it can be optimized, "Mastering Regular Expressions" has the answers
+    private static final String COOKIE_SEPARATOR_PROPERTY =
+        "org.apache.cxf.http.cookie.separator";
+    private static final String COOKIE_SEPARATOR_CRLF = "crlf";
+    private static final String DEFAULT_SEPARATOR = ",";
+    
     private static final String COMPLEX_HEADER_EXPRESSION = 
         "(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+))(;(([\\w]+=\"[^\"]*\")|([\\w]+=[\\w]+)|([\\w]+)))?";
     private static final Pattern COMPLEX_HEADER_PATTERN =
@@ -63,10 +68,12 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
     
     
+    private Message message;
     private MultivaluedMap<String, String> headers;
     
     @SuppressWarnings("unchecked")
     public HttpHeadersImpl(Message message) {
+        this.message = message;
         this.headers = new MetadataMap<String, String>(
             (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS), true, true);
     }
@@ -92,7 +99,7 @@ public class HttpHeadersImpl implements HttpHeaders {
             if (value == null) {
                 continue;
             }
-            List<String> cs = getHeaderValues(HttpHeaders.COOKIE, value);
+            List<String> cs = getHeaderValues(HttpHeaders.COOKIE, value, getCookieSeparator());
             for (String c : cs) {
                 Cookie cookie = Cookie.valueOf(c);
                 cl.put(cookie.getName(), cookie);
@@ -101,6 +108,16 @@ public class HttpHeadersImpl implements HttpHeaders {
         return cl;
     }
 
+    private String getCookieSeparator() {
+        Object cookiePropValue = message.getContextualProperty(COOKIE_SEPARATOR_PROPERTY);
+        if (cookiePropValue != null) {
+            return COOKIE_SEPARATOR_CRLF.equals(cookiePropValue.toString()) 
+                ? "\r\n" : cookiePropValue.toString();
+        } else {
+            return DEFAULT_SEPARATOR;
+        }
+    }
+    
     public Locale getLanguage() {
         List<String> values = getListValues(HttpHeaders.CONTENT_LANGUAGE);
         return values.size() == 0 ? null : createLocale(values.get(0).trim());
@@ -114,7 +131,7 @@ public class HttpHeadersImpl implements HttpHeaders {
     public MultivaluedMap<String, String> getRequestHeaders() {
         Map<String, List<String>> newHeaders = new LinkedHashMap<String, List<String>>();
         for (Map.Entry<String, List<String>> entry : headers.entrySet()) {
-            newHeaders.put(entry.getKey(), getListValues(entry.getKey()));
+            newHeaders.put(entry.getKey(), getRequestHeader(entry.getKey()));
         }
         return new MetadataMap<String, String>(newHeaders, true, true);
     }
@@ -151,7 +168,22 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
 
     public List<String> getRequestHeader(String name) {
-        return getListValues(name);
+        List<String> values = headers.get(name);
+        if (values == null || values.isEmpty() || values.get(0) == null) {
+            return Collections.emptyList();
+        }
+        if (HttpUtils.isDateRelatedHeader(name)) {
+            return values;
+        }
+        String sep = HttpHeaders.COOKIE.equalsIgnoreCase(name) ? getCookieSeparator() : DEFAULT_SEPARATOR;
+        List<String> ls = new LinkedList<String>();
+        for (String value : values) {
+            if (value == null) {
+                continue;
+            }
+            ls.addAll(getHeaderValues(name, value, sep));
+        }
+        return ls;
     }
 
     private List<String> getListValues(String headerName) {
@@ -166,9 +198,13 @@ public class HttpHeadersImpl implements HttpHeaders {
     }
     
     private List<String> getHeaderValues(String headerName, String originalValue) {
+        return getHeaderValues(headerName, originalValue, DEFAULT_SEPARATOR);
+    }
+    
+    private List<String> getHeaderValues(String headerName, String originalValue, String sep) {
         if (!originalValue.contains(QUOTE)
             || HEADERS_WITH_POSSIBLE_QUOTES.contains(headerName)) {
-            String[] ls = originalValue.split(",");
+            String[] ls = originalValue.split(sep);
             if (ls.length == 1) {
                 return Collections.singletonList(ls[0].trim());
             } else {

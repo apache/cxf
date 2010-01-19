@@ -108,39 +108,34 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return;
         }
         
-        if (objs.get(0) != null) {
-            Object responseObj = objs.get(0);
-            Response response = null;
-            if (objs.get(0) instanceof Response) {
-                response = (Response)responseObj;
-            } else {
-                int status = getStatus(message, 200);
-                response = Response.status(status).entity(responseObj).build();
-            }
-            
-            Exchange exchange = message.getExchange();
-            OperationResourceInfo ori = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
-                .getName());
-
-            List<ProviderInfo<ResponseHandler>> handlers = 
-                ProviderFactory.getInstance(message).getResponseHandlers();
-            for (ProviderInfo<ResponseHandler> rh : handlers) {
-                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
-                                                   message.getExchange().getInMessage());
-                InjectionUtils.injectContextFields(rh.getProvider(), rh, 
-                                                   message.getExchange().getInMessage());
-                Response r = rh.getProvider().handleResponse(message, ori, response);
-                if (r != null) {
-                    response = r;
-                }
-            }
-            
-            serializeMessage(message, response, ori, true);        
-            
+        Object responseObj = objs.get(0);
+        
+        Response response = null;
+        if (responseObj instanceof Response) {
+            response = (Response)responseObj;
         } else {
-            int status = getStatus(message, 204);
-            message.put(Message.RESPONSE_CODE, status);
+            int status = getStatus(message, responseObj != null ? 200 : 204);
+            response = Response.status(status).entity(responseObj).build();
         }
+        
+        Exchange exchange = message.getExchange();
+        OperationResourceInfo ori = (OperationResourceInfo)exchange.get(OperationResourceInfo.class
+            .getName());
+
+        List<ProviderInfo<ResponseHandler>> handlers = 
+            ProviderFactory.getInstance(message).getResponseHandlers();
+        for (ProviderInfo<ResponseHandler> rh : handlers) {
+            InjectionUtils.injectContextFields(rh.getProvider(), rh, 
+                                               message.getExchange().getInMessage());
+            InjectionUtils.injectContextFields(rh.getProvider(), rh, 
+                                               message.getExchange().getInMessage());
+            Response r = rh.getProvider().handleResponse(message, ori, response);
+            if (r != null) {
+                response = r;
+            }
+        }
+        
+        serializeMessage(message, response, ori, true);        
     }
 
     private int getStatus(Message message, int defaultValue) {

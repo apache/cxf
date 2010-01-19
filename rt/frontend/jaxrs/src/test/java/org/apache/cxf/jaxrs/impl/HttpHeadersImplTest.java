@@ -30,6 +30,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.easymock.classextension.EasyMock;
@@ -219,8 +221,27 @@ public class HttpHeadersImplTest extends Assert {
     public void testGetCookies() throws Exception {
         
         Message m = new MessageImpl();
+        m.setExchange(new ExchangeImpl());
         MetadataMap<String, String> headers = createHeaders();
         headers.putSingle(HttpHeaders.COOKIE, "a=b,c=d");
+        m.put(Message.PROTOCOL_HEADERS, headers);
+        HttpHeaders h = new HttpHeadersImpl(m);
+        Map<String, Cookie> cookies = h.getCookies();
+        assertEquals(2, cookies.size());
+        assertEquals("b", cookies.get("a").getValue());
+        assertEquals("d", cookies.get("c").getValue());
+    }
+    
+    @Test
+    public void testGetCookiesWithSemiColon() throws Exception {
+        
+        Message m = new MessageImpl();
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        ex.put("org.apache.cxf.http.cookie.separator", ";");
+        m.setExchange(ex);
+        MetadataMap<String, String> headers = createHeaders();
+        headers.putSingle(HttpHeaders.COOKIE, "a=b" + ";" + "c=d");
         m.put(Message.PROTOCOL_HEADERS, headers);
         HttpHeaders h = new HttpHeadersImpl(m);
         Map<String, Cookie> cookies = h.getCookies();
