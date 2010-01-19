@@ -175,6 +175,16 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         public void setName(String s) {
             name = s;
         }
+        public void shutdown() {
+            if (!group.isDestroyed()) {
+                try {
+                    group.destroy();
+                    group.setDaemon(true);
+                } catch (Throwable t) {
+                    //ignore
+                }
+            }            
+        }
     }
     
     @Resource(name = "org.apache.cxf.workqueue.WorkQueueManager")
@@ -283,7 +293,14 @@ public class AutomaticWorkQueueImpl extends ThreadPoolExecutor implements Automa
         if (!processRemainingWorkItems) {
             getQueue().clear();
         }
-        shutdown();    
+        shutdown();
+    }
+    @Override
+    protected void terminated() {
+        ThreadFactory f = this.getThreadFactory();
+        if (f instanceof AWQThreadFactory) {
+            ((AWQThreadFactory)f).shutdown();
+        }
     }
 
     /**
