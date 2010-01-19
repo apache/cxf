@@ -55,12 +55,15 @@ public class DelegatingInputStream extends FilterInputStream {
      * stream may not be valid by the time the next read() occurs
      */
     public void cacheInput() {
-        CachedOutputStream cache = new CachedOutputStream();
-        try {
-            IOUtils.copy(in, cache);
-            in = cache.getInputStream();
-        } catch (IOException e) {
-            //ignore
+        if (in != origIn) {
+            CachedOutputStream cache = new CachedOutputStream();
+            try {
+                IOUtils.copy(in, cache); 
+                in = cache.getInputStream();
+                cache.close();
+            } catch (IOException e) {
+                //ignore
+            }
         }
     }
     

@@ -28,6 +28,7 @@ import java.net.URL;
 import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.attachment.AttachmentDataSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Exception;
 import org.apache.cxf.common.util.Base64Utility;
@@ -52,9 +54,11 @@ import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.io.DelegatingInputStream;
+import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.security.SecurityContext;
@@ -461,10 +465,43 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     }
   
    
+    /**
+     * On first write, we need to make sure any attachments and such that are still on the incoming stream 
+     * are read in.  Otherwise we can get into a deadlock where the client is still trying to send the 
+     * request, but the server is trying to send the response.   Neither side is reading and both blocked 
+     * on full buffers.  Not a good situation.    
+     * @param outMessage
+     */
+    private void cacheInput(Message outMessage) {
+        Message inMessage = outMessage.getExchange().getInMessage();
+        if (inMessage == null) {
+            return;
+        }
+        Collection<Attachment> atts = inMessage.getAttachments();
+        if (atts != null) {
+            for (Attachment a : atts) {
+                if (a.getDataHandler().getDataSource() instanceof AttachmentDataSource) {
+                    try {
+                        ((AttachmentDataSource)a.getDataHandler().getDataSource()).cache();
+                    } catch (IOException e) {
+                        throw new Fault(e);
+                    }
+                }
+            }
+        }
+        DelegatingInputStream in = inMessage.getContent(DelegatingInputStream.class);
+        if (in != null) {
+            in.cacheInput();
+        }
+    }
+    
     protected OutputStream flushHeaders(Message outMessage) throws IOException {
         if (isResponseRedirected(outMessage)) {
             return null;
         }
+        
+        cacheInput(outMessage);
+        
         updateResponseHeaders(outMessage);
         Object responseObj = outMessage.get(HTTP_RESPONSE);
         OutputStream responseStream = null;
