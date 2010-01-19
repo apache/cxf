@@ -3,7 +3,7 @@ Apache CXF 2.1.9 Release Notes
 1. Overview
 
 Apache CXF 2.1.9 delivers the latest set of patches and bug fixes for the Apache
-CXF 2.1.x branch.   This release fixes 29 JIRA issues that have been reported by 
+CXF 2.1.x branch.   This release fixes 43 JIRA issues that have been reported by 
 users.
 
 IMPORTANT NOTE:  2.1.9 is the last scheduled release for the 2.1.x series of 
