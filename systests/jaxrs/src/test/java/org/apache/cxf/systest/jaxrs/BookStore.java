@@ -246,6 +246,13 @@ public class BookStore {
             || !cookies.containsKey("e")) {
             throw new WebApplicationException();
         }
+        List<String> cookiesList = httpHeaders.getRequestHeader(HttpHeaders.COOKIE);
+        if (cookiesList.size() != 3
+            || !cookiesList.contains("a=b")
+            || !cookiesList.contains("c=d")
+            || !cookiesList.contains("e=f")) {
+            throw new WebApplicationException();
+        }
         return doGetBook(ids.get(0) + ids.get(1) + ids.get(2));
     }
     
