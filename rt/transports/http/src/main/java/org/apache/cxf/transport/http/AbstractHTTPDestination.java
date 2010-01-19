@@ -451,6 +451,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
      * @param outMessage
      */
     private void cacheInput(Message outMessage) {
+        if (outMessage.getExchange() == null) {
+            return;
+        }
         Message inMessage = outMessage.getExchange().getInMessage();
         if (inMessage == null) {
             return;
