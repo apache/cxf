@@ -118,7 +118,12 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
             ctx = bus.getExtension(BusApplicationContext.class);
         } else {
             LOG.info("LOAD_BUS_WITH_APPLICATION_CONTEXT");
-            bus = new SpringBusFactory(ctx).createBus();
+            inRefresh = true;
+            try {
+                bus = new SpringBusFactory(ctx).createBus();
+            } finally {
+                inRefresh = false;
+            }
         }        
         
         ResourceManager resourceManager = bus.getExtension(ResourceManager.class);
@@ -175,7 +180,7 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
     }
 
     public void onApplicationEvent(ApplicationEvent event) {
-        if (!inRefresh && event instanceof ContextRefreshedEvent) {
+        if (!inRefresh && event instanceof ContextRefreshedEvent && getServletConfig() != null) {
             //need to re-do the bus/controller stuff
             try {
                 inRefresh = true;
