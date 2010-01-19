@@ -24,6 +24,8 @@ import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
@@ -49,6 +51,37 @@ public class AttachmentDeserializerTest extends Assert {
         msg = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         msg.setExchange(exchange);
+    }
+    
+    @Test
+    public void testNoBoundaryInCT() throws Exception {
+        //CXF-2623
+        String message = "SomeHeader: foo\n" 
+            + "------=_Part_34950_1098328613.1263781527359\n"
+            + "Content-Type: text/xml; charset=UTF-8\n"
+            + "Content-Transfer-Encoding: binary\n"
+            + "Content-Id: <318731183421.1263781527359.IBM.WEBSERVICES@auhpap02>\n"
+            + "\n"
+            + "<envelope/>\n"
+            + "------=_Part_34950_1098328613.1263781527359\n"
+            + "Content-Type: text/xml\n"
+            + "Content-Transfer-Encoding: binary\n"
+            + "Content-Id: <b86a5f2d-e7af-4e5e-b71a-9f6f2307cab0>\n"
+            + "\n"
+            + "<message>\n"
+            + "------=_Part_34950_1098328613.1263781527359--";
+        
+        Matcher m = Pattern.compile("^--(\\S*)$").matcher(message);
+        Assert.assertFalse(m.find());
+        m = Pattern.compile("^--(\\S*)$", Pattern.MULTILINE).matcher(message);
+        Assert.assertTrue(m.find());
+        
+        msg = new MessageImpl();
+        msg.setContent(InputStream.class, new ByteArrayInputStream(message.getBytes("UTF-8")));
+        msg.put(Message.CONTENT_TYPE, "multipart/related");
+        AttachmentDeserializer ad = new AttachmentDeserializer(msg);
+        ad.initializeAttachments();
+        assertEquals(1, msg.getAttachments().size());
     }
     
     @Test
@@ -331,6 +364,5 @@ public class AttachmentDeserializerTest extends Assert {
         InputStream inputStreamWithoutAttachments = message.getContent(InputStream.class);
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
         parser.parse(inputStreamWithoutAttachments, new DefaultHandler());
-        System.out.println("All done.");
     }
 }
