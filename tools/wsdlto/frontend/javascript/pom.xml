@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-wsdlto-frontend-javascript</artifactId>
     <packaging>jar</packaging>
-    <version>2.2.6</version>
+    <version>2.2.7-SNAPSHOT</version>
     <name>Apache CXF Command Line Tools WSDL to JavaScript Front End</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.6</version>
+        <version>2.2.7-SNAPSHOT</version>
         <relativePath>../../../../parent/pom.xml</relativePath>
     </parent>
 
