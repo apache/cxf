@@ -27,6 +27,7 @@ import org.apache.cxf.helpers.IOUtils;
 
 public class DelegatingInputStream extends FilterInputStream {
     private InputStream origIn;
+    private boolean cached;
     
     public DelegatingInputStream(InputStream is) {
         super(is);
@@ -55,15 +56,18 @@ public class DelegatingInputStream extends FilterInputStream {
      * stream may not be valid by the time the next read() occurs
      */
     public void cacheInput() {
-        if (in != origIn) {
+        if (!cached) {
             CachedOutputStream cache = new CachedOutputStream();
             try {
-                IOUtils.copy(in, cache); 
-                in = cache.getInputStream();
+                IOUtils.copy(in, cache);
+                if (cache.size() > 0) {
+                    in = cache.getInputStream();
+                }
                 cache.close();
             } catch (IOException e) {
                 //ignore
             }
+            cached = true;
         }
     }
     
