@@ -898,10 +898,21 @@ public class JAXBDataBinding extends AbstractDataBinding
                 // JAXB Type get XmlElement Annotation
                 XmlElement el = elField.getAnnotation(XmlElement.class);
                 if (el != null
-                    && partName.equals(el.name())) {
+                    && (partName.equals(el.name())
+                        || "##default".equals(el.name()))) {
                     elField.setAccessible(true);
                     fields.add(elField);
                 } else {
+                    if (getMethod == null && setMethod == null) {
+                        if (el != null) {
+                            LOG.warning("Could not create accessor for property " + partName 
+                                        + " of type " + wrapperType.getName() + " as the @XmlElement "
+                                        + "defines the name as " + el.name());
+                        } else {
+                            LOG.warning("Could not create accessor for property " + partName 
+                                        + " of type " + wrapperType.getName());
+                        }
+                    }
                     fields.add(null);
                 } 
             } else {
