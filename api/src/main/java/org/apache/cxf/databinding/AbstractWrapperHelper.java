@@ -82,7 +82,7 @@ public abstract class AbstractWrapperHelper implements WrapperHelper {
                 }
                 Object o = lst.get(x);
                 o = getPartObject(x, o);                
-                if (o instanceof List) {
+                if (o instanceof List && getMethods[x] != null) {
                     List<Object> col = CastUtils.cast((List)getMethods[x].invoke(wrapperObject));
                     if (col == null) {
                         //broken generated java wrappers
