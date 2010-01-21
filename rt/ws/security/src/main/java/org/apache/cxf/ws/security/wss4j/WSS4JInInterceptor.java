@@ -149,6 +149,15 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             return;
         }
         msg.put(SECURITY_PROCESSED, Boolean.TRUE);
+        WSSConfig config = (WSSConfig)msg.getContextualProperty(WSSConfig.class.getName()); 
+        WSSecurityEngine engine;
+        if (config != null) {
+            engine = new WSSecurityEngine();
+            engine.setWssConfig(config);
+        } else {
+            engine = getSecurityEngine();
+        }
+        
         SOAPMessage doc = getSOAPMessage(msg);
         
         boolean doDebug = LOG.isLoggable(Level.FINE);
@@ -196,7 +205,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 t1 = System.currentTimeMillis();
             }
 
-            wsResult = getSecurityEngine().processSecurityHeader(
+            wsResult = engine.processSecurityHeader(
                 doc.getSOAPPart(), 
                 actor, 
                 cbHandler, 
@@ -224,71 +233,9 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 checkSignatureConfirmation(reqData, wsResult);
             }
 
-            /*
-             * Now we can check the certificate used to sign the message. In the
-             * following implementation the certificate is only trusted if
-             * either it itself or the certificate of the issuer is installed in
-             * the keystore. Note: the method verifyTrust(X509Certificate)
-             * allows custom implementations with other validation algorithms
-             * for subclasses.
-             */
-
-            // Extract the signature action result from the action vector
-            Vector signatureResults = new Vector();
-            signatureResults = 
-                WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN, signatureResults);
-
-            if (!signatureResults.isEmpty()) {
-                for (int i = 0; i < signatureResults.size(); i++) {
-                    WSSecurityEngineResult result = 
-                        (WSSecurityEngineResult) signatureResults.get(i);
-                    
-                    X509Certificate returnCert = (X509Certificate)result
-                        .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-    
-                    if (returnCert != null && !verifyTrust(returnCert, reqData)) {
-                        LOG.warning("The certificate used for the signature is not trusted");
-                        throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
-                    }
-                    msg.put(SIGNATURE_RESULT, result);
-                }
-            }
-
-            /*
-             * Perform further checks on the timestamp that was transmitted in
-             * the header. In the following implementation the timestamp is
-             * valid if it was created after (now-ttl), where ttl is set on
-             * server side, not by the client. Note: the method
-             * verifyTimestamp(Timestamp) allows custom implementations with
-             * other validation algorithms for subclasses.
-             */
-
-            // Extract the timestamp action result from the action vector
-            Vector timestampResults = new Vector();
-            timestampResults = 
-                WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS, timestampResults);
-
-            if (!timestampResults.isEmpty()) {
-                for (int i = 0; i < timestampResults.size(); i++) {
-                    WSSecurityEngineResult result = 
-                        (WSSecurityEngineResult) timestampResults.get(i);
-                    Timestamp timestamp = (Timestamp)result.get(WSSecurityEngineResult.TAG_TIMESTAMP);
-    
-                    if (timestamp != null && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
-                        LOG.warning("The timestamp could not be validated");
-                        throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
-                    }
-                    msg.put(TIMESTAMP_RESULT, result);
-                }
-            }
-
-            /*
-             * now check the security actions: do they match, in any order?
-             */
-            if (!ignoreActions && !checkReceiverResultsAnyOrder(wsResult, actions)) {
-                LOG.warning("Security processing failed (actions mismatch)");
-                throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
-            }
+            checkSignatures(msg, reqData, wsResult);
+            checkTimestamps(msg, reqData, wsResult);
+            checkActions(msg, reqData, wsResult, actions);
             
             doResults(msg, actor, doc, wsResult);
 
@@ -318,6 +265,79 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         }
     }
 
+    private void checkActions(SoapMessage msg, RequestData reqData, Vector wsResult, Vector actions) 
+        throws WSSecurityException {
+        /*
+         * now check the security actions: do they match, in any order?
+         */
+        if (!ignoreActions && !checkReceiverResultsAnyOrder(wsResult, actions)) {
+            LOG.warning("Security processing failed (actions mismatch)");
+            throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+        }
+    }
+    private void checkSignatures(SoapMessage msg, RequestData reqData, Vector wsResult) 
+        throws WSSecurityException {
+        /*
+         * Now we can check the certificate used to sign the message. In the
+         * following implementation the certificate is only trusted if
+         * either it itself or the certificate of the issuer is installed in
+         * the keystore. Note: the method verifyTrust(X509Certificate)
+         * allows custom implementations with other validation algorithms
+         * for subclasses.
+         */
+
+        // Extract the signature action result from the action vector
+        Vector signatureResults = new Vector();
+        signatureResults = 
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.SIGN, signatureResults);
+
+        if (!signatureResults.isEmpty()) {
+            for (int i = 0; i < signatureResults.size(); i++) {
+                WSSecurityEngineResult result = 
+                    (WSSecurityEngineResult) signatureResults.get(i);
+                
+                X509Certificate returnCert = (X509Certificate)result
+                    .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
+
+                if (returnCert != null && !verifyTrust(returnCert, reqData)) {
+                    LOG.warning("The certificate used for the signature is not trusted");
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                }
+                msg.put(SIGNATURE_RESULT, result);
+            }
+        }
+    }
+    
+    protected void checkTimestamps(SoapMessage msg, RequestData reqData, Vector wsResult) 
+        throws WSSecurityException {
+        /*
+         * Perform further checks on the timestamp that was transmitted in
+         * the header. In the following implementation the timestamp is
+         * valid if it was created after (now-ttl), where ttl is set on
+         * server side, not by the client. Note: the method
+         * verifyTimestamp(Timestamp) allows custom implementations with
+         * other validation algorithms for subclasses.
+         */
+        // Extract the timestamp action result from the action vector
+        Vector timestampResults = new Vector();
+        timestampResults = 
+            WSSecurityUtil.fetchAllActionResults(wsResult, WSConstants.TS, timestampResults);
+
+        if (!timestampResults.isEmpty()) {
+            for (int i = 0; i < timestampResults.size(); i++) {
+                WSSecurityEngineResult result = 
+                    (WSSecurityEngineResult) timestampResults.get(i);
+                Timestamp timestamp = (Timestamp)result.get(WSSecurityEngineResult.TAG_TIMESTAMP);
+
+                if (timestamp != null && !verifyTimestamp(timestamp, decodeTimeToLive(reqData))) {
+                    LOG.warning("The timestamp could not be validated");
+                    throw new WSSecurityException(WSSecurityException.MESSAGE_EXPIRED);
+                }
+                msg.put(TIMESTAMP_RESULT, result);
+            }
+        }
+    }
+    
     /**
      * Do whatever is necessary to determine the action for the incoming message and 
      * do whatever other setup work is necessary.
@@ -515,7 +535,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * TODO The WSS4J APIs leave something to be desired here, but hopefully
      * we'll clean all this up in WSS4J-2.0
      */
-    private WSSecurityEngine
+    private static WSSecurityEngine
     createSecurityEngine(
         final Map<QName, Object> map
     ) {
