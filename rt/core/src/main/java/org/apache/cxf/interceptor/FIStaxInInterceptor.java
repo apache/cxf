@@ -28,6 +28,7 @@ import com.sun.xml.fastinfoset.stax.factory.StAXInputFactory;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -35,21 +36,26 @@ import org.apache.cxf.phase.Phase;
  * Creates an XMLStreamReader from the InputStream on the Message.
  */
 public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
+    public static final String FI_GET_SUPPORTED = "org.apache.cxf.fastinfoset.get.supported";
+    
     XMLInputFactory factory = new StAXInputFactory();
 
     public FIStaxInInterceptor() {
         this(Phase.POST_STREAM);
     }
+    
     public FIStaxInInterceptor(String phase) {
         super(phase);
         addBefore(StaxInInterceptor.class.getName());
     }
+    
     protected boolean isRequestor(Message message) {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
 
     public void handleMessage(Message message) {
-        if (isGET(message) || message.getContentFormats().contains(XMLStreamReader.class)) {
+        if (message.getContentFormats().contains(XMLStreamReader.class)
+            || !isHttpVerbSupported(message)) {
             return;
         }
 
@@ -69,6 +75,18 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
                 Endpoint ep = message.getExchange().get(Endpoint.class);
                 ep.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
             }
+        }
+    }
+    
+    protected boolean isHttpVerbSupported(Message message) {
+        if (isGET(message)) {
+            if (isRequestor(message) 
+                && MessageUtils.isTrue(message.getContextualProperty(FI_GET_SUPPORTED))) {
+                return true;
+            }
+            return false;
+        } else {
+            return true;
         }
     }
 }

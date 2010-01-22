@@ -142,5 +142,13 @@ public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
         }
         return this;
     }
+
+    public Book addFastinfoBook(Book book) {
+        return book;
+    }
+    
+    public Book getFastinfoBook() {
+        return new Book("CXF2", 2L);
+    }
     
 }

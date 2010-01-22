@@ -22,8 +22,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xmlns:jaxrs="http://cxf.apache.org/jaxrs"
   xmlns:jaxws="http://cxf.apache.org/jaxws"
+  xmlns:util="http://www.springframework.org/schema/util"
   xsi:schemaLocation="http://www.springframework.org/schema/beans 
 http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/util 
+http://www.springframework.org/schema/util/spring-util-2.0.xsd
 http://cxf.apache.org/jaxws
 http://cxf.apache.org/schemas/jaxws.xsd
 http://cxf.apache.org/jaxrs
@@ -74,6 +77,40 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
   <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl2"/>
+
+  <util:list id="fastinfosetType">
+    <value>application/fastinfoset</value>
+  </util:list> 
+
+
+  <jaxrs:server id="restservice3"
+		        address="/rest3">
+    <jaxrs:serviceBeans>
+      <ref bean="bookstore"/>
+    </jaxrs:serviceBeans>
+    
+    <jaxrs:providers>
+       <ref bean="jaxbProvider" />
+    </jaxrs:providers>
+        
+    <jaxrs:outInterceptors>
+      <ref bean="fastInfosetOutInterceptor" />
+    </jaxrs:outInterceptors>
+    <jaxrs:inInterceptors>
+      <ref bean="fastInfosetInInterceptor" />
+    </jaxrs:inInterceptors>
+    		   
+  </jaxrs:server> 
+
+  <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+      <property name="produceMediaTypes" ref="fastinfosetType"/>
+      <property name="consumeMediaTypes" ref="fastinfosetType"/>
+  </bean>
+
+   <bean id="fastInfosetOutInterceptor"
+         class="org.apache.cxf.interceptor.FIStaxOutInterceptor" />
+   <bean id="fastInfosetInInterceptor"
+         class="org.apache.cxf.interceptor.FIStaxInInterceptor" />
 
 </beans>
 <!-- END SNIPPET: beans -->

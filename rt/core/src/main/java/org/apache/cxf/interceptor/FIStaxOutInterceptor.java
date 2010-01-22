@@ -31,6 +31,7 @@ import com.sun.xml.fastinfoset.stax.factory.StAXOutputFactory;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
@@ -53,6 +54,8 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         this();
         force = f;
     }
+    
+    
     
     public void handleMessage(Message message) {
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
@@ -87,7 +90,7 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         }
             
         if (force 
-            || Boolean.TRUE.equals(o)) {
+            || MessageUtils.isTrue(o)) {
             
             message.put(XMLOutputFactory.class.getName(),
                         factory);

@@ -53,4 +53,17 @@ public interface BookStoreJaxrsJaxws {
     @Path("/thestore/{id}")
     @WebMethod(exclude = true)
     BookStoreJaxrsJaxws getBookStore(@PathParam("id") String id);
+    
+    @POST
+    @Path("/fastinfoset")
+    @Consumes({"text/xml" })
+    @Produces({"application/fastinfoset", "text/xml", "application/xml" })
+    @WebMethod(exclude = true)
+    Book addFastinfoBook(Book book);
+    
+    @GET
+    @Path("/fastinfoset2")
+    @Produces({"application/fastinfoset", "text/xml", "application/xml" })
+    @WebMethod(exclude = true)
+    Book getFastinfoBook();
 }
