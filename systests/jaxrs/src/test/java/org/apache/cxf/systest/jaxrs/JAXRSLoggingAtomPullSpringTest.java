@@ -21,6 +21,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
@@ -35,8 +36,13 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.logging.LogLevel;
+import org.apache.cxf.jaxrs.ext.logging.ReadWriteLogStorage;
+import org.apache.cxf.jaxrs.ext.logging.ReadableLogStorage;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -68,6 +74,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     @Before
     public void before() throws Exception {
         context = JAXBContext.newInstance(org.apache.cxf.jaxrs.ext.logging.LogRecord.class);
+        Storage.clearRecords();
     }
 
     @Test
@@ -93,11 +100,58 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2);
-        verifyPages("http://localhost:9080/atom2/logs?page=3", "previous", 2, 3);
+        verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2, "theNamedLogger");
+        verifyPages("http://localhost:9080/atom2/logs?page=3", "previous", 2, 3, "theNamedLogger");
     }
     
-    private void verifyPages(String startAddress, String rel, int firstValue, int lastValue) 
+    @Test
+    public void testPagedFeedWithReadWriteStorage() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:9080/resource3/storage");
+        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
+        wc.path("/log").get();
+        Thread.sleep(3000);
+        
+        verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
+        List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = Storage.getRecords();
+        assertEquals(4, list.size());
+        verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
+        verifyStoragePages("http://localhost:9080/atom3/logs?page=2", "previous", "Resource3", 
+                           "theStorageLogger");
+    }
+    
+    @Test
+    public void testPagedFeedWithReadOnlyStorage() throws Exception {
+        verifyStoragePages("http://localhost:9080/atom4/logs", "next", "Resource4", "readOnlyStorageLogger");
+        verifyStoragePages("http://localhost:9080/atom4/logs?page=2", "previous", "Resource4", 
+                           "readOnlyStorageLogger");
+    }
+    
+    private void verifyStoragePages(String startAddress, String rel, 
+                                    String resourceName, String nLogger) 
+        throws Exception {
+        List<Entry> entries = new ArrayList<Entry>();
+        String href1 = fillPagedEntries(entries, startAddress, 4, rel, true);
+        assertNull(fillPagedEntries(entries, href1, 4, rel, false));
+        assertEquals(8, entries.size());
+        
+        resetCounters();
+        for (Entry e : entries) {
+            updateCounters(readLogRecord(e.getContent()), resourceName, nLogger);
+        }
+        if ("Resource4".equals(resourceName)) {
+            assertEquals(1, throwables);
+            assertEquals(6, resourceLogger);
+            assertEquals(2, namedLogger);
+            assertEquals(0, fakyLogger);
+        } else {
+            verifyCounters();
+        }
+    }
+    
+    private void verifyPages(String startAddress, String rel, 
+                             int firstValue, int lastValue, String nLogger) 
         throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
         String href1 = fillPagedEntries(entries, startAddress, 
@@ -108,7 +162,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         
         resetCounters();
         for (Entry e : entries) {
-            updateCounters(readLogRecord(e.getContent()), "Resource2", "theNamedLogger");
+            updateCounters(readLogRecord(e.getContent()), "Resource2", nLogger);
         }
         verifyCounters();
     }
@@ -131,6 +185,9 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     private Feed getFeed(String address) {
         WebClient wc = WebClient.create(address,
                                          Collections.singletonList(new AtomFeedProvider()));
+        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
         Feed feed = wc.accept("application/atom+xml").get(Feed.class);
         feed.toString();
         return feed;
@@ -164,12 +221,121 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
 
     }
     
+    @Ignore
+    @Path("/storage")
+    public static class Resource3 {
+        private static final Logger LOG1 = LogUtils.getL7dLogger(Resource3.class);
+        private static final Logger LOG2 = LogUtils.getL7dLogger(Resource3.class, null, "theStorageLogger");
+        
+        @GET
+        @Path("/log")
+        public void doLogging() {
+            doLog(Resource3.LOG1, Resource3.LOG2);
+        }
+
+    }
+    
+    @Ignore
+    public static class ExternalStorage implements ReadableLogStorage {
+
+        private List<org.apache.cxf.jaxrs.ext.logging.LogRecord> records = 
+            new LinkedList<org.apache.cxf.jaxrs.ext.logging.LogRecord>();
+        
+        public ExternalStorage() {
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
+                      Level.SEVERE, null);
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
+                      Level.WARNING, null);
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
+                      Level.INFO, null);
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4",
+                      Level.FINE, new IllegalArgumentException());
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
+                      Level.FINEST, null);
+            addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
+                      Level.FINER, null);
+            addRecord("readOnlyStorageLogger", Level.SEVERE, null);
+            addRecord("readOnlyStorageLogger", Level.SEVERE, null);
+        }
+        
+        private void addRecord(String loggerName, Level level, Throwable t) {
+            org.apache.cxf.jaxrs.ext.logging.LogRecord lr = 
+                new org.apache.cxf.jaxrs.ext.logging.LogRecord();
+            lr.setLoggerName(loggerName);
+            lr.setLevel(LogLevel.fromJUL(level));
+            if (t != null) {
+                lr.setThrowable(t);
+            }
+            records.add(lr);
+        }
+        
+        public void close() {
+            // TODO Auto-generated method stub
+            
+        }
+
+        public int getSize() {
+            // this storage is getting the records from a file log entries are added to
+            return -1;
+        }
+
+        public void load(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list, 
+                         SearchCondition<org.apache.cxf.jaxrs.ext.logging.LogRecord> condition, 
+                         int loadFrom, 
+                         int maxNumberOfRecords) {
+            int limit = loadFrom + maxNumberOfRecords;
+            for (int i = loadFrom; i < limit; i++) {
+                if (condition.isMet(records.get(i))) {
+                    list.add(records.get(i));
+                }
+            }
+        }
+        
+    }
+    
+    @Ignore
+    public static class Storage implements ReadWriteLogStorage {
+        private static List<org.apache.cxf.jaxrs.ext.logging.LogRecord> records = 
+            new LinkedList<org.apache.cxf.jaxrs.ext.logging.LogRecord>();
+
+        public void load(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list,
+                         SearchCondition<org.apache.cxf.jaxrs.ext.logging.LogRecord> sc,
+                         int from, int quantity) {
+            list.addAll(records.subList(from, from + quantity));
+        }
+
+        public void save(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list) {
+            records.addAll(list);
+        }
+        
+        public void clear() {
+        }
+
+        public void close() {
+        }
+
+        public int getSize() {
+            return records.size();
+        }
+
+        public static List<org.apache.cxf.jaxrs.ext.logging.LogRecord> getRecords() {
+            return records;
+        }
+        
+        public static void clearRecords() {
+            records.clear();
+        }
+    }
+    
     
     private static void doLog(Logger l1, Logger l2) {
         l1.severe("severe message");
         l1.warning("warning message");
         l1.info("info message");
         LogRecord r = new LogRecord(Level.FINE, "fine message");
+        if ("Resource4".equals(l1.getName())) {
+            r.setLoggerName(l1.getName());
+        }
         r.setThrown(new IllegalArgumentException("tadaam"));
         l1.log(r);
         r = new LogRecord(Level.FINER, "finer message with {0} and {1}");
@@ -206,8 +372,9 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             } else if ("faky-logger".equals(name)) {
                 fakyLogger++;      
             }
-        } else {
-            assertNotNull(record.getThrowable());
+        } 
+        
+        if (record.getThrowable().length() > 0) {
             throwables++;
         }
     }

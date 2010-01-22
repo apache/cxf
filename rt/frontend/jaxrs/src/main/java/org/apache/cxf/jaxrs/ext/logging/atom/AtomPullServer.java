@@ -28,14 +28,19 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 
-import org.apache.abdera.model.Element;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.ext.logging.LogLevel;
 import org.apache.cxf.jaxrs.ext.logging.LogRecord;
+import org.apache.cxf.jaxrs.ext.logging.ReadWriteLogStorage;
+import org.apache.cxf.jaxrs.ext.logging.ReadableLogStorage;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
 import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
+import org.apache.cxf.jaxrs.ext.search.ConditionType;
+import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 
 @Path("logs")
 public class AtomPullServer extends AbstractAtomBean {
@@ -44,16 +49,57 @@ public class AtomPullServer extends AbstractAtomBean {
         new StandardConverter(Output.FEED, Multiplicity.MANY, Format.CONTENT);
     private List<LogRecord> records = new LinkedList<LogRecord>();
     private WeakHashMap<Integer, Feed> feeds = new WeakHashMap<Integer, Feed>();
+    private ReadableLogStorage storage;
     private int pageSize = 20;
+    private int maxInMemorySize = 500;
     private boolean useArchivedFeeds;
-    
+    private int recordsSize;
+    private volatile boolean alreadyClosed;
+    private SearchCondition<LogRecord> condition;
+        
     @Context
     private MessageContext context;
+    
+    @Override
+    public void init() {
+        // the storage might've been used to save previous records or it might
+        // point to a file log entries are added to
+        if (storage != null) {
+            //-1 can be returned by read-only storage if it does not know in advance
+            // a number of records it may contain 
+            recordsSize = storage.getSize();
+        }
+        
+        if (storage == null || storage instanceof ReadWriteLogStorage) {
+            super.init();
+        } else {
+            // super.init() results in the additional Handler being created and publish()
+            // method being called as a result. If the storage is read-only it is assumed it points to
+            // the external source of log records thus no need to get the publish events here
+            
+            // instead we create a SearchCondition the external storage will check against when
+            // loading the matching records on request
+            
+            List<SearchCondition<LogRecord>> list = new LinkedList<SearchCondition<LogRecord>>();
+            for (LoggerLevel l : super.getLoggers()) {
+                LogRecord r = new LogRecord();
+                r.setLoggerName(l.getLogger());
+                r.setLevel(LogLevel.valueOf(l.getLevel()));
+                list.add(new SearchConditionImpl(r));
+            }
+            condition = new OrSearchCondition<LogRecord>(list);
+        }
+        
+    }
     
     @GET
     @Produces("application/atom+xml")
     public Feed getRecords() {
         int page = getPageValue();
+        
+        // lets check if the Atom reader is asking for a set of records which has already been 
+        // converted to Feed
+        
         synchronized (feeds) {
             Feed f = feeds.get(page);
             if (f != null) {
@@ -61,45 +107,89 @@ public class AtomPullServer extends AbstractAtomBean {
             }
         }
         
-        List<? extends Element> elements = null;
+        Feed feed = null;
         synchronized (records) {
             List<LogRecord> list = getSubList(page);
-            elements = converter.convert(list);
+            feed = (Feed)converter.convert(list).get(0);
+            setFeedPageProperties(feed, page);
         }
-        Feed feed = (Feed)(elements.get(0));
-        setFeedPageProperties(feed, page);
-        synchronized (feeds) {
-            feeds.put(page, feed);
+        // if at the moment we've converted n < pageSize number of records only and
+        // persist a Feed keyed by a page then another reader requesting the same page 
+        // may miss latest records which might've been added since the original request
+        if (feed.getEntries().size() == pageSize) {
+            synchronized (feeds) {
+                feeds.put(page, feed);
+            }
         }
         return feed;
     }
 
+    @GET
+    @Path("records")
+    @Produces("text/plain")
+    public int getNumberOfAvaiableRecords() {
+        return recordsSize;
+    }
+    
+    
     protected List<LogRecord> getSubList(int page) {
-        if (records.size() == 0) {
+        
+        if (recordsSize == -1) {
+            // let the external storage load the records it knows about
+            List<LogRecord> list = new LinkedList<LogRecord>();
+            storage.load(list, condition, page == 1 ? 0 : (page - 1) * pageSize, pageSize);
+            return list;
+        }
+        
+        if (recordsSize == 0) {
             return records;
         }
         
+        int fromIndex = 0;
+        int toIndex = 0;
+        // see http://tools.ietf.org/html/draft-nottingham-atompub-feed-history-07
         if (!useArchivedFeeds) {
-        
-            int fromIndex = page == 1 ? 0 : (page - 1) * pageSize;
-            if (fromIndex > records.size()) {
+            fromIndex = page == 1 ? 0 : (page - 1) * pageSize;
+            if (fromIndex > recordsSize) {
                 // this should not happen really
                 page = 1;
                 fromIndex = 0;
             }
-            int toIndex = page == 1 ? pageSize : fromIndex + pageSize;
-            if (toIndex > records.size()) {
-                toIndex = records.size();
+            toIndex = page == 1 ? pageSize : fromIndex + pageSize;
+            if (toIndex > recordsSize) {
+                toIndex = recordsSize;
             }
-            return records.subList(fromIndex, toIndex);
         } else {
-            int fromIndex = records.size() - pageSize * page;
+            fromIndex = recordsSize - pageSize * page;
             if (fromIndex < 0) {
                 fromIndex = 0;
             }
-            int toIndex = pageSize < records.size() ? records.size() : pageSize;
-            return records.subList(fromIndex, toIndex);
+            toIndex = pageSize < recordsSize ? recordsSize : pageSize;
         }
+
+        // if we have the storage then try to load from it
+        if (storage != null) {
+            if (fromIndex < storage.getSize()) {
+                int storageSize = storage.getSize();
+                int maxQuantityToLoad = toIndex > storageSize ? toIndex - storageSize : toIndex - fromIndex;
+                List<LogRecord> list = new LinkedList<LogRecord>();
+                storage.load(list, condition, fromIndex, maxQuantityToLoad);
+                int totalQuantity = toIndex - fromIndex;
+                if (list.size() < totalQuantity) {
+                    int remaining = totalQuantity - list.size();
+                    if (remaining > records.size()) {
+                        remaining = records.size();
+                    }
+                    list.addAll(records.subList(0, remaining));
+                }
+                return list;
+            } else {
+                fromIndex -= storage.getSize();
+                toIndex -= storage.getSize();
+            }
+        } 
+        return records.subList(fromIndex, toIndex);
+        
     }
     
     protected void setFeedPageProperties(Feed feed, int page) {
@@ -109,19 +199,21 @@ public class AtomPullServer extends AbstractAtomBean {
         String uri = context.getUriInfo().getAbsolutePath().toString();
         
         if (!useArchivedFeeds) {
-        
-            if (page > 2) {
-                feed.addLink(uri, "first");
-            }
-            
-            if (page * pageSize < records.size()) {
+            if (recordsSize != -1) {
+                if (page > 2) {
+                    feed.addLink(uri, "first");
+                }
+                
+                if (page * pageSize < recordsSize) {
+                    feed.addLink(uri + "?page=" + (page + 1), "next");
+                }
+                
+                if (page * (pageSize + 1) < recordsSize) {
+                    feed.addLink(uri + "?page=" + (recordsSize / pageSize + 1), "last");
+                }
+            } else if (feed.getEntries().size() == pageSize) {
                 feed.addLink(uri + "?page=" + (page + 1), "next");
             }
-            
-            if (page * (pageSize + 1) < records.size()) {
-                feed.addLink(uri + "?page=" + (records.size() / pageSize + 1), "last");
-            }
-            
             if (page > 1) {
                 uri = page > 2 ? uri + "?page=" + (page - 1) : uri;
                 feed.addLink(uri, "previous");
@@ -156,16 +248,80 @@ public class AtomPullServer extends AbstractAtomBean {
     }
     
     public void publish(LogRecord record) {
-        synchronized (records) {
-            records.add(record);
+        if (alreadyClosed) {
+            System.err.println("AtomPullServer has been closed, the following log record can not be saved : "
+                               + record.toString());
+            return;
         }
-    }
-    
-    public void close() {
-        
+        synchronized (records) {
+            if (records.size() == maxInMemorySize) {
+                if (storage instanceof ReadWriteLogStorage) {
+                    ((ReadWriteLogStorage)storage).save(records);
+                    records.clear();
+                } else {
+                    LogRecord oldRecord = records.remove(0);
+                    System.err.println("The oldest log record is removed : " + oldRecord.toString());
+                }
+            } 
+            records.add(record);
+            ++recordsSize;
+        }
     }
     
     public void setPageSize(int size) {
         pageSize = size;
     }
+
+    public void setMaxInMemorySize(int maxInMemorySize) {
+        this.maxInMemorySize = maxInMemorySize;
+    }
+
+    public void setStorage(ReadableLogStorage storage) {
+        this.storage = storage;
+    }
+    
+    public void close() {
+        if (alreadyClosed) {
+            return;
+        }
+        alreadyClosed = true;
+        if (storage instanceof ReadWriteLogStorage) {
+            ((ReadWriteLogStorage)storage).save(records);
+        }
+    }
+    
+    private static class SearchConditionImpl implements SearchCondition<LogRecord> {
+        private LogRecord template;
+        
+        public SearchConditionImpl(LogRecord l) {
+            this.template = l;
+        }
+
+        public boolean isMet(LogRecord pojo) {
+            
+            return (template.getLevel() == LogLevel.ALL
+                   || pojo.getLevel().compareTo(template.getLevel()) <= 0)
+                   && template.getLoggerName().equals(pojo.getLoggerName());
+        }
+
+        public LogRecord getCondition() {
+            return new LogRecord(template);
+        }
+
+        public ConditionType getConditionType() {
+            return ConditionType.CUSTOM;
+        }
+
+        public List<SearchCondition<LogRecord>> getConditions() {
+            return null;
+        }
+
+        public List<LogRecord> findAll(List<LogRecord> pojos) {
+            // TODO Auto-generated method stub
+            return null;
+        }
+        
+        
+    }
+    
 }

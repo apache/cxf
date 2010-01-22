@@ -54,7 +54,35 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			theNamedLogger:WARN" />
 		  <property name="pageSize" value="3"/>	
 		  	
+	</bean>
+	
+	<bean id = "atomPullServer3" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	      init-method="init">
+	      <property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource3:ALL,
+			theStorageLogger:WARN" />
+		  <property name="pageSize" value="4"/>
+		  <property name="maxInMemorySize" value="4"/>	
+		  <property name="storage">
+			<ref bean="storage" />
+		</property>	
+	</bean>
+	
+	<bean id = "atomPullServer4" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	      init-method="init">
+	      <property name="loggers"
+			value="
+			org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4:ALL,
+			readOnlyStorageLogger:WARN" />
+		  <property name="pageSize" value="4"/>
+		  <property name="storage">
+			<ref bean="storage2" />
+		</property>	
 	</bean>      
+
+   	<bean id="storage" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Storage"/> 
+   	<bean id="storage2" class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$ExternalStorage"/> 
 
 	<bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider">
 	    <property name="formattedOutput" value="true"/>
@@ -77,7 +105,15 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
-
+	
+	<jaxrs:server id="resource3Server" address="/resource3">
+		<jaxrs:serviceBeans>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource3"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
 
     <jaxrs:server id="atomServer" address="/atom">
 		<jaxrs:serviceBeans>
@@ -96,7 +132,25 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			<ref bean="feed" />
 		</jaxrs:providers>
 	</jaxrs:server>
+	
+	<jaxrs:server id="atomServer3" address="/atom3">
+		<jaxrs:serviceBeans>
+			<ref bean="atomPullServer3"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
 
+	<jaxrs:server id="atomServer4" address="/atom4">
+		<jaxrs:serviceBeans>
+			<ref bean="atomPullServer4"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+		</jaxrs:providers>
+	</jaxrs:server>
+    
 </beans>
 <!-- END SNIPPET: beans -->
 

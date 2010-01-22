@@ -49,6 +49,19 @@ public class LogRecord {
     private String threadName = "";
     private String throwable = "";
 
+    public LogRecord() {
+        
+    }
+    
+    public LogRecord(LogRecord copy) {
+        this.eventTimestamp = copy.getEventTimestamp();
+        this.level = copy.getLevel();
+        this.message = copy.getMessage();
+        this.loggerName = copy.getLoggerName();
+        this.threadName = copy.getThreadName();
+        this.throwable = copy.getThrowable();
+    }
+    
     /**
      * Creates this object from JUL LogRecord. Most attributes are copied, others are converted as follows:
      * raw {@link java.util.logging.LogRecord#getMessage() message} is formatted with
@@ -164,4 +177,6 @@ public class LogRecord {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
     }
+    
+    
 }

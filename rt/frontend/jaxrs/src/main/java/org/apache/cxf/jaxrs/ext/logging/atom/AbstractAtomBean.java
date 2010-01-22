@@ -102,7 +102,7 @@ public abstract class AbstractAtomBean {
 
 
     /**
-     * Initializes bean; creates ATOM push handler based on current properties state, and attaches handler to
+     * Initializes bean; creates ATOM handler based on current properties state, and attaches handler to
      * logger(s).
      */
     public void init() {
@@ -138,7 +138,11 @@ public abstract class AbstractAtomBean {
         }
     }
 
-    private static class LoggerLevel {
+    protected List<LoggerLevel> getLoggers() {
+        return loggers;
+    }
+
+    protected static class LoggerLevel {
         private String logger;
         private String level;
 
