@@ -45,6 +45,9 @@ import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
@@ -186,6 +189,19 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
         MessageContext mc = getContext();
         XMLStreamReader reader = mc != null ? mc.getContent(XMLStreamReader.class) : null;
+        
+        if (reader == null && mc != null) {
+            XMLInputFactory factory = (XMLInputFactory)mc.get(XMLInputFactory.class.getName());
+            if (factory != null) {
+                try {
+                    reader = factory.createXMLStreamReader(is);
+                } catch (XMLStreamException e) {
+                    throw new WebApplicationException(
+                        new RuntimeException("Cant' create XMLStreamReader", e));
+                }
+            }
+        }
+        
         reader = createTransformReaderIfNeeded(reader, is);
         if (InjectionUtils.isSupportedCollectionOrArray(type)) {
             return new JAXBCollectionWrapperReader(createNewReaderIfNeeded(reader, is));
@@ -332,6 +348,17 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MessageContext mc = getContext();
         if (mc != null) {
             writer = mc.getContent(XMLStreamWriter.class);
+            if (writer == null) {
+                XMLOutputFactory factory = (XMLOutputFactory)mc.get(XMLOutputFactory.class.getName());
+                if (factory != null) {
+                    try {
+                        writer = factory.createXMLStreamWriter(os);
+                    } catch (XMLStreamException e) {
+                        throw new WebApplicationException(
+                            new RuntimeException("Cant' create XMLStreamWriter", e));
+                    }
+                }
+            }
             if (writer == null && enableStreaming) {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }

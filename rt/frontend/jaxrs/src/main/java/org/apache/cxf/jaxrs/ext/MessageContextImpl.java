@@ -68,7 +68,18 @@ public class MessageContextImpl implements MessageContext {
             || (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded").equals(keyValue)) {
             return createAttachments(key.toString());
         }
-        return m.get(key);
+        Object value = m.get(key);
+        if (value == null && isRequestor()) {
+            Message inMessage = m.getExchange().getInMessage();
+            if (inMessage != null) {
+                value = inMessage.get(key);
+            }
+        } 
+        return value;
+    }
+    
+    private boolean isRequestor() {
+        return Boolean.TRUE.equals(m.containsKey(Message.REQUESTOR_ROLE));
     }
     
     public <T> T getContent(Class<T> format) {

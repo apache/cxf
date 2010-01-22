@@ -45,6 +45,8 @@ import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.Bus;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.interceptor.FIStaxInInterceptor;
+import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.io.CachedOutputStream;
@@ -55,6 +57,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.form.Form;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -79,6 +82,50 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         InputStream in = getHttpInputStream("http://localhost:9092/test/services/rest2/myRestService");
         assertEquals("0", getStringFromInputStream(in));
                 
+    }
+    
+    @Test
+    public void testGetBookFastinfoset() throws Exception {
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://localhost:9092/test/services/rest3/bookstore/fastinfoset2");
+        bean.getInInterceptors().add(new FIStaxInInterceptor());
+        JAXBElementProvider p = new JAXBElementProvider();
+        p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
+        bean.setProvider(p);
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(FIStaxInInterceptor.FI_GET_SUPPORTED, Boolean.TRUE);
+        bean.setProperties(props);
+        
+        WebClient client = bean.createWebClient();
+        Book b = client.accept("application/fastinfoset").get(Book.class);
+        assertEquals("CXF2", b.getName());
+        assertEquals(2L, b.getId());
+    }
+    
+    @Test
+    public void testPostGetBookFastinfoset() throws Exception {
+        
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://localhost:9092/test/services/rest3/bookstore/fastinfoset");
+        bean.getOutInterceptors().add(new FIStaxOutInterceptor());
+        bean.getInInterceptors().add(new FIStaxInInterceptor());
+        JAXBElementProvider p = new JAXBElementProvider();
+        p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
+        p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
+        bean.setProvider(p);
+        
+        Map<String, Object> props = new HashMap<String, Object>();
+        props.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
+        bean.setProperties(props);
+        
+        WebClient client = bean.createWebClient();
+        Book b = new Book("CXF", 1L);
+        Book b2 = client.type("application/fastinfoset").accept("application/fastinfoset")
+            .post(b, Book.class);
+        assertEquals(b2.getName(), b.getName());
+        assertEquals(b2.getId(), b.getId());
     }
     
     @Test
