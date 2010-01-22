@@ -78,7 +78,7 @@ public class JettyHTTPServerEngineFactoryTest
             assertNotNull("Cannot get DestinationFactoryManager", destFM);
             DestinationFactory destF = 
                 destFM.getDestinationFactory(
-                        "http://schemas.xmlsoap.org/soap/http");
+                        "http://cxf.apache.org/transports/http");
             assertNotNull("No DestinationFactory", destF);
             assertTrue(JettyHTTPTransportFactory.class.isInstance(destF));
         } catch (BusException e) {

@@ -135,7 +135,7 @@ public class SpringBusFactoryTest extends Assert {
          
         
         assertNotNull("conduit initiator not available", 
-                      cim.getConduitInitiator("http://cxf.apache.org/bindings/xformat"));
+                      cim.getConduitInitiator("http://cxf.apache.org/transports/http"));
         assertNotNull("conduit initiator not available", 
                       cim.getConduitInitiator("http://cxf.apache.org/transports/jms"));
         assertNotNull("conduit initiator not available", 
@@ -144,7 +144,7 @@ public class SpringBusFactoryTest extends Assert {
         
 
         assertNotNull("destination factory not available", 
-                      dfm.getDestinationFactory("http://cxf.apache.org/bindings/xformat"));
+                      dfm.getDestinationFactory("http://cxf.apache.org/transports/http"));
         assertNotNull("destination factory not available", 
                       dfm.getDestinationFactory("http://cxf.apache.org/transports/jms"));
         assertNotNull("destination factory not available", 

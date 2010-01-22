@@ -73,28 +73,50 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     public Set<String> getUriPrefixes() {
         return Collections.singleton("soap.tcp");
     }
-    public String mapTransportURI(String s) {
-        if ("http://www.w3.org/2008/07/soap/bindings/JMS/".equals(s)) {
+    public String mapTransportURI(String s, String address) {
+        if ("http://www.w3.org/2008/07/soap/bindings/JMS/".equals(s)
+            || (address != null && address.startsWith("jms"))) {
             s = "http://cxf.apache.org/transports/jms";
+        } else if (SOAP_11_HTTP_BINDING.equals(s)
+            || SOAP_12_HTTP_BINDING.equals(s)
+            || "http://schemas.xmlsoap.org/wsdl/soap/".equals(s)
+            || "http://schemas.xmlsoap.org/wsdl/http".equals(s)
+            || "http://schemas.xmlsoap.org/wsdl/soap/http".equals(s)
+            || "http://schemas.xmlsoap.org/wsdl/soap/http/".equals(s)
+            || "http://schemas.xmlsoap.org/wsdl/http/".equals(s)) {
+            s = "http://cxf.apache.org/transports/http";
         }
         return s;
     }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
-        if (ei.getAddress() != null && ei.getAddress().startsWith("soap.tcp")) {
+        String address = ei.getAddress();
+        if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp")) {
             return new SoapTcpDestination(ei.getTarget(), ei);
-            //return SoapTcpDestination.getInstance(ei.getTarget(), ei);
         }
-        
-        SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
+        BindingInfo bi = ei.getBinding();
+        String transId = ei.getTransportId();
+        if (bi instanceof SoapBindingInfo) {
+            transId = ((SoapBindingInfo)bi).getTransportURI();
+            if (transId == null) {
+                transId = ei.getTransportId();
+            }
+        }
         DestinationFactory destinationFactory;
         try {
-            destinationFactory = bus.getExtension(DestinationFactoryManager.class)
-                .getDestinationFactory(mapTransportURI(binding.getTransportURI()));
+            DestinationFactoryManager mgr = bus.getExtension(DestinationFactoryManager.class);
+            if (StringUtils.isEmpty(address) 
+                || address.startsWith("http") 
+                || address.startsWith("jms")
+                || address.startsWith("/")) {
+                destinationFactory = mgr.getDestinationFactory(mapTransportURI(transId, address));
+            } else {
+                destinationFactory = mgr.getDestinationFactoryForUri(address);
+            }
             return destinationFactory.getDestination(ei);
         } catch (BusException e) {
             throw new RuntimeException("Could not find destination factory for transport "
-                                       + binding.getTransportURI());
+                                       + transId);
         }
     }
 
@@ -158,21 +180,31 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     }
 
     public Conduit getConduit(EndpointInfo ei) throws IOException {
-        if (!StringUtils.isEmpty(ei.getAddress()) && ei.getAddress().startsWith("soap.tcp://")) {
+        String address = ei.getAddress();
+        if (!StringUtils.isEmpty(address) && address.startsWith("soap.tcp://")) {
             //TODO - examine policies and stuff to look for the sun tcp policies
             return new TCPConduit(ei);
         }
-        
-        SoapBindingInfo binding = (SoapBindingInfo)ei.getBinding();
+        BindingInfo bi = ei.getBinding();
+        String transId = ei.getTransportId();
+        if (bi instanceof SoapBindingInfo) {
+            transId = ((SoapBindingInfo)bi).getTransportURI();
+            if (transId == null) {
+                transId = ei.getTransportId();
+            }
+        }
         ConduitInitiator conduitInit;
         try {
-            conduitInit = bus.getExtension(ConduitInitiatorManager.class)
-                .getConduitInitiator(mapTransportURI(binding.getTransportURI()));
-
+            ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
+            if (StringUtils.isEmpty(address) || address.startsWith("http") || address.startsWith("jms")) {
+                conduitInit = mgr.getConduitInitiator(mapTransportURI(transId, address));
+            } else {
+                conduitInit = mgr.getConduitInitiatorForUri(address);
+            }
             return conduitInit.getConduit(ei);
         } catch (BusException e) {
             throw new RuntimeException("Could not find conduit initiator for transport "
-                                       + binding.getTransportURI());
+                                       + transId);
         }
     }
 

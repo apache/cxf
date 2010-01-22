@@ -24,11 +24,13 @@ import javax.annotation.Resource;
 
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
+@NoJSR250Annotations(unlessNull = "bus")
 public class ClientOnlyHTTPTransportFactory extends AbstractHTTPTransportFactory
     implements ConduitInitiator {
 

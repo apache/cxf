@@ -23,6 +23,8 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.transport.local.LocalTransportFactory;
+
 import org.junit.Test;
 
 /**
@@ -34,6 +36,7 @@ public class DocLitBareTest extends AbstractCXFTest {
     public void testNamespaceCrash() {
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setServiceClass(University.class);
+        svrFactory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         svrFactory.setAddress("local://dlbTest");
         svrFactory.setServiceBean(new UniversityImpl());
         svrFactory.getServiceFactory().setDataBinding(new AegisDatabinding());
@@ -43,6 +46,7 @@ public class DocLitBareTest extends AbstractCXFTest {
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
        
         factory.setServiceClass(University.class);
+        factory.setTransportId(LocalTransportFactory.TRANSPORT_ID);
         factory.setAddress("local://dlbTest");
         University client = (University) factory.create();
        

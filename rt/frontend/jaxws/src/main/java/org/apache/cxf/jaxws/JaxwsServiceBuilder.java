@@ -42,6 +42,8 @@ public class JaxwsServiceBuilder extends AbstractServiceFactory {
         setBindingConfig(new JaxWsSoapBindingConfiguration(serviceFactory));
     }
     
+    
+    
     public File getOutputFile() {
         JaxWsImplementorInfo jaxwsImpl = serviceFactory.getJaxWsImplementorInfo();
         String wsdlLocation = jaxwsImpl.getWsdlLocation();

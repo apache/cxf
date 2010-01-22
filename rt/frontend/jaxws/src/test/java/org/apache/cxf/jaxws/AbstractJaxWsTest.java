@@ -66,20 +66,21 @@ public abstract class AbstractJaxWsTest extends AbstractCXFTest {
         soapDF.setBus(bus);
         dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/", soapDF);
         dfm.registerDestinationFactory(SoapBindingConstants.SOAP11_BINDING_ID, soapDF);
+        dfm.registerDestinationFactory(SoapBindingConstants.SOAP12_BINDING_ID, soapDF);
         dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", soapDF);
         
         localTransport = new LocalTransportFactory();
         localTransport.setUriPrefixes(new HashSet<String>(Arrays.asList("http", "local")));
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/soap/http", localTransport);
-        dfm.registerDestinationFactory("http://schemas.xmlsoap.org/wsdl/soap/http", localTransport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/bindings/xformat", localTransport);
-        dfm.registerDestinationFactory("http://cxf.apache.org/transports/local", localTransport);
+        dfm.registerDestinationFactory(LocalTransportFactory.TRANSPORT_ID, localTransport);
+        dfm.registerDestinationFactory("http://cxf.apache.org/transports/http", localTransport);
+        dfm.registerDestinationFactory("http://cxf.apache.org/transports/http/configuration", localTransport);
 
         ConduitInitiatorManager extension = bus.getExtension(ConduitInitiatorManager.class);
         extension.registerConduitInitiator(LocalTransportFactory.TRANSPORT_ID, localTransport);
-        extension.registerConduitInitiator("http://schemas.xmlsoap.org/wsdl/soap/", localTransport);
         extension.registerConduitInitiator("http://schemas.xmlsoap.org/soap/http", localTransport);
-        extension.registerConduitInitiator(SoapBindingConstants.SOAP11_BINDING_ID, localTransport);
+        extension.registerConduitInitiator("http://cxf.apache.org/transports/http", localTransport);
+        extension.registerConduitInitiator("http://cxf.apache.org/transports/http/configuration",
+                                           localTransport);
         
         WSDLManagerImpl manager = new WSDLManagerImpl();
         manager.setBus(bus);

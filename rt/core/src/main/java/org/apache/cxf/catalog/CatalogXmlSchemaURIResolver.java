@@ -39,17 +39,12 @@ import org.apache.ws.commons.schema.resolver.URIResolver;
 public class CatalogXmlSchemaURIResolver implements URIResolver {
 
     private ExtendedURIResolver resolver;
-    private OASISCatalogManager catalogResolver;
+    private Bus bus;
     private Map<String, String> resolved = new HashMap<String, String>();
 
     public CatalogXmlSchemaURIResolver(Bus bus) {
-        this(OASISCatalogManager.getCatalogManager(bus));
         this.resolver = new TransportURIResolver(bus);
-        this.catalogResolver = OASISCatalogManager.getCatalogManager(bus);
-    }
-    public CatalogXmlSchemaURIResolver(OASISCatalogManager catalogManager) {
-        this.resolver = new ExtendedURIResolver();
-        this.catalogResolver = catalogManager;
+        this.bus = bus; 
     }
     
     public Map<String, String> getResolvedMap() {
@@ -57,11 +52,11 @@ public class CatalogXmlSchemaURIResolver implements URIResolver {
     }
 
     public InputSource resolveEntity(String targetNamespace, String schemaLocation, String baseUri) {
-        
         String resolvedSchemaLocation = null;
-        if (this.catalogResolver != null) {
+        OASISCatalogManager catalogResolver = OASISCatalogManager.getCatalogManager(bus);
+        if (catalogResolver != null) {
             try {
-                resolvedSchemaLocation = this.catalogResolver.resolveSystem(schemaLocation);
+                resolvedSchemaLocation = catalogResolver.resolveSystem(schemaLocation);
                 
                 if (resolvedSchemaLocation == null) {
                     resolvedSchemaLocation = catalogResolver.resolveURI(schemaLocation);

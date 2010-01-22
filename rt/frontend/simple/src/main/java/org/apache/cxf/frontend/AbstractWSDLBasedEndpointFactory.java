@@ -234,28 +234,10 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         }
     }
 
+    protected abstract String detectTransportIdFromAddress(String ad);
+    protected abstract WSDLEndpointFactory getWSDLEndpointFactory();
+    
     protected EndpointInfo createEndpointInfo() throws BusException {
-        if (transportId == null 
-            && getAddress() != null
-            && getAddress().contains("://")) {
-            DestinationFactory df = getDestinationFactory();
-            if (df == null) {
-                DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
-                df = dfm.getDestinationFactoryForUri(getAddress());
-            }
-            
-            if (df != null) {
-                transportId = df.getTransportIds().get(0);
-            } else {
-                //check conduits (the address could be supported on client only)
-                ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
-                ConduitInitiator ci = cim.getConduitInitiatorForUri(getAddress());
-                if (ci != null) {
-                    transportId = ci.getTransportIds().get(0);
-                }    
-            }
-        }
-        
         // Get the Service from the ServiceFactory if specified
         Service service = serviceFactory.getService();
         // SOAP nonsense
@@ -270,11 +252,14 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         
         if (transportId == null) {
             if (bindingInfo instanceof SoapBindingInfo) {
-                // TODO: we shouldn't have to do this, but the DF is null because the
-                // LocalTransport doesn't return for the http:// uris
-                // People also seem to be supplying a null JMS getAddress(), which is worrying
-                transportId = "http://schemas.xmlsoap.org/wsdl/soap/";                
-            } else {
+                transportId = ((SoapBindingInfo)bindingInfo).getTransportURI();
+            }
+            if (transportId == null 
+                && getAddress() != null
+                && getAddress().contains("://")) {
+                transportId = detectTransportIdFromAddress(getAddress());
+            }
+            if (transportId == null) {
                 transportId = "http://schemas.xmlsoap.org/wsdl/http/";
             }
         }
@@ -283,27 +268,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
 
         setTransportId(transportId);
         
-        WSDLEndpointFactory wsdlEndpointFactory = null;
-        if (destinationFactory == null) {
-            try {
-                destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
-                    .getDestinationFactory(transportId);
-            } catch (Throwable t) {
-                try {
-                    Object o = getBus().getExtension(ConduitInitiatorManager.class)
-                        .getConduitInitiator(transportId);
-                    if (o instanceof WSDLEndpointFactory) {
-                        wsdlEndpointFactory = (WSDLEndpointFactory)o;
-                    }
-                } catch (Throwable th) {
-                    //ignore
-                }
-            }
-        } 
-        if (destinationFactory instanceof WSDLEndpointFactory) {
-            wsdlEndpointFactory = (WSDLEndpointFactory)destinationFactory;
-        }
-        
+        WSDLEndpointFactory wsdlEndpointFactory = getWSDLEndpointFactory();
         EndpointInfo ei;
         if (wsdlEndpointFactory != null) {
             ei = wsdlEndpointFactory.createEndpointInfo(service.getServiceInfos().get(0), bindingInfo, null);

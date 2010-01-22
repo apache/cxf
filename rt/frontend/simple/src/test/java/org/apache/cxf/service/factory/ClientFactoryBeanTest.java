@@ -21,7 +21,6 @@ package org.apache.cxf.service.factory;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
@@ -57,9 +56,6 @@ public class ClientFactoryBeanTest extends AbstractSimpleFrontendTest {
         
         Endpoint ep = eps.values().iterator().next();
         EndpointInfo endpointInfo = ep.getEndpointInfo();
-        
-        SOAPAddress soapAddress = endpointInfo.getExtensor(SOAPAddress.class);
-        assertNotNull(soapAddress);
         
         BindingInfo b = endpointInfo.getService().getBindings().iterator().next();
         

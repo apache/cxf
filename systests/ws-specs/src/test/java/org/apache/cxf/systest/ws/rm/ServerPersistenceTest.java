@@ -72,8 +72,12 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
+        String derbyHome = System.getProperty("derby.system.home");
+        if (derbyHome == null) {
+            System.setProperty("derby.system.home", "target/derby");
+        }
         RMTxStore.deleteDatabaseFiles();
-        String derbyHome = System.getProperty("derby.system.home"); 
+        derbyHome = System.getProperty("derby.system.home"); 
         try {
             System.setProperty("derby.system.home", derbyHome + "-server");
             RMTxStore.deleteDatabaseFiles();
@@ -88,8 +92,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         // run server in process to avoid a problem with UUID generation
         // during asynchronous invocations
 
-        boolean inProcess = "Windows 2000".equals(System.getProperty("os.name"));
-        assertTrue("server did not launch correctly", launchServer(Server.class, inProcess));  
+        assertTrue("server did not launch correctly", launchServer(Server.class));  
     }
     
     @Test 
@@ -100,7 +103,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Created bus " + bus + " with default cfg");
         ControlService cs = new ControlService();
         Control control = cs.getControlPort();
-        
+
         assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG)); 
         LOG.fine("Started greeter server.");
         
@@ -194,7 +197,8 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         // wait until all messages have received their responses
         int nDone = 0;
         long waited = 0;
-        while (waited < 5000) {
+        while (waited < 20) {
+            nDone = 0;
             for (int i = 0; i < responses.length; i++) {
                 if (responses[i].isDone()) {
                     nDone++;
@@ -204,7 +208,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
                 break;
             }
             Thread.sleep(500);
-            nDone = 0;
+            waited++;
         }
         
         assertEquals("Not all responses have been received.", 3, nDone);

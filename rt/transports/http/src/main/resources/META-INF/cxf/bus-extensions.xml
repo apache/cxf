@@ -20,11 +20,9 @@
 <extensions xmlns="http://cxf.apache.org/bus/extension">
 
     <extension class="org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory"  deferred="true">
-        <namespace>http://schemas.xmlsoap.org/wsdl/soap/http</namespace>
-        <namespace>http://schemas.xmlsoap.org/soap/http</namespace>
-        <namespace>http://www.w3.org/2003/05/soap/bindings/HTTP/</namespace>
-        <namespace>http://schemas.xmlsoap.org/wsdl/http/</namespace>
+        <namespace>http://cxf.apache.org/transports/http</namespace>
         <namespace>http://cxf.apache.org/transports/http/configuration</namespace>
-        <namespace>http://cxf.apache.org/bindings/xformat</namespace>
+        <namespace>http://schemas.xmlsoap.org/wsdl/http</namespace>
+        <namespace>http://schemas.xmlsoap.org/wsdl/http/</namespace>
     </extension>
 </extensions>

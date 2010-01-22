@@ -38,12 +38,10 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
         <property name="bus" ref="cxf"/>
         <property name="transportIds">
             <list>
-                <value>http://schemas.xmlsoap.org/soap/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
- 	            <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
+                <value>http://cxf.apache.org/transports/http</value>
                 <value>http://cxf.apache.org/transports/http/configuration</value>
-                <value>http://cxf.apache.org/bindings/xformat</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
             </list>
         </property>
     </bean>

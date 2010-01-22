@@ -58,7 +58,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <property name="address" value="/services/serverFactory/restful"/>
     <property name="bus" ref="cxf"/>
     <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
-    <property name="transportId" value="http://schemas.xmlsoap.org/wsdl/soap/http"/>
+    <property name="transportId" value="http://schemas.xmlsoap.org/wsdl/http/"/>
     <property name="serviceFactory" ref="JaxWsServiceFactoryBean"/>
   </bean> 
   
@@ -99,7 +99,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     <property name="address" value="/services/serverFactory/json"/>
     <property name="bus" ref="cxf"/>
     <property name="bindingId" value="http://apache.org/cxf/binding/http"/>
-    <property name="transportId" value="http://schemas.xmlsoap.org/wsdl/soap/http"/>
+    <property name="transportId" value="http://schemas.xmlsoap.org/wsdl/http/"/>
     <property name="serviceFactory"> 
        <bean class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean">
          <property name="wrapped" value="false"/>

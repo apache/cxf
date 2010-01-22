@@ -92,6 +92,13 @@ public class Jsr250BeanPostProcessor
         if (!isProcessing) {
             return bean;
         }
+        
+        /*
+        if (bean.getClass().getName().contains("Corb")) {
+            Thread.dumpStack();
+        }
+        */
+        
         if (bean != null 
             && injectable(bean, beanId)) {
             new ResourceInjector(getResourceManager(bean)).inject(bean);
@@ -100,7 +107,7 @@ public class Jsr250BeanPostProcessor
         } else if (bean != null) {
             System.out.println("np: " + (++count2) 
                                + ": " + bean.getClass().getName() + " " + beanId);
-            */
+                               */
         }
         return bean;
     }

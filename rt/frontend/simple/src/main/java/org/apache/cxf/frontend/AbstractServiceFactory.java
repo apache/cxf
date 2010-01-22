@@ -23,6 +23,10 @@ import java.io.File;
 import org.apache.cxf.service.ServiceBuilder;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFactory implements
     ServiceBuilder {
@@ -34,6 +38,41 @@ public abstract class AbstractServiceFactory extends AbstractWSDLBasedEndpointFa
         super(sbean);
     }
     
+    @Override
+    protected String detectTransportIdFromAddress(String ad) {
+        ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
+        ConduitInitiator ci = cim.getConduitInitiatorForUri(getAddress());
+        if (ci != null) {
+            return ci.getTransportIds().get(0);
+        }    
+        return null;
+    }
+    
+    @Override
+    protected WSDLEndpointFactory getWSDLEndpointFactory() {
+        if (destinationFactory == null) {
+            try {
+                destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
+                    .getDestinationFactory(transportId);
+            } catch (Throwable t) {
+                try {
+                    Object o = getBus().getExtension(ConduitInitiatorManager.class)
+                        .getConduitInitiator(transportId);
+                    if (o instanceof WSDLEndpointFactory) {
+                        return (WSDLEndpointFactory)o;
+                    }
+                } catch (Throwable th) {
+                    //ignore
+                }
+            }
+        } 
+        if (destinationFactory instanceof WSDLEndpointFactory) {
+            return (WSDLEndpointFactory)destinationFactory;
+        }
+        return null;
+    }
+
+
     public ServiceInfo createService() {
         try {
             return createEndpoint().getEndpointInfo().getService();

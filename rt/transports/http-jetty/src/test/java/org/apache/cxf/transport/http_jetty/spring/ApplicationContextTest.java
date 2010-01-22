@@ -106,7 +106,7 @@ public class ApplicationContextTest extends Assert {
         bus.setExtension(cfg, Configurer.class);
         
         DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        DestinationFactory factory = dfm.getDestinationFactory("http://schemas.xmlsoap.org/soap/http");
+        DestinationFactory factory = dfm.getDestinationFactory("http://cxf.apache.org/transports/http");
         Destination d = factory.getDestination(info);
         assertTrue(d instanceof JettyHTTPDestination);
         JettyHTTPDestination jd = (JettyHTTPDestination) d;        
@@ -117,7 +117,7 @@ public class ApplicationContextTest extends Assert {
         assertEquals(120, engine.getThreadingParameters().getMaxThreads());
         
         ConduitInitiatorManager cim = bus.getExtension(ConduitInitiatorManager.class);
-        ConduitInitiator ci = cim.getConduitInitiator("http://schemas.xmlsoap.org/soap/http");
+        ConduitInitiator ci = cim.getConduitInitiator("http://cxf.apache.org/transports/http");
         HTTPConduit conduit = (HTTPConduit) ci.getConduit(info);
         assertEquals(97, conduit.getClient().getConnectionTimeout());
         

@@ -85,8 +85,15 @@ public class TransportURIResolver extends ExtendedURIResolver {
         if (is == null && base != null 
             && base.getScheme() != null) {
             try {
-                ConduitInitiator ci = bus.getExtension(ConduitInitiatorManager.class)
-                    .getConduitInitiatorForUri(base.toString());
+                ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
+                ConduitInitiator ci = null;
+                if ("http".equals(base.getScheme()) || "https".equals(base.getScheme())) {
+                    //common case, don't "search"
+                    ci = mgr.getConduitInitiator("http://cxf.apache.org/transports/http");
+                } 
+                if (ci == null) {
+                    ci = mgr.getConduitInitiatorForUri(base.toString());
+                }
                 if (ci != null) {
                     EndpointInfo info = new EndpointInfo();
                     info.setAddress(base.toString());

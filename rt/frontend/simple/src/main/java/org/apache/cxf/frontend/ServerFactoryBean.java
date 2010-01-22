@@ -36,6 +36,10 @@ import org.apache.cxf.service.invoker.BeanInvoker;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.Invoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
+import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 
 /**
@@ -85,6 +89,44 @@ public class ServerFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public String getBeanName() {
         return this.getClass().getName();
     }
+    
+    @Override
+    protected String detectTransportIdFromAddress(String ad) {
+        DestinationFactory df = getDestinationFactory();
+        if (df == null) {
+            DestinationFactoryManager dfm = getBus().getExtension(DestinationFactoryManager.class);
+            df = dfm.getDestinationFactoryForUri(getAddress());
+            if (df != null) {
+                return df.getTransportIds().get(0);
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    protected WSDLEndpointFactory getWSDLEndpointFactory() {
+        if (destinationFactory == null) {
+            try {
+                destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
+                    .getDestinationFactory(transportId);
+            } catch (Throwable t) {
+                try {
+                    Object o = getBus().getExtension(ConduitInitiatorManager.class)
+                        .getConduitInitiator(transportId);
+                    if (o instanceof WSDLEndpointFactory) {
+                        return (WSDLEndpointFactory)o;
+                    }
+                } catch (Throwable th) {
+                    //ignore
+                }
+            }
+        } 
+        if (destinationFactory instanceof WSDLEndpointFactory) {
+            return (WSDLEndpointFactory)destinationFactory;
+        }
+        return null;
+    }
+    
 
     public Server create() {
         try {

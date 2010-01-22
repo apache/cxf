@@ -153,6 +153,11 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
 
             if (transportId != null) {
                 conf.setTransportURI(transportId);
+            } else if (getAddress() != null 
+                && !getAddress().startsWith("http")
+                && !getAddress().startsWith("/")) {
+                // need to try and detect an id
+                transportId = detectTransportIdFromAddress(getAddress());
             }
             conf.setJaxWsServiceFactoryBean(sf);
             

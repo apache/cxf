@@ -23,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
 
@@ -159,9 +158,6 @@ public class ReflectionServiceFactoryTest extends AbstractSimpleFrontendTest {
         EndpointInfo endpointInfo = ep.getEndpointInfo();
         
         assertEquals("test", ep.get("test"));
-        
-        SOAPAddress soapAddress = endpointInfo.getExtensor(SOAPAddress.class);
-        assertNotNull(soapAddress);
         
         BindingInfo b = endpointInfo.getService().getBindings().iterator().next();
         

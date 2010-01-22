@@ -151,15 +151,16 @@ public class ExtensionManagerImpl implements ExtensionManager {
         
         if (!e.isDeferred()) {
             loadAndRegister(e);
-        }
-        Collection<String> namespaces = e.getNamespaces();
-        for (String ns : namespaces) {
-            Collection<Extension> extensions = deferred.get(ns);
-            if (null == extensions) {
-                extensions = new ArrayList<Extension>();
-                deferred.put(ns, extensions);
+        } else {
+            Collection<String> namespaces = e.getNamespaces();
+            for (String ns : namespaces) {
+                Collection<Extension> extensions = deferred.get(ns);
+                if (null == extensions) {
+                    extensions = new ArrayList<Extension>();
+                    deferred.put(ns, extensions);
+                }
+                extensions.add(e);
             }
-            extensions.add(e);
         }
     }
     

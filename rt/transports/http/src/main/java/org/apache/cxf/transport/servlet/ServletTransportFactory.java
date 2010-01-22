@@ -53,12 +53,10 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     public ServletTransportFactory(Bus b) {
         super.setBus(b);
         List<String> ids = Arrays.asList(new String[] {
-            "http://schemas.xmlsoap.org/wsdl/soap/http",
-            "http://schemas.xmlsoap.org/soap/http",
-            "http://www.w3.org/2003/05/soap/bindings/HTTP/",
-            "http://schemas.xmlsoap.org/wsdl/http/",
+            "http://cxf.apache.org/transports/http",
             "http://cxf.apache.org/transports/http/configuration",
-            "http://cxf.apache.org/bindings/xformat",         
+            "http://schemas.xmlsoap.org/wsdl/http",
+            "http://schemas.xmlsoap.org/wsdl/http/",
         });
         this.setTransportIds(ids);
     }

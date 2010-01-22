@@ -30,6 +30,10 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
 public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
 
@@ -39,7 +43,41 @@ public class ClientFactoryBean extends AbstractWSDLBasedEndpointFactory {
     public ClientFactoryBean(ReflectionServiceFactoryBean factory) {
         super(factory);
     }
-
+    
+    @Override
+    protected String detectTransportIdFromAddress(String ad) {
+        ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
+        ConduitInitiator ci = cim.getConduitInitiatorForUri(getAddress());
+        if (ci != null) {
+            return ci.getTransportIds().get(0);
+        }    
+        return null;
+    }
+    @Override
+    protected WSDLEndpointFactory getWSDLEndpointFactory() {
+        if (destinationFactory instanceof WSDLEndpointFactory) {
+            return (WSDLEndpointFactory)destinationFactory;
+        }
+        try {
+            Object o = getBus().getExtension(ConduitInitiatorManager.class)
+                .getConduitInitiator(transportId);
+            if (o instanceof WSDLEndpointFactory) {
+                return (WSDLEndpointFactory)o;
+            }
+        } catch (Throwable t) {
+            //ignore
+        }
+        
+        if (destinationFactory == null) {
+            try {
+                destinationFactory = getBus().getExtension(DestinationFactoryManager.class)
+                    .getDestinationFactory(transportId);
+            } catch (Throwable t) {
+                //ignore
+            }
+        } 
+        return null;
+    }
     public Client create() {
         getServiceFactory().reset();
         if (getServiceFactory().getProperties() == null) {
