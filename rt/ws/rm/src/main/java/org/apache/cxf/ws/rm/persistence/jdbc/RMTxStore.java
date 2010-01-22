@@ -584,7 +584,7 @@ public class RMTxStore implements RMStore {
     synchronized void init() {
         
         if (null == connection) {
-            LOG.log(Level.INFO, "Using derby.system.home: {0}", System.getProperty("derby.system.home"));
+            LOG.log(Level.FINE, "Using derby.system.home: {0}", System.getProperty("derby.system.home"));
             assert null != url;
             assert null != driverClassName;
             try {
@@ -595,7 +595,7 @@ public class RMTxStore implements RMStore {
             }
 
             try {
-                LOG.log(Level.INFO, "Using url: " + url);
+                LOG.log(Level.FINE, "Using url: " + url);
                 connection = DriverManager.getConnection(url, userName, password);
 
             } catch (SQLException ex) {
