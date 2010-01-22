@@ -22,6 +22,7 @@ import javax.jms.ConnectionFactory;
 import javax.jms.Message;
 import javax.jms.XAConnectionFactory;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfigurationException;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
@@ -34,6 +35,7 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
+@NoJSR250Annotations
 public class JMSConfiguration implements InitializingBean {
     /**
      * The use of -1 is to make easier to determine 

@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.util.logging.Level;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -32,6 +33,7 @@ import org.apache.cxf.phase.Phase;
 /**
  * 
  */
+@NoJSR250Annotations
 public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
     private static final String LOG_SETUP = LoggingOutInterceptor.class.getName() + ".log-setup";
     

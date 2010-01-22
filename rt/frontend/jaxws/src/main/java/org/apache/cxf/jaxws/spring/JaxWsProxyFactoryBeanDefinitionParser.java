@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.spring.ClientProxyFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -52,7 +53,7 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
         return ".jaxws-client";
     }
 
-    
+    @NoJSR250Annotations
     public static class JAXWSSpringClientProxyFactoryBean extends JaxWsProxyFactoryBean
         implements ApplicationContextAware, FactoryBean {
 

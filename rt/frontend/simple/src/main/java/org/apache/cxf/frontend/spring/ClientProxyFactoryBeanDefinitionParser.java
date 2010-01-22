@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
@@ -90,6 +91,7 @@ public class ClientProxyFactoryBeanDefinitionParser
         }
     }
     
+    @NoJSR250Annotations
     public static class SpringClientProxyFactoryBean extends ClientProxyFactoryBean
         implements ApplicationContextAware, FactoryBean {
 

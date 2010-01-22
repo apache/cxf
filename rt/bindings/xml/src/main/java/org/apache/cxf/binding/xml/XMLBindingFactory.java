@@ -20,12 +20,14 @@ package org.apache.cxf.binding.xml;
 
 import javax.xml.namespace.QName;
 
+
 import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultInInterceptor;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
 import org.apache.cxf.binding.xml.interceptor.XMLMessageInInterceptor;
 import org.apache.cxf.binding.xml.interceptor.XMLMessageOutInterceptor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.DocLiteralInInterceptor;
@@ -38,6 +40,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class XMLBindingFactory extends AbstractBindingFactory {
     
     public Binding createBinding(BindingInfo binding) {

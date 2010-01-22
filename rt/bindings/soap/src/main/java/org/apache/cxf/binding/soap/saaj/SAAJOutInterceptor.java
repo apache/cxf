@@ -46,6 +46,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
@@ -63,6 +64,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  * at the end of the chain in the SEND phase which writes the resulting
  * SOAPMessage.
  */
+@NoJSR250Annotations
 public class SAAJOutInterceptor extends AbstractSoapInterceptor {
     public static final String ORIGINAL_XML_WRITER 
         = SAAJOutInterceptor.class.getName() + ".original.xml.writer";

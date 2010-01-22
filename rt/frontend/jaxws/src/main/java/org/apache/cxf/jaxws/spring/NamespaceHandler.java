@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.spring;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.spring.StringBeanDefinitionParser;
 import org.apache.cxf.frontend.spring.ServerFactoryBeanDefinitionParser;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -41,6 +42,7 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
         registerBeanDefinitionParser("server", parser);
     }
 
+    @NoJSR250Annotations
     public static class SpringServerFactoryBean extends JaxWsServerFactoryBean
         implements ApplicationContextAware {
 

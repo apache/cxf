@@ -53,6 +53,7 @@ import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap11FaultInInterceptor;
 import org.apache.cxf.binding.soap.interceptor.Soap12FaultInInterceptor;
 import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.headers.HeaderManager;
@@ -68,6 +69,7 @@ import org.apache.cxf.staxutils.W3CDOMStreamWriter;
  * Builds a SAAJ tree from the Document fragment inside the message which contains
  * the SOAP headers and from the XMLStreamReader.
  */
+@NoJSR250Annotations
 public class SAAJInInterceptor extends AbstractSoapInterceptor {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(SAAJInInterceptor.class);
     

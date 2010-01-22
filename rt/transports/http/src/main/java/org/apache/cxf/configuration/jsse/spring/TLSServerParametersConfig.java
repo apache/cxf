@@ -21,6 +21,7 @@ package org.apache.cxf.configuration.jsse.spring;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 
@@ -29,6 +30,7 @@ import org.apache.cxf.configuration.security.TLSServerParametersType;
  * JAXB generated type into programmatic TLS Server Parameters for the
  * configuration of the http-destination.
  */
+@NoJSR250Annotations
 public class TLSServerParametersConfig 
     extends TLSServerParameters {
 

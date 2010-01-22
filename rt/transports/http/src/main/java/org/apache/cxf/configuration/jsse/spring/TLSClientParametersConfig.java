@@ -29,6 +29,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.stream.XMLStreamReader;
 
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.TLSClientParametersType;
@@ -40,6 +41,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * type TLSClientParametersType that was used in the Spring configuration
  * of the http-conduit bean.
  */
+@NoJSR250Annotations
 public final class TLSClientParametersConfig {
     static JAXBContext context;
     

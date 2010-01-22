@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
@@ -29,6 +30,7 @@ import org.apache.cxf.transport.Conduit;
  * the current ConduitSelector, as a work-around for broken 
  * Exchange.remove(ConduitSelector.class) semantics.
  */
+@NoJSR250Annotations
 public class NullConduitSelector implements ConduitSelector {
 
     private Endpoint endpoint;

@@ -35,6 +35,7 @@ import org.apache.cxf.binding.http.strategy.ResourceStrategy;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultInInterceptor;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.AttachmentInInterceptor;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
@@ -47,6 +48,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class HttpBindingFactory extends AbstractBindingFactory {
 
     public static final String HTTP_BINDING_ID = "http://apache.org/cxf/binding/http";

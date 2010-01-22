@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
@@ -50,6 +51,7 @@ import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
  * Client cxfClient = ClientProxy.getClient(client);
  * </pre>
  */
+@NoJSR250Annotations
 public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     private ClientFactoryBean clientFactoryBean;
     private String username;

@@ -31,6 +31,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.jsse.spring.TLSServerParametersConfig;
 import org.apache.cxf.configuration.security.TLSServerParametersType;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
@@ -42,6 +43,7 @@ import org.apache.cxf.transports.http_jetty.configuration.TLSServerParametersIde
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersIdentifiedType;
 import org.apache.cxf.transports.http_jetty.configuration.ThreadingParametersType;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.config.ConstructorArgumentValues.ValueHolder;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.xml.ParserContext;
@@ -148,8 +150,9 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
         return SpringJettyHTTPServerEngine.class;
     }
     
+    @NoJSR250Annotations
     public static class SpringJettyHTTPServerEngine extends JettyHTTPServerEngine
-        implements ApplicationContextAware {
+        implements ApplicationContextAware, InitializingBean {
         
         String threadingRef;
         String tlsRef;
@@ -196,6 +199,10 @@ public class JettyHTTPServerEngineBeanDefinitionParser extends AbstractBeanDefin
                 }
             }
             super.finalizeConfig();
+        }
+
+        public void afterPropertiesSet() throws Exception {
+            finalizeConfig();
         }
 
     }

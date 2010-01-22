@@ -25,6 +25,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 /**
@@ -38,6 +39,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * or concrete but with sufficient information embedded to enable
  * its renewal if necessary.
  */
+@NoJSR250Annotations
 public class EndpointResolverRegistryImpl implements EndpointResolverRegistry {
 
     private Bus bus;

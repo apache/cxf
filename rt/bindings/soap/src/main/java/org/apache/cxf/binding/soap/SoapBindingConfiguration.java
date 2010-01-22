@@ -21,11 +21,13 @@ package org.apache.cxf.binding.soap;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.BindingConfiguration;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
+@NoJSR250Annotations
 public class SoapBindingConfiguration extends BindingConfiguration {
     private SoapVersion soapVersion = Soap11.getInstance();
     private String style;

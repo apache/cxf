@@ -27,6 +27,7 @@ import java.util.concurrent.Executor;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Endpoint;
@@ -36,6 +37,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 
+@NoJSR250Annotations
 public class ServiceImpl extends AbstractAttributedInterceptorProvider implements Service, Configurable {
     private List<ServiceInfo> serviceInfos;
     private DataBinding dataBinding;

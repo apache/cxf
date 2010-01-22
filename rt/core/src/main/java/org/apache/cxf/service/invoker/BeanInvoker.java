@@ -19,12 +19,14 @@
 
 package org.apache.cxf.service.invoker;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.message.Exchange;
 
 /**
  * Invoker for externally created service objects.
  * 
  */
+@NoJSR250Annotations
 public class BeanInvoker extends AbstractInvoker {
     private Object proxy;
 

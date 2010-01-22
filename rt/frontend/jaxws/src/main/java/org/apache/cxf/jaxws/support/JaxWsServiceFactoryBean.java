@@ -51,6 +51,7 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -87,6 +88,7 @@ import org.apache.cxf.wsdl11.WSDLServiceBuilder;
  *
  * @see org.apache.cxf.jaxws.JaxWsServerFactoryBean
  */
+@NoJSR250Annotations
 public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     // used to tag property on service.
     public static final  String WS_FEATURES = "JAXWS-WS-FEATURES";

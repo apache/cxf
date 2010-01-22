@@ -28,6 +28,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.frontend.ServerFactoryBean;
@@ -109,7 +110,8 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
     protected boolean hasBusProperty() {
         return true;
     }
-
+    
+    @NoJSR250Annotations
     public static class SpringServerFactoryBean extends ServerFactoryBean
         implements ApplicationContextAware {
 

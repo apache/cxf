@@ -23,12 +23,15 @@ import org.apache.cxf.binding.AbstractBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSInInterceptor;
 import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 
+
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class JAXRSBindingFactory extends AbstractBindingFactory {
 
     public static final String JAXRS_BINDING_ID = "http://apache.org/cxf/binding/jaxrs";

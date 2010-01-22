@@ -31,6 +31,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
@@ -154,7 +155,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
         return id;
     }
     
-    
+    @NoJSR250Annotations
     public static class SpringEndpointImpl extends EndpointImpl
         implements ApplicationContextAware {
     

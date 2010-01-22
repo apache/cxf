@@ -20,6 +20,7 @@
 package org.apache.cxf.binding.soap;
 
 import java.io.IOException;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -39,6 +40,7 @@ import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
 import org.apache.cxf.binding.soap.tcp.TCPConduit;
 import org.apache.cxf.binding.soap.wsdl11.SoapAddressPlugin;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -56,6 +58,7 @@ import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
+@NoJSR250Annotations(unlessNull = { "bus" })
 public class SoapTransportFactory extends AbstractTransportFactory implements DestinationFactory,
     WSDLEndpointFactory, ConduitInitiator {
     

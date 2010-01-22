@@ -25,6 +25,7 @@ import java.util.List;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientFactoryBean;
@@ -53,6 +54,7 @@ import org.apache.cxf.service.model.ServiceInfo;
  * internal properties used to set-up proxies. Using it provides more control 
  * than the standard JAX-WS APIs.
  */
+@NoJSR250Annotations
 public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     List<Handler> handlers = new ArrayList<Handler>();
     boolean loadHandlers = true;

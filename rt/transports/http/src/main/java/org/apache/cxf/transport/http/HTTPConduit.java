@@ -44,6 +44,7 @@ import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
@@ -142,6 +143,7 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
  * instance is governed by policies either explicitly set or by 
  * configuration.
  */
+@NoJSR250Annotations
 public class HTTPConduit 
     extends AbstractConduit 
     implements Configurable, Assertor {  
