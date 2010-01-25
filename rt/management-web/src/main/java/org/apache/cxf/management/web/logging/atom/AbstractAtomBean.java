@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +26,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.jaxrs.ext.logging.LogLevel;
+import org.apache.cxf.management.web.logging.LogLevel;
 
 
 public abstract class AbstractAtomBean {

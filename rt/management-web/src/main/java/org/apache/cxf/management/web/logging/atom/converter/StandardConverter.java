@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom.converter;
+package org.apache.cxf.management.web.logging.atom.converter;
 
 import java.io.StringWriter;
 import java.text.DateFormat;
@@ -43,8 +43,8 @@ import org.apache.abdera.model.Feed;
 import org.apache.commons.lang.Validate;
 import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
-import org.apache.cxf.jaxrs.ext.logging.LogRecord;
-import org.apache.cxf.jaxrs.ext.logging.LogRecords;
+import org.apache.cxf.management.web.logging.LogRecord;
+import org.apache.cxf.management.web.logging.LogRecords;
 
 /**
  * Converter producing ATOM Feeds on standalone Entries with LogRecords or LogRecordsLists embedded as content

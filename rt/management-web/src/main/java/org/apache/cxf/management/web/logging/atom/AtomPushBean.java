@@ -16,13 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.logging.Handler;
 
 import org.apache.commons.lang.Validate;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.management.web.logging.atom.converter.Converter;
+import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
 
 /**
  * Bean used to configure {@link AtomPushHandler JUL handler} with Spring instead of properties file. See

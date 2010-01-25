@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 /**
  * Helps disable logging from calls of the same thread. Motivation: log handlers in this package causes other

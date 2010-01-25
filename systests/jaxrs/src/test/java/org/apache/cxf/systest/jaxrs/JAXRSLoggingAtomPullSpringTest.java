@@ -36,11 +36,11 @@ import org.apache.abdera.model.Feed;
 import org.apache.abdera.model.Link;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.logging.LogLevel;
-import org.apache.cxf.jaxrs.ext.logging.ReadWriteLogStorage;
-import org.apache.cxf.jaxrs.ext.logging.ReadableLogStorage;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
+import org.apache.cxf.management.web.logging.LogLevel;
+import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
+import org.apache.cxf.management.web.logging.ReadableLogStorage;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 
@@ -73,7 +73,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
 
     @Before
     public void before() throws Exception {
-        context = JAXBContext.newInstance(org.apache.cxf.jaxrs.ext.logging.LogRecord.class);
+        context = JAXBContext.newInstance(org.apache.cxf.management.web.logging.LogRecord.class);
         Storage.clearRecords();
     }
 
@@ -114,7 +114,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         Thread.sleep(3000);
         
         verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
-        List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = Storage.getRecords();
+        List<org.apache.cxf.management.web.logging.LogRecord> list = Storage.getRecords();
         assertEquals(4, list.size());
         verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
         verifyStoragePages("http://localhost:9080/atom3/logs?page=2", "previous", "Resource3", 
@@ -238,8 +238,8 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     @Ignore
     public static class ExternalStorage implements ReadableLogStorage {
 
-        private List<org.apache.cxf.jaxrs.ext.logging.LogRecord> records = 
-            new LinkedList<org.apache.cxf.jaxrs.ext.logging.LogRecord>();
+        private List<org.apache.cxf.management.web.logging.LogRecord> records = 
+            new LinkedList<org.apache.cxf.management.web.logging.LogRecord>();
         
         public ExternalStorage() {
             addRecord("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPullSpringTest$Resource4", 
@@ -259,8 +259,8 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         }
         
         private void addRecord(String loggerName, Level level, Throwable t) {
-            org.apache.cxf.jaxrs.ext.logging.LogRecord lr = 
-                new org.apache.cxf.jaxrs.ext.logging.LogRecord();
+            org.apache.cxf.management.web.logging.LogRecord lr = 
+                new org.apache.cxf.management.web.logging.LogRecord();
             lr.setLoggerName(loggerName);
             lr.setLevel(LogLevel.fromJUL(level));
             if (t != null) {
@@ -279,8 +279,8 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             return -1;
         }
 
-        public void load(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list, 
-                         SearchCondition<org.apache.cxf.jaxrs.ext.logging.LogRecord> condition, 
+        public void load(List<org.apache.cxf.management.web.logging.LogRecord> list, 
+                         SearchCondition<org.apache.cxf.management.web.logging.LogRecord> condition, 
                          int loadFrom, 
                          int maxNumberOfRecords) {
             int limit = loadFrom + maxNumberOfRecords;
@@ -295,16 +295,16 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     
     @Ignore
     public static class Storage implements ReadWriteLogStorage {
-        private static List<org.apache.cxf.jaxrs.ext.logging.LogRecord> records = 
-            new LinkedList<org.apache.cxf.jaxrs.ext.logging.LogRecord>();
+        private static List<org.apache.cxf.management.web.logging.LogRecord> records = 
+            new LinkedList<org.apache.cxf.management.web.logging.LogRecord>();
 
-        public void load(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list,
-                         SearchCondition<org.apache.cxf.jaxrs.ext.logging.LogRecord> sc,
+        public void load(List<org.apache.cxf.management.web.logging.LogRecord> list,
+                         SearchCondition<org.apache.cxf.management.web.logging.LogRecord> sc,
                          int from, int quantity) {
             list.addAll(records.subList(from, from + quantity));
         }
 
-        public void save(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list) {
+        public void save(List<org.apache.cxf.management.web.logging.LogRecord> list) {
             records.addAll(list);
         }
         
@@ -318,7 +318,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
             return records.size();
         }
 
-        public static List<org.apache.cxf.jaxrs.ext.logging.LogRecord> getRecords() {
+        public static List<org.apache.cxf.management.web.logging.LogRecord> getRecords() {
             return records;
         }
         
@@ -354,13 +354,13 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         
     }
     
-    private org.apache.cxf.jaxrs.ext.logging.LogRecord readLogRecord(String value) throws Exception {
-        return (org.apache.cxf.jaxrs.ext.logging.LogRecord)
+    private org.apache.cxf.management.web.logging.LogRecord readLogRecord(String value) throws Exception {
+        return (org.apache.cxf.management.web.logging.LogRecord)
             context.createUnmarshaller().unmarshal(new StringReader(value));
     }
     
     
-    private void updateCounters(org.apache.cxf.jaxrs.ext.logging.LogRecord record, 
+    private void updateCounters(org.apache.cxf.management.web.logging.LogRecord record, 
                                 String clsName,
                                 String namedLoggerName) {
         String name = record.getLoggerName();

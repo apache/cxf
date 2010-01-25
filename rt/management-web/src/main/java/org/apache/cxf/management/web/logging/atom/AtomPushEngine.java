@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -28,9 +28,9 @@ import java.util.concurrent.Executors;
 
 import org.apache.abdera.model.Element;
 import org.apache.commons.lang.Validate;
-import org.apache.cxf.jaxrs.ext.logging.LogRecord;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.management.web.logging.LogRecord;
+import org.apache.cxf.management.web.logging.atom.converter.Converter;
+import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
 
 /**
  * Package private ATOM push-style engine. Engine enqueues log records as they are {@link #publish(LogRecord)

@@ -16,27 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom.deliverer;
+package org.apache.cxf.management.web.logging.atom.converter;
+
+import java.util.List;
 
 import org.apache.abdera.model.Element;
+import org.apache.cxf.management.web.logging.LogRecord;
 
 /**
- * ATOM element deliverer. Represents transport strategy e.g. using
- * {@link org.apache.cxf.jaxrs.client.WebClient}, SOAP reliable messaging etc.
+ * Converts batch of log records into one or more ATOM Elements to deliver.
  */
-public interface Deliverer {
+public interface Converter {
 
     /**
-     * Delivers ATOM element.
+     * Converts given collection.
      * 
-     * @param element element to deliver.
-     * @return true if delivery successful, false otherwise.
+     * @param records not-null collection of records
+     * @return non-empty collection of ATOM Elements that represent log records
      */
-    boolean deliver(Element element) throws InterruptedException;
-    
-    /**
-     * Returns the address of the remote endpoint this deliverer send elements to
-     * @return
-     */
-    String getEndpointAddress();
+    List<? extends Element> convert(List<LogRecord> records);
 }

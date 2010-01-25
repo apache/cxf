@@ -16,14 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.logging.Handler;
 import java.util.logging.LogManager;
 
-import org.apache.cxf.jaxrs.ext.logging.LogRecord;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.management.web.logging.LogRecord;
+import org.apache.cxf.management.web.logging.atom.converter.Converter;
+import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
 
 /**
  * Handler pushing log records in batches as Atom Feeds or Entries to registered client. Handler

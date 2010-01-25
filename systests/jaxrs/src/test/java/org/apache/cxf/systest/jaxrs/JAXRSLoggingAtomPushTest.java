@@ -39,53 +39,29 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
-import org.apache.cxf.jaxrs.ext.logging.atom.AtomPushHandler;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer;
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
+import org.apache.cxf.management.web.logging.atom.AtomPushHandler;
+import org.apache.cxf.management.web.logging.atom.converter.Converter;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Format;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Multiplicity;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Output;
+import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.management.web.logging.atom.deliverer.WebClientDeliverer;
 
 import org.junit.AfterClass;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
-public class JAXRSLoggingAtomPushTest {
+public class JAXRSLoggingAtomPushTest extends Assert {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
     private static Server server;
     
-    @Ignore
-    @Path("/")
-    public static class Resource {
-        
-        private static Queue<Feed> feeds = new ConcurrentLinkedQueue<Feed>();
-        private static Queue<Entry> entries = new ConcurrentLinkedQueue<Entry>();
-        
-        @POST
-        public void consume(Feed feed) {
-            feeds.add(feed);
-        }
-
-        @POST
-        @Path("/atomPub")
-        public void consume(Entry entry) {
-            entries.add(entry);
-        }
-        
-        public static void clear() {
-            feeds.clear();
-            entries.clear();
-        }
-    }
-
+    
     @SuppressWarnings("unchecked")
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -181,20 +157,10 @@ public class JAXRSLoggingAtomPushTest {
     public void testPrivateLoggerCustomBuilders() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
-        AbstractFeedBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>> fb = 
-            new AbstractFeedBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>>() {
-                @Override
-                public String getAuthor(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> pojo) {
-                    return "custom author";
-                }
-            };
-        AbstractEntryBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>> eb = 
-            new AbstractEntryBuilder<List<org.apache.cxf.jaxrs.ext.logging.LogRecord>>() {
-                @Override
-                public String getSummary(List<org.apache.cxf.jaxrs.ext.logging.LogRecord> pojo) {
-                    return "custom summary";
-                }
-            };
+        AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> fb = 
+            createCustomFeedBuilder();
+        AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> eb =
+            createCustomEntryBuilder(); 
         Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT, fb, eb);
         Deliverer d = new WebClientDeliverer("http://localhost:9080");
         Handler h = new AtomPushHandler(2, c, d);
@@ -207,6 +173,34 @@ public class JAXRSLoggingAtomPushTest {
         assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
 
+
+    @Ignore
+    private AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> 
+    createCustomFeedBuilder() {
+
+        AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> fb = 
+            new AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>>() {
+                @Override
+                public String getAuthor(List<org.apache.cxf.management.web.logging.LogRecord> pojo) {
+                    return "custom author";
+                }
+            };
+        return fb; 
+    }  
+
+    @Ignore
+    private AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> 
+    createCustomEntryBuilder() {
+        AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> eb = 
+            new AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>>() {
+                @Override
+                public String getSummary(List<org.apache.cxf.management.web.logging.LogRecord> pojo) {
+                    return "custom summary";
+                }
+            };
+        return eb;
+    }
+
     @Test
     public void testAtomPubEntries() throws Exception {
         configureLogging("resources/logging_atompush_atompub.properties");
@@ -215,6 +209,30 @@ public class JAXRSLoggingAtomPushTest {
         Thread.sleep(3000);
         // 6 events logged as entries
         assertEquals("Different logged events count;", 6, Resource.entries.size());
+    }
+
+    @Ignore
+    @Path("/")
+    public static class Resource {
+        
+        private static Queue<Feed> feeds = new ConcurrentLinkedQueue<Feed>();
+        private static Queue<Entry> entries = new ConcurrentLinkedQueue<Entry>();
+        
+        @POST
+        public void consume(Feed feed) {
+            feeds.add(feed);
+        }
+
+        @POST
+        @Path("/atomPub")
+        public void consume(Entry entry) {
+            entries.add(entry);
+        }
+        
+        public static void clear() {
+            feeds.clear();
+            entries.clear();
+        }
     }
 
 }

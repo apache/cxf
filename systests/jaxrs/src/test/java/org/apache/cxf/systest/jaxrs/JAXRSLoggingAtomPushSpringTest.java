@@ -37,7 +37,7 @@ import org.apache.abdera.model.ExtensibleElement;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
-import org.apache.cxf.jaxrs.ext.logging.LogRecords;
+import org.apache.cxf.management.web.logging.LogRecords;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
 
 import org.junit.Before;
@@ -75,7 +75,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
         Resource4.clear();
         Resource5.clear();
         context = JAXBContext.newInstance(LogRecords.class, 
-            org.apache.cxf.jaxrs.ext.logging.LogRecord.class);
+            org.apache.cxf.management.web.logging.LogRecord.class);
     }
 
     @Test
@@ -92,7 +92,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
             assertEquals(1, entries.size());
             Entry e = entries.get(0);
             LogRecords records = readLogRecords(e.getContent());
-            List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = records.getLogRecords();
+            List<org.apache.cxf.management.web.logging.LogRecord> list = records.getLogRecords();
             assertNotNull(list);
             assertEquals(1, list.size());
             updateCounters(list.get(0), "Resource");
@@ -153,10 +153,10 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
         
         for (Entry e : elements) {
             LogRecords records = readLogRecords(e.getContent());
-            List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = records.getLogRecords();
+            List<org.apache.cxf.management.web.logging.LogRecord> list = records.getLogRecords();
             assertNotNull(list);
             assertEquals(2, list.size());
-            for (org.apache.cxf.jaxrs.ext.logging.LogRecord record : list) {
+            for (org.apache.cxf.management.web.logging.LogRecord record : list) {
                 updateCounters(record, "Resource4");
             }
             
@@ -178,7 +178,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
             assertEquals(1, entries.size());
             Entry e = entries.get(0);
             LogRecords records = readLogRecordsExtension(e);
-            List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = records.getLogRecords();
+            List<org.apache.cxf.management.web.logging.LogRecord> list = records.getLogRecords();
             assertNotNull(list);
             assertEquals(1, list.size());
             updateCounters(list.get(0), "Resource5");
@@ -373,19 +373,19 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
         return (LogRecords)context.createUnmarshaller().unmarshal(new StringReader(value));
     }
     
-    private org.apache.cxf.jaxrs.ext.logging.LogRecord readLogRecord(String value) throws Exception {
-        return (org.apache.cxf.jaxrs.ext.logging.LogRecord)
+    private org.apache.cxf.management.web.logging.LogRecord readLogRecord(String value) throws Exception {
+        return (org.apache.cxf.management.web.logging.LogRecord)
             context.createUnmarshaller().unmarshal(new StringReader(value));
     }
     
     private LogRecords readLogRecordsExtension(Entry e) throws Exception {
         ExtensibleElement el = e.getExtension(new QName("http://cxf.apache.org/log", "logRecords", "log"));
         LogRecords records = new LogRecords();
-        List<org.apache.cxf.jaxrs.ext.logging.LogRecord> list = 
-            new ArrayList<org.apache.cxf.jaxrs.ext.logging.LogRecord>();
+        List<org.apache.cxf.management.web.logging.LogRecord> list = 
+            new ArrayList<org.apache.cxf.management.web.logging.LogRecord>();
         for (Element element : el.getElements()) {
-            org.apache.cxf.jaxrs.ext.logging.LogRecord record = 
-                new org.apache.cxf.jaxrs.ext.logging.LogRecord();
+            org.apache.cxf.management.web.logging.LogRecord record = 
+                new org.apache.cxf.management.web.logging.LogRecord();
             Element loggerName = element.getFirstChild(
                                      new QName("http://cxf.apache.org/log", "loggerName", "log"));
             if (loggerName != null) {
@@ -402,7 +402,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
         return records;
     }
     
-    private void updateCounters(org.apache.cxf.jaxrs.ext.logging.LogRecord record, String clsName) {
+    private void updateCounters(org.apache.cxf.management.web.logging.LogRecord record, String clsName) {
         String name = record.getLoggerName();
         if (name != null && name.length() > 0) {
             if (("org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$" + clsName).equals(name)) {

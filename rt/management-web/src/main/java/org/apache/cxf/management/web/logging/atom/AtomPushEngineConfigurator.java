@@ -16,18 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.lang.reflect.Constructor;
 
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.Converter;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.Deliverer;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.RetryingDeliverer;
-import org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer;
+import org.apache.cxf.management.web.logging.atom.converter.Converter;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Format;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Multiplicity;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Output;
+import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
+import org.apache.cxf.management.web.logging.atom.deliverer.RetryingDeliverer;
+import org.apache.cxf.management.web.logging.atom.deliverer.WebClientDeliverer;
 
 /**
  * Package private interpreter of incomplete input of engine configuration. Used commonly by

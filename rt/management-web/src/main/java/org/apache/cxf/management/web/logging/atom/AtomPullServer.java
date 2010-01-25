@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -30,17 +30,18 @@ import javax.ws.rs.core.Context;
 
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.jaxrs.ext.MessageContext;
-import org.apache.cxf.jaxrs.ext.logging.LogLevel;
-import org.apache.cxf.jaxrs.ext.logging.LogRecord;
-import org.apache.cxf.jaxrs.ext.logging.ReadWriteLogStorage;
-import org.apache.cxf.jaxrs.ext.logging.ReadableLogStorage;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Format;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Multiplicity;
-import org.apache.cxf.jaxrs.ext.logging.atom.converter.StandardConverter.Output;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.management.web.logging.LogLevel;
+import org.apache.cxf.management.web.logging.LogRecord;
+import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
+import org.apache.cxf.management.web.logging.ReadableLogStorage;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Format;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Multiplicity;
+import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Output;
+
 
 @Path("logs")
 public class AtomPullServer extends AbstractAtomBean {

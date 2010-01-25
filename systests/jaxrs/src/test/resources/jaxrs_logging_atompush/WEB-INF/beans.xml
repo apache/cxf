@@ -38,7 +38,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-	<bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+	<bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="multiplicity" value="one"/>
 		<property name="loggers"
@@ -50,7 +50,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 		</property>	
 	</bean>
 
-    <bean id="webDeliverer" class="org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer">
+    <bean id="webDeliverer" class="org.apache.cxf.management.web.logging.atom.deliverer.WebClientDeliverer">
         <constructor-arg ref="webClient"/>
     </bean>
 
@@ -60,7 +60,7 @@ factory-method="create">
         <constructor-arg ref="feedProvider" />
     </bean> 
 
-    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+    <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="batchSize" value="4"/>
 		<property name="loggers"
@@ -70,7 +70,7 @@ factory-method="create">
 		<property name="url" value="http://localhost:9080/batch/feeds"/>	
 	</bean>
 
-    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+    <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="output" value="entry"/>
 		<property name="loggers"
@@ -82,7 +82,7 @@ factory-method="create">
 		</property>	
 	</bean>
 
-    <bean id="webDeliverer3" class="org.apache.cxf.jaxrs.ext.logging.atom.deliverer.WebClientDeliverer">
+    <bean id="webDeliverer3" class="org.apache.cxf.management.web.logging.atom.deliverer.WebClientDeliverer">
         <constructor-arg ref="webClient3"/>
     </bean>
 
@@ -92,7 +92,7 @@ factory-method="create">
         <constructor-arg ref="entryProvider" />
     </bean> 
 
-    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+    <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="output" value="entry"/>
 		<property name="multiplicity" value="many"/>
@@ -104,7 +104,7 @@ factory-method="create">
 		<property name="url" value="http://localhost:9080/entriesMany/entries"/>
 	</bean>
 
-    <bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+    <bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="multiplicity" value="one"/>
 		<property name="format" value="extension"/>
@@ -147,7 +147,7 @@ factory-method="create">
 	<!--  
 	Other config samples:
 	
-	<bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+	<bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 
 		<property name="url" value="http://localhost:9080/feed" />
@@ -155,7 +155,7 @@ factory-method="create">
 	</bean>
 
 	<bean id="soapDeliverer" ... />
-	<bean class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPushBean"
+	<bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="deliverer">
 			<ref bean="soapDeliverer" />

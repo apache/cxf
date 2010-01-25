@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging;
+package org.apache.cxf.management.web.logging;
 
 import java.util.HashMap;
 import java.util.Map;

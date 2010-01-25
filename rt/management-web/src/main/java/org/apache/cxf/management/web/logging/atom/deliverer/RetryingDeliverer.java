@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom.deliverer;
+package org.apache.cxf.management.web.logging.atom.deliverer;
 
 import java.util.Calendar;
 import java.util.Date;

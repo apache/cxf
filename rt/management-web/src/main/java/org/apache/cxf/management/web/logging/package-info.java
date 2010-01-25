@@ -18,10 +18,14 @@
  */
 
 /**
- * Support for producing logs in
- * <a href="http://tools.ietf.org/html/rfc4287">ATOM Syndication Format</a>.
- * Allows to configure <tt>java.util.logging</tt> (JUL) loggers to use
- * handlers producing ATOM feeds that are either pushed to or pulled by client.  
+ * CXF specific logging support. Based on <tt>java.util.logging</tt> (JUL)
+ * with use of different logging frameworks factored out; assumes that client 
+ * with source code logging to other systems, like Log4J, can bridge 
+ * to this implementation applying <a href="www.slf4j.org">SLF4J</a> 
+ * that JAXRS already depends on.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+@javax.xml.bind.annotation.XmlSchema(xmlns = {
+        @javax.xml.bind.annotation.XmlNs(namespaceURI = "http://cxf.apache.org/log", prefix = "log")
+            })
+package org.apache.cxf.management.web.logging;
 

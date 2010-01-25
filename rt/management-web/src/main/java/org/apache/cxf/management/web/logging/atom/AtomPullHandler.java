@@ -16,11 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.logging.atom;
+package org.apache.cxf.management.web.logging.atom;
 
 import java.util.logging.Handler;
 
-import org.apache.cxf.jaxrs.ext.logging.LogRecord;
+import org.apache.cxf.management.web.logging.LogRecord;
 
 
 public final class AtomPullHandler extends Handler {

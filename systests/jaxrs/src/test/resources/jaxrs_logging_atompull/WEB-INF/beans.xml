@@ -38,7 +38,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-	<bean id = "atomPullServer" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	<bean id = "atomPullServer" class="org.apache.cxf.management.web.logging.atom.AtomPullServer" 
 	      init-method="init">
 	      <property name="loggers"
 			value="
@@ -46,7 +46,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 			namedLogger:WARN" />
 	</bean>
 	
-	<bean id = "atomPullServer2" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	<bean id = "atomPullServer2" class="org.apache.cxf.management.web.logging.atom.AtomPullServer" 
 	      init-method="init">
 	      <property name="loggers"
 			value="
@@ -56,7 +56,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 		  	
 	</bean>
 	
-	<bean id = "atomPullServer3" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	<bean id = "atomPullServer3" class="org.apache.cxf.management.web.logging.atom.AtomPullServer" 
 	      init-method="init">
 	      <property name="loggers"
 			value="
@@ -69,7 +69,7 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 		</property>	
 	</bean>
 	
-	<bean id = "atomPullServer4" class="org.apache.cxf.jaxrs.ext.logging.atom.AtomPullServer" 
+	<bean id = "atomPullServer4" class="org.apache.cxf.management.web.logging.atom.AtomPullServer" 
 	      init-method="init">
 	      <property name="loggers"
 			value="
