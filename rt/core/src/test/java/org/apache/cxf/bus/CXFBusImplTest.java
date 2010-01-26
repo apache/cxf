@@ -28,7 +28,6 @@ import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.bus.extension.ExtensionManagerBus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
-import org.apache.cxf.event.EventProcessor;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -58,7 +57,6 @@ public class CXFBusImplTest extends Assert {
         IMocksControl control;
         BindingFactoryManager bindingFactoryManager;
         WSDLManager wsdlManager;
-        EventProcessor eventProcessor;
         InstrumentationManager instrumentationManager;
         PhaseManager phaseManager;
         
@@ -67,13 +65,11 @@ public class CXFBusImplTest extends Assert {
         Map<Class, Object> extensions = new HashMap<Class, Object>();
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
         wsdlManager = control.createMock(WSDLManager.class);
-        eventProcessor = control.createMock(EventProcessor.class);
         instrumentationManager = control.createMock(InstrumentationManager.class);
         phaseManager = control.createMock(PhaseManager.class);
         
         extensions.put(BindingFactoryManager.class, bindingFactoryManager);
         extensions.put(WSDLManager.class, wsdlManager);
-        extensions.put(EventProcessor.class, eventProcessor);
         extensions.put(InstrumentationManager.class, instrumentationManager);
         extensions.put(PhaseManager.class, phaseManager);
         
@@ -81,7 +77,6 @@ public class CXFBusImplTest extends Assert {
         
         assertSame(bindingFactoryManager, bus.getExtension(BindingFactoryManager.class));
         assertSame(wsdlManager, bus.getExtension(WSDLManager.class));
-        assertSame(eventProcessor, bus.getExtension(EventProcessor.class));
         assertSame(instrumentationManager, bus.getExtension(InstrumentationManager.class));
         assertSame(phaseManager, bus.getExtension(PhaseManager.class));
   
