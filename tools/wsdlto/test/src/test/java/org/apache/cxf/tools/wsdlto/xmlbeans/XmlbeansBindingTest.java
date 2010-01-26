@@ -24,26 +24,9 @@ import java.io.File;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.wsdlto.WSDLToJava;
-import org.junit.After;
-import org.junit.Before;
 import org.junit.Test;
 
 public class XmlbeansBindingTest extends ProcessorTestBase {
-    
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
-        classFile.mkdir();
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                                              + File.separatorChar);
-
-    }
-
-    @After
-    public void tearDown() {
-        //super.tearDown();
-    }
     
     @Test
     public void testEmbeddedSchema() throws Exception {

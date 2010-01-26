@@ -42,8 +42,6 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
         env.put(Bus.class, BusFactory.getDefaultBus());
     }
 

@@ -45,8 +45,9 @@ import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.util.ToolsStaxUtils;
 import org.junit.After;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.ComparisonFailure;
+import org.junit.Rule;
+import org.junit.rules.TemporaryFolder;
 
 public class ProcessorTestBase extends Assert {
 
@@ -56,21 +57,23 @@ public class ProcessorTestBase extends Assert {
                                                                                       "version"});
     public static final List<String> DEFAULT_IGNORE_TAG = Arrays.asList(new String[]{"sequence"});
 
-    protected ToolContext env = new ToolContext();
+    //CHECKSTYLE:OFF
+    @Rule
+    public TemporaryFolder tmpDir = new TemporaryFolder() {
+        protected void before() throws Throwable {
+            super.before();
+            output = tmpDir.getRoot();
+            env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        }
+    };
+    //CHECKSTYLE:ON
+    
     protected File output;
+    protected ToolContext env = new ToolContext();
 
-    @Before
-    public void setUp() throws Exception {
-        URL url = getClass().getResource(".");
-        output = new File(url.toURI());
-        output = new File(output, "/generated");
-        FileUtils.mkDir(output);
-    }
 
     @After
     public void tearDown() {
-        FileUtils.removeDir(output);
-        output = null;
         env = null;
     }
 

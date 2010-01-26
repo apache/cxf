@@ -39,7 +39,6 @@ public class FaultBeanGeneratorTest extends ProcessorTestBase {
     String classPath = "";
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         classPath = System.getProperty("java.class.path");
         System.setProperty("java.class.path", getClassPath());
         processor.setEnvironment(env);

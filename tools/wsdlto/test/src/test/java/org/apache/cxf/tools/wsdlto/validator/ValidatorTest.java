@@ -34,11 +34,9 @@ public class ValidatorTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         env.put(ToolConstants.CFG_VERBOSE, ToolConstants.CFG_VERBOSE);
         env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
         env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());        
     }
     
     @Test

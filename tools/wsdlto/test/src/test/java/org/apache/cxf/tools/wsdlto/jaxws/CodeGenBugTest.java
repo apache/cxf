@@ -44,8 +44,10 @@ import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
 import org.apache.cxf.wsdl11.WSDLRuntimeException;
 
 import org.junit.Test;
+
 import org.mortbay.jetty.Server;
 import org.mortbay.jetty.handler.ResourceHandler;
+
 
 public class CodeGenBugTest extends AbstractCodeGenTest {
     

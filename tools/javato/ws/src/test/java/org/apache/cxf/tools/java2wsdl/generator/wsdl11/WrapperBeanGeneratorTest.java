@@ -22,6 +22,8 @@ package org.apache.cxf.tools.java2wsdl.generator.wsdl11;
 import java.io.File;
 import java.io.FileInputStream;
 import java.lang.reflect.Field;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import javax.xml.bind.annotation.XmlList;
 
@@ -30,33 +32,33 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.java2wsdl.processor.JavaToWSDLProcessor;
-import org.apache.cxf.tools.util.AnnotationUtil;
-import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExternalResource;
 
 public class WrapperBeanGeneratorTest extends ProcessorTestBase {
     JavaToWSDLProcessor processor = new JavaToWSDLProcessor();
-    String classPath = "";
     ClassLoader classLoader;
 
+    //CHECKSTYLE:OFF
+    @Rule 
+    public ExternalResource envRule = new ExternalResource() {
+        protected void before() throws Throwable {
+            System.setProperty("java.class.path", getClassPath() + tmpDir.getRoot().getCanonicalPath()
+                                                  + File.separatorChar);
+            classLoader = new URLClassLoader(new URL[] {tmpDir.getRoot().toURI().toURL()},
+                                             Thread.currentThread().getContextClassLoader());
+        }
+    };
+    //CHECKSTYLE:ON
+    
+    
     @Before
     public void setUp() throws Exception {
-        super.setUp();        
-        classPath = System.getProperty("java.class.path");
-        String pathSeparator = System.getProperty("path.separator");
-        System.setProperty("java.class.path", getClassPath() + pathSeparator + output.getPath());
-        classLoader = AnnotationUtil.getClassLoader(Thread.currentThread().getContextClassLoader());
         processor.setEnvironment(env);
-        
     }
 
-    @After
-    public void tearDown() {
-        super.tearDown();
-        System.setProperty("java.class.path", classPath);
-    }
-    
     private ServiceInfo getServiceInfo() {
         return processor.getServiceBuilder().createService();
     }
