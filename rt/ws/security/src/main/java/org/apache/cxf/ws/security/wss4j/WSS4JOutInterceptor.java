@@ -35,16 +35,27 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityException;
+import org.apache.ws.security.action.Action;
 import org.apache.ws.security.handler.RequestData;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.util.WSSecurityUtil;
 
 public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
+    
+    /**
+     * Property name for a map of action IDs ({@link Integer}) to action
+     * class names.  Values can be either {@link String}) or Objects
+     * implementing {@link Action}.  
+     */
+    public static final String WSS4J_ACTION_MAP = "wss4j.action.map";
+    
     private static final Logger LOG = LogUtils
             .getL7dLogger(WSS4JOutInterceptor.class);
 
@@ -52,6 +63,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             .getL7dLogger(WSS4JOutInterceptor.class,
                           null,
                           WSS4JOutInterceptor.class.getName() + "-Time");
+        
     private WSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();
     private boolean mtomEnabled;
@@ -152,6 +164,15 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
              * housekeeping.
              */
             try {
+                WSSConfig config = WSSConfig.getNewInstance();
+                reqData.setWssConfig(config);
+                
+                /*
+                 * Setup any custom actions first by processing the input properties
+                 * and reconfiguring the WSSConfig with the user defined properties.
+                 */
+                this.configureActions(mc, doDebug, version, config);
+                
                 /*
                  * Get the action first.
                  */
@@ -162,7 +183,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                             .getReceiver());
                 }
     
-                int doAction = WSSecurityUtil.decodeAction(action, actions);
+                int doAction = WSSecurityUtil.decodeAction(action, actions, config);
                 if (doAction == WSConstants.NO_SECURITY) {
                     return;
                 }
@@ -274,6 +295,49 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
 
         public void handleFault(SoapMessage message) {
             //nothing
+        }
+        
+        private void configureActions(SoapMessage mc, boolean doDebug,
+                SoapVersion version, WSSConfig config) {
+            
+            final Map<Integer, Object> actionMap = CastUtils.cast(
+                (Map<?, ?>)getProperty(mc, WSS4J_ACTION_MAP));
+            if (actionMap != null) {
+                for (Map.Entry<Integer, Object> entry : actionMap.entrySet()) {
+                    String removedAction = null;
+                    
+                    // Be defensive here since the cast above is slightly risky
+                    // with the handler config options not being strongly typed.
+                    try {
+                        if (entry.getValue() instanceof String) {
+                            removedAction = config.setAction(
+                                    entry.getKey().intValue(),
+                                    (String) entry.getValue());
+                        } else if (entry.getValue() instanceof Action) {
+                            removedAction = config.setAction(
+                                    entry.getKey().intValue(),
+                                    (Action) entry.getValue());
+                        } else {
+                            throw new SoapFault(new Message("BAD_ACTION", LOG), version
+                                    .getReceiver());
+                        }
+                    } catch (ClassCastException e) {
+                        throw new SoapFault(new Message("BAD_ACTION", LOG), version
+                                .getReceiver());
+                    }
+                    
+                    if (doDebug) {
+                        if (removedAction != null) {
+                            LOG.fine("Replaced Action: " + removedAction
+                                    + " with Action: " + entry.getValue()
+                                    + " for ID: " + entry.getKey());
+                        } else {
+                            LOG.fine("Added Action: " + entry.getValue()
+                                    + " with ID: " + entry.getKey());
+                        }
+                    }
+                }
+            }
         }
     }
 }
