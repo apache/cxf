@@ -81,12 +81,12 @@ public class BeanGenerator extends AbstractGenerator<File> {
         
                 //compile the classes
             Compiler compiler = new Compiler();
-
+            compiler.setOutputDir(compileToDir);
             List<String> files = new ArrayList<String>(generatedFiles.size());
             for (File file : generatedFiles) {
                 files.add(file.getAbsolutePath());
             }
-            if (!compiler.compileFiles(files.toArray(new String[files.size()]), compileToDir)) {
+            if (!compiler.compileFiles(files.toArray(new String[files.size()]))) {
                 // TODO - compile issue
             }
 

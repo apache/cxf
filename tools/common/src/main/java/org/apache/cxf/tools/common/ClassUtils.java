@@ -39,41 +39,27 @@ public class ClassUtils {
     
     protected static final Logger LOG = LogUtils.getL7dLogger(ClassUtils.class);
     
-    public void compile(ToolContext context) throws ToolException {        
-        List<String> argList = new ArrayList<String>();
+    public void compile(ToolContext context) throws ToolException {
+        Compiler compiler = new Compiler();
         
-        //fix for CXF-2081, set maximum heap of current VM to javac.
-        argList.add("-J-Xmx" + Runtime.getRuntime().maxMemory());
-
-        String javaClasspath = System.getProperty("java.class.path");
-        // hard code cxf.jar
-        boolean classpathSetted = javaClasspath != null ? true : false;
-        // && (javaClasspath.indexOf("cxf.jar") >= 0);
         if (context.isVerbose()) {
-            argList.add("-verbose");
-        }
-
-        if ("1.5".equals(System.getProperty("java.specification.version"))) {
-            argList.add("-target");
-            argList.add("1.5");
+            compiler.setVerbose(true);
         }
         
-        if (context.get(ToolConstants.CFG_CLASSDIR) != null) {
-            argList.add("-d");
-            String classDir = (String)context.get(ToolConstants.CFG_CLASSDIR);
-            argList.add(classDir.replace(File.pathSeparatorChar, '/'));
+        if ("1.5".equals(System.getProperty("java.specification.version"))) {
+            compiler.setTarget("1.5");
         }
-
-        if (!classpathSetted) {
-            argList.add("-extdirs");
-            argList.add(getClass().getClassLoader().getResource(".").getFile() + "../lib/");
-        } else {
-            argList.add("-classpath");
+        if (context.get(ToolConstants.CFG_CLASSDIR) != null) {
+            compiler.setOutputDir((String)context.get(ToolConstants.CFG_CLASSDIR));
+        }
+        
+        String javaClasspath = System.getProperty("java.class.path");
+        if (javaClasspath != null) {
             if (context.get(ToolConstants.CFG_OUTPUTDIR) != null) { 
-                argList.add(javaClasspath + File.pathSeparatorChar 
+                compiler.setClassPath(javaClasspath + File.pathSeparatorChar 
                             + context.get(ToolConstants.CFG_OUTPUTDIR));
             } else {
-                argList.add(javaClasspath);
+                compiler.setClassPath(javaClasspath);
             }
         }
 
@@ -123,30 +109,8 @@ public class ClassUtils {
             }
 
         }
-        //Jaxb's bug . Jaxb ClassNameCollecotr may not be invoked when generated class is an enum.
-        //So we need recheck whether we add all generated source files to  fileList
-        
-        String[] arguments = new String[argList.size() + fileList.size() + 1];
-        arguments[0] = "javac";
-        
-        int i = 1;
-        
-        for (Object obj : argList.toArray()) {
-            String arg = (String)obj;
-            arguments[i] = arg;
-            i++;
-        }
-        
-        int srcFileIndex = i; 
-        for (Object o : fileList.toArray()) {
-            String file = (String)o;
-            arguments[i] = file;
-            i++;
-        }
 
-        Compiler compiler = new Compiler();
-
-        if (!compiler.internalCompile(arguments, srcFileIndex)) {
+        if (!compiler.compileFiles(fileList.toArray(new String[fileList.size()]))) {
             Message msg = new Message("FAIL_TO_COMPILE_GENERATE_CODES", LOG);
             throw new ToolException(msg);
         }        

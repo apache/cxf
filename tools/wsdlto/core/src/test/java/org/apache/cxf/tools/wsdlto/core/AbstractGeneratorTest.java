@@ -25,7 +25,6 @@ import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.util.FileWriterUtil;
-import org.junit.Before;
 import org.junit.Test;
 
 public class AbstractGeneratorTest extends ProcessorTestBase {
@@ -37,10 +36,8 @@ public class AbstractGeneratorTest extends ProcessorTestBase {
     String packageName = "org.apache";
     String className = "Hello";
 
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-
+    @Test
+    public void testKeep() throws Exception {
         gen = new DummyGenerator();
         util = new FileWriterUtil(output.toString());
 
@@ -52,16 +49,26 @@ public class AbstractGeneratorTest extends ProcessorTestBase {
         writer.write("hello world");
         writer.flush();
         writer.close();
-    }
 
-    @Test
-    public void testKeep() throws Exception {
         context.put(ToolConstants.CFG_GEN_NEW_ONLY, "keep");
         assertNull(gen.parseOutputName(packageName, className));
     }
 
     @Test
     public void testOverwrite() throws Exception {
+        gen = new DummyGenerator();
+        util = new FileWriterUtil(output.toString());
+
+        context = new ToolContext();
+        context.put(ToolConstants.CFG_OUTPUTDIR, output.toString());
+
+        gen.setEnvironment(context);
+
+        Writer writer = util.getWriter(packageName, className + ".java");
+        writer.write("hello world");
+        writer.flush();
+        writer.close();
+
         assertNotNull(gen.parseOutputName(packageName, className));
     }
 }

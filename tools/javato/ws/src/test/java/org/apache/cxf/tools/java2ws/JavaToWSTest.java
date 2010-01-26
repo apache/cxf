@@ -116,7 +116,8 @@ public class JavaToWSTest extends ToolTestBase {
         String[] files = new String[]{client.getAbsoluteFile().toString(),
                                      server.getAbsoluteFile().toString(),
                                      impl.getAbsoluteFile().toString()};
-        compiler.compileFiles(files, this.classDir);
+        compiler.setOutputDir(this.classDir);
+        compiler.compileFiles(files);
     }
 
     @Test
@@ -150,7 +151,8 @@ public class JavaToWSTest extends ToolTestBase {
         String[] files = new String[]{client.getAbsoluteFile().toString(),
                                      server.getAbsoluteFile().toString(),
                                      impl.getAbsoluteFile().toString()};
-        compiler.compileFiles(files, this.classDir);
+        compiler.setOutputDir(this.classDir);
+        compiler.compileFiles(files);
 
 
     }

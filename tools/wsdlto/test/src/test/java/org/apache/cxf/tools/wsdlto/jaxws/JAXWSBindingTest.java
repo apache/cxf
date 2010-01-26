@@ -37,11 +37,8 @@ public class JAXWSBindingTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-
-        super.setUp();
         env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
         env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
 
         processor = new JAXWSContainer(null);
     }

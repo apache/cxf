@@ -19,47 +19,53 @@
 package org.apache.cxf.tools.wsdlto;
 
 import java.io.File;
+import java.net.URL;
+import java.net.URLClassLoader;
 
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
-import org.apache.cxf.tools.util.AnnotationUtil;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
 import org.apache.cxf.tools.wsdlto.core.FrontEndProfile;
 import org.apache.cxf.tools.wsdlto.core.PluginLoader;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.JAXWSContainer;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
+import org.junit.rules.ExternalResource;
 
 public abstract class AbstractCodeGenTest extends ProcessorTestBase {
 
+    //CHECKSTYLE:OFF
+    @Rule 
+    public ExternalResource envRule = new ExternalResource() {
+        protected void before() throws Throwable {
+            File classFile = tmpDir.newFolder("classes");
+            classFile.mkdir();
+            classLoader = new URLClassLoader(new URL[] {classFile.toURI().toURL()},
+                                             Thread.currentThread().getContextClassLoader());
+            env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
+            env.put(ToolConstants.CFG_CLASSDIR, classFile.toString());
+            env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
+            env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
+            env.put(ToolConstants.CFG_IMPL, "impl");
+            env.put(ToolConstants.CFG_OUTPUTDIR, tmpDir.getRoot().toString());
+            env.put(ToolConstants.CFG_SUPPRESS_WARNINGS, true);
+        }
+    };
+    //CHECKSTYLE:ON
+    
+    
     protected JAXWSContainer processor;
     protected ClassLoader classLoader;
-    protected String origCP;
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
-        File classFile = new java.io.File(output.getCanonicalPath() + "/classes");
-        classFile.mkdir();
-        origCP = System.getProperty("java.class.path");
-        System.setProperty("java.class.path", getClassPath() + classFile.getCanonicalPath()
-                                              + File.separatorChar);
-        classLoader = AnnotationUtil.getClassLoader(Thread.currentThread().getContextClassLoader());
-        env.put(ToolConstants.CFG_COMPILE, ToolConstants.CFG_COMPILE);
-        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
-        env.put(FrontEndProfile.class, PluginLoader.getInstance().getFrontEndProfile("jaxws"));
-        env.put(DataBindingProfile.class, PluginLoader.getInstance().getDataBindingProfile("jaxb"));
-        env.put(ToolConstants.CFG_IMPL, "impl");
-        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
-        env.put(ToolConstants.CFG_SUPPRESS_WARNINGS, true);
-    
         processor = new JAXWSContainer(null);
     
     }
 
     @After
     public void tearDown() {
-        System.setProperty("java.class.path", origCP);
         processor = null;
         env = null;
         super.tearDown();

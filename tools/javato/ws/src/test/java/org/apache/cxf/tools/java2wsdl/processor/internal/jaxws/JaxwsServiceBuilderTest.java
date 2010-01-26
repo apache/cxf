@@ -49,7 +49,6 @@ public class JaxwsServiceBuilderTest extends ProcessorTestBase {
 
     @Before
     public void setUp() throws Exception {
-        super.setUp();
         JAXBDataBinding.clearCaches();
         builder = new JaxwsServiceBuilder();
         builder.setBus(BusFactory.getDefaultBus());
