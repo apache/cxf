@@ -22,8 +22,11 @@ package org.apache.cxf.ws.addressing;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
@@ -38,16 +41,19 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.phase.PhaseManagerImpl;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.OperationInfo;
@@ -292,6 +298,7 @@ public class MAPAggregatorTest extends Assert {
                                                       true,
                                                       false,
                                                       true});
+        
         aggregator.mediate(message, true);
         control.verify();
         verifyMessage(message, false, true, true);
@@ -405,7 +412,7 @@ public class MAPAggregatorTest extends Assert {
         
         Message message = getMessage();        
         Exchange exchange = getExchange();
-        setUpOutbound(message, exchange, outbound);
+        setUpOutbound(message, exchange, outbound, fault);
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.valueOf(requestor));
@@ -574,7 +581,14 @@ public class MAPAggregatorTest extends Assert {
                 setUpMessageProperty(message,
                                      REQUESTOR_ROLE,
                                      Boolean.FALSE);
-                expectedAction = "http://foo/bar/SEI/opResponse";
+                
+                if (fault) {
+                    message.setContent(Exception.class, new SoapFault("blah",
+                            (Throwable) new Exception(), Fault.FAULT_CODE_SERVER));
+                    expectedAction = "http://foo/bar/SEI/Fault/Exception";
+                } else {
+                    expectedAction = "http://foo/bar/SEI/opResponse";
+                }
             }
             setUpMessageProperty(message,
                                  REQUESTOR_ROLE,
@@ -631,9 +645,9 @@ public class MAPAggregatorTest extends Assert {
         setUpExchangeOneway(exchange, oneway);
     }
 
-    private void setUpOutbound(Message message, Exchange exchange, boolean outbound) {
+    private void setUpOutbound(Message message, Exchange exchange, boolean outbound, boolean fault) {
         setUpMessageExchange(message, exchange);
-        setUpExchangeOutbound(exchange, message, outbound);
+        setUpExchangeOutbound(exchange, message, outbound, fault);
     }
 
     private void setUpConduit(Message message, Exchange exchange) {
@@ -657,6 +671,10 @@ public class MAPAggregatorTest extends Assert {
                         opInfo.createMessage(new QName("http://foo/bar", "opRequest"), Type.INPUT));
         opInfo.setOutput("opResponse",
                          opInfo.createMessage(new QName("http://foo/bar", "opResponse"), Type.INPUT));
+        FaultInfo finfo = opInfo.addFault(new QName("http://foo/bar", "opFault"),
+                new QName("http://foo/bar", "opFault"));
+        finfo.addMessagePart("fault");
+        
         BindingOperationInfo bindingOpInfo = new TestBindingOperationInfo(opInfo);
         setUpExchangeGet(exchange, BindingOperationInfo.class, bindingOpInfo);
         // Usual fun with EasyMock not always working as expected
@@ -718,8 +736,13 @@ public class MAPAggregatorTest extends Assert {
 
     private void setUpExchangeOutbound(Exchange exchange,
                                        Message message,
-                                       boolean outbound) {
-        exchange.getOutMessage();
+                                       boolean outbound,
+                                       boolean fault) {
+        if (fault) {
+            exchange.getOutFaultMessage();
+        } else {
+            exchange.getOutMessage();
+        }
         EasyMock.expectLastCall().andReturn(outbound ? message : null).anyTimes();
         //exchange.setOutMessage(outbound ? message : new MessageImpl());
     }
@@ -797,8 +820,18 @@ public class MAPAggregatorTest extends Assert {
     }
 
     private static class TestBindingOperationInfo extends BindingOperationInfo {
+        private Map<QName, BindingFaultInfo> faults;
+        
         public TestBindingOperationInfo(OperationInfo oi) {
             opInfo = oi;
+            
+            Collection<FaultInfo> of = opInfo.getFaults();
+            if (of != null && !of.isEmpty()) {
+                faults = new ConcurrentHashMap<QName, BindingFaultInfo>(of.size());
+                for (FaultInfo fault : of) {
+                    faults.put(fault.getFaultName(), new BindingFaultInfo(fault, this));
+                }
+            }
         }
 
         public BindingMessageInfo getInput() {
@@ -808,5 +841,10 @@ public class MAPAggregatorTest extends Assert {
         public BindingMessageInfo getOutput() {
             return new TestBindingMessageInfo();
         }
+
+        @Override
+        public Collection<BindingFaultInfo> getFaults() {
+            return Collections.unmodifiableCollection(this.faults.values());
+        }        
     }
 }
