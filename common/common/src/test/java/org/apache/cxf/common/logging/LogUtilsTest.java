@@ -34,16 +34,15 @@ import org.junit.Test;
 
 
 public class LogUtilsTest extends Assert {
-    private static final Logger LOG = LogUtils.getL7dLogger(LogUtilsTest.class);
-
 
     @Test
     public void testGetL7dLog() throws Exception {
-        assertNotNull("expected non-null logger", LOG);
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testGetL7dLog");
+        assertNotNull("expected non-null logger", log);
         assertEquals("unexpected resource bundle name",
                      BundleUtils.getBundleName(LogUtilsTest.class),
-                     LOG.getResourceBundleName());
-        Logger otherLogger = LogUtils.getL7dLogger(LogUtilsTest.class, "Messages");
+                     log.getResourceBundleName());
+        Logger otherLogger = LogUtils.getL7dLogger(LogUtilsTest.class, "Messages", "testGetL7dLog");
         assertEquals("unexpected resource bundle name",
                      BundleUtils.getBundleName(LogUtilsTest.class, "Messages"),
                      otherLogger.getResourceBundleName());
@@ -51,97 +50,109 @@ public class LogUtilsTest extends Assert {
 
     @Test
     public void testHandleL7dMessage() throws Exception {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testHandleL7dMessage");
         Handler handler = EasyMock.createNiceMock(Handler.class);
-        LOG.addHandler(handler);
+        log.addHandler(handler);
         // handler called *before* localization of message
         LogRecord record = new LogRecord(Level.WARNING, "FOOBAR_MSG");
-        record.setResourceBundle(LOG.getResourceBundle());
+        record.setResourceBundle(log.getResourceBundle());
         EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
         EasyMock.replay(handler);
-        LOG.log(Level.WARNING, "FOOBAR_MSG");
+        log.log(Level.WARNING, "FOOBAR_MSG");
         EasyMock.verify(handler);
-        LOG.removeHandler(handler);
+        log.removeHandler(handler);
     }
     
     @Test
     public void testLogNoParamsOrThrowable() {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsOrThrowable");
         Handler handler = EasyMock.createNiceMock(Handler.class);
-        LOG.addHandler(handler);
+        log.addHandler(handler);
         // handler called *after* localization of message
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in {0} only");
         EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
         EasyMock.replay(handler);
-        LogUtils.log(LOG, Level.SEVERE, "SUB1_MSG");
+        LogUtils.log(log, Level.SEVERE, "SUB1_MSG");
         EasyMock.verify(handler);
-        LOG.removeHandler(handler);
+        log.removeHandler(handler);
     }
     
     @Test
     public void testLogNoParamsWithThrowable() {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogNoParamsWithThrowable");
         Handler handler = EasyMock.createNiceMock(Handler.class);
-        LOG.addHandler(handler);
-        // handler called *after* localization of message
         Exception ex = new Exception("x");
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in {0} only");
         record.setThrown(ex);
         EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
         EasyMock.replay(handler);
-        LogUtils.log(LOG, Level.SEVERE, "SUB1_MSG", ex);
-        EasyMock.verify(handler);
-        LOG.removeHandler(handler);
+        synchronized (log) {
+            log.addHandler(handler);
+            // handler called *after* localization of message
+            LogUtils.log(log, Level.SEVERE, "SUB1_MSG", ex);
+            EasyMock.verify(handler);
+            log.removeHandler(handler);
+        }
     }
 
     @Test
     public void testLogParamSubstitutionWithThrowable() throws Exception {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testLogParamSubstitutionWithThrowable");
         Handler handler = EasyMock.createNiceMock(Handler.class);
-        LOG.addHandler(handler);
-        // handler called *after* localization of message
         Exception ex = new Exception();
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in 1 only");
         record.setThrown(ex);
         EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
         EasyMock.replay(handler);
-        LogUtils.log(LOG, Level.SEVERE, "SUB1_MSG", ex, 1);
-        EasyMock.verify(handler);
-        LOG.removeHandler(handler);
+        synchronized (log) {
+            log.addHandler(handler);
+            LogUtils.log(log, Level.SEVERE, "SUB1_MSG", ex, 1);
+            EasyMock.verify(handler);
+            log.removeHandler(handler);
+        }
     }
 
     @Test
     public void testLogParamsSubstitutionWithThrowable() throws Exception {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null,
+                                           "testLogParamsSubstitutionWithThrowable");
         Handler handler = EasyMock.createNiceMock(Handler.class);
-        LOG.addHandler(handler);
-        // handler called *after* localization of message
         Exception ex = new Exception();
         LogRecord record = new LogRecord(Level.SEVERE, "subbed in 4 & 3");
         record.setThrown(ex);
         EasyMock.reportMatcher(new LogRecordMatcher(record));
         handler.publish(record);
         EasyMock.replay(handler);
-        LogUtils.log(LOG, Level.SEVERE, "SUB2_MSG", ex, new Object[] {3, 4});
-        EasyMock.verify(handler);
-        LOG.removeHandler(handler);
+        synchronized (log) {
+            log.addHandler(handler);
+            LogUtils.log(log, Level.SEVERE, "SUB2_MSG", ex, new Object[] {3, 4});
+            EasyMock.verify(handler);
+            log.removeHandler(handler);
+        }
     }
     @Test
     public void testCXF1420() throws Exception {
-        LogUtils.log(LOG, Level.SEVERE, "SQLException for SQL [{call FOO.ping(?, ?)}]");
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testCXF1420");
+        LogUtils.log(log, Level.SEVERE, "SQLException for SQL [{call FOO.ping(?, ?)}]");
     }    
     @Test
     public void testClassMethodNames() throws Exception {
+        Logger log = LogUtils.getL7dLogger(LogUtilsTest.class, null, "testClassMethodNames");
         TestLogHandler handler = new TestLogHandler();
-        LOG.addHandler(handler);
+        log.addHandler(handler);
 
         // logger called directly
-        LOG.warning("hello");
+        log.warning("hello");
         
         String cname = handler.cname;
         String mname = handler.mname;
         
         // logger called through LogUtils
-        LogUtils.log(LOG, Level.WARNING,  "FOOBAR_MSG");
+        LogUtils.log(log, Level.WARNING,  "FOOBAR_MSG");
         
         assertEquals(cname, handler.cname);
         assertEquals(mname, handler.mname);
