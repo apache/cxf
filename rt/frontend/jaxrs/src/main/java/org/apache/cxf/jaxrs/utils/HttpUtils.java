@@ -38,6 +38,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
 import org.apache.cxf.common.util.UrlUtils;
+import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.message.Message;
@@ -146,18 +147,25 @@ public final class HttpUtils {
     }
     
     public static String getPathToMatch(Message m, boolean addSlash) {
-        String requestAddress = (String)m.get(Message.REQUEST_URI);
+        String requestAddress = getProtocolHeader(m, Message.REQUEST_URI, "/");
         String baseAddress = getBaseAddress(m);
         return getPathToMatch(requestAddress, baseAddress, addSlash);
     }
     
+    public static String getProtocolHeader(Message m, String name, String defaultValue) {
+        String value = (String)m.get(name);
+        if (value == null) {
+            value = new HttpHeadersImpl(m).getRequestHeaders().getFirst(name);
+        }
+        return value == null ? defaultValue : value;
+    }
     
     public static String getBaseAddress(Message m) {
+        String endpointAddress = getEndpointAddress(m);
         try {
-            String endpointAddress = getEndpointAddress(m);
             return new URL(endpointAddress).getPath();
         } catch (MalformedURLException ex) {
-            return (String)m.get(Message.BASE_PATH);
+            return endpointAddress == null ? "/" : endpointAddress;
         }
     }
     
