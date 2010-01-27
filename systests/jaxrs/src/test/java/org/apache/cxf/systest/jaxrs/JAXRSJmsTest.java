@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -87,7 +88,8 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             MessageConsumer consumer = session.createConsumer(replyToDestination);
             Message jmsMessage = consumer.receive(3000);
             org.apache.cxf.message.Message cxfMessage = new org.apache.cxf.message.MessageImpl();
-            JMSUtils.retrieveAndSetPayload(cxfMessage, jmsMessage, null);
+            byte[] bytes = JMSUtils.retrievePayload(jmsMessage, null);
+            cxfMessage.setContent(InputStream.class, new ByteArrayInputStream(bytes));
             Book b = readBook(cxfMessage.getContent(InputStream.class));
             assertEquals(124L, b.getId());
             assertEquals("JMS", b.getName());
