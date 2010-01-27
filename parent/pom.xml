@@ -39,8 +39,6 @@
         <surefire.parallel.mode/>
         <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
         <server.launcher.vmargs>-ea</server.launcher.vmargs>
-        <surefire.extra.sysprop.name1>None</surefire.extra.sysprop.name1>
-        <surefire.extra.sysprop.value1>None</surefire.extra.sysprop.value1>
         <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
         <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
         <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
@@ -72,9 +70,6 @@
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
 
         <downloadSources>true</downloadSources>
-
-        <extra.surefire.syspropery.name>None</extra.surefire.syspropery.name>
-        <extra.surefire.syspropery.value>None</extra.surefire.syspropery.value>
 
         <resources.base.path />
 
@@ -267,52 +262,19 @@
                         <childDelegation>false</childDelegation>
                         <argLine>${surefire.fork.vmargs}</argLine>
                         <parallel>${surefire.parallel.mode}</parallel>
-                        <systemProperties>
-                            <property>
-                                <name>${surefire.extra.sysprop.name1}</name>
-                                <name>${surefire.extra.sysprop.value1}</name>
-                            </property>
-                            <property>
-                                <name>cxf.validateServiceSchemas</name>
-                                <value>${cxf.validateServices}</value>
-                            </property>
-                            <property>
-                                <name>java.awt.headless</name>
-                                <value>${java.awt.headless}</value>
-                            </property>
-                            <property>
-                                <name>java.util.logging.config.file</name>
-                                <value>${basedir}/target/test-classes/logging.properties</value>
-                            </property>
-                            <property>
-                                <name>activemq.store.dir</name>
-                                <value>${basedir}/target/ActiveMQ</value>
-                            </property>
-                            <property>
-                                <name>derby.system.home</name>
-                                <value>${basedir}/target/derby</value>
-                            </property>
-                            <property>
-                                <name>spring.validation.mode</name>
-                                <value>${spring.validation.mode}</value>
-                            </property>
-                            <property>
-                                <name>server.launcher.vmargs</name>
-                                <value>${server.launcher.vmargs}</value>
-                            </property>
-                            <property>
-                                <name>${extra.surefire.syspropery.name}</name>
-                                <value>${extra.surefire.syspropery.value}</value>
-                            </property>
-    
-                            <property>
+                        <systemPropertyVariables>
+                                <cxf.validateServiceSchemas>${cxf.validateServices}</cxf.validateServiceSchemas>
+                                <java.awt.headless>${java.awt.headless}</java.awt.headless>
+                                <java.util.logging.config.file>${basedir}/target/test-classes/logging.properties</java.util.logging.config.file>
+                                <activemq.store.dir>${basedir}/target/ActiveMQ</activemq.store.dir>
+                                <derby.system.home>${basedir}/target/derby</derby.system.home>
+                                <spring.validation.mode>${spring.validation.mode}</spring.validation.mode>
+                                <server.launcher.vmargs>${server.launcher.vmargs}</server.launcher.vmargs>
                                 <!-- If we close the port after a client in the same JVM has opened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until
                                 some timeout occurs.   That may cause some tests to timeout/hang. -->
-                                <name>org.apache.cxf.transports.http_jetty.DontClosePort</name>
-                                <value>false</value>
-                            </property>
-                        </systemProperties>
+                                <org.apache.cxf.transports.http_jetty.DontClosePort>false</org.apache.cxf.transports.http_jetty.DontClosePort>
+                        </systemPropertyVariables>
                     </configuration>
                 </plugin>
             </plugins>
@@ -1336,22 +1298,6 @@
                     <artifactId>xalan</artifactId>
                 </dependency>
             </dependencies>
-            <properties>
-                <!--
-                The default xalan TransformerFactory on the
-                ibm jdk seems to be 
-                org.apache.xalan.processor.TransformerFactoryImpl
-                which seems to have an issue causing it to
-                add things like duplicate default namespace
-                declarations.  woodstox doesn't like that.
-                So set this property to use the xsltc
-                TransformerFactory which behaves better with
-                woodstox (and which the sun jdk seems to
-                default to).
-                -->
-                <surefire.extra.sysprop.name1>javax.xml.transform.TransformerFactory</surefire.extra.sysprop.name1>
-                <surefire.extra.sysprop.value1>org.apache.xalan.xsltc.trax.TransformerFactoryImpl</surefire.extra.sysprop.value1>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
