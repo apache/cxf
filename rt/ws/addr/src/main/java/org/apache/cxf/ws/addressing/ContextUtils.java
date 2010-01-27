@@ -34,6 +34,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.NullConduitSelector;
@@ -744,6 +745,7 @@ public final class ContextUtils {
                         SoapOperationInfo soi = 
                             bindingOpInfo.getExtensor(SoapOperationInfo.class);
                         action = soi == null ? null : soi.getAction();
+                        action = StringUtils.isEmpty(action) ? null : action; 
                     }
                 }
             } else {
