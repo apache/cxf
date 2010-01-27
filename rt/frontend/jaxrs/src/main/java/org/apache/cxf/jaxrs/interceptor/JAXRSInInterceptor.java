@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
@@ -125,7 +126,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         Service service = message.getExchange().get(Service.class);
         List<ClassResourceInfo> resources = ((JAXRSServiceImpl)service).getClassResourceInfos();
 
-        String acceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+        String acceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, null);
         if (acceptTypes == null) {
             acceptTypes = "*/*";
             message.put(Message.ACCEPT_CONTENT_TYPE, acceptTypes);
@@ -150,13 +151,13 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         message.getExchange().put(JAXRSUtils.ROOT_RESOURCE_CLASS, resource);
 
-        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        String httpMethod = HttpUtils.getProtocolHeader(message, Message.HTTP_REQUEST_METHOD, "POST");
         OperationResourceInfo ori = null;     
         
         boolean operChecked = false;
         List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(message).getRequestHandlers();
         for (ProviderInfo<RequestHandler> sh : shs) {
-            String newAcceptTypes = (String)message.get(Message.ACCEPT_CONTENT_TYPE);
+            String newAcceptTypes = HttpUtils.getProtocolHeader(message, Message.ACCEPT_CONTENT_TYPE, "*/*");
             if (!acceptTypes.equals(newAcceptTypes) || (ori == null && !operChecked)) {
                 acceptTypes = newAcceptTypes;
                 acceptContentTypes = JAXRSUtils.sortMediaTypes(newAcceptTypes);
@@ -241,6 +242,9 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             plainOperationName = ori.getClassResourceInfo().getServiceClass().getSimpleName()
                 + "#" + plainOperationName;
         }
-        message.getExchange().put("org.apache.cxf.resource.operation.name", plainOperationName);    
+        message.getExchange().put("org.apache.cxf.resource.operation.name", plainOperationName);
+        
+        message.getExchange().setOneWay(
+            MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_MESSAGE, null)));
     }
 }

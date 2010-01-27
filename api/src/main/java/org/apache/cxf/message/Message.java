@@ -67,6 +67,7 @@ public interface Message extends StringMap {
      */
     String DECOUPLED_CHANNEL_MESSAGE = "decoupled.channel.message";
     String PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response";
+    String ONE_WAY_MESSAGE = "OnewayMessage";
     
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";

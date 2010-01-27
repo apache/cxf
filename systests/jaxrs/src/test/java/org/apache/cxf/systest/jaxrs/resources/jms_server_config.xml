@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+
+<beans 
+    xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:jms="http://cxf.apache.org/transports/jms"
+    xmlns:p="http://www.springframework.org/schema/p"
+    xmlns:jaxrs="http://cxf.apache.org/jaxrs"
+    xsi:schemaLocation="
+http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+http://cxf.apache.org/jaxrs
+http://cxf.apache.org/schemas/jaxrs.xsd">
+    
+  <import resource="classpath:META-INF/cxf/cxf.xml" />
+  <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />  
+  <import resource="classpath:META-INF/cxf/cxf-extension-jms.xml" />
+    
+  <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
+  	p:brokerURL="tcp://localhost:61500"/>
+  
+  <bean id="singleConnectionFactory"
+    class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
+    <property name="targetConnectionFactory" ref="jmsConnectionFactory"/>
+  </bean>
+    
+  <bean id="jmsConfig" class="org.apache.cxf.transport.jms.JMSConfiguration"
+    p:connectionFactory-ref="singleConnectionFactory" 
+    p:timeToLive="500000"
+    p:concurrentConsumers="1"
+    p:maxSuspendedContinuations="0"
+  	p:maxConcurrentConsumers="1"/>
+
+  <jms:destination name="{http://books.com}BookService.jms-destination">     
+      <jms:address jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+      <jms:jmsConfig-ref>jmsConfig</jms:jmsConfig-ref>  
+  </jms:destination>
+
+  <jaxrs:server xmlns:s="http://books.com" 
+                serviceName="s:BookService"
+                transportId="http://cxf.apache.org/transports/jms"
+		        address="/">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.BookStore" />
+    </jaxrs:serviceBeans>		
+  </jaxrs:server>
+
+</beans>
