@@ -19,12 +19,17 @@
 package org.apache.cxf.transport.https_jetty;
 
 
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.security.SecureRandom;
+import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManager;
 
@@ -129,6 +134,14 @@ public class CXFJettySslSocketConnector extends SslSocketConnector {
         
         setExcludeCipherSuites(cs);
         return con;
+    }
+    protected ServerSocket newServerSocket(String host, int port, int backlog) throws IOException {
+        ServerSocket sock = super.newServerSocket(host, port, backlog);
+        if (sock instanceof SSLServerSocket && LOG.isLoggable(Level.INFO)) {
+            SSLServerSocket sslSock = (SSLServerSocket)sock;
+            LOG.log(Level.INFO, "CIPHERSUITES_SET", Arrays.asList(sslSock.getEnabledCipherSuites()));
+        }
+        return sock;
     }
 
 }
