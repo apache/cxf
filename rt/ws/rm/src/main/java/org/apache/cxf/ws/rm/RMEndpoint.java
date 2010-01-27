@@ -53,6 +53,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.EndpointPolicy;
@@ -462,61 +463,62 @@ public class RMEndpoint {
             SoapBindingInfo bi = new SoapBindingInfo(si, bindingId, sv);
             bi.setName(BINDING_NAME);
             BindingOperationInfo boi = null;
-            SoapOperationInfo soi = null;
 
             boi = bi.buildOperation(RMConstants.getCreateSequenceOperationName(), RMConstants
                 .getCreateSequenceOperationName().getLocalPart(), null);
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getCreateSequenceAction());
-            boi.addExtensor(soi);
+            addAction(boi,
+                      RMConstants.getCreateSequenceAction(),
+                      RMConstants.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getTerminateSequenceOperationName(), RMConstants
                 .getTerminateSequenceOperationName().getLocalPart(), null);
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getTerminateSequenceAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getTerminateSequenceAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getSequenceAckOperationName(), null, null);
-            assert null != boi;
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getSequenceAckAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getSequenceAckAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getLastMessageOperationName(), null, null);
-            assert null != boi;
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getLastMessageAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getLastMessageAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getAckRequestedOperationName(), null, null);
-            assert null != boi;
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getAckRequestedAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getAckRequestedAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getCreateSequenceOnewayOperationName(), RMConstants
                 .getCreateSequenceOperationName().getLocalPart(), null);
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getCreateSequenceAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getCreateSequenceAction());
             bi.addOperation(boi);
 
             boi = bi.buildOperation(RMConstants.getCreateSequenceResponseOnewayOperationName(), RMConstants
                 .getCreateSequenceResponseOperationName().getLocalPart(), null);
-            soi = new SoapOperationInfo();
-            soi.setAction(RMConstants.getCreateSequenceResponseAction());
-            boi.addExtensor(soi);
+            addAction(boi, RMConstants.getCreateSequenceResponseAction());
             bi.addOperation(boi);
 
             si.addBinding(bi);
         }
 
         // TODO: BindingFaultInfo (SequenceFault)
+    }
+
+    private void addAction(BindingOperationInfo boi, String action) {
+        addAction(boi, action, action);
+    }
+    private void addAction(BindingOperationInfo boi, String action, String outputAction) {
+        SoapOperationInfo soi = new SoapOperationInfo();
+        soi.setAction(action);
+        boi.addExtensor(soi);
+
+        MessageInfo info = boi.getOperationInfo().getInput();
+        info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action);
+        
+        info = boi.getOperationInfo().getOutput();
+        if (info != null) {
+            info.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, outputAction);
+        }
     }
 
     Object getUsingAddressing(EndpointInfo endpointInfo) {
