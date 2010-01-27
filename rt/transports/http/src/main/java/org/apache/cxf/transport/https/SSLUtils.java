@@ -355,7 +355,7 @@ public final class SSLUtils {
                                            Logger log, boolean exclude) {
         String[] cipherSuites = null;
         if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
-            cipherSuites = getCiphersFromList(cipherSuitesList, log);
+            cipherSuites = getCiphersFromList(cipherSuitesList, log, exclude);
         } else {
             LogUtils.log(log, Level.INFO, "CIPHERSUITES_NOT_SET");
             if (filters == null) {
@@ -396,9 +396,9 @@ public final class SSLUtils {
                          "CIPHERSUITES_EXCLUDED",
                          excludedCipherSuites);
             if (exclude) {
-                cipherSuites = getCiphersFromList(excludedCipherSuites, log);
+                cipherSuites = getCiphersFromList(excludedCipherSuites, log, exclude);
             } else {
-                cipherSuites = getCiphersFromList(filteredCipherSuites, log);
+                cipherSuites = getCiphersFromList(filteredCipherSuites, log, exclude);
             }
         } 
         return cipherSuites;
@@ -435,19 +435,21 @@ public final class SSLUtils {
     }
     
     private static String[] getCiphersFromList(List<String> cipherSuitesList,
-                                               Logger log) {
+                                               Logger log, 
+                                               boolean exclude) {
         int numCipherSuites = cipherSuitesList.size();
-        String[] cipherSuites = new String[numCipherSuites];
-        String ciphsStr = null;
-        for (int i = 0; i < numCipherSuites; i++) {
-            cipherSuites[i] = cipherSuitesList.get(i);
-            if (ciphsStr == null) {
-                ciphsStr = cipherSuites[i];
-            } else {
-                ciphsStr += ", " + cipherSuites[i];
+        String[] cipherSuites = cipherSuitesList.toArray(new String[numCipherSuites]);
+        if (log.isLoggable(exclude ? Level.FINE : Level.INFO)) {
+            StringBuilder ciphsStr = new StringBuilder();
+            for (String s : cipherSuites) {
+                if (ciphsStr.length() != 0) {
+                    ciphsStr.append(", ");
+                }
+                ciphsStr.append(s);
             }
+            LogUtils.log(log, exclude ? Level.FINE : Level.INFO, 
+                exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());            
         }
-        LogUtils.log(log, Level.INFO, "CIPHERSUITES_SET", ciphsStr);
         return cipherSuites;
     }
     
