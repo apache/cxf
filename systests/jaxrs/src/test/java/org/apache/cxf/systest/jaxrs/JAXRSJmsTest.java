@@ -102,7 +102,6 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
                 }
                 
             }
-            System.out.println("Hanging...");
         }
         
     }
