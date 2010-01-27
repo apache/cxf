@@ -468,18 +468,6 @@ public final class StaxUtils {
 //        System.out.println("STAXUTILS:writeStartElement : node name : " + local +  " namespace URI" + uri);
         boolean writeElementNS = false;
         
-     // Write out the element name
-        if (uri != null) {
-            if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
-                writer.writeStartElement(local);
-            } else {
-                writer.writeStartElement(prefix, local, uri);
-            }
-        } else {
-            writer.writeStartElement(local);
-        }
-
-        
         if (uri != null) {
             writeElementNS = true;
             Iterator<String> it = CastUtils.cast(writer.getNamespaceContext().getPrefixes(uri));
@@ -492,6 +480,17 @@ public final class StaxUtils {
                     writeElementNS = false;
                 }
             }
+        }
+        
+        // Write out the element name
+        if (uri != null) {
+            if (prefix.length() == 0 && StringUtils.isEmpty(uri)) {
+                writer.writeStartElement(local);
+            } else {
+                writer.writeStartElement(prefix, local, uri);
+            }
+        } else {
+            writer.writeStartElement(local);
         }
 
         // Write out the namespaces
