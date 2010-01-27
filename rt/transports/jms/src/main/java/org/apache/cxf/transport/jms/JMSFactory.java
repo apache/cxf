@@ -19,6 +19,7 @@
 package org.apache.cxf.transport.jms;
 
 import java.lang.reflect.Method;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.jms.ConnectionFactory;
@@ -32,6 +33,7 @@ import javax.naming.NamingException;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
@@ -234,6 +236,7 @@ public final class JMSFactory {
             jmsListener.setDestinationResolver(jmsConfig.getDestinationResolver());
         }
         if (jmsConfig.getTaskExecutor() != null) {
+            setTaskExecutor(jmsListener, jmsConfig.getTaskExecutor());
             jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
         } 
         
@@ -248,6 +251,31 @@ public final class JMSFactory {
         jmsListener.initialize();
         jmsListener.start();
         return jmsListener;
+    }
+    
+    private static void setTaskExecutor(DefaultMessageListenerContainer jmsListener, TaskExecutor exec) {
+        //CXF-2630 - The method sig for DefaultMessageListenerContainer.setTaskExecutor changed between 
+        //Spring 2.5 and 3.0 and code compiled for one won't run on the other.   Thus, we need
+        //to revert to using some reflection to make this call
+        Exception ex = null;
+        for (Method m : jmsListener.getClass().getMethods()) {
+            if ("setTaskExecutor".equals(m.getName())
+                && m.getParameterTypes().length == 1
+                && m.getParameterTypes()[0].isInstance(exec)) {
+                try {
+                    m.invoke(jmsListener, exec);
+                    return;
+                } catch (Exception e) {
+                    ex = e;
+                }
+            }
+        }
+        //if we get here, we couldn't find a valid method or something else went wrong
+        if (ex != null) {
+            LOG.log(Level.WARNING, "ERROR_SETTING_TASKEXECUTOR", ex);
+        } else {
+            LOG.log(Level.WARNING, "NO_SETTASKEXECUTOR_METHOD", jmsListener.getClass().getName());
+        }
     }
 
     /**
