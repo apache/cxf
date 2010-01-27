@@ -32,7 +32,6 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
-import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
@@ -729,14 +728,7 @@ public final class ContextUtils {
             }
             if (fault == null) {
                 action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
-                if (action == null) {
-                    SoapOperationInfo soi = 
-                        bindingOpInfo.getExtensor(SoapOperationInfo.class);
-                    if (null != soi) {
-                        action = soi.getAction();
-                    }
-
-                }
+               
                 if (action == null || "".equals(action)) {
                     MessageInfo msgInfo = 
                         ContextUtils.isRequestor(message)
