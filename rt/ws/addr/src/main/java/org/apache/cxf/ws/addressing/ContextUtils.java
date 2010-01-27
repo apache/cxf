@@ -756,7 +756,10 @@ public final class ContextUtils {
                 // http://www.w3.org/2005/02/addressing/wsdl schema
                 for (BindingFaultInfo bfi : bindingOpInfo.getFaults()) {
                     FaultInfo fi = bfi.getFaultInfo();
-                    if (t != null && t.getClass().isAssignableFrom(fi.getMessagePart(0).getTypeClass())) {
+                    Class<?> fiTypeClass = fi.getMessagePart(0).getTypeClass();
+                    if (t != null 
+                            && fiTypeClass != null
+                            && t.getClass().isAssignableFrom(fiTypeClass)) {
                         if (fi.getExtensionAttributes() == null) {
                             continue;
                         }
