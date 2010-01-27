@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.Type;
@@ -493,11 +494,17 @@ public final class JAXBUtils {
             if (cls.getName().equals("javax.xml.ws.wsaddressing.W3CEndpointReference")) {
                 return cls;
             }
+            Constructor cons = null;
             try {
-                if (cls.getConstructor(new Class[0]) == null) {
-                    cls = null;
-                }
+                cons = cls.getDeclaredConstructor(new Class[0]);
             } catch (NoSuchMethodException ex) {
+                try {
+                    cons = cls.getConstructor(new Class[0]);
+                } catch (NoSuchMethodException ex2) {
+                    cons = null;
+                }
+            }
+            if (cons == null) {
                 cls = null;
             }
         }
