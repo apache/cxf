@@ -173,7 +173,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                     ori = JAXRSUtils.findTargetMethod(resource, 
                         message, httpMethod, values, 
                         requestContentType, acceptContentTypes, false);
-                    setMessageProperties(message, ori, values, resources.size());
+                    setExchangeProperties(message, ori, values, resources.size());
                 } catch (WebApplicationException ex) {
                     operChecked = true;
                 }
@@ -203,7 +203,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
             try {                
                 ori = JAXRSUtils.findTargetMethod(resource, message, 
                                             httpMethod, values, requestContentType, acceptContentTypes, true);
-                setMessageProperties(message, ori, values, resources.size());
+                setExchangeProperties(message, ori, values, resources.size());
             } catch (WebApplicationException ex) {
                 if (ex.getResponse() != null && ex.getResponse().getStatus() == 405 
                     && "OPTIONS".equalsIgnoreCase(httpMethod)) {
@@ -224,14 +224,14 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
 
             LOG.fine("Found operation: " + ori.getMethodToInvoke().getName());
         }
-        setMessageProperties(message, ori, values, resources.size());  
+        setExchangeProperties(message, ori, values, resources.size());  
       
         //Process parameters
         List<Object> params = JAXRSUtils.processParameters(ori, values, message);
         message.setContent(List.class, params);
     }
     
-    private void setMessageProperties(Message message, OperationResourceInfo ori, 
+    private void setExchangeProperties(Message message, OperationResourceInfo ori, 
                                       MultivaluedMap<String, String> values,
                                       int numberOfResources) {
         message.getExchange().put(OperationResourceInfo.class, ori);
@@ -244,7 +244,8 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
         message.getExchange().put("org.apache.cxf.resource.operation.name", plainOperationName);
         
-        message.getExchange().setOneWay(
-            MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_MESSAGE, null)));
+        boolean oneway = ori.isOneway() 
+            || MessageUtils.isTrue(HttpUtils.getProtocolHeader(message, Message.ONE_WAY_REQUEST, null));
+        message.getExchange().setOneWay(oneway);
     }
 }

@@ -65,6 +65,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
@@ -486,6 +487,15 @@ public class BookStore {
         books.put(book.getId(), book);
 
         return Response.ok(book).build();
+    }
+    
+    @POST
+    @Path("/oneway")
+    @Oneway
+    public void onewayRequest() {
+        if (!PhaseInterceptorChain.getCurrentMessage().getExchange().isOneWay()) {
+            throw new WebApplicationException();
+        }
     }
     
     @POST

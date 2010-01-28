@@ -61,6 +61,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     
     @Test
+    public void testOnewayWebClient() throws Exception {
+        WebClient client = WebClient.create("http://localhost:9080/bookstore/oneway");
+        Response r = client.header("OnewayRequest", "true").post(null);
+        assertEquals(202, r.getStatus());
+    }
+    
+    @Test
+    public void testOnewayProxy() throws Exception {
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        proxy.onewayRequest();
+        assertEquals(202, WebClient.client(proxy).getResponse().getStatus());
+    }
+    
+    @Test
     public void testPropogateException() throws Exception {
         getAndCompare("http://localhost:9080/bookstore/propogateexception",
                       "", "application/xml", 500);

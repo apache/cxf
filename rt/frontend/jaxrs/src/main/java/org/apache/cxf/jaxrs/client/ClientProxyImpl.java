@@ -403,6 +403,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                           MultivaluedMap<ParameterType, Parameter> types,
                           List<Object> pathParams) throws Throwable {
         Message outMessage = createMessage(ori.getHttpMethod(), headers, uri);
+        outMessage.getExchange().setOneWay(ori.isOneway());
         if (pathParams.size() != 0) { 
             List<String> vars = ori.getURITemplate().getVariables();
             MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());

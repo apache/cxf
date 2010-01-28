@@ -28,6 +28,7 @@ import javax.ws.rs.Encoded;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
@@ -43,6 +44,7 @@ public class OperationResourceInfo {
     private boolean encoded;
     private String defaultParamValue;
     private List<Parameter> parameters;
+    private boolean oneway; 
 
     public OperationResourceInfo(Method mInvoke, ClassResourceInfo cri) {
         this(mInvoke, mInvoke, cri);
@@ -58,6 +60,7 @@ public class OperationResourceInfo {
         this.encoded = ori.encoded;
         this.defaultParamValue = ori.defaultParamValue;
         this.parameters = ori.parameters;
+        this.oneway = ori.oneway;
         this.classResourceInfo = cri;
     }
     
@@ -71,6 +74,7 @@ public class OperationResourceInfo {
         checkMediaTypes(null, null);
         checkEncoded();
         checkDefaultParameterValue();
+        checkOneway();
     }
     
     public OperationResourceInfo(Method m, 
@@ -89,6 +93,16 @@ public class OperationResourceInfo {
         parameters = params;
     }
 
+    private void checkOneway() {
+        if (annotatedMethod != null) {
+            oneway = AnnotationUtils.getAnnotation(annotatedMethod.getAnnotations(), Oneway.class) != null;
+        }
+    }
+
+    public boolean isOneway() {
+        return oneway;
+    }
+    
     public List<Parameter> getParameters() {
         return parameters;
     }
