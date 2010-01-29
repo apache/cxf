@@ -19,6 +19,7 @@
 package org.apache.cxf.io;
 
 
+import java.io.ByteArrayInputStream;
 import java.io.FilterInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -26,12 +27,10 @@ import java.io.InputStream;
 import org.apache.cxf.helpers.IOUtils;
 
 public class DelegatingInputStream extends FilterInputStream {
-    private InputStream origIn;
-    private boolean cached;
+    protected boolean cached;
     
     public DelegatingInputStream(InputStream is) {
         super(is);
-        origIn = is;
     }
 
 
@@ -40,14 +39,6 @@ public class DelegatingInputStream extends FilterInputStream {
     }
     public InputStream getInputStream() {
         return in;
-    }
-    
-
-    public void close() throws IOException {
-        super.close();
-        if (in != origIn) {
-            origIn.close();
-        }
     }
     
     /**
@@ -59,11 +50,15 @@ public class DelegatingInputStream extends FilterInputStream {
         if (!cached) {
             CachedOutputStream cache = new CachedOutputStream();
             try {
+                InputStream origIn = in;
                 IOUtils.copy(in, cache);
                 if (cache.size() > 0) {
                     in = cache.getInputStream();
+                } else {
+                    in = new ByteArrayInputStream(new byte[0]);
                 }
                 cache.close();
+                origIn.close();
             } catch (IOException e) {
                 //ignore
             }
