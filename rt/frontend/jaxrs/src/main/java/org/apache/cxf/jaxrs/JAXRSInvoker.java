@@ -81,6 +81,9 @@ public class JAXRSInvoker extends AbstractInvoker {
         try {
             return invoke(exchange, request, serviceObject);
         } finally {
+            if (exchange.isOneWay()) {
+                ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
+            }
             if (!isServiceObjectRequestScope(exchange.getInMessage())) {
                 provider.releaseInstance(exchange.getInMessage(), serviceObject);
             } else {

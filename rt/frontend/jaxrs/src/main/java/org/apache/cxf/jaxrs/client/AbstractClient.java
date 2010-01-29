@@ -557,7 +557,7 @@ public class AbstractClient implements Client {
         exchange.put(Bus.class, cfg.getBus());
         exchange.put(MessageObserver.class, new ClientMessageObserver(cfg));
         exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
-        exchange.setOneWay(false);
+        exchange.setOneWay("true".equals(headers.getFirst(Message.ONE_WAY_REQUEST)));
         m.setExchange(exchange);
         
         PhaseInterceptorChain chain = setupOutInterceptorChain(cfg);
