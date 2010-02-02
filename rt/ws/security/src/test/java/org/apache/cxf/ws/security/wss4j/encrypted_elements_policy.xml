@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsp:Policy 
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+    xmlns:ser="http://www.sdj.pl">
+  <wsp:ExactlyOne>
+    <wsp:All>
+      <sp:EncryptedElements>
+        <sp:XPath>//ser:Header</sp:XPath>
+      </sp:EncryptedElements>  
+    </wsp:All>
+  </wsp:ExactlyOne>
+</wsp:Policy>
