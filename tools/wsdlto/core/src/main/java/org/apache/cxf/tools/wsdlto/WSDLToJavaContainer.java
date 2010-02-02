@@ -385,25 +385,27 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
     public void validate(ToolContext env) throws ToolException {
         String outdir = (String)env.get(ToolConstants.CFG_OUTPUTDIR);
-        if (outdir != null) {
-            File dir = new File(outdir);
-            if (!dir.exists() && !dir.mkdirs()) {
-                Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, outdir);
-                throw new ToolException(msg);
-            }
-            if (!dir.isDirectory()) {
-                Message msg = new Message("NOT_A_DIRECTORY", LOG, outdir);
-                throw new ToolException(msg);
-            }
-        }
-
-        if (env.optionSet(ToolConstants.CFG_COMPILE)) {
-            String clsdir = (String)env.get(ToolConstants.CFG_CLASSDIR);
-            if (clsdir != null) {
-                File dir = new File(clsdir);
+        if (!isSuppressCodeGen()) {
+            if (outdir != null) {
+                File dir = new File(outdir);
                 if (!dir.exists() && !dir.mkdirs()) {
-                    Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, clsdir);
+                    Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, outdir);
                     throw new ToolException(msg);
+                }
+                if (!dir.isDirectory()) {
+                    Message msg = new Message("NOT_A_DIRECTORY", LOG, outdir);
+                    throw new ToolException(msg);
+                }
+            }
+    
+            if (env.optionSet(ToolConstants.CFG_COMPILE)) {
+                String clsdir = (String)env.get(ToolConstants.CFG_CLASSDIR);
+                if (clsdir != null) {
+                    File dir = new File(clsdir);
+                    if (!dir.exists() && !dir.mkdirs()) {
+                        Message msg = new Message("DIRECTORY_COULD_NOT_BE_CREATED", LOG, clsdir);
+                        throw new ToolException(msg);
+                    }
                 }
             }
         }
