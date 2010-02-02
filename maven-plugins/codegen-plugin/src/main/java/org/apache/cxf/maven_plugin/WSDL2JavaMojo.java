@@ -129,6 +129,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
     /**
      * By default all maven dependencies of type "wsdl" are added to the effective wsdlOptions. Setting this
      * parameter to true disables this functionality
+     * 
+     * @parameter expression="${cxf.disableDependencyScan}" default-value="false"
      */
     boolean disableDependencyScan;
 
