@@ -30,6 +30,8 @@ WebServiceProvider.invoke = function(document) {
     var name = list.item(0).getFirstChild().getNodeValue();
     var newDoc = document.getImplementation().createDocument(ns4, "ns4:greetMeResponse", null);
     var el = newDoc.createElementNS(ns4, "ns4:responseType");
+    el.setAttributeNS("http://www.w3.org/2000/xmlns/", 
+                      "xmlns:ns4", ns4);
     var txt = newDoc.createTextNode("Hi " + name);
     el.insertBefore(txt, null);
     newDoc.getDocumentElement().insertBefore(el, null);
