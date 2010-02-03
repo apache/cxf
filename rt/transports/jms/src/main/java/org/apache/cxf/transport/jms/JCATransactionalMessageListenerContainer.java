@@ -20,6 +20,8 @@
 package org.apache.cxf.transport.jms;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.jms.JMSException;
 import javax.jms.MessageConsumer;
@@ -34,7 +36,7 @@ import org.springframework.jms.listener.DefaultMessageListenerContainer;
 import org.springframework.jms.support.JmsUtils;
 
 public class JCATransactionalMessageListenerContainer extends DefaultMessageListenerContainer {
-    static final ThreadLocal<MessageEndpoint> ENDPOINT_LOCAL = new ThreadLocal<MessageEndpoint>();
+    static final ThreadLocal<Map<Class<?>, ?>> ENDPOINT_LOCAL = new ThreadLocal<Map<Class<?>, ?>>();
     static final String MESSAGE_ENDPOINT_FACTORY = "MessageEndpointFactory";
     static final String MDB_TRANSACTED_METHOD = "MDBTransactedMethod";
     private MessageEndpointFactory factory;
@@ -61,7 +63,11 @@ public class JCATransactionalMessageListenerContainer extends DefaultMessageList
             s = xa.getSession();
             mc = s.createConsumer(getDestination());            
             ep = factory.createEndpoint(xar);
-            ENDPOINT_LOCAL.set(ep);
+            
+            Map<Class<?>, Object> mp = new HashMap<Class<?>, Object>();
+            mp.put(MessageEndpoint.class, ep);
+            
+            ENDPOINT_LOCAL.set(mp);
             ep.beforeDelivery(method);                
             messageReceived = doReceiveAndExecute(invoker, s, mc, null);
             ep.afterDelivery();
