@@ -107,7 +107,7 @@ public class JMSDestination extends AbstractMultiplexDestination
      * Initialize jmsTemplate and jmsListener from jms configuration data in jmsConfig {@inheritDoc}
      */
     public void activate() {
-        getLogger().log(Level.INFO, "JMSDestination activate().... ");
+        getLogger().log(Level.FINE, "JMSDestination activate().... ");
         String name = endpointInfo.getName().toString() + ".jms-destination";
         org.apache.cxf.common.i18n.Message msg = 
             new org.apache.cxf.common.i18n.Message("INSUFFICIENT_CONFIGURATION_DESTINATION", LOG, name);
