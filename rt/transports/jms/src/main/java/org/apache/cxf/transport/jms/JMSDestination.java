@@ -25,6 +25,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+import java.util.Map;
 import java.util.SimpleTimeZone;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -37,7 +38,6 @@ import javax.jms.JMSException;
 import javax.jms.MessageListener;
 import javax.jms.Session;
 import javax.jms.TextMessage;
-import javax.resource.spi.endpoint.MessageEndpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
@@ -199,9 +199,12 @@ public class JMSDestination extends AbstractMultiplexDestination
             
             BusFactory.setThreadDefaultBus(bus);
 
-            MessageEndpoint ep = JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.get();
-            if (ep != null) {
-                inMessage.setContent(MessageEndpoint.class, ep);
+            
+            Map<Class<?>, ?> mp = JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.get();
+            if (mp != null) {
+                for (Map.Entry<Class<?>, ?> ent : mp.entrySet()) {
+                    inMessage.setContent(ent.getKey(), ent.getValue());
+                }
                 JCATransactionalMessageListenerContainer.ENDPOINT_LOCAL.remove();
             }
 
