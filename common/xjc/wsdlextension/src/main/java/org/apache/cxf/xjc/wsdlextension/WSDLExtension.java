@@ -41,11 +41,9 @@ import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
 import com.sun.tools.xjc.outline.Outline;
 
-import org.apache.cxf.common.logging.LogUtils;
-
 public class WSDLExtension {
 
-    private static final Logger LOG = LogUtils.getL7dLogger(WSDLExtension.class);
+    private static final Logger LOG = Logger.getLogger(WSDLExtension.class.getName()); //NOPMD
 
     public String getOptionName() {
         return "Xwsdlextension";

@@ -62,6 +62,11 @@ public class ToStringPlugin extends Plugin {
         return impl.run(outline, opt, errorHandler);
     }
 
+    public void onActivated(Options opts) throws BadCommandLineException {
+        impl.onActivated(opts);
+    }
+
+    
     /* (non-Javadoc)
      * @see com.sun.tools.xjc.Plugin#parseArgument(com.sun.tools.xjc.Options, java.lang.String[], int)
      */

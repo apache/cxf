@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.DatatypeConverter;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
+import javax.xml.datatype.DatatypeConfigurationException;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
 
@@ -39,6 +41,7 @@ import com.sun.codemodel.JFieldRef;
 import com.sun.codemodel.JFieldVar;
 import com.sun.codemodel.JMethod;
 import com.sun.codemodel.JOp;
+import com.sun.codemodel.JTryBlock;
 import com.sun.codemodel.JType;
 import com.sun.tools.xjc.Options;
 import com.sun.tools.xjc.outline.ClassOutline;
@@ -159,8 +162,12 @@ public class DefaultValuePlugin {
                     
                     updateSetter(co, f, co.implClass);
                     updateGetter(co, f, co.implClass, dvExpr, true);                    
-                    
                 } else if (null == dvExpr) {
+                    JType type = f.getRawType();
+                    String typeName = type.fullName();
+                    if ("javax.xml.datatype.Duration".equals(typeName)) {
+                        updateDurationGetter(co, f, co.implClass, xmlDefaultValue, outline);
+                    }
                     continue;
                 } else {
                     updateGetter(co, f, co.implClass, dvExpr, false);                    
@@ -172,6 +179,42 @@ public class DefaultValuePlugin {
     }
     
     
+    private void updateDurationGetter(ClassOutline co, FieldOutline fo, JDefinedClass dc,
+                                      XmlString xmlDefaultValue, Outline outline) {
+        String fieldName = fo.getPropertyInfo().getName(false);
+
+        String getterName = "get" + fo.getPropertyInfo().getName(true);
+
+        JMethod method = dc.getMethod(getterName, new JType[0]);
+        JDocComment doc = method.javadoc();
+        int mods = method.mods().getValue();
+        JType mtype = method.type();
+
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Updating getter: " + getterName);
+        }
+        // remove existing method and define new one
+
+        dc.methods().remove(method);
+
+        method = dc.method(mods, mtype, getterName);
+        method.javadoc().append(doc);
+
+        JFieldRef fr = JExpr.ref(fieldName);
+        if (xmlDefaultValue != null) {
+            JExpression test = JOp.eq(JExpr._null(), fr);
+            JConditional jc =  method.body()._if(test);
+            JTryBlock b = jc._then()._try();
+            b.body()._return(outline.getCodeModel().ref(DatatypeFactory.class)
+                .staticInvoke("newInstance").invoke("newDuration").arg(JExpr.lit(xmlDefaultValue.value)));
+            b._catch(outline.getCodeModel().ref(DatatypeConfigurationException.class));
+            method.body()._return(fr);
+        } else {
+            method.body()._return(fr);
+        }
+
+    }
+
     JExpression getDefaultValueExpression(FieldOutline f,
                                           ClassOutline co,
                                           Outline outline,
@@ -235,8 +278,7 @@ public class DefaultValuePlugin {
                 .arg(qn.getLocalPart())
                 .arg(qn.getPrefix());
         } else if ("javax.xml.datatype.Duration".equals(typeName)) {
-            dv = outline.getCodeModel().ref("org.apache.cxf.jaxb.DatatypeFactory")
-                .staticInvoke("createDuration").arg(defaultValue);
+            dv = null;
         } else if (type instanceof JDefinedClass) {
             JDefinedClass cls = (JDefinedClass)type;
             if (cls.getClassType() == ClassType.ENUM) {
@@ -306,10 +348,8 @@ public class DefaultValuePlugin {
             JExpression test = JOp.eq(JExpr._null(), fr);
             JConditional jc =  method.body()._if(test);
             jc._then()._return(dvExpr);
-            jc._else()._return(fr);
-        } else {
-            method.body()._return(fr);
         }
+        method.body()._return(fr);
     }
     private void updateSetter(ClassOutline co, FieldOutline fo, 
                               JDefinedClass dc) {

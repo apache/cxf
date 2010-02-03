@@ -52,11 +52,6 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-common-utilities</artifactId>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>commons-lang</groupId>
             <artifactId>commons-lang</artifactId>
         </dependency>
@@ -78,7 +73,7 @@
                 <configuration>
                     <outputDirectory>${basedir}/target/generated/src/test/java</outputDirectory>
                     <schemaDirectory>${basedir}/src/test/resources/schemas/configuration</schemaDirectory>
-                    <arguments>-Xts</arguments>
+                    <arguments>-Xts:style:org.apache.commons.lang.builder.ToStringStyle.DEFAULT_STYLE</arguments>
                     <extension>true</extension>
                     <quiet>true</quiet>
                 </configuration>
