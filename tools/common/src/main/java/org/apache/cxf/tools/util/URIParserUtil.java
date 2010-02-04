@@ -225,7 +225,7 @@ public final class URIParserUtil {
         return KEYWORDS.contains(token);
     }
 
-    private static String escapeChars(String s) {
+    public static String escapeChars(String s) {
         StringBuilder b = new StringBuilder(s);
         int x = 0;
         do {
