@@ -77,7 +77,7 @@ public final class LogUtils {
                 }
             }
             if (StringUtils.isEmpty(cname)) {
-                Class.forName("org/slf4j/impl/StaticLoggerBinder");
+                Class.forName("org.slf4j.impl.StaticLoggerBinder");
                 Class<?> cls = Class.forName("org.slf4j.LoggerFactory");
                 Class<?> fcls = cls.getMethod("getILoggerFactory").invoke(null).getClass();
                 if (fcls.getName().contains("Log4j")) {
