@@ -20,6 +20,7 @@
 package org.apache.cxf.tools.util;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -41,9 +42,15 @@ public final class URIParserUtil {
                               "public", "return", "short", "static", "strictfp", "super", "switch",
                               "synchronized", "this", "throw", "throws", "transient", "try", "void",
                               "volatile", "while", "true", "false", "null", "assert", "enum"}));
+    private static final String EXCLUDED_CHARS = "<>\"{}|\\^`";
+    private static final String HEX_DIGITS = "0123456789abcdef";
 
     private URIParserUtil() {
         // complete
+    }
+
+    private static boolean isExcluded(char ch) {
+        return ch <= 0x20 || ch >= 0x7F || EXCLUDED_CHARS.indexOf(ch) != -1;
     }
 
     public static URL[] pathToURLs(String path) {
@@ -218,11 +225,32 @@ public final class URIParserUtil {
         return KEYWORDS.contains(token);
     }
 
+    private static String escapeChars(String s) {
+        StringBuilder b = new StringBuilder(s);
+        int x = 0;
+        do {
+            char ch = b.charAt(x);
+            if (isExcluded(ch)) {
+                try {
+                    byte[] bytes = Character.toString(ch).getBytes("UTF-8");
+                    b.setCharAt(x++, '%');
+                    for (int y = 0; y < bytes.length; y++) {
+                        b.insert(x++, HEX_DIGITS.charAt((bytes[y] & 0xFF) >> 4));
+                        b.insert(x, HEX_DIGITS.charAt(bytes[y] & 0x0F));
+                    }
+                } catch (UnsupportedEncodingException e) {
+                    //should not happen
+                }
+            }
+            x++;
+        } while (x < b.length());
+        return b.toString();
+    }
     public static String normalize(final String uri) {
         URL url = null;
         try {
             url = new URL(uri);
-            return url.toString().replace("\\", "/");
+            return escapeChars(url.toString().replace("\\", "/"));
         } catch (MalformedURLException e1) {
             try {
                 if (uri.startsWith("classpath:")) {
@@ -244,9 +272,9 @@ public final class URIParserUtil {
                     f = "file:" + uri;
                 }
                 url = new URL(f);
-                return url.toString().replace("\\", "/");
+                return escapeChars(url.toString().replace("\\", "/"));
             } catch (Exception e2) {
-                return uri.replace("\\", "/");
+                return escapeChars(uri.replace("\\", "/"));
             }
         }
     }
