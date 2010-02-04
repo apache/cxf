@@ -24,6 +24,8 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.cxf.tools.util.URIParserUtil;
+
 public class WsdlOption extends Option {
 
     /**
@@ -83,7 +85,8 @@ public class WsdlOption extends Option {
     public URI getWsdlURI(URI baseURI) {
         String wsdlLocation = getWsdl();
         File wsdlFile = new File(wsdlLocation);
-        return wsdlFile.exists() ? wsdlFile.toURI() : baseURI.resolve(wsdlLocation);
+        return wsdlFile.exists() ? wsdlFile.toURI() 
+            : baseURI.resolve(URIParserUtil.escapeChars(wsdlLocation));
     }
 
     public boolean isDefServiceName() {
