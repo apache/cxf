@@ -46,6 +46,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerConfigurationException;
@@ -626,7 +627,9 @@ public final class EndpointReferenceUtils {
                     DOMSource ds = new DOMSource(el, baseURI);   
                     schemaSourcesMap2.put(si.getSystemId() + ":" + si.getNamespaceURI(), ds);
                     LoadingByteArrayOutputStream out = new LoadingByteArrayOutputStream();
-                    StaxUtils.copy(el, StaxUtils.createXMLStreamWriter(out));
+                    XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(out);
+                    StaxUtils.copy(el, writer);
+                    writer.flush();
                     schemaSourcesMap.put(si.getSystemId() + ":" + si.getNamespaceURI(), out.toByteArray());
                 }
 
