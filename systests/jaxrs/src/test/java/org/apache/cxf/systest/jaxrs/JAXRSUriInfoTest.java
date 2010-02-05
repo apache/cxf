@@ -62,15 +62,15 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
     public void testBasePathAndPathAndPathParam() throws Exception {
         checkUriInfo("http://localhost:9080/app/v1", "\"\"", "/");
         checkUriInfo("http://localhost:9080/app/v1/", "\"\"", "/");
-        checkUriInfo("http://localhost:9080/app/v1/test", "\"test\"", "/test");
+        checkUriInfo("http://localhost:9080/app/v1/test", "\"test\"", "test");
         checkUriInfo("http://localhost:9080/app/v1/", "\"\"", "/");
         checkUriInfo("http://localhost:9080/app/v1", "\"\"", "/");
           
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "/bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "/bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar/test", "\"bar/test\"", "/bar/test");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "/bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "/bar");
+        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:9080/app/v1/bar/test", "\"bar/test\"", "bar/test");
+        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
     }
     
     private void checkUriInfo(String address, String path, String pathParam) {
