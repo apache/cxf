@@ -214,7 +214,7 @@
                                 <version>1.6.5</version>
                             </dependency>
                             <dependency>
-                                <groupId>org.apache.cxf.buildutils</groupId>
+                                <groupId>org.apache.cxf.build-utils</groupId>
                                 <artifactId>cxf-buildtools</artifactId>
                                 <version>${cxf.build-utils.version}</version>
                             </dependency>
