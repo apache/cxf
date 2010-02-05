@@ -126,7 +126,7 @@
                             </xsdOptions>
                         </configuration>
                         <goals>
-                            <goal>xsdtojava</goal>
+                            <goal>xsdtojava-tests</goal>
                         </goals>
                     </execution>
                 </executions>
