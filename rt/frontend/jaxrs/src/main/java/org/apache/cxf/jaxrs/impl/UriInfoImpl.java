@@ -88,7 +88,12 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public String getPath(boolean decode) {
-        return doGetPath(decode, true);
+        String value = doGetPath(decode, true);
+        if (value.length() > 1 && value.startsWith("/")) { 
+            return value.substring(1);
+        } else {
+            return value;
+        }
     }
 
     public List<PathSegment> getPathSegments() {
@@ -192,7 +197,7 @@ public class UriInfoImpl implements UriInfo {
         if (MessageUtils.isRequestor(message)) {
             return address;
         }
-        String path = doGetPath(true, false);
+        String path = doGetPath(false, false);
         if (path.startsWith("/") && address.endsWith("/")) {
             address = address.substring(0, address.length() - 1);
         }

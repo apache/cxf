@@ -60,6 +60,20 @@ public class UriInfoImplTest extends Assert {
     }
     
     @Test
+    public void testGetAbsolutePathWithEncodedChars() {
+        
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz%20foo", "/bar"),
+                                        null);
+        assertEquals("Wrong absolute path", "http://localhost:8080/baz%20foo/bar", 
+                     u.getAbsolutePath().toString());
+        u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/%20foo", "/bar%20foo"),
+                                        null);
+        assertEquals("Wrong absolute path", "http://localhost:8080/baz/%20foo/bar%20foo", 
+                     u.getAbsolutePath().toString());
+        
+    }
+    
+    @Test
     public void testGetQueryParameters() {
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
                                         null);
@@ -87,10 +101,20 @@ public class UriInfoImplTest extends Assert {
     @Test
     public void testGetRequestURI() {
         
-        UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/baz/bar", "n=1%202"),
+        UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/foo", "n=1%202"),
                             null);
 
-        assertEquals("Wrong request uri", "http://localhost:8080/baz/bar?n=1%202",
+        assertEquals("Wrong request uri", "http://localhost:8080/baz/bar/foo?n=1%202",
+                     u.getRequestUri().toString());
+    }
+    
+    @Test
+    public void testGetRequestURIWithEncodedChars() {
+        
+        UriInfo u = new UriInfoImpl(mockMessage("http://localhost:8080/baz/bar", "/foo/%20bar", "n=1%202"),
+                            null);
+
+        assertEquals("Wrong request uri", "http://localhost:8080/baz/bar/foo/%20bar?n=1%202",
                      u.getRequestUri().toString());
     }
     
@@ -150,7 +174,7 @@ public class UriInfoImplTest extends Assert {
         UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz", 
                                                     "/baz"),
                                         null);
-        assertEquals("Wrong path", "/baz", u.getPath());
+        assertEquals("Wrong path", "baz", u.getPath());
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/bar/baz", 
                             "/bar/baz"), null);
@@ -162,11 +186,11 @@ public class UriInfoImplTest extends Assert {
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
                                         null);
-        assertEquals("Wrong path", "/bar 1", u.getPath());
+        assertEquals("Wrong path", "bar 1", u.getPath());
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/baz/bar%201"),
                             null);
-        assertEquals("Wrong path", "/bar%201", u.getPath(false));
+        assertEquals("Wrong path", "bar%201", u.getPath(false));
       
         
     }
