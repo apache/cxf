@@ -33,9 +33,7 @@
 
     <modules>
         <module>common</module>
-        <module>xsd</module>
         <module>schemas</module>
-        <module>xjc</module>
         <module>wstx-msv-validation</module>
         <module>xerces-xsd-validation</module>
     </modules>

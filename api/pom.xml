@@ -79,8 +79,8 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-	  <groupId>${stax.impl.groupId}</groupId>
-	  <artifactId>${stax.impl.artifactId}</artifactId>
+            <groupId>${stax.impl.groupId}</groupId>
+            <artifactId>${stax.impl.artifactId}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.neethi</groupId>
@@ -90,12 +90,6 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-schemas</artifactId>
             <version>${project.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.cxf</groupId>
-            <artifactId>cxf-xjc-dv</artifactId>
-            <version>${project.version}</version>
-            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -126,12 +120,15 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-common-xsd</artifactId>
-                <version>${project.version}</version>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>${cxf.xjc-utils.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
                         <phase>generate-sources</phase>
+                        <goals>
+                            <goal>xsdtojava</goal>
+                        </goals>
                         <configuration>
                             <sourceRoot>${basedir}/target/generated/src/main/java</sourceRoot>
                             <xsdOptions>
@@ -156,28 +153,27 @@
                                     <bindingFile>${basedir}/target/schemas/schemas/configuration/security.xjb</bindingFile>
                                     <catalog>${basedir}/src/main/build-resources/catalog.cat</catalog>
                                     <extensionArgs>
-                                         <extensionArg>-Xdv</extensionArg>
-                                     </extensionArgs>
+                                        <extensionArg>-Xdv</extensionArg>
+                                    </extensionArgs>
                                 </xsdOption>
                                 <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/ws-addr-wsdl.xjb</bindingFile>
                                     <extension>true</extension>
                                 </xsdOption>
-                                   <xsdOption>
+                                <xsdOption>
                                     <xsd>${basedir}/target/schemas/schemas/wsdl/addressing200403.xsd</xsd>
                                     <bindingFile>${basedir}/target/schemas/schemas/wsdl/addressing200403.xjb</bindingFile>
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
-                        <goals>
-                            <goal>xsdtojava</goal>
-                        </goals>
                     </execution>
-
                     <execution>
                         <id>generate-test-sources</id>
                         <phase>generate-test-sources</phase>
+                        <goals>
+                            <goal>xsdtojava-tests</goal>
+                        </goals>
                         <configuration>
                             <testSourceRoot>${basedir}/target/generated/src/test/java</testSourceRoot>
                             <xsdOptions>
@@ -194,48 +190,38 @@
                                 </xsdOption>
                             </xsdOptions>
                         </configuration>
-                        <goals>
-                            <goal>xsdtojava</goal>
-                        </goals>
                     </execution>
 
                 </executions>
 
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-dv</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-common-utilities</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
+                <configuration>
+                    <extensions>
+                        <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                    </extensions>
+                </configuration>
             </plugin>
         </plugins>
 
         <pluginManagement>
-             <plugins>
-                 <plugin>
-                     <groupId>org.apache.maven.plugins</groupId>
-                     <artifactId>maven-javadoc-plugin</artifactId>
-                     <executions>
-                         <execution>
-                             <id>package</id>
-                             <phase>package</phase>
-                             <goals>
-                                 <goal>jar</goal>
-                             </goals>
-                         </execution>
-                     </executions>
-                     <configuration>
-                         <header>Apache CXF API</header>
-                         <footer>Apache CXF API</footer>
-                     </configuration>
-                 </plugin>
-             </plugins>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>package</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <header>Apache CXF API</header>
+                        <footer>Apache CXF API</footer>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 

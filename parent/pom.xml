@@ -168,9 +168,9 @@
                     <version>2.3</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.cxf</groupId>
+                            <groupId>org.apache.cxf.build-utils</groupId>
                             <artifactId>cxf-buildtools</artifactId>
-                            <version>${project.version}</version>
+                            <version>${cxf.build-utils.version}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.codehaus.plexus</groupId>
@@ -217,9 +217,9 @@
                     <version>2.4</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.cxf</groupId>
+                            <groupId>org.apache.cxf.build-utils</groupId>
                             <artifactId>cxf-buildtools</artifactId>
-                            <version>${project.version}</version>
+                            <version>${cxf.build-utils.version}</version>
                         </dependency>
                     </dependencies>
                     <configuration>
@@ -286,9 +286,9 @@
         </pluginManagement>
         <plugins>
             <plugin>
-                <groupId>org.apache.cxf</groupId>
+                <groupId>org.apache.cxf.build-utils</groupId>
                 <artifactId>cxf-xml2fastinfoset-plugin</artifactId>
-                <version>${project.version}</version>
+                <version>${cxf.build-utils.version}</version>
                 <configuration>
                     <includes>
                         <include>META-INF/cxf/cxf*.xml</include>
@@ -310,9 +310,9 @@
                 <version>1.0</version>
                 <dependencies>
                     <dependency>
-                        <groupId>org.apache.cxf</groupId>
+                        <groupId>org.apache.cxf.build-utils</groupId>
                         <artifactId>cxf-buildtools</artifactId>
-                        <version>${project.version}</version>
+                        <version>${cxf.build-utils.version}</version>
                     </dependency>
                 </dependencies>
                 <executions>
@@ -1386,21 +1386,6 @@
             </build>
         </profile>
     </profiles>
-    <repositories>
-        <repository>
-            <id>codehaus-snapshots</id>
-            <name>Codehaus Snapshots Repository</name>
-            <url>http://snapshots.repository.codehaus.org</url>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-            <releases>
-                <enabled>false</enabled>
-            </releases>
-        </repository> 
-    </repositories>
-
-
 </project>
 
 

@@ -140,8 +140,8 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-common-xsd</artifactId>
-                <version>${project.version}</version>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>${cxf.xjc-utils.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -168,6 +168,13 @@
                                         <deleteDir>${basedir}/target/generated/src/main/java/org/apache/cxf/wsdl</deleteDir>
                                     </deleteDirs>
                                 </xsdOption>
+                                <xsdOption>
+                                    <xsd>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xsd</xsd>
+                                    <bindingFile>${basedir}/src/main/resources/schemas/wsdl/spec/jms-spec-wsdl.xjb</bindingFile>
+                                    <extensionArgs>
+                                         <extensionArg>-Xwsdlextension</extensionArg>
+                                     </extensionArgs>
+                                </xsdOption>
                             </xsdOptions>
                         </configuration>
                         <goals>
@@ -175,58 +182,12 @@
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-dv</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-common-utilities</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>jaxb2-maven-plugin</artifactId>
-                <version>1.2</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>xjc</goal>
-                        </goals>
-                    </execution>
-                </executions>
                 <configuration>
-                	<clearOutputDir>false</clearOutputDir> 
-                	<packageName>org.apache.cxf.transport.jms.wsdl</packageName>
-                    <outputDirectory>${basedir}/target/generated/src/main/java</outputDirectory>
-                    <schemaDirectory>${basedir}/src/main/resources/schemas/wsdl/spec</schemaDirectory>
-                    <schemaFiles>jms-spec-wsdl.xsd</schemaFiles>
-                    <arguments>-Xwsdlextension</arguments>
-                    <extension>true</extension>
-                    <quiet>true</quiet>
-                </configuration>
-
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-dv</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-ts</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-wsdlextension</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
+                     <extensions>
+                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-dv:${cxf.xjc-utils.version}</extension>
+                         <extension>org.apache.cxf.xjcplugins:cxf-xjc-wsdlextension:${cxf.xjc-utils.version}</extension>
+                     </extensions>
+                 </configuration>
             </plugin>
         </plugins>
     </build>

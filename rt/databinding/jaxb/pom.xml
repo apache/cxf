@@ -57,8 +57,8 @@
             </plugin>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
-                <artifactId>cxf-common-xsd</artifactId>
-                <version>${project.version}</version>
+                <artifactId>cxf-xjc-plugin</artifactId>
+                <version>${cxf.xjc-utils.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -75,22 +75,10 @@
                             </xsdOptions>
                         </configuration>
                         <goals>
-                            <goal>xsdtojava</goal>
+                            <goal>xsdtojava-tests</goal>
                         </goals>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-xjc-dv</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.cxf</groupId>
-                        <artifactId>cxf-common-utilities</artifactId>
-                        <version>${project.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
@@ -122,6 +110,7 @@
             <version>${project.version}</version>
         </dependency>
        
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-testutils</artifactId>
@@ -139,8 +128,8 @@
         </dependency>
 
         <dependency>
-	    <groupId>${stax.impl.groupId}</groupId>
-	    <artifactId>${stax.impl.artifactId}</artifactId>
+            <groupId>${stax.impl.groupId}</groupId>
+            <artifactId>${stax.impl.artifactId}</artifactId>
         </dependency>
 
 
@@ -157,7 +146,7 @@
             <artifactId>asm</artifactId>
             <optional>true</optional>
         </dependency>
-	 <dependency>
+        <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-jaxws_2.1_spec</artifactId>
             <scope>test</scope>
