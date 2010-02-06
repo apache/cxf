@@ -26,7 +26,6 @@ import javax.wsdl.Definition;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.i18n.Message;
-import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.tools.validator.internal.model.XNode;
 import org.apache.cxf.wsdl11.WSDLDefinitionBuilder;
 import org.junit.Assert;
@@ -58,24 +57,29 @@ public class WSDLRefValidatorTest extends Assert {
         assertEquals(2, results.getErrors().size());
         String t = results.getErrors().pop();
         String text = "{http://apache.org/hello_world/messages}[portType:GreeterA][operation:sayHi]";
-        Message msg;
-        if (StaxUtils.isWoodstox()) {
-            msg = new Message("FAILED_AT_POINT",
-                              WSDLRefValidator.LOG,
-                              27,
-                              2,
-                              new java.net.URI(wsdl).toURL(),
-                              text);
-        } else {
-            // sjsxp
-            msg = new Message("FAILED_AT_POINT",
-                              WSDLRefValidator.LOG,
-                              -1,
-                              -1,
-                              new java.net.URI(wsdl).toURL(),
-                              text);
-        }
-        assertEquals(msg.toString(), t);
+        Set<String> possibles = new HashSet<String>();
+        //woodstox
+        possibles.add(new Message("FAILED_AT_POINT",
+                    WSDLRefValidator.LOG,
+                    27,
+                    2,
+                    new java.net.URI(wsdl).toURL(),
+                    text).toString());
+        //Sun java6 stax parser
+        possibles.add(new Message("FAILED_AT_POINT",
+                                  WSDLRefValidator.LOG,
+                                  27,
+                                  31,
+                                  new java.net.URI(wsdl).toURL(),
+                                  text).toString());
+        //sjsxp
+        possibles.add(new Message("FAILED_AT_POINT",
+                                  WSDLRefValidator.LOG,
+                                  -1,
+                                  -1,
+                                  new java.net.URI(wsdl).toURL(),
+                                  text).toString());
+        assertTrue(possibles.contains(t));
     }
     
 
@@ -139,23 +143,29 @@ public class WSDLRefValidatorTest extends Assert {
         
         assertEquals(1, results.getErrors().size());
         String text = "{http://schemas.apache.org/yoko/idl/OptionsPT}[message:getEmployee]";
-        Message msg;
-        if (StaxUtils.isWoodstox()) {
-            msg = new Message("FAILED_AT_POINT",
-                              WSDLRefValidator.LOG,
-                              42,
-                              6,
-                              new java.net.URI(wsdl).toURL(),
-                              text);
-        } else {
-            msg = new Message("FAILED_AT_POINT",
-                              WSDLRefValidator.LOG,
-                              -1,
-                              -1,
-                              new java.net.URI(wsdl).toURL(),
-                              text);
-        }
-        assertEquals(msg.toString(), results.getErrors().pop());
+        Set<String> possibles = new HashSet<String>();
+        //woodstox
+        possibles.add(new Message("FAILED_AT_POINT",
+                    WSDLRefValidator.LOG,
+                    42,
+                    6,
+                    new java.net.URI(wsdl).toURL(),
+                    text).toString());
+        //Sun java6 stax parser
+        possibles.add(new Message("FAILED_AT_POINT",
+                                  WSDLRefValidator.LOG,
+                                  42,
+                                  70,
+                                  new java.net.URI(wsdl).toURL(),
+                                  text).toString());
+        //sjsxp
+        possibles.add(new Message("FAILED_AT_POINT",
+                                  WSDLRefValidator.LOG,
+                                  -1,
+                                  -1,
+                                  new java.net.URI(wsdl).toURL(),
+                                  text).toString());
+        assertTrue(possibles.contains(results.getErrors().pop()));
     }
 
     @Test

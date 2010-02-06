@@ -32,7 +32,7 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
-    <dependencies>    
+    <dependencies>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-common</artifactId>
@@ -69,22 +69,19 @@
             <version>${project.version}</version>
         </dependency>
         
+
         <dependency>
-	     <groupId>org.apache.cxf</groupId>
-	     <artifactId>cxf-rt-core</artifactId>
-	     <version>${project.version}</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-core</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
-	     <groupId>org.apache.cxf</groupId>
-	     <artifactId>cxf-rt-javascript</artifactId>
-	     <version>${project.version}</version>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-javascript</artifactId>
+            <version>${project.version}</version>
         </dependency>
 
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-        </dependency>
 
 
         <dependency>
@@ -114,16 +111,7 @@
         </dependency>
 
 
-        <dependency>
-            <groupId>javax.xml.soap</groupId>
-            <artifactId>saaj-api</artifactId>
-        </dependency>
 
-        <dependency>
-	    <groupId>${stax.impl.groupId}</groupId>
-	    <artifactId>${stax.impl.artifactId}</artifactId>
-            <scope>runtime</scope>
-        </dependency>
 
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -156,11 +144,6 @@
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
             <artifactId>jaxb-impl</artifactId>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-jaxws_2.1_spec</artifactId>
         </dependency>
 
         <dependency>
@@ -213,5 +196,32 @@
 
         </plugins>
     </build>
+    <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>javax.xml.bind</groupId>
+                    <artifactId>jaxb-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>javax.xml.soap</groupId>
+                    <artifactId>saaj-api</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${stax.impl.groupId}</groupId>
+                    <artifactId>${stax.impl.artifactId}</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
 </project>

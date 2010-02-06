@@ -61,6 +61,8 @@
             <version>${project.version}</version>
         </dependency>
         
+
+
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-tools-wsdlto-core</artifactId>
@@ -85,15 +87,6 @@
                     <artifactId>stax-api</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-stax-api_1.0_spec</artifactId>
-        </dependency>
-        <dependency>
-	    <groupId>${stax.impl.groupId}</groupId>
-	    <artifactId>${stax.impl.artifactId}</artifactId>
         </dependency>
 
         <dependency>
@@ -157,12 +150,12 @@
                             <testWsdlRoot>src/test/resources/wsdl</testWsdlRoot>
                             <wsdlOptions>
                                 <wsdlOption>
-                                  <wsdl>src/test/resources/wsdl/xmlbeanstest.wsdl</wsdl>
-                                  <dataBinding>xmlbeans</dataBinding>
-                                  <extraargs>
-                                    <arg>-classdir</arg>
-                                    <arg>${basedir}/target/generated/src/test/resources</arg>
-                                  </extraargs>
+                                    <wsdl>src/test/resources/wsdl/xmlbeanstest.wsdl</wsdl>
+                                    <dataBinding>xmlbeans</dataBinding>
+                                    <extraargs>
+                                        <arg>-classdir</arg>
+                                        <arg>${basedir}/target/generated/src/test/resources</arg>
+                                    </extraargs>
                                 </wsdlOption>
                             </wsdlOptions>
                         </configuration>
@@ -174,4 +167,23 @@
             </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                </dependency>
+                <dependency>
+                    <groupId>${stax.impl.groupId}</groupId>
+                    <artifactId>${stax.impl.artifactId}</artifactId>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 </project>

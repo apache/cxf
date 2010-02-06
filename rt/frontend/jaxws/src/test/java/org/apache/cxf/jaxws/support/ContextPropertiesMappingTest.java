@@ -25,13 +25,13 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -100,7 +100,7 @@ public class ContextPropertiesMappingTest extends Assert {
         
         Collection<Attachment> attachments = new LinkedList<Attachment>();
 
-        DataSource source = new ByteArrayDataSource(new byte[0], "text/xml");
+        DataSource source = new ByteDataSource(new byte[0], "text/xml");
         
         DataHandler handler1 = new DataHandler(source);
         attachments.add(new AttachmentImpl("part1", handler1));
