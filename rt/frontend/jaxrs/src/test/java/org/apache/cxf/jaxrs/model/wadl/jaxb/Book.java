@@ -30,10 +30,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.jaxrs.ext.Description;
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 
 @XmlRootElement(name = "thebook", namespace = "http://superbooks")
 @XmlType(name = "book", namespace = "http://superbooks")
 @Description("Book subresource")
+@XMLName(value = "{http://books}thesuperbook", prefix = "p1")
 public class Book {
 
     private int id;

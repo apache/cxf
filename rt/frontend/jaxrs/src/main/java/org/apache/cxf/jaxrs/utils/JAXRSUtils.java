@@ -872,21 +872,18 @@ public final class JAXRSUtils {
                                           Message m, 
                                           String defaultValue,
                                           boolean decode) {
+        
+        MultivaluedMap<String, String> queryMap = new UriInfoImpl(m, null).getQueryParameters(decode);
+        
         if ("".equals(queryName)) {
-            return InjectionUtils.handleBean(paramType, new UriInfoImpl(m, null).getQueryParameters(),
-                                             ParameterType.QUERY, m, decode);
+            return InjectionUtils.handleBean(paramType, queryMap, ParameterType.QUERY, m, false);
         } else {
-            List<String> results = getStructuredParams((String)m.get(Message.QUERY_STRING),
-                                       "&",
-                                       decode).get(queryName);
-    
-            return InjectionUtils.createParameterObject(results, 
+            return InjectionUtils.createParameterObject(queryMap.get(queryName), 
                                                         paramType, 
                                                         genericType,
                                                         defaultValue,
                                                         false,
                                                         ParameterType.QUERY, m);
-             
         }
     }
 
@@ -900,9 +897,18 @@ public final class JAXRSUtils {
     public static MultivaluedMap<String, String> getStructuredParams(String query, 
                                                                     String sep, 
                                                                     boolean decode) {
-        MultivaluedMap<String, String> queries = 
+        MultivaluedMap<String, String> map = 
             new MetadataMap<String, String>(new LinkedHashMap<String, List<String>>());
         
+        getStructuredParams(map, query, sep, decode);
+        
+        return map;
+    }
+    
+    public static void getStructuredParams(MultivaluedMap<String, String> queries,
+                                           String query, 
+                                           String sep, 
+                                           boolean decode) {
         if (!StringUtils.isEmpty(query)) {            
             List<String> parts = Arrays.asList(query.split(sep));
             for (String part : parts) {
@@ -919,7 +925,6 @@ public final class JAXRSUtils {
                 queries.add(HttpUtils.urlDecode(values[0]), value);
             }
         }
-        return queries;
     }
 
     @SuppressWarnings("unchecked")

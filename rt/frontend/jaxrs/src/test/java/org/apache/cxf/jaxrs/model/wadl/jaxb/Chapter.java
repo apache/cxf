@@ -25,10 +25,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.jaxrs.ext.Description;
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 
 @XmlRootElement(name = "thechapter", namespace = "http://superbooks")
 @XmlType(name = "chapter", namespace = "http://superbooks")
 @Description("Chapter subresource")
+@XMLName(value = "{http://books}thesuperchapter", prefix = "p1")
 public class Chapter {
 
     private int id;

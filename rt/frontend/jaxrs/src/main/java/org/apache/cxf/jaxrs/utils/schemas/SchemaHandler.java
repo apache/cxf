@@ -20,8 +20,6 @@
 package org.apache.cxf.jaxrs.utils.schemas;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -43,7 +41,6 @@ import org.apache.cxf.jaxrs.utils.ResourceUtils;
 public class SchemaHandler {
 
     private static final Logger LOG = LogUtils.getL7dLogger(SchemaHandler.class);
-    private static final String CLASSPATH_PREFIX = "classpath:";
     
     private Schema schema;
     private Bus bus;
@@ -71,23 +68,10 @@ public class SchemaHandler {
         try {
             List<Source> sources = new ArrayList<Source>();
             for (String loc : locations) {
-                InputStream is = null;
-                if (loc.startsWith(CLASSPATH_PREFIX)) {
-                    String path = loc.substring(CLASSPATH_PREFIX.length());
-                    is = ResourceUtils.getClasspathResourceStream(path, SchemaHandler.class, bus);
-                    if (is == null) {
-                        LOG.warning("No schema resource " + loc + " is available on classpath");
-                        return null;
-                    }
-                } else {
-                    File f = new File(loc);
-                    if (!f.exists()) {
-                        LOG.warning("No schema resource " + loc + " is available on local disk");
-                        return null;
-                    }
-                    is = new FileInputStream(f);
+                InputStream is = ResourceUtils.getResourceStream(loc, bus);
+                if (is == null) {
+                    return null;
                 }
-                                
                 Reader r = new BufferedReader(
                                new InputStreamReader(is, "UTF-8"));
                 sources.add(new StreamSource(r));

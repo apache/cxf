@@ -43,18 +43,16 @@ import org.apache.cxf.message.MessageUtils;
 
 public class UriInfoImpl implements UriInfo {
     private static final Logger LOG = LogUtils.getL7dLogger(UriInfoImpl.class);
+    private static final String CASE_INSENSITIVE_QUERIES = "org.apache.cxf.http.case_insensitive_queries";
 
     private MultivaluedMap<String, String> templateParams;
     private Message message;
     private OperationResourceInfoStack stack;
+    private boolean caseInsensitiveQueries;
 
     @SuppressWarnings("unchecked")
     public UriInfoImpl(Message m) {
-        this.message = m;
-        this.templateParams = (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS);
-        if (m != null) {
-            this.stack = m.get(OperationResourceInfoStack.class);
-        }
+        this(m, (MultivaluedMap<String, String>)m.get(URITemplate.TEMPLATE_PARAMETERS));
     }
     
     public UriInfoImpl(Message m, MultivaluedMap<String, String> templateParams) {
@@ -62,6 +60,8 @@ public class UriInfoImpl implements UriInfo {
         this.templateParams = templateParams;
         if (m != null) {
             this.stack = m.get(OperationResourceInfoStack.class);
+            this.caseInsensitiveQueries = 
+                MessageUtils.isTrue(m.getContextualProperty(CASE_INSENSITIVE_QUERIES));
         }
     }
 
@@ -109,7 +109,15 @@ public class UriInfoImpl implements UriInfo {
     }
 
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
-        return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), "&", decode);
+        
+        if (!caseInsensitiveQueries) {
+            return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), "&", decode);
+        }
+        
+        MultivaluedMap<String, String> queries = new MetadataMap<String, String>(false, true);
+        JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING), "&", decode);
+        return queries;
+        
     }
 
     public URI getRequestUri() {

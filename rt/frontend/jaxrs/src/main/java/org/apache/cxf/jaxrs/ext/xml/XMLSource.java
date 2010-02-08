@@ -18,9 +18,12 @@
  */
 package org.apache.cxf.jaxrs.ext.xml;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Iterator;
@@ -32,6 +35,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.NamespaceContext;
+import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.xpath.XPath;
@@ -46,9 +50,12 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 /**
  * Utility class for manipulating XML response using XPath and XSLT
@@ -62,6 +69,7 @@ public class XMLSource {
     
     private InputStream stream; 
     private boolean buffering;
+    private boolean markFailed;
     
     public XMLSource(InputStream is) {
         stream = is;
@@ -83,17 +91,14 @@ public class XMLSource {
     }
     
     public <T> T getNode(String expression, Map<String, String> namespaces, Class<T> cls) {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
-        try {
-            Node node = (Node)xpath.evaluate(expression, getSource(), XPathConstants.NODE);
-            if (node == null) {
-                return null;
-            }
-            DOMSource ds = new DOMSource(node);
-            return readFromSource(ds, cls);
-        } catch (XPathExpressionException ex) {
-            throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
+        Node node = (Node)evaluate(expression, namespaces, XPathConstants.NODE);
+        if (node == null) {
+            return null;
+        }
+        if (cls.isPrimitive() || cls == String.class) {
+            return readPrimitiveValue(node, cls);    
+        } else {
+            return readFromSource(new DOMSource(node), cls);
         }
     }
     
@@ -103,25 +108,21 @@ public class XMLSource {
     
     @SuppressWarnings("unchecked")
     public <T> T[] getNodes(String expression, Map<String, String> namespaces, Class<T> cls) {
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
-        try {
-            NodeList nodes = (NodeList)xpath.evaluate(expression, getSource(), XPathConstants.NODESET);
-            if (nodes == null || nodes.getLength() == 0) {
-                return null;
-            }
-            T[] values = (T[])Array.newInstance(cls, nodes.getLength());
- 
-            for (int i = 0; i < nodes.getLength(); i++) {
-                DOMSource ds = new DOMSource(nodes.item(i));
-                values[i] = readFromSource(ds, cls);
-            }
-                  
-            return values;
-            
-        } catch (XPathExpressionException ex) {
-            throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
+        
+        NodeList nodes = (NodeList)evaluate(expression, namespaces, XPathConstants.NODESET);
+        if (nodes == null || nodes.getLength() == 0) {
+            return null;
         }
+        T[] values = (T[])Array.newInstance(cls, nodes.getLength());
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            if (InjectionUtils.isPrimitive(cls)) {
+                values[i] = readPrimitiveValue(node, cls);
+            } else {
+                values[i] = readFromSource(new DOMSource(node), cls);
+            }
+        }
+        return values;
     }
 
     public URI getLink(String expression) {
@@ -144,13 +145,32 @@ public class XMLSource {
     }
     
     public String getValue(String expression, Map<String, String> namespaces) {
+        return getValue(expression, namespaces, String.class);
+    }
+    
+    public <T> T getValue(String expression, Map<String, String> namespaces, Class<T> cls) {
+        Object result = evaluate(expression, namespaces, XPathConstants.STRING);
+        return result == null ? null : convertStringToPrimitive(result.toString(), cls); 
+    }
+    
+    
+    private Object evaluate(String expression, Map<String, String> namespaces, QName type) {
         XPath xpath = XPathFactory.newInstance().newXPath();
         xpath.setNamespaceContext(new NamespaceContextImpl(namespaces));
         try {
-            return (String)xpath.evaluate(expression, getSource(), XPathConstants.STRING);
+            return xpath.evaluate(expression, getSource(), type);
         } catch (XPathExpressionException ex) {
             throw new IllegalArgumentException("Illegal XPath expression '" + expression + "'", ex);
         }
+    }
+    
+    
+    public String[] getValues(String expression) {
+        return getValues(expression, CastUtils.cast(Collections.emptyMap(), String.class, String.class));
+    }
+    
+    public String[] getValues(String expression, Map<String, String> namespaces) {
+        return getNodes(expression, namespaces, String.class);
     }
     
     private static class NamespaceContextImpl implements NamespaceContext {
@@ -183,6 +203,41 @@ public class XMLSource {
         }
     }
     
+    private <T> T readPrimitiveValue(Node node, Class<T> cls) {
+        if (String.class == cls) {
+            if (node.getNodeType() == Node.ELEMENT_NODE) {
+                ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                XMLUtils.writeTo(new DOMSource(node), bos, 0, "", "yes");
+                try {
+                    return cls.cast(bos.toString("UTF-8"));
+                } catch (UnsupportedEncodingException ex) {
+                    // won't happen
+                }
+            } else {
+                return cls.cast(node.getNodeValue());
+            }
+        } 
+        
+        return convertStringToPrimitive(node.getNodeValue(), cls);
+    }
+    
+    private <T> T convertStringToPrimitive(String value, Class<T> cls) {
+        if (String.class == cls) {
+            return cls.cast(value);
+        }
+        if (cls.isPrimitive()) {
+            return cls.cast(PrimitiveUtils.read(value, cls));
+        } else {
+            try {
+                Method m = cls.getMethod("valueOf", new Class[]{String.class});
+                return cls.cast(m.invoke(null, value));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
+        }
+    }
+    
+    
     private <T> T readFromSource(Source s, Class<T> cls) {
         try {
             JAXBElementProvider provider = new JAXBElementProvider();
@@ -199,9 +254,15 @@ public class XMLSource {
     
     private InputSource getSource() {
         try {
-            if (buffering) {
-                stream.reset();
-                stream.mark(stream.available());
+            if (!markFailed && buffering) {
+                try {
+                    stream.reset();
+                    stream.mark(stream.available());
+                } catch (IOException ex) {
+                    markFailed = true;
+                    LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());
+                    stream = IOUtils.loadIntoBAIS(stream);
+                }
             }
         } catch (IOException ex) {
             LOG.warning(new org.apache.cxf.common.i18n.Message("NO_SOURCE_MARK", BUNDLE).toString());

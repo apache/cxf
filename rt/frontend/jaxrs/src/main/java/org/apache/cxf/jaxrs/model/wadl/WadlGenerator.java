@@ -18,10 +18,16 @@
  */
 package org.apache.cxf.jaxrs.model.wadl;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -45,8 +51,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,6 +76,8 @@ import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.UriInfoImpl;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -75,12 +85,14 @@ import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
 import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 
@@ -98,7 +110,14 @@ public class WadlGenerator implements RequestHandler {
     private String wadlNamespace;
     private boolean ignoreMessageWriters = true;
     private boolean singleResourceMultipleMethods = true;
-    private boolean useSingleSlashResource = true;
+    private boolean useSingleSlashResource;
+    
+    private boolean useJaxbContextForQnames = true;
+    
+    private List<String> externalSchemasCache;
+    private List<URI> externalSchemaLinks;
+    private Map<String, List<String>> externalQnamesMap; 
+    private ElementQNameResolver resolver;
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -122,25 +141,26 @@ public class WadlGenerator implements RequestHandler {
         
         List<ClassResourceInfo> cris = getResourcesList(m, resource);
         
-        Set<Class<?>> jaxbTypes = ResourceUtils.getAllRequestResponseTypes(cris, true).keySet();
-        JAXBContext context = createJaxbContext(jaxbTypes);
-        SchemaCollection coll = getSchemaCollection(context);
-        JAXBContextProxy proxy = null;
-        if (coll != null) {
-            proxy = ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
-        }
+        Set<Class<?>> allTypes = 
+            ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames).keySet();
+        
+        JAXBContext context = createJaxbContext(allTypes);
+        SchemaWriter schemaWriter = createSchemaWriter(context, ui);
+        ElementQNameResolver qnameResolver = 
+            schemaWriter == null ? null : createElementQNameResolver(context);
+        
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
         Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
             String path = cri.getURITemplate().getValue();
             sbResources.append("<resource path=\"").append(path).append("\">");
             handleDocs(cri.getServiceClass().getAnnotations(), sbResources);
-            handleResource(sbResources, jaxbTypes, proxy, clsMap, cri, visitedResources);
+            handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources);
             sbResources.append("</resource>");
         }
         sbResources.append("</resources>");
         
-        handleGrammars(sbMain, sbGrammars, coll, clsMap);
+        handleGrammars(sbMain, sbGrammars, schemaWriter, clsMap);
         
         sbGrammars.append("</grammars>");
         sbMain.append(">");
@@ -157,7 +177,11 @@ public class WadlGenerator implements RequestHandler {
     }
 
     private void handleGrammars(StringBuilder sbApp, StringBuilder sbGrammars, 
-                                SchemaCollection coll, Map<Class<?>, QName> clsMap) {
+                                SchemaWriter writer, Map<Class<?>, QName> clsMap) {
+        if (writer == null) {
+            return;
+        }
+        
         Map<String, String> map = new HashMap<String, String>();
         for (QName qname : clsMap.values()) {
             map.put(qname.getPrefix(), qname.getNamespaceURI());
@@ -167,25 +191,12 @@ public class WadlGenerator implements RequestHandler {
                  .append(entry.getValue()).append("\"");
         }
         
-        
-        writeSchemas(sbGrammars, coll);
+        writer.write(sbGrammars);
     }
     
-    private void writeSchemas(StringBuilder sb, SchemaCollection coll) {
-        if (coll == null) {
-            return;
-        }
-        for (XmlSchema xs : coll.getXmlSchemas()) {
-            if (xs.getItems().getCount() == 0) {
-                continue;
-            }
-            StringWriter writer = new StringWriter();
-            xs.write(writer);
-            sb.append(writer.toString());
-        }
-    }
     
-    private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy,
+    private void handleResource(StringBuilder sb, Set<Class<?>> jaxbTypes, 
+                                ElementQNameResolver qnameResolver,
                                 Map<Class<?>, QName> clsMap, ClassResourceInfo cri, 
                                 Set<ClassResourceInfo> visitedResources) {
         visitedResources.add(cri);
@@ -204,23 +215,23 @@ public class WadlGenerator implements RequestHandler {
                     sb.append("<resource path=\"").append(path).append("\">");
                     handleDocs(subcri.getServiceClass().getAnnotations(), sb);
                     handlePathAndMatrixParams(sb, ori);
-                    handleResource(sb, jaxbTypes, jaxbProxy, clsMap, subcri, 
+                    handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri, 
                                    visitedResources);
                     sb.append("</resource>");
                 } else {
-                    handleDynamicSubresource(sb, jaxbTypes, jaxbProxy, clsMap, ori, subcri);
+                    handleDynamicSubresource(sb, jaxbTypes, qnameResolver, clsMap, ori, subcri);
                 }
                 continue;
             }
             OperationResourceInfo nextOp = i + 1 < sortedOps.size() ? sortedOps.get(i + 1) : null;
-            resourceTagOpened = handleOperation(sb, jaxbTypes, jaxbProxy, clsMap, ori, nextOp, 
+            resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, nextOp, 
                                                 resourceTagOpened, i);
         }
     }
     
     //CHECKSTYLE:OFF
     private boolean handleOperation(StringBuilder sb, Set<Class<?>> jaxbTypes, 
-                                 JAXBContextProxy jaxbProxy, 
+                                 ElementQNameResolver qnameResolver, 
                                  Map<Class<?>, QName> clsMap, 
                                  OperationResourceInfo ori,
                                  OperationResourceInfo nextOp,
@@ -250,10 +261,10 @@ public class WadlGenerator implements RequestHandler {
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
             sb.append("<request>");
             if (isFormRequest(ori)) {
-                handleRepresentation(sb, jaxbTypes, jaxbProxy, clsMap, ori, null, false);
+                handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, null, false);
             } else {
                 for (Parameter p : ori.getParameters()) {        
-                    handleParameter(sb, jaxbTypes, jaxbProxy, clsMap, ori, p);             
+                    handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p);             
                 }
             }
             sb.append("</request>");
@@ -265,7 +276,7 @@ public class WadlGenerator implements RequestHandler {
         }
         sb.append(">");
         if (void.class != ori.getMethodToInvoke().getReturnType()) {
-            handleRepresentation(sb, jaxbTypes, jaxbProxy, clsMap, ori,
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori,
                                  ori.getMethodToInvoke().getReturnType(), false);
         }
         sb.append("</response>");
@@ -315,7 +326,7 @@ public class WadlGenerator implements RequestHandler {
     }
     
     protected void handleDynamicSubresource(StringBuilder sb, Set<Class<?>> jaxbTypes, 
-                 JAXBContextProxy jaxbProxy, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
+                 ElementQNameResolver qnameResolver, Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
                  ClassResourceInfo subcri) {
         
         if (subcri != null) {
@@ -334,11 +345,12 @@ public class WadlGenerator implements RequestHandler {
     }
     
     
-    private void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy, 
+    private void handleParameter(StringBuilder sb, Set<Class<?>> jaxbTypes, 
+                                 ElementQNameResolver qnameResolver, 
                                  Map<Class<?>, QName> clsMap, OperationResourceInfo ori, Parameter pm) {
         Class<?> cls = ori.getMethodToInvoke().getParameterTypes()[pm.getIndex()];
         if (pm.getType() == ParameterType.REQUEST_BODY) {
-            handleRepresentation(sb, jaxbTypes, jaxbProxy, clsMap, ori, cls, true);
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, cls, true);
             return;
         }
         if (pm.getType() == ParameterType.PATH || pm.getType() == ParameterType.MATRIX) {
@@ -355,6 +367,19 @@ public class WadlGenerator implements RequestHandler {
             if (pm.getType() == type) {
                 writeParam(sb, pm, ori);
             }
+        }
+    }
+    
+    private Annotation[] getBodyAnnotations(OperationResourceInfo ori, boolean inbound) {
+        if (inbound) {
+            for (Parameter pm : ori.getParameters()) {
+                if (pm.getType() == ParameterType.REQUEST_BODY) {
+                    return ori.getAnnotatedMethod().getParameterAnnotations()[pm.getIndex()];
+                }
+            }
+            return new Annotation[]{};
+        } else {
+            return ori.getAnnotatedMethod().getDeclaredAnnotations();
         }
     }
     
@@ -383,7 +408,9 @@ public class WadlGenerator implements RequestHandler {
     }
     
     protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
-        
+        if (ParameterType.REQUEST_BODY == pm.getType()) {
+            return;
+        }
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template" 
                        : ParameterType.FORM == pm.getType() ? "query"
@@ -399,7 +426,8 @@ public class WadlGenerator implements RequestHandler {
         sb.append("/>");
     }
     
-    private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes, JAXBContextProxy jaxbProxy,
+    private void handleRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes, 
+                                      ElementQNameResolver qnameResolver,
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori, 
                                       Class<?> type, boolean inbound) {
         List<MediaType> types = inbound ? ori.getConsumeTypes() : ori.getProduceTypes();
@@ -416,8 +444,9 @@ public class WadlGenerator implements RequestHandler {
                 }
                 sb.append("<representation");
                 sb.append(" mediaType=\"").append(mt.toString()).append("\"");
-                if (jaxbProxy != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
-                    generateQName(sb, jaxbProxy, clsMap, type);
+                if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
+                    generateQName(sb, qnameResolver, clsMap, type,
+                                  getBodyAnnotations(ori, inbound));
                 }
                 sb.append("/>");
             }
@@ -463,9 +492,10 @@ public class WadlGenerator implements RequestHandler {
     
 
     private void generateQName(StringBuilder sb,
-                               JAXBContextProxy jaxbProxy,
+                               ElementQNameResolver qnameResolver,
                                Map<Class<?>, QName> clsMap, 
-                               Class<?> type) {
+                               Class<?> type,
+                               Annotation[] annotations) {
         
         QName typeQName = clsMap.get(type);
         if (typeQName != null) {
@@ -473,7 +503,8 @@ public class WadlGenerator implements RequestHandler {
             return;
         }
         
-        QName qname = getQName(jaxbProxy, type, clsMap);
+        QName qname = qnameResolver.resolve(type, annotations,
+                                            Collections.unmodifiableMap(clsMap));
         
         if (qname != null) {
             writeQName(sb, qname);
@@ -513,7 +544,7 @@ public class WadlGenerator implements RequestHandler {
         return xmlSchemaCollection;
     }
     
-    private QName getQName(JAXBContextProxy jaxbProxy, Class<?> type, Map<Class<?>, QName> clsMap) {
+    private QName getJaxbQName(JAXBContextProxy jaxbProxy, Class<?> type, Map<Class<?>, QName> clsMap) {
         
         XmlRootElement root = type.getAnnotation(XmlRootElement.class);
         if (root != null) {
@@ -530,7 +561,7 @@ public class WadlGenerator implements RequestHandler {
         }
         
         try {
-            JAXBBeanInfo jaxbInfo = JAXBUtils.getBeanInfo(jaxbProxy, type);
+            JAXBBeanInfo jaxbInfo = jaxbProxy == null ? null : JAXBUtils.getBeanInfo(jaxbProxy, type);
             if (jaxbInfo == null) {
                 return null;
             }
@@ -560,7 +591,7 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private JAXBContext createJaxbContext(Set<Class<?>> classes) {
-        if (classes.isEmpty()) {
+        if (!useJaxbContextForQnames || classes.isEmpty()) {
             return null;
         }
         Set<Class<?>> classesToBeBound = new HashSet<Class<?>>(classes);
@@ -734,4 +765,309 @@ public class WadlGenerator implements RequestHandler {
         this.useSingleSlashResource = useSingleSlashResource;
     }
 
+    public void setSchemaLocations(List<String> locations) {
+        
+        externalQnamesMap = new HashMap<String, List<String>>();
+        externalSchemasCache = new ArrayList<String>(locations.size()); 
+        for (int i = 0; i < locations.size(); i++) {
+            String loc = locations.get(i);
+            try {
+                InputStream is = ResourceUtils.getResourceStream(loc, BusFactory.getDefaultBus());
+                if (is == null) {
+                    return;
+                }
+                ByteArrayInputStream bis = IOUtils.loadIntoBAIS(is);
+                XMLSource source = new XMLSource(bis);
+                source.setBuffering(true);
+                String targetNs = source.getValue("/*/@targetNamespace");
+                
+                Map<String, String> nsMap = 
+                    Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+                String[] elementNames = source.getValues("/*/xs:element/@name", nsMap);
+                externalQnamesMap.put(targetNs, Arrays.asList(elementNames));
+                String schemaValue = source.getNode("/xs:schema", nsMap, String.class);
+                externalSchemasCache.add(schemaValue);
+            } catch (Exception ex) {
+                LOG.warning("No schema resource " + loc + " can be loaded : " + ex.getMessage());
+                externalSchemasCache = null;
+                externalQnamesMap = null;
+                return;
+            }
+        }
+         
+    }
+
+    public void setUseJaxbContextForQnames(boolean checkJaxbOnly) {
+        this.useJaxbContextForQnames = checkJaxbOnly;
+    }
+    
+    protected ElementQNameResolver createElementQNameResolver(JAXBContext context) {
+        if (resolver != null) {
+            return resolver;
+        }
+        if (useJaxbContextForQnames) {
+            if (context != null) {
+                JAXBContextProxy proxy = 
+                    ReflectionInvokationHandler.createProxyWrapper(context, JAXBContextProxy.class);
+                return new JaxbContextQNameResolver(proxy);
+            } else {
+                return null;
+            }
+        } else if (externalQnamesMap != null) {
+            return new SchemaQNameResolver(externalQnamesMap);
+        } else {
+            return new XMLNameQNameResolver();
+        }
+    }
+    
+    protected SchemaWriter createSchemaWriter(JAXBContext context, UriInfo ui) {
+        // if neither externalSchemaLinks nor externalSchemasCache is set
+        // then JAXBContext will be used to generate the schema
+        if (externalSchemaLinks != null && externalSchemasCache == null) {
+            return new ExternalSchemaWriter(externalSchemaLinks, ui);
+        } else if (externalSchemasCache != null) {
+            return new StringSchemaWriter(externalSchemasCache, externalSchemaLinks, ui);
+        } else if (context != null) {
+            SchemaCollection coll = getSchemaCollection(context);
+            if (coll != null) {
+                return new SchemaCollectionWriter(coll);
+            }
+        }
+        return null;
+    }
+    
+    public void setExternalLinks(List<String> externalLinks) {
+        externalSchemaLinks = new LinkedList<URI>();
+        for (String s : externalLinks) {
+            try {
+                externalSchemaLinks.add(URI.create(s));
+            } catch (Exception ex) {
+                LOG.warning("Not a valid URI : " + s);
+                externalSchemaLinks = null;
+                break;
+            }
+        }
+    }
+
+    private static interface SchemaWriter {
+        void write(StringBuilder sb);
+    }
+    
+    private class StringSchemaWriter implements SchemaWriter {
+        
+        private List<String> theSchemas;
+        
+        public StringSchemaWriter(List<String> schemas, List<URI> links, UriInfo ui) {
+            
+            this.theSchemas = new LinkedList<String>();
+            // we'll need to do the proper schema caching eventually 
+            for (String s : schemas) {
+                XMLSource source = new XMLSource(new ByteArrayInputStream(s.getBytes()));
+                source.setBuffering(true);
+                Map<String, String> locs = getLocationsMap(source, "import", links, ui);
+                String actualSchema = !locs.isEmpty() ? transformSchema(s, locs) : s;
+                theSchemas.add(actualSchema);
+            }
+        }
+
+        private Map<String, String> getLocationsMap(XMLSource source, String elementName,
+                                                    List<URI> links, UriInfo ui) {
+            Map<String, String> nsMap = 
+                Collections.singletonMap("xs", XmlSchemaConstants.XSD_NAMESPACE_URI);
+            String[] locations = source.getValues("/*/xs:" + elementName + "/@schemaLocation", nsMap);
+            if (locations == null) {
+                return Collections.emptyMap();
+            }
+            
+            Map<String, String> locs = new HashMap<String, String>();
+            for (String loc : locations) {
+                try {
+                    URI uri = URI.create(loc);
+                    if (!uri.isAbsolute()) {
+                        if (links != null) {
+                            for (URI overwriteURI : links) {
+                                if (overwriteURI.toString().endsWith(loc)) {
+                                    if (overwriteURI.isAbsolute()) {
+                                        locs.put(loc, overwriteURI.toString());
+                                    } else {
+                                        locs.put(loc, ui.getBaseUriBuilder().path(
+                                            overwriteURI.toString()).build().toString());
+                                    }
+                                    break;
+                                }
+                            }
+                        }
+                        if (!locs.containsKey(loc)) {
+                            locs.put(loc, ui.getBaseUriBuilder().path(
+                                 loc.toString()).build().toString());
+                        }
+                    }
+                } catch (Exception ex) {
+                    // continue
+                }
+            }
+            return locs;
+        }
+        
+        private String transformSchema(String schema, Map<String, String> locs) {
+            ByteArrayOutputStream bos = new ByteArrayOutputStream();
+            SchemaConverter sc = new SchemaConverter(StaxUtils.createXMLStreamWriter(bos), locs);
+            try {
+                StaxUtils.copy(new StreamSource(new StringReader(schema)), sc);
+                sc.flush();
+                sc.close();
+                return bos.toString();
+            } catch (Exception ex) {
+                return schema;
+            }
+            
+        }
+        
+        public void write(StringBuilder sb) {
+            for (String s : theSchemas) { 
+                sb.append(s);
+            }
+        }
+    }
+    
+    private class SchemaCollectionWriter implements SchemaWriter {
+        
+        private SchemaCollection coll;
+        
+        public SchemaCollectionWriter(SchemaCollection coll) {
+            this.coll = coll;
+        }
+        
+        public void write(StringBuilder sb) {
+            for (XmlSchema xs : coll.getXmlSchemas()) {
+                if (xs.getItems().getCount() == 0) {
+                    continue;
+                }
+                StringWriter writer = new StringWriter();
+                xs.write(writer);
+                sb.append(writer.toString());
+            }
+        }
+    }
+    
+    private class ExternalSchemaWriter implements SchemaWriter {
+        
+        private List<URI> links;
+        private UriInfo uriInfo; 
+        
+        public ExternalSchemaWriter(List<URI> links, UriInfo ui) {
+            this.links = links;
+            this.uriInfo = ui;
+        }
+        
+        public void write(StringBuilder sb) {
+            for (URI link : links) {
+                try {
+                    URI value = link.isAbsolute() ? link 
+                        : uriInfo.getBaseUriBuilder().path(link.toString()).build(); 
+                    sb.append("<include href=\"").append(value.toString()).append("\"/>");
+                } catch (Exception ex) {
+                    LOG.warning("WADL grammar section will be incomplete, this link is not a valid URI : "
+                                + link.toString());
+                }
+            }
+        }
+    }
+    
+    private class JaxbContextQNameResolver implements ElementQNameResolver {
+
+        private JAXBContextProxy proxy;
+        
+        public JaxbContextQNameResolver(JAXBContextProxy proxy) {
+            this.proxy = proxy;
+        }
+        
+        public QName resolve(Class<?> type, Annotation[] annotations, Map<Class<?>, QName> clsMap) {
+            return getJaxbQName(proxy, type, clsMap);
+        }
+        
+    }
+    
+    private class XMLNameQNameResolver implements ElementQNameResolver {
+
+        public QName resolve(Class<?> type, Annotation[] annotations, Map<Class<?>, QName> clsMap) {
+            XMLName name = AnnotationUtils.getAnnotation(annotations, XMLName.class);
+            if (name == null) {
+                name = type.getAnnotation(XMLName.class);
+            }
+            if (name != null) {
+                QName qname = convertStringToQName(name.value(), name.prefix());
+                if (qname.getPrefix().length() > 0) {
+                    return qname;
+                } else {
+                    return getQNameFromParts(qname.getLocalPart(),
+                                             qname.getNamespaceURI(), clsMap);                    
+                }
+            }
+            return null;
+        }
+        
+    }
+    
+    private class SchemaQNameResolver implements ElementQNameResolver {
+
+        private Map<String, List<String>> map;
+        
+        public SchemaQNameResolver(Map<String, List<String>> map) {
+            this.map = map;
+        }
+        
+        public QName resolve(Class<?> type, Annotation[] annotations, Map<Class<?>, QName> clsMap) {
+            String name = type.getSimpleName();
+            for (Map.Entry<String, List<String>> entry : map.entrySet()) {
+                String elementName = null;  
+                if (entry.getValue().contains(name)) { 
+                    elementName = name;                    
+                } else if (entry.getValue().contains(name.toLowerCase())) { 
+                    elementName = name.toLowerCase();                    
+                }  
+                if (elementName != null) {
+                    return getQNameFromParts(elementName, entry.getKey(), clsMap);
+                }
+            }
+            return null;
+        }
+        
+    }
+    
+    private QName convertStringToQName(String name, String prefix) {
+        int ind1 = name.indexOf('{');
+        if (ind1 != 0) {
+            return null;
+        }
+        
+        int ind2 = name.indexOf('}');
+        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
+            return null;
+        }
+        String ns = name.substring(ind1 + 1, ind2);
+        String localName = name.substring(ind2 + 1);
+        return new QName(ns, localName, prefix);
+    }
+
+    public void setResolver(ElementQNameResolver resolver) {
+        this.resolver = resolver;
+    }
+    
+    private static class SchemaConverter extends DelegatingXMLStreamWriter {
+        private static final String SCHEMA_LOCATION = "schemaLocation";
+        private Map<String, String> locsMap;    
+        public SchemaConverter(XMLStreamWriter writer, Map<String, String> locsMap) {
+            super(writer);
+            this.locsMap = locsMap;
+        }
+    
+        public void writeAttribute(String local, String value) throws XMLStreamException {
+            if (SCHEMA_LOCATION.equals(local) && locsMap.containsKey(value)) {
+                value = locsMap.get(value);
+            }
+            super.writeAttribute(local, value);
+        }
+    }        
+        
 }

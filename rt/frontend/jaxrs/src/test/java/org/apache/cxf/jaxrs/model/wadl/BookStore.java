@@ -33,6 +33,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 
 import org.apache.cxf.jaxrs.ext.Description;
+import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Book;
 import org.apache.cxf.jaxrs.model.wadl.jaxb.Chapter;
@@ -72,7 +73,8 @@ public class BookStore {
                         @CookieParam("cid") int cookieId,
                         @QueryParam("provider.bar") int queryParam,
                         @Context HttpHeaders headers,
-                        Book b) {
+                        @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
+                        Book2 b) {
         return new Book(1);
     }
     
@@ -105,6 +107,7 @@ public class BookStore {
     
     @Path("book2")
     @GET
+    @XMLName(value = "{http://books}thesuperbook2", prefix = "p1")
     public Book2 getBook2() {
         return new Book2();
     }

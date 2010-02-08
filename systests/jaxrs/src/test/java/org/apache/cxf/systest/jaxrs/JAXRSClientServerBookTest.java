@@ -387,7 +387,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testBookExists() throws Exception {
         checkBook("http://localhost:9080/bookstore/books/check/123", true);
         checkBook("http://localhost:9080/bookstore/books/check/125", false);  
-        
+    }
+    
+    @Test
+    public void testBookExists2() throws Exception {
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        assertTrue(proxy.checkBook2(123L));
+        assertFalse(proxy.checkBook2(125L));
     }
     
     private void checkBook(String address, boolean expected) throws Exception {
@@ -699,11 +705,12 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     public void testAddBookCustomFailureStatus() throws Exception {
         String endpointAddress = "http://localhost:9080/bookstore/books/customstatus";
         WebClient client = WebClient.create(endpointAddress);
-        Book book = client.type("text/xml").accept("text/xml").post(new Book(), Book.class);
+        Book book = client.type("text/xml").accept("application/xml").post(new Book(), Book.class);
         assertEquals(888L, book.getId());
         Response r = client.getResponse();
         assertEquals("CustomValue", r.getMetadata().getFirst("CustomHeader"));
         assertEquals(333, r.getStatus());
+        assertEquals("application/xml", r.getMetadata().getFirst("Content-Type"));
     }
     
     @Test

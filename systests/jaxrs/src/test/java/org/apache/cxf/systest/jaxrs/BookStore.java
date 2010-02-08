@@ -140,6 +140,14 @@ public class BookStore {
         return books.containsKey(id);
     }
     
+    @POST
+    @Path("books/check2")
+    @Produces("text/plain")
+    @Consumes("text/plain")
+    public Boolean checkBook2(Long id) {
+        return books.containsKey(id);
+    }
+    
     
     @GET
     @Path("timetable")
@@ -500,7 +508,7 @@ public class BookStore {
     
     @POST
     @Path("/books/customstatus")
-    @Produces("text/xml")
+    @Produces("application/xml")
     @Consumes("text/xml")
     public Book addBookCustomFailure(Book book, @Context HttpServletResponse response) {
         response.setStatus(333);
