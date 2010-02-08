@@ -336,12 +336,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             Response excResponse = JAXRSUtils.convertFaultToResponse(ex, message);
             if (excResponse != null) {
                 serializeMessage(message, excResponse, ori, false);
+                return;
+            } else {
+                ex.printStackTrace();
             }
-        } else {
-            message.put(Message.RESPONSE_CODE, 500);
-            writeResponseErrorMessage(out, "SERIALIZE_ERROR", 
-                                      responseObj.getClass().getSimpleName()); 
-        }    
+        }
+        message.put(Message.RESPONSE_CODE, 500);
+        writeResponseErrorMessage(out, "SERIALIZE_ERROR", 
+                                  responseObj.getClass().getSimpleName()); 
+            
     }
     
     

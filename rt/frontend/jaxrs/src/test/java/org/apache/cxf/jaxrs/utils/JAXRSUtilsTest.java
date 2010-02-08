@@ -1396,6 +1396,7 @@ public class JAXRSUtilsTest extends Assert {
     private Message createMessage() {
         ProviderFactory factory = ProviderFactory.getInstance();
         Message m = new MessageImpl();
+        m.put("org.apache.cxf.http.case_insensitive_queries", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         e.setInMessage(m);

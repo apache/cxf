@@ -78,7 +78,7 @@ public final class ResourceUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(ResourceUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(ResourceUtils.class);
-
+    private static final String CLASSPATH_PREFIX = "classpath:";
     
     private ResourceUtils() {
         
@@ -354,18 +354,8 @@ public final class ResourceUtils {
     
     public static List<UserResource> getUserResources(String loc, Bus bus) {
         try {
-            InputStream is = null;
-            if (loc.startsWith("classpath:")) {
-                String path = loc.substring("classpath:".length());
-                is = getClasspathResourceStream(path, ResourceUtils.class, bus);
-            } else {
-                File f = new File(loc);
-                if (f.exists()) {
-                    is = new FileInputStream(f);
-                }
-            }
+            InputStream is = ResourceUtils.getResourceStream(loc, bus);
             if (is == null) {
-                LOG.warning("No user model is available at " + loc);
                 return null;
             }
             return getUserResources(is);
@@ -374,6 +364,26 @@ public final class ResourceUtils {
         }
         
         return null;
+    }
+    
+    public static InputStream getResourceStream(String loc, Bus bus) throws Exception {
+        InputStream is = null;
+        if (loc.startsWith(CLASSPATH_PREFIX)) {
+            String path = loc.substring(CLASSPATH_PREFIX.length());
+            is = ResourceUtils.getClasspathResourceStream(path, ResourceUtils.class, bus);
+            if (is == null) {
+                LOG.warning("No classpath resource " + loc + " is available on classpath");
+                return null;
+            }
+        } else {
+            File f = new File(loc);
+            if (!f.exists()) {
+                LOG.warning("No file resource " + loc + " is available on local disk");
+                return null;
+            }
+            is = new FileInputStream(f);
+        }
+        return is;
     }
     
     public static InputStream getClasspathResourceStream(String path, Class<?> callingClass, Bus bus) {

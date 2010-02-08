@@ -19,8 +19,6 @@
 package org.apache.cxf.jaxrs.provider;
 
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
@@ -270,18 +268,8 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
     
     protected Templates createTemplates(String loc) {
         try {
-            InputStream is = null;
-            if (loc.startsWith("classpath:")) {
-                String path = loc.substring("classpath:".length());
-                is = ResourceUtils.getClasspathResourceStream(path, this.getClass(), this.getBus());
-            } else {
-                File f = new File(loc);
-                if (f.exists()) {
-                    is = new FileInputStream(f);
-                }
-            }
+            InputStream is = ResourceUtils.getResourceStream(loc, this.getBus());
             if (is == null) {
-                LOG.warning("No template is available at : " + loc);
                 return null;
             }
             

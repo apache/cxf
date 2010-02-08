@@ -20,6 +20,7 @@ package org.apache.cxf.jaxrs.model.wadl;
 
 import java.io.StringReader;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.ws.rs.core.HttpHeaders;
@@ -64,8 +65,10 @@ public class WadlGeneratorTest extends Assert {
     }
     
     @Test
-    public void testSingleRootResource() throws Exception {
+    public void testCustomSchemaJaxbContextPrefixes() throws Exception {
         WadlGenerator wg = new WadlGenerator();
+        wg.setSchemaLocations(Collections.singletonList("classpath:/book1.xsd"));
+        
         ClassResourceInfo cri = 
             ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
         Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
@@ -73,8 +76,133 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, cri);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
-        checkBookStoreInfo(els.get(0));
+        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
+    }
+    
+    @Test
+    public void testCustomSchemaWithImportJaxbContextPrefixes() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setSchemaLocations(Collections.singletonList("classpath:/books.xsd"));
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(doc.getDocumentElement(), 
+            WadlGenerator.WADL_NS, "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+            XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+        assertEquals(1, schemasEls.size());
+        assertEquals("http://books", schemasEls.get(0).getAttribute("targetNamespace"));
+        List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
+            XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
+        assertEquals(1, elementEls.size());
+        assertTrue(checkElement(elementEls, "books", "tns:books"));
+
+        List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
+            XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
+        assertEquals(1, complexTypesEls.size());
+        assertTrue(checkComplexType(complexTypesEls, "books"));
+        
+        List<Element> importEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
+            XmlSchemaConstants.XSD_NAMESPACE_URI, "import");
+        assertEquals(1, importEls.size());
+        assertEquals("http://localhost:8080/baz/book1.xsd",
+                     importEls.get(0).getAttribute("schemaLocation"));
+    }
+    
+    @Test
+    public void testExternalSchemaJaxbContextPrefixes() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setExternalLinks(Collections.singletonList("http://books.xsd"));
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammarsWithLinks(doc.getDocumentElement(), Collections.singletonList("http://books.xsd"));
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
+    }
+    
+    @Test
+    public void testExternalRelativeSchemaJaxbContextPrefixes() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setExternalLinks(Collections.singletonList("books.xsd"));
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammarsWithLinks(doc.getDocumentElement(), 
+                               Collections.singletonList("http://localhost:8080/baz/books.xsd"));
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
+    }
+    
+    @Test
+    public void testExternalSchemaCustomPrefix() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setExternalLinks(Collections.singletonList("http://books"));
+        wg.setUseJaxbContextForQnames(false);
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammarsWithLinks(doc.getDocumentElement(), 
+                               Collections.singletonList("http://books"));
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), "p1:thesuperbook", "p1:thesuperbook2", "p1:thesuperchapter");
+    }
+    
+    @Test
+    public void testCustomSchemaAndSchemaPrefixes() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        wg.setSchemaLocations(Collections.singletonList("classpath:/book2.xsd"));
+        wg.setUseJaxbContextForQnames(false);
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammars(doc.getDocumentElement(), "book", "book2", "chapter");
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), "prefix1:book", "prefix1:book2", "prefix1:chapter");
+    }
+    
+    @Test
+    public void testSingleRootResource() throws Exception {
+        WadlGenerator wg = new WadlGenerator();
+        
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", WadlGenerator.WADL_QUERY, null);
+        
+        Response r = wg.handleRequest(m, cri);
+        checkResponse(r);
+        Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
+        List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 1);
+        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         
     }
     
@@ -127,14 +255,14 @@ public class WadlGeneratorTest extends Assert {
         Response r = wg.handleRequest(m, null);
         checkResponse(r);
         Document doc = DOMUtils.readXml(new StringReader(r.getEntity().toString()));
-        checkGrammars(doc.getDocumentElement());
+        checkGrammars(doc.getDocumentElement(), "thebook", "thebook2", "thechapter");
         List<Element> els = getWadlResourcesInfo(doc, "http://localhost:8080/baz", 2);
-        checkBookStoreInfo(els.get(0));
+        checkBookStoreInfo(els.get(0), "prefix1:thebook", "prefix1:thebook2", "prefix1:thechapter");
         Element orderResource = els.get(1);
         assertEquals("/orders", orderResource.getAttribute("path"));
     }
 
-    private void checkGrammars(Element appElement) {
+    private void checkGrammars(Element appElement, String bookEl, String book2El, String chapterEl) {
         List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
                                                                 "grammars");
         assertEquals(1, grammarEls.size());
@@ -145,9 +273,9 @@ public class WadlGeneratorTest extends Assert {
         List<Element> elementEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                             XmlSchemaConstants.XSD_NAMESPACE_URI, "element");
         assertEquals(3, elementEls.size());
-        assertTrue(checkElement(elementEls, "thebook", "tns:book"));
-        assertTrue(checkElement(elementEls, "thebook2", "tns:book2"));
-        assertTrue(checkElement(elementEls, "thechapter", "tns:chapter"));
+        assertTrue(checkElement(elementEls, bookEl, "tns:book"));
+        assertTrue(checkElement(elementEls, book2El, "tns:book2"));
+        assertTrue(checkElement(elementEls, chapterEl, "tns:chapter"));
         
         List<Element> complexTypesEls = DOMUtils.getChildrenWithName(schemasEls.get(0), 
                                         XmlSchemaConstants.XSD_NAMESPACE_URI, "complexType");
@@ -156,6 +284,23 @@ public class WadlGeneratorTest extends Assert {
         assertTrue(checkComplexType(complexTypesEls, "book"));
         assertTrue(checkComplexType(complexTypesEls, "book2"));
         assertTrue(checkComplexType(complexTypesEls, "chapter"));
+    }
+    
+    private void checkGrammarsWithLinks(Element appElement, List<String> links) {
+        assertTrue(links.size() > 0);
+        List<Element> grammarEls = DOMUtils.getChildrenWithName(appElement, WadlGenerator.WADL_NS, 
+                                                                "grammars");
+        assertEquals(1, grammarEls.size());
+        List<Element> schemasEls = DOMUtils.getChildrenWithName(grammarEls.get(0), 
+                                                          XmlSchemaConstants.XSD_NAMESPACE_URI, "schema");
+        assertEquals(0, schemasEls.size());
+        
+        List<Element> includeEls = DOMUtils.getChildrenWithName(grammarEls.get(0), WadlGenerator.WADL_NS,
+                                                                "include");
+        assertEquals(links.size(), includeEls.size());
+        for (Element el : includeEls) {
+            assertTrue(links.contains(el.getAttribute("href")));
+        }
     }
     
     private boolean checkComplexType(List<Element> els, String name) {
@@ -177,31 +322,30 @@ public class WadlGeneratorTest extends Assert {
         return false;
     }
     
-    private void checkBookStoreInfo(Element resource) {
+    private void checkBookStoreInfo(Element resource, String bookEl, String book2El, String chapterEl) {
         assertEquals("/bookstore/{id}", resource.getAttribute("path"));
         
         checkRootDocs(resource);
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(7, resourceEls.size());        
-        assertEquals("/", resourceEls.get(0).getAttribute("path"));
-        assertEquals("/book2", resourceEls.get(1).getAttribute("path"));
-        assertEquals("/books/{bookid}", resourceEls.get(2).getAttribute("path"));
-        assertEquals("/chapter", resourceEls.get(3).getAttribute("path"));
-        assertEquals("/books/{bookid}", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(6).getAttribute("path"));
+        assertEquals(6, resourceEls.size());        
+        assertEquals("/book2", resourceEls.get(0).getAttribute("path"));
+        assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
+        assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
+        assertEquals("/books/{bookid}", resourceEls.get(3).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(4).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(5).getAttribute("path"));
         
-        // verify repource starting with "/"
+        // verify root resource starting with "/"
         // must have a single template parameter
-        List<Element> paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
+        List<Element> paramsEls = DOMUtils.getChildrenWithName(resource, 
                                                                WadlGenerator.WADL_NS, "param");
         assertEquals(1, paramsEls.size());
         checkParameter(paramsEls.get(0), "id", "template", "xs:long");
         
         // must have 2 methods, GET and PUT
-        List<Element> methodEls = DOMUtils.getChildrenWithName(resourceEls.get(0), 
+        List<Element> methodEls = DOMUtils.getChildrenWithName(resource, 
                                                                WadlGenerator.WADL_NS, "method");
         assertEquals(2, methodEls.size());
         
@@ -236,10 +380,10 @@ public class WadlGeneratorTest extends Assert {
         verifyResponseWithStatus(methodEls.get(1), "204");
         
         // verify resource starting with /book2
-        verifyGetResourceMethod(resourceEls.get(1), "prefix1:thebook2");
+        verifyGetResourceMethod(resourceEls.get(0), book2El);
         
         //verify resource starting with /books/{bookid}
-        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
+        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
                                                                WadlGenerator.WADL_NS, "param");
         // should have 3 parameters
         assertEquals(3, paramsEls.size());
@@ -248,7 +392,7 @@ public class WadlGeneratorTest extends Assert {
         checkParameter(paramsEls.get(2), "mid", "matrix", "xs:int");
         
         // and 2 methods
-        methodEls = DOMUtils.getChildrenWithName(resourceEls.get(2), 
+        methodEls = DOMUtils.getChildrenWithName(resourceEls.get(1), 
                                                  WadlGenerator.WADL_NS, "method");
         assertEquals(2, methodEls.size());
         
@@ -264,29 +408,29 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(2, paramsEls.size());
         checkParameter(paramsEls.get(0), "hid", "header", "xs:int");
         checkParameter(paramsEls.get(1), "provider.bar", "query", "xs:int");
-        verifyXmlJsonRepresentations(requestEls.get(0), "prefix1:thebook");
+        verifyXmlJsonRepresentations(requestEls.get(0), book2El);
         
         // PUT
         assertEquals("PUT", methodEls.get(1).getAttribute("name"));
         requestEls = DOMUtils.getChildrenWithName(methodEls.get(1), 
                                                                 WadlGenerator.WADL_NS, "request");
         assertEquals(1, requestEls.size());
-        verifyXmlJsonRepresentations(requestEls.get(0), "prefix1:thebook");
+        verifyXmlJsonRepresentations(requestEls.get(0), bookEl);
         verifyResponseWithStatus(methodEls.get(1), "204");
         
         // verify resource starting with /chapter
-        verifyGetResourceMethod(resourceEls.get(3), "prefix1:thechapter");
+        verifyGetResourceMethod(resourceEls.get(2), chapterEl);
         
         // verify resource starting from /booksubresource
         // should have 2 parameters
-        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
+        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(4), 
                          WadlGenerator.WADL_NS, "param");
         assertEquals(2, paramsEls.size());
         checkParameter(paramsEls.get(0), "id", "template", "xs:int");
         checkParameter(paramsEls.get(1), "mid", "matrix", "xs:int");
         
         // should have 4 child resources
-        List<Element> subResourceEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
+        List<Element> subResourceEls = DOMUtils.getChildrenWithName(resourceEls.get(4), 
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(4, subResourceEls.size());        
         assertEquals("/book", subResourceEls.get(0).getAttribute("path"));
@@ -295,7 +439,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals("/chapter/{cid}", subResourceEls.get(3).getAttribute("path"));
         // verify subresource /book
         // GET 
-        verifyGetResourceMethod(subResourceEls.get(0), "prefix1:thebook");
+        verifyGetResourceMethod(subResourceEls.get(0), bookEl);
         
         // verify subresource /chapter/{id}
         List<Element> chapterMethodEls = DOMUtils.getChildrenWithName(subResourceEls.get(3), 
@@ -307,7 +451,7 @@ public class WadlGeneratorTest extends Assert {
         assertEquals(1, paramsEls.size());
         checkParameter(paramsEls.get(0), "cid", "template", "xs:int");
         // GET
-        verifyGetResourceMethod(chapterMethodEls.get(0), "prefix1:thechapter");
+        verifyGetResourceMethod(chapterMethodEls.get(0), chapterEl);
     }
     
     private void checkRootDocs(Element el) {

@@ -629,9 +629,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return writer == null ? StaxUtils.createXMLStreamWriter(os) : writer;
     }
     
-    protected static void convertToMapOfQNames(Map<String, String> map,
-                                               Map<QName, QName> elementsMap,
-                                               Map<String, String> nsMap) {
+    protected static void convertToQNamesMap(Map<String, String> map,
+                                             QNamesMap elementsMap,
+                                             Map<String, String> nsMap) {
         if (map != null) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
                 QName lname = convertStringToQName(entry.getKey());
@@ -640,6 +640,17 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                 if (nsMap != null) {
                     nsMap.put(lname.getNamespaceURI(), rname.getNamespaceURI());
                 }
+            }
+        }
+    }
+    
+    protected static void convertToMapOfQNames(Map<String, String> map,
+                                               Map<QName, QName> elementsMap) {
+        if (map != null) {
+            for (Map.Entry<String, String> entry : map.entrySet()) {
+                QName lname = convertStringToQName(entry.getKey());
+                QName rname = convertStringToQName(entry.getValue());
+                elementsMap.put(lname, rname);
             }
         }
     }
@@ -703,7 +714,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     protected static class OutTransformWriter extends DelegatingXMLStreamWriter {
-        private Map<QName, QName> elementsMap = new HashMap<QName, QName>(5);
+        private QNamesMap elementsMap;
         private Map<QName, QName> appendMap = new HashMap<QName, QName>(5);
         private Map<String, String> nsMap = new HashMap<String, String>(5);
         private Set<String> prefixes = new HashSet<String>(2);
@@ -722,8 +733,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                   List<String> dropEls,
                                   boolean attributesToElements) {
             super(writer);
-            convertToMapOfQNames(outMap, elementsMap, nsMap);
-            convertToMapOfQNames(append, appendMap, null);
+            elementsMap = new QNamesMap(outMap == null ? 0 : outMap.size());
+            convertToQNamesMap(outMap, elementsMap, nsMap);
+            convertToMapOfQNames(append, appendMap);
             dropElements = convertToSetOfQNames(dropEls);
             this.attributesToElements = attributesToElements;
         }
@@ -869,12 +881,44 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
+    private static class QNamesMap {
+        private QName[] keys;
+        private QName[] values;
+        private int index;
+        
+        public QNamesMap(int size) {
+            keys = new QName[size];
+            values = new QName[size];
+        }
+        
+        public void put(QName key, QName value) {
+            keys[index] = key;
+            values[index] = value;
+            index++;
+        }
+        
+        public QName get(QName key) {
+            for (int i = 0; i < keys.length; i++) {
+                if (keys[i].getNamespaceURI().equals(key.getNamespaceURI())) {
+                    if (keys[i].getLocalPart().equals(key.getLocalPart())) {
+                        return values[i];
+                    } else if ("*".equals(keys[i].getLocalPart())) {
+                        // assume it is something like {somens}* : *
+                        return "*".equals(values[i]) ? new QName(key.getLocalPart()) 
+                            : new QName(values[i].getNamespaceURI(), key.getLocalPart());
+                    }
+                }
+            }
+            return null;    
+        }
+    }
+    
     protected static class InTransformReader extends DepthXMLStreamReader {
         
         private static final String INTERN_NAMES = "org.codehaus.stax2.internNames";
         private static final String INTERN_NS = "org.codehaus.stax2.internNsUris";
         
-        private Map<QName, QName> inElementsMap = new HashMap<QName, QName>(5);
+        private QNamesMap inElementsMap;
         private Map<QName, QName> inAppendMap = new HashMap<QName, QName>(5);
         private Map<String, String> nsMap = new HashMap<String, String>(5);
         private QName currentQName;
@@ -885,8 +929,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                  Map<String, String> inMap,
                                  Map<String, String> appendMap) {
             super(reader);
-            convertToMapOfQNames(inMap, inElementsMap, nsMap);
-            convertToMapOfQNames(appendMap, inAppendMap, null);
+            inElementsMap = new QNamesMap(inMap == null ? 0 : inMap.size());
+            convertToQNamesMap(inMap, inElementsMap, nsMap);
+            convertToMapOfQNames(appendMap, inAppendMap);
         }
         
         public int next() throws XMLStreamException {

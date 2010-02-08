@@ -32,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -463,6 +464,47 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @SuppressWarnings("unchecked")
+    @Test
+    public void testInNsElementsFromLocalsWildcard() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<tagholder><thetag><group>B</group><name>A</name></thetag></tagholder>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("group", "group");
+        map.put("name", "name");
+        map.put("*", "{http://tags}*");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testInNsElementsFromLocalsWildcard2() throws Exception {
+        String data = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ns2:tagholder xmlns:ns2=\"http://tags2\" attr=\"attribute\"><ns2:thetag><group>B</group>"
+            + "<name>A</name></ns2:thetag></ns2:tagholder>";
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new LinkedHashMap<String, String>();
+        map.put("group", "group");
+        map.put("name", "name");
+        map.put("{http://tags2}*", "{http://tags}*");
+        provider.setInTransformElements(map);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Object o = provider.readFrom((Class)TagVO2Holder.class, TagVO2Holder.class,
+                      new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, String>(), is);
+        TagVO2Holder holder = (TagVO2Holder)o;
+        TagVO2 tag2 = holder.getTagValue();
+        assertEquals("A", tag2.getName());
+        assertEquals("B", tag2.getGroup());    
+    }
+    
+    @SuppressWarnings("unchecked")
     private void readTagVOAfterTransform(String data, String keyValue) throws Exception {
         JAXBElementProvider provider = new JAXBElementProvider();
         Map<String, String> map = new HashMap<String, String>();
@@ -586,6 +628,42 @@ public class JAXBElementProviderTest extends Assert {
                        new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
         String expected = "<?xml version='1.0' encoding='UTF-8'?>"
             + "<t><group>B</group><name>A</name></t>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalNsToLocalWildcard() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}*", "*");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(holder, TagVO2Holder.class, TagVO2Holder.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<tagholder attr=\"attribute\"><thetag><group>B</group><name>A</name></thetag></tagholder>";
+        assertEquals(expected, bos.toString());
+    }
+    
+    @Test
+    public void testOutElementsMapLocalNsToLocalWildcard2() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> map = new HashMap<String, String>();
+        map.put("{http://tags}*", "{http://tags2}*");
+        provider.setOutTransformElements(map);
+        TagVO2 tag = new TagVO2("A", "B");
+        TagVO2Holder holder = new TagVO2Holder();
+        holder.setTag(tag);
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        provider.writeTo(holder, TagVO2Holder.class, TagVO2Holder.class,
+                       new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        
+        String expected = "<?xml version='1.0' encoding='UTF-8'?>"
+            + "<ns2:tagholder xmlns:ns2=\"http://tags2\" attr=\"attribute\"><ns2:thetag><group>B</group>"
+            + "<name>A</name></ns2:thetag></ns2:tagholder>";
         assertEquals(expected, bos.toString());
     }
     

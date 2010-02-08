@@ -24,6 +24,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -87,10 +88,31 @@ public class UriInfoImplTest extends Assert {
         assertEquals("Wrong query value", qps.getFirst("n"), "1%202");
         
         u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar", 
-                                        "n=1%202&n=3&b=2&a%2Eb=ab"),
+                                        "N=0&n=1%202&n=3&b=2&a%2Eb=ab"),
                             null);
 
         qps = u.getQueryParameters();
+        assertEquals("Number of queiries is wrong", 4, qps.size());
+        assertEquals("Wrong query value", qps.get("N").get(0), "0");
+        assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
+        assertEquals("Wrong query value", qps.get("n").get(1), "3");
+        assertEquals("Wrong query value", qps.get("b").get(0), "2");
+        assertEquals("Wrong query value", qps.get("a.b").get(0), "ab");
+    }
+    
+    @Test
+    public void testGetCaseinsensitiveQueryParameters() {
+        UriInfoImpl u = new UriInfoImpl(mockMessage("http://localhost:8080/baz", "/bar"),
+                                        null);
+        assertEquals("unexpected queries", 0, u.getQueryParameters().size());
+        
+        Message m = mockMessage("http://localhost:8080/baz", "/bar", 
+                                "N=1%202&n=3&b=2&a%2Eb=ab");
+        m.put("org.apache.cxf.http.case_insensitive_queries", "true");
+                
+        u = new UriInfoImpl(m, null);
+
+        MultivaluedMap<String, String> qps = u.getQueryParameters();
         assertEquals("Number of queiries is wrong", 3, qps.size());
         assertEquals("Wrong query value", qps.get("n").get(0), "1 2");
         assertEquals("Wrong query value", qps.get("n").get(1), "3");
@@ -207,11 +229,10 @@ public class UriInfoImplTest extends Assert {
                                 String query, String fragment) {
         Message m = new MessageImpl();
         control.reset();
-        Exchange e = control.createMock(Exchange.class);
+        Exchange e = new ExchangeImpl();
         m.setExchange(e);
         ServletDestination d = control.createMock(ServletDestination.class);
-        e.getDestination();
-        EasyMock.expectLastCall().andReturn(d).anyTimes();
+        e.setDestination(d);
         EndpointInfo epr = new EndpointInfo(); 
         epr.setAddress(baseAddress);
         d.getEndpointInfo();
