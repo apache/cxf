@@ -83,6 +83,10 @@ public class MessageContextImpl implements MessageContext {
     }
     
     public <T> T getContent(Class<T> format) {
+        if (isRequestor() && m.getExchange().getInMessage() != null) {
+            Message inMessage = m.getExchange().getInMessage();
+            return inMessage.getContent(format);
+        } 
         return m.getContent(format);
     }
     

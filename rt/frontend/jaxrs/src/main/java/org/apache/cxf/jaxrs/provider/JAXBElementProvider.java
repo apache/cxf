@@ -189,7 +189,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     protected XMLStreamReader getStreamReader(InputStream is, Class<?> type, MediaType mt) {
         MessageContext mc = getContext();
         XMLStreamReader reader = mc != null ? mc.getContent(XMLStreamReader.class) : null;
-        
         if (reader == null && mc != null) {
             XMLInputFactory factory = (XMLInputFactory)mc.get(XMLInputFactory.class.getName());
             if (factory != null) {
@@ -335,9 +334,17 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         XMLStreamWriter writer = getStreamWriter(obj, os, mt);
         if (writer != null) {
             if (mc != null) {
+                if (mc.getContent(XMLStreamWriter.class) != null) {
+                    ms.setProperty(Marshaller.JAXB_FRAGMENT, true);
+                }
                 mc.put(XMLStreamWriter.class.getName(), writer);
-            }
+            }    
             marshalToWriter(ms, obj, writer, mt);
+            if (mc != null && mc.getContent(XMLStreamWriter.class) != null) {
+                writer.writeEndDocument();
+                writer.flush();
+                writer.close();
+            }
         } else {
             marshalToOutputStream(ms, obj, os, mt);
         }

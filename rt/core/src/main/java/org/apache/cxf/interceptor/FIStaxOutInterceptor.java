@@ -20,15 +20,18 @@
 package org.apache.cxf.interceptor;
 
 
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.ResourceBundle;
 
-import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
-import com.sun.xml.fastinfoset.stax.factory.StAXOutputFactory;
+import com.sun.xml.fastinfoset.stax.StAXDocumentSerializer;
 
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
@@ -41,9 +44,11 @@ import org.apache.cxf.phase.Phase;
  */
 public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String FI_ENABLED = "org.apache.cxf.fastinfoset.enabled";
-    
+    private static final String OUTPUT_STREAM_HOLDER = FIStaxOutInterceptor.class.getName() + ".outputstream";
+    private static final FIStaxOutEndingInterceptor ENDING = new FIStaxOutEndingInterceptor();
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(FIStaxOutInterceptor.class);
+
     boolean force;
-    XMLOutputFactory factory = new StAXOutputFactory();
     
     public FIStaxOutInterceptor() {
         super(Phase.PRE_STREAM);
@@ -55,13 +60,22 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
         force = f;
     }
     
-    
+    @Override
+    public void handleFault(Message message) {
+        super.handleFault(message);
+        OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
+        if (os != null) {
+            message.setContent(OutputStream.class, os);
+        }
+    }
     
     public void handleMessage(Message message) {
+        OutputStream out = message.getContent(OutputStream.class);
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
-        if (writer != null) {
+        if (out == null || writer != null) {
             return;
-        }
+        } 
+        
         boolean req = isRequestor(message);
         Object o = message.getContextualProperty(FI_ENABLED);
         if (!req) {
@@ -91,9 +105,14 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             
         if (force 
             || MessageUtils.isTrue(o)) {
+            StAXDocumentSerializer serializer = getOutput(message, out);
+            message.setContent(XMLStreamWriter.class, serializer);
             
-            message.put(XMLOutputFactory.class.getName(),
-                        factory);
+            message.removeContent(OutputStream.class);
+            message.put(OUTPUT_STREAM_HOLDER, out);
+            message.put(AbstractOutDatabindingInterceptor.DISABLE_OUTPUTSTREAM_OPTIMIZATION,
+                  Boolean.TRUE);
+
             String s = (String)message.get(Message.CONTENT_TYPE);
             if (s.contains("application/soap+xml")) {
                 s = s.replace("application/soap+xml", "application/soap+fastinfoset");
@@ -101,7 +120,61 @@ public class FIStaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
             } else {
                 message.put(Message.CONTENT_TYPE, "application/fastinfoset");
             }
+            
+            try {
+                serializer.writeStartDocument();
+            } catch (XMLStreamException e) {
+                throw new Fault(e);
+            }
+            message.getInterceptorChain().add(ENDING);
         }
     }
+    
+    private StAXDocumentSerializer getOutput(Message m, OutputStream out) {
+        /*
+        StAXDocumentSerializer serializer = (StAXDocumentSerializer)m.getExchange().get(Endpoint.class)
+            .remove(StAXDocumentSerializer.class.getName());
+        if (serializer != null) {
+            serializer.setOutputStream(out);
+        } else {
+            serializer = new StAXDocumentSerializer(out);
+        }
+        return serializer;
+        */
+        return new StAXDocumentSerializer(out);
+    }
+    public static class FIStaxOutEndingInterceptor extends AbstractPhaseInterceptor<Message> {
+        public FIStaxOutEndingInterceptor() {
+            super(Phase.PRE_STREAM_ENDING);
+            getAfter().add(AttachmentOutInterceptor.AttachmentOutEndingInterceptor.class.getName());
+        }
+
+        public void handleMessage(Message message) throws Fault {
+            try {
+                XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
+                if (xtw != null) {
+                    xtw.writeEndDocument();
+                    xtw.flush();
+                    xtw.close();
+                }
+                /*
+                if (xtw instanceof StAXDocumentSerializer) {
+                    ((StAXDocumentSerializer)xtw).setOutputStream(null);
+                    message.getExchange().get(Endpoint.class)
+                        .put(StAXDocumentSerializer.class.getName(), xtw);
+                }
+                */
+
+                OutputStream os = (OutputStream)message.get(OUTPUT_STREAM_HOLDER);
+                if (os != null) {
+                    message.setContent(OutputStream.class, os);
+                }
+                message.removeContent(XMLStreamWriter.class);
+            } catch (XMLStreamException e) {
+                throw new Fault(new org.apache.cxf.common.i18n.Message("STAX_WRITE_EXC", BUNDLE), e);
+            }
+        }
+
+    }    
 
 }
