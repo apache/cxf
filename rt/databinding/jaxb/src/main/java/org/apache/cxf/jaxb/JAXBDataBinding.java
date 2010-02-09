@@ -307,15 +307,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
 
 
-        contextClasses = new LinkedHashSet<Class<?>>() {
-            @Override
-            public boolean add(Class<?> e) {
-                if (e == null) {
-                    Thread.dumpStack();
-                }
-                return super.add(e);
-            }
-        };
+        contextClasses = new LinkedHashSet<Class<?>>();
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
             JAXBContextInitializer initializer 
                 = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs);
