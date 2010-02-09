@@ -528,7 +528,14 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         
         if (xmlSeeAlsoAnno != null && xmlSeeAlsoAnno.value() != null) {
             for (int i = 0; i < xmlSeeAlsoAnno.value().length; i++) {
-                classes.add(xmlSeeAlsoAnno.value()[i]);
+                Class<?> value = xmlSeeAlsoAnno.value()[i];
+                if (value == null) {
+                    LOG.log(Level.WARNING, "XMLSEEALSO_NULL_CLASS", 
+                            new Object[] {getServiceClass().getName(), i});
+                } else {
+                    classes.add(value);
+                }
+                
             }
         }
         return classes;
