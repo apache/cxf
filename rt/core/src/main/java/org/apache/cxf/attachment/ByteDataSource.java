@@ -36,6 +36,10 @@ public class ByteDataSource implements DataSource {
     public ByteDataSource(byte[] dataParam) {
         this(dataParam, 0, dataParam.length);
     }
+    public ByteDataSource(byte[] dataParam, String ct) {
+        this(dataParam, 0, dataParam.length);
+        contentType = ct;
+    }
 
     public ByteDataSource(byte[] dataParam, int offsetParam, int lengthParam) {
         this.data = dataParam;

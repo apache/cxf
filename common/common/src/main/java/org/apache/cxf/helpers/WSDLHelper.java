@@ -37,6 +37,7 @@ import javax.wsdl.Part;
 import javax.wsdl.PortType;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
+import javax.xml.namespace.QName;
 
 public class WSDLHelper {
 
@@ -56,6 +57,10 @@ public class WSDLHelper {
             }
         }
         return null;
+    }
+    
+    public static String writeQName(Definition def, QName qname) {
+        return def.getPrefix(qname.getNamespaceURI()) + ":" + qname.getLocalPart();
     }
 
     public BindingOperation getBindingOperation(Binding binding, String operationName) {

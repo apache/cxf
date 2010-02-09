@@ -354,7 +354,6 @@ public final class StaxUtils {
             InputSource src = ((SAXSource)source).getInputSource();
             if (src.getSystemId() == null && src.getPublicId() == null
                 && ((SAXSource)source).getXMLReader() != null) {
-                
                 //OK - reader is OK.  We'll use that out
                 StreamWriterContentHandler ch = new StreamWriterContentHandler(writer);
                 XMLReader reader = ((SAXSource)source).getXMLReader();
@@ -1083,6 +1082,8 @@ public final class StaxUtils {
                 } catch (Exception ex) {
                     //ignore
                 }
+            } else if (source instanceof SAXSource) {
+                return createXMLStreamReader(((SAXSource)source).getInputSource());
             }
             
             XMLInputFactory factory = getXMLInputFactory();

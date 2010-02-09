@@ -24,7 +24,6 @@ import java.awt.MediaTracker;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -40,7 +39,6 @@ import javax.activation.DataSource;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 import javax.imageio.stream.ImageOutputStream;
-import javax.mail.util.ByteArrayDataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -48,6 +46,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.attachment.AttachmentImpl;
+import org.apache.cxf.attachment.ByteDataSource;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
@@ -181,7 +180,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                                      LOG, ct));                    
                 }
                 
-                dh = new DataHandler(new ByteArrayDataSource(bos.toByteArray(), ct));
+                dh = new DataHandler(new ByteDataSource(bos.toByteArray(), ct));
             } else if (o instanceof DataHandler) {
                 dh = (DataHandler) o;
                 ct = dh.getContentType();
@@ -198,13 +197,13 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 if (ct == null) {
                     ct = "application/octet-stream";
                 }
-                dh = new DataHandler(new ByteArrayDataSource((byte[])o, ct));                
+                dh = new DataHandler(new ByteDataSource((byte[])o, ct));                
             } else if (o instanceof String) {
                 if (ct == null) {
                     ct = "text/plain; charset=\'UTF-8\'";
                 }
                 try {
-                    dh = new DataHandler(new ByteArrayDataSource((String)o, ct));
+                    dh = new DataHandler(new ByteDataSource(((String)o).getBytes("UTF-8"), ct));
                 } catch (IOException e) {
                     throw new Fault(e);
                 }                
@@ -233,25 +232,23 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
                 if (src.getInputStream() != null) {
                     ByteArrayOutputStream bos = new ByteArrayOutputStream(2048);
                     IOUtils.copy(src.getInputStream(), bos, 1024);
-                    ds = new ByteArrayDataSource(bos.toByteArray(), ct);
+                    ds = new ByteDataSource(bos.toByteArray(), ct);
                 } else {
-                    ds = new ByteArrayDataSource(IOUtils.toString(src.getReader()),
+                    ds = new ByteDataSource(IOUtils.toString(src.getReader()).getBytes("UTF-8"),
                                                  ct);                            
                 }
             } catch (IOException e) {
                 throw new Fault(e);
             }
         } else {
-            StringWriter stringWriter = new StringWriter();
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(stringWriter);
+            ByteArrayOutputStream bwriter = new ByteArrayOutputStream();
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(bwriter);
             try {
                 StaxUtils.copy((Source)o, writer);
                 writer.flush();
-                ds = new ByteArrayDataSource(stringWriter.toString(), ct);
+                ds = new ByteDataSource(bwriter.toByteArray(), ct);
             } catch (XMLStreamException e1) {
                 throw new Fault(e1);
-            } catch (IOException e) {
-                throw new Fault(e);
             }
         }
         return ds;

@@ -35,7 +35,6 @@ import java.util.StringTokenizer;
 import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -385,10 +384,6 @@ public final class XMLUtils {
             parent.removeChild(node);
             node = node.getNextSibling();
         }
-    }
-
-    public static String writeQName(Definition def, QName qname) {
-        return def.getPrefix(qname.getNamespaceURI()) + ":" + qname.getLocalPart();
     }
 
     public static InputStream getInputStream(Document doc) throws Exception {
