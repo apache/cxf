@@ -116,7 +116,8 @@
             </xsd:annotation>
         </xsd:element>
       </xsd:all>
-      <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>          
+      <xsd:attributeGroup ref="cxf-beans:beanAttributes"/>
+      <xsd:attribute name="bus" type="xsd:string" />        
     </xsd:complexType>
   </xsd:element>
 </xsd:schema>
