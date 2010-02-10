@@ -75,7 +75,6 @@
 		<module name="StaticVariableName" />
 		<module name="TypeName" />
 
-
 		<!-- Checks for imports                              -->
 		<!-- See http://checkstyle.sf.net/config_import.html -->
 		<module name="AvoidStarImport">
@@ -105,9 +104,6 @@
 		<module name="ExecutableStatementCount">
 			<property name="max" value="75" />
 		</module>
-		<module name="FileLength">
-			<property name="max" value="3000" />
-		</module>
 		<module name="LineLength">
 			<property name="max" value="110" />
 		</module>
@@ -132,7 +128,6 @@
 		<module name="OperatorWrap" />
 		<module name="ParenPad" />
 		<module name="TypecastParenPad" />
-		<module name="TabCharacter" />
 		<module name="WhitespaceAfter">
 			<property name="tokens" value="COMMA, SEMI" />
 		</module>
@@ -297,4 +292,10 @@
                 value="/**\n * Licensed to the Apache Software Foundation (ASF) under one\n * or more contributor license agreements. See the NOTICE file\n * distributed with this work for additional information\n * regarding copyright ownership. The ASF licenses this file\n * to you under the Apache License, Version 2.0 (the\n * &quot;License&quot;); you may not use this file except in compliance\n * with the License. You may obtain a copy of the License at\n *\n * http://www.apache.org/licenses/LICENSE-2.0\n *\n * Unless required by applicable law or agreed to in writing,\n * software distributed under the License is distributed on an\n * &quot;AS IS&quot; BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY\n * KIND, either express or implied. See the License for the\n * specific language governing permissions and limitations\n * under the License.\n */\n" />
     </module>
     <!-- <module name="RegexpHeader"/> -->
+    <module name="FileLength">
+      <property name="max" value="3000" />
+    </module>
+    <module name="FileTabCharacter">
+      <property name="eachLine" value="true"/>
+    </module>
 </module>

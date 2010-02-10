@@ -23,4 +23,7 @@
         <file-match-pattern match-pattern="^src[/\\]main[/\\]generated[/\\]." include-pattern="false"/>
         <file-match-pattern match-pattern="^src[/\\]test[/\\]generated[/\\]." include-pattern="false"/>
     </fileset>
+    <filter name="FileTypesFilter" enabled="true">
+        <filter-data value="java"/>
+    </filter>
 </fileset-config>
