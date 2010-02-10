@@ -32,6 +32,8 @@ import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.junit.Assert;
 import org.junit.Test;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 public class BusDefinitionParserTest extends Assert {
     
     @Test
@@ -61,6 +63,26 @@ public class BusDefinitionParserTest extends Assert {
         assertTrue("test feature  has not been initialised", tf.initialised);
         assertNotNull("test feature has not been injected", tf.testBean);
         assertTrue("bean injected into test feature has not been initialised", tf.testBean.initialised);
+    }
+    
+    @Test
+    public void testBusConfigure() {
+        ClassPathXmlApplicationContext context = null;
+        try {
+            context = new ClassPathXmlApplicationContext("org/apache/cxf/bus/spring/customerBus.xml");
+            Bus cxf1 = (Bus)context.getBean("cxf1");
+            
+            assertTrue(cxf1.getOutInterceptors().size() == 1);
+            assertTrue(cxf1.getInInterceptors().size() == 0);
+            
+            Bus cxf2 = (Bus)context.getBean("cxf2");
+            assertTrue(cxf2.getInInterceptors().size() == 1);
+            assertTrue(cxf2.getOutInterceptors().size() == 0);
+        } finally {
+            if (context != null) {
+                context.close();
+            }
+        }
     }
     
     static class TestBean {
