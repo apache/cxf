@@ -47,11 +47,12 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
         setBeanClass(BusConfig.class);
     }
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
-        String bus = element.getAttribute("bus");
+        String bus = element.getAttribute("bus");        
         if (StringUtils.isEmpty(bus)) {
             addBusWiringAttribute(bean, BusWiringType.CONSTRUCTOR);
         } else {
             bean.addConstructorArgReference(bus);
+            element.removeAttribute("bus");
         }
         super.doParse(element, ctx, bean);
     }
