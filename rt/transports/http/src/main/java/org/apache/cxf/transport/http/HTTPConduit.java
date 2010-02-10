@@ -1977,7 +1977,7 @@ public class HTTPConduit
             super.flush();
             if (!cachingForRetransmission) {
                 super.close();
-            } else {
+            } else if (cachedStream != null) {
                 cachedStream.getOut().close();
                 cachedStream.closeFlowthroughStream();
             }
@@ -2157,7 +2157,7 @@ public class HTTPConduit
                 //not going to be resending or anything, clear out the stuff in the out message
                 //to free memory
                 outMessage.removeContent(OutputStream.class);
-                if (cachingForRetransmission) {
+                if (cachingForRetransmission && cachedStream != null) {
                     cachedStream.close();
                 }
                 cachedStream = null;
