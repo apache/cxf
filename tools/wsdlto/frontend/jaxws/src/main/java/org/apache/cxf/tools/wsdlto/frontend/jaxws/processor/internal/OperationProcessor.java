@@ -88,20 +88,7 @@ public class OperationProcessor  extends AbstractProcessor {
 
         ParameterProcessor paramProcessor = new ParameterProcessor(context);
         method.clear();
-        paramProcessor.process(method,
-                               inputMessage,
-                               outputMessage,
-                               operation.getParameterOrdering());
-
-        method.annotate(new WebMethodAnnotator());
-
-        if (method.isWrapperStyle()) {
-            setWrapper(operation);
-            method.annotate(new WrapperAnnotator(wrapperRequest, wrapperResponse));
-        }
-
-        method.annotate(new WebResultAnnotator());
-
+        
         JAXWSBinding opBinding = (JAXWSBinding)operation.getExtensor(JAXWSBinding.class);
         JAXWSBinding ptBinding = operation.getInterface().getExtensor(JAXWSBinding.class);
         JAXWSBinding defBinding = operation.getInterface().getService()
@@ -109,12 +96,16 @@ public class OperationProcessor  extends AbstractProcessor {
         
         boolean enableAsync = false;
         boolean enableMime = false;
+        boolean enableWrapper = method.isWrapperStyle();
         if (defBinding != null) {
             if (defBinding.isSetEnableMime()) {
                 enableMime = defBinding.isEnableMime();
             }
             if (defBinding.isSetEnableAsyncMapping()) {
                 enableAsync = defBinding.isEnableAsyncMapping();
+            }
+            if (defBinding.isSetEnableWrapperStyle()) {
+                enableWrapper = defBinding.isEnableWrapperStyle();
             }
         }
         if (ptBinding != null) {
@@ -124,6 +115,9 @@ public class OperationProcessor  extends AbstractProcessor {
             if (ptBinding.isSetEnableAsyncMapping()) {
                 enableAsync = ptBinding.isEnableAsyncMapping();
             }
+            if (ptBinding.isSetEnableWrapperStyle()) {
+                enableWrapper = ptBinding.isEnableWrapperStyle();
+            }
         }
         if (opBinding != null) {
             if (opBinding.isSetEnableMime()) {
@@ -132,13 +126,33 @@ public class OperationProcessor  extends AbstractProcessor {
             if (opBinding.isSetEnableAsyncMapping()) {
                 enableAsync = opBinding.isEnableAsyncMapping();
             }
+            if (opBinding.isSetEnableWrapperStyle()) {
+                enableWrapper = opBinding.isEnableWrapperStyle();
+            }
         }
+        method.setWrapperStyle(enableWrapper);
         
+        
+        paramProcessor.process(method,
+                               inputMessage,
+                               outputMessage,
+                               operation.getParameterOrdering());
+
+        if (method.isWrapperStyle()) {
+            setWrapper(operation);
+            method.annotate(new WrapperAnnotator(wrapperRequest, wrapperResponse));
+        }
+
+        method.annotate(new WebMethodAnnotator());
+
+
+        method.annotate(new WebResultAnnotator());
+
+
         if (!method.isOneWay()
             && enableAsync && !isAddedAsycMethod(method)) {
             addAsyncMethod(method);
         }
-
         if (enableMime) {
             method.setMimeEnable(true);
         }
