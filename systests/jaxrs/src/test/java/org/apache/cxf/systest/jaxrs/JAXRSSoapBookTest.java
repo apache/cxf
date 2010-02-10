@@ -161,6 +161,11 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         
         HTTPConduit conduit2 = (HTTPConduit)WebClient.getConfig(proxy).getConduit();
         assertSame(conduit, conduit2);
+        
+        conduit.getClient().setAutoRedirect(true);
+        b = proxy.getBook(new Long("123"));
+        assertEquals(123, b.getId());
+        assertEquals("CXF in Action", b.getName());
     }
     
     @Test
