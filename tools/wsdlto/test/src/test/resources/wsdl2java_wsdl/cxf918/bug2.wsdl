@@ -27,7 +27,7 @@
     
     <!-- customizations with global scope below it shows the default customizations -->
     <jaxws:bindings xmlns:jaxws="http://java.sun.com/xml/ns/jaxws">
-	<jaxws:enableWrapperStyle>false</jaxws:enableWrapperStyle>
+	<jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
 	<jaxws:enableAsyncMapping>false</jaxws:enableAsyncMapping>
     </jaxws:bindings>
 

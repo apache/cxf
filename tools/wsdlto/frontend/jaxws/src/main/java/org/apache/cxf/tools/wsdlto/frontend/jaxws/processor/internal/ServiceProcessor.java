@@ -369,29 +369,29 @@ public class ServiceProcessor extends AbstractProcessor {
                 OperationInfo opinfo = bop.getOperationInfo();
 
                 JAXWSBinding opBinding = (JAXWSBinding)opinfo.getExtensor(JAXWSBinding.class);
-
-
-                if (opBinding != null) {
-                    if (opBinding.isEnableWrapperStyle()) {
-                        jaxwsBinding.setEnableWrapperStyle(true);
-                    } else {
-                        jaxwsBinding.setEnableWrapperStyle(false);
-                        if (!opBinding.isEnableAsyncMapping()) {
-                            jaxwsBinding.setEnableAsyncMapping(false);
-                        }
-                    }
-
-                    if (opBinding.isEnableMime()) {
-                        enableOpMime = true;
-                    }
+                JAXWSBinding infBinding = (JAXWSBinding)opinfo.getInterface().getExtensor(JAXWSBinding.class);
+                boolean enableMime = enableOpMime;
+                boolean enableWrapperStyle = true;
+                
+                if (infBinding != null && infBinding.isSetEnableWrapperStyle()) {
+                    enableWrapperStyle = infBinding.isEnableWrapperStyle();
                 }
-                if (jaxwsBinding.isEnableMime() || enableOpMime) {
+                if (infBinding != null && infBinding.isSetEnableMime()) {
+                    enableMime = infBinding.isEnableMime();
+                }
+                if (opBinding != null && opBinding.isSetEnableWrapperStyle()) {
+                    enableWrapperStyle = opBinding.isEnableWrapperStyle();
+                }
+                if (opBinding != null && opBinding.isSetEnableMime()) {
+                    enableMime = opBinding.isEnableMime();
+                }
+                if (jaxwsBinding.isEnableMime() || enableMime) {
                     jm.setMimeEnable(true);
                 }
-                
-                if (jm.isWrapperStyle() && headerType > this.noHEADER
+                if ((jm.isWrapperStyle() && headerType > this.noHEADER)
                     || !jaxwsBinding.isEnableWrapperStyle()
-                    || jm.enableMime() && jm.isWrapperStyle()) {
+                    || (jm.enableMime() && jm.isWrapperStyle())
+                    || !enableWrapperStyle) {
                     // changed wrapper style
 
                     jm.setWrapperStyle(false);
@@ -401,7 +401,6 @@ public class ServiceProcessor extends AbstractProcessor {
 
                 } else {
                     processor.processMethod(jm, bop.getOperationInfo());
-
                 }
 
                 if (headerType == this.resultHeader) {
