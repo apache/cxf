@@ -72,6 +72,8 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.MessageContextImpl;
+import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
+import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
@@ -769,8 +771,9 @@ public final class JAXRSUtils {
         Object o = null;
         if (UriInfo.class.isAssignableFrom(clazz)) {
             o = createUriInfo(contextMessage);
-        } else if (HttpHeaders.class.isAssignableFrom(clazz)) {
-            o = createHttpHeaders(contextMessage);
+        } else if (HttpHeaders.class.isAssignableFrom(clazz)
+            || ProtocolHeaders.class.isAssignableFrom(clazz)) {
+            o = createHttpHeaders(contextMessage, clazz);
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
@@ -797,11 +800,12 @@ public final class JAXRSUtils {
         return new UriInfoImpl(m, templateParams);
     }
     
-    private static HttpHeaders createHttpHeaders(Message m) {
+    private static Object createHttpHeaders(Message m, Class<?> ctxClass) {
         if (MessageUtils.isRequestor(m)) {
             m = m.getExchange() != null ? m.getExchange().getOutMessage() : m;
         }
-        return new HttpHeadersImpl(m);
+        return HttpHeaders.class.isAssignableFrom(ctxClass) ? new HttpHeadersImpl(m)
+            : new ProtocolHeadersImpl(m);
     }
     
     public static ContextResolver<?> createContextResolver(Type genericType, Message m) {

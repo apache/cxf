@@ -75,6 +75,7 @@ import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.ext.Description;
+import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
@@ -272,7 +273,8 @@ public class WadlGenerator implements RequestHandler {
         sb.append("<response");
         boolean isVoid = void.class == ori.getMethodToInvoke().getReturnType();
         if (isVoid) {
-            sb.append(" status=\"204\"");
+            boolean oneway = ori.getMethodToInvoke().getAnnotation(Oneway.class) != null;
+            sb.append(" status=\"" + (oneway ? 202 : 204) + "\"");
         }
         sb.append(">");
         if (void.class != ori.getMethodToInvoke().getReturnType()) {
