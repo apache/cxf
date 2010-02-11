@@ -22,6 +22,7 @@ package org.apache.cxf.bus.spring;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.w3c.dom.Element;
 
@@ -41,6 +42,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 public class BusDefinitionParser extends AbstractBeanDefinitionParser {
+    private static AtomicInteger counter = new AtomicInteger(0);
 
     public BusDefinitionParser() {
         super();
@@ -76,7 +78,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
     protected String getIdOrName(Element elem) {
         String id = super.getIdOrName(elem); 
         if (StringUtils.isEmpty(id)) {
-            id = Bus.DEFAULT_BUS_ID + ".config";
+            id = Bus.DEFAULT_BUS_ID + ".config" + counter.getAndIncrement();
         }
         return id;
     }
