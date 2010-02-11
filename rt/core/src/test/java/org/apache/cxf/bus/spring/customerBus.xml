@@ -28,13 +28,13 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
    
   <bean id="cxf2" class="org.apache.cxf.bus.CXFBusImpl"/>
 
-   <cxf:bus name="test1" bus="cxf1">
+   <cxf:bus bus="cxf1">
         <cxf:outInterceptors>
         <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
         </cxf:outInterceptors>
     </cxf:bus>
 
-    <cxf:bus name="test2" bus="cxf2">
+    <cxf:bus bus="cxf2">
         <cxf:inInterceptors>
         <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
         </cxf:inInterceptors>
