@@ -257,7 +257,8 @@ public class AegisDatabinding
             }
         }
 
-        aegisContext.setMappingNamespaceURI(s.getServiceInfos().get(0).getName().getNamespaceURI());
+        aegisContext.setMappingNamespaceURI(s.getServiceInfos().get(0)
+                                                .getInterface().getName().getNamespaceURI());
         aegisContext.initialize();
         this.service = s;
 

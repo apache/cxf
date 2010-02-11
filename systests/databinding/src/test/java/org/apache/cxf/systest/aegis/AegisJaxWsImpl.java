@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.systest.aegis;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.jws.WebService;
@@ -50,5 +52,11 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     }
     
     
+    public Integer getSimpleValue(Integer a, String b) {
+        return a;
+    }
 
+    public List<String> getStringList() {
+        return Arrays.asList("a", "b", "c");
+    }
 }
