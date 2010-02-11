@@ -76,9 +76,18 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     private boolean isRoot;
     private Map<String, Object> valuesMap;
     
-    public ClientProxyImpl(URI baseURI, URI currentURI, ClassResourceInfo cri, boolean isRoot, 
+    public ClientProxyImpl(URI baseURI, ClassResourceInfo cri, boolean isRoot, 
                            boolean inheritHeaders, Object... varValues) {
-        super(baseURI, currentURI);
+        super(baseURI);
+        this.cri = cri;
+        this.isRoot = isRoot;
+        this.inheritHeaders = inheritHeaders;
+        initValuesMap(varValues);
+    }
+    
+    public ClientProxyImpl(ClientState initialState, ClassResourceInfo cri, boolean isRoot, 
+                           boolean inheritHeaders, Object... varValues) {
+        super(initialState);
         this.cri = cri;
         this.isRoot = isRoot;
         this.inheritHeaders = inheritHeaders;
@@ -148,15 +157,16 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             if (subCri == null) {
                 reportInvalidResourceMethod(m, "INVALID_SUBRESOURCE");
             }
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(getBaseURI(), uri, subCri, false, inheritHeaders);
-            proxyImpl.setConfiguration(getConfiguration());
             
-            Object proxy = JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
+            MultivaluedMap<String, String> subHeaders = paramHeaders;
             if (inheritHeaders) {
-                WebClient.client(proxy).headers(headers);
+                subHeaders.putAll(headers);    
             }
-            WebClient.client(proxy).headers(paramHeaders);
-            return proxy;
+            
+            ClientState newState = getState().newState(uri, headers);
+            ClientProxyImpl proxyImpl = new ClientProxyImpl(newState, subCri, false, inheritHeaders);
+            proxyImpl.setConfiguration(getConfiguration());
+            return JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
         } 
         
         headers.putAll(paramHeaders);
@@ -443,7 +453,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
     
     protected Object handleResponse(HttpURLConnection connect, Message outMessage, OperationResourceInfo ori) 
         throws Throwable {
-        Response r = setResponseBuilder(connect, outMessage.getExchange()).clone().build();
+        Response r = setResponseBuilder(connect, outMessage.getExchange()).build();
         Method method = ori.getMethodToInvoke();
         checkResponse(method, r, outMessage);
         if (method.getReturnType() == Void.class) { 

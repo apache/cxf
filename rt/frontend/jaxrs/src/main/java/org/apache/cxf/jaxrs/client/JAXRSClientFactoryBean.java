@@ -46,6 +46,8 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     private String password;
     private boolean inheritHeaders; 
     private MultivaluedMap<String, String> headers;
+    private ClientState initialState;
+    private boolean threadSafe; 
     
     public JAXRSClientFactoryBean() {
         this(new JAXRSServiceFactoryBean());
@@ -55,6 +57,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         super(serviceFactory);
         serviceFactory.setEnableStaticResolution(true);
         
+    }
+    
+    public void setThreadSafe(boolean threadSafe) {
+        this.threadSafe = threadSafe;
     }
     
     public String getUsername() {
@@ -108,13 +114,27 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         
         try {
             Endpoint ep = createEndpoint();
-            WebClient client = new WebClient(getAddress());
-            initClient(client, ep);
+            ClientState actualState = getActualState();
+            WebClient client = actualState == null ? new WebClient(getAddress())
+                : new WebClient(actualState);
+            initClient(client, ep, actualState == null);
             
             return client;
         } catch (Exception ex) {
             LOG.severe(ex.getClass().getName() + " : " + ex.getLocalizedMessage());
             throw new RuntimeException(ex);
+        }
+    }
+    
+    private ClientState getActualState() {
+        if (threadSafe) {
+            initialState = new ThreadLocalClientState(getAddress());
+        }
+        if (initialState != null) {
+            return headers != null
+                ? initialState.newState(URI.create(getAddress()), headers) : initialState;
+        } else {
+            return null;
         }
     }
     
@@ -131,12 +151,18 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         ClassResourceInfo cri = null;
         try {
             Endpoint ep = createEndpoint();
-            URI baseURI = URI.create(getAddress());
             cri = serviceFactory.getClassResourceInfo().get(0);
             boolean isRoot = cri.getURITemplate() != null;
-            ClientProxyImpl proxyImpl = new ClientProxyImpl(baseURI, baseURI, cri, isRoot, inheritHeaders,
-                                                            varValues);
-            initClient(proxyImpl, ep);    
+            ClientProxyImpl proxyImpl = null;
+            ClientState actualState = getActualState();
+            if (actualState == null) {
+                proxyImpl = 
+                    new ClientProxyImpl(URI.create(getAddress()), cri, isRoot, inheritHeaders, varValues);
+            } else {
+                proxyImpl = 
+                    new ClientProxyImpl(actualState, cri, isRoot, inheritHeaders, varValues);
+            }
+            initClient(proxyImpl, ep, actualState == null);    
             
             try {
                 return (Client)ProxyHelper.getProxy(cri.getServiceClass().getClassLoader(),
@@ -174,7 +200,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         return cs;
     }
     
-    protected void initClient(AbstractClient client, Endpoint ep) {
+    protected void initClient(AbstractClient client, Endpoint ep, boolean addHeaders) {
         
         if (username != null) {
             AuthorizationPolicy authPolicy = new AuthorizationPolicy();
@@ -188,9 +214,11 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         client.getConfiguration().setBus(getBus());
         client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
         client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
-        if (headers != null) {
+
+        if (headers != null && addHeaders) {
             client.headers(headers);
         }
+        
         setupFactory(ep);
     }
     
@@ -201,4 +229,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
             }
         }
     }
+
+    public void setInitialState(ClientState initialState) {
+        this.initialState = initialState;
+    }
+
+    
 } 
