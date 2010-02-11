@@ -19,7 +19,9 @@
 
 package org.apache.cxf.systest.aegis;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -100,5 +102,15 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
         Assert.assertEquals(42, key2.intValue());
         Assert.assertEquals("Godzilla", item2.getData());
     }
-    
+    @Test
+    public void testGetStringList() throws Exception {
+        setupForTest(false);
+
+        Integer soucet = client.getSimpleValue(5, "aa");
+        //this one fail, when comment org.apache.cxf.systest.aegis.AegisJaxWs.getStringList test pass
+        Assert.assertEquals(new Integer(5), soucet);
+
+        List<String> item = client.getStringList();
+        Assert.assertEquals(Arrays.asList("a", "b", "c"), item);
+    }
 }
