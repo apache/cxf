@@ -337,6 +337,27 @@ public final class DOMUtils {
         }
         return r;
     }
+    
+    /**
+     * Returns all child elements with specified namespace.
+     * 
+     * @param parent the element to search under
+     * @param ns the namespace to find elements in
+     * @return all child elements with specified namespace
+     */
+    public static List<Element> getChildrenWithNamespace(Element parent, String ns) {
+        List<Element> r = new ArrayList<Element>();
+        for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
+            if (n instanceof Element) {
+                Element e = (Element)n;
+                String eNs = (e.getNamespaceURI() == null) ? "" : e.getNamespaceURI();
+                if (ns.equals(eNs)) {
+                    r.add(e);
+                }
+            }
+        }
+        return r;
+    }
 
     /**
      * Get the first child of the specified type.

@@ -20,9 +20,10 @@
 package org.apache.cxf.ws.security.wss4j;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import org.apache.cxf.helpers.DOMUtils;
@@ -56,6 +56,54 @@ public final class CryptoCoverageUtil {
      * Hidden in utility class.
      */
     private CryptoCoverageUtil() {
+    }
+    
+    /**
+     * Inspects the signed and encrypted content in the message and accurately
+     * resolves encrypted and then signed elements in {@code signedRefs}.
+     * Entries in {@code signedRefs} that correspond to an encrypted element
+     * are resolved to the decrypted element and added to {@code signedRefs}.
+     * The original reference to the encrypted content remains unaltered in the
+     * list to allow for matching against a requirement that xenc:EncryptedData
+     * elements be signed.
+     * 
+     * @param signedRefs references to the signed content in the message
+     * @param encryptedRefs refernces to the encrypted content in the message
+     */
+    public static void reconcileEncryptedSignedRefs(final Collection<WSDataRef> signedRefs, 
+            final Collection<WSDataRef> encryptedRefs) {
+        
+        final List<WSDataRef> encryptedSignedRefs = new LinkedList<WSDataRef>();
+        
+        for (WSDataRef encryptedRef : encryptedRefs) {
+            final String encryptedRefId = encryptedRef.getWsuId();
+            final Iterator<WSDataRef> signedRefsIt = signedRefs.iterator();
+            while (signedRefsIt.hasNext()) {
+                final WSDataRef signedRef = signedRefsIt.next();
+                
+                if (signedRef.getWsuId().equals(encryptedRefId)
+                        || signedRef.getWsuId().equals("#" + encryptedRefId)) {
+                    
+                    final WSDataRef encryptedSignedRef = 
+                        new WSDataRef(signedRef.getDataref());
+                    
+                    encryptedSignedRef.setContent(false);
+                    encryptedSignedRef.setName(encryptedRef.getName());
+                    encryptedSignedRef.setProtectedElement(encryptedRef
+                            .getProtectedElement());
+                    // This value is the ID of the encrypted element, not
+                    // the value of the ID in the decrypted content 
+                    // (WSS4J 1.5.8).  Therefore, passing it along does
+                    // not provide much value.
+                    //encryptedSignedRef.setWsuId(encryptedRef.getWsuId());
+                    encryptedSignedRef.setXpath(encryptedRef.getXpath());
+                    
+                    encryptedSignedRefs.add(encryptedSignedRef);
+                }
+            }
+        }
+        
+        signedRefs.addAll(encryptedSignedRefs);
     }
     
     /**
@@ -141,20 +189,7 @@ public final class CryptoCoverageUtil {
         }
         
         if (name == null) {
-            // TODO add to DOMUtils as findChildElementsByNamespace
-            final String ns = namespace;
-            List<Element> r = new ArrayList<Element>();
-            for (Node n = parent.getFirstChild(); n != null; n = n.getNextSibling()) {
-                if (n instanceof Element) {
-                    Element e = (Element)n;
-                    String eNs = (e.getNamespaceURI() == null) ? "" : e.getNamespaceURI();
-                    if (ns.equals(eNs)) {
-                        r.add(e);
-                    }
-                }
-            }
-            
-            elements = r;
+            elements = DOMUtils.getChildrenWithNamespace(parent, namespace);
         } else {
             elements = DOMUtils.getChildrenWithName(
                     parent, namespace, name);

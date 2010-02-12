@@ -4,6 +4,30 @@
     xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
   <wsp:ExactlyOne>
     <wsp:All>
+      <sp:SymmetricBinding>
+        <wsp:Policy>
+          <sp:ProtectionToken>
+            <wsp:Policy>
+              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
+                <wsp:Policy>
+                  <sp:RequireEmbeddedTokenReference />
+                  <sp:WssX509V3Token10 />
+                </wsp:Policy>
+              </sp:X509Token>
+            </wsp:Policy>
+          </sp:ProtectionToken>
+          <sp:AlgorithmSuite>
+            <wsp:Policy>
+              <sp:Basic128 />
+            </wsp:Policy>
+          </sp:AlgorithmSuite>
+          <sp:Layout>
+            <wsp:Policy>
+              <sp:Strict />
+            </wsp:Policy>
+          </sp:Layout>
+        </wsp:Policy>
+      </sp:SymmetricBinding>
       <sp:EncryptedParts>
         <sp:Body/>
       </sp:EncryptedParts>  

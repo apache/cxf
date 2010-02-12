@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -634,6 +635,14 @@ public abstract class AbstractBindingBuilder {
         return cb[0].getPassword();
     }
 
+    /**
+     * Generates a wsu:Id attribute for the provided {@code Element} and returns the attribute value
+     * or finds and returns the value of the attribute if it already exists.
+     * 
+     * @param element the {@code Element} to check/create the attribute on
+     *
+     * @return the generated or discovered wsu:Id attribute value
+     */
     public String addWsuIdToElement(Element elem) {
         String id;
         
@@ -710,12 +719,15 @@ public abstract class AbstractBindingBuilder {
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
-                                                            "Content");
+                                                            "Element");
                 signedParts.add(wep);
             }
         }
     
-        
+        // REVISIT consider catching exceptions and unassert failed assertions or
+        // to process and assert them one at a time.  Additionally, a found list
+        // should be applied to all operations that involve adding anything to
+        // the encrypted vector to prevent duplication / errors in encryption.
         return getPartsAndElements(false, 
                                    isBody,
                                    signedParts,
@@ -754,12 +766,15 @@ public abstract class AbstractBindingBuilder {
             for (Header head : parts.getHeaders()) {
                 WSEncryptionPart wep = new WSEncryptionPart(head.getName(),
                                                             head.getNamespace(),
-                                                            "Content");
+                                                            "Element");
                 signedParts.add(wep);
             }
         }
-
         
+        // REVISIT consider catching exceptions and unassert failed assertions or
+        // to process and assert them one at a time.  Additionally, a found list
+        // should be applied to all operations that involve adding anything to
+        // the signed vector to prevent duplication in the signature.
         return getPartsAndElements(true, 
                                    isSignBody,
                                    signedParts,
@@ -767,6 +782,38 @@ public abstract class AbstractBindingBuilder {
                                    elements == null ? null : elements.getDeclaredNamespaces(),
                                    null, null);
     }
+
+    /**
+     * Identifies the portions of the message to be signed/encrypted.
+     * 
+     * @param sign
+     *            whether the matches are to be signed or encrypted
+     * @param includeBody
+     *            if the body should be included in the signature/encryption
+     * @param parts
+     *            any {@code WSEncryptionPart}s to match for signature or
+     *            encryption as specified by WS-SP signed parts or encrypted
+     *            parts. Parts without a name match all elements with the
+     *            provided namespace.
+     * @param xpaths
+     *            any XPath expressions to sign/encrypt matches
+     * @param namespaces
+     *            namespace prefix to namespace mappings for XPath expressions
+     *            in {@code xpaths}
+     * @param contentXpaths
+     *            any XPath expressions to content encrypt
+     * @param cnamespaces
+     *            namespace prefix to namespace mappings for XPath expressions
+     *            in {@code contentXpaths}
+     * @return a configured vector of {@code WSEncryptionPart}s suitable for
+     *         processing by WSS4J
+     * @throws SOAPException
+     *             if there is an error extracting SOAP content from the SAAJ
+     *             model
+     *             
+     * @deprecated Use {@link #getSignedParts()} and {@link #getEncryptedParts()}
+     *             instead.
+     */
     public Vector<WSEncryptionPart> getPartsAndElements(boolean sign, 
                                                     boolean includeBody,
                                                     List<WSEncryptionPart> parts,
@@ -777,68 +824,141 @@ public abstract class AbstractBindingBuilder {
         throws SOAPException {
         
         Vector<WSEncryptionPart> result = new Vector<WSEncryptionPart>();
+        
         List<Element> found = new ArrayList<Element>();
-        if (includeBody) {
-            if (sign) {
-                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody()),
-                                                null, WSConstants.PART_TYPE_BODY));
-            } else {
-                result.add(new WSEncryptionPart(addWsuIdToElement(saaj.getSOAPBody()),
-                                                "Content", WSConstants.PART_TYPE_BODY));
-            }
+        
+        // Handle sign/enc parts
+        result.addAll(this.getParts(sign, includeBody, parts, found));
+        
+        
+        // Handle sign/enc elements
+        try {
+            result.addAll(this.getElements("Element", xpaths, namespaces, found));
+        } catch (XPathExpressionException e) {  
+            // REVISIT
+        }
+        
+        // Handle content encrypted elements
+        try {
+            result.addAll(this.getElements("Content", contentXpaths, cnamespaces, found));
+        } catch (XPathExpressionException e) {
+            // REVISIT
+        }
+        
+        return result;
+    }
+    
+    /**
+     * Identifies the portions of the message to be signed/encrypted.
+     * 
+     * @param sign
+     *            whether the matches are to be signed or encrypted
+     * @param includeBody
+     *            if the body should be included in the signature/encryption
+     * @param parts
+     *            any {@code WSEncryptionPart}s to match for signature or
+     *            encryption as specified by WS-SP signed parts or encrypted
+     *            parts. Parts without a name match all elements with the
+     *            provided namespace.
+     * @param found 
+     *            a list of elements that have previously been tagged for
+     *            signing/encryption. Populated with additional matches found by
+     *            this method and used to prevent including the same element
+     *            twice under the same operation.
+     * @return a configured vector of {@code WSEncryptionPart}s suitable for
+     *         processing by WSS4J
+     * @throws SOAPException
+     *             if there is an error extracting SOAP content from the SAAJ
+     *             model
+     */
+    private Vector<WSEncryptionPart> getParts(boolean sign,
+            boolean includeBody, List<WSEncryptionPart> parts,
+            List<Element> found) throws SOAPException {
+        
+        Vector<WSEncryptionPart> result = new Vector<WSEncryptionPart>();
+        
+        
+        if (includeBody && !found.contains(this.saaj.getSOAPBody())) {
             found.add(saaj.getSOAPBody());
-        }
-        SOAPHeader header = saaj.getSOAPHeader();
-        for (WSEncryptionPart part : parts) {
-            if (StringUtils.isEmpty(part.getName())) {
-                //an entire namespace
-                Element el = DOMUtils.getFirstElement(header);
-                while (el != null) {
-                    if (part.getNamespace().equals(el.getNamespaceURI())
-                        && !found.contains(el)) {
-                        found.add(el);
-                        
-                        if (sign) {
-                            result.add(new WSEncryptionPart(el.getLocalName(), 
-                                                            part.getNamespace(),
-                                                            "Content",
-                                                            WSConstants.PART_TYPE_HEADER));
-                        } else {
-                            WSEncryptionPart encryptedHeader 
-                                = new WSEncryptionPart(el.getLocalName(),
-                                                       part.getNamespace(), 
-                                                       "Element",
-                                                       WSConstants.PART_TYPE_HEADER);
-                            String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
-                            
-                            if (!StringUtils.isEmpty(wsuId)) {
-                                encryptedHeader.setEncId(wsuId);
-                            }
-                            result.add(encryptedHeader);
-                        }
-                    }
-                }
-                el = DOMUtils.getNextElement(el);
+            final String id = this.addWsuIdToElement(this.saaj.getSOAPBody());
+            if (sign) {
+                result.add(new WSEncryptionPart(
+                        id,
+                        "Element",
+                        WSConstants.PART_TYPE_BODY));
             } else {
-                Element el = DOMUtils.getFirstElement(header);
-                while (el != null) {
-                    if (part.getName().equals(el.getLocalName())
-                        && part.getNamespace().equals(el.getNamespaceURI())
-                        && !found.contains(el)) {
-                        found.add(el);          
-                        part.setType(WSConstants.PART_TYPE_HEADER);
-                        String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
-                        
-                        if (!StringUtils.isEmpty(wsuId)) {
-                            part.setEncId(wsuId);
-                        }
-                        
-                        result.add(part);
-                    }
-                    el = DOMUtils.getNextElement(el);
+                result.add(new WSEncryptionPart(
+                        id,
+                        "Content",
+                        WSConstants.PART_TYPE_BODY));
+            }
+        }
+        
+        final SOAPHeader header = saaj.getSOAPHeader();
+        
+        // Handle sign/enc parts
+        for (WSEncryptionPart part : parts) {
+            final List<Element> elements;
+            
+            if (StringUtils.isEmpty(part.getName())) {
+                // An entire namespace
+                elements = 
+                    DOMUtils.getChildrenWithNamespace(header, part.getNamespace());    
+            } else {
+                // All elements with a given name and namespace 
+                elements = 
+                    DOMUtils.getChildrenWithName(header, part.getNamespace(), part.getName());
+            }
+            
+            for (Element el : elements) {
+                if (!found.contains(el)) {
+                    found.add(el);
+                    // Generate an ID for the element and use this ID or else
+                    // WSS4J will only ever sign/encrypt the first matching
+                    // elemenet with the same name and namespace as that in the
+                    // WSEncryptionPart
+                    final String id = this.addWsuIdToElement(el);
+                    result.add(new WSEncryptionPart(
+                            id,
+                            part.getEncModifier(),
+                            WSConstants.PART_TYPE_HEADER));
                 }
             }
         }
+        
+        return result;
+    }
+    
+    /**
+     * Identifies the portions of the message to be signed/encrypted.
+     * 
+     * @param encryptionModifier
+     *            indicates the scope of the crypto operation over matched
+     *            elements. Either "Content" or "Element".
+     * @param xpaths
+     *            any XPath expressions to sign/encrypt matches
+     * @param namespaces
+     *            namespace prefix to namespace mappings for XPath expressions
+     *            in {@code xpaths}
+     * @param found
+     *            a list of elements that have previously been tagged for
+     *            signing/encryption. Populated with additional matches found by
+     *            this method and used to prevent including the same element
+     *            twice under the same operation.
+     * @return a configured vector of {@code WSEncryptionPart}s suitable for
+     *         processing by WSS4J
+     * @throws XPathExpressionException
+     *             if a provided XPath is invalid
+     * @throws SOAPException
+     *             if there is an error extracting SOAP content from the SAAJ
+     *             model
+     */
+    private Vector<WSEncryptionPart> getElements(String encryptionModifier,
+            List<String> xpaths, Map<String, String> namespaces,
+            List<Element> found) throws XPathExpressionException, SOAPException {
+        
+        Vector<WSEncryptionPart> result = new Vector<WSEncryptionPart>();
+        
         if (xpaths != null && !xpaths.isEmpty()) {
             XPathFactory factory = XPathFactory.newInstance();
             for (String expression : xpaths) {
@@ -846,71 +966,42 @@ public abstract class AbstractBindingBuilder {
                 if (namespaces != null) {
                     xpath.setNamespaceContext(new MapNamespaceContext(namespaces));
                 }
-                try {
-                    NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
-                                                   XPathConstants.NODESET);
-                    for (int x = 0; x < list.getLength(); x++) {
-                        Element el = (Element)list.item(x);
-                        if (sign) {
-                            WSEncryptionPart part = new WSEncryptionPart(el.getLocalName(),
-                                                            el.getNamespaceURI(), 
-                                                            "Content",
-                                                            WSConstants.PART_TYPE_ELEMENT);
-                            part.setXpath(expression);
-                            result.add(part);
-                        } else {
-                            WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
-                                                                                  el.getNamespaceURI(),
-                                                                                  "Element",
-                                                                                  WSConstants
-                                                                                      .PART_TYPE_ELEMENT);
-                            encryptedElem.setXpath(expression);
-                            String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
-                            
-                            if (!StringUtils.isEmpty(wsuId)) {
-                                encryptedElem.setEncId(wsuId);
-                            }
-                            result.add(encryptedElem);
-                        }
-                    }
-                } catch (XPathExpressionException e) {
-                    //REVISIT!!!!
-                }
-            }
-        }
-        if (contentXpaths != null && !contentXpaths.isEmpty()) {
-            XPathFactory factory = XPathFactory.newInstance();
-            for (String expression : contentXpaths) {
-                XPath xpath = factory.newXPath();
-                if (cnamespaces != null) {
-                    xpath.setNamespaceContext(new MapNamespaceContext(cnamespaces));
-                }
-                try {
-                    NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
-                                                   XPathConstants.NODESET);
-                    for (int x = 0; x < list.getLength(); x++) {
-                        Element el = (Element)list.item(x);
-                        WSEncryptionPart encryptedElem = new WSEncryptionPart(el.getLocalName(),
-                                                                              el.getNamespaceURI(),
-                                                                              "Content",
-                                                                              WSConstants
-                                                                                  .PART_TYPE_ELEMENT);
-                        encryptedElem.setXpath(expression);
+               
+                NodeList list = (NodeList)xpath.evaluate(expression, saaj.getSOAPPart().getEnvelope(),
+                                               XPathConstants.NODESET);
+                for (int x = 0; x < list.getLength(); x++) {
+                    Element el = (Element)list.item(x);
+                    
+                    if (!found.contains(el)) {
+                        // Generate an ID for the element and use this ID or else
+                        // WSS4J will only ever sign/encrypt the first matching
+                        // element with the same name and namespace as that in the
+                        // WSEncryptionPart
+                        final String id = this.addWsuIdToElement(el);
+                        
+                        
+                        WSEncryptionPart part = new WSEncryptionPart(
+                                id, 
+                                encryptionModifier,
+                                WSConstants.PART_TYPE_ELEMENT);
+                        part.setXpath(expression);
+                        
+                        /**
                         String wsuId = el.getAttributeNS(WSConstants.WSU_NS, "Id");
                         
                         if (!StringUtils.isEmpty(wsuId)) {
                             encryptedElem.setEncId(wsuId);
                         }
-                        result.add(encryptedElem);
+                        **/
+                        
+                        result.add(part);
                     }
-                } catch (XPathExpressionException e) {
-                    //REVISIT!!!!
                 }
             }
         }
+        
         return result;
     }
-    
     
     protected WSSecEncryptedKey getEncryptedKeyBuilder(TokenWrapper wrapper, 
                                                        Token token) throws WSSecurityException {
@@ -1555,43 +1646,47 @@ public abstract class AbstractBindingBuilder {
         }
     }
     
-    
+    /**
+     * Processes the parts to be signed and reconfigures those parts that have
+     * already been encrypted.
+     * 
+     * @param encryptedParts
+     *            the parts that have been encrypted
+     * @param signedParts
+     *            the parts that are to be signed
+     * 
+     * @throws IllegalArgumentException
+     *             if an element in {@code signedParts} contains a {@code
+     *             WSEncryptionPart} with a {@code null} {@code id} value
+     */
     public void handleEncryptedSignedHeaders(Vector<WSEncryptionPart> encryptedParts, 
                                              Vector<WSEncryptionPart> signedParts) {
-       
-        for (WSEncryptionPart signedPart : signedParts) {
-            if (signedPart.getNamespace() == null || signedPart.getName() == null) {
-                continue;
-            }
-            
-            for (WSEncryptionPart encryptedPart : encryptedParts) {
-                if (encryptedPart.getNamespace() == null 
-                    || encryptedPart.getName() == null) {
-                    continue;
-                }
-               
-                if (signedPart.getName().equals(encryptedPart.getName()) 
-                    && signedPart.getNamespace().equals(encryptedPart.getNamespace())) {
-                   
-                    String encDataID =  encryptedPart.getEncId();                    
-                    Element encDataElem = WSSecurityUtil
-                           .findElementById(saaj.getSOAPPart().getDocumentElement(),
-                                            encDataID, null);
-                   
-                    if (encDataElem != null) {
-                        Element encHeader = (Element)encDataElem.getParentNode();
-                        String encHeaderId = encHeader.getAttributeNS(WSConstants.WSU_NS, "Id");
-                        
-                        if (!StringUtils.isEmpty(encHeaderId)) {
-                            signedParts.remove(signedPart);
-                            WSEncryptionPart encHeaderToSign = new WSEncryptionPart(encHeaderId);
-                            signedParts.add(encHeaderToSign);
-                        }
-                    }
+
+        final Vector<WSEncryptionPart> signedEncryptedParts = new Vector<WSEncryptionPart>();
+        
+        for (WSEncryptionPart encryptedPart : encryptedParts) {
+            final Iterator<WSEncryptionPart> signedPartsIt = signedParts.iterator();
+            while (signedPartsIt.hasNext()) {
+                WSEncryptionPart signedPart = signedPartsIt.next();
+                if (signedPart.getId() == null) {
+                    throw new IllegalArgumentException(
+                            "WSEncryptionPart must be ID based but no id was found.");
+                } else if (encryptedPart.getEncModifier().equals("Element")
+                        && signedPart.getId().equals(encryptedPart.getId())) {
+                    // We are to sign something that has already been encrypted.
+                    // We need to preserve the original aspects of signedPart but
+                    // change the ID to the encrypted ID.
+                    
+                    signedPartsIt.remove();
+                    signedEncryptedParts.add(
+                            new WSEncryptionPart(
+                                    encryptedPart.getEncId(),
+                                    encryptedPart.getEncModifier(),
+                                    encryptedPart.getType()));
                 }
             }
         }
+        
+        signedParts.addAll(signedEncryptedParts);
     }
-   
-  
 }

@@ -20,11 +20,16 @@
 package org.apache.cxf.ws.security.wss4j;
 
 
-import java.security.cert.X509Certificate;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Vector;
+import java.util.concurrent.Executor;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
@@ -33,28 +38,431 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
+import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
+import org.apache.ws.security.util.WSSecurityUtil;
 import org.junit.Test;
 
 
 public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     private PolicyBuilder policyBuilder;
+       
+    public static boolean checkUnrestrictedPoliciesInstalled() {
+        try {
+            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+            SecretKey key192 = new SecretKeySpec(
+                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+                            "AES");
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key192);
+            c.doFinal(data);
+            return true;
+        } catch (Exception e) {
+            //ignore
+        }
+        return false;
+    }
+    
+    @Test
+    @org.junit.Ignore("missing file")
+    public void testSignedElementsPolicyWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_missing_signed_header.xml",
+                "signed_elements_policy.xml",
+                null,
+                SP12Constants.SIGNED_ELEMENTS,
+                CoverageType.SIGNED);
+    }
+    
+    @Test
+    public void testSignedElementsPolicyWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "signed_elements_policy.xml",
+                SP12Constants.SIGNED_ELEMENTS,
+                null,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_elements_policy.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.SIGNED_ELEMENTS),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+    }
+
+    @Test
+    @org.junit.Ignore("missing file")
+    public void testSignedPartsPolicyWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_missing_signed_body.xml",
+                "signed_parts_policy_body.xml",
+                null,
+                SP12Constants.SIGNED_PARTS,
+                CoverageType.SIGNED);
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_missing_signed_header.xml",
+                "signed_parts_policy_header_namespace_only.xml",
+                null,
+                SP12Constants.SIGNED_PARTS,
+                CoverageType.SIGNED);
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_missing_signed_header.xml",
+                "signed_parts_policy_header.xml",
+                null,
+                SP12Constants.SIGNED_PARTS,
+                CoverageType.SIGNED);
+    }
+    
+    @Test
+    public void testSignedPartsPolicyWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "signed_parts_policy_body.xml",
+                SP12Constants.SIGNED_PARTS,
+                null,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_parts_policy_body.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "signed_parts_policy_header_namespace_only.xml",
+                SP12Constants.SIGNED_PARTS,
+                null,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_parts_policy_header_namespace_only.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "signed_parts_policy_header.xml",
+                SP12Constants.SIGNED_PARTS,
+                null,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_parts_policy_header.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "signed_parts_policy_header_and_body.xml",
+                SP12Constants.SIGNED_PARTS,
+                null,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_parts_policy_header_and_body.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.SIGNED));
+    }
+    
+    @Test
+    public void testEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_missing_enc_header.xml",
+                "encrypted_elements_policy.xml",
+                null,
+                SP12Constants.ENCRYPTED_ELEMENTS,
+                CoverageType.ENCRYPTED);
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_elements_policy2.xml",
+                null,
+                SP12Constants.ENCRYPTED_ELEMENTS,
+                CoverageType.ENCRYPTED);
+    }
+    
+    @Test
+    public void testEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_elements_policy.xml",
+                SP12Constants.ENCRYPTED_ELEMENTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_elements_policy.xml",
+                null,
+                null,
+                Arrays.asList(new QName[] {SP12Constants.ENCRYPTED_ELEMENTS}),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_element.xml",
+                "encrypted_elements_policy2.xml",
+                SP12Constants.ENCRYPTED_ELEMENTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_elements_policy2.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_ELEMENTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+    }
+    
+    @Test
+    public void testContentEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_element.xml",
+                "content_encrypted_elements_policy.xml",
+                null,
+                SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
+                CoverageType.ENCRYPTED);
+    }
+    
+    @Test
+    public void testContentEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "content_encrypted_elements_policy.xml",
+                SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "content_encrypted_elements_policy.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.CONTENT_ENCRYPTED_ELEMENTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+    }
+    
+    @Test
+    public void testEncryptedPartsPolicyWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_missing_enc_body.xml",
+                "encrypted_parts_policy_body.xml",
+                null,
+                SP12Constants.ENCRYPTED_PARTS,
+                CoverageType.ENCRYPTED);
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_element.xml",
+                "encrypted_parts_policy_body.xml",
+                null,
+                SP12Constants.ENCRYPTED_PARTS,
+                CoverageType.ENCRYPTED);
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_missing_enc_header.xml",
+                "encrypted_parts_policy_header_namespace_only.xml",
+                null,
+                SP12Constants.ENCRYPTED_PARTS,
+                CoverageType.ENCRYPTED);
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_missing_enc_header.xml",
+                "encrypted_parts_policy_header.xml",
+                null,
+                SP12Constants.ENCRYPTED_PARTS,
+                CoverageType.ENCRYPTED);
+    }
+    
+    @Test
+    public void testEncryptedPartsPolicyWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_parts_policy_body.xml",
+                SP12Constants.ENCRYPTED_PARTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_parts_policy_body.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_parts_policy_header_namespace_only.xml",
+                SP12Constants.ENCRYPTED_PARTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_parts_policy_header_namespace_only.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_parts_policy_header.xml",
+                SP12Constants.ENCRYPTED_PARTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_parts_policy_header.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+        
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content.xml",
+                "encrypted_parts_policy_header_and_body.xml",
+                SP12Constants.ENCRYPTED_PARTS,
+                null,
+                CoverageType.ENCRYPTED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_parts_policy_header_and_body.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED));
+    }
+    
+    @Test
+    public void testSignedEncryptedPartsWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_encrypted_missing_enc_header.xml",
+                "signed_parts_policy_header_and_body_encrypted.xml",
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS),
+                Arrays.asList(CoverageType.ENCRYPTED,
+                        CoverageType.SIGNED));
+    }
+    
+    @Test
+    public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
+        if (!checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_encrypted.xml",
+                "signed_parts_policy_header_and_body_encrypted.xml",
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                        SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED,
+                        CoverageType.SIGNED));
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "signed_parts_policy_header_and_body_encrypted.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                        SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED,
+                        CoverageType.SIGNED));
+    }
+    
+    @Test
+    public void testEncryptedSignedPartsWithIncompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content_signed_missing_signed_header.xml",
+                "encrypted_parts_policy_header_and_body_signed.xml",
+                null,
+                Arrays.asList(SP12Constants.SIGNED_PARTS),
+                Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
+    }
+    
+    @Test
+    public void testEncryptedSignedPartsWithCompleteCoverage() throws Exception {
+        this.runInInterceptorAndValidate(
+                "encrypted_body_content_signed.xml",
+                "encrypted_parts_policy_header_and_body_signed.xml",
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS, 
+                        SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED, CoverageType.SIGNED));
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "encrypted_parts_policy_header_and_body_signed.xml",
+                null,
+                null,
+                Arrays.asList(SP12Constants.ENCRYPTED_PARTS,
+                        SP12Constants.SIGNED_PARTS),
+                null,
+                Arrays.asList(CoverageType.ENCRYPTED,
+                        CoverageType.SIGNED));
+    }
     
     protected Bus createBus() throws BusException {
         Bus b = super.createBus();
@@ -62,251 +470,228 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
             b.getExtension(PolicyBuilder.class);
         return b;
     }
-    @Test
-    public void testSignedElementsPolicyWithIncompleteCoverage() throws Exception {
-        this.runAndValidatePolicyNotAsserted(
-                "signed_missing_signed_header.xml",
-                "signed_elements_policy.xml",
-                SP12Constants.SIGNED_ELEMENTS,
-                CoverageType.SIGNED);
+    
+    private void runAndValidate(String document, String policyDocument,
+            List<QName> assertedOutAssertions, List<QName> notAssertedOutAssertions,
+            List<QName> assertedInAssertions, List<QName> notAssertedInAssertions,
+            List<CoverageType> types) throws Exception {
+        
+        final Element policyElement = 
+            this.readDocument(policyDocument).getDocumentElement();
+        
+        final Policy outPolicy = this.policyBuilder.getPolicy(policyElement);
+        final Policy inPolicy = this.policyBuilder.getPolicy(policyElement);
+        
+        final Document originalDoc = this.readDocument(document);
+        
+        final Document inDoc = this.runOutInterceptorAndValidate(
+                originalDoc, outPolicy, assertedOutAssertions,
+                notAssertedOutAssertions);
+        
+        // Can't use this method if you want output that is not mangled.
+        // Such is the case when you want to capture output to use
+        // as input to another test case.
+        //DOMUtils.writeXml(inDoc, System.out);
+        
+        // Use this snippet if you need intermediate output for debugging.
+        /*
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer t = tf.newTransformer();
+        t.setOutputProperty(OutputKeys.INDENT, "no");
+        t.transform(new DOMSource(inDoc), new StreamResult(System.out));
+        */
+        
+        this.runInInterceptorAndValidate(inDoc,
+                inPolicy, assertedInAssertions,
+                assertedOutAssertions, types);
     }
     
-    @Test
-    public void testSignedElementsPolicyWithCompleteCoverage() throws Exception {
-        this.runAndValidatePolicyAsserted(
-                "signed.xml",
-                "signed_elements_policy.xml",
-                SP12Constants.SIGNED_ELEMENTS,
-                CoverageType.SIGNED);
-    }
-
-    @Test
-    public void testSignedPartsPolicyWithIncompleteCoverage() throws Exception {
-        this.runAndValidatePolicyNotAsserted(
-                "signed_missing_signed_body.xml",
-                "signed_parts_policy_body.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "signed_missing_signed_header.xml",
-                "signed_parts_policy_header_namespace_only.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "signed_missing_signed_header.xml",
-                "signed_parts_policy_header.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-    }
-    
-    @Test
-    public void testSignedPartsPolicyWithCompleteCoverage() throws Exception {
-        this.runAndValidatePolicyAsserted(
-                "signed.xml",
-                "signed_parts_policy_body.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-        
-        this.runAndValidatePolicyAsserted(
-                "signed.xml",
-                "signed_parts_policy_header_namespace_only.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-        
-        this.runAndValidatePolicyAsserted(
-                "signed.xml",
-                "signed_parts_policy_header.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-        
-        this.runAndValidatePolicyAsserted(
-                "signed.xml",
-                "signed_parts_policy_header_and_body.xml",
-                SP12Constants.SIGNED_PARTS,
-                CoverageType.SIGNED);
-    }
-    
-    @Test
-    public void testEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_missing_enc_header.xml",
-                "encrypted_elements_policy.xml",
-                SP12Constants.ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_elements_policy2.xml",
-                SP12Constants.ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    @Test
-    public void testEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_elements_policy.xml",
-                SP12Constants.ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_element.xml",
-                "encrypted_elements_policy2.xml",
-                SP12Constants.ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    @Test
-    public void testContentEncryptedElementsPolicyWithIncompleteCoverage() throws Exception {
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_body_element.xml",
-                "content_encrypted_elements_policy.xml",
-                SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    @Test
-    public void testContentEncryptedElementsPolicyWithCompleteCoverage() throws Exception {
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "content_encrypted_elements_policy.xml",
-                SP12Constants.CONTENT_ENCRYPTED_ELEMENTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    @Test
-    public void testEncryptedPartsPolicyWithIncompleteCoverage() throws Exception {
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_missing_enc_body.xml",
-                "encrypted_parts_policy_body.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_body_element.xml",
-                "encrypted_parts_policy_body.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_missing_enc_header.xml",
-                "encrypted_parts_policy_header_namespace_only.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyNotAsserted(
-                "encrypted_missing_enc_header.xml",
-                "encrypted_parts_policy_header.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    @Test
-    public void testEncryptedPartsPolicyWithCompleteCoverage() throws Exception {
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_parts_policy_body.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_parts_policy_header_namespace_only.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_parts_policy_header.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-        
-        this.runAndValidatePolicyAsserted(
-                "encrypted_body_content.xml",
-                "encrypted_parts_policy_header_and_body.xml",
-                SP12Constants.ENCRYPTED_PARTS,
-                CoverageType.ENCRYPTED);
-    }
-    
-    private void runAndValidatePolicyAsserted(String document,
-            String policyDocument, QName assertionType,
+    private void runInInterceptorAndValidate(String document,
+            String policyDocument, QName assertedInAssertion,
+            QName notAssertedInAssertion, 
             CoverageType type) throws Exception {
-        Policy policy = this.policyBuilder.getPolicy(
+        
+        this.runInInterceptorAndValidate(
+                document, policyDocument, 
+                assertedInAssertion == null ? null 
+                        : Arrays.asList(assertedInAssertion),
+                notAssertedInAssertion == null ? null
+                        : Arrays.asList(notAssertedInAssertion),
+                Arrays.asList(type));
+    }
+    
+    private void runInInterceptorAndValidate(String document,
+            String policyDocument, List<QName> assertedInAssertions,
+            List<QName> notAssertedInAssertions,
+            List<CoverageType> types) throws Exception {
+        
+        final Policy policy = this.policyBuilder.getPolicy(
                 this.readDocument(policyDocument).getDocumentElement());
         
-        AssertionInfoMap aim = new AssertionInfoMap(policy);
+        final Document doc = this.readDocument(document);
         
-        this.runAndValidateWss(document, aim, type);
+        this.runInInterceptorAndValidate(
+                doc, policy, 
+                assertedInAssertions,
+                notAssertedInAssertions,
+                types);
+    }
+    
+    private void runInInterceptorAndValidate(Document document,
+            Policy policy, List<QName> assertedInAssertions,
+            List<QName> notAssertedInAssertions,
+            List<CoverageType> types) throws Exception {
+        
+        final AssertionInfoMap aim = new AssertionInfoMap(policy);
+        
+        this.runInInterceptorAndValidateWss(document, aim, types);
         
         try {
             aim.checkEffectivePolicy(policy);
+        } catch (PolicyException e) {
+            // Expected but not relevant
+        } finally {
+            if (assertedInAssertions != null) {
+                for (QName assertionType : assertedInAssertions) {
+                    Collection<AssertionInfo> ais = aim.get(assertionType);
+                    assertNotNull(ais);
+                    for (AssertionInfo ai : ais) {
+                        assertTrue(assertionType + " policy erroneously failed.",
+                                ai.getAssertion().isAsserted(aim));
+                    }
+                }
+            }
             
-        } catch (PolicyException e) {
-            fail(assertionType + " policy erroneously failed.");
-        }
-    }
-    
-    private void runAndValidatePolicyNotAsserted(String document,
-            String policyDocument, QName assertionType,
-            CoverageType type) throws Exception {
-        Policy policy = this.policyBuilder.getPolicy(
-                this.readDocument(policyDocument).getDocumentElement());
-        
-        AssertionInfoMap aim = new AssertionInfoMap(policy);
-        
-        this.runAndValidateWss(document, aim, type);
-        
-        try {
-            aim.checkEffectivePolicy(policy);
-            fail(assertionType + " policy erroneously asserted.");
-        } catch (PolicyException e) {
-            Collection<AssertionInfo> ais = aim.get(assertionType);
-            for (AssertionInfo ai : ais) {
-                assertFalse(ai.getAssertion().isAsserted(aim));
+            if (notAssertedInAssertions != null) {
+                for (QName assertionType : notAssertedInAssertions) {
+                    Collection<AssertionInfo> ais = aim.get(assertionType);
+                    assertNotNull(ais);
+                    for (AssertionInfo ai : ais) {
+                        assertFalse(assertionType + " policy erroneously asserted.",
+                                ai.getAssertion().isAsserted(aim));
+                    }
+                }
             }
         }
     }
     
-    private void runAndValidateWss(String document, AssertionInfoMap aim, CoverageType type)
-        throws Exception {
-        Document doc = readDocument(document);
+    private void runInInterceptorAndValidateWss(Document document, AssertionInfoMap aim,
+            List<CoverageType> types) throws Exception {
         
         PolicyBasedWSS4JInInterceptor inHandler = 
-            CoverageType.SIGNED.equals(type)
-                    ? this.getInInterceptorForSignature()
-                            : this.getInInterceptorForEncryption();
-
-        SoapMessage inmsg = this.getSoapMessageForDom(doc, aim);
+            this.getInInterceptor(types);
+            
+        SoapMessage inmsg = this.getSoapMessageForDom(document, aim);
 
         inHandler.handleMessage(inmsg);
         
-        if (CoverageType.SIGNED.equals(type)) {
-            this.verifyWss4jSigResults(inmsg);
-        } else {
-            this.verifyWss4jEncResults(inmsg);
+        for (CoverageType type : types) {
+            switch(type) {
+            case SIGNED:
+                this.verifyWss4jSigResults(inmsg);
+                break;
+            case ENCRYPTED:
+                this.verifyWss4jEncResults(inmsg);
+                break;
+            default:
+                fail("Unsupported coverage type.");
+            }
         }
     }
     
-    private PolicyBasedWSS4JInInterceptor getInInterceptorForSignature() {
+    private Document runOutInterceptorAndValidate(Document document, Policy policy,
+            List<QName> assertedOutAssertions, 
+            List<QName> notAssertedOutAssertions) throws Exception {
+        
+        AssertionInfoMap aim = new AssertionInfoMap(policy);
+        
+        final SoapMessage msg = 
+            this.getOutSoapMessageForDom(document, aim); 
+        
+        this.getOutInterceptor().handleMessage(msg);
+        
+        try {
+            aim.checkEffectivePolicy(policy);
+        } catch (PolicyException e) {
+            // Expected but not relevant
+        } finally {
+            if (assertedOutAssertions != null) {
+                for (QName assertionType : assertedOutAssertions) {
+                    Collection<AssertionInfo> ais = aim.get(assertionType);
+                    assertNotNull(ais);
+                    for (AssertionInfo ai : ais) {
+                        assertTrue(assertionType + " policy erroneously failed.",
+                                ai.getAssertion().isAsserted(aim));
+                    }
+                }
+            }
+            
+            if (notAssertedOutAssertions != null) {
+                for (QName assertionType : notAssertedOutAssertions) {
+                    Collection<AssertionInfo> ais = aim.get(assertionType);
+                    assertNotNull(ais);
+                    for (AssertionInfo ai : ais) {
+                        assertFalse(assertionType + " policy erroneously asserted.",
+                                ai.getAssertion().isAsserted(aim));
+                    }
+                }
+            }
+        }
+        
+        return msg.getContent(SOAPMessage.class).getSOAPPart();
+    }
+    
+    private PolicyBasedWSS4JOutInterceptorInternal getOutInterceptor() {
+        return (new PolicyBasedWSS4JOutInterceptor()).createEndingInterceptor();
+    }
+    
+    private PolicyBasedWSS4JInInterceptor getInInterceptor(List<CoverageType> types) {
         PolicyBasedWSS4JInInterceptor inHandler = new PolicyBasedWSS4JInInterceptor();
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.SIGNATURE);
+        String action = "";
+        
+        for (CoverageType type : types) {
+            switch(type) {
+            case SIGNED:
+                action += " " + WSHandlerConstants.SIGNATURE;
+                break;
+            case ENCRYPTED:
+                action += " " + WSHandlerConstants.ENCRYPT;
+                break;
+            default:
+                fail("Unsupported coverage type.");
+            }
+        }
+        inHandler.setProperty(WSHandlerConstants.ACTION, action);
         inHandler.setProperty(WSHandlerConstants.SIG_PROP_FILE, 
                 "META-INF/cxf/insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
+                "META-INF/cxf/insecurity.properties");
+        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
+                TestPwdCallback.class.getName());
         
         return inHandler;
     }
     
-    private PolicyBasedWSS4JInInterceptor getInInterceptorForEncryption() {
-        PolicyBasedWSS4JInInterceptor inHandler = new PolicyBasedWSS4JInInterceptor();
-        inHandler.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT);
-        inHandler.setProperty(WSHandlerConstants.DEC_PROP_FILE,
-                "META-INF/cxf/insecurity.properties");
-        inHandler.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, 
-                "org.apache.cxf.ws.security.wss4j.TestPwdCallback");
+    /**
+     * Gets a SoapMessage, but with the needed SecurityConstants in the context propreties
+     * so that it can be passed to PolicyBasedWSS4JOutInterceptor.
+     *
+     * @see #getSoapMessageForDom(Document, AssertionInfoMap)
+     */
+    private SoapMessage getOutSoapMessageForDom(Document doc, AssertionInfoMap aim)
+        throws SOAPException {
+        SoapMessage msg = this.getSoapMessageForDom(doc, aim);
+        msg.put(SecurityConstants.SIGNATURE_PROPERTIES, "META-INF/cxf/outsecurity.properties");
+        msg.put(SecurityConstants.ENCRYPT_PROPERTIES, "META-INF/cxf/outsecurity.properties");
+        msg.put(SecurityConstants.CALLBACK_HANDLER, TestPwdCallback.class.getName());
+        msg.put(SecurityConstants.SIGNATURE_USERNAME, "myalias");
+        msg.put(SecurityConstants.ENCRYPT_USERNAME, "myalias");
         
-        return inHandler;
+        msg.getExchange().put(Endpoint.class, new MockEndpoint());
+        msg.getExchange().put(Bus.class, this.bus);
+        msg.put(Message.REQUESTOR_ROLE, true);
+        
+        return msg;
     }
     
     private SoapMessage getSoapMessageForDom(Document doc, AssertionInfoMap aim)
@@ -316,23 +701,21 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         part.setContent(new DOMSource(doc));
         saajMsg.saveChanges();
         
-        SoapMessage inmsg = new SoapMessage(new MessageImpl());
+        SoapMessage msg = new SoapMessage(new MessageImpl());
         Exchange ex = new ExchangeImpl();
-        ex.setInMessage(inmsg);
-        inmsg.setContent(SOAPMessage.class, saajMsg);
+        ex.setInMessage(msg);
+        msg.setContent(SOAPMessage.class, saajMsg);
         if (aim != null) {
-            inmsg.put(AssertionInfoMap.class, aim);
+            msg.put(AssertionInfoMap.class, aim);
         }
-        return inmsg;
+        
+        return msg;
     }
     
     private void verifyWss4jSigResults(SoapMessage inmsg) {
         WSSecurityEngineResult result = 
             (WSSecurityEngineResult) inmsg.get(WSS4JInInterceptor.SIGNATURE_RESULT);
         assertNotNull(result);
-        X509Certificate certificate = (X509Certificate)result
-            .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-        assertNotNull(certificate);
     }
     
     @SuppressWarnings("unchecked")
@@ -345,12 +728,12 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 .get(WSHandlerConstants.RECV_RESULTS);
         assertNotNull(handlerResults);
         assertSame(handlerResults.size(), 1);
-        //
-        // This should contain exactly 1 protection result
-        //
-        final List<Object> protectionResults = (List<Object>) handlerResults
-                .get(0).getResults();
+
+        Vector<Object> protectionResults = new Vector<Object>();
+        WSSecurityUtil.fetchAllActionResults(handlerResults.get(0).getResults(),
+                WSConstants.ENCR, protectionResults);
         assertNotNull(protectionResults);
+        
         //
         // This result should contain a reference to the decrypted element
         //
@@ -359,5 +742,56 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         final List<WSDataRef> protectedElements = (List<WSDataRef>) result
                 .get(WSSecurityEngineResult.TAG_DATA_REF_URIS);
         assertNotNull(protectedElements);
+    }
+    
+    private static final class MockEndpoint extends 
+        AbstractAttributedInterceptorProvider implements Endpoint {
+
+        private static final long serialVersionUID = 1L;
+
+        private EndpointInfo epi = new EndpointInfo();
+        
+        public MockEndpoint() {
+            epi.setBinding(new BindingInfo(null, null));
+        }
+        
+        
+        public List<AbstractFeature> getActiveFeatures() {
+            return null;
+        }
+
+        public Binding getBinding() {
+            return null;
+        }
+
+        public EndpointInfo getEndpointInfo() {
+            return this.epi;
+        }
+
+        public Executor getExecutor() {
+            return null;
+        }
+
+        public MessageObserver getInFaultObserver() {
+            return null;
+        }
+
+        public MessageObserver getOutFaultObserver() {
+            return null;
+        }
+
+        public Service getService() {
+            return null;
+        }
+
+        public void setExecutor(Executor executor) {   
+        }
+
+        public void setInFaultObserver(MessageObserver observer) {
+        }
+
+        public void setOutFaultObserver(MessageObserver observer) {            
+        }
+        
     }
 }

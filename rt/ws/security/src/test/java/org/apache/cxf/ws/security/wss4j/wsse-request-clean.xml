@@ -2,6 +2,10 @@
 <soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
   xmlns:xsd="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soap:Header>
+    <Header xmlns="http://www.sdj.pl">1234</Header>
+    <Header xmlns="http://www.sdj.pl">5678</Header>
+  </soap:Header>
   <soap:Body>
     <echo xmlns="http://www.sdj.pl">
       <in0 xmlns="http://www.sdj.pl">A</in0>    

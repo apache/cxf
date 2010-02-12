@@ -523,6 +523,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 //anything else to process?  Maybe check tokens for BKT requirements?
             }                        
         }
+        
+        CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
+        
         assertTokens(aim, SP12Constants.SIGNED_PARTS, signed, msg, doc, CoverageType.SIGNED);
         assertTokens(aim, SP12Constants.ENCRYPTED_PARTS, encrypted, msg, doc, CoverageType.ENCRYPTED);
         assertXPathTokens(aim, SP12Constants.SIGNED_ELEMENTS, signed, msg, doc,
