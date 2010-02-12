@@ -134,6 +134,18 @@ public class XMLSource {
         return value == null ? null : URI.create(value);
     }
     
+    public URI[] getLinks(String expression, Map<String, String> namespaces) {
+        String[] values = getValues(expression, namespaces);
+        if (values == null) {
+            return null;
+        }
+        URI[] uris = new URI[values.length];
+        for (int i = 0; i < values.length; i++) {
+            uris[i] = URI.create(values[i]);
+        }
+        return uris;
+    }
+    
     public URI getBaseURI() {
         Map<String, String> map = new LinkedHashMap<String, String>();
         map.put("xml", XML_NAMESPACE);

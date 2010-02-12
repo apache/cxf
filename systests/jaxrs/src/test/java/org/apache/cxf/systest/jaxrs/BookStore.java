@@ -633,6 +633,27 @@ public class BookStore {
         return new Long(theBookId);
     }
     
+    @POST
+    @Path("/booksecho")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoBookNameAndHeader(@HeaderParam("CustomHeader") String headerValue, String name) {
+        return Response.ok().entity(name).header("CustomHeader", headerValue).build();
+    }
+    
+    @Path("/bookstoresub")
+    public BookStore echoThroughBookStoreSub() {
+        return this;
+    }
+    
+    @POST
+    @Path("/booksecho2")
+    @Consumes("text/plain")
+    @Produces("text/plain")
+    public Response echoBookNameAndHeader2(String name) {
+        return echoBookNameAndHeader(httpHeaders.getRequestHeader("CustomHeader").get(0), name);
+    }
+    
     @GET
     @Path("/cd/{CDId}/")
     public CD getCD() {

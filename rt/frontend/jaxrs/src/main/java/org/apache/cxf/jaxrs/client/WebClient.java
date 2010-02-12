@@ -25,6 +25,7 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.URI;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -39,7 +40,6 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
-
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -71,7 +71,11 @@ public class WebClient extends AbstractClient {
     }
     
     protected WebClient(URI baseAddress) {
-        super(baseAddress, baseAddress);
+        super(baseAddress);
+    }
+    
+    protected WebClient(ClientState state) {
+        super(state);
     }
     
     /**
@@ -95,10 +99,32 @@ public class WebClient extends AbstractClient {
     /**
      * Creates WebClient
      * @param baseURI baseURI
+     */
+    public static WebClient create(String baseURI, boolean threadSafe) {
+        return create(baseURI, Collections.emptyList(), threadSafe);
+    }
+    
+    /**
+     * Creates WebClient
+     * @param baseURI baseURI
      * @param providers list of providers
      */
     public static WebClient create(String baseAddress, List<?> providers) {
         return create(baseAddress, providers, null);        
+    }
+    
+    /**
+     * Creates WebClient
+     * @param baseURI baseURI
+     * @param providers list of providers
+     */
+    public static WebClient create(String baseAddress, List<?> providers, boolean threadSafe) {
+        JAXRSClientFactoryBean bean = getBean(baseAddress, null);
+        bean.setProviders(providers);
+        if (threadSafe) {
+            bean.setInitialState(new ThreadLocalClientState(baseAddress));
+        }
+        return bean.createWebClient();        
     }
     
     /**
@@ -159,9 +185,18 @@ public class WebClient extends AbstractClient {
      *        and subresource proxies if any 
      */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
-        WebClient webClient = create(client.getCurrentURI());
-        if (inheritHeaders) {
-            webClient.headers(client.getHeaders());
+        
+        WebClient webClient = null;
+        
+        ClientState clientState = getClientState(client);
+        if (clientState == null) {
+            webClient = create(client.getCurrentURI());
+            if (inheritHeaders) {
+                webClient.headers(client.getHeaders());
+            }
+        } else {
+            MultivaluedMap<String, String> headers = inheritHeaders ? client.getHeaders() : null;
+            webClient = new WebClient(clientState.newState(client.getCurrentURI(), headers));
         }
         copyProperties(webClient, client);
         return webClient;
@@ -586,7 +621,7 @@ public class WebClient extends AbstractClient {
     protected Response handleResponse(HttpURLConnection conn, Message outMessage, 
                                       Class<?> responseClass, Type genericType) {
         try {
-            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange()).clone();
+            ResponseBuilder rb = setResponseBuilder(conn, outMessage.getExchange());
             Response currentResponse = rb.clone().build();
             
             Object entity = readBody(currentResponse, conn, outMessage, responseClass, genericType,
@@ -664,5 +699,16 @@ public class WebClient extends AbstractClient {
         }
         bean.setAddress(baseAddress);
         return bean;
+    }
+    
+    static ClientState getClientState(Client client) {
+        ClientState clientState = null;
+        if (client instanceof WebClient) { 
+            clientState = ((AbstractClient)client).getState();
+        } else if (client instanceof InvocationHandlerAware) {
+            Object handler = ((InvocationHandlerAware)client).getInvocationHandler();
+            clientState = ((AbstractClient)handler).getState();
+        }
+        return clientState;
     }
 }

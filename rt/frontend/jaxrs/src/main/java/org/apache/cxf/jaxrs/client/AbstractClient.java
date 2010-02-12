@@ -83,16 +83,14 @@ public class AbstractClient implements Client {
     private static final String RESPONSE_CONTEXT = "ResponseContext";
     
     protected ClientConfiguration cfg = new ClientConfiguration();
+    private ClientState state;
     
-    private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
-    private ResponseBuilder responseBuilder;
+    protected AbstractClient(URI baseURI) {
+        this.state = new LocalClientState(baseURI);
+    }
     
-    private URI baseURI;
-    private UriBuilder currentBuilder;
-
-    protected AbstractClient(URI baseURI, URI currentURI) {
-        this.baseURI = baseURI;
-        this.currentBuilder = new UriBuilderImpl(currentURI);
+    protected AbstractClient(ClientState initialState) {
+        this.state = initialState;
     }
     
     /**
@@ -102,20 +100,25 @@ public class AbstractClient implements Client {
         if (values == null) {
             throw new IllegalArgumentException();
         }
-        if (HttpHeaders.CONTENT_TYPE.equals(name) && values.length > 1) {
-            throw new WebApplicationException();
-        }
-        for (Object o : values) {
-            requestHeaders.add(name, o.toString());
+        if (HttpHeaders.CONTENT_TYPE.equals(name)) {
+            if (values.length > 1) {
+                throw new IllegalArgumentException("Content-Type can have a single value only");
+            }
+            type(values[0].toString());
+        } else {
+            for (Object o : values) {
+                possiblyAddHeader(name, o.toString());
+            }
         }
         return this;
     }
 
+    
     /**
      * {@inheritDoc}
      */
     public Client headers(MultivaluedMap<String, String> map) {
-        requestHeaders.putAll(map);
+        state.getRequestHeaders().putAll(map);
         return this;
     }
     
@@ -124,7 +127,7 @@ public class AbstractClient implements Client {
      */
     public Client accept(MediaType... types) {
         for (MediaType mt : types) {
-            requestHeaders.add(HttpHeaders.ACCEPT, mt.toString());
+            possiblyAddHeader(HttpHeaders.ACCEPT, mt.toString());
         }
         return this;
     }
@@ -140,7 +143,7 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public Client type(String type) {
-        requestHeaders.putSingle(HttpHeaders.CONTENT_TYPE, type);
+        state.getRequestHeaders().putSingle(HttpHeaders.CONTENT_TYPE, type);
         return this;
     }
 
@@ -149,7 +152,7 @@ public class AbstractClient implements Client {
      */
     public Client accept(String... types) {
         for (String type : types) {
-            requestHeaders.add(HttpHeaders.ACCEPT, type);
+            possiblyAddHeader(HttpHeaders.ACCEPT, type);
         }
         return this;
     }
@@ -158,7 +161,7 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public Client cookie(Cookie cookie) {
-        requestHeaders.add(HttpHeaders.COOKIE, cookie.toString());
+        possiblyAddHeader(HttpHeaders.COOKIE, cookie.toString());
         return this;
     }
 
@@ -168,7 +171,7 @@ public class AbstractClient implements Client {
     public Client modified(Date date, boolean ifNot) {
         SimpleDateFormat dateFormat = HttpUtils.getHttpDateFormat();
         String hName = ifNot ? HttpHeaders.IF_UNMODIFIED_SINCE : HttpHeaders.IF_MODIFIED_SINCE;
-        requestHeaders.putSingle(hName, dateFormat.format(date));
+        state.getRequestHeaders().putSingle(hName, dateFormat.format(date));
         return this;
     }
 
@@ -176,7 +179,7 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public Client language(String language) {
-        requestHeaders.putSingle(HttpHeaders.CONTENT_LANGUAGE, language);
+        state.getRequestHeaders().putSingle(HttpHeaders.CONTENT_LANGUAGE, language);
         return this;
     }
 
@@ -185,7 +188,7 @@ public class AbstractClient implements Client {
      */
     public Client match(EntityTag tag, boolean ifNot) {
         String hName = ifNot ? HttpHeaders.IF_NONE_MATCH : HttpHeaders.IF_MATCH; 
-        requestHeaders.putSingle(hName, tag.toString());
+        state.getRequestHeaders().putSingle(hName, tag.toString());
         return this;
     }
 
@@ -194,7 +197,7 @@ public class AbstractClient implements Client {
      */
     public Client acceptLanguage(String... languages) {
         for (String s : languages) {
-            requestHeaders.add(HttpHeaders.ACCEPT_LANGUAGE, s);
+            possiblyAddHeader(HttpHeaders.ACCEPT_LANGUAGE, s);
         }
         return this;
     }
@@ -204,7 +207,7 @@ public class AbstractClient implements Client {
      */
     public Client acceptEncoding(String... encs) {
         for (String s : encs) {
-            requestHeaders.add(HttpHeaders.ACCEPT_ENCODING, s);
+            possiblyAddHeader(HttpHeaders.ACCEPT_ENCODING, s);
         }
         return this;
     }
@@ -213,7 +216,7 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public Client encoding(String enc) {
-        requestHeaders.putSingle(HttpHeaders.CONTENT_ENCODING, enc);
+        state.getRequestHeaders().putSingle(HttpHeaders.CONTENT_ENCODING, enc);
         return this;
     }
 
@@ -222,7 +225,7 @@ public class AbstractClient implements Client {
      */
     public MultivaluedMap<String, String> getHeaders() {
         MultivaluedMap<String, String> map = new MetadataMap<String, String>();
-        map.putAll(requestHeaders);
+        map.putAll(state.getRequestHeaders());
         return map;
     }
     
@@ -230,7 +233,7 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public URI getBaseURI() {
-        return baseURI;
+        return state.getBaseURI();
     }
     
     /**
@@ -244,37 +247,50 @@ public class AbstractClient implements Client {
      * {@inheritDoc}
      */
     public Response getResponse() {
-        if (responseBuilder == null) {
+        if (state.getResponseBuilder() == null) {
             return null;
         }
-        return responseBuilder.build();
+        return state.getResponseBuilder().build();
     }
     
     /**
      * {@inheritDoc}
      */
     public Client reset() {
-        requestHeaders.clear();
-        resetResponse();
+        state.reset();
         return this;
     }
 
+    private void possiblyAddHeader(String name, String value) {
+        if (!isDuplicate(name, value)) {
+            state.getRequestHeaders().add(name, value);
+        }
+    }
+    
+    private boolean isDuplicate(String name, String value) {
+        List<String> values = state.getRequestHeaders().get(name);
+        return values != null && values.contains(value) ? true : false;
+    }
+    
+    protected ClientState getState() {
+        return state;
+    }
     
     protected UriBuilder getCurrentBuilder() {
-        return currentBuilder;
+        return state.getCurrentBuilder();
     }
 
     protected void resetResponse() {
-        responseBuilder = null;
+        state.setResponseBuilder(null);
     }
     
     protected void resetBaseAddress(URI uri) {
-        baseURI = uri;
+        state.setBaseURI(uri);
         resetCurrentBuilder(uri);
     }
     
     protected void resetCurrentBuilder(URI uri) {
-        currentBuilder = new UriBuilderImpl(uri);
+        state.setCurrentBuilder(new UriBuilderImpl(uri));
     }
     
     protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Exchange exchange) throws Throwable {
@@ -297,19 +313,20 @@ public class AbstractClient implements Client {
             }
         } 
         int status = responseCode.intValue();
-        responseBuilder = Response.status(status);
+        ResponseBuilder currentResponseBuilder = Response.status(status);
+        
         for (Map.Entry<String, List<String>> entry : conn.getHeaderFields().entrySet()) {
             if (null == entry.getKey()) {
                 continue;
             }
             if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
-                responseBuilder.header(entry.getKey(), entry.getValue());
+                currentResponseBuilder.header(entry.getKey(), entry.getValue());
             } else if (entry.getValue().size() > 0) {
                 String[] values = entry.getValue().get(0).split(",");
                 for (String s : values) {
                     String theValue = s.trim();
                     if (theValue.length() > 0) {
-                        responseBuilder.header(entry.getKey(), theValue);
+                        currentResponseBuilder.header(entry.getKey(), theValue);
                     }
                 }
             }
@@ -321,19 +338,21 @@ public class AbstractClient implements Client {
         if (status >= 400) {
             try {
                 InputStream errorStream = mStream == null ? conn.getErrorStream() : mStream;
-                responseBuilder.entity(errorStream);
+                currentResponseBuilder.entity(errorStream);
             } catch (Exception ex) {
                 // nothing we can do really
             }
         } else {
             try {
                 InputStream stream = mStream == null ? conn.getInputStream() : mStream;
-                responseBuilder.entity(stream);
+                currentResponseBuilder.entity(stream);
             } catch (Exception ex) {
                 // it may that the successful response has no response body
             }
         }
-        return responseBuilder;
+        ResponseBuilder rb = currentResponseBuilder.clone();
+        state.setResponseBuilder(currentResponseBuilder);
+        return rb;
     }
 
     @SuppressWarnings("unchecked")
