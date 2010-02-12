@@ -271,7 +271,7 @@ public final class JAXRSClientFactory {
             }
         } else {
             MultivaluedMap<String, String> headers = inheritHeaders ? client.getHeaders() : null;
-            bean.setInitialState(clientState.newState(client.getCurrentURI(), headers));
+            bean.setInitialState(clientState.newState(client.getCurrentURI(), headers, null));
             proxy = bean.create(cls);
         }
         WebClient.copyProperties(WebClient.client(proxy), client);

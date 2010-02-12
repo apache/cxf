@@ -57,6 +57,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.UriBuilderImpl;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -291,6 +292,21 @@ public class AbstractClient implements Client {
     
     protected void resetCurrentBuilder(URI uri) {
         state.setCurrentBuilder(new UriBuilderImpl(uri));
+    }
+    
+    protected MultivaluedMap<String, String> getTemplateParametersMap(URITemplate template, 
+                                                                      List<Object> values) {
+        if (values != null && values.size() != 0) { 
+            List<String> vars = template.getVariables();
+            MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());
+            for (int i = 0; i < vars.size(); i++) {
+                if (i < values.size()) {
+                    templatesMap.add(vars.get(i), values.get(i).toString());
+                }
+            }
+            return templatesMap;
+        } 
+        return null;
     }
     
     protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Exchange exchange) throws Throwable {

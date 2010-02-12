@@ -163,7 +163,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                 subHeaders.putAll(headers);    
             }
             
-            ClientState newState = getState().newState(uri, headers);
+            ClientState newState = getState().newState(uri, subHeaders, 
+                 getTemplateParametersMap(ori.getURITemplate(), pathParams));
             ClientProxyImpl proxyImpl = new ClientProxyImpl(newState, subCri, false, inheritHeaders);
             proxyImpl.setConfiguration(getConfiguration());
             return JAXRSClientFactory.create(m.getReturnType(), proxyImpl);
@@ -414,16 +415,10 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                           List<Object> pathParams) throws Throwable {
         Message outMessage = createMessage(ori.getHttpMethod(), headers, uri);
         outMessage.getExchange().setOneWay(ori.isOneway());
-        if (pathParams.size() != 0) { 
-            List<String> vars = ori.getURITemplate().getVariables();
-            MultivaluedMap<String, String> templatesMap =  new MetadataMap<String, String>(vars.size());
-            for (int i = 0; i < vars.size(); i++) {
-                if (i < pathParams.size()) {
-                    templatesMap.add(vars.get(i), pathParams.get(i).toString());
-                }
-            }
-            outMessage.put(URITemplate.TEMPLATE_PARAMETERS, templatesMap);
-        }
+        
+        getState().setTemplates(getTemplateParametersMap(ori.getURITemplate(), pathParams));
+        outMessage.put(URITemplate.TEMPLATE_PARAMETERS, getState().getTemplates());
+        
         outMessage.setContent(OperationResourceInfo.class, ori);
         setPlainOperationNameProperty(outMessage, ori.getMethodToInvoke().getName());
         outMessage.getExchange().put(Method.class, ori.getMethodToInvoke());
