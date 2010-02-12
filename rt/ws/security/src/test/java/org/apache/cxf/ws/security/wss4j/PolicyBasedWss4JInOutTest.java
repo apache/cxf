@@ -731,50 +731,40 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         }
         
         
-        @Override
         public List<AbstractFeature> getActiveFeatures() {
             return null;
         }
 
-        @Override
         public Binding getBinding() {
             return null;
         }
 
-        @Override
         public EndpointInfo getEndpointInfo() {
             return this.epi;
         }
 
-        @Override
         public Executor getExecutor() {
             return null;
         }
 
-        @Override
         public MessageObserver getInFaultObserver() {
             return null;
         }
 
-        @Override
         public MessageObserver getOutFaultObserver() {
             return null;
         }
 
-        @Override
         public Service getService() {
             return null;
         }
 
-        @Override
         public void setExecutor(Executor executor) {   
         }
 
-        @Override
         public void setInFaultObserver(MessageObserver observer) {
         }
 
-        @Override
         public void setOutFaultObserver(MessageObserver observer) {            
         }
         
