@@ -581,6 +581,9 @@ public final class ProviderFactory {
                      requestHandlers,
                      responseHandlers,
                      exceptionMappers);
+        if (this != SHARED_FACTORY) {
+            SHARED_FACTORY.clearThreadLocalProxies();
+        }
     }
     
     void clearProxies(List<?> ...lists) {
