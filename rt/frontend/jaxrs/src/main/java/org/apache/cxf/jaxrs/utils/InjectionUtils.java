@@ -68,6 +68,7 @@ import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
+import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
@@ -75,6 +76,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageContext;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
@@ -697,6 +699,8 @@ public final class InjectionUtils {
             proxy = new ThreadLocalUriInfo();
         } else if (HttpHeaders.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpHeaders();
+        } else if (ProtocolHeaders.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalProtocolHeaders();
         } else if (SecurityContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalSecurityContext();
         } else if (ContextResolver.class.isAssignableFrom(type)) {

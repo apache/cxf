@@ -66,8 +66,35 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", 
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
         assertTrue("server did not launch correctly",
-                   launchServer(JMSServer.class, false));
+                   launchServer(JMSServer.class));
         serversStarted = true;
+    }
+    
+    @Test
+    public void testGetBook() throws Exception {
+        Context ctx = getContext();
+        ConnectionFactory factory = (ConnectionFactory)ctx.lookup("ConnectionFactory");
+        
+        Destination destination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.text");
+        Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
+                
+        Connection connection = null;
+        try {
+            connection = factory.createConnection();
+            connection.start();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            postGetMessage(session, destination, replyToDestination);
+            checkBookInResponse(session, replyToDestination, 123L, "CXF JMS Rocks");
+            session.close();
+        } finally {
+            try {
+                connection.stop();
+                connection.close();
+            } catch (JMSException ex) {
+                // ignore
+            }
+        }
+        
     }
     
     
@@ -85,27 +112,57 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
             connection.start();
             Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
             postBook(session, destination, replyToDestination);
-            MessageConsumer consumer = session.createConsumer(replyToDestination);
-            Message jmsMessage = consumer.receive(3000);
-            org.apache.cxf.message.Message cxfMessage = new org.apache.cxf.message.MessageImpl();
-            byte[] bytes = JMSUtils.retrievePayload(jmsMessage, null);
-            cxfMessage.setContent(InputStream.class, new ByteArrayInputStream(bytes));
-            Book b = readBook(cxfMessage.getContent(InputStream.class));
-            assertEquals(124L, b.getId());
-            assertEquals("JMS", b.getName());
+            checkBookInResponse(session, replyToDestination, 124L, "JMS");
             session.close();
         } finally {
-            if (connection != null) {
-                try {
-                    connection.stop();
-                    connection.close();
-                } catch (JMSException ex) {
-                    // ignore
-                }
-                
+            try {
+                connection.stop();
+                connection.close();
+            } catch (JMSException ex) {
+                // ignore
             }
         }
         
+    }
+    
+    @Test
+    public void testOneWayBook() throws Exception {
+        Context ctx = getContext();
+        ConnectionFactory factory = (ConnectionFactory)ctx.lookup("ConnectionFactory");
+
+        Destination destination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.text");
+        Destination replyToDestination = (Destination)ctx.lookup("dynamicQueues/test.jmstransport.response");
+                
+        Connection connection = null;
+        try {
+            connection = factory.createConnection();
+            connection.start();
+            Session session = connection.createSession(false, Session.AUTO_ACKNOWLEDGE);
+            postOneWayBook(session, destination);
+            checkBookInResponse(session, replyToDestination, 125L, "JMS OneWay");
+            session.close();
+        } finally {
+            try {
+                connection.stop();
+                connection.close();
+            } catch (JMSException ex) {
+                // ignore
+            }
+        }
+        
+    }
+    
+    
+    private void checkBookInResponse(Session session, Destination replyToDestination,
+                                     long bookId, String bookName) throws Exception {
+        MessageConsumer consumer = session.createConsumer(replyToDestination);
+        Message jmsMessage = consumer.receive(300000);
+        org.apache.cxf.message.Message cxfMessage = new org.apache.cxf.message.MessageImpl();
+        byte[] bytes = JMSUtils.retrievePayload(jmsMessage, null);
+        cxfMessage.setContent(InputStream.class, new ByteArrayInputStream(bytes));
+        Book b = readBook(cxfMessage.getContent(InputStream.class));
+        assertEquals(bookId, b.getId());
+        assertEquals(bookName, b.getName());
     }
     
     private Context getContext() throws Exception {
@@ -117,6 +174,32 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         
     }
     
+    private void postGetMessage(Session session, Destination destination, Destination replyTo) 
+        throws Exception {
+        MessageProducer producer = session.createProducer(destination);
+        Message message = session.createMessage();
+        message.setJMSReplyTo(replyTo);
+        message.setStringProperty("Accept", "application/xml");
+        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books/123");
+        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "GET");
+        producer.send(message);
+        producer.close();
+    }
+    
+    private void postOneWayBook(Session session, Destination destination) 
+        throws Exception {
+        MessageProducer producer = session.createProducer(destination);
+        
+        Message message = JMSUtils.createAndSetPayload(
+            writeBook(new Book("JMS OneWay", 125L)), session, "text");
+        message.setStringProperty("Content-Type", "application/xml");
+        message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/oneway");
+        message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "PUT");
+                    
+        producer.send(message);
+        producer.close();
+    }
+    
     private void postBook(Session session, Destination destination, Destination replyTo) 
         throws Exception {
         MessageProducer producer = session.createProducer(destination);
@@ -124,7 +207,11 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Message message = JMSUtils.createAndSetPayload(writeBook(new Book("JMS", 3L)), session, "text");
         message.setJMSReplyTo(replyTo);
         // or, if oneway,
-        // message.setStringProperty("OnewayMessage", "true");
+        // message.setStringProperty("OnewayRequest", "true");
+        // we could've set this header in JMSDestination if no replyTo were set
+        // but in CXF one could also provide the replyTo in the configuration
+        // so it is just simpler to set this header if needed to avoid some
+        // complex logic on the server side
         
         // all these properties are optional
         // CXF JAXRS and JMS Transport will default to 
@@ -137,7 +224,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         message.setStringProperty("Accept", "text/xml");
         message.setStringProperty(org.apache.cxf.message.Message.REQUEST_URI, "/bookstore/books");
         message.setStringProperty(org.apache.cxf.message.Message.HTTP_REQUEST_METHOD, "POST");
-            
+        message.setStringProperty("custom.protocol.header", "custom.value");    
                     
         producer.send(message);
         producer.close();

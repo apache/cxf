@@ -63,7 +63,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
                 transportId="http://cxf.apache.org/transports/jms"
 		        address="/">
     <jaxrs:serviceBeans>
-      <bean class="org.apache.cxf.systest.jaxrs.BookStore" />
+      <bean class="org.apache.cxf.systest.jaxrs.JMSBookStore" />
     </jaxrs:serviceBeans>		
   </jaxrs:server>
 

@@ -68,13 +68,15 @@ public interface Message extends StringMap {
     String DECOUPLED_CHANNEL_MESSAGE = "decoupled.channel.message";
     String PARTIAL_RESPONSE_MESSAGE = "org.apache.cxf.partial.response";
     String ONE_WAY_REQUEST = "OnewayRequest";
+
+    
+    String HTTP_REQUEST_METHOD = "org.apache.cxf.request.method";
+    String REQUEST_URI = "org.apache.cxf.request.uri";
     
     String PROTOCOL_HEADERS = Message.class.getName() + ".PROTOCOL_HEADERS";
     String RESPONSE_CODE = Message.class.getName() + ".RESPONSE_CODE";
     String ENDPOINT_ADDRESS = Message.class.getName() + ".ENDPOINT_ADDRESS";
-    String HTTP_REQUEST_METHOD = Message.class.getName() + ".HTTP_REQUEST_METHOD";
     String PATH_INFO = Message.class.getName() + ".PATH_INFO";
-    String REQUEST_URI = Message.class.getName() + ".REQUEST_URI";
     String QUERY_STRING = Message.class.getName() + ".QUERY_STRING";
 
     String PROPOGATE_EXCEPTION = Message.class.getName() + ".PROPOGATE_EXCEPTION";
