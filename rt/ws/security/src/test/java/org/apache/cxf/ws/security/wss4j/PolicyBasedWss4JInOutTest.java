@@ -27,6 +27,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
 import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
@@ -72,6 +75,25 @@ import org.junit.Test;
 public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     private PolicyBuilder policyBuilder;
        
+    public static boolean checkUnrestrictedPoliciesInstalled() {
+        try {
+            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
+
+            SecretKey key192 = new SecretKeySpec(
+                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
+                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
+                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
+                            "AES");
+            Cipher c = Cipher.getInstance("AES");
+            c.init(Cipher.ENCRYPT_MODE, key192);
+            c.doFinal(data);
+            return true;
+        } catch (Exception e) {
+            //ignore
+        }
+        return false;
+    }
+    
     @Test
     @org.junit.Ignore("missing file")
     public void testSignedElementsPolicyWithIncompleteCoverage() throws Exception {
@@ -386,6 +408,9 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     
     @Test
     public void testSignedEncryptedPartsWithCompleteCoverage() throws Exception {
+        if (!checkUnrestrictedPoliciesInstalled()) {
+            return;
+        }
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_encrypted.xml",
                 "signed_parts_policy_header_and_body_encrypted.xml",
