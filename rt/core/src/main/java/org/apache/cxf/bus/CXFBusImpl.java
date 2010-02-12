@@ -40,6 +40,7 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
             //treat these all the same
             b |= Boolean.getBoolean("com.sun.xml.ws.transport.local.LocalTransportPipe.dump");
             b |= Boolean.getBoolean("com.sun.xml.ws.util.pipe.StandaloneTubeAssembler.dump");
+            b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.client.HttpTransportPipe.dump");
             b |= Boolean.getBoolean("com.sun.xml.ws.transport.http.HttpAdapter.dump");
         } catch (Throwable t) {
             //ignore
