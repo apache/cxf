@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <wsp:Policy 
     xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
-    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
-    xmlns:ser="http://www.sdj.pl">
+    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
   <wsp:ExactlyOne>
     <wsp:All>
       <sp:SymmetricBinding>
@@ -27,11 +26,21 @@
               <sp:Strict />
             </wsp:Policy>
           </sp:Layout>
+          <sp:EncryptBeforeSigning/>
         </wsp:Policy>
       </sp:SymmetricBinding>
-      <sp:EncryptedElements>
-        <sp:XPath>//ser:Header</sp:XPath>
-      </sp:EncryptedElements>  
+      <sp:SignedParts>
+        <sp:Body/>
+        <sp:Header Namespace="http://www.sdj.pl"/>
+      </sp:SignedParts>
+      <sp:EncryptedParts>
+        <sp:Body/>
+        <sp:Header Name="Header" Namespace="http://www.sdj.pl"/>
+      </sp:EncryptedParts>  
+      <sp:EncryptedParts>
+        <sp:Body/>
+        <sp:Header Namespace="http://www.sdj.pl"/>
+      </sp:EncryptedParts>
     </wsp:All>
   </wsp:ExactlyOne>
 </wsp:Policy>

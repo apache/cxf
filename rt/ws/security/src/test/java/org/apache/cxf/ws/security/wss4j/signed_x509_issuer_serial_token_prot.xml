@@ -1,0 +1,59 @@
+<soap:Envelope xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <soap:Header><wsse:Security xmlns:wsse="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd"><ds:Signature Id="Signature-25" xmlns:ds="http://www.w3.org/2000/09/xmldsig#">
+<ds:SignedInfo>
+<ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+<ds:SignatureMethod Algorithm="http://www.w3.org/2000/09/xmldsig#rsa-sha1"/>
+<ds:Reference URI="#8">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>yrFltN8AySIQ4cvGezqY3dJccv0=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference URI="#id-26">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>GxPT0vMspxayELR1vubKq2h4QwY=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference URI="#id-27">
+<ds:Transforms>
+<ds:Transform Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>xibtuSP37C6DvoeC/hCmjSfG5/w=</ds:DigestValue>
+</ds:Reference>
+<ds:Reference URI="#STRId-09AB012A7AA77D06AA126565303871827">
+<ds:Transforms>
+<ds:Transform Algorithm="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#STR-Transform">
+<wsse:TransformationParameters><ds:CanonicalizationMethod Algorithm="http://www.w3.org/2001/10/xml-exc-c14n#"/></wsse:TransformationParameters>
+</ds:Transform>
+</ds:Transforms>
+<ds:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha1"/>
+<ds:DigestValue>KcXtgDMfdhizxGV1QSk/pDNRQ1E=</ds:DigestValue>
+</ds:Reference>
+</ds:SignedInfo>
+<ds:SignatureValue>
+Tkf4uCbER3J1Q9oJXABUNdKihAy3BnLJbqHc0ERRwkv30XAgZi405qpoqcxuFZMonCRJEPUeryEm
+vtmRFGmQTrEWSBDqjJfPe/gUrBTIT2lnMRQfUEkRrwVCBT/qFGTOwGFfauDGssye3F+TLaxgAaR9
+s60Ekf1OMmIjSrQ7YXw=
+</ds:SignatureValue>
+<ds:KeyInfo Id="KeyId-09AB012A7AA77D06AA126565303871826">
+<wsse:SecurityTokenReference wsu:Id="STRId-09AB012A7AA77D06AA126565303871827" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"><ds:X509Data>
+<ds:X509IssuerSerial>
+<ds:X509IssuerName>CN=myAlias</ds:X509IssuerName>
+<ds:X509SerialNumber>1181668586</ds:X509SerialNumber>
+</ds:X509IssuerSerial>
+</ds:X509Data></wsse:SecurityTokenReference>
+</ds:KeyInfo>
+</ds:Signature></wsse:Security>
+    <Header wsu:Id="id-26" xmlns="http://www.sdj.pl" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">1234</Header>
+    <Header wsu:Id="8" xmlns="http://www.sdj.pl" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">5678</Header>
+  </soap:Header>
+  <soap:Body wsu:Id="id-27" xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+    <echo xmlns="http://www.sdj.pl">
+      <in0>A</in0>    
+    </echo>
+  </soap:Body>
+</soap:Envelope>

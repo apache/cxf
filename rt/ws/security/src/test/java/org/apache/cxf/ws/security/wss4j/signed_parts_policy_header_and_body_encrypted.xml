@@ -8,9 +8,9 @@
         <wsp:Policy>
           <sp:InitiatorToken>
             <wsp:Policy>
-              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
                 <wsp:Policy>
-                  <sp:RequireIssuerSerialReference />
+                  <sp:RequireEmbeddedTokenReference />
                   <sp:WssX509V3Token10 />
                 </wsp:Policy>
               </sp:X509Token>
@@ -18,9 +18,9 @@
           </sp:InitiatorToken>
           <sp:RecipientToken>
             <wsp:Policy>
-              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Always">
                 <wsp:Policy>
-                  <sp:RequireIssuerSerialReference />
+                  <sp:RequireEmbeddedTokenReference />
                   <sp:WssX509V3Token10 />
                 </wsp:Policy>
               </sp:X509Token>
@@ -35,12 +35,21 @@
             <wsp:Policy>
               <sp:Strict />
             </wsp:Policy>
-          </sp:Layout>         
+          </sp:Layout>
         </wsp:Policy>
       </sp:AsymmetricBinding>
       <sp:SignedParts>
+        <sp:Body/>
         <sp:Header Name="Header" Namespace="http://www.sdj.pl"/>
       </sp:SignedParts>  
+      <sp:SignedParts>
+        <sp:Body/>
+        <sp:Header Namespace="http://www.sdj.pl"/>
+      </sp:SignedParts>
+      <sp:EncryptedParts>
+        <sp:Body/>
+        <sp:Header Namespace="http://www.sdj.pl"/>
+      </sp:EncryptedParts>
     </wsp:All>
   </wsp:ExactlyOne>
 </wsp:Policy>
