@@ -62,7 +62,7 @@ public final class AttachmentUtil {
      */
     public static String createContentID(String ns) throws UnsupportedEncodingException {
         // tend to change
-        String cid = "http://cxf.apache.org/";
+        String cid = "cxf.apache.org";
         
         String name = ATT_UUID + "-" + String.valueOf(++counter);
         if (ns != null && (ns.length() > 0)) {
