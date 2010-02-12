@@ -29,8 +29,9 @@ import javax.ws.rs.core.UriBuilder;
  * Represents the client state :
  *  - baseURI
  *  - current uri builder
- *  - current requestHeaders,
- *  - current response
+ *  - current requestHeaders
+ *  - current template parameters map
+ *  - last response
  */
 public interface ClientState {
     
@@ -83,6 +84,19 @@ public interface ClientState {
     MultivaluedMap<String, String> getRequestHeaders();
     
     /**
+     * Sets the map containing template name and value pairs
+     * @param templates
+     */
+    void setTemplates(MultivaluedMap<String, String> map);
+    
+    /**
+     * Gets the templates map
+     * @return templates
+     */
+    MultivaluedMap<String, String> getTemplates();
+    
+    
+    /**
      * Resets the current state to the baseURI
      *
      */
@@ -94,8 +108,11 @@ public interface ClientState {
      * subresource proxies and new web clients respectively to ensure thet stay
      * thread-local if needed
      * @param baseURI baseURI
-     * @param headers request headers
+     * @param headers request headers, can be null
+     * @param templates initial templates map, can be null
      * @return client state
      */
-    ClientState newState(URI baseURI, MultivaluedMap<String, String> headers);
+    ClientState newState(URI baseURI, 
+                         MultivaluedMap<String, String> headers,
+                         MultivaluedMap<String, String> templates);
 }

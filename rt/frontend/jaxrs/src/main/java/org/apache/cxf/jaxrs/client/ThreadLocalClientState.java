@@ -83,15 +83,24 @@ public class ThreadLocalClientState implements ClientState {
         return getState().getRequestHeaders();
     }
     
+    public MultivaluedMap<String, String> getTemplates() {
+        return getState().getTemplates();
+    }
+
+    public void setTemplates(MultivaluedMap<String, String> map) {
+        getState().setTemplates(map);
+    }
+    
     public void reset() {
         removeThreadLocalState(Thread.currentThread());
     }
     
-    public ClientState newState(URI baseURI, MultivaluedMap<String, String> headers) {
+    public ClientState newState(URI baseURI, 
+                                MultivaluedMap<String, String> headers,
+                                MultivaluedMap<String, String> templates) {
         LocalClientState ls = new LocalClientState(baseURI);
-        if (headers != null) {
-            ls.setRequestHeaders(headers);
-        }
+        ls.setRequestHeaders(headers);
+        ls.setTemplates(templates);
         return new ThreadLocalClientState(ls);
     }
     
@@ -148,4 +157,6 @@ public class ThreadLocalClientState implements ClientState {
             }
         }
     }
+
+    
 }

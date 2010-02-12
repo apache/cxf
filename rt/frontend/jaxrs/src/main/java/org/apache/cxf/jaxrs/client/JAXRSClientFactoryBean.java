@@ -132,7 +132,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
         if (initialState != null) {
             return headers != null
-                ? initialState.newState(URI.create(getAddress()), headers) : initialState;
+                ? initialState.newState(URI.create(getAddress()), headers, null) : initialState;
         } else {
             return null;
         }

@@ -33,6 +33,7 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 public class LocalClientState implements ClientState {
     
     private MultivaluedMap<String, String> requestHeaders = new MetadataMap<String, String>();
+    private MultivaluedMap<String, String> templates;
     private ResponseBuilder responseBuilder;
     private URI baseURI;
     private UriBuilder currentBuilder;
@@ -48,10 +49,10 @@ public class LocalClientState implements ClientState {
     
     public LocalClientState(LocalClientState cs) {
         this.requestHeaders = new MetadataMap<String, String>(cs.requestHeaders);
+        this.templates = cs.templates == null ? null : new MetadataMap<String, String>(cs.templates);
         this.responseBuilder = cs.responseBuilder != null ? cs.responseBuilder.clone() : null;
         this.baseURI = cs.baseURI;
         this.currentBuilder = cs.currentBuilder != null ? cs.currentBuilder.clone() : null;
-        
     }
     
     
@@ -88,17 +89,42 @@ public class LocalClientState implements ClientState {
         return requestHeaders;
     }
     
+    public MultivaluedMap<String, String> getTemplates() {
+        return templates;
+    }
+
+    public void setTemplates(MultivaluedMap<String, String> map) {
+        if (templates == null) {
+            this.templates = map;
+        } else if (map != null) {
+            templates.putAll(map);
+        } else {
+            templates = null;
+        }
+    }
+    
     public void reset() {
         requestHeaders.clear();
         responseBuilder = null;
         currentBuilder = UriBuilder.fromUri(baseURI);
+        templates = null;
     }
     
-    public ClientState newState(URI newBaseURI, MultivaluedMap<String, String> headers) {
+    public ClientState newState(URI newBaseURI, 
+                                MultivaluedMap<String, String> headers,
+                                MultivaluedMap<String, String> templatesMap) {
         ClientState state = new LocalClientState(newBaseURI);
         if (headers != null) {
             state.setRequestHeaders(headers);
         }
+        // we need to carry the template parameters forward
+        MultivaluedMap<String, String> newTemplateParams = templates;
+        if (newTemplateParams != null && templatesMap != null) {
+            newTemplateParams.putAll(templatesMap);
+        } else {
+            newTemplateParams = templatesMap;
+        }
+        state.setTemplates(newTemplateParams);
         return state;
     }
 }
