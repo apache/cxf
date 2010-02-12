@@ -129,6 +129,17 @@ public final class JMSFactory {
                                                                     String destinationName, 
                                                                     String messageSelectorPrefix,
                                                                     boolean userCID) {
+        
+        if (jmsConfig.getMessageListenerContainer() != null) {
+            AbstractMessageListenerContainer  jmsListener =  jmsConfig.getMessageListenerContainer();
+            if (jmsListener.getMessageListener() == null) {
+                jmsListener.setMessageListener(listenerHandler);
+                jmsListener.initialize();
+                jmsListener.start();
+            }
+            return jmsListener;
+        }
+        
         if (jmsConfig.getMessageListenerContainer() != null) {
             return jmsConfig.getMessageListenerContainer();
         }
