@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PushbackInputStream;
+import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
@@ -1983,6 +1984,49 @@ public class HTTPConduit
             }
             try {
                 handleResponse();
+            } catch (HttpRetryException e) {
+                String msg = "HTTP response '" + e.responseCode() + ": "
+                             + connection.getResponseMessage() + "' invoking " + connection.getURL();
+                switch (e.responseCode()) {
+                case HttpURLConnection.HTTP_MOVED_PERM: // 301
+                case HttpURLConnection.HTTP_MOVED_TEMP: // 302
+                    msg += " that returned location header '" + e.getLocation() + "'";
+                    break;
+                case HttpURLConnection.HTTP_UNAUTHORIZED: // 401
+                    if (authorizationPolicy == null || authorizationPolicy.getUserName() == null) {
+                        msg += " with NO authorization username configured in conduit " + getConduitName();
+                    } else {
+                        msg += " with authorization username '" + authorizationPolicy.getUserName() + "'";
+                    }
+                    break;
+                case HttpURLConnection.HTTP_PROXY_AUTH: // 407
+                    if (proxyAuthorizationPolicy == null || proxyAuthorizationPolicy.getUserName() == null) {
+                        msg += " with NO proxy authorization configured in conduit " + getConduitName();
+                    } else {
+                        msg += " with proxy authorization username '"
+                               + proxyAuthorizationPolicy.getUserName() + "'";
+                    }
+                    if (clientSidePolicy == null || clientSidePolicy.getProxyServer() == null) {
+                        if (connection.usingProxy()) {
+                            msg += " using a proxy even if NONE is configured in CXF conduit "
+                                   + getConduitName()
+                                   + " (maybe one is configured by java.net.ProxySelector)";
+                        } else {
+                            msg += " but NO proxy was used by the connection (none configured in cxf "
+                                   + "conduit and none selected by java.net.ProxySelector)";
+                        }
+                    } else {
+                        msg += " using " + clientSidePolicy.getProxyServerType() + " proxy "
+                               + clientSidePolicy.getProxyServer() + ":"
+                               + clientSidePolicy.getProxyServerPort();
+                    }
+                    break;
+                default:
+                    // No other type of HttpRetryException should be thrown
+                    break;
+                }
+                // pass cause with initCause() instead of constructor for jdk 1.5 compatibility
+                throw (IOException) new IOException(msg).initCause(e);
             } catch (IOException e) {
                 String url = connection.getURL().toString();
                 String origMessage = e.getMessage();
