@@ -2027,7 +2027,8 @@ public class HTTPConduit
                     // No other type of HttpRetryException should be thrown
                     break;
                 }
-                throw new IOException(msg, e);
+                // pass cause with initCause() instead of constructor for jdk 1.5 compatibility
+                throw (IOException) new IOException(msg).initCause(e);
             } catch (IOException e) {
                 String url = connection.getURL().toString();
                 String origMessage = e.getMessage();
