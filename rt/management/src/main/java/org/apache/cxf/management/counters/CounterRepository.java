@@ -21,6 +21,8 @@ package org.apache.cxf.management.counters;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -48,6 +50,7 @@ public class CounterRepository {
     
     private Map<ObjectName, Counter> counters;
     private Bus bus;
+    private Lock counterCreationLock = new ReentrantLock();
     
     public CounterRepository() {
         counters = new ConcurrentHashMap<ObjectName, Counter>();
@@ -84,9 +87,18 @@ public class CounterRepository {
     
     public void increaseCounter(ObjectName on, MessageHandlingTimeRecorder mhtr) {
         Counter counter = getCounter(on);
-        if (null == counter) {            
-            counter = createCounter(on, mhtr);
-            counters.put(on, counter);
+        if (null == counter) {
+            counterCreationLock.lock();
+            try {
+                // check if the counter has been created during the locked time
+                counter = getCounter(on);
+                if (counter == null) {
+                    counter = createCounter(on, mhtr);
+                    counters.put(on, counter);
+                }
+            } finally {
+                counterCreationLock.unlock();
+            }
         }
         counter.increase(mhtr);        
         if (LOG.isLoggable(Level.FINE)) {
