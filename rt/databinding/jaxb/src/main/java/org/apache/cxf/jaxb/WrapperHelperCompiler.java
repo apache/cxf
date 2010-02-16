@@ -263,7 +263,7 @@ final class WrapperHelperCompiler extends ASMHelper {
                                       "L" + periodToSlashes(objectFactoryClass.getName()) + ";");
                 }
                 mv.visitVarInsn(Opcodes.ALOAD, 1);
-                mv.visitIntInsn(Opcodes.BIPUSH, x);
+                mv.visitIntInsn(Opcodes.SIPUSH, x);
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "get", "(I)Ljava/lang/Object;");
                 
                 if (tp.isPrimitive()) {
@@ -320,7 +320,7 @@ final class WrapperHelperCompiler extends ASMHelper {
                            getMethodSignature(getMethods[x]));
         mv.visitVarInsn(Opcodes.ASTORE, 3);
         mv.visitVarInsn(Opcodes.ALOAD, 1);
-        mv.visitIntInsn(Opcodes.BIPUSH, x);
+        mv.visitIntInsn(Opcodes.SIPUSH, x);
         mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List",
                            "get", "(I)Ljava/lang/Object;");
         mv.visitTypeInsn(Opcodes.CHECKCAST, "java/util/List");
