@@ -412,12 +412,12 @@ public final class SOAPBindingUtil {
             extElement = (SOAP12Binding)extReg.createExtension(Binding.class,
                                                                new QName(WSDLConstants.NS_SOAP12,
                                                                          "binding"));
-            ((SOAP12Binding)extElement).setTransportURI(WSDLConstants.NS_SOAP12_HTTP_TRANSPORT);
+            ((SOAP12Binding)extElement).setTransportURI(WSDLConstants.NS_SOAP_HTTP_TRANSPORT);
         } else {
             extElement = (SOAPBinding)extReg.createExtension(Binding.class,
                                                              new QName(WSDLConstants.NS_SOAP11,
                                                                        "binding"));
-            ((SOAPBinding)extElement).setTransportURI(WSDLConstants.NS_SOAP11_HTTP_TRANSPORT);
+            ((SOAPBinding)extElement).setTransportURI(WSDLConstants.NS_SOAP_HTTP_TRANSPORT);
         }
         return getSoapBinding(extElement);
     }

@@ -863,7 +863,7 @@ public class ServiceJavascriptBuilder extends ServiceModelVisitor {
                 ) {
                 SoapBindingInfo sbi = (SoapBindingInfo)bindingInfo;
                 if (WSDLConstants.NS_SOAP11_HTTP_TRANSPORT.equals(sbi.getTransportURI())
-                    || WSDLConstants.NS_SOAP12_HTTP_TRANSPORT.equals(sbi.getTransportURI())
+                    || WSDLConstants.NS_SOAP12_HTTP_BINDING.equals(sbi.getTransportURI())
                     // we may want this for testing.
                     || LocalTransportFactory.TRANSPORT_ID.equals(sbi.getTransportURI())) {
                     soapBindingInfo = sbi;

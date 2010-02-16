@@ -242,7 +242,7 @@ public class WSDLToSoapProcessorTest extends ProcessorTestBase {
                 SoapBinding soapBinding = SOAPBindingUtil.getSoapBinding(obj);
                 assertNotNull(soapBinding);
                 assertTrue("document".equalsIgnoreCase(soapBinding.getStyle()));
-                assertTrue(WSDLConstants.NS_SOAP12_HTTP_TRANSPORT.
+                assertTrue(WSDLConstants.NS_SOAP_HTTP_TRANSPORT.
                            equalsIgnoreCase(soapBinding.getTransportURI()));
             }
 
