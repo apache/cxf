@@ -83,7 +83,7 @@
     </wsdl:operation>
   </wsdl:portType>
   <wsdl:binding name="GreeterServiceSoapBinding" type="tns:Greeter">
-    <soap12:binding style="document" transport="http://www.w3.org/2003/05/soap/bindings/HTTP/"/>
+    <soap12:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
     <wsdl:operation name="sayHi">
       <soap12:operation soapAction="" style="document"/>
       <wsdl:input name="sayHi">

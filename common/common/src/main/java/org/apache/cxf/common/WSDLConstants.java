@@ -57,6 +57,7 @@ public final class WSDLConstants {
     public static final String SOAP11_PREFIX = "soap";
     public static final String SOAP12_PREFIX = "soap12";
     
+    public static final String NS_SOAP_HTTP_TRANSPORT = "http://schemas.xmlsoap.org/soap/http";
     public static final String NS_SOAP11_HTTP_TRANSPORT = "http://schemas.xmlsoap.org/soap/http";
     
     public static final QName QNAME_SOAP_BINDING = new QName(NS_SOAP, "binding");
@@ -66,7 +67,7 @@ public final class WSDLConstants {
     public static final QName QNAME_SOAP_BINDING_ADDRESS = new QName(NS_SOAP, "address");
 
 
-    public static final String NS_SOAP12_HTTP_TRANSPORT = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
+    public static final String NS_SOAP12_HTTP_BINDING = "http://www.w3.org/2003/05/soap/bindings/HTTP/";
     
     public static final QName QNAME_SOAP12_BINDING = new QName(NS_SOAP12, "binding");
     public static final QName QNAME_SOAP12_BINDING_ADDRESS = new QName(NS_SOAP12, "address");

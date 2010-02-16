@@ -194,7 +194,7 @@ public class SoapBindingFactoryTest extends Assert {
 
         SoapBindingInfo sbi = (SoapBindingInfo)bi;
         assertEquals("document", sbi.getStyle());
-        assertTrue(WSDLConstants.NS_SOAP12_HTTP_TRANSPORT.equalsIgnoreCase(sbi.getTransportURI()));
+        assertEquals(WSDLConstants.NS_SOAP_HTTP_TRANSPORT, sbi.getTransportURI());
         assertTrue(sbi.getSoapVersion() instanceof Soap12);
 
         BindingOperationInfo boi = sbi.getOperation(new QName("http://apache.org/hello_world_soap12_http",
