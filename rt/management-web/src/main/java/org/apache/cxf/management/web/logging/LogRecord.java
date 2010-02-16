@@ -22,9 +22,11 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.text.MessageFormat;
 import java.util.Date;
+import java.util.UUID;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.commons.lang.Validate;
 import org.apache.commons.lang.builder.EqualsBuilder;
@@ -42,6 +44,9 @@ import org.apache.commons.lang.builder.ToStringStyle;
 @XmlRootElement(namespace = "http://cxf.apache.org/log")
 public class LogRecord {
 
+    @XmlTransient
+    private String id = "uuid:" + UUID.randomUUID().toString();
+    
     private Date eventTimestamp = new Date();
     private LogLevel level = LogLevel.INFO;
     private String message = "";
@@ -51,6 +56,10 @@ public class LogRecord {
 
     public LogRecord() {
         
+    }
+    
+    public LogRecord(String id) {
+        this.id = id;
     }
     
     public LogRecord(LogRecord copy) {
@@ -90,6 +99,10 @@ public class LogRecord {
         return record;
     }
 
+    public String getId() {
+        return id;
+    }
+    
     @XmlElement(namespace = "http://cxf.apache.org/log")
     public Date getEventTimestamp() {
         return eventTimestamp;

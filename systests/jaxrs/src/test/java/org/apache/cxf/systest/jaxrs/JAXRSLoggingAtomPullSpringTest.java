@@ -37,6 +37,7 @@ import org.apache.abdera.model.Link;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
@@ -77,17 +78,39 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         Storage.clearRecords();
     }
 
+    
     @Test
     public void testFeed() throws Exception {
+        String listing = WebClient.create("http://localhost:9080/services").get(String.class);
+        assertTrue(listing.contains("http://localhost:9080/atom/logs"));
         WebClient wc = WebClient.create("http://localhost:9080/resource/root");
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        Feed feed = getFeed("http://localhost:9080/atom/logs");
-        assertEquals(8, feed.getEntries().size());
+        checkSimpleFeed(getFeed("http://localhost:9080/atom/logs").getEntries());
+        checkSimpleFeed(getFeed("http://localhost:9080/atom/logs").getEntries());
+     
+        List<Entry> entries = new LinkedList<Entry>();
+        WebClient wcEntry = WebClient.create("http://localhost:9080/atom/logs",
+            Collections.singletonList(new AtomEntryProvider()))
+            .accept("application/atom+xml;type=entry");
+        HTTPConduit conduit = WebClient.getConfig(wcEntry).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
+        for (int i = 0; i < 8; i++) {
+            Entry entry = wcEntry.path("entry/" + i).get(Entry.class);
+            entry.toString();
+            entries.add(entry);
+            wcEntry.back(true);
+        }
+        checkSimpleFeed(entries);
+    }
+    
+    private void checkSimpleFeed(List<Entry> entries) throws Exception {
+        assertEquals(8, entries.size());
         
         resetCounters();
-        for (Entry e : feed.getEntries()) {
+        for (Entry e : entries) {
             updateCounters(readLogRecord(e.getContent()), "Resource", "namedLogger");
         }
         
@@ -101,7 +124,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         Thread.sleep(3000);
         
         verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2, "theNamedLogger");
-        verifyPages("http://localhost:9080/atom2/logs?page=3", "previous", 2, 3, "theNamedLogger");
+        verifyPages("http://localhost:9080/atom2/logs/3", "previous", 2, 3, "theNamedLogger");
     }
     
     @Test
@@ -117,14 +140,14 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
         List<org.apache.cxf.management.web.logging.LogRecord> list = Storage.getRecords();
         assertEquals(4, list.size());
         verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
-        verifyStoragePages("http://localhost:9080/atom3/logs?page=2", "previous", "Resource3", 
+        verifyStoragePages("http://localhost:9080/atom3/logs/2", "previous", "Resource3", 
                            "theStorageLogger");
     }
     
     @Test
     public void testPagedFeedWithReadOnlyStorage() throws Exception {
         verifyStoragePages("http://localhost:9080/atom4/logs", "next", "Resource4", "readOnlyStorageLogger");
-        verifyStoragePages("http://localhost:9080/atom4/logs?page=2", "previous", "Resource4", 
+        verifyStoragePages("http://localhost:9080/atom4/logs/2", "previous", "Resource4", 
                            "readOnlyStorageLogger");
     }
     
@@ -185,9 +208,6 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     private Feed getFeed(String address) {
         WebClient wc = WebClient.create(address,
                                          Collections.singletonList(new AtomFeedProvider()));
-        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         Feed feed = wc.accept("application/atom+xml").get(Feed.class);
         feed.toString();
         return feed;

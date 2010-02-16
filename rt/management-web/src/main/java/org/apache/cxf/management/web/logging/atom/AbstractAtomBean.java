@@ -25,6 +25,7 @@ import java.util.logging.Handler;
 import java.util.logging.Logger;
 
 import org.apache.commons.lang.Validate;
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.management.web.logging.LogLevel;
 
@@ -33,7 +34,8 @@ public abstract class AbstractAtomBean {
 
     private List<LoggerLevel> loggers = new ArrayList<LoggerLevel>();
     private boolean initialized;
-
+    private Bus bus;
+    
     /**
      * Creates unconfigured and uninitialized bean. To configure setters must be used, then {@link #init()}
      * must be called.
@@ -47,6 +49,13 @@ public abstract class AbstractAtomBean {
         loggers.add(new LoggerLevel("", "INFO"));
     }
 
+    public void setBus(Bus bus) {
+        this.bus = bus;
+    }
+    
+    public Bus getBus() {
+        return bus;
+    }
 
     /**
      * Set one or more loggers and levels descriptor. <br>
@@ -115,7 +124,7 @@ public abstract class AbstractAtomBean {
             l.setLevel(LogLevel.toJUL(LogLevel.valueOf(loggers.get(i).getLevel())));
         }
     }
-
+    
     protected abstract Handler createHandler();
     
     protected void checkInit() {

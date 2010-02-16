@@ -50,7 +50,7 @@ import org.apache.cxf.management.web.logging.LogRecords;
  * Converter producing ATOM Feeds on standalone Entries with LogRecords or LogRecordsLists embedded as content
  * or extension. For configuration details see constructor documentation.
  */
-public final class StandardConverter implements Converter {
+public class StandardConverter implements Converter {
 
     /** Conversion output */
     public enum Output {
@@ -111,7 +111,7 @@ public final class StandardConverter implements Converter {
         this.feedBuilder = feedBuilder;
         this.entryBuilder = entryBuilder;
         
-        configure(output, multiplicity, format);
+        configure(output, multiplicity, format); //NOPMD
         df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
         factory = Abdera.getNewFactory();
         try {
@@ -164,14 +164,14 @@ public final class StandardConverter implements Converter {
 
     private List<Entry> createEntries(Format format, List<LogRecord> records) {
         List<Entry> entries = new ArrayList<Entry>();
-        for (LogRecord record : records) {
-            entries.add(createEntryFromRecord(format, record));
+        for (int i = 0; i < records.size(); i++) {
+            entries.add(createEntryFromRecord(format, records.get(i), i));
         }
         return entries;
     }
     
     private Entry createEntryFromList(Format format, List<LogRecord> records) {
-        Entry e = createEntry(records);
+        Entry e = createEntry(records, 0);
         if (format == Format.CONTENT) {
             setEntryContent(e, createContent(records));
         } else {
@@ -180,8 +180,8 @@ public final class StandardConverter implements Converter {
         return e;
     }
     
-    private Entry createEntryFromRecord(Format format, LogRecord record) {
-        Entry e = createEntry(Collections.singletonList(record));
+    private Entry createEntryFromRecord(Format format, LogRecord record, int entryIndex) {
+        Entry e = createEntry(Collections.singletonList(record), entryIndex);
         if (format == Format.CONTENT) {
             setEntryContent(e, createContent(record));
         } else {
@@ -214,15 +214,11 @@ public final class StandardConverter implements Converter {
 
     private ExtensibleElement createExtension(LogRecord record) {
         ExtensibleElement erec = factory.newExtensionElement(qn("logRecord"));
-        String date = df.format(record.getEventTimestamp());
-        // timezone in date does not have semicolon as XML Date requires
-        // e.g we have "2009-11-23T22:03:53.996+0100"
-        // instead of "2009-11-23T22:03:53.996+01:00"
-        date = date.substring(0, date.length() - 2) + ":" + date.substring(date.length() - 2);
+        
         // forget about single line "addExtension().setText()" since
         // javac failure "org.apache.abdera.model.Element cannot be dereferenced"
         Element e = erec.addExtension(qn("eventTimestamp"));
-        e.setText(date);
+        e.setText(toAtomDateFormat(record.getEventTimestamp()));
         e = erec.addExtension(qn("level"));
         e.setText(record.getLevel().toString());
         e = erec.addExtension(qn("loggerName"));
@@ -236,6 +232,14 @@ public final class StandardConverter implements Converter {
         return erec;
     }
 
+    private String toAtomDateFormat(Date d) {
+        String date = df.format(d);
+        // timezone in date does not have semicolon as XML Date requires
+        // e.g we have "2009-11-23T22:03:53.996+0100"
+        // instead of "2009-11-23T22:03:53.996+01:00"
+        return date.substring(0, date.length() - 2) + ":" + date.substring(date.length() - 2);
+    }
+    
     private QName qn(String name) {
         return new QName("http://cxf.apache.org/log", name, "log");
     }
@@ -248,9 +252,9 @@ public final class StandardConverter implements Converter {
         return list;
     }
 
-    private Entry createEntry(List<LogRecord> records) {
+    private Entry createEntry(List<LogRecord> records, int entryIndex) {
         Entry entry = factory.newEntry();
-        setDefaultEntryProperties(entry, records);
+        setDefaultEntryProperties(entry, records, entryIndex);
         
         return entry;
     }
@@ -304,18 +308,20 @@ public final class StandardConverter implements Converter {
         } else {
             feed.setId("uuid:" + UUID.randomUUID().toString());
             feed.addAuthor("CXF");
-            feed.setTitle(String.format("Feed with %d entry(ies)", feed.getEntries().size()));
+            feed.setTitle("CXF Service Log Entries");
             feed.setUpdated(new Date());
         }
     }
     
-    protected void setDefaultEntryProperties(Entry entry, List<LogRecord> records) {
+    protected void setDefaultEntryProperties(Entry entry, List<LogRecord> records,
+                                             int entryIndex) {
         if (entryBuilder != null) {
             entry.setId(entryBuilder.getId(records));
             entry.addAuthor(entryBuilder.getAuthor(records));
             entry.setTitle(entryBuilder.getTitle(records));
             entry.setUpdated(entryBuilder.getUpdated(records));
             entry.setBaseUri(entryBuilder.getBaseUri(records));
+            entry.setSummary(entryBuilder.getSummary(records));
             List<String> categories = entryBuilder.getCategories(records);
             if (categories != null) {
                 for (String category : categories) {
@@ -331,11 +337,19 @@ public final class StandardConverter implements Converter {
             entry.setPublished(entryBuilder.getPublished(records));
             entry.setSummary(entryBuilder.getSummary(records));
         } else {    
-            entry.setId("uuid:" + UUID.randomUUID().toString());
             entry.addAuthor("CXF");
-            entry.setTitle(String.format("Entry with %d log record(s)", 
-                                         records.size()));
-            entry.setUpdated(new Date());
+            if (records.size() != 1) {
+                entry.setId("uuid:" + UUID.randomUUID().toString());
+                entry.setTitle(String.format("Entry with %d log record(s)", 
+                                             records.size()));
+            } else {
+                entry.setId(records.get(0).getId());
+                entry.setTitle("Log record with level " + records.get(0).getLevel().toString());
+                entry.setSummary(records.get(0).getLoggerName() + " : " + records.get(0).getMessage());
+            }
+            if (records.size() > 0) {
+                entry.setUpdated(toAtomDateFormat(records.get(0).getEventTimestamp()));
+            }
         }
     }
     

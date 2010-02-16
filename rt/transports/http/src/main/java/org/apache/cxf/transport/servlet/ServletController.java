@@ -20,12 +20,14 @@ package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -208,6 +210,7 @@ public class ServletController extends AbstractServletController {
         return ret; 
     }
     
+    @SuppressWarnings("unchecked")
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
         throws IOException {        
         response.setContentType("text/html; charset=UTF-8");        
@@ -235,8 +238,11 @@ public class ServletController extends AbstractServletController {
         List<ServletDestination> destinations = getServletDestinations();
             
         if (destinations.size() > 0) {
-            writeSOAPEndpoints(response, destinations);
-            writeRESTfulEndpoints(response, destinations);
+            //TODO : we may introduce a bus extension instead
+            Map<String, String> atomMap = 
+                (Map<String, String>)bus.getProperty("org.apache.cxf.extensions.logging.atom.pull");
+            writeSOAPEndpoints(response, destinations, atomMap);
+            writeRESTfulEndpoints(response, destinations, atomMap);
         } else {
             response.getWriter().write("<span class=\"heading\">No services have been found.</span>");
         }
@@ -244,7 +250,8 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("</body></html>");
     }
 
-    private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+    private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
+                                    Map<String, String> atomMap)
         throws IOException {
         response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
@@ -273,6 +280,7 @@ public class ServletController extends AbstractServletController {
                 response.getWriter().write("<br/><span class=\"field\">Target namespace:</span> "
                         + "<span class=\"value\">" 
                         + sd.getEndpointInfo().getService().getTargetNamespace() + "</span>");
+                addAtomLinkIfNeeded(address, atomMap, response.getWriter());
                 response.getWriter().write("</td></tr>");
             }    
         }
@@ -280,7 +288,8 @@ public class ServletController extends AbstractServletController {
     }
     
     
-    private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations)
+    private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
+                                       Map<String, String> atomMap)
         throws IOException {
         
         List<ServletDestination> restfulDests = new ArrayList<ServletDestination>();
@@ -306,10 +315,34 @@ public class ServletController extends AbstractServletController {
                 response.getWriter().write("<br/><span class=\"field\">WADL :</span> "
                         + "<a href=\"" + address + "?_wadl&_type=xml\">"
                         + address + "?_wadl&type=xml" + "</a>");
+                addAtomLinkIfNeeded(address, atomMap, response.getWriter());
                 response.getWriter().write("</td></tr>");
             }    
         }
         response.getWriter().write("</table>");
+    }
+    
+    private static void addAtomLinkIfNeeded(String address, Map<String, String> extMap,
+                                            PrintWriter pw) {
+        String atomAddress = getExtensionEndpointAddress(address, extMap);
+        if (atomAddress != null) {
+            pw.write("<br/><span class=\"field\">Atom Log Feed :</span> "
+                + "<a href=\"" + atomAddress + "\">" + atomAddress + "</a>");
+        }
+    }
+    
+    private static String getExtensionEndpointAddress(String endpointAddress, Map<String, String> extMap) {
+        if (extMap != null) {
+            for (Map.Entry<String, String> entry : extMap.entrySet()) {
+                if (endpointAddress.endsWith(entry.getKey())) {    
+                    endpointAddress = 
+                        endpointAddress.substring(0, endpointAddress.length() - entry.getKey().length());
+                    endpointAddress += entry.getValue();
+                    return endpointAddress;
+                }
+            }
+        }
+        return null;
     }
     
     private void renderStyleSheet(HttpServletRequest request,

@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.management.web.logging.atom;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.WeakHashMap;
@@ -25,10 +27,15 @@ import java.util.logging.Handler;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.UriBuilder;
 
+import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
+import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
@@ -38,16 +45,11 @@ import org.apache.cxf.management.web.logging.LogRecord;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
 import org.apache.cxf.management.web.logging.ReadableLogStorage;
 import org.apache.cxf.management.web.logging.atom.converter.StandardConverter;
-import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Format;
-import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Multiplicity;
-import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Output;
 
 
-@Path("logs")
+@Path("/logs")
 public class AtomPullServer extends AbstractAtomBean {
 
-    private StandardConverter converter = 
-        new StandardConverter(Output.FEED, Multiplicity.MANY, Format.CONTENT);
     private List<LogRecord> records = new LinkedList<LogRecord>();
     private WeakHashMap<Integer, Feed> feeds = new WeakHashMap<Integer, Feed>();
     private ReadableLogStorage storage;
@@ -60,6 +62,17 @@ public class AtomPullServer extends AbstractAtomBean {
         
     @Context
     private MessageContext context;
+    
+    private String endpointAddress;
+    private String serverAddress;
+    
+    public void setEndpointAddress(String address) {
+        this.endpointAddress = address;
+    }
+    
+    public void setServerAddress(String address) {
+        this.serverAddress = address;
+    }
     
     @Override
     public void init() {
@@ -90,13 +103,34 @@ public class AtomPullServer extends AbstractAtomBean {
             }
             condition = new OrSearchCondition<LogRecord>(list);
         }
-        
+        initBusProperty();
+    }
+    
+    @Override
+    protected Handler createHandler() {
+        return new AtomPullHandler(this);
+    }
+    
+    protected void initBusProperty() {
+        if (endpointAddress != null && serverAddress != null && getBus() != null) {
+            Bus bus = getBus();
+            synchronized (bus) {
+                bus.setProperty("org.apache.cxf.extensions.logging.atom.pull",
+                    Collections.singletonMap(endpointAddress, serverAddress + "/logs"));
+            }
+        }
     }
     
     @GET
     @Produces("application/atom+xml")
-    public Feed getRecords() {
-        int page = getPageValue();
+    public Feed getXmlFeed(@PathParam("id") int page) {
+        return getXmlFeedWithPage(1);
+    }
+    
+    @GET
+    @Produces("application/atom+xml")
+    @Path("{id}")
+    public Feed getXmlFeedWithPage(@PathParam("id") int page) {
         
         // lets check if the Atom reader is asking for a set of records which has already been 
         // converted to Feed
@@ -111,7 +145,8 @@ public class AtomPullServer extends AbstractAtomBean {
         Feed feed = null;
         synchronized (records) {
             List<LogRecord> list = getSubList(page);
-            feed = (Feed)converter.convert(list).get(0);
+            Collections.sort(list, new LogRecordComparator());
+            feed = (Feed)new CustomFeedConverter(page).convert(list).get(0);
             setFeedPageProperties(feed, page);
         }
         // if at the moment we've converted n < pageSize number of records only and
@@ -124,12 +159,56 @@ public class AtomPullServer extends AbstractAtomBean {
         }
         return feed;
     }
+    
+    @GET
+    @Produces({"text/xml", "application/xhtml+xml" })
+    @Path("alternate/{id}")
+    public String getAlternateFeed(@PathParam("id") int page) {
+        List<LogRecord> list = getSubList(page);
+        Collections.sort(list, new LogRecordComparator());
+        return convertEntriesToHtml(list);
+        
+    }
 
+    @GET
+    @Path("entry/{id}")
+    @Produces("application/atom+xml;type=entry")
+    public Entry getEntry(@PathParam("id") int index) {
+        List<LogRecord> list = getLogRecords(index);
+        return (Entry)new CustomEntryConverter(index).convert(list).get(0);
+    }
+    
+    @GET
+    @Path("entry/alternate/{id}")
+    @Produces({"text/xml", "application/xhtml+xml" })
+    public String getAlternateEntry(@PathParam("id") int index) {
+        List<LogRecord> logRecords = getLogRecords(index);
+        return convertEntryToHtml(logRecords.get(0));
+    }
+    
     @GET
     @Path("records")
     @Produces("text/plain")
     public int getNumberOfAvaiableRecords() {
         return recordsSize;
+    }
+    
+    private List<LogRecord> getLogRecords(int index) {
+        List<LogRecord> list = new LinkedList<LogRecord>();
+        if (storage != null) {
+            int storageSize = storage.getSize();
+            if (recordsSize == -1 || index < storageSize) {
+                storage.load(list, condition, index, 1);
+            } else if (index < recordsSize) {
+                list.add(records.get(index - storageSize));   
+            }
+        } else {
+            list.add(records.get(index));
+        }
+        if (list.size() != 1) { 
+            throw new WebApplicationException(404);
+        }
+        return list;
     }
     
     
@@ -194,11 +273,11 @@ public class AtomPullServer extends AbstractAtomBean {
     }
     
     protected void setFeedPageProperties(Feed feed, int page) {
-        String self = context.getUriInfo().getRequestUri().toString();
+        String self = context.getUriInfo().getAbsolutePath().toString();
         feed.addLink(self, "self");
         
-        String uri = context.getUriInfo().getAbsolutePath().toString();
-        
+        String uri = context.getUriInfo().getBaseUriBuilder().path("logs").build().toString();
+        feed.addLink(uri + "/alternate/" + page, "alternate");
         if (!useArchivedFeeds) {
             if (recordsSize != -1) {
                 if (page > 2) {
@@ -206,21 +285,21 @@ public class AtomPullServer extends AbstractAtomBean {
                 }
                 
                 if (page * pageSize < recordsSize) {
-                    feed.addLink(uri + "?page=" + (page + 1), "next");
+                    feed.addLink(uri + "/" + (page + 1), "next");
                 }
                 
                 if (page * (pageSize + 1) < recordsSize) {
-                    feed.addLink(uri + "?page=" + (recordsSize / pageSize + 1), "last");
+                    feed.addLink(uri + "/" + (recordsSize / pageSize + 1), "last");
                 }
             } else if (feed.getEntries().size() == pageSize) {
-                feed.addLink(uri + "?page=" + (page + 1), "next");
+                feed.addLink(uri + "/" + (page + 1), "next");
             }
             if (page > 1) {
-                uri = page > 2 ? uri + "?page=" + (page - 1) : uri;
+                uri = page > 2 ? uri + "/" + (page - 1) : uri;
                 feed.addLink(uri, "previous");
             }
         } else {
-            feed.addLink(uri, "current");
+            feed.addLink(self, "current");
             // TODO : add prev-archive and next-archive; next-archive should not be set if it will point to
             // current
             // and xmlns:fh="http://purl.org/syndication/history/1.0":archive extension but only if
@@ -229,24 +308,6 @@ public class AtomPullServer extends AbstractAtomBean {
         
     }
     
-        
-    protected int getPageValue() {
-        String pageValue = context.getUriInfo().getQueryParameters().getFirst("page");
-        int page = 1;
-        try {
-            if (pageValue != null) {
-                page = Integer.parseInt(pageValue);
-            } 
-        } catch (Exception ex) {
-            // default to 1
-        }
-        return page;
-    }
-    
-    @Override
-    protected Handler createHandler() {
-        return new AtomPullHandler(this);
-    }
     
     public void publish(LogRecord record) {
         if (alreadyClosed) {
@@ -291,6 +352,46 @@ public class AtomPullServer extends AbstractAtomBean {
         }
     }
     
+    // TODO : this all can be done later on in a simple xslt template
+    private String convertEntriesToHtml(List<LogRecord> rs) {
+        StringBuilder sb = new StringBuilder();
+        startHtmlHeadAndBody(sb, "CXF Service Log Entries");
+        addRecordToTable(sb, rs);
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+    // TODO : this all can be done later on in a simple xslt template
+    private String convertEntryToHtml(LogRecord r) {
+        StringBuilder sb = new StringBuilder();
+        startHtmlHeadAndBody(sb, r.getLevel().toString());
+        addRecordToTable(sb, Collections.singletonList(r));
+        sb.append("</body></html>");
+        return sb.toString();
+    }
+    
+    private void addRecordToTable(StringBuilder sb, List<LogRecord> list) {
+        sb.append("<table border=\"1\">");
+        sb.append("<tr><th>Logger</th><th>Level</th><th>Message</th></tr>");
+        for (LogRecord lr : list) {
+            sb.append("<tr>");
+            sb.append("<td>" + lr.getLoggerName() + "</td>");
+            sb.append("<td>" + lr.getLevel().toString() + "</td>");
+            sb.append("<td>" + lr.getMessage() + "</td>");
+            sb.append("</tr>");
+        }
+        sb.append("</table><br/><br/>");
+    
+    }
+    
+    private void startHtmlHeadAndBody(StringBuilder sb, String title) {
+        sb.append("<html xmlns=\"http://www.w3.org/1999/xhtml\">");
+        sb.append("<head>");
+        sb.append("<meta http-equiv=\"content-type\" content=\"text/html;charset=UTF-8\"/>");
+        sb.append("<title>" + "Log record with level " + title + "</title>");
+        sb.append("</head>");
+        sb.append("<body>");
+    }
+    
     private static class SearchConditionImpl implements SearchCondition<LogRecord> {
         private LogRecord template;
         
@@ -318,11 +419,62 @@ public class AtomPullServer extends AbstractAtomBean {
         }
 
         public List<LogRecord> findAll(List<LogRecord> pojos) {
-            // TODO Auto-generated method stub
-            return null;
+            List<LogRecord> list = new LinkedList<LogRecord>();
+            for (LogRecord r : pojos) {
+                if (isMet(r)) {
+                    list.add(r);
+                }
+            }
+            return list;
         }
         
         
     }
     
+    private static class LogRecordComparator implements Comparator<LogRecord> {
+
+        public int compare(LogRecord r1, LogRecord r2) {
+            return r1.getEventTimestamp().compareTo(r2.getEventTimestamp()) * -1;
+        }
+        
+    }
+    
+    private class CustomFeedConverter extends StandardConverter {
+        private int page;
+        public CustomFeedConverter(int page) {
+            super(Output.FEED, Multiplicity.MANY, Format.CONTENT);
+            this.page = page;
+        }
+        
+        @Override
+        protected void setDefaultEntryProperties(Entry entry, List<LogRecord> rs, int entryIndex) {
+            super.setDefaultEntryProperties(entry, rs, entryIndex);
+            UriBuilder builder = context.getUriInfo().getAbsolutePathBuilder().path("entry");
+            Integer realIndex = page == 1 ? entryIndex : page * pageSize + entryIndex;
+
+            entry.addLink(builder.clone().path(realIndex.toString()).build().toString(), "self");
+            entry.addLink(builder.path("alternate").path(realIndex.toString()).build().toString(), 
+                          "alternate");
+        }
+        
+    }
+    
+    private class CustomEntryConverter extends StandardConverter {
+        private String selfFragment;
+        private String altFragment;
+        public CustomEntryConverter(int index) {
+            super(Output.ENTRY, Multiplicity.ONE, Format.CONTENT);
+            this.selfFragment = "logs/entry/" + index;
+            this.altFragment = "logs/alternate/entry/" + index;
+        }
+        
+        @Override
+        protected void setDefaultEntryProperties(Entry entry, List<LogRecord> rs, int entryIndex) {
+            super.setDefaultEntryProperties(entry, rs, entryIndex);
+            entry.addLink(context.getUriInfo().getBaseUriBuilder().path(selfFragment).build().toString(),
+                "self");
+            entry.addLink(context.getUriInfo().getBaseUriBuilder().path(altFragment).build().toString(),
+                "alternate");
+        }
+    }
 }
