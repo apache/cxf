@@ -129,7 +129,7 @@ public final class JMSUtils {
         } else if (converted instanceof byte[]) {
             return (byte[])converted;
         } else {
-            return (byte[])converted; // TODO is this correct?
+            return null;
         }
     }
 

@@ -188,8 +188,10 @@ public class JMSDestination extends AbstractMultiplexDestination
                                              JMSConstants.JMS_SERVER_REQUEST_HEADERS, jmsConfig);
             
             byte[] request = JMSUtils.retrievePayload(message, (String)inMessage.get(Message.ENCODING));
-            getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
-            inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
+            if (request != null) {
+                getLogger().log(Level.FINE, "The Request Message is [ " + request + "]");
+                inMessage.setContent(InputStream.class, new ByteArrayInputStream(request));
+            }
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
             inMessage.setDestination(this);
