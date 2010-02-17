@@ -27,6 +27,7 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
     private Layout layout;
     private SupportingToken signedSupportingToken;
     private SupportingToken signedEndorsingSupportingTokens;
+    private boolean tokenProtection;
 
     public Binding(SPConstants version) {
         super(version);
@@ -89,5 +90,19 @@ public abstract class Binding extends AbstractSecurityAssertion implements Algor
 
     public void setSignedSupportingToken(SupportingToken signedSupportingToken) {
         this.signedSupportingToken = signedSupportingToken;
+    }
+    
+    /**
+     * @return Returns the tokenProtection.
+     */
+    public boolean isTokenProtection() {
+        return tokenProtection;
+    }
+
+    /**
+     * @param tokenProtection The tokenProtection to set.
+     */
+    public void setTokenProtection(boolean tokenProtection) {
+        this.tokenProtection = tokenProtection;
     }
 }

@@ -26,8 +26,6 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
 
     private boolean signatureProtection;
 
-    private boolean tokenProtection;
-
     private boolean entireHeadersAndBodySignatures;
 
     public SymmetricAsymmetricBindingBase(SPConstants version) {
@@ -74,20 +72,6 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
      */
     public void setSignatureProtection(boolean signatureProtection) {
         this.signatureProtection = signatureProtection;
-    }
-
-    /**
-     * @return Returns the tokenProtection.
-     */
-    public boolean isTokenProtection() {
-        return tokenProtection;
-    }
-
-    /**
-     * @param tokenProtection The tokenProtection to set.
-     */
-    public void setTokenProtection(boolean tokenProtection) {
-        this.tokenProtection = tokenProtection;
     }
 
 }
