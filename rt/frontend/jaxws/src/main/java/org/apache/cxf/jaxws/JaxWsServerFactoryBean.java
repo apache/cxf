@@ -175,6 +175,8 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
     public Server create() {
         Server server = super.create();
         init();
+        checkPrivateEndpoint(server.getEndpoint());
+        
         return server;
     }
     

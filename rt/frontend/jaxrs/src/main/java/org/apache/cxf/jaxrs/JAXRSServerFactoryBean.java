@@ -22,7 +22,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,7 +39,6 @@ import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
-import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Invoker;
 
@@ -105,13 +103,12 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             }
             
             ProviderFactory factory = setupFactory(ep);
-            checkIfPrivate(factory, ep);
             factory.setRequestPreprocessor(
                 new RequestPreprocessor(languageMappings, extensionMappings));
             if (rc != null) {
                 ep.put("org.apache.cxf.jaxrs.comparator", rc);
             }
-            
+            checkPrivateEndpoint(ep);
             if (start) {
                 server.start();
             }
@@ -129,20 +126,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return server;
     }
 
-    @SuppressWarnings("unchecked")
-    protected void checkIfPrivate(ProviderFactory factory, Endpoint ep) {
-        if (MessageUtils.isTrue(ep.get("org.apache.cxf.endpoint.private"))) {
-            List<String> addresses = 
-                (List<String>)getBus().getProperty("org.apache.cxf.private.endpoints");
-            if (addresses == null) {
-                addresses = new LinkedList<String>();
-            }
-            addresses.add(getAddress());
-            
-            bus.setProperty("org.apache.cxf.private.endpoints", addresses);
-        }
-    }
-    
     protected void applyFeatures() {
         if (getFeatures() != null) {
             for (AbstractFeature feature : getFeatures()) {
