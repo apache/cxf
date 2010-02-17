@@ -18,10 +18,14 @@
  */
 package org.apache.cxf.management.web.logging.atom;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.logging.Handler;
 
@@ -53,7 +57,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private List<LogRecord> records = new LinkedList<LogRecord>();
     private WeakHashMap<Integer, Feed> feeds = new WeakHashMap<Integer, Feed>();
     private ReadableLogStorage storage;
-    private int pageSize = 20;
+    private int pageSize = 40;
     private int maxInMemorySize = 500;
     private boolean useArchivedFeeds;
     private int recordsSize;
@@ -63,11 +67,15 @@ public class AtomPullServer extends AbstractAtomBean {
     @Context
     private MessageContext context;
     
-    private String endpointAddress;
+    private List<String> endpointAddresses;
     private String serverAddress;
     
     public void setEndpointAddress(String address) {
-        this.endpointAddress = address;
+        setEndpointAddresses(Collections.singletonList(address));
+    }
+    
+    public void setEndpointAddresses(List<String> addresses) {
+        this.endpointAddresses = addresses;
     }
     
     public void setServerAddress(String address) {
@@ -111,12 +119,20 @@ public class AtomPullServer extends AbstractAtomBean {
         return new AtomPullHandler(this);
     }
     
+    @SuppressWarnings("unchecked")
     protected void initBusProperty() {
-        if (endpointAddress != null && serverAddress != null && getBus() != null) {
+        if (endpointAddresses != null && serverAddress != null && getBus() != null) {
             Bus bus = getBus();
             synchronized (bus) {
-                bus.setProperty("org.apache.cxf.extensions.logging.atom.pull",
-                    Collections.singletonMap(endpointAddress, serverAddress + "/logs"));
+                Map<String, String> addresses = 
+                    (Map<String, String>)bus.getProperty("org.apache.cxf.extensions.logging.atom.pull");
+                if (addresses == null) {
+                    addresses = new HashMap<String, String>();
+                }
+                for (String address : endpointAddresses) {
+                    addresses.put(address, serverAddress + "/logs");
+                }
+                bus.setProperty("org.apache.cxf.extensions.logging.atom.pull", addresses);
             }
         }
     }
@@ -161,7 +177,7 @@ public class AtomPullServer extends AbstractAtomBean {
     }
     
     @GET
-    @Produces({"text/xml", "application/xhtml+xml" })
+    @Produces({"text/html", "application/xhtml+xml" })
     @Path("alternate/{id}")
     public String getAlternateFeed(@PathParam("id") int page) {
         List<LogRecord> list = getSubList(page);
@@ -180,7 +196,7 @@ public class AtomPullServer extends AbstractAtomBean {
     
     @GET
     @Path("entry/alternate/{id}")
-    @Produces({"text/xml", "application/xhtml+xml" })
+    @Produces({"text/html", "application/xhtml+xml" })
     public String getAlternateEntry(@PathParam("id") int index) {
         List<LogRecord> logRecords = getLogRecords(index);
         return convertEntryToHtml(logRecords.get(0));
@@ -189,7 +205,7 @@ public class AtomPullServer extends AbstractAtomBean {
     @GET
     @Path("records")
     @Produces("text/plain")
-    public int getNumberOfAvaiableRecords() {
+    public int getNumberOfAvailableRecords() {
         return recordsSize;
     }
     
@@ -356,7 +372,7 @@ public class AtomPullServer extends AbstractAtomBean {
     private String convertEntriesToHtml(List<LogRecord> rs) {
         StringBuilder sb = new StringBuilder();
         startHtmlHeadAndBody(sb, "CXF Service Log Entries");
-        addRecordToTable(sb, rs);
+        addRecordToTable(sb, rs, true);
         sb.append("</body></html>");
         return sb.toString();
     }
@@ -364,19 +380,33 @@ public class AtomPullServer extends AbstractAtomBean {
     private String convertEntryToHtml(LogRecord r) {
         StringBuilder sb = new StringBuilder();
         startHtmlHeadAndBody(sb, r.getLevel().toString());
-        addRecordToTable(sb, Collections.singletonList(r));
+        addRecordToTable(sb, Collections.singletonList(r), false);
         sb.append("</body></html>");
         return sb.toString();
     }
     
-    private void addRecordToTable(StringBuilder sb, List<LogRecord> list) {
+    private void addRecordToTable(StringBuilder sb, List<LogRecord> list, boolean forFeed) {
+        DateFormat df = new SimpleDateFormat("dd/MM/yy HH:mm:ss");
         sb.append("<table border=\"1\">");
-        sb.append("<tr><th>Logger</th><th>Level</th><th>Message</th></tr>");
+        sb.append("<tr><th>Date</th><th>Level</th><th>Logger</th><th>Message</th></tr>");
         for (LogRecord lr : list) {
             sb.append("<tr>");
-            sb.append("<td>" + lr.getLoggerName() + "</td>");
+            sb.append("<td>" + df.format(lr.getEventTimestamp()) + "</td>");
             sb.append("<td>" + lr.getLevel().toString() + "</td>");
-            sb.append("<td>" + lr.getMessage() + "</td>");
+            sb.append("<td>" + lr.getLoggerName() + "</td>");
+            String message = null;
+            if (lr.getMessage().length() > 0) {
+                message =  lr.getThrowable().length() > 0 ? lr.getMessage() + " : " + lr.getThrowable()
+                           : lr.getMessage();
+            } else if (lr.getThrowable().length() > 0) {
+                message = lr.getThrowable();
+            } else {
+                message = "&nbsp";
+            }
+            if (forFeed && lr.getThrowable().length() > 0) {
+                message = message.substring(0, message.length() / 2);
+            }
+            sb.append("<td>" + message + "</td>");
             sb.append("</tr>");
         }
         sb.append("</table><br/><br/>");
