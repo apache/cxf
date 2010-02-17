@@ -397,6 +397,11 @@ public class ServiceImpl extends ServiceDelegate {
         proxyFac.setBus(bus);
         proxyFac.setServiceClass(serviceEndpointInterface);
         proxyFac.setServiceName(serviceName);
+        if (epr != null 
+            && epr.getAddress() != null 
+            && epr.getAddress().getValue() != null) {
+            clientFac.setAddress(epr.getAddress().getValue());
+        }
 
         if (wsdlURL != null) {
             proxyFac.setWsdlURL(wsdlURL);

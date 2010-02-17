@@ -23,7 +23,6 @@ import java.util.Date;
 import java.util.concurrent.Future;
 
 import javax.annotation.Resource;
-import javax.jws.WebService;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Response;
 import javax.xml.ws.WebServiceContext;
@@ -44,20 +43,18 @@ import org.apache.hello_world_soap_http.types.TestNillableResponse;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PROPERTIES_INBOUND;
 
-
-@WebService(serviceName = "SOAPServiceAddressing", 
-            portName = "SoapPort", 
-            endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
-            targetNamespace = "http://apache.org/hello_world_soap_http",
-            wsdlLocation = "testutils/hello_world.wsdl")
-public class GreeterImpl implements Greeter {
+public abstract class AbstractGreeterImpl implements Greeter {
     VerificationCache verificationCache;
-
+    
     /**
      * Injectable context.
      */
     @Resource
     private WebServiceContext context;
+
+    
+    public AbstractGreeterImpl() {
+    }
 
 
     public String greetMe(String me) {

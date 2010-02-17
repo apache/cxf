@@ -91,6 +91,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         }
         return s;
     }
+    private boolean isJMSSpecAddress(String address) {
+        return address != null && address.startsWith("jms:") && !"jms://".equals(address);
+    }
 
     public Destination getDestination(EndpointInfo ei) throws IOException {
         String address = ei.getAddress();
@@ -104,6 +107,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             if (transId == null) {
                 transId = ei.getTransportId();
             }
+        }
+        if (isJMSSpecAddress(address)) {
+            ei.setTransportId("http://www.w3.org/2008/07/soap/bindings/JMS/");
         }
         DestinationFactory destinationFactory;
         try {
@@ -169,6 +175,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     
                     info.addExtensor(sa);
                     info.setAddress(sa.getLocationURI());
+                    if (isJMSSpecAddress(sa.getLocationURI())) {
+                        info.setTransportId("http://www.w3.org/2008/07/soap/bindings/JMS/");
+                    }
                 } else {
                     info.addExtensor(extensor);
                 }
@@ -195,6 +204,9 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             if (transId == null) {
                 transId = ei.getTransportId();
             }
+        }
+        if (isJMSSpecAddress(address)) {
+            ei.setTransportId("http://www.w3.org/2008/07/soap/bindings/JMS/");
         }
         ConduitInitiator conduitInit;
         try {

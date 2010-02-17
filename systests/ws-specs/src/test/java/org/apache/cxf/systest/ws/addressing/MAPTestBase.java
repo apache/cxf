@@ -55,8 +55,6 @@ import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES;
@@ -81,25 +79,13 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
 
     private static final QName SERVICE_NAME = 
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
-    private static final String NOWHERE = "http://nowhere.nada.nothing.nought:5555";
-    private static final String DECOUPLED = "http://localhost:9999/decoupled_endpoint";
     
     private static Map<Object, Map<String, String>> messageIDs =
         new HashMap<Object, Map<String, String>>();
     protected Greeter greeter;
     private String verified;
     
-    
 
-    @BeforeClass
-    public static void startServers() throws Exception {
-        // special case handling for WS-Addressing system test to avoid
-        // UUID related issue when server is run as separate process
-        // via maven on Win2k
-        boolean inProcess = "Windows 2000".equals(System.getProperty("os.name"));
-        assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, inProcess));
-    }
     
     @AfterClass
     public static void shutdownBus() throws Exception {
@@ -120,6 +106,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     }
     
     public abstract String getConfigFileName();
+    public abstract String getAddress();
     
     @Before
     public void setUp() throws Exception {
@@ -141,20 +128,24 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
         addInterceptors(staticBus.getInFaultInterceptors(), interceptors);
         
         EndpointReferenceType target = 
-            EndpointReferenceUtils.getEndpointReference(Server.ADDRESS);
+            EndpointReferenceUtils.getEndpointReference(getAddress());
         ReferenceParametersType params = 
             ContextUtils.WSA_OBJECT_FACTORY.createReferenceParametersType();
         JAXBElement<String> param =
              new JAXBElement<String>(CUSTOMER_NAME, String.class, CUSTOMER_KEY);
         params.getAny().add(param);
         target.setReferenceParameters(params);
-        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
-        ServiceImpl serviceImpl = 
-            ServiceDelegateAccessor.get(new SOAPService(wsdl, SERVICE_NAME));
-        greeter = serviceImpl.getPort(target, Greeter.class);
-
+        greeter = createGreeter(target);
         mapVerifier.verificationCache = this;
         headerVerifier.verificationCache = this;
+    }
+    public URL getWSDLURL() {
+        return getClass().getResource("/wsdl/hello_world.wsdl");
+    }
+    public Greeter createGreeter(EndpointReferenceType target) {
+        ServiceImpl serviceImpl = 
+            ServiceDelegateAccessor.get(new SOAPService(getWSDLURL(), SERVICE_NAME));
+        return serviceImpl.getPort(target, Greeter.class);        
     }
     
     @After
@@ -191,7 +182,8 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     }
 
     @Test
-    @Ignore("randomly fails quite often, but not in the debugger so not sure what is going on yet")
+    //@org.junit.Ignore("randomly fails quite often, but not in the "
+    //                    + " debugger so not sure what is going on yet")
     public void testExplicitMAPs() throws Exception {
         try {
             String msgId = "urn:uuid:12345-" + Math.random();
@@ -233,7 +225,6 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     }
     
     @Test
-    @Ignore
     public void testFaultTo() throws Exception {
         try {
             String greeting = greeter.greetMe("warmup");
@@ -241,20 +232,11 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
                          "Hello warmup",
                          greeting);
             checkVerification();
-
-            Map<String, Object> requestContext = 
-                ((BindingProvider)greeter).getRequestContext();
-            AddressingProperties maps = new AddressingPropertiesImpl();
-            maps.setReplyTo(EndpointReferenceUtils.getEndpointReference(NOWHERE));
-            maps.setFaultTo(EndpointReferenceUtils.getEndpointReference(DECOUPLED));
-            requestContext.put(CLIENT_ADDRESSING_PROPERTIES, maps);
             try {
                 greeter.testDocLitFault("BadRecordLitFault");
                 fail("expected fault from service");
             } catch (BadRecordLitFault brlf) {
                 checkVerification();
-            } catch (UndeclaredThrowableException ex) {
-                throw (Exception)ex.getCause();
             }
         } catch (UndeclaredThrowableException ex) {
             throw (Exception)ex.getCause();
@@ -273,7 +255,7 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     
     
     @Test
-    @Ignore("Random failure on Linux")
+    //@org.junit.Ignore("Random failure on Linux")
     public void testApplicationFault() throws Exception {
         try {
             greeter.testDocLitFault("BadRecordLitFault");

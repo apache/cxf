@@ -19,7 +19,13 @@
 
 package org.apache.cxf.systest.ws.addressing;
 
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.jws.WebService;
+
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -29,9 +35,12 @@ import org.junit.Test;
  * Tests the addition of WS-Addressing Message Addressing Properties
  * in the non-decoupled case.
  */
-public class NonDecoupledTest extends MAPTestBase {
-    static final String ADDRESS = "http://localhost:9008/SoapContext/SoapPort";
-
+public class NonDecoupledJMSTest extends MAPTestBase {
+    private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0001?"
+        + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+        + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+    
+    
     private static final String CONFIG =
         "org/apache/cxf/systest/ws/addressing/wsa_interceptors.xml";
 
@@ -39,34 +48,43 @@ public class NonDecoupledTest extends MAPTestBase {
         return CONFIG;
     }
     
+    @Test
+    @Override
+    public void testImplicitMAPs() throws Exception {
+        super.testImplicitMAPs();
+    }
+    
+    public String getAddress() {
+        return ADDRESS;
+    }
+    
+    public URL getWSDLURL() {
+        return null;
+    }
+
     @BeforeClass
     public static void startServers() throws Exception {
-        // special case handling for WS-Addressing system test to avoid
-        // UUID related issue when server is run as separate process
-        // via maven on Win2k
-        boolean inProcess = "Windows 2000".equals(System.getProperty("os.name"));
+        
+        Map<String, String> props = new HashMap<String, String>();
+        if (System.getProperty("activemq.store.dir") != null) {
+            props.put("activemq.store.dir", System.getProperty("activemq.store.dir"));
+        }
+        props.put("java.util.logging.config.file", System
+            .getProperty("java.util.logging.config.file"));
+        assertTrue("server did not launch correctly", launchServer(EmbeddedJMSBrokerLauncher.class,
+                                                                   props, null));
+
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, null, 
-                                new String[] {ADDRESS, GreeterImpl.class.getName()}, inProcess));
+                                new String[] {ADDRESS, GreeterImpl.class.getName()}, false));
     }
     
     @WebService(serviceName = "SOAPServiceAddressing", 
                 portName = "SoapPort", 
                 endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
-                targetNamespace = "http://apache.org/hello_world_soap_http",
-                wsdlLocation = "testutils/hello_world.wsdl")
+                targetNamespace = "http://apache.org/hello_world_soap_http")
     public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
         
     }
-    public String getAddress() {
-        return ADDRESS;
-    }
-
-    
-    @Test
-    public void foo() {
-        
-    }
-    
 }
 

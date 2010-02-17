@@ -34,12 +34,17 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase implements VerificationCache {
-    static final String ADDRESS = "http://localhost:9008/SoapContext/SoapPort";
 
     private String verified;
+    private String address;
+    private Class<?> cls;
  
-    protected void run()  {
-
+    public Server(String[] args) throws Exception {
+        address = args[0];
+        cls = Class.forName(args[1]);
+    }
+    
+    protected void run() {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/ws/addressing/server.xml");
         BusFactory.setDefaultBus(bus);
@@ -47,9 +52,13 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
 
         addVerifiers();
 
-        GreeterImpl implementor = new GreeterImpl();
-        implementor.verificationCache = this;
-        Endpoint.publish(ADDRESS, implementor);
+        try {
+            AbstractGreeterImpl implementor = (AbstractGreeterImpl)cls.newInstance();
+            implementor.verificationCache = this;
+            Endpoint.publish(address, implementor);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     protected void addVerifiers() {
@@ -74,7 +83,7 @@ public class Server extends AbstractBusTestServerBase implements VerificationCac
         
     public static void main(String[] args) {
         try { 
-            Server s = new Server(); 
+            Server s = new Server(args); 
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

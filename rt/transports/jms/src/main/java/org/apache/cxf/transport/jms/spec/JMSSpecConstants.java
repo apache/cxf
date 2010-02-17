@@ -25,8 +25,8 @@ package org.apache.cxf.transport.jms.spec;
  */
 public final class JMSSpecConstants {
 
-    public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2008/07/"
-                                                                     + "soap/bindings/JMS/";
+    public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID 
+        = "http://www.w3.org/2008/07/soap/bindings/JMS/";
     public static final String SOAP_JMS_NAMESPACE = SOAP_JMS_SPECIFICIATION_TRANSPORTID;
 
     public static final String SOAP_JMS_PREFIX = "SOAPJMS_";
