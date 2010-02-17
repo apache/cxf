@@ -68,7 +68,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       endpointName="s:BookPort"
       id="soapservice2"
       implementor="#bookstore2"
-      address="/soap/bookservice2" />
+      address="/soap/bookservice2">
+      <jaxws:properties>
+          <entry key="org.apache.cxf.endpoint.private" value="true"/>
+      </jaxws:properties>
+  </jaxws:endpoint>    
 
   <jaxrs:server id="restservice2"
 		        address="/rest2">

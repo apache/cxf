@@ -19,6 +19,7 @@
 package org.apache.cxf.endpoint;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -32,12 +33,17 @@ import org.apache.cxf.binding.BindingFactory;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorProvider {
+    
+    private static final String PRIVATE_ENDPOINT = "org.apache.cxf.endpoint.private";
+    private static final String PRIVATE_ENDPOINTS = "org.apache.cxf.private.endpoints";
+    
     protected Bus bus;
     protected String address;
     protected String transportId;
@@ -182,4 +188,27 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
         this.dataBinding = dataBinding;
     }
 
+    /**
+     * Checks if a given endpoint has been marked as private.
+     * If yes then its address will be added to a bus list property
+     * Note that client factories might also check the endpoint, ex, 
+     * if the endpoint if private then it is likely no service contract
+     * will be available if requested from the remote address hence it has to
+     * be availbale locally or generated from the local source
+     * @param ep endpoint
+     */
+    @SuppressWarnings("unchecked")
+    protected boolean checkPrivateEndpoint(Endpoint ep) {
+        if (MessageUtils.isTrue(ep.get(PRIVATE_ENDPOINT))) {
+            List<String> addresses = 
+                (List<String>)getBus().getProperty(PRIVATE_ENDPOINTS);
+            if (addresses == null) {
+                addresses = new LinkedList<String>();
+            }
+            addresses.add(getAddress());
+            bus.setProperty(PRIVATE_ENDPOINTS, addresses);
+            return true;
+        }
+        return false;
+    }
 }

@@ -485,7 +485,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             getStringFromInputStream(getHttpInputStream("http://localhost:9092/test/services"));
         assertNotNull(listings);
         assertTrue(listings.contains("http://localhost:9092/test/services/soap/bookservice?wsdl"));
-        assertTrue(listings.contains("http://localhost:9092/test/services/soap/bookservice2?wsdl"));
+        assertFalse(listings.contains("http://localhost:9092/test/services/soap/bookservice2?wsdl"));
         
         assertTrue(listings.contains("http://localhost:9092/test/services/rest?_wadl&type=xml"));
         assertEquals(200, WebClient.create(
