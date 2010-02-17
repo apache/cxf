@@ -73,7 +73,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class, true));
+                   launchServer(BookServerRestSoap.class));
     }
     
     @Test
@@ -477,10 +477,29 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         BookStoreJaxrsJaxws store = service.getBookPort();
         Book book = store.getBook(new Long(123));
         assertEquals("id is wrong", book.getId(), 123);
-        
+    }
+    
+    @Test
+    public void testServiceListingsAndWadl() throws Exception {
         String listings = 
             getStringFromInputStream(getHttpInputStream("http://localhost:9092/test/services"));
         assertNotNull(listings);
+        assertTrue(listings.contains("http://localhost:9092/test/services/soap/bookservice?wsdl"));
+        assertTrue(listings.contains("http://localhost:9092/test/services/soap/bookservice2?wsdl"));
+        
+        assertTrue(listings.contains("http://localhost:9092/test/services/rest?_wadl&type=xml"));
+        assertEquals(200, WebClient.create(
+            "http://localhost:9092/test/services/rest?_wadl&type=xml").get().getStatus());
+        assertTrue(listings.contains("http://localhost:9092/test/services/rest2?_wadl&type=xml"));
+        assertEquals(200, WebClient.create(
+            "http://localhost:9092/test/services/rest2?_wadl&type=xml").get().getStatus());
+        assertFalse(listings.contains("http://localhost:9092/test/services/rest3?_wadl&type=xml"));
+        assertEquals(401, WebClient.create(
+            "http://localhost:9092/test/services/rest3?_wadl&type=xml").get().getStatus());
+        
+         
+        
+        assertFalse(listings.contains("Atom Log Feed"));
     }
     
     @Test

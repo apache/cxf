@@ -238,11 +238,13 @@ public class ServletController extends AbstractServletController {
         List<ServletDestination> destinations = getServletDestinations();
             
         if (destinations.size() > 0) {
+            List<String> privateEndpoints = 
+                (List<String>)bus.getProperty("org.apache.cxf.private.endpoints");
             //TODO : we may introduce a bus extension instead
             Map<String, String> atomMap = 
                 (Map<String, String>)bus.getProperty("org.apache.cxf.extensions.logging.atom.pull");
-            writeSOAPEndpoints(response, destinations, atomMap);
-            writeRESTfulEndpoints(response, destinations, atomMap);
+            writeSOAPEndpoints(response, destinations, privateEndpoints, atomMap);
+            writeRESTfulEndpoints(response, destinations, privateEndpoints, atomMap);
         } else {
             response.getWriter().write("<span class=\"heading\">No services have been found.</span>");
         }
@@ -251,14 +253,16 @@ public class ServletController extends AbstractServletController {
     }
 
     private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
-                                    Map<String, String> atomMap)
+                                    List<String> privateEndpoints, Map<String, String> atomMap)
         throws IOException {
         response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
         for (ServletDestination sd : destinations) {
+            
             if (null != sd.getEndpointInfo().getName() 
-                && null != sd.getEndpointInfo().getInterface()) {
+                && null != sd.getEndpointInfo().getInterface()
+                && !isPrivate(sd.getEndpointInfo(), privateEndpoints)) {
                 response.getWriter().write("<tr><td>");
                 response.getWriter().write("<span class=\"porttypename\">"
                         + sd.getEndpointInfo().getInterface().getName().getLocalPart()
@@ -289,13 +293,14 @@ public class ServletController extends AbstractServletController {
     
     
     private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
-                                       Map<String, String> atomMap)
+                                       List<String> privateEndpoints, Map<String, String> atomMap)
         throws IOException {
         
         List<ServletDestination> restfulDests = new ArrayList<ServletDestination>();
         for (ServletDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
-            if (null == sd.getEndpointInfo().getInterface()) {
+            if (null == sd.getEndpointInfo().getInterface() 
+                && !isPrivate(sd.getEndpointInfo(), privateEndpoints)) {
                 restfulDests.add(sd);
             }
         }
@@ -306,20 +311,29 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("<span class=\"heading\">Available RESTful services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (ServletDestination sd : destinations) {
-            if (null == sd.getEndpointInfo().getInterface()) {
-                response.getWriter().write("<tr><td>");
-                String address = sd.getEndpointInfo().getAddress();
-                response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
-                        + "<span class=\"value\">" + address + "</span>");
-                response.getWriter().write("<br/><span class=\"field\">WADL :</span> "
-                        + "<a href=\"" + address + "?_wadl&_type=xml\">"
-                        + address + "?_wadl&type=xml" + "</a>");
-                addAtomLinkIfNeeded(address, atomMap, response.getWriter());
-                response.getWriter().write("</td></tr>");
-            }    
+        for (ServletDestination sd : restfulDests) {
+            response.getWriter().write("<tr><td>");
+            String address = sd.getEndpointInfo().getAddress();
+            response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
+                    + "<span class=\"value\">" + address + "</span>");
+            response.getWriter().write("<br/><span class=\"field\">WADL :</span> "
+                    + "<a href=\"" + address + "?_wadl&_type=xml\">"
+                    + address + "?_wadl&type=xml" + "</a>");
+            addAtomLinkIfNeeded(address, atomMap, response.getWriter());
+            response.getWriter().write("</td></tr>");
         }
         response.getWriter().write("</table>");
+    }
+    
+    private boolean isPrivate(EndpointInfo ei, List<String> privateAddresses) {
+        if (privateAddresses != null) {
+            for (String s : privateAddresses) {
+                if (ei.getAddress().endsWith(s)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
     
     private static void addAtomLinkIfNeeded(String address, Map<String, String> extMap,
