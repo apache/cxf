@@ -33,6 +33,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.management.persistence.ExchangeData;
 import org.apache.cxf.management.persistence.ExchangeDataDAO;
+import org.apache.cxf.management.persistence.ExchangeDataFilter;
 import org.apache.cxf.management.persistence.ExchangeDataProperty;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -42,10 +43,12 @@ import org.apache.cxf.service.model.OperationInfo;
 
 public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    public static final String CXF_CONSOLE_ADDITIONAL_PROPERTY_PREFIX = 
+    public static final String CXF_CONSOLE_ADDITIONAL_PROPERTY_PREFIX =
         "org.apache.cxf.management.interceptor.prefix";
 
     private ExchangeDataDAO exchangeDataDAO;
+
+    private ExchangeDataFilter exchangeDataFilter;
 
     public PersistOutInterceptor() {
         super(Phase.PRE_STREAM);
@@ -57,7 +60,7 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
         private final OutputStream origStream;
         private final ExchangeData exchange;
 
-        public PersistOutInterceptorCallback(final Message msg, final OutputStream os, 
+        public PersistOutInterceptorCallback(final Message msg, final OutputStream os,
                                              final ExchangeData ex) {
             this.message = msg;
             this.origStream = os;
@@ -88,11 +91,14 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
             }
             this.message.setContent(OutputStream.class, this.origStream);
 
-            try {
-                PersistOutInterceptor.this.exchangeDataDAO.save(this.exchange);
-            } catch (Throwable e) {
+            if (PersistOutInterceptor.this.exchangeDataFilter == null
+                || PersistOutInterceptor.this.exchangeDataFilter.shouldPersist(this.exchange)) {
+                try {
+                    PersistOutInterceptor.this.exchangeDataDAO.save(this.exchange);
+                } catch (Throwable e) {
 
-                e.printStackTrace();
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -133,14 +139,14 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
                 }
 
             } else if (entry.getKey().startsWith("org.apache.cxf.message.Message.")
-                       && (entry.getValue() instanceof String || entry.getValue() instanceof Integer || entry
-                           .getValue() instanceof Boolean)) {
+                && (entry.getValue() instanceof String || entry.getValue() instanceof Integer || entry
+                    .getValue() instanceof Boolean)) {
                 addProperty(exchange, entry.getKey(), entry.getValue().toString());
 
             } else if (entry.getKey().startsWith(CXF_CONSOLE_ADDITIONAL_PROPERTY_PREFIX)) {
                 addProperty(exchange, entry.getKey().substring(
                                                                CXF_CONSOLE_ADDITIONAL_PROPERTY_PREFIX
-                                                                   .length()), entry.getValue().toString());
+                                                               .length()), entry.getValue().toString());
 
             }
         }
@@ -215,6 +221,10 @@ public class PersistOutInterceptor extends AbstractPhaseInterceptor<Message> {
 
     public void setExchangeDataDAO(ExchangeDataDAO exchangeDataDAO) {
         this.exchangeDataDAO = exchangeDataDAO;
+    }
+
+    public void setExchangeDataFilter(ExchangeDataFilter exchangeDataFilter) {
+        this.exchangeDataFilter = exchangeDataFilter;
     }
 
 }

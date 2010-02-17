@@ -21,13 +21,18 @@ package org.apache.cxf.management.persistence;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.StringWriter;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
 
 public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
+
+    private static final Logger LOG = LogUtils.getL7dLogger(FilesystemExchangeDataDAO.class);
 
     private String directory;
 
     private String extension = "txt";
-    
 
     public void setDirectory(String directory) {
         this.directory = directory;
@@ -36,10 +41,10 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
     public void save(ExchangeData exchange) throws Exception {
         File file = null;
 
-        if (directory == null) {
-            file = File.createTempFile("cxf-management-", "." + extension);
+        if (this.directory == null) {
+            file = File.createTempFile("cxf-management-", "." + this.extension);
         } else {
-            file = File.createTempFile("cxf-management-", "." + extension, new File(directory));
+            file = File.createTempFile("cxf-management-", "." + this.extension, new File(this.directory));
         }
 
         StringWriter stringWriter = new StringWriter();
@@ -116,6 +121,10 @@ public class FilesystemExchangeDataDAO implements ExchangeDataDAO {
         fileOutputStream.write(stringWriter.getBuffer().toString().getBytes());
 
         fileOutputStream.close();
+
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Exchange data saved in " + file.getAbsolutePath());
+        }
 
     }
 }
