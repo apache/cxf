@@ -647,6 +647,10 @@ public class AegisDatabinding
     }
 
     private Method getMethod(Service s, OperationInfo op) {
+        Method m = op.getProperty(Method.class.getName(), Method.class);
+        if (m != null) {
+            return m;
+        }
         MethodDispatcher md = (MethodDispatcher)s.get(MethodDispatcher.class.getName());
         // The ibm jdk requires the simple frontend dependency to be
         // present for the SimpleMethodDispatcher cast below even if

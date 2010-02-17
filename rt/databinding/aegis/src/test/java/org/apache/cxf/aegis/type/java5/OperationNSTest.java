@@ -82,7 +82,7 @@ public class OperationNSTest extends AbstractAegisTest {
                                Document notify);
 
         @WebMethod(operationName = "query", action = "")
-        @WebResult(name = "queryResponse",
+        @WebResult(name = "queryResponseDocs",
                    targetNamespace = "http://www.sics.se/NotificationLog")
         List<Document> query(@WebParam(name = "xpath",
                                        targetNamespace = "http://www.sics.se/NotificationLog")
