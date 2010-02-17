@@ -82,7 +82,7 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     @Test
     public void testFeed() throws Exception {
         String listing = WebClient.create("http://localhost:9080/services").get(String.class);
-        assertTrue(listing.contains("http://localhost:9080/atom/logs"));
+        assertTrue(listing, listing.contains("http://localhost:9080/atom/logs"));
         WebClient wc = WebClient.create("http://localhost:9080/resource/root");
         wc.path("/log").get();
         Thread.sleep(3000);
