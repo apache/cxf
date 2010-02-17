@@ -114,6 +114,7 @@ public class RequestPreprocessorTest extends Assert {
                                 String methodHeader) {
         Message m = new MessageImpl();
         m.put("org.apache.cxf.http.case_insensitive_queries", false);
+        m.put("org.apache.cxf.endpoint.private", false);
         Exchange e = new ExchangeImpl();
         m.setExchange(e);
         control.reset();

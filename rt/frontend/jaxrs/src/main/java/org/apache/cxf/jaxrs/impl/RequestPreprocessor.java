@@ -49,6 +49,7 @@ public class RequestPreprocessor {
         SHORTCUTS.put("json", "application/json");
         SHORTCUTS.put("text", "text/*");
         SHORTCUTS.put("xml", "application/xml");
+        SHORTCUTS.put("atom", "application/atom+xml");
         // more to come
     }
     

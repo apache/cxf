@@ -99,7 +99,9 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:inInterceptors>
       <ref bean="fastInfosetInInterceptor" />
     </jaxrs:inInterceptors>
-    		   
+    <jaxrs:properties>
+      <entry key="org.apache.cxf.endpoint.private" value="true"/>
+    </jaxrs:properties>    		   
   </jaxrs:server> 
 
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">

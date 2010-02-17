@@ -92,6 +92,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -119,6 +120,7 @@ public class WadlGenerator implements RequestHandler {
     private List<URI> externalSchemaLinks;
     private Map<String, List<String>> externalQnamesMap; 
     private ElementQNameResolver resolver;
+    private List<String> privateAddresses;
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -129,6 +131,10 @@ public class WadlGenerator implements RequestHandler {
         UriInfo ui = new UriInfoImpl(m);
         if (!ui.getQueryParameters().containsKey(WADL_QUERY)) {
             return null;
+        }
+        
+        if (isPrivate(m)) {
+            return Response.status(401).build();
         }
         
         StringBuilder sbMain = new StringBuilder();
@@ -1054,6 +1060,18 @@ public class WadlGenerator implements RequestHandler {
 
     public void setResolver(ElementQNameResolver resolver) {
         this.resolver = resolver;
+    }
+    
+    public void setPrivateAddresses(List<String> privateAddresses) {
+        this.privateAddresses = privateAddresses;
+    }
+    
+    public List<String> getPrivateAddresses() {
+        return privateAddresses;
+    }
+
+    private boolean isPrivate(Message m) {
+        return MessageUtils.isTrue(m.getContextualProperty("org.apache.cxf.endpoint.private")); 
     }
     
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
