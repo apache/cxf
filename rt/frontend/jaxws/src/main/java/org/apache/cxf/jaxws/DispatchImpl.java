@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxws;
 
+import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -54,6 +55,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.interceptors.MessageModeInInterceptor;
 import org.apache.cxf.jaxws.interceptors.MessageModeOutInterceptor;
@@ -217,6 +219,10 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         }
     }
     private RuntimeException mapException(Exception ex) {
+        if (ex instanceof Fault && ex.getCause() instanceof IOException) {
+            throw new WebServiceException(ex.getMessage(), ex.getCause());
+        }
+        
         if (getBinding() instanceof HTTPBinding) {
             HTTPException exception = new HTTPException(HttpURLConnection.HTTP_INTERNAL_ERROR);
             exception.initCause(ex);

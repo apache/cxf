@@ -39,6 +39,8 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -52,8 +54,10 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.hello_world_soap_http.BadRecordLitFault;
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -112,6 +116,45 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
             }
             Thread.sleep(20);
         }
+    }
+    @Test
+    public void testTimeout() throws Exception {
+        //CXF-2384
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+
+        //pick one of the other service/ports that would have an address
+        //without a service running
+        QName otherServiceName = new QName("http://apache.org/hello_world_soap_http",
+                "SOAPProviderService");
+        QName otherPortName = new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
+        
+        
+        SOAPService service = new SOAPService(wsdl, otherServiceName);
+        assertNotNull(service);
+
+        Dispatch<SOAPMessage> disp = service
+            .createDispatch(otherPortName, SOAPMessage.class, Service.Mode.MESSAGE);
+        
+        DispatchImpl dispImpl = (DispatchImpl)disp;
+        HTTPConduit cond = (HTTPConduit)dispImpl.getClient().getConduit();
+        cond.getClient().setConnectionTimeout(500);
+        
+        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
+        assertNotNull(soapReqMsg);
+        
+        try {
+            disp.invoke(soapReqMsg);
+            fail("Should have faulted");
+        } catch (SOAPFaultException ex) {
+            fail("should not be a SOAPFaultException");
+        } catch (WebServiceException ex) {
+            //expected
+            assertTrue(ex.getCause().getClass().getName(), 
+                       ex.getCause() instanceof java.net.ConnectException);
+        }
+        
     }
 
     @Test
