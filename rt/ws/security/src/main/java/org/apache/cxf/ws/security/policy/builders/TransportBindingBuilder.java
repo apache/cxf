@@ -84,6 +84,8 @@ public class TransportBindingBuilder implements AssertionBuilder {
                         parent.setIncludeTimestamp(true);
                     } else if (name.equals(SPConstants.LAYOUT)) {
                         parent.setLayout((Layout)new LayoutBuilder().build(child));
+                    } else if (name.equals(SPConstants.PROTECT_TOKENS)) {
+                        parent.setTokenProtection(true);
                     } else if (name.equals(SPConstants.SIGNED_SUPPORTING_TOKENS)
                         || name.equals(SPConstants.SIGNED_ENDORSING_SUPPORTING_TOKENS)) {
                         
