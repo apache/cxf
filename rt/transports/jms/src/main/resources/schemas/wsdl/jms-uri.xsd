@@ -67,5 +67,9 @@
 		<xs:attribute name="jndiConnectionFactoryName" type="xs:string" />
 		<xs:attribute name="jndiInitialContextFactory" type="xs:string" />
 		<xs:attribute name="jndiURL" type="xs:string" />
+		<xs:attribute name="username" type="xs:string" />
+		<xs:attribute name="password" type="xs:string" />
+		<xs:attribute name="reconnectOnException" type="xs:boolean" />
+		<xs:attribute name="useJMS11" type="xs:boolean" />
 	</xs:complexType>
 </xs:schema>

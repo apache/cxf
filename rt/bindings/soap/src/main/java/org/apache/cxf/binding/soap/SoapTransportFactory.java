@@ -108,9 +108,6 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 transId = ei.getTransportId();
             }
         }
-        if (isJMSSpecAddress(address)) {
-            ei.setTransportId("http://www.w3.org/2008/07/soap/bindings/JMS/");
-        }
         DestinationFactory destinationFactory;
         try {
             DestinationFactoryManager mgr = bus.getExtension(DestinationFactoryManager.class);
@@ -204,9 +201,6 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
             if (transId == null) {
                 transId = ei.getTransportId();
             }
-        }
-        if (isJMSSpecAddress(address)) {
-            ei.setTransportId("http://www.w3.org/2008/07/soap/bindings/JMS/");
         }
         ConduitInitiator conduitInit;
         try {

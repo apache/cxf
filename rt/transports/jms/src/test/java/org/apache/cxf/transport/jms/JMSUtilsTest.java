@@ -21,35 +21,13 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.atomic.AtomicLong;
-
-import javax.naming.Context;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JMSUtilsTest extends Assert {
-
-    @Test
-    public void testpopulateIncomingContextNonNull() throws Exception {
-        AddressType addrType =  new AddressType();
-        
-        JMSNamingPropertyType prop = new JMSNamingPropertyType();
-        prop.setName(Context.APPLET);
-        prop.setValue("testValue");
-        addrType.getJMSNamingProperty().add(prop);      
-        
-        JMSNamingPropertyType prop2 = new JMSNamingPropertyType();
-        prop2.setName(Context.BATCHSIZE);
-        prop2.setValue("12");
-        addrType.getJMSNamingProperty().add(prop2);
-        
-        Properties env = JMSOldConfigHolder.getInitialContextEnv(addrType);
-        assertTrue("Environment should not be empty", env.size() > 0);
-        assertTrue("Environemnt should contain NamingBatchSize property", env.get(Context.BATCHSIZE) != null);
-    }
     
     @Test
     public void testGetEncoding() throws IOException {                

@@ -30,6 +30,7 @@ public final class JMSURIConstants {
     public static final String QUEUE = "queue";
     public static final String TOPIC = "topic";
     public static final String JNDI = "jndi";
+    public static final String JNDI_TOPIC = "jndi-topic";
 
     public static final String QUEUE_PREFIX = "queue:";
     public static final String TOPIC_PREFIX = "topic:";

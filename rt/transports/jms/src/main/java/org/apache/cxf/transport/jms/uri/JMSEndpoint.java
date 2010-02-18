@@ -39,9 +39,13 @@ public class JMSEndpoint extends JMSEndpointType {
         this.jmsVariant = jmsVariant;
         this.destinationName = destinationName;
     }
+    public JMSEndpoint() {
+        jmsVariant = JMSURIConstants.QUEUE;
+    }
 
     public String getRequestURI() {
-        String requestUri = "jms:" + jmsVariant + ":" + destinationName;
+        String requestUri = "jms:" + (jmsVariant == JMSURIConstants.JNDI_TOPIC ? "jndi" : jmsVariant)
+            + ":" + destinationName;
         boolean first = true;
         Iterator iter = parameters.keySet().iterator();
         while (iter.hasNext()) {
@@ -80,14 +84,14 @@ public class JMSEndpoint extends JMSEndpointType {
         return (String)parameters.get(key);
     }
 
-    public Map getJndiParameters() {
+    public Map<String, String> getJndiParameters() {
         return jndiParameters;
     }
 
     /**
      * @return
      */
-    public Map getParameters() {
+    public Map<String, String> getParameters() {
         return parameters;
     }
 }

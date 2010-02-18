@@ -20,7 +20,6 @@ package org.apache.cxf.transport.jms;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.Properties;
 import java.util.logging.Level;
@@ -31,6 +30,7 @@ import javax.naming.Context;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -55,125 +55,27 @@ public class JMSOldConfigHolder {
     private ClientConfig clientConfig;
     private ClientBehaviorPolicyType runtimePolicy;
 
-    private AddressType address;
     private SessionPoolType sessionPool;
     private JMSConfiguration jmsConfig;
     private ServerConfig serverConfig;
     private ServerBehaviorPolicyType serverBehavior;
+    private AddressType address;
 
     public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus,
                                                                    EndpointInfo endpointInfo,
                                                                    boolean isConduit) 
         throws IOException {
-        String transportId = endpointInfo.getTransportId();
-        if (transportId.equals(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID)) {
-            return createJMSConfigurationFromEndpointInfoForSpecification(bus, endpointInfo,
-                                                                          isConduit);
-        } else {
-            return createJMSConfigurationFromEndpointInfoForOldJMS(bus, endpointInfo, isConduit);
-        }
-
-    }
-    
-    public JMSConfiguration createJMSConfigurationFromEndpointInfoForOldJMS(Bus bus,
-                                                                   EndpointInfo endpointInfo,
-                                                                   boolean isConduit) {
-
-        // Retrieve configuration information that was extracted from the WSDL
-        address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class);
-        clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
-        runtimePolicy = endpointInfo.getTraversedExtensor(new ClientBehaviorPolicyType(),
-                                                          ClientBehaviorPolicyType.class);
-        serverConfig = endpointInfo.getTraversedExtensor(new ServerConfig(), ServerConfig.class);
-        sessionPool = endpointInfo.getTraversedExtensor(new SessionPoolType(), SessionPoolType.class);
-        serverBehavior = endpointInfo.getTraversedExtensor(new ServerBehaviorPolicyType(),
-                                                           ServerBehaviorPolicyType.class);
-        String name = endpointInfo.getName().toString() + (isConduit ? ".jms-conduit" : ".jms-destination");
-       
-        // Try to retrieve configuration information from the spring
-        // config. Search for a conduit or destination with name=endpoint name + ".jms-conduit"
-        // or ".jms-destination"
-        
-        Configurer configurer = bus.getExtension(Configurer.class);
-        if (null != configurer) {
-            configurer.configureBean(name, this);
-        }
-        
-        if (jmsConfig == null) {
-            jmsConfig = new JMSConfiguration();
-        }
-
-        if (jmsConfig.isUsingEndpointInfo()) {
-            JndiTemplate jt = new JndiTemplate();
-            jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(address));
-            boolean pubSubDomain = false;
-            if (address.isSetDestinationStyle()) {
-                pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
-            }
-            JNDIConfiguration jndiConfig = new JNDIConfiguration();
-            jndiConfig.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
-            jmsConfig.setJndiTemplate(jt);
-            jndiConfig.setConnectionUserName(address.getConnectionUserName());
-            jndiConfig.setConnectionPassword(address.getConnectionPassword());
-            jmsConfig.setJndiConfig(jndiConfig);
-            if (address.isSetReconnectOnException()) {
-                jmsConfig.setReconnectOnException(address.isReconnectOnException());
-            }
-            jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
-            jmsConfig.setExplicitQosEnabled(true);
-            if (jmsConfig.getMessageSelector() == null) {
-                jmsConfig.setMessageSelector(serverBehavior.getMessageSelector());
-            }
-            if (isConduit && runtimePolicy.isSetMessageType()) {
-                jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
-            }        
-            jmsConfig.setPubSubDomain(pubSubDomain);
-            jmsConfig.setPubSubNoLocal(true);
-            if (clientConfig.isSetClientReceiveTimeout()) {
-                jmsConfig.setReceiveTimeout(clientConfig.getClientReceiveTimeout());
-            }
-            if (clientConfig.isSetUseConduitIdSelector()) {
-                jmsConfig.setUseConduitIdSelector(clientConfig.isUseConduitIdSelector());
-            }
-            if (clientConfig.isSetConduitSelectorPrefix()) {
-                jmsConfig.setConduitSelectorPrefix(clientConfig.getConduitSelectorPrefix());
-            }
-            jmsConfig.setEnforceSpec(clientConfig.isEnforceSpec());
-            jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
-            jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
-            jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
-            if (sessionPool.isSetHighWaterMark()) {
-                jmsConfig.setMaxConcurrentConsumers(sessionPool.getHighWaterMark());
-            }
-            if (sessionPool.isSetLowWaterMark()) {
-                jmsConfig.setConcurrentConsumers(sessionPool.getLowWaterMark());
-            }
-            long timeToLive = isConduit ? clientConfig.getMessageTimeToLive() : serverConfig
-                .getMessageTimeToLive();
-            jmsConfig.setTimeToLive(timeToLive);            
-            if (address.isSetUseJms11()) {                
-                jmsConfig.setUseJms11(address.isUseJms11());        
-            }
-            if (serverBehavior.isSetTransactional()) {
-                jmsConfig.setSessionTransacted(serverBehavior.isTransactional());                
-            }
-            boolean useJndi = address.isSetJndiDestinationName();
-            if (useJndi) {
-                // Setup Destination jndi destination resolver
-                final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
-                jndiDestinationResolver.setJndiTemplate(jt);
-                jmsConfig.setDestinationResolver(jndiDestinationResolver);
-                jmsConfig.setTargetDestination(address.getJndiDestinationName());
-                jmsConfig.setReplyDestination(address.getJndiReplyDestinationName());
-            } else {
-                // Use the default dynamic destination resolver
-                jmsConfig.setTargetDestination(address.getJmsDestinationName());
-                jmsConfig.setReplyDestination(address.getJmsReplyDestinationName());
-            }
-        }
+        createJMSConfigurationFromEndpointInfoForSpecification(bus, endpointInfo, isConduit);
         return jmsConfig;
     }
 
+    public void setAddress(AddressType ad) {
+        address = ad;
+    }
+    public AddressType getAddress() {
+        return address;
+    }
+    
     public ClientConfig getClientConfig() {
         return clientConfig;
     }
@@ -188,14 +90,6 @@ public class JMSOldConfigHolder {
 
     public void setRuntimePolicy(ClientBehaviorPolicyType runtimePolicy) {
         this.runtimePolicy = runtimePolicy;
-    }
-
-    public AddressType getAddress() {
-        return address;
-    }
-
-    public void setAddress(AddressType address) {
-        this.address = address;
     }
 
     public SessionPoolType getSessionPool() {
@@ -230,40 +124,20 @@ public class JMSOldConfigHolder {
         this.serverBehavior = serverBehavior;
     }
 
-    public static Properties getInitialContextEnv(AddressType addrType) {
-        Properties env = new Properties();
-        java.util.ListIterator listIter = addrType.getJMSNamingProperty().listIterator();
-        while (listIter.hasNext()) {
-            JMSNamingPropertyType propertyPair = (JMSNamingPropertyType)listIter.next();
-            if (null != propertyPair.getValue()) {
-                env.setProperty(propertyPair.getName(), propertyPair.getValue());
-            }
-        }
-        if (LOG.isLoggable(Level.FINE)) {
-            Enumeration props = env.propertyNames();
-            while (props.hasMoreElements()) {
-                String name = (String)props.nextElement();
-                String value = env.getProperty(name);
-                LOG.log(Level.FINE, "Context property: " + name + " | " + value);
-            }
-        }
-        return env;
-    }
-
+    
     /**
-     * @param bus
-     * @param endpointInfo
-     * @param isConduit
-     * @return
+     * Get the extensors from the wsdl and/or configuration that will
+     * then be used to configure the JMSConfiguration object 
      */
-    private JMSConfiguration createJMSConfigurationFromEndpointInfoForSpecification(
-                                                                                    Bus bus,
-                                                                                    EndpointInfo endpointInfo,
-                                                                                    boolean isConduit) 
-        throws IOException {
+    private JMSEndpoint getExtensorsAndConfig(Bus bus,
+                           EndpointInfo endpointInfo,
+                           boolean isConduit) throws IOException {
         JMSEndpoint endpoint = null;
+        String adr = endpointInfo.getAddress();
         try {           
-            endpoint = JMSEndpointParser.createEndpoint(endpointInfo.getAddress());
+            endpoint = StringUtils.isEmpty(adr) || "jms://".equals(adr) || !adr.startsWith("jms") 
+                ?  new JMSEndpoint()
+                : JMSEndpointParser.createEndpoint(adr);                
         } catch (RuntimeException ex) {
             throw ex;
         } catch (Exception e) {
@@ -272,7 +146,8 @@ public class JMSOldConfigHolder {
             throw e2;
         }
         retrieveWSDLInformation(endpoint, endpointInfo);
-        //address = endpointInfo.getTraversedExtensor(new AddressType(), AddressType.class); 
+
+        address = endpointInfo.getTraversedExtensor(address, AddressType.class);
         clientConfig = endpointInfo.getTraversedExtensor(new ClientConfig(), ClientConfig.class);
         runtimePolicy = endpointInfo.getTraversedExtensor(new ClientBehaviorPolicyType(),
                                                           ClientBehaviorPolicyType.class);
@@ -292,7 +167,24 @@ public class JMSOldConfigHolder {
         if (null != configurer) {
             configurer.configureBean(name, this);
         }
+        return endpoint;
+    }
+    
+    /**
+     * @param bus
+     * @param endpointInfo
+     * @param isConduit
+     * @return
+     */
+    private JMSConfiguration createJMSConfigurationFromEndpointInfoForSpecification(Bus bus,
+                                                                                    EndpointInfo endpointInfo,
+                                                                                    boolean isConduit) 
+        throws IOException {
+        JMSEndpoint endpoint = getExtensorsAndConfig(bus, endpointInfo, isConduit);
 
+        if (address != null) {
+            mapAddressToEndpoint(address, endpoint);
+        }
         if (jmsConfig == null) {
             jmsConfig = new JMSConfiguration();
         }
@@ -312,21 +204,18 @@ public class JMSOldConfigHolder {
         if (jmsConfig.isUsingEndpointInfo()) {
             JndiTemplate jt = new JndiTemplate();
             jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(endpoint));
-            boolean pubSubDomain = false;
-            pubSubDomain = endpoint.getJmsVariant().equals(JMSURIConstants.TOPIC);
+            boolean pubSubDomain = endpoint.getJmsVariant().contains(JMSURIConstants.TOPIC);
             JNDIConfiguration jndiConfig = new JNDIConfiguration();
             jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
             jmsConfig.setJndiTemplate(jt);
-            // TODO need to check the userName and Password setting the specification
-            /*
-             * jndiConfig.setConnectionUserName(address.getConnectionUserName());
-             * jndiConfig.setConnectionPassword(address.getConnectionPassword());
-             */
+            
+            jndiConfig.setConnectionUserName(endpoint.getUsername());
+            jndiConfig.setConnectionPassword(endpoint.getPassword());
+            
             jmsConfig.setJndiConfig(jndiConfig);
-            /*
-             * if (address.isSetReconnectOnException()) {
-             * jmsConfig.setReconnectOnException(address.isReconnectOnException()); }
-             */
+            if (endpoint.isSetReconnectOnException()) {
+                jmsConfig.setReconnectOnException(endpoint.isReconnectOnException());
+            }
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setExplicitQosEnabled(true);
             if (jmsConfig.getMessageSelector() == null) {
@@ -335,7 +224,7 @@ public class JMSOldConfigHolder {
             if (isConduit) {
                 if (runtimePolicy.isSetMessageType()) {
                     jmsConfig.setMessageType(runtimePolicy.getMessageType().value());
-                } else {
+                } else if (address == null) {
                     jmsConfig.setMessageType(JMSConstants.BYTE_MESSAGE_TYPE);
                 }
             }
@@ -350,6 +239,7 @@ public class JMSOldConfigHolder {
             if (clientConfig.isSetConduitSelectorPrefix()) {
                 jmsConfig.setConduitSelectorPrefix(clientConfig.getConduitSelectorPrefix());
             }
+            jmsConfig.setEnforceSpec(clientConfig.isEnforceSpec());
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
@@ -363,13 +253,13 @@ public class JMSOldConfigHolder {
                 long timeToLive = endpoint.getTimeToLive();
                 jmsConfig.setTimeToLive(timeToLive);
             }
-            /*
-             * if (address.isSetUseJms11()) { jmsConfig.setUseJms11(address.isUseJms11()); }
-             */
+            if (endpoint.isSetUseJMS11()) {
+                jmsConfig.setUseJms11(endpoint.isUseJMS11());
+            }
             if (serverBehavior.isSetTransactional()) {
                 jmsConfig.setSessionTransacted(serverBehavior.isTransactional());
             }
-            boolean useJndi = endpoint.getJmsVariant().equals(JMSURIConstants.JNDI);
+            boolean useJndi = endpoint.getJmsVariant().contains(JMSURIConstants.JNDI);
             if (useJndi) {
                 // Setup Destination jndi destination resolver
                 final JndiDestinationResolver jndiDestinationResolver = new JndiDestinationResolver();
@@ -390,6 +280,48 @@ public class JMSOldConfigHolder {
         String targetService = endpoint.getParameter(JMSSpecConstants.TARGETSERVICE_PARAMETER_NAME);
         jmsConfig.setTargetService(targetService);
         return jmsConfig;
+    }
+
+    private static void mapAddressToEndpoint(AddressType address, JMSEndpoint endpoint) {
+        boolean pubSubDomain = DestinationStyleType.TOPIC == address.getDestinationStyle();
+        if (address.isSetDestinationStyle()) {
+            endpoint.setJmsVariant(pubSubDomain ? JMSURIConstants.TOPIC : JMSURIConstants.QUEUE);
+        } else {
+            endpoint.setJmsVariant(JMSURIConstants.QUEUE);
+        }
+        if (address.isSetJndiConnectionFactoryName()) {
+            endpoint.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
+        }
+        if (address.isSetConnectionUserName()) {
+            endpoint.setUsername(address.getConnectionUserName());
+        }
+        if (address.isSetConnectionPassword()) {
+            endpoint.setPassword(address.getConnectionUserName());
+        }
+        if (address.isSetReconnectOnException()) {
+            endpoint.setReconnectOnException(address.isReconnectOnException());
+        }
+        if (address.isSetUseJms11()) {
+            endpoint.setUseJMS11(address.isUseJms11());
+        }
+        boolean useJndi = address.isSetJndiDestinationName();
+        if (useJndi) {
+            endpoint.setJmsVariant(pubSubDomain ? JMSURIConstants.JNDI_TOPIC : JMSURIConstants.JNDI);
+            endpoint.setDestinationName(address.getJndiDestinationName());
+            endpoint.setReplyToName(address.getJndiReplyDestinationName());
+        } else {
+            endpoint.setDestinationName(address.getJmsDestinationName());
+            endpoint.setReplyToName(address.getJmsReplyDestinationName());
+        }
+        
+        java.util.ListIterator<JMSNamingPropertyType> listIter 
+            = address.getJMSNamingProperty().listIterator();
+        while (listIter.hasNext()) {
+            JMSNamingPropertyType propertyPair = listIter.next();
+            if (null != propertyPair.getValue()) {
+                endpoint.putJndiParameter(propertyPair.getName(), propertyPair.getValue());
+            }
+        }
     }
 
     /**
@@ -463,10 +395,10 @@ public class JMSOldConfigHolder {
         BindingInfo bi = ei.getBinding();
         
         Object o = ei.getExtensor(cls);
-        if (o == null) {
+        if (o == null && si != null) {
             o = si.getExtensor(cls);
         }
-        if (o == null) {
+        if (o == null && bi != null) {
             o = bi.getExtensor(cls);
         }
         
@@ -481,13 +413,14 @@ public class JMSOldConfigHolder {
     
     public static Properties getInitialContextEnv(JMSEndpoint endpoint) {
         Properties env = new Properties();
-        env.put(Context.INITIAL_CONTEXT_FACTORY, endpoint.getJndiInitialContextFactory());
-        env.put(Context.PROVIDER_URL, endpoint.getJndiURL());
-        Map addParas = endpoint.getJndiParameters();
-        Iterator keyIter = addParas.keySet().iterator();
-        while (keyIter.hasNext()) {
-            String key = (String)keyIter.next();
-            env.put(key, addParas.get(key));
+        if (endpoint.isSetJndiInitialContextFactory()) {
+            env.put(Context.INITIAL_CONTEXT_FACTORY, endpoint.getJndiInitialContextFactory());
+        }
+        if (endpoint.isSetJndiURL()) {
+            env.put(Context.PROVIDER_URL, endpoint.getJndiURL());
+        }
+        for (Map.Entry<String, String> ent : endpoint.getJndiParameters().entrySet()) {
+            env.put(ent.getKey(), ent.getValue());
         }
         if (LOG.isLoggable(Level.FINE)) {
             Enumeration props = env.propertyNames();
