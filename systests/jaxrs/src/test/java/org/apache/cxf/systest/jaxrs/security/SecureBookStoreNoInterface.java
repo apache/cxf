@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxrs.security;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -31,7 +32,6 @@ import javax.ws.rs.Produces;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
-import org.springframework.security.annotation.Secured;
 
 @Path("/bookstorestorage/")
 public class SecureBookStoreNoInterface {
@@ -46,7 +46,7 @@ public class SecureBookStoreNoInterface {
     
     @POST
     @Path("/bookforms")
-    @Secured({"ROLE_USER", "ROLE_ADMIN" })
+    @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
     public Book getBookFromFormParams(@FormParam("name") String name, @FormParam("id") long id) {
         if (name == null || id == 0) {
             throw new RuntimeException("FormParams are not set");
@@ -57,7 +57,7 @@ public class SecureBookStoreNoInterface {
     @GET
     @Path("/thosebooks/{bookId}/{id}")
     @Produces("application/xml")
-    @Secured({"ROLE_USER", "ROLE_ADMIN" })
+    @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
     public Book getThatBook(@PathParam("bookId") Long id, @PathParam("id") String s) {
         if (s == null) {
             throw new RuntimeException();
@@ -68,7 +68,7 @@ public class SecureBookStoreNoInterface {
     @GET
     @Path("/thosebooks/{bookId}/")
     @Produces("application/xml")
-    @Secured("ROLE_USER")
+    @RolesAllowed("ROLE_USER")
     public Book getThatBook(@PathParam("bookId") Long id) {
         return books.get(id);
     }
@@ -76,7 +76,7 @@ public class SecureBookStoreNoInterface {
     @GET
     @Path("/thosebooks")
     @Produces("application/xml")
-    @Secured("ROLE_ADMIN")
+    @RolesAllowed("ROLE_ADMIN")
     public Book getThatBook() throws BookNotFoundFault {
         return books.get(123L);
     }
