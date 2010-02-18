@@ -41,9 +41,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.classextension.EasyMock;
@@ -53,8 +50,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
 /**
  */
@@ -127,7 +122,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     @Test
     public void testSend() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, false);
+        HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         conduit.prepare(message);
         verifySentMessage(conduit, message);
@@ -137,7 +132,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     @Test
     public void testSendWithHeaders() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, false);
+        HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         message.put("Content-Type", "text/xml;charset=utf8");
         setUpHeaders(message);
@@ -149,7 +144,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     @Test
     public void testSendHttpConnection() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, false);
+        HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         conduit.prepare(message);
         verifySentMessage(conduit, message);
@@ -159,48 +154,18 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     @Test
     public void testSendHttpConnectionAutoRedirect() throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, true, false);
+        HTTPConduit conduit = setUpConduit(true, true);
         Message message = new MessageImpl();
         conduit.prepare(message);
         verifySentMessage(conduit, message);
         finalVerify();
     }
-
-    @Test
-    public void testSendOnewayExplicitLenghtPartialResponse()
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);        
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.NONE,
-                          ResponseDelimiter.LENGTH,
-                          false); // non-empty response
-        finalVerify();
-    }
-        
-    @Test
-    public void testSendOnewayChunkedPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.NONE,
-                          ResponseDelimiter.CHUNKED,
-                          false); // non-empty response
-        finalVerify();
-    }
-    
+            
     @Test
     public void testSendOnewayChunkedEmptyPartialResponse() 
         throws Exception {
         control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
+        HTTPConduit conduit = setUpConduit(true, false);
         Message message = new MessageImpl();
         conduit.prepare(message);
         verifySentMessage(conduit, 
@@ -208,111 +173,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                           ResponseStyle.NONE,
                           ResponseDelimiter.CHUNKED,
                           true);  // empty response
-        finalVerify();
-    }
-
-    @Test
-    public void testSendOnewayEOFTerminatedPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.NONE,
-                          ResponseDelimiter.EOF,
-                          false); // non-empty response
-        finalVerify();
-    }
-    
-    @Test
-    public void testSendOnewayEOFTerminatedEmptyPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.NONE,
-                          ResponseDelimiter.EOF,
-                          true); // empty response
-        finalVerify();
-    }
-    
-    @Test
-    public void testSendDecoupledExplicitLenghtPartialResponse()
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.DECOUPLED,
-                          ResponseDelimiter.LENGTH,
-                          false); // non-empty response
-        finalVerify();
-    }
-
-    @Test
-    public void testSendDecoupledChunkedPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.DECOUPLED,
-                          ResponseDelimiter.CHUNKED,
-                          false); // non-empty response
-        finalVerify();
-    }
-    
-    @Test
-    public void testSendDecoupledChunkedEmptyPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.DECOUPLED,
-                          ResponseDelimiter.CHUNKED,
-                          true);  // empty response
-        finalVerify();
-    }
-
-    @Test
-    public void testSendDecoupledEOFTerminatedPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.DECOUPLED,
-                          ResponseDelimiter.EOF,
-                          false); // non-empty response
-        finalVerify();
-    }
-    
-    @Test
-    public void testSendDecoupledEOFTerminatedEmptyPartialResponse() 
-        throws Exception {
-        control = EasyMock.createNiceControl();
-        HTTPConduit conduit = setUpConduit(true, false, true);
-        Message message = new MessageImpl();
-        conduit.prepare(message);
-        verifySentMessage(conduit, 
-                          message, 
-                          ResponseStyle.DECOUPLED,
-                          ResponseDelimiter.EOF,
-                          true); // empty response
         finalVerify();
     }
     
@@ -346,8 +206,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
 
     private HTTPConduit setUpConduit(
         boolean send,
-        boolean autoRedirect,
-        boolean decoupled
+        boolean autoRedirect
     ) throws Exception {
         endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(NOWHERE + "bar/foo");
@@ -390,23 +249,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         }
 
         CXFBusImpl bus = new CXFBusImpl();
-        URL decoupledURL = null;
-        if (decoupled) {
-            decoupledURL = new URL(NOWHERE + "response");
-            DestinationFactoryManager mgr =
-                control.createMock(DestinationFactoryManager.class);
-            DestinationFactory factory =
-                control.createMock(DestinationFactory.class);
-            Destination destination =
-                control.createMock(Destination.class);
-
-            bus.setExtension(mgr, DestinationFactoryManager.class);
-            mgr.getDestinationFactoryForUri(decoupledURL.toString());
-            EasyMock.expectLastCall().andReturn(factory);
-            factory.getDestination(EasyMock.isA(EndpointInfo.class));
-            EasyMock.expectLastCall().andReturn(destination);
-            destination.setMessageObserver(EasyMock.isA(HTTPConduit.InterposedMessageObserver.class));
-        }
         
         control.replay();
         
@@ -424,13 +266,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                 conduit.getClient().setAllowChunking(true);
                 conduit.getClient().setChunkingThreshold(0);
             }
-        }
-
-        if (decoupled) {
-            conduit.getClient().setDecoupledEndpoint(decoupledURL.toString());
-            assertNotNull("expected back channel", conduit.getBackChannel());
-        } else {
-            assertNull("unexpected back channel", conduit.getBackChannel());
         }
 
         observer = new MessageObserver() {
@@ -537,10 +372,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             }
         }
         
-        if (style == ResponseStyle.DECOUPLED) {
-            verifyDecoupledResponse(conduit);
-        }
-        
         conduit.close();
         
         finalVerify();
@@ -644,30 +475,6 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         }
     }
     
-    private void verifyDecoupledResponse(HTTPConduit conduit)
-        throws IOException {
-        Message incoming = new MessageImpl();
-        conduit.getDecoupledObserver().onMessage(incoming);
-        assertSame("expected pass thru onMessage() notification",
-                   inMessage,
-                   incoming);
-        assertEquals("unexpected response code",
-                     HttpURLConnection.HTTP_OK,
-                     inMessage.get(Message.RESPONSE_CODE));
-        assertEquals("expected DECOUPLED_CHANNEL_MESSAGE flag set",
-                     Boolean.TRUE,
-                     inMessage.get(DECOUPLED_CHANNEL_MESSAGE));
-        assertEquals("unexpected HTTP_REQUEST set",
-                     false,
-                     inMessage.containsKey(AbstractHTTPDestination.HTTP_REQUEST));
-        assertEquals("unexpected HTTP_RESPONSE set",
-                     false,
-                     inMessage.containsKey(AbstractHTTPDestination.HTTP_RESPONSE));
-        assertEquals("unexpected Message.ASYNC_POST_RESPONSE_DISPATCH set",
-                     false,
-                     inMessage.containsKey(Message.ASYNC_POST_RESPONSE_DISPATCH));
-    }
-
     private void finalVerify() {
         if (control != null) {
             control.verify();

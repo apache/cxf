@@ -207,7 +207,7 @@ public class RMManagerTest extends Assert {
         manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange).times(3);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         WrappedEndpoint wre = control.createMock(WrappedEndpoint.class);
         EasyMock.expect(exchange.get(Endpoint.class)).andReturn(wre);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
@@ -227,7 +227,7 @@ public class RMManagerTest extends Assert {
         EndpointReferenceType replyTo = RMUtils.createAnonymousReference();
         EasyMock.expect(maps.getReplyTo()).andReturn(replyTo);
         EasyMock.expect(exchange.getConduit(message)).andReturn(null);
-        rme.initialise(null, replyTo);
+        rme.initialise(null, replyTo, null);
         EasyMock.expectLastCall();
 
         control.replay();
@@ -254,7 +254,7 @@ public class RMManagerTest extends Assert {
         manager.setReliableEndpointsMap(new HashMap<Endpoint, RMEndpoint>());
         Message message = control.createMock(Message.class);
         Exchange exchange = control.createMock(Exchange.class);
-        EasyMock.expect(message.getExchange()).andReturn(exchange).times(3);
+        EasyMock.expect(message.getExchange()).andReturn(exchange).anyTimes();
         Endpoint endpoint = control.createMock(Endpoint.class);
         EasyMock.expect(exchange.get(Endpoint.class)).andReturn(endpoint);
         EndpointInfo ei = control.createMock(EndpointInfo.class);
@@ -266,7 +266,7 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(exchange.getDestination()).andReturn(null);
         Conduit conduit = control.createMock(Conduit.class);
         EasyMock.expect(exchange.getConduit(message)).andReturn(conduit);
-        rme.initialise(conduit, null);
+        rme.initialise(conduit, null, null);
         EasyMock.expectLastCall();
 
         control.replay();
@@ -380,7 +380,6 @@ public class RMManagerTest extends Assert {
         EasyMock.expect(exchange.getOutFaultMessage()).andReturn(null).anyTimes();
         Conduit conduit = control.createMock(Conduit.class);
         EasyMock.expect(exchange.getConduit(message)).andReturn(conduit).anyTimes();
-        EasyMock.expect(conduit.getBackChannel()).andReturn(null).anyTimes();
         Identifier inSid = control.createMock(Identifier.class);        
         AddressingProperties maps = control.createMock(AddressingProperties.class);
         Source source = control.createMock(Source.class);

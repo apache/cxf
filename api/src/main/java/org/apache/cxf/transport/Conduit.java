@@ -65,14 +65,6 @@ public interface Conduit extends Observable {
     EndpointReferenceType getTarget();
     
     /**
-     * Retreive the back-channel Destination.
-     * 
-     * @return the backchannel Destination (or null if the backchannel is
-     * built-in)
-     */
-    Destination getBackChannel();
-        
-    /**
      * Close the conduit
      */
     void close();

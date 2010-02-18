@@ -31,7 +31,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -81,14 +80,13 @@ public class CorbaServerConduit implements Conduit {
         return target;
     }
 
-    public Destination getBackChannel() {
-        return null;
-    }
-
     public void close() {
     }
 
     public void setMessageObserver(MessageObserver observer) {
+    }
+    public MessageObserver getMessageObserver() {
+        return null;
     }
 
     public final EndpointReferenceType getTargetReference(EndpointReferenceType t) {

@@ -464,7 +464,7 @@ public class MAPAggregatorTest extends Assert {
         setUpExchangeGet(exchange, Endpoint.class, endpoint);
         EndpointInfo endpointInfo = control.createMock(EndpointInfo.class);
         endpoint.getEndpointInfo();
-        EasyMock.expectLastCall().andReturn(endpointInfo);
+        EasyMock.expectLastCall().andReturn(endpointInfo).anyTimes();
         List<ExtensibilityElement> endpointExts =
             new ArrayList<ExtensibilityElement>();
         endpointInfo.getExtensors(EasyMock.eq(ExtensibilityElement.class));

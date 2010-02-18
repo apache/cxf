@@ -54,6 +54,7 @@ import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.RelatesToType;
 import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
@@ -270,7 +271,12 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 AddressingPropertiesImpl maps = RMContextUtils.retrieveMAPs(message, false, false);
                 replyTo = maps.getReplyTo();
             }
-            rme.initialise(message.getExchange().getConduit(message), replyTo);
+            Endpoint ei = message.getExchange().get(Endpoint.class);
+            org.apache.cxf.transport.Destination dest 
+                = ei == null ? null : ei.getEndpointInfo()
+                    .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
+                             org.apache.cxf.transport.Destination.class);
+            rme.initialise(message.getExchange().getConduit(message), replyTo, dest);
             reliableEndpoints.put(endpoint, rme);
             LOG.fine("Created new RMEndpoint.");
         }
@@ -320,8 +326,11 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 to = RMUtils.createReference(maps.getTo().getValue());
                 acksTo = VersionTransformer.convert(maps.getReplyTo());
                 if (RMConstants.getNoneAddress().equals(acksTo.getAddress().getValue())) {
-                    org.apache.cxf.transport.Destination dest = message.getExchange().getConduit(message)
-                        .getBackChannel();
+                    Endpoint ei = message.getExchange().get(Endpoint.class);
+                    org.apache.cxf.transport.Destination dest 
+                        = ei == null ? null : ei.getEndpointInfo()
+                                .getProperty(MAPAggregator.DECOUPLED_DESTINATION, 
+                                         org.apache.cxf.transport.Destination.class);
                     if (null == dest) {
                         acksTo = RMUtils.createAnonymousReference2004();
                     } else {
@@ -408,7 +417,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                 LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
                         new Object[] {null == conduit ? "client" : "server", id});
                 rme = createReliableEndpoint(endpoint);
-                rme.initialise(conduit, null);
+                rme.initialise(conduit, null, null);
                 reliableEndpoints.put(endpoint, rme);
             }
             rme.getSource().addSequence(ss, false);

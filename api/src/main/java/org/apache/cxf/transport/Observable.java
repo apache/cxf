@@ -29,4 +29,11 @@ public interface Observable {
      * @param observer the observer to notify on receipt of incoming
      */
     void setMessageObserver(MessageObserver observer);
+    
+    
+    /**
+     * Retrieves the message observer for incoming messages
+     * @return
+     */
+    MessageObserver getMessageObserver();
 }

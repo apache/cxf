@@ -28,11 +28,11 @@ import org.apache.cxf.transport.Conduit;
  * Holder for utility methods relating to contexts.
  */
 public final class WSAContextUtils {
+    public static final String REPLYTO_PROPERTY =
+        "org.apache.cxf.ws.addressing.replyto";
 
     private static final String TO_PROPERTY =
         "org.apache.cxf.ws.addressing.to";
-    private static final String REPLYTO_PROPERTY =
-        "org.apache.cxf.ws.addressing.replyto";
     private static final String USING_PROPERTY =
         "org.apache.cxf.ws.addressing.using";    
 
@@ -91,29 +91,5 @@ public final class WSAContextUtils {
         }
         return to;
     }
-    
-    /**
-     * Store ReplyTo EPR in the context
-     *
-     * @param replyTo the ReplyTo EPR
-     * @param message the current message
-     */   
-    public static void storeReplyTo(EndpointReferenceType replyTo,
-                                    Message message) {
-        message.put(REPLYTO_PROPERTY, replyTo);
-    }
 
-    /**
-     * Retrieve ReplyTo EPR from the context.
-     *
-     * @param conduit the Conduit if available
-     * @param message the current message
-     * @return the retrieved EPR
-     */
-    public static EndpointReferenceType retrieveReplyTo(Conduit conduit,
-                                                        Message message) {
-        return conduit != null
-               ? conduit.getBackChannel().getAddress()
-               : (EndpointReferenceType)message.get(REPLYTO_PROPERTY); 
-    }
 }

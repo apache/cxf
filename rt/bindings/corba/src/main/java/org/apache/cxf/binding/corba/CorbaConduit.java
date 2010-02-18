@@ -50,7 +50,6 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -154,10 +153,6 @@ public class CorbaConduit implements Conduit {
 
     public EndpointReferenceType getTarget() {
         return target;
-    }
-
-    public Destination getBackChannel() {
-        return null;
     }
 
     public void close() {
@@ -400,5 +395,10 @@ public class CorbaConduit implements Conduit {
             message.setContent(Exception.class, inCorbaMsg.getContent(Exception.class));
         }
 
+    }
+
+    @Override
+    public MessageObserver getMessageObserver() {
+        return this.incomingObserver;
     }
 }

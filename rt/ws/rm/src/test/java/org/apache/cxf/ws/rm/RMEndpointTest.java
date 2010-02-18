@@ -132,13 +132,14 @@ public class RMEndpointTest extends Assert {
     @Test
     public void testInitialise() throws NoSuchMethodException {
         Method m1 = RMEndpoint.class.getDeclaredMethod("createService", new Class[] {});
-        Method m2 = RMEndpoint.class.getDeclaredMethod("createEndpoint", new Class[] {});
+        Method m2 = RMEndpoint.class
+            .getDeclaredMethod("createEndpoint", new Class[] {org.apache.cxf.transport.Destination.class});
         Method m3 = RMEndpoint.class.getDeclaredMethod("setPolicies", new Class[] {});
 
         rme = control.createMock(RMEndpoint.class, new Method[] {m1, m2, m3});
         rme.createService();
         EasyMock.expectLastCall();
-        rme.createEndpoint();
+        rme.createEndpoint(null);
         EasyMock.expectLastCall();
         rme.setPolicies();
         EasyMock.expectLastCall();
@@ -146,7 +147,7 @@ public class RMEndpointTest extends Assert {
         org.apache.cxf.ws.addressing.EndpointReferenceType epr = control
             .createMock(org.apache.cxf.ws.addressing.EndpointReferenceType.class);
         control.replay();
-        rme.initialise(c, epr);
+        rme.initialise(c, epr, null);
         assertSame(c, rme.getConduit());
         assertSame(epr, rme.getReplyTo());
     }
@@ -188,7 +189,7 @@ public class RMEndpointTest extends Assert {
         EasyMock.expect(rme.getUsingAddressing(aei)).andReturn(ua);
         control.replay();
         rme.createService();
-        rme.createEndpoint();
+        rme.createEndpoint(null);
         Endpoint e = rme.getEndpoint();
         WrappedEndpoint we = (WrappedEndpoint)e;
         assertSame(ae, we.getWrappedEndpoint());

@@ -35,7 +35,9 @@ public class ClientLifeCycleManagerImpl implements ClientLifeCycleManager, BusEx
     }
 
     public void registerListener(ClientLifeCycleListener listener) {
-        listeners.add(listener);
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
     }
 
     public void clientCreated(Client client) {

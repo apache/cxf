@@ -21,7 +21,6 @@ package org.apache.cxf.transport.http;
 
 
 import java.io.OutputStream;
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,25 +35,15 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
-import org.easymock.classextension.EasyMock;
-import org.easymock.classextension.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
-
 
 public class HTTPConduitTest extends Assert {
-    private Message inMessage;
-    private IMocksControl control;
 
     @Before
     public void setUp() throws Exception {
@@ -250,82 +239,5 @@ public class HTTPConduitTest extends Assert {
                 headers.get("Authorization").get(0));
     }
 
-    public void testDecoupledEndpoint() throws Exception {
-        control = EasyMock.createNiceControl();
-
-        Bus bus = new CXFBusImpl();
-
-        URL decoupledURL = new URL("http://nowhere.com/response");
-        DestinationFactoryManager mgr =
-            control.createMock(DestinationFactoryManager.class);
-        DestinationFactory factory =
-            control.createMock(DestinationFactory.class);
-        Destination destination =
-            control.createMock(Destination.class);
-
-        bus.setExtension(mgr, DestinationFactoryManager.class);
-        mgr.getDestinationFactoryForUri(decoupledURL.toString());
-        EasyMock.expectLastCall().andReturn(factory);
-        factory.getDestination(EasyMock.isA(EndpointInfo.class));
-        EasyMock.expectLastCall().andReturn(destination);
-        destination.setMessageObserver(
-                EasyMock.isA(HTTPConduit.InterposedMessageObserver.class));
-
-        control.replay();
-
-        EndpointInfo ei = new EndpointInfo();
-        ei.setAddress("http://nowhere.com/bar/foo");
-        HTTPConduit conduit = new HTTPConduit(bus, ei, null);
-        conduit.finalizeConfig();
-
-        // Test call
-        conduit.getClient().setDecoupledEndpoint(decoupledURL.toString());
-
-        assertNotNull("expected back channel", conduit.getBackChannel());
-
-        MessageObserver observer = new MessageObserver() {
-            public void onMessage(Message m) {
-                inMessage = m;
-            }
-        };
-
-        // Test call
-        conduit.setMessageObserver(observer);
-
-        Message incoming = new MessageImpl();
-        conduit.getDecoupledObserver().onMessage(incoming);
-
-        assertSame("expected pass thru onMessage() notification",
-                   inMessage,
-                   incoming);
-        assertEquals("unexpected response code",
-                     HttpURLConnection.HTTP_OK,
-                     inMessage.get(Message.RESPONSE_CODE));
-        assertEquals("expected DECOUPLED_CHANNEL_MESSAGE flag set",
-                     Boolean.TRUE,
-                     inMessage.get(DECOUPLED_CHANNEL_MESSAGE));
-        assertEquals("unexpected HTTP_REQUEST set",
-                     false,
-                     inMessage.containsKey(AbstractHTTPDestination.HTTP_REQUEST));
-        assertEquals("unexpected HTTP_RESPONSE set",
-                     false,
-                     inMessage.containsKey(AbstractHTTPDestination.HTTP_RESPONSE));
-        assertEquals("unexpected Message.ASYNC_POST_RESPONSE_DISPATCH set",
-                     false,
-                     inMessage.containsKey(Message.ASYNC_POST_RESPONSE_DISPATCH));
-
-        // avoid intermittent spurious failures on EasyMock detecting finalize
-        // calls by mocking up only class data members (no local variables)
-        // and explicitly making available for GC post-verify
-        finalVerify();
-        inMessage = null;
-    }
-
-    private void finalVerify() {
-        if (control != null) {
-            control.verify();
-            control = null;
-        }
-    }
 
 }

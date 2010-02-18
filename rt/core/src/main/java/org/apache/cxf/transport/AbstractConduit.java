@@ -48,16 +48,6 @@ public abstract class AbstractConduit
     }
 
     /**
-     * Retrieve the back-channel Destination.
-     * 
-     * @return the backchannel Destination (or null if the backchannel is
-     * built-in)
-     */
-    public Destination getBackChannel() {
-        return null;
-    }
-
-    /**
      * @param message for which content should be closed.
      */    
     public void close(Message msg) throws IOException {

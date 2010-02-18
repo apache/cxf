@@ -19,6 +19,9 @@
 
 package org.apache.cxf.ws.addressing;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
 import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
@@ -33,15 +36,22 @@ import javax.wsdl.extensions.ExtensibilityElement;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebFault;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientLifeCycleListener;
+import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -54,10 +64,15 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.UnwrappedOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.Observable;
 import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.ws.addressing.policy.MetadataConstants;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 
 /**
@@ -66,12 +81,30 @@ import org.apache.cxf.ws.policy.AssertionInfoMap;
  */
 public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     public static final String USING_ADDRESSING = MAPAggregator.class.getName() + ".usingAddressing";
+    public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName() 
+        + ".decoupledDestination";
 
     private static final Logger LOG = 
         LogUtils.getL7dLogger(MAPAggregator.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
 
-    
+    private static final ClientLifeCycleListener DECOUPLED_DEST_CLEANER = new ClientLifeCycleListener() {
+        @Override
+        public void clientCreated(Client client) {
+            //ignore
+        }
+
+        @Override
+        public void clientDestroyed(Client client) {
+            Destination dest = client.getEndpoint().getEndpointInfo()
+                .getProperty(DECOUPLED_DESTINATION, Destination.class);
+            if (dest != null) {
+                dest.setMessageObserver(null);
+                dest.shutdown();
+            }
+        }
+        
+    };
 
     /**
      * REVISIT: map usage implies that the *same* interceptor instance 
@@ -582,10 +615,10 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             // add request-specific MAPs
             boolean isOneway = exchange.isOneWay();
             boolean isOutbound = ContextUtils.isOutbound(message);
-            Conduit conduit = null;
             
             // To
             if (maps.getTo() == null) {
+                Conduit conduit = null;
                 if (isOutbound) {
                     conduit = ContextUtils.getConduit(conduit, message);
                 }
@@ -600,13 +633,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             // current invocation
             EndpointReferenceType replyTo = maps.getReplyTo();
             if (ContextUtils.isGenericAddress(replyTo)) {
-                conduit = ContextUtils.getConduit(conduit, message);
-                if (conduit != null) {
-                    Destination backChannel = conduit.getBackChannel();
-                    if (backChannel != null) {
-                        replyTo = backChannel.getAddress();
-                    }
-                }
+                replyTo = getReplyTo(message);
                 if (replyTo == null
                     || (isOneway
                         && (replyTo.getAddress() == null
@@ -663,6 +690,122 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
     }
 
+    private EndpointReferenceType getReplyTo(Message message) {
+        Exchange exchange = message.getExchange();
+        Endpoint info = exchange.get(Endpoint.class);
+        if (info == null) {
+            return null;
+        }
+        synchronized (info) {
+            EndpointInfo ei = info.getEndpointInfo();
+            Destination dest = ei.getProperty(DECOUPLED_DESTINATION, Destination.class);
+            if (dest == null) {
+                dest = createDecoupledDestination(message);
+                if (dest != null) {
+                    info.getEndpointInfo().setProperty(DECOUPLED_DESTINATION, dest);
+                }
+            }
+            if (dest != null) {
+                return dest.getAddress();
+            }
+        }
+        return null;
+    }
+
+    private Destination createDecoupledDestination(Message message) {
+        String replyToAddress = (String)message.getContextualProperty(WSAContextUtils.REPLYTO_PROPERTY);
+        if (replyToAddress != null) {
+            return setUpDecoupledDestination(message.getExchange().get(Bus.class),
+                                             replyToAddress, 
+                                             message);
+        }
+        return null;
+    }
+    /**
+     * Set up the decoupled Destination if necessary.
+     */
+    private Destination setUpDecoupledDestination(Bus bus, String replyToAddress, Message message) {        
+        EndpointReferenceType reference =
+            EndpointReferenceUtils.getEndpointReference(replyToAddress);
+        if (reference != null) {
+            String decoupledAddress = reference.getAddress().getValue();
+            LOG.info("creating decoupled endpoint: " + decoupledAddress);
+            try {
+                Destination dest = getDestination(bus, replyToAddress, message);
+                bus.getExtension(ClientLifeCycleManager.class).registerListener(DECOUPLED_DEST_CLEANER);
+                return dest;
+            } catch (Exception e) {
+                // REVISIT move message to localizable Messages.properties
+                LOG.log(Level.WARNING, 
+                        "decoupled endpoint creation failed: ", e);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @param address the address
+     * @return a Destination for the address
+     */
+    private Destination getDestination(Bus bus, String address, Message message) throws IOException {
+        Destination destination = null;
+        DestinationFactoryManager factoryManager =
+            bus.getExtension(DestinationFactoryManager.class);
+        DestinationFactory factory =
+            factoryManager.getDestinationFactoryForUri(address);
+        if (factory != null) {
+            EndpointInfo ei = new EndpointInfo();
+            ei.setAddress(address);
+            destination = factory.getDestination(ei);
+            Conduit conduit = ContextUtils.getConduit(null, message);
+            if (conduit instanceof Observable) {
+                MessageObserver ob = ((Observable)conduit).getMessageObserver();
+                ob = new InterposedMessageObserver(bus, ob);
+                destination.setMessageObserver(ob);
+            }
+        }
+        return destination;
+    }
+    protected static class InterposedMessageObserver implements MessageObserver {
+        Bus bus;
+        MessageObserver observer;
+        public InterposedMessageObserver(Bus b, MessageObserver o) {
+            bus = b;
+            observer = o;
+        }
+        
+        /**
+         * Called for an incoming message.
+         * 
+         * @param inMessage
+         */
+        public void onMessage(Message inMessage) {
+            // disposable exchange, swapped with real Exchange on correlation
+            inMessage.setExchange(new ExchangeImpl());
+            inMessage.getExchange().put(Bus.class, bus);
+            inMessage.put(Message.DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
+            inMessage.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
+
+            // remove server-specific properties
+            //inMessage.remove(AbstractHTTPDestination.HTTP_REQUEST);
+            //inMessage.remove(AbstractHTTPDestination.HTTP_RESPONSE);
+            inMessage.remove(Message.ASYNC_POST_RESPONSE_DISPATCH);
+
+            //cache this inputstream since it's defer to use in case of async
+            try {
+                InputStream in = inMessage.getContent(InputStream.class);
+                if (in != null) {
+                    CachedOutputStream cos = new CachedOutputStream();
+                    IOUtils.copy(in, cos);
+                    inMessage.setContent(InputStream.class, cos.getInputStream());
+                }
+                observer.onMessage(inMessage);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+    
     /**
      * Get the starting point MAPs (either empty or those set explicitly
      * by the application on the binding provider request context).

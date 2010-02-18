@@ -399,8 +399,6 @@ public class JettyHTTPDestinationTest extends Assert {
         Conduit backChannel = destination.getBackChannel(inMessage, null, null);
         
         assertNotNull("expected back channel", backChannel);
-        assertNull("unexpected backchannel-backchannel",
-                   backChannel.getBackChannel());
         assertEquals("unexpected target",
                      EndpointReferenceUtils.ANONYMOUS_ADDRESS,
                      backChannel.getTarget().getAddress().getValue());

@@ -55,6 +55,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.policy.EffectivePolicy;
 import org.apache.cxf.ws.policy.EndpointPolicy;
@@ -228,11 +229,13 @@ public class RMEndpoint {
         return replyTo;
     }
 
-    void initialise(Conduit c, org.apache.cxf.ws.addressing.EndpointReferenceType r) {
+    void initialise(Conduit c, 
+                    org.apache.cxf.ws.addressing.EndpointReferenceType r,
+                    org.apache.cxf.transport.Destination d) {
         conduit = c;
         replyTo = r;
         createService();
-        createEndpoint();
+        createEndpoint(d);
         setPolicies();
     }
 
@@ -281,12 +284,15 @@ public class RMEndpoint {
         return rmSchema;
     }
 
-    void createEndpoint() {
+    void createEndpoint(org.apache.cxf.transport.Destination d) {
         ServiceInfo si = service.getServiceInfo();
         buildBindingInfo(si);
         EndpointInfo aei = applicationEndpoint.getEndpointInfo();
         String transportId = aei.getTransportId();
         EndpointInfo ei = new EndpointInfo(si, transportId);
+        if (d != null) {
+            ei.setProperty(MAPAggregator.DECOUPLED_DESTINATION, d);
+        }
 
         ei.setAddress(aei.getAddress());
 

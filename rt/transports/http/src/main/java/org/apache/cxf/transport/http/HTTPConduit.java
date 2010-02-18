@@ -19,6 +19,8 @@
 package org.apache.cxf.transport.http;
 
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -69,9 +71,6 @@ import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.DestinationFactory;
-import org.apache.cxf.transport.DestinationFactoryManager;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.CertConstraints;
@@ -84,7 +83,6 @@ import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 
@@ -147,7 +145,7 @@ import static org.apache.cxf.message.Message.DECOUPLED_CHANNEL_MESSAGE;
 @NoJSR250Annotations
 public class HTTPConduit 
     extends AbstractConduit 
-    implements Configurable, Assertor {  
+    implements Configurable, Assertor, PropertyChangeListener {  
 
     /**
      *  This constant is the Message(Map) key for the HttpURLConnection that
@@ -209,10 +207,6 @@ public class HTTPConduit
     private URL defaultEndpointURL;
     private boolean fromEndpointReferenceType;
 
-    private Destination decoupledDestination;
-    private MessageObserver decoupledObserver;
-    private int decoupledDestinationRefCount;
-    
     // Configurable values
     
     /**
@@ -431,6 +425,14 @@ public class HTTPConduit
         // We have finalized the configuration. Any configurable entity
         // set now, must make changes dynamically.
         configFinalized = true;
+        
+        if (getClient().getDecoupledEndpoint() != null) {
+            this.endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto",
+                                          getClient().getDecoupledEndpoint());
+        }
+        if (clientSidePolicy != null) {
+            clientSidePolicy.addPropertyChangeListener(this);
+        }
     }
     
     /**
@@ -762,20 +764,7 @@ public class HTTPConduit
         }        
         return new URL(result);    
     }
-    
-    /**
-     * Retreive the back-channel Destination.
-     * 
-     * @return the backchannel Destination (or null if the backchannel is
-     * built-in)
-     */
-    public synchronized Destination getBackChannel() {
-        if (decoupledDestination == null
-            &&  getClient().getDecoupledEndpoint() != null) {
-            setUpDecoupledDestination(); 
-        }
-        return decoupledDestination;
-    }
+
 
     /**
      * Close the conduit
@@ -793,13 +782,6 @@ public class HTTPConduit
             //defaultEndpointURL = null;
         }
     
-        // in decoupled case, close response Destination if reference count
-        // hits zero
-        //
-        if (decoupledDestination != null) {
-            releaseDecoupledDestination();
-            
-        }
     }
 
     /**
@@ -960,67 +942,6 @@ public class HTTPConduit
         
     }
     
-    /**
-     * Set up the decoupled Destination if necessary.
-     */
-    private void setUpDecoupledDestination() {        
-        EndpointReferenceType reference =
-            EndpointReferenceUtils.getEndpointReference(
-                getClient().getDecoupledEndpoint());
-        if (reference != null) {
-            String decoupledAddress = reference.getAddress().getValue();
-            LOG.info("creating decoupled endpoint: " + decoupledAddress);
-            try {
-                decoupledDestination = getDestination(decoupledAddress);
-                duplicateDecoupledDestination();
-            } catch (Exception e) {
-                // REVISIT move message to localizable Messages.properties
-                LOG.log(Level.WARNING, 
-                        "decoupled endpoint creation failed: ", e);
-            }
-        }
-    }
-
-    /**
-     * @param address the address
-     * @return a Destination for the address
-     */
-    private Destination getDestination(String address) throws IOException {
-        Destination destination = null;
-        DestinationFactoryManager factoryManager =
-            bus.getExtension(DestinationFactoryManager.class);
-        DestinationFactory factory =
-            factoryManager.getDestinationFactoryForUri(address);
-        if (factory != null) {
-            EndpointInfo ei = new EndpointInfo();
-            ei.setAddress(address);
-            destination = factory.getDestination(ei);
-            decoupledObserver = new InterposedMessageObserver();
-            destination.setMessageObserver(decoupledObserver);
-        }
-        return destination;
-    }
-    
-    /**
-     * @return the decoupled observer
-     */
-    protected MessageObserver getDecoupledObserver() {
-        return decoupledObserver;
-    }
-    
-    private synchronized void duplicateDecoupledDestination() {
-        decoupledDestinationRefCount++;
-    }
-    
-    private synchronized void releaseDecoupledDestination() {
-        if (--decoupledDestinationRefCount == 0) {
-            LOG.log(Level.FINE, "shutting down decoupled destination");
-            decoupledDestination.shutdown();
-
-            //this way we can release the port of decoupled destination
-            decoupledDestination.setMessageObserver(null);
-        }
-    }
     
     /**
      * This predicate returns true iff the exchange indicates 
@@ -1031,14 +952,7 @@ public class HTTPConduit
     private boolean isOneway(Exchange exchange) {
         return exchange != null && exchange.isOneWay();
     }
-    
-    /**
-     * @return true if expecting a decoupled response
-     */
-    private boolean isDecoupled() {
-        return decoupledDestination != null;
-    }
-    
+
     /**
      * Get an input stream containing the partial response if one is present.
      * 
@@ -1344,6 +1258,8 @@ public class HTTPConduit
      */
     public void setClient(HTTPClientPolicy client) {
         this.clientSidePolicy = client;
+        client.addPropertyChangeListener(this);
+        endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto", client.getDecoupledEndpoint());
     }
 
     /**
@@ -2191,7 +2107,7 @@ public class HTTPConduit
             Exchange exchange = outMessage.getExchange();
 
             InputStream in = null;
-            if (isOneway(exchange) || isDecoupled()) {
+            if (isOneway(exchange)) {
                 in = getPartialResponse(connection, responseCode);
                 if (in == null) {
                     // oneway operation or decoupled MEP without 
@@ -2257,7 +2173,6 @@ public class HTTPConduit
             
         }
 
-
     }
     
     /**
@@ -2299,7 +2214,6 @@ public class HTTPConduit
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
     
@@ -2314,6 +2228,15 @@ public class HTTPConduit
     @Deprecated
     public void setBasicAuthSupplier(HttpBasicAuthSupplier basicAuthSupplier) {
         setAuthSupplier(basicAuthSupplier);
+    }
+
+    @Override
+    public void propertyChange(PropertyChangeEvent evt) {
+        if (evt.getSource() == clientSidePolicy
+            && "decoupledEndpoint".equals(evt.getPropertyName())) {
+            this.endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto",
+                                          evt.getNewValue());
+        }
     }
     
 }
