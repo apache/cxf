@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.jaxrs.security;
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -59,6 +60,7 @@ public class SecureBook {
     @Path("self")    
     @Produces("application/xml")
     @Secured("ROLE_ADMIN")
+    @RolesAllowed("ROLE_ADMIN")
     public Book getBook() {
         return new Book(name, id);
     } 

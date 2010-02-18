@@ -61,7 +61,8 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <aop:config proxy-target-class="true"/>
   
-  <security:global-method-security secured-annotations="enabled"/>
+  <security:global-method-security secured-annotations="disabled"
+            jsr250-annotations="enabled"/>
   
   <security:http auto-config='true'>
     <security:http-basic />
