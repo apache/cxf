@@ -21,8 +21,11 @@ package org.apache.cxf.jaxws;
 
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
@@ -346,17 +349,17 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             server = serverFactory.create();
             
             org.apache.cxf.endpoint.Endpoint endpoint = getEndpoint();
-            if (getInInterceptors() != null) {
-                endpoint.getInInterceptors().addAll(getInInterceptors());
+            if (in != null) {
+                endpoint.getInInterceptors().addAll(in);
             }
-            if (getOutInterceptors() != null) {
-                endpoint.getOutInterceptors().addAll(getOutInterceptors());
+            if (out != null) {
+                endpoint.getOutInterceptors().addAll(out);
             }
-            if (getInFaultInterceptors() != null) {
-                endpoint.getInFaultInterceptors().addAll(getInFaultInterceptors());
+            if (inFault != null) {
+                endpoint.getInFaultInterceptors().addAll(inFault);
             }
-            if (getOutFaultInterceptors() != null) {
-                endpoint.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
+            if (outFault != null) {
+                endpoint.getOutFaultInterceptors().addAll(outFault);
             }
             
             if (properties != null) {
@@ -471,19 +474,125 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     }
 
     public List<Interceptor> getOutFaultInterceptors() {
-        return outFault;
+        if (server == null) {
+            return outFault;
+        }
+        return new DoubleAddInterceptorList(outFault, server.getEndpoint().getOutFaultInterceptors());
     }
 
     public List<Interceptor> getInFaultInterceptors() {
-        return inFault;
+        if (server == null) {
+            return inFault;
+        }
+        return new DoubleAddInterceptorList(inFault, server.getEndpoint().getInFaultInterceptors());
     }
 
     public List<Interceptor> getInInterceptors() {
-        return in;
+        if (server == null) {
+            return in;
+        }
+        return new DoubleAddInterceptorList(in, server.getEndpoint().getInInterceptors());
     }
 
     public List<Interceptor> getOutInterceptors() {
-        return out;
+        if (server == null) {
+            return out;
+        }
+        return new DoubleAddInterceptorList(out, server.getEndpoint().getOutInterceptors());
+    }
+    
+    class DoubleAddInterceptorList implements List<Interceptor> {
+        List<Interceptor> orig;
+        List<Interceptor> other;
+        public DoubleAddInterceptorList(List<Interceptor> a1,
+                                        List<Interceptor> a2) {
+            orig = a1;
+            other = a2;
+        }
+        public boolean add(Interceptor e) {
+            other.add(e);
+            return orig.add(e);
+        }
+        public void add(int index, Interceptor element) {
+            other.add(element);
+            orig.add(index, element);
+        }
+        public boolean addAll(Collection<? extends Interceptor> c) {
+            other.addAll(c);
+            return orig.addAll(c);
+        }
+        public boolean addAll(int index, Collection<? extends Interceptor> c) {
+            other.addAll(c);
+            return orig.addAll(index, c);
+        }
+        public void clear() {
+            orig.clear();
+        }
+        public boolean contains(Object o) {
+            return orig.contains(o);
+        }
+        public boolean containsAll(Collection<?> c) {
+            return orig.containsAll(c);
+        }
+        public Interceptor get(int index) {
+            return orig.get(index);
+        }
+        public int indexOf(Object o) {
+            return orig.indexOf(o);
+        }
+        public boolean isEmpty() {
+            return orig.isEmpty();
+        }
+        public Iterator<Interceptor> iterator() {
+            return orig.iterator();
+        }
+        public int lastIndexOf(Object o) {
+            return orig.lastIndexOf(o);
+        }
+        public ListIterator<Interceptor> listIterator() {
+            return orig.listIterator();
+        }
+        public ListIterator<Interceptor> listIterator(int index) {
+            return orig.listIterator(index);
+        }
+        public boolean remove(Object o) {
+            other.remove(o);
+            return orig.remove(o);
+        }
+        public Interceptor remove(int index) {
+            Interceptor o = orig.remove(index);
+            if (o == null) {
+                other.remove(o);
+            }
+            return o;
+        }
+        public boolean removeAll(Collection<?> c) {
+            other.removeAll(c);
+            return orig.removeAll(c);
+        }
+        public boolean retainAll(Collection<?> c) {
+            throw new UnsupportedOperationException();
+        }
+        public Interceptor set(int index, Interceptor element) {
+            Interceptor o = orig.set(index, element);
+            if (o != null) {
+                int idx = other.indexOf(o);
+                other.set(idx, element);
+            }
+            return o;
+        }
+        public int size() {
+            return orig.size();
+        }
+        public List<Interceptor> subList(int fromIndex, int toIndex) {
+            return orig.subList(fromIndex, toIndex);
+        }
+        public Object[] toArray() {
+            return orig.toArray();
+        }
+        public <T> T[] toArray(T[] a) {
+            return orig.toArray(a);
+        }
     }
 
     public void setInInterceptors(List<Interceptor> interceptors) {
