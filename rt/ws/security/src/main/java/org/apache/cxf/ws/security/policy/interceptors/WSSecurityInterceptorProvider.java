@@ -25,7 +25,6 @@ import java.util.Collection;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
-import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
@@ -38,14 +37,11 @@ public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProv
     static {
         ASSERTION_TYPES = new ArrayList<QName>();
         
-        ASSERTION_TYPES.add(SP11Constants.TRANSPORT_BINDING);
         ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
-
-        ASSERTION_TYPES.add(SP11Constants.ASYMMETRIC_BINDING);
         ASSERTION_TYPES.add(SP12Constants.ASYMMETRIC_BINDING);
-
-        ASSERTION_TYPES.add(SP11Constants.SYMMETRIC_BINDING);
         ASSERTION_TYPES.add(SP12Constants.SYMMETRIC_BINDING);
+        
+        ASSERTION_TYPES.add(SP12Constants.USERNAME_TOKEN);
     }
 
     public WSSecurityInterceptorProvider() {

@@ -55,6 +55,18 @@ public class LoggingFeature extends AbstractFeature {
     public LoggingFeature() {
         
     }
+    public LoggingFeature(int lim) {
+        limit = lim;
+    }
+    public LoggingFeature(String in, String out) {
+        inLocation = in;
+        outLocation = out;
+    }
+    public LoggingFeature(String in, String out, int lim) {
+        inLocation = in;
+        outLocation = out;
+        limit = lim;
+    }
 
     public LoggingFeature(Logging annotation) {
         inLocation = annotation.inLocation();
