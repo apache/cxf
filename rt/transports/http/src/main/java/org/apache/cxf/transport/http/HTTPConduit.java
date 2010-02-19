@@ -2230,7 +2230,6 @@ public class HTTPConduit
         setAuthSupplier(basicAuthSupplier);
     }
 
-    @Override
     public void propertyChange(PropertyChangeEvent evt) {
         if (evt.getSource() == clientSidePolicy
             && "decoupledEndpoint".equals(evt.getPropertyName())) {
