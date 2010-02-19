@@ -11,7 +11,7 @@ Files in any medium without fee or royalty as long as this notice and
 license are distributed with them.  The originals of these files can 
 be located at:
 
-http://schemas.xmlsoap.org/wsdl/2003-02-11.xsd
+http://schemas.xmlsoap.org/wsdl/2004-08-24.xsd
 
 THESE SCHEMA FILES ARE PROVIDED "AS IS," AND THE AUTHORS MAKE NO REPRESENTATIONS 
 OR WARRANTIES, EXPRESS OR IMPLIED, REGARDING THESE FILES, INCLUDING, BUT NOT 
@@ -50,8 +50,9 @@ No other rights are granted by implication, estoppel or otherwise.
       <xs:element name="documentation" type="wsdl:tDocumentation" minOccurs="0" />
     </xs:sequence>
   </xs:complexType>
-	 
-  <xs:complexType name="tExtensibleAttributesDocumented" abstract="true" >
+
+ <!-- implemented resolution of swa124 -->
+ <xs:complexType name="tExtensibleAttributesDocumented" abstract="true" >
     <xs:complexContent>
       <xs:extension base="wsdl:tDocumented" >
         <xs:annotation>
@@ -59,11 +60,15 @@ No other rights are granted by implication, estoppel or otherwise.
           This type is extended by component types to allow attributes from other namespaces to be added.
           </xs:documentation>
         </xs:annotation>
-        <xs:anyAttribute namespace="##other" processContents="lax" />    
+        <xs:sequence>
+          <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
+        </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax" />   
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
 
+ <!-- implemented resolution of swa124 -->
   <xs:complexType name="tExtensibleDocumented" abstract="true" >
     <xs:complexContent>
       <xs:extension base="wsdl:tDocumented" >
@@ -75,6 +80,7 @@ No other rights are granted by implication, estoppel or otherwise.
         <xs:sequence>
           <xs:any namespace="##other" minOccurs="0" maxOccurs="unbounded" processContents="lax" />
         </xs:sequence>
+        <xs:anyAttribute namespace="##other" processContents="lax" />   
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
@@ -128,18 +134,24 @@ No other rights are granted by implication, estoppel or otherwise.
     </xs:choice>
   </xs:group>
 
-  <xs:complexType name="tDefinitions" >
+  <!-- implemented resolution of er015 and UPA fix. ASK -->
+  <xs:complexType name="tDefinitions">
     <xs:complexContent>
-      <xs:extension base="wsdl:tExtensibleDocumented" >
-        <xs:sequence>
-          <xs:group ref="wsdl:anyTopLevelOptionalElement"  minOccurs="0"   maxOccurs="unbounded" />
+      <xs:extension base="wsdl:tExtensibleDocumented">
+        <xs:sequence minOccurs="0">
+          <xs:group ref="wsdl:anyTopLevelOptionalElement"/>
+          <xs:choice minOccurs="0" maxOccurs="unbounded">
+            <xs:group ref="wsdl:anyTopLevelOptionalElement"/>
+            <xs:any namespace="##other" processContents="lax"/>
+          </xs:choice>
         </xs:sequence>
-        <xs:attribute name="targetNamespace" type="xs:anyURI" use="optional" />
-        <xs:attribute name="name" type="xs:NCName" use="optional" />
+        <xs:attribute name="targetNamespace" type="xs:anyURI" use=
+"optional"/>
+        <xs:attribute name="name" type="xs:NCName" use="optional"/>
       </xs:extension>
     </xs:complexContent>
   </xs:complexType>
-   
+
   <xs:complexType name="tImport" >
     <xs:complexContent>
       <xs:extension base="wsdl:tExtensibleAttributesDocumented" >
