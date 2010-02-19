@@ -361,13 +361,11 @@ public class WadlGeneratorTest extends Assert {
         // 6 parameters are expected
         paramsEls = DOMUtils.getChildrenWithName(requestEls.get(0), 
                                                  WadlGenerator.WADL_NS, "param");
-        assertEquals(6, paramsEls.size());
+        assertEquals(4, paramsEls.size());
         checkParameter(paramsEls.get(0), "a", "query", "xs:int");
-        checkParameter(paramsEls.get(1), "b", "query", "xs:int");
-        checkParameter(paramsEls.get(2), "c.a", "query", "xs:int");
-        checkParameter(paramsEls.get(3), "c.b", "query", "xs:int");
-        checkParameter(paramsEls.get(4), "c.d.a", "query", "xs:int");
-        checkParameter(paramsEls.get(5), "c.d.b", "query", "xs:int");
+        checkParameter(paramsEls.get(1), "c.a", "query", "xs:int");
+        checkParameter(paramsEls.get(2), "c.b", "query", "xs:int");
+        checkParameter(paramsEls.get(3), "c.d.a", "query", "xs:int");
         assertEquals(0, DOMUtils.getChildrenWithName(requestEls.get(0), 
                          WadlGenerator.WADL_NS, "representation").size());
         //check response

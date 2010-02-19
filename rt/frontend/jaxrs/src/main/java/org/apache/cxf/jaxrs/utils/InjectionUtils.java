@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxrs.utils;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -843,13 +844,15 @@ public final class InjectionUtils {
     }
     
     public static Map<Parameter, Class<?>> getParametersFromBeanClass(Class<?> beanClass, 
-                                                                      ParameterType type) {
+                                                                      ParameterType type,
+                                                                      boolean checkIgnorable) {
         Map<Parameter, Class<?>> params = new LinkedHashMap<Parameter, Class<?>>();
         for (Method m : beanClass.getMethods()) {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
                 && m.getName().length() > 3) {
                 String propertyName = m.getName().substring(3).toLowerCase();
-                if ("class".equals(propertyName)) {
+                if ("class".equals(propertyName) 
+                    || checkIgnorable && canPropertyBeIgnored(m, propertyName)) {
                     continue;
                 }
                 params.put(new Parameter(type, propertyName), m.getReturnType());
@@ -858,6 +861,16 @@ public final class InjectionUtils {
         return params;
     }
     
+    private static boolean canPropertyBeIgnored(Method m, String propertyName) {
+        for (Annotation ann : m.getAnnotations()) {
+            String annType = ann.annotationType().getName();
+            if ("org.apache.cxf.aegis.type.java5.IgnoreProperty".equals(annType)
+                || "javax.xml.bind.annotation.XmlTransient".equals(annType)) {
+                return true;
+            }
+        }
+        return false;
+    }
     
     public static boolean isPrimitive(Class<?> type) {
         return type.isPrimitive() 
