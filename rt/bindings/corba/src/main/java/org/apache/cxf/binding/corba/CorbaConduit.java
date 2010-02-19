@@ -397,7 +397,6 @@ public class CorbaConduit implements Conduit {
 
     }
 
-    @Override
     public MessageObserver getMessageObserver() {
         return this.incomingObserver;
     }
