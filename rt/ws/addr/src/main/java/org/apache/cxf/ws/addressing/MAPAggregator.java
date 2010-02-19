@@ -89,12 +89,10 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
 
     private static final ClientLifeCycleListener DECOUPLED_DEST_CLEANER = new ClientLifeCycleListener() {
-        @Override
         public void clientCreated(Client client) {
             //ignore
         }
 
-        @Override
         public void clientDestroyed(Client client) {
             Destination dest = client.getEndpoint().getEndpointInfo()
                 .getProperty(DECOUPLED_DESTINATION, Destination.class);
