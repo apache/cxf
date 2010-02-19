@@ -53,7 +53,14 @@ public final class FileUtils {
         } catch (SecurityException e) {
             //Ignorable, we'll use the default
         }
-        if (s == null) {
+        if (s != null) {
+            //assume someone outside of us will manage the directory
+            File f = new File(s);
+            if (f.mkdirs()) {
+                defaultTempDir = f;                
+            }
+        }
+        if (defaultTempDir == null) {
             int x = (int)(Math.random() * 1000000);
             s = System.getProperty("java.io.tmpdir");
             File checkExists = new File(s);
@@ -76,11 +83,6 @@ public final class FileUtils {
                 }
             };
             Runtime.getRuntime().addShutdownHook(hook);            
-        } else {
-            //assume someone outside of us will manage the directory
-            File f = new File(s);
-            f.mkdirs();
-            defaultTempDir = f;
         }
         return defaultTempDir;
     }
@@ -290,10 +292,14 @@ public final class FileUtils {
         }
         BufferedReader reader = new BufferedReader(new FileReader(file));
         List<String> results = new ArrayList<String>();
-        String line = reader.readLine();
-        while (line != null) {
-            results.add(line);
-            line = reader.readLine();
+        try {
+            String line = reader.readLine();
+            while (line != null) {
+                results.add(line);
+                line = reader.readLine();
+            }
+        } finally {
+            reader.close();
         }
         return results;
     }

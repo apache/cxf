@@ -92,7 +92,7 @@ public class NSStack {
      * @param URI the namespace name for whom a declared prefix is desired
      * @return the prefix or null if namespace name not found
      */
-    public String getPrefix(String uri) {
+    public synchronized String getPrefix(String uri) {
         for (int i = size - 1; i >= 0; i--) {
             List<NSDecl> scope = stack.get(i);
             ListIterator<NSDecl> lsIterator =  scope.listIterator();
@@ -115,7 +115,7 @@ public class NSStack {
      * @param prefix the prefix for whom a declared namespace name is desired
      * @return the namespace name or null if prefix not found
      */
-    public String getURI(String prefix) {
+    public synchronized String getURI(String prefix) {
         for (int i = size - 1; i >= 0; i--) {
             List<NSDecl> scope = stack.get(i);
             ListIterator<NSDecl> lsIterator = scope.listIterator();

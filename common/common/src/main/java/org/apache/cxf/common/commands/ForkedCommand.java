@@ -65,7 +65,7 @@ public class ForkedCommand extends Thread {
 
     public String toString() {
         if (null == arguments) {
-            return null;
+            return "";
         }
         StringBuilder buf = new StringBuilder();
         for (int i = 0; i < arguments.length; i++) {

@@ -168,9 +168,12 @@ public final class SortedArraySet<T> implements SortedSet<T> {
     @SuppressWarnings("unchecked")
     public <X> X[] toArray(X[] a) {
         T[] tmp = data.get();
-        if (tmp == null && a.length != 0) {
-            return (X[])java.lang.reflect.Array.
-                newInstance(a.getClass().getComponentType(), 0);
+        if (tmp == null) {
+            if (a.length != 0) {
+                return (X[])java.lang.reflect.Array.
+                    newInstance(a.getClass().getComponentType(), 0);
+            }
+            return a;
         }
         
         if (a.length < tmp.length) {
@@ -186,6 +189,9 @@ public final class SortedArraySet<T> implements SortedSet<T> {
 
     @SuppressWarnings("unchecked")
     public boolean equals(Object o) {
+        if (!(o instanceof SortedArraySet)) {
+            return false;
+        }
         SortedArraySet<T> as = (SortedArraySet<T>)o;
         return Arrays.equals(data.get(), as.data.get());
     }

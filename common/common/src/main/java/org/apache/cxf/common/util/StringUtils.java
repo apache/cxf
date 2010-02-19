@@ -216,11 +216,10 @@ public final class StringUtils {
     }
     
     public static String uncapitalize(String str) {
-        int strLen = str.length();
-        if (str == null || strLen == 0) {
+        if (str == null || str.length() == 0) {
             return str;
         }
-        return new StringBuilder(strLen)
+        return new StringBuilder(str.length())
             .append(Character.toLowerCase(str.charAt(0)))
             .append(str.substring(1))
             .toString();

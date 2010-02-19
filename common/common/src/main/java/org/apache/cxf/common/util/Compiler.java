@@ -221,12 +221,12 @@ public class Compiler {
 
             if (p.getErrorStream() != null) {
                 StreamPrinter errorStreamPrinter = new StreamPrinter(p.getErrorStream(), "", System.out);
-                errorStreamPrinter.run();
+                errorStreamPrinter.start();
             }
 
             if (p.getInputStream() != null) {
                 StreamPrinter infoStreamPrinter = new StreamPrinter(p.getInputStream(), "[INFO]", System.out);
-                infoStreamPrinter.run();
+                infoStreamPrinter.start();
             }
 
             if (p != null) {

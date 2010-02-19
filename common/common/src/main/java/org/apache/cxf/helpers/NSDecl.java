@@ -51,6 +51,9 @@ public final class NSDecl {
     }
 
     public boolean equals(Object obj) {
+        if (!(obj instanceof NSDecl)) {
+            return false;
+        }
         return obj != null
             && uri == ((NSDecl)obj).uri
             && prefix == ((NSDecl)obj).prefix;

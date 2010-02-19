@@ -29,17 +29,20 @@ public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<
         super();
     }
     public ModCountCopyOnWriteArrayList(Collection<? extends T> c) {
-        super(c);
-        if (c instanceof ModCountCopyOnWriteArrayList) {
-            modCount = ((ModCountCopyOnWriteArrayList)c).modCount;
+        super();
+        synchronized (c) {
+            addAll(c);
+            if (c instanceof ModCountCopyOnWriteArrayList) {
+                modCount = ((ModCountCopyOnWriteArrayList)c).getModCount();
+            }
         }
     }
     
-    public int getModCount() {
+    public synchronized int getModCount() {
         return modCount;
     }
     
-    public void setModCount(int i) {
+    public synchronized void setModCount(int i) {
         modCount = i;
     }
     
@@ -107,6 +110,17 @@ public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<
     public synchronized boolean retainAll(Collection c) {
         ++modCount;
         return super.retainAll(c);
+    }
+    
+    public synchronized int hashCode() {
+        return super.hashCode() + modCount;
+    }
+    
+    public synchronized boolean equals(Object o) {
+        if (o instanceof ModCountCopyOnWriteArrayList) {
+            return super.equals(o) && modCount == ((ModCountCopyOnWriteArrayList)o).getModCount();
+        }
+        return false;
     }
 
 }

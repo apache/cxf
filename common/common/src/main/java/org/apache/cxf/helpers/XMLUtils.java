@@ -154,8 +154,11 @@ public final class XMLUtils {
     }
 
     public static Document parse(byte[] in) throws ParserConfigurationException, SAXException, IOException {
-        if (in == null && LOG.isLoggable(Level.FINE)) {
-            LOG.fine("XMLUtils trying to parse a null bytes");
+        if (in == null) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("XMLUtils trying to parse a null bytes");
+            }
+            return null;
         }
         return getParser().parse(new ByteArrayInputStream(in));
     }
