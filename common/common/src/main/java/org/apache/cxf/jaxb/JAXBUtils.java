@@ -779,9 +779,9 @@ public final class JAXBUtils {
         }
         for (Map.Entry<String, InputStream> entry : packages.entrySet()) {
             if (entry.getValue() != null) {
+                BufferedReader reader = null;
                 try {
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(entry.getValue(),
-                                                                                     "UTF-8"));
+                    reader = new BufferedReader(new InputStreamReader(entry.getValue(), "UTF-8"));
                     String pkg = entry.getKey();
                     ClassLoader loader = packageLoaders.get(pkg);
                     if (!StringUtils.isEmpty(pkg)) {
@@ -808,7 +808,10 @@ public final class JAXBUtils {
                     // ignore
                 } finally {
                     try {
-                        entry.getValue().close();
+                        if (reader != null) {
+                            reader.close();
+                            entry.getValue().close();
+                        }
                     } catch (Exception e) {
                         // ignore
                     }

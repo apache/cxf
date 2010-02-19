@@ -349,13 +349,8 @@ public abstract class AbstractBeanDefinitionParser
             }
             
             Unmarshaller u = context.createUnmarshaller();
-            Object obj = u.unmarshal(data, cls);
-            if (obj instanceof JAXBElement<?>) {
-                JAXBElement<?> el = (JAXBElement<?>)obj;
-                obj = el.getValue();
-
-            }
-            return cls.cast(obj);
+            JAXBElement<?> obj = u.unmarshal(data, cls);
+            return cls.cast(obj.getValue());
         } catch (RuntimeException e) {
             throw e;
         } catch (Exception e) {

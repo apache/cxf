@@ -98,6 +98,9 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     }
 
     public boolean equals(Object o) {
+        if (!(o instanceof WeakIdentityHashMap)) {
+            return false;
+        }
         return backingStore.equals(((WeakIdentityHashMap)o).backingStore);
     }
 
@@ -161,9 +164,11 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
             if (this == o) {
                 return true;
             }
-            IdentityWeakReference ref = (IdentityWeakReference)o;
-            if (this.get() == ref.get()) {
-                return true;
+            if (o instanceof WeakReference) {
+                WeakReference ref = (WeakReference)o;
+                if (this.get() == ref.get()) {
+                    return true;
+                }
             }
             return false;
         }

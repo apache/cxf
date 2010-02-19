@@ -58,6 +58,7 @@ import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 import org.apache.ws.commons.schema.utils.TargetNamespaceValidator;
 
+
 /**
  * Wrapper class for XmlSchemaCollection that deals with various quirks and bugs. One bug is WSCOMMONS-272.
  */
@@ -97,7 +98,12 @@ public class SchemaCollection {
     }
 
     public boolean equals(Object obj) {
-        return schemaCollection.equals(obj);
+        if (obj instanceof SchemaCollection) {
+            return schemaCollection.equals(((SchemaCollection)obj).schemaCollection);
+        } else if (obj instanceof XmlSchemaCollection) {
+            return schemaCollection.equals(obj);
+        }
+        return false;
     }
 
     public XmlSchemaElement getElementByQName(QName qname) {

@@ -19,6 +19,7 @@
 
 package org.apache.cxf.helpers;
 
+import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.Comparator;
 
@@ -26,7 +27,7 @@ import java.util.Comparator;
  * Sorts methods according to their name, number of parameters, and parameter
  * types.
  */
-public class MethodComparator implements Comparator<Method> {
+public class MethodComparator implements Comparator<Method>, Serializable {
 
     public int compare(Method m1, Method m2) {
 

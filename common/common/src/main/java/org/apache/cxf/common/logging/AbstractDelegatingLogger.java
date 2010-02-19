@@ -184,10 +184,13 @@ public abstract class AbstractDelegatingLogger extends Logger {
                 logp(Level.FINER, sourceClass, sourceMethod, msg);
                 return;
             }
+            StringBuilder builder = new StringBuilder(msg);
             for (int i = 0; i < params.length; i++) {
-                msg = msg + " {" + i + "}";
+                builder.append(" {");
+                builder.append(Integer.toString(i));
+                builder.append("}");
             }
-            logp(Level.FINER, sourceClass, sourceMethod, msg, params);
+            logp(Level.FINER, sourceClass, sourceMethod, builder.toString(), params);
         }
     }
 

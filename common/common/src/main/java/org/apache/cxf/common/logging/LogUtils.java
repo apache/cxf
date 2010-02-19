@@ -73,7 +73,11 @@ public final class LogUtils {
                 }
                 if (ins != null) {
                     BufferedReader din = new BufferedReader(new InputStreamReader(ins));
-                    cname = din.readLine();
+                    try {
+                        cname = din.readLine();
+                    } finally {
+                        din.close();
+                    }
                 }
             }
             if (StringUtils.isEmpty(cname)) {

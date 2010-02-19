@@ -24,10 +24,10 @@ import org.junit.Test;
 
 public class NameSpaceTest extends Assert {
     
-    private final String myURL1 = "http://test.apache.org/testurl1";
-    private final String myURL2 = "http://test.apache.org/testurl2";
-    private final String myCustomURL = "http://test.apache.org/custom-prefix-url";
-    private final String myOwnPrefix = "myown-prefix";
+    private static final String MY_URL1 = "http://test.apache.org/testurl1";
+    private static final String MY_URL2 = "http://test.apache.org/testurl2";
+    private static final String MY_CUSTOM_URL = "http://test.apache.org/custom-prefix-url";
+    private static final String MY_OWN_PREFIX = "myown-prefix";
     
 
     @Test
@@ -36,30 +36,30 @@ public class NameSpaceTest extends Assert {
         
         nsStackObj.push();
         
-        nsStackObj.add(myURL1);
-        nsStackObj.add(myOwnPrefix, myCustomURL);
-        nsStackObj.add(myURL2);
+        nsStackObj.add(MY_URL1);
+        nsStackObj.add(MY_OWN_PREFIX, MY_CUSTOM_URL);
+        nsStackObj.add(MY_URL2);
         
-        assertEquals(myURL1, nsStackObj.getURI("ns1"));
-        assertEquals(myCustomURL, nsStackObj.getURI(myOwnPrefix));
-        assertEquals(myURL2, nsStackObj.getURI("ns2"));
+        assertEquals(MY_URL1, nsStackObj.getURI("ns1"));
+        assertEquals(MY_CUSTOM_URL, nsStackObj.getURI(MY_OWN_PREFIX));
+        assertEquals(MY_URL2, nsStackObj.getURI("ns2"));
         assertNull(nsStackObj.getURI("non-existent-prefix"));
         
-        assertEquals("ns2", nsStackObj.getPrefix(myURL2));
-        assertEquals(myOwnPrefix, nsStackObj.getPrefix(myCustomURL));
-        assertEquals("ns1", nsStackObj.getPrefix(myURL1));
+        assertEquals("ns2", nsStackObj.getPrefix(MY_URL2));
+        assertEquals(MY_OWN_PREFIX, nsStackObj.getPrefix(MY_CUSTOM_URL));
+        assertEquals("ns1", nsStackObj.getPrefix(MY_URL1));
         assertNull(nsStackObj.getPrefix("non-existent-prefix"));
         
         nsStackObj.pop();
         assertNull(nsStackObj.getPrefix("non-existent-prefix"));
-        assertNull(nsStackObj.getPrefix(myCustomURL));
+        assertNull(nsStackObj.getPrefix(MY_CUSTOM_URL));
     }
     
     @Test
     public void testNSDeclOperaions() throws Exception {
-        NSDecl nsDecl1 = new NSDecl(myOwnPrefix, myCustomURL);
-        NSDecl nsDecl2 = new NSDecl("ns2", myURL2);
-        NSDecl nsDecl3 = new NSDecl(myOwnPrefix, myCustomURL);
+        NSDecl nsDecl1 = new NSDecl(MY_OWN_PREFIX, MY_CUSTOM_URL);
+        NSDecl nsDecl2 = new NSDecl("ns2", MY_URL2);
+        NSDecl nsDecl3 = new NSDecl(MY_OWN_PREFIX, MY_CUSTOM_URL);
         
         assertFalse(nsDecl2.equals(nsDecl1));
         assertTrue(nsDecl3.equals(nsDecl1));

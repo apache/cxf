@@ -46,7 +46,7 @@ public class ForkedCommandTest extends Assert {
     public void testBasics() {
         ForkedCommand fc1 = new ForkedCommand();
         String cmdline1 = fc1.toString();
-        assertNull(cmdline1);
+        assertEquals("", cmdline1);
         try {
             fc1.execute();
         } catch (ForkedCommandException ex) {

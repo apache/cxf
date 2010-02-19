@@ -84,7 +84,7 @@ public class CacheMap<K, V> implements Map<K, V> {
         V val = mainDataMap.get(key);
         if (val == null) {
             updateMainDataMap();
-            val = mainDataMap.get(val);
+            val = mainDataMap.get(key);
         }
         if (val != null) {
             extraKeyMap.put((K)key, val);

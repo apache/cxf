@@ -411,6 +411,7 @@ public final class XmlSchemaUtils {
                                                String referencingURI, 
                                                XmlSchemaElement element,
                                                XmlSchemaType containingType) {
+        assert element != null;
         if (element.getSchemaTypeName() != null) {
             XmlSchemaType type = xmlSchemaCollection.getTypeByQName(element.getSchemaTypeName());
             if (type == null) {
@@ -420,7 +421,6 @@ public final class XmlSchemaUtils {
             }
             return type;
         }
-        assert element != null;
         // The referencing URI only helps if there is a schema that points to
         // it.
         // It might be the URI for the wsdl TNS, which might have no schema.

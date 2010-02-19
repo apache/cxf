@@ -62,7 +62,6 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         List<String> uris;
         List<String> prefixes;
         List<Object> attributes;
-        List<Object> allAttributes;
 
         final ElementFrame<T, I> parent;
         
@@ -83,7 +82,6 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
             attributes = Collections.emptyList();
             prefixes = Collections.emptyList();
             uris = Collections.emptyList();
-            allAttributes = Collections.emptyList();
         }
         public ElementFrame(T doc) {
             this(doc, true);

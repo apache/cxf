@@ -19,6 +19,7 @@
 package org.apache.cxf.configuration.spring;
 
 import java.beans.PropertyDescriptor;
+import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -39,7 +40,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
 abstract class AbstractSpringBeanMap<X, V> 
-    implements ApplicationContextAware, InitializingBean, MapProvider<X, V> {
+    implements ApplicationContextAware, InitializingBean, MapProvider<X, V>, Serializable {
     protected ApplicationContext context;
     protected Class<?> type;
     protected String idsProperty;
