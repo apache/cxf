@@ -109,7 +109,9 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                         ai.setAsserted(true);
                     }                    
                 }
-                
+                if (transport == null && isRequestor(message)) {
+                    transport = new TransportBinding(SP12Constants.INSTANCE);
+                }
                 
                 if (transport != null) {
                     WSSecHeader secHeader = new WSSecHeader(actor, mustUnderstand);
