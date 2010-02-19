@@ -401,7 +401,7 @@ public class WadlGenerator implements RequestHandler {
     }
     
     private void doWriteBeanParam(StringBuilder sb, Class<?> type, Parameter pm, String parentName) {
-        Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType());
+        Map<Parameter, Class<?>> pms = InjectionUtils.getParametersFromBeanClass(type, pm.getType(), true);
         for (Map.Entry<Parameter, Class<?>> entry : pms.entrySet()) {
             String name = entry.getKey().getName();
             if (parentName != null) {

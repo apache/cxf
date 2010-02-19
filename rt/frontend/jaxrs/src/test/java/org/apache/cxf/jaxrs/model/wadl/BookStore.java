@@ -31,7 +31,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.xml.bind.annotation.XmlTransient;
 
+import org.apache.cxf.aegis.type.java5.IgnoreProperty;
 import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
 import org.apache.cxf.jaxrs.fortest.jaxb.packageinfo.Book2;
@@ -121,6 +123,7 @@ public class BookStore {
             return a;
         }
         
+        @IgnoreProperty
         public int getB() {
             return b;
         }
@@ -129,9 +132,6 @@ public class BookStore {
             return bean;
         }
         
-        public void setC(QueryBean2 c) {
-            bean = c;
-        }
     }
     
     public static class QueryBean2 {
@@ -151,9 +151,6 @@ public class BookStore {
             return bean;
         }
         
-        public void setD(QueryBean3 d) {
-            bean = d;
-        }
     }
     
     public static class QueryBean3 {
@@ -164,6 +161,7 @@ public class BookStore {
             return a;
         }
         
+        @XmlTransient
         public int getB() {
             return b;
         }
