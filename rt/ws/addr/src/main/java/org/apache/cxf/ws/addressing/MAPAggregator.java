@@ -752,7 +752,11 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         DestinationFactory factory =
             factoryManager.getDestinationFactoryForUri(address);
         if (factory != null) {
+            Endpoint ep = message.getExchange().get(Endpoint.class);
+            
             EndpointInfo ei = new EndpointInfo();
+            ei.setName(new QName(ep.getEndpointInfo().getName().getNamespaceURI(),
+                                 ep.getEndpointInfo().getName().getLocalPart() + ".decoupled"));
             ei.setAddress(address);
             destination = factory.getDestination(ei);
             Conduit conduit = ContextUtils.getConduit(null, message);

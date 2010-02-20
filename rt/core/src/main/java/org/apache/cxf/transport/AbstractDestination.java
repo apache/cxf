@@ -37,7 +37,10 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  */
 public abstract class AbstractDestination
     extends AbstractObservable implements Destination, DestinationWithEndpoint {
-
+    
+    public static final String PARTIAL_RESPONSE = AbstractDestination.class.getName()
+        + ".partial.response";
+    
     protected final EndpointReferenceType reference;
     protected final EndpointInfo endpointInfo;
     protected final Bus bus;
@@ -92,6 +95,9 @@ public abstract class AbstractDestination
                     backChannel = getInbuiltBackChannel(inMessage);
                 }
             } else {
+                //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
+                //we don't wait for a response.
+                inMessage.getExchange().setOneWay(true);
                 ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
                 if (mgr != null) {
                     ConduitInitiator conduitInitiator 
@@ -135,9 +141,15 @@ public abstract class AbstractDestination
      */
     protected boolean markPartialResponse(Message partialResponse,
                                           EndpointReferenceType decoupledTarget) {
-        return false;
+        
+        partialResponse.getExchange().put(EndpointReferenceType.class, decoupledTarget);
+        partialResponse.put(PARTIAL_RESPONSE, Boolean.TRUE);
+        return true;
     }
-    
+    protected boolean isPartialResponse(Message m) {
+        return Boolean.TRUE.equals(m.get(PARTIAL_RESPONSE));
+    }
+
     /**
      * @param inMessage the incoming message
      * @return the inbuilt backchannel

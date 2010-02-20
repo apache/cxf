@@ -47,6 +47,7 @@ import org.apache.cxf.transport.jms.wsdl.JndiURLType;
 import org.apache.cxf.transport.jms.wsdl.PriorityType;
 import org.apache.cxf.transport.jms.wsdl.ReplyToNameType;
 import org.apache.cxf.transport.jms.wsdl.TimeToLiveType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.springframework.jms.support.destination.JndiDestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
@@ -60,14 +61,6 @@ public class JMSOldConfigHolder {
     private ServerConfig serverConfig;
     private ServerBehaviorPolicyType serverBehavior;
     private AddressType address;
-
-    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus,
-                                                                   EndpointInfo endpointInfo,
-                                                                   boolean isConduit) 
-        throws IOException {
-        createJMSConfigurationFromEndpointInfoForSpecification(bus, endpointInfo, isConduit);
-        return jmsConfig;
-    }
 
     public void setAddress(AddressType ad) {
         address = ad;
@@ -128,12 +121,14 @@ public class JMSOldConfigHolder {
     /**
      * Get the extensors from the wsdl and/or configuration that will
      * then be used to configure the JMSConfiguration object 
+     * @param target 
      */
     private JMSEndpoint getExtensorsAndConfig(Bus bus,
                            EndpointInfo endpointInfo,
+                           EndpointReferenceType target,
                            boolean isConduit) throws IOException {
         JMSEndpoint endpoint = null;
-        String adr = endpointInfo.getAddress();
+        String adr = target == null ? endpointInfo.getAddress() : target.getAddress().getValue();
         try {           
             endpoint = StringUtils.isEmpty(adr) || "jms://".equals(adr) || !adr.startsWith("jms") 
                 ?  new JMSEndpoint()
@@ -156,7 +151,7 @@ public class JMSOldConfigHolder {
                                                         SessionPoolType.class);
         serverBehavior = endpointInfo.getTraversedExtensor(new ServerBehaviorPolicyType(),
                                                            ServerBehaviorPolicyType.class);
-        String name = endpointInfo.getName().toString()
+        String name = endpointInfo.getName() == null ? null : endpointInfo.getName().toString()
                       + (isConduit ? ".jms-conduit" : ".jms-destination");
 
         // Try to retrieve configuration information from the spring
@@ -165,7 +160,12 @@ public class JMSOldConfigHolder {
 
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {
-            configurer.configureBean(name, this);
+            if (name != null) {
+                configurer.configureBean(name, this);
+            }
+            if (adr != null) {
+                configurer.configureBean(adr, this);
+            }
         }
         return endpoint;
     }
@@ -176,11 +176,12 @@ public class JMSOldConfigHolder {
      * @param isConduit
      * @return
      */
-    private JMSConfiguration createJMSConfigurationFromEndpointInfoForSpecification(Bus bus,
-                                                                                    EndpointInfo endpointInfo,
-                                                                                    boolean isConduit) 
+    public JMSConfiguration createJMSConfigurationFromEndpointInfo(Bus bus,
+                                                                   EndpointInfo endpointInfo,
+                                                                   EndpointReferenceType target,
+                                                                   boolean isConduit) 
         throws IOException {
-        JMSEndpoint endpoint = getExtensorsAndConfig(bus, endpointInfo, isConduit);
+        JMSEndpoint endpoint = getExtensorsAndConfig(bus, endpointInfo, target, isConduit);
 
         if (address != null) {
             mapAddressToEndpoint(address, endpoint);

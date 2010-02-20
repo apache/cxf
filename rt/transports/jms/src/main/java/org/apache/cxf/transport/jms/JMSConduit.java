@@ -139,7 +139,9 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
     public void sendExchange(final Exchange exchange, final Object request) {
         LOG.log(Level.FINE, "JMSConduit send message");
 
-        final Message outMessage = exchange.getOutMessage();
+        final Message outMessage = exchange.getOutMessage() == null 
+            ? exchange.getOutFaultMessage() 
+            : exchange.getOutMessage();
         if (outMessage == null) {
             throw new RuntimeException("Exchange to be sent has no outMessage");
         }

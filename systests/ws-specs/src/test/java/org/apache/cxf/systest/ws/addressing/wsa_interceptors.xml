@@ -30,6 +30,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     </bean>
     <bean id="mapCodec" class="org.apache.cxf.ws.addressing.soap.MAPCodec"/>
     <bean id="loggingIn" class="org.apache.cxf.interceptor.LoggingInInterceptor"/>
+    <bean id="loggingOut" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/>
 
     <!-- We are adding the interceptors to the bus as we will have only one endpoint/service/bus. -->
 
@@ -45,27 +46,30 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
             <list>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
+                <ref bean="loggingIn"/>
             </list>
         </property>
         <property name="outInterceptors">
             <list>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
+                <ref bean="loggingOut"/>
             </list>
         </property>
         <property name="outFaultInterceptors">
             <list>
                 <ref bean="mapAggregator"/>
                 <ref bean="mapCodec"/>
+                <ref bean="loggingOut"/>
             </list>
         </property>
     </bean>
 
-    <jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" 
+    <!--jaxws:client name="{http://apache.org/hello_world_soap_http}SoapPort" 
                   createdFromAPI="true">
         <jaxws:conduitSelector>
             <bean class="org.apache.cxf.endpoint.DeferredConduitSelector"/>
         </jaxws:conduitSelector>
-    </jaxws:client>
+    </jaxws:client-->
     
 </beans>

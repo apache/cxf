@@ -88,8 +88,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
         
-    public static final String PARTIAL_RESPONSE = AbstractMultiplexDestination.class.getName()
-        + ".partial.response";
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     
@@ -390,15 +388,11 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     protected final boolean markPartialResponse(Message partialResponse,
                                        EndpointReferenceType decoupledTarget) {
         // setup the outbound message to for 202 Accepted
+        super.markPartialResponse(partialResponse, decoupledTarget);
         partialResponse.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
-        partialResponse.getExchange().put(EndpointReferenceType.class, decoupledTarget);
-        partialResponse.put(PARTIAL_RESPONSE, Boolean.TRUE);
         return true;
     }
     
-    protected boolean isPartialResponse(Message m) {
-        return Boolean.TRUE.equals(m.get(PARTIAL_RESPONSE));
-    }
 
     private void initConfig() {
         PolicyEngine engine = bus.getExtension(PolicyEngine.class);
