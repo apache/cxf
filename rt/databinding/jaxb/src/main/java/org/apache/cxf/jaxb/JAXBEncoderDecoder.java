@@ -69,6 +69,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.SchemaInfo;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.ws.commons.schema.XmlSchemaElement;
@@ -744,8 +745,16 @@ public final class JAXBEncoderDecoder {
             }
             if (source instanceof Node) {
                 obj = unmarshalWithClass ? u.unmarshal((Node)source, clazz) : u.unmarshal((Node)source);
+            } else if (source instanceof DepthXMLStreamReader) {
+                // JAXB optimizes a ton of stuff depending on the StreamReader impl. Thus,
+                // we REALLY want to pass the original reader in.   This is OK with JAXB
+                // as it doesn't read beyond the end so the DepthXMLStreamReader state
+                // would be OK when it returns.   The main winner is FastInfoset where parsing
+                // a testcase I have goes from about 300/sec to well over 1000.
+                DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
+                obj = unmarshalWithClass ? u.unmarshal(dr.getReader(), clazz) : u
+                    .unmarshal(dr.getReader());
             } else if (source instanceof XMLStreamReader) {
-
                 obj = unmarshalWithClass ? u.unmarshal((XMLStreamReader)source, clazz) : u
                     .unmarshal((XMLStreamReader)source);
             } else if (source instanceof XMLEventReader) {
