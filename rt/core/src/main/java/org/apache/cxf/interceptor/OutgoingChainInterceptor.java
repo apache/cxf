@@ -43,7 +43,6 @@ import org.apache.cxf.service.model.BindingMessageInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> {
     private static final Logger LOG = LogUtils.getL7dLogger(OutgoingChainInterceptor.class);
@@ -83,9 +82,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         if (ex.getConduit(message) == null
             && ex.getDestination() != null) {
             try {
-                EndpointReferenceType target =
-                    ex.get(EndpointReferenceType.class);
-                conduit = ex.getDestination().getBackChannel(ex.getInMessage(), null, target);
+                conduit = ex.getDestination().getBackChannel(ex.getInMessage(), null, null);
                 ex.put(ConduitSelector.class, 
                        new PreexistingConduitSelector(conduit, ex.get(Endpoint.class)));
             } catch (IOException e) {

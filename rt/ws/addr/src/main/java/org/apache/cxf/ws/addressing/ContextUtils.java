@@ -20,6 +20,8 @@
 package org.apache.cxf.ws.addressing;
 
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
@@ -48,11 +50,15 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.Extensible;
 import org.apache.cxf.service.model.FaultInfo;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiator;
+import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
+import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.workqueue.OneShotAsyncExecutor;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -342,7 +348,7 @@ public final class ContextUtils {
      * @param inMAPs the inbound MAPs
      * @param inMessage the current message
      */
-    public static void rebaseResponse(EndpointReferenceType reference,
+    public static void rebaseResponse(final EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
         String namespaceURI = inMAPs.getNamespaceURI();
@@ -391,12 +397,52 @@ public final class ContextUtils {
                         chain.reset();                        
                     }
                     exchange.put(ConduitSelector.class, new NullConduitSelector());
-                    if (fullResponse != null) {
-                        exchange.setOutMessage(fullResponse);
-                    } else {
+                    
+                    if (fullResponse == null) {
                         fullResponse = createMessage(exchange);
-                        exchange.setOutMessage(fullResponse);
                     }
+                    exchange.setOutMessage(fullResponse);
+                    final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
+                    exchange.setDestination(new Destination() {
+                        public EndpointReferenceType getAddress() {
+                            return reference;
+                        }
+                        public Conduit getBackChannel(Message inMessage, Message partialResponse,
+                                                      EndpointReferenceType address) throws IOException {
+                            Bus bus = inMessage.getExchange().get(Bus.class);
+                            //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
+                            //we don't wait for a response.
+                            inMessage.getExchange().setOneWay(true);
+                            ConduitInitiator conduitInitiator 
+                                = bus.getExtension(ConduitInitiatorManager.class)
+                                    .getConduitInitiatorForUri(reference.getAddress().getValue());
+                            if (conduitInitiator != null) {
+                                Conduit c = conduitInitiator.getConduit(ei, reference);
+                                // ensure decoupled back channel input stream is closed
+                                c.setMessageObserver(new MessageObserver() {
+                                    public void onMessage(Message m) {
+                                        if (m.getContentFormats().contains(InputStream.class)) {
+                                            InputStream is = m.getContent(InputStream.class);
+                                            try {
+                                                is.close();
+                                            } catch (Exception e) {
+                                                // ignore
+                                            }
+                                        }
+                                    }
+                                });
+                                return c;
+                            }
+                            return null;
+                        }
+                        public MessageObserver getMessageObserver() {
+                            return null;
+                        }
+                        public void shutdown() {
+                        }
+                        public void setMessageObserver(MessageObserver observer) {
+                        }
+                    });
                     
                     if (retrieveAsyncPostResponseDispatch(inMessage)) {
                         //need to suck in all the data from the input stream as

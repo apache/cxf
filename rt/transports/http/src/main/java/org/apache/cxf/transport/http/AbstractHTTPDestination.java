@@ -61,6 +61,7 @@ import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractDestination;
@@ -168,6 +169,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     }
     
     protected void updateResponseHeaders(Message message) {
+        if (MessageUtils.isPartialResponse(message)) {
+            message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
+        }
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         if (responseHeaders == null) {
@@ -377,22 +381,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         HttpServletResponse response = (HttpServletResponse)inMessage.get(HTTP_RESPONSE);
         return new BackChannelConduit(response);
     }
-    
-    /**
-     * Mark message as a partial message.
-     * 
-     * @param partialResponse the partial response message
-     * @param the decoupled target
-     * @return true iff partial responses are supported
-     */
-    protected final boolean markPartialResponse(Message partialResponse,
-                                       EndpointReferenceType decoupledTarget) {
-        // setup the outbound message to for 202 Accepted
-        super.markPartialResponse(partialResponse, decoupledTarget);
-        partialResponse.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
-        return true;
-    }
-    
 
     private void initConfig() {
         PolicyEngine engine = bus.getExtension(PolicyEngine.class);
@@ -515,7 +503,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
             copyResponseHeaders(outMessage, response);
 
             
-            if (oneWay && !isPartialResponse(outMessage)) {
+            if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setContentLength(0);
                 response.flushBuffer();
                 response.getOutputStream().close();
@@ -562,6 +550,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
          * @param message the message to be sent.
          */
         public void prepare(Message message) throws IOException {
+            if (MessageUtils.isPartialResponse(message)) {
+                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
+            }
             message.put(HTTP_RESPONSE, response);
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {

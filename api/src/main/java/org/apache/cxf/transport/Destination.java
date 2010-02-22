@@ -39,18 +39,15 @@ public interface Destination extends Observable {
      * Retreive a back-channel Conduit, which must be policy-compatible
      * with the current Message and associated Destination. For example
      * compatible Quality of Protection must be asserted on the back-channel.
-     * This would generally only be an issue if the back-channel is decoupled.
      * 
-     * @param inMessage the current message (null to indicate a disassociated
-     * back-channel.
-     * @param partialResponse in the decoupled case, this is expected to be the
-     * outbound Message to be sent over the in-built back-channel. 
-     * @param address the backchannel address (null to indicate anonymous)
+     * @param inMessage the current message
+     * @param unused1 - will likely always be null  
+     * @param unused2 - will likely always be null
      * @return a suitable Conduit
      */
     Conduit getBackChannel(Message inMessage,
-                           Message partialResponse,
-                           EndpointReferenceType address)
+                           Message unused1,
+                           EndpointReferenceType unused2)
         throws IOException;
 
     /**

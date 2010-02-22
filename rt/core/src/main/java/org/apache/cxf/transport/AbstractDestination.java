@@ -20,11 +20,9 @@
 package org.apache.cxf.transport;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -37,9 +35,6 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
  */
 public abstract class AbstractDestination
     extends AbstractObservable implements Destination, DestinationWithEndpoint {
-    
-    public static final String PARTIAL_RESPONSE = AbstractDestination.class.getName()
-        + ".partial.response";
     
     protected final EndpointReferenceType reference;
     protected final EndpointInfo endpointInfo;
@@ -82,46 +77,8 @@ public abstract class AbstractDestination
                                   Message partialResponse,
                                   EndpointReferenceType address)
         throws IOException {
-        Conduit backChannel = null;
-        Exchange ex = inMessage.getExchange();
-        EndpointReferenceType target = address != null
-                                       ? address
-                                       : ex.get(EndpointReferenceType.class);
-        if (target == null) {
-            backChannel = getInbuiltBackChannel(inMessage);
-        } else {
-            if (partialResponse != null) {
-                if (markPartialResponse(partialResponse, target)) {
-                    backChannel = getInbuiltBackChannel(inMessage);
-                }
-            } else {
-                //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
-                //we don't wait for a response.
-                inMessage.getExchange().setOneWay(true);
-                ConduitInitiatorManager mgr = bus.getExtension(ConduitInitiatorManager.class);
-                if (mgr != null) {
-                    ConduitInitiator conduitInitiator 
-                        = mgr.getConduitInitiatorForUri(target.getAddress().getValue());
-                    if (conduitInitiator != null) {
-                        backChannel = conduitInitiator.getConduit(endpointInfo, target);
-                        // ensure decoupled back channel input stream is closed
-                        backChannel.setMessageObserver(new MessageObserver() {
-                            public void onMessage(Message m) {
-                                if (m.getContentFormats().contains(InputStream.class)) {
-                                    InputStream is = m.getContent(InputStream.class);
-                                    try {
-                                        is.close();
-                                    } catch (Exception e) {
-                                        // ignore
-                                    }
-                                }
-                            }
-                        });
-                    }
-                }
-            }
-        }
-        return backChannel;
+        
+        return getInbuiltBackChannel(inMessage);
     }
         
     /**
@@ -129,25 +86,6 @@ public abstract class AbstractDestination
      */
     public void shutdown() {
         // nothing to do by default
-    }
-
-    /**
-     * Mark message as a partial message. Only required if decoupled
-     * mode is supported.
-     * 
-     * @param partialResponse the partial response message
-     * @param the decoupled target
-     * @return true iff partial responses are supported
-     */
-    protected boolean markPartialResponse(Message partialResponse,
-                                          EndpointReferenceType decoupledTarget) {
-        
-        partialResponse.getExchange().put(EndpointReferenceType.class, decoupledTarget);
-        partialResponse.put(PARTIAL_RESPONSE, Boolean.TRUE);
-        return true;
-    }
-    protected boolean isPartialResponse(Message m) {
-        return Boolean.TRUE.equals(m.get(PARTIAL_RESPONSE));
     }
 
     /**
