@@ -95,7 +95,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     }
     
     @Test
-    @org.junit.Ignore("missing file")
     public void testSignedElementsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_header.xml",
@@ -125,7 +124,6 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     }
 
     @Test
-    @org.junit.Ignore("missing file")
     public void testSignedPartsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
                 "signed_x509_issuer_serial_missing_signed_body.xml",
