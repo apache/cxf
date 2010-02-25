@@ -37,6 +37,9 @@ public class LogicalHandlerFaultInInterceptor<T extends Message>
     }
 
     public void handleMessage(T message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;

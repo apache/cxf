@@ -19,37 +19,73 @@
 
 package org.apache.cxf.message;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.Destination;
 
 public class MessageImpl extends StringMapImpl implements Message {
-    static int count;
+    private static final Class<?> DEFAULT_CONTENTS[];
+    private static final int DEFAULT_CONTENTS_LENGTH;
     
-    private Collection<Attachment> attachments;
+    static {
+        Class<?> tmps[];
+        
+        try {
+            //if SAAJ is there, give it a slot
+            Class<?> cls = Class.forName("javax.xml.soap.SOAPMessage");
+            tmps = new Class<?>[] {
+                XMLStreamReader.class, XMLStreamWriter.class,
+                InputStream.class, OutputStream.class,
+                List.class, Exception.class, Node.class, DelegatingInputStream.class,
+                cls
+            };
+        } catch (Throwable e) {
+            tmps = new Class<?>[] {
+                XMLStreamReader.class, XMLStreamWriter.class,
+                InputStream.class, OutputStream.class,
+                List.class, Exception.class, Node.class, DelegatingInputStream.class
+            };
+        }
+        DEFAULT_CONTENTS = tmps;
+        DEFAULT_CONTENTS_LENGTH = tmps.length;
+    }
+    
+    
     private Exchange exchange;
     private String id;
     private InterceptorChain interceptorChain;
-    private Map<Class<?>, Object> contents = new IdentityHashMap<Class<?>, Object>(6);
+    
+    private Object[] defaultContents = new Object[DEFAULT_CONTENTS_LENGTH];
+    private Map<Class<?>, Object> contents;
     
     public MessageImpl() {
         //nothing
     }
     
     public Collection<Attachment> getAttachments() {
-        return attachments;
+        return CastUtils.cast((Collection<?>)get(ATTACHMENTS));
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
-        this.attachments = attachments;
         put(ATTACHMENTS, attachments);
     }
 
@@ -74,20 +110,55 @@ public class MessageImpl extends StringMapImpl implements Message {
         return this.interceptorChain;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getContent(Class<T> format) {
-        return format.cast(contents.get(format));
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                return (T)defaultContents[x];
+            }
+        }
+        return contents == null ? null : (T)contents.get(format);
     }
 
     public <T> void setContent(Class<T> format, Object content) {
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                defaultContents[x] = content;
+                return;
+            }
+        }
+        if (contents == null) {
+            contents = new IdentityHashMap<Class<?>, Object>(6);
+        }
         contents.put(format, content);
     }
     
     public <T> void removeContent(Class<T> format) {
-        contents.remove(format);
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                defaultContents[x] = null;
+                return;
+            }
+        }
+        if (contents != null) {
+            contents.remove(format);
+        }
     }
 
     public Set<Class<?>> getContentFormats() {
-        return contents.keySet();
+        
+        Set<Class<?>> c;
+        if (contents == null) {
+            c = new HashSet<Class<?>>();
+        } else {
+            c = new HashSet<Class<?>>(contents.keySet());
+        }
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (defaultContents[x] != null) {
+                c.add(DEFAULT_CONTENTS[x]);
+            }
+        }
+        return c;
     }
 
     public void setDestination(Destination d) {

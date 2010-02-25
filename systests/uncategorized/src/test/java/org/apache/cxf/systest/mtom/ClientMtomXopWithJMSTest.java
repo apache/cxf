@@ -126,7 +126,7 @@ public class ClientMtomXopWithJMSTest extends AbstractBusClientServerTestBase {
         Service service = serviceFactory.create();
         EndpointInfo ei = service.getEndpointInfo(portName);
         JaxWsEndpointImpl jaxwsEndpoint = new JaxWsEndpointImpl(bus, service, ei);
-        SOAPBinding jaxWsSoapBinding = new SOAPBindingImpl(ei.getBinding());
+        SOAPBinding jaxWsSoapBinding = new SOAPBindingImpl(ei.getBinding(), jaxwsEndpoint);
         jaxWsSoapBinding.setMTOMEnabled(enableMTOM);
         
         jaxwsEndpoint.getBinding().getInInterceptors().add(new TestMultipartMessageInterceptor());

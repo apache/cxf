@@ -36,6 +36,7 @@ import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxws.binding.AbstractBindingImpl;
+import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.BindingInfo;
 
@@ -47,7 +48,8 @@ public class SOAPBindingImpl extends AbstractBindingImpl implements SOAPBinding 
     private BindingInfo soapBinding;
     private Set<String> roles;
 
-    public SOAPBindingImpl(BindingInfo sb) {
+    public SOAPBindingImpl(BindingInfo sb, JaxWsEndpointImpl endpoint) {
+        super(endpoint);
         soapBinding = sb;  
         addRequiredRoles();
     }

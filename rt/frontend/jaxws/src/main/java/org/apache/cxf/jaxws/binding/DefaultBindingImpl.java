@@ -19,7 +19,13 @@
 
 package org.apache.cxf.jaxws.binding;
 
+import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
+
 public class DefaultBindingImpl extends AbstractBindingImpl {
+    public DefaultBindingImpl(JaxWsEndpointImpl endpoint) {
+        super(endpoint);
+    }
+    
     public String getBindingID() {
         //DefaultBindingImpl should not be used, though JBI binding and
         //some other bindings did not implement their own Binding.

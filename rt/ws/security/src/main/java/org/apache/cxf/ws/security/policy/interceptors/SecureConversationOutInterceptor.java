@@ -75,6 +75,8 @@ class SecureConversationOutInterceptor extends AbstractPhaseInterceptor<SoapMess
                     }
                     message.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
                                                                   tok.getId());
+                    message.getExchange().put(SecurityConstants.TOKEN_ID, 
+                                              tok.getId());
                     SecureConversationTokenInterceptorProvider.getTokenStore(message).add(tok);
                     
                 }

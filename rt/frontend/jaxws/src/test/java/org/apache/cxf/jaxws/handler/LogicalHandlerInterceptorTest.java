@@ -30,6 +30,7 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.handler.LogicalMessageContext;
 import javax.xml.ws.handler.MessageContext;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.jaxws.handler.logical.LogicalHandlerInInterceptor;
 import org.apache.cxf.message.Exchange;
@@ -85,6 +86,8 @@ public class LogicalHandlerInterceptorTest extends Assert {
                 return true;
             }
         });
+        List<Handler> hList = CastUtils.cast(list);
+        expect(binding.getHandlerChain()).andReturn(hList).anyTimes();
         expect(invoker.getLogicalHandlers()).andReturn(list);
         expect(message.getExchange()).andReturn(exchange).anyTimes();
         expect(message.get(Message.REQUESTOR_ROLE)).andReturn(Boolean.TRUE).anyTimes();
@@ -127,6 +130,8 @@ public class LogicalHandlerInterceptorTest extends Assert {
 
         IMocksControl control1 = createNiceControl();
         Binding binding1 = control1.createMock(Binding.class);
+        List<Handler> hList = CastUtils.cast(list);
+        expect(binding1.getHandlerChain()).andReturn(hList).anyTimes();
         Exchange exchange1 = control1.createMock(Exchange.class);
         expect(exchange1.get(HandlerChainInvoker.class)).andReturn(invoker1).anyTimes();
         Message outMessage = new MessageImpl();

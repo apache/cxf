@@ -33,6 +33,9 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     private AtomicReference<Object[]> extensors = new AtomicReference<Object[]>();
     private Map<QName, Object> extensionAttributes;
     
+    public Map<String, Object> getProperties() {
+        return propertyMap.get();
+    }
     public Object getProperty(String name) {
         if (null == propertyMap.get()) {
             return null;

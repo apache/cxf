@@ -19,6 +19,7 @@
 
 package org.apache.cxf.binding.soap;
 
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -75,17 +76,15 @@ public final class HeaderUtil {
     }
 
     public static Set<QName> getHeaderQNameInOperationParam(SoapMessage soapMessage) {
-        Set<QName> headers = new HashSet<QName>();
-        BindingOperationInfo bop = soapMessage.getExchange()
-            .get(BindingOperationInfo.class);
+        BindingOperationInfo bop = soapMessage.getExchange().getBindingOperationInfo();
         if (bop != null) {
             if (bop.getInput() != null) {
-                headers.addAll(getHeaderParts(bop.getInput()));
+                return getHeaderParts(bop.getInput());
             }
             if (bop.getOutput() != null) {
-                headers.addAll(getHeaderParts(bop.getOutput()));
+                return getHeaderParts(bop.getOutput());
             }
         }
-        return headers;
+        return Collections.emptySet();
     }
 }

@@ -107,6 +107,7 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
             tokenStore = new MemoryTokenStore();
             message.getExchange().get(Endpoint.class).getEndpointInfo()
                 .setProperty(TokenStore.class.getName(), tokenStore);
+            message.getExchange().put(TokenStore.class.getName(), tokenStore);
         }
         return tokenStore;
     }

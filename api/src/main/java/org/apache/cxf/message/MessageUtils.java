@@ -26,6 +26,16 @@ import org.w3c.dom.Node;
  * Holder for utility methods relating to messages.
  */
 public final class MessageUtils {
+    private static final Class<?> SAAJ_CLASS;
+    static {
+        Class<?> tmp = null;
+        try {
+            tmp = Class.forName("javax.xml.soap.SOAPMessage");
+        } catch (Throwable t) {
+            tmp = null;
+        }
+        SAAJ_CLASS = tmp;
+    }
 
     /**
      * Prevents instantiation.
@@ -130,12 +140,7 @@ public final class MessageUtils {
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
     public static boolean isDOMPresent(Message m) {
-        for (Class c : m.getContentFormats()) {
-            if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
-                return true;
-            }   
-        }
-        return false;
+        return m.getContent(Node.class) != null || (SAAJ_CLASS != null && m.getContent(SAAJ_CLASS) != null);
     }
 
 }

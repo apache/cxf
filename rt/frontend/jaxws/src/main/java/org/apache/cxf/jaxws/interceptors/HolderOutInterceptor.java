@@ -49,7 +49,9 @@ public class HolderOutInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) throws Fault {
         MessageContentsList outObjects = MessageContentsList.getContentsList(message);
         Exchange exchange = message.getExchange();
-        OperationInfo op = exchange.get(OperationInfo.class);
+        OperationInfo op = exchange.getBindingOperationInfo() == null 
+            ? null
+                : exchange.getBindingOperationInfo().getOperationInfo();
         
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("op: " + op);

@@ -207,8 +207,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<DOMSource> disp = service.createDispatch(portNameXML, DOMSource.class, Mode.MESSAGE);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
@@ -230,8 +229,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<DOMSource> disp = service.createDispatch(portNameXML, DOMSource.class, Mode.PAYLOAD);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");
         MessageFactory factory = MessageFactory.newInstance();
@@ -253,8 +251,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<DataSource> disp = service.createDispatch(portNameXML, DataSource.class, Mode.MESSAGE);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
@@ -278,8 +275,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<DataSource> disp = service.createDispatch(portNameXML, DataSource.class, Mode.PAYLOAD);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         URL is = getClass().getResource("/messages/XML_GreetMeDocLiteralReq.xml");
         DataSource ds = new URLDataSource(is);
@@ -305,8 +301,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<Object> disp = service.createDispatch(portNameXML, jc, Mode.MESSAGE);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         org.apache.hello_world_xml_http.wrapped.types.GreetMe req =
             new org.apache.hello_world_xml_http.wrapped.types.GreetMe();
@@ -331,8 +326,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         Dispatch<Object> disp = service.createDispatch(portNameXML, jc, Mode.PAYLOAD);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
-        TestSOAPHandler soapHandler = new TestSOAPHandler();
-        addHandlersProgrammatically(disp, handler, soapHandler);
+        addHandlersProgrammatically(disp, handler);
 
         org.apache.hello_world_xml_http.wrapped.types.GreetMe req =
             new org.apache.hello_world_xml_http.wrapped.types.GreetMe();
@@ -351,6 +345,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         for (Handler h : handlers) {
             handlerChain.add(h);
         }
+        bp.getBinding().setHandlerChain(handlerChain);
     }
 
     class TestHandler implements LogicalHandler<LogicalMessageContext> {

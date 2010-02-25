@@ -205,6 +205,7 @@ public class HTTPConduit
      * is created on demand.
      */
     private URL defaultEndpointURL;
+    private String defaultEndpointURLString;
     private boolean fromEndpointReferenceType;
 
     private Destination decoupledDestination;
@@ -424,7 +425,7 @@ public class HTTPConduit
 
         // Get the correct URLConnection factory based on the 
         // configuration.
-        retrieveConnectionFactory();
+        retrieveConnectionFactory(getAddress());
 
         // We have finalized the configuration. Any configurable entity
         // set now, must make changes dynamically.
@@ -450,7 +451,7 @@ public class HTTPConduit
      * Factory get altered.
      */
     protected synchronized void retrieveConnectionFactory() {
-        connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this);
+        connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this, getAddress());
     }
     protected synchronized void retrieveConnectionFactory(String url) {
         connectionFactory = AbstractHTTPTransportFactory.getConnectionFactory(this, url);
@@ -493,16 +494,15 @@ public class HTTPConduit
         // protocol from the default set in EndpointInfo that is associated
         // with the Conduit.
         URL currentURL = setupURL(message);       
-        
+
         // The need to cache the request is off by default
         boolean needToCacheRequest = false;
         
         HTTPClientPolicy csPolicy = getClient(message);
-        HttpURLConnection connection = getConnectionFactory(currentURL)
-            .createConnection(getProxy(csPolicy), currentURL);
+
+        HttpURLConnectionFactory f = getConnectionFactory(currentURL);
+        HttpURLConnection connection = f.createConnection(getProxy(csPolicy), currentURL);
         connection.setDoOutput(true);  
-        
-        //TODO using Message context to decided HTTP send properties 
              
         long timeout = csPolicy.getConnectionTimeout();
         if (timeout > Integer.MAX_VALUE) {
@@ -529,7 +529,7 @@ public class HTTPConduit
         } else {
             connection.setRequestMethod("POST");
         }
-        
+                
         boolean isChunking = false;
         int chunkThreshold = 0;
         // We must cache the request if we have basic auth supplier
@@ -569,8 +569,7 @@ public class HTTPConduit
                 connection.setChunkedStreamingMode(-1);                    
             }
         }
-        
-        
+
         //Do we need to maintain a session?
         maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
         
@@ -610,15 +609,14 @@ public class HTTPConduit
         // Set the headers on the message according to configured 
         // client side policy.
         setHeadersByPolicy(message, currentURL, headers);
-     
         
-        message.setContent(OutputStream.class,
-                new WrappedOutputStream(
-                        message, connection,
-                        needToCacheRequest, 
-                        isChunking,
-                        chunkThreshold));
-       
+
+        message.setContent(OutputStream.class, 
+                           new WrappedOutputStream(
+                                   message, connection,
+                                   needToCacheRequest, 
+                                   isChunking,
+                                   chunkThreshold));
         // We are now "ready" to "send" the message. 
     }
     
@@ -658,11 +656,8 @@ public class HTTPConduit
      *                     established by the configured MessageTrustDecider.
      * @see MessageTrustDecider
      */
-    private void makeTrustDecision(Message message)
+    private void makeTrustDecision(Message message, HttpURLConnection connection)
         throws IOException {
-
-        HttpURLConnection connection = 
-            (HttpURLConnection) message.get(KEY_HTTP_CONNECTION);
         
         MessageTrustDecider decider2 = message.get(MessageTrustDecider.class);
         if (trustDecider != null || decider2 != null) {
@@ -744,7 +739,7 @@ public class HTTPConduit
         if (result == null) {
             if (pathInfo == null && queryString == null) {
                 URL url = getURL();
-                message.put(Message.ENDPOINT_ADDRESS, url.toString());
+                message.put(Message.ENDPOINT_ADDRESS, defaultEndpointURLString);
                 return url;
             }
             result = getURL().toString();
@@ -803,9 +798,9 @@ public class HTTPConduit
     /**
      * @return the default target address
      */
-    protected String getAddress() throws MalformedURLException {
+    protected String getAddress() {
         if (defaultEndpointURL != null) {
-            return defaultEndpointURL.toExternalForm();
+            return defaultEndpointURLString;
         } else if (fromEndpointReferenceType) {
             return getTarget().getAddress().getValue();
         }
@@ -815,8 +810,11 @@ public class HTTPConduit
     /**
      * @return the default target URL
      */
-    protected synchronized URL getURL() throws MalformedURLException {
-        return getURL(true);
+    protected URL getURL() throws MalformedURLException {
+        if (defaultEndpointURL == null) {
+            return getURL(true);
+        } 
+        return defaultEndpointURL;
     }
 
     /**
@@ -828,12 +826,14 @@ public class HTTPConduit
         if (defaultEndpointURL == null && createOnDemand) {
             if (fromEndpointReferenceType && getTarget().getAddress().getValue() != null) {
                 defaultEndpointURL = new URL(this.getTarget().getAddress().getValue());
+                defaultEndpointURLString = defaultEndpointURL.toExternalForm();
                 return defaultEndpointURL;
             }
             if (endpointInfo.getAddress() == null) {
                 throw new MalformedURLException("Invalid address. Endpoint address cannot be null.");
             }
             defaultEndpointURL = new URL(endpointInfo.getAddress());
+            defaultEndpointURLString = defaultEndpointURL.toExternalForm();
         }
         return defaultEndpointURL;
     }
@@ -927,9 +927,9 @@ public class HTTPConduit
         HttpURLConnection connection = 
             (HttpURLConnection)message.get(KEY_HTTP_CONNECTION);
 
-        String ct  = (String) message.get(Message.CONTENT_TYPE);
-        String enc = (String) message.get(Message.ENCODING);
-        
+        String ct  = (String)message.get(Message.CONTENT_TYPE);
+        String enc = (String)message.get(Message.ENCODING);
+
         if (null != ct) {
             if (enc != null 
                 && ct.indexOf("charset=") == -1
@@ -1399,7 +1399,7 @@ public class HTTPConduit
         // If this is called after the HTTPTransportFactory called 
         // finalizeConfig, we need to update the connection factory.
         if (configFinalized) {
-            retrieveConnectionFactory();
+            retrieveConnectionFactory(getAddress());
         }
     }
 
@@ -1715,7 +1715,7 @@ public class HTTPConduit
         // makeTrustDecision needs to make a connect() call to
         // make sure the proper information is available.
         // 
-        makeTrustDecision(message);
+        makeTrustDecision(message, connection);
 
         // If this is a GET method we must not touch the output
         // stream as this automagically turns the request into a POST.
@@ -1929,7 +1929,7 @@ public class HTTPConduit
             // makeTrustDecision needs to make a connect() call to
             // make sure the proper information is available.
             // 
-            makeTrustDecision(outMessage);
+            makeTrustDecision(outMessage, connection);
             
             // Trust is okay, set up for writing the request.
             
@@ -1975,10 +1975,10 @@ public class HTTPConduit
             if (!written) {
                 handleHeadersTrustCaching();
             }
-            super.flush();
             if (!cachingForRetransmission) {
                 super.close();
             } else if (cachedStream != null) {
+                super.flush();
                 cachedStream.getOut().close();
                 cachedStream.closeFlowthroughStream();
             }
@@ -2151,9 +2151,10 @@ public class HTTPConduit
             }
         }
         protected void handleResponseInternal() throws IOException {
+            Exchange exchange = outMessage.getExchange();
             int responseCode = connection.getResponseCode();
-            if ((outMessage != null) && (outMessage.getExchange() != null)) {
-                outMessage.getExchange().put(Message.RESPONSE_CODE, responseCode);
+            if (outMessage != null && exchange != null) {
+                exchange.put(Message.RESPONSE_CODE, responseCode);
             }
             
             if (LOG.isLoggable(Level.FINE)) {
@@ -2176,7 +2177,6 @@ public class HTTPConduit
                     LOG.fine(buf.toString());
                 }
             }
-        
             
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND
                 && !MessageUtils.isTrue(outMessage.getContextualProperty(
@@ -2186,7 +2186,6 @@ public class HTTPConduit
             }
 
             
-            Exchange exchange = outMessage.getExchange();
 
             InputStream in = null;
             if (isOneway(exchange) || isDecoupled()) {
@@ -2209,13 +2208,13 @@ public class HTTPConduit
             
             Message inMessage = new MessageImpl();
             inMessage.setExchange(exchange);
-            
+            Map<String, List<String>> origHeaders = connection.getHeaderFields();
             Map<String, List<String>> headers = 
                 new HashMap<String, List<String>>();
             for (String key : connection.getHeaderFields().keySet()) {
                 if (key != null) {
                     headers.put(HttpHeaderHelper.getHeaderKey(key), 
-                        connection.getHeaderFields().get(key));
+                        origHeaders.get(key));
                 }
             }
             
@@ -2231,8 +2230,7 @@ public class HTTPConduit
                 LOG.log(Level.WARNING, m);
                 throw new IOException(m);   
             } 
-            
-            inMessage.put(Message.ENCODING, normalizedEncoding);
+            inMessage.put(Message.ENCODING, normalizedEncoding);            
                         
             if (maintainSession) {
                 List<String> cookies = connection.getHeaderFields().get("Set-Cookie");
@@ -2245,7 +2243,6 @@ public class HTTPConduit
                        : connection.getErrorStream()
                      : in;
             }
-                   
             // if (in == null) : it's perfectly ok for non-soap http services
             // have no response body : those interceptors which do need it will check anyway        
             inMessage.setContent(InputStream.class, in);
@@ -2254,7 +2251,6 @@ public class HTTPConduit
             incomingObserver.onMessage(inMessage);
             
         }
-
 
     }
     
@@ -2297,7 +2293,6 @@ public class HTTPConduit
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
         }
     }
     

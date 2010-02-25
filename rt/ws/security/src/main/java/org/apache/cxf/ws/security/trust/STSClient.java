@@ -569,6 +569,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         ptoken.setToken(sct);
         
         SignedEncryptedParts parts = new SignedEncryptedParts(true);
+        parts.setOptional(true);
         parts.setBody(true);
         parts.addHeader(new Header("To", addressingNamespace));
         parts.addHeader(new Header("From", addressingNamespace));

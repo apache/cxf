@@ -1187,6 +1187,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         for (Handler h : handlers) {
             handlerChain.add(h);
         }
+        bp.getBinding().setHandlerChain(handlerChain);
     }
 
     List<String> getHandlerNames(SOAPBody soapBody) throws Exception {

@@ -188,4 +188,6 @@ public interface Message extends StringMap {
      * @return the property's value
      */
     Object getContextualProperty(String key);   
+    
+
 }

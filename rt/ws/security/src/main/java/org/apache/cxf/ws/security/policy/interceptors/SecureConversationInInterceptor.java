@@ -233,6 +233,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                                                   policy,
                                                   null);
             endpoint.getEndpointInfo().setProperty(TokenStore.class.getName(), store);
+            message.getExchange().put(TokenStore.class.getName(), store);
         
             EndpointPolicy ep = pe.getServerEndpointPolicy(endpoint.getEndpointInfo(), destination);
             List<Interceptor> interceptors = ep.getInterceptors();

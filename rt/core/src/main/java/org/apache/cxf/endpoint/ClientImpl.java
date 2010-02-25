@@ -596,7 +596,7 @@ public class ClientImpl
 
     public void onMessage(Message message) {
 
-        Endpoint endpoint = message.getExchange().get(Endpoint.class);
+        Endpoint endpoint = message.getExchange().getEndpoint();
         if (endpoint == null) {
             // in this case correlation will occur outside the transport,
             // however there's a possibility that the endpoint may have been
@@ -858,19 +858,17 @@ public class ClientImpl
         return getConduitSelector(null);
     }
 
-    protected final synchronized ConduitSelector getConduitSelector(
+    protected final ConduitSelector getConduitSelector(
         ConduitSelector override
     ) {
         if (null == conduitSelector) {
-            setConduitSelector(override != null
-                               ? override
-                               : new UpfrontConduitSelector());
+            setConduitSelector(override);
         }
         return conduitSelector;
     }
 
-    public final void setConduitSelector(ConduitSelector selector) {
-        conduitSelector = selector;
+    public final synchronized void setConduitSelector(ConduitSelector selector) {
+        conduitSelector = selector == null ? new UpfrontConduitSelector() : selector;
     }
 
     private boolean isPartialResponse(Message in) {

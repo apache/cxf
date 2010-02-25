@@ -30,7 +30,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
 
 public abstract class AbstractJAXWSHandlerInterceptor<T extends Message> extends AbstractPhaseInterceptor<T> {
-    private Binding binding;
+    protected Binding binding;
     
     protected AbstractJAXWSHandlerInterceptor(Binding b, String phase) {
         super(phase);

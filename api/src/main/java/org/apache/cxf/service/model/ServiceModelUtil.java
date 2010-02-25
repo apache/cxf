@@ -42,7 +42,7 @@ public final class ServiceModelUtil {
     }
 
     public static Service getService(Exchange exchange) {
-        return exchange.get(Service.class);
+        return exchange.getService();
     }
     
     public static String getTargetNamespace(Exchange exchange) {

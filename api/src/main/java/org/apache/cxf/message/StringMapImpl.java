@@ -20,6 +20,7 @@
 package org.apache.cxf.message;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A variation on HashMap which allows lookup by Class, via the string
@@ -29,8 +30,15 @@ public class StringMapImpl
     extends HashMap<String, Object> 
     implements StringMap {
     
+    public StringMapImpl() {
+    }
+    public StringMapImpl(Map<String, Object> i) {
+        super(i);
+    }
+    
+    @SuppressWarnings("unchecked")
     public <T> T get(Class<T> key) {
-        return key.cast(get(key.getName()));
+        return (T)get(key.getName());
     }
 
     public <T> void put(Class<T> key, T value) {

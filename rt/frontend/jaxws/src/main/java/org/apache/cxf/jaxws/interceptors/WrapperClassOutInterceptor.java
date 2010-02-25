@@ -48,7 +48,7 @@ public class WrapperClassOutInterceptor extends AbstractPhaseInterceptor<Message
 
     public void handleMessage(Message message) throws Fault {
         Exchange ex = message.getExchange();
-        BindingOperationInfo bop = ex.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = ex.getBindingOperationInfo();
 
         MessageInfo messageInfo = message.get(MessageInfo.class);
         if (messageInfo == null || bop == null || !bop.isUnwrapped()) {

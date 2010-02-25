@@ -60,6 +60,12 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage soapMessage) {
+        Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
+
+        if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
+            return;
+        }
+        
         SoapVersion soapVersion = soapMessage.getVersion();              
         Set<Header> mustUnderstandHeaders = new HashSet<Header>();
         Set<URI> serviceRoles = new HashSet<URI>();
@@ -67,7 +73,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         Set<Header> ultimateReceiverHeaders = new HashSet<Header>();
         Set<QName> mustUnderstandQNames = new HashSet<QName>();
 
-        initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles);
+        initServiceSideInfo(mustUnderstandQNames, soapMessage, serviceRoles, paramHeaders);
         buildMustUnderstandHeaders(mustUnderstandHeaders, soapMessage,
                                    serviceRoles, ultimateReceiverHeaders);
         
@@ -124,9 +130,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         }
     }
     private void initServiceSideInfo(Set<QName> mustUnderstandQNames, SoapMessage soapMessage,
-                    Set<URI> serviceRoles) {
-
-        Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
+                    Set<URI> serviceRoles, Set<QName> paramHeaders) {
 
         if (paramHeaders != null) {
             mustUnderstandQNames.addAll(paramHeaders);

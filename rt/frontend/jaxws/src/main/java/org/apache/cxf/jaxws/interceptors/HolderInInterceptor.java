@@ -47,7 +47,7 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
 
         Exchange exchange = message.getExchange();
         
-        OperationInfo op = exchange.get(OperationInfo.class);
+        OperationInfo op = exchange.getBindingOperationInfo().getOperationInfo();
         if (op == null || !op.hasOutput() || op.getOutput().size() == 0) {
             return;
         }

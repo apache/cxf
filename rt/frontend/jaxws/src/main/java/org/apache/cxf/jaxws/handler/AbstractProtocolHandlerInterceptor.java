@@ -39,6 +39,9 @@ public abstract class AbstractProtocolHandlerInterceptor<T extends Message>
     }
     
     public void handleMessage(T message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         MessageContext context = createProtocolMessageContext(message);
         HandlerChainInvoker invoker = getInvoker(message);
         invoker.setProtocolMessageContext(context);

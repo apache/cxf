@@ -332,6 +332,9 @@ public abstract class AbstractBindingBuilder {
         synchronized (info) {
             TokenStore tokenStore = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
             if (tokenStore == null) {
+                tokenStore = (TokenStore)info.getProperty(TokenStore.class.getName());
+            }
+            if (tokenStore == null) {
                 tokenStore = new MemoryTokenStore();
                 info.setProperty(TokenStore.class.getName(), tokenStore);
             }

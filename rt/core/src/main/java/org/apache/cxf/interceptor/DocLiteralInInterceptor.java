@@ -67,7 +67,7 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
         MessageContentsList parameters = new MessageContentsList();
 
         Exchange exchange = message.getExchange();
-        BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = exchange.getBindingOperationInfo();
 
         boolean client = isRequestor(message);
 

@@ -19,15 +19,19 @@
 
 package org.apache.cxf.message;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.PreexistingConduitSelector;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
 
 public class ExchangeImpl extends StringMapImpl implements Exchange {
-
+    
     private Destination destination;
     private boolean oneWay;
     private boolean synchronous = true;
@@ -38,6 +42,28 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
     private Message outFaultMessage;
     
     private Session session;
+    
+    private Bus bus;
+    private Endpoint endpoint;
+    private Service service;
+    private Binding binding;
+    private BindingOperationInfo bindingOp;
+    
+
+    public <T> void put(Class<T> key, T value) {
+        super.put(key, value);
+        if (key == Bus.class) {
+            bus = (Bus)value;
+        } else if (key == Endpoint.class) {
+            endpoint = (Endpoint)value;
+        } else if (key == Service.class) {
+            service = (Service)value;
+        } else if (key == BindingOperationInfo.class) {
+            bindingOp = (BindingOperationInfo)value;
+        } else if (key == Binding.class) {
+            binding = (Binding)value;
+        }
+    }
     
     public Destination getDestination() {
         return destination;
@@ -131,5 +157,26 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
         inFaultMessage = null;
         outFaultMessage = null;
         session = null;
+        bus = null;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public Endpoint getEndpoint() {
+        return endpoint;
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    public Binding getBinding() {
+        return binding;
+    }
+
+    public BindingOperationInfo getBindingOperationInfo() {
+        return bindingOp;
     }
 }

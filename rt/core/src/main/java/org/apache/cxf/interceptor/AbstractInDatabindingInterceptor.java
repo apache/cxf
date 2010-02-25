@@ -89,7 +89,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
                                                                    BUNDLE, service.getName()));
         }
         dataReader.setAttachments(message.getAttachments());
-        dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().get(Endpoint.class));
+        dataReader.setProperty(DataReader.ENDPOINT, message.getExchange().getEndpoint());
         dataReader.setProperty(Message.class.getName(), message);
         setSchemaInMessage(service, message, dataReader);   
         return dataReader;
@@ -215,7 +215,7 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
         QName interfaceQName = si.getInterface().getName();
         message.put(Message.WSDL_INTERFACE, interfaceQName);
 
-        EndpointInfo endpointInfo = ex.get(Endpoint.class).getEndpointInfo();
+        EndpointInfo endpointInfo = ex.getEndpoint().getEndpointInfo();
         QName portQName = endpointInfo.getName();
         message.put(Message.WSDL_PORT, portQName);
 

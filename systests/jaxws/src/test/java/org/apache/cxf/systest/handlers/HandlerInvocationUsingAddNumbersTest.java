@@ -168,7 +168,8 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
         assertNotNull(handlerChain);
         for (Handler h : handlers) {
             handlerChain.add(h);
-        }    
+        }
+        bp.getBinding().setHandlerChain(handlerChain);
     }
 
 }

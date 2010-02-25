@@ -36,6 +36,8 @@ import javax.xml.soap.SOAPPart;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.w3c.dom.Node;
+
 
 import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.binding.soap.Soap11;
@@ -122,6 +124,7 @@ public class SAAJOutInterceptor extends AbstractSoapInterceptor {
                 // Replace stax writer with DomStreamWriter
                 message.setContent(XMLStreamWriter.class, writer);
                 message.setContent(SOAPMessage.class, soapMessage);
+                message.setContent(Node.class, soapMessage.getSOAPPart());
                 
                 
             } catch (SOAPException e) {

@@ -110,6 +110,7 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
             } else {
                 StaxUtils.copy(node, new W3CDOMStreamWriter(part));
             }
+            message.setContent(Node.class, soapMessage.getSOAPPart());
 
             Collection<Attachment> atts = message.getAttachments();
             if (atts != null) {

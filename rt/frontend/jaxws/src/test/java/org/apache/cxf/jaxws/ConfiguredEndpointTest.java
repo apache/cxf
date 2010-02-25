@@ -290,19 +290,19 @@ public class ConfiguredEndpointTest extends Assert {
         assertTrue("Unexpected value for property validating", 
                    Boolean.valueOf((String) ei.getProperties().get(Message.SCHEMA_VALIDATION_ENABLED)));
         List<Interceptor> interceptors = endpoint.getInInterceptors();
-        assertEquals("Unexpected number of interceptors.", 6, interceptors.size());
+        assertEquals("Unexpected number of interceptors.", 4, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-in", 
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getOutInterceptors();
-        assertEquals("Unexpected number of interceptors.", 7, interceptors.size());
+        assertEquals("Unexpected number of interceptors.", 5, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-out", 
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getInFaultInterceptors();
-        assertEquals("Unexpected number of interceptors.", 4, interceptors.size());
+        assertEquals("Unexpected number of interceptors.", 2, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-in-fault", 
                      findTestInterceptor(interceptors).getId());
         interceptors = endpoint.getOutFaultInterceptors();
-        assertEquals("Unexpected number of interceptors.", 4, interceptors.size());
+        assertEquals("Unexpected number of interceptors.", 2, interceptors.size());
         assertEquals("Unexpected interceptor id.", "endpoint-out-fault", 
                      findTestInterceptor(interceptors).getId());
         

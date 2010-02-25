@@ -204,9 +204,12 @@ public abstract class AbstractMessageContainer extends AbstractPropertiesHolder 
      * @return all message parts.
      */
     public List<MessagePartInfo> getMessageParts() {
+        if (outOfBandParts == null) {
+            return new ArrayList<MessagePartInfo>(messageParts.values());
+        }
         List<MessagePartInfo> parts = new ArrayList<MessagePartInfo>(messageParts.values());
-        parts.addAll(getOutOfBandParts());
-        return Collections.unmodifiableList(parts);
+        parts.addAll(outOfBandParts);
+        return parts;
     }
     public List<MessagePartInfo> getOutOfBandParts() {
         if (outOfBandParts == null) {
