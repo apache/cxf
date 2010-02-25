@@ -97,7 +97,7 @@ public class SoapPreProtocolOutInterceptor extends AbstractSoapInterceptor {
     }
     
     private void setSoapAction(SoapMessage message) {
-        BindingOperationInfo boi = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo boi = message.getExchange().getBindingOperationInfo();
         
         // The soap action is set on the wrapped operation.
         if (boi != null && boi.isUnwrapped()) {

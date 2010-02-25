@@ -46,7 +46,7 @@ public class SwAInInterceptor extends AbstractSoapInterceptor {
     }
 
     public void handleMessage(SoapMessage message) throws Fault {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
         if (bop == null) {
             return;
         }

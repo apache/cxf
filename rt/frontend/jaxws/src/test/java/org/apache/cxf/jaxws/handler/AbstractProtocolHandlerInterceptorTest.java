@@ -19,6 +19,9 @@
 
 package org.apache.cxf.jaxws.handler;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.ws.Binding;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
@@ -51,7 +54,11 @@ public class AbstractProtocolHandlerInterceptorTest extends Assert {
         invoker = control.createMock(HandlerChainInvoker.class);
         message = control.createMock(IIOPMessage.class);
         exchange = control.createMock(Exchange.class);
+        binding = control.createMock(Binding.class);
         
+        List<Handler> list = new ArrayList<Handler>();
+        list.add(null);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
     }
     
     @After

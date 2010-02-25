@@ -70,12 +70,15 @@ public class JettyContinuationWrapper implements Continuation {
     public void setObject(Object userObject) {
         
         ContinuationInfo ci = null;
-        
+        Message m = message;
+        if (m != null && m.getExchange() != null && m.getExchange().getInMessage() != null) {
+            m = m.getExchange().getInMessage();
+        }
         Object obj = continuation.getObject();
         if (obj instanceof ContinuationInfo) {
             ci = (ContinuationInfo)obj;
         } else {
-            ci = new ContinuationInfo(message);
+            ci = new ContinuationInfo(m);
             ci.setUserObject(obj);
         }
         if (message != userObject) {
@@ -108,7 +111,11 @@ public class JettyContinuationWrapper implements Continuation {
     }
 
     protected Message getMessage() {
-        return message;
+        Message m = message;
+        if (m != null && m.getExchange().getInMessage() != null) {
+            m = m.getExchange().getInMessage();
+        }
+        return m;
     }
     
     public org.mortbay.util.ajax.Continuation getContinuation() {

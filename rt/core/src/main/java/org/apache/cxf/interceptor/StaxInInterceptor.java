@@ -57,7 +57,7 @@ public class StaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) {
-        if (isGET(message) || message.getContentFormats().contains(XMLStreamReader.class)) {
+        if (isGET(message) || message.getContent(XMLStreamReader.class) != null) {
             LOG.fine("StaxInInterceptor skipped.");
             return;
         }

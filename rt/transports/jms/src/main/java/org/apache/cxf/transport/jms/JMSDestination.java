@@ -179,14 +179,14 @@ public class JMSDestination extends AbstractMultiplexDestination
         try {
             getLogger().log(Level.FINE, "server received request: ", message);
              // Build CXF message from JMS message
-            MessageImpl inMessage = new MessageImpl();            
+            Message inMessage = new MessageImpl();            
             JMSUtils.populateIncomingContext(message, inMessage, 
                                              JMSConstants.JMS_SERVER_REQUEST_HEADERS, jmsConfig);
             
             JMSUtils.retrieveAndSetPayload(inMessage, message, (String)inMessage.get(Message.ENCODING));
             inMessage.put(JMSConstants.JMS_SERVER_RESPONSE_HEADERS, new JMSMessageHeadersType());
             inMessage.put(JMSConstants.JMS_REQUEST_MESSAGE, message);
-            inMessage.setDestination(this);
+            ((MessageImpl)inMessage).setDestination(this);
             if (jmsConfig.getMaxSuspendedContinuations() != 0) {
                 inMessage.put(ContinuationProvider.class.getName(), 
                               new JMSContinuationProvider(bus,
@@ -210,6 +210,8 @@ public class JMSDestination extends AbstractMultiplexDestination
 
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
+            
+            inMessage = inMessage.getExchange().getInMessage();
             
             //need to propagate any exceptions back to Spring container 
             //so transactions can occur

@@ -99,7 +99,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
 
     public void handleMessage(SoapMessage message) throws Fault {
         Exchange ex = message.getExchange();
-        BindingOperationInfo bop = ex.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = ex.getBindingOperationInfo();
         if (bop == null) {
             return;
         }
@@ -118,7 +118,7 @@ public class SwAOutInterceptor extends AbstractSoapInterceptor {
         SoapBodyInfo sbi = bmi.getExtensor(SoapBodyInfo.class);
         
         if (sbi == null || sbi.getAttachments() == null || sbi.getAttachments().size() == 0) {
-            Service s = ex.get(Service.class);
+            Service s = ex.getService();
             DataBinding db = s.getDataBinding();
             if (db instanceof JAXBDataBinding
                 && hasSwaRef((JAXBDataBinding) db)) {

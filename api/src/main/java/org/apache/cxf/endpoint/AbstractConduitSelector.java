@@ -22,7 +22,6 @@ package org.apache.cxf.endpoint;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -67,8 +66,8 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
             EndpointInfo ei = endpoint.getEndpointInfo();
             String transportID = ei.getTransportId();
             try {
-                ConduitInitiatorManager conduitInitiatorMgr =
-                    getBus(exchange).getExtension(ConduitInitiatorManager.class);
+                ConduitInitiatorManager conduitInitiatorMgr = exchange.getBus()
+                    .getExtension(ConduitInitiatorManager.class);
                 if (conduitInitiatorMgr != null) {
                     ConduitInitiator conduitInitiator =
                         conduitInitiatorMgr.getConduitInitiator(transportID);
@@ -120,17 +119,6 @@ public abstract class AbstractConduitSelector implements ConduitSelector {
     public void setEndpoint(Endpoint ep) {
         endpoint = ep;
     }
-    
-    /**
-     * Get the associated Bus instance from the exchange.
-     * 
-     * @param exchange the current exchange
-     * @return the Bus instance
-     */
-    private Bus getBus(Exchange exchange) {
-        return exchange.get(Bus.class);
-    }
-    
     
     /**
      * Called on completion of the MEP for which the Conduit was required.

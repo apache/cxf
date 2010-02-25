@@ -21,104 +21,129 @@ package org.apache.cxf.common.util;
 
 import java.util.Collection;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public final class ModCountCopyOnWriteArrayList<T> extends CopyOnWriteArrayList<T> {
-    int modCount;
+    AtomicInteger modCount = new AtomicInteger();
     
     public ModCountCopyOnWriteArrayList() {
         super();
     }
     public ModCountCopyOnWriteArrayList(Collection<? extends T> c) {
-        super();
-        synchronized (c) {
-            addAll(c);
-            if (c instanceof ModCountCopyOnWriteArrayList) {
-                modCount = ((ModCountCopyOnWriteArrayList)c).getModCount();
-            }
+        super(c);
+        if (c instanceof ModCountCopyOnWriteArrayList) {
+            modCount.set(((ModCountCopyOnWriteArrayList)c).getModCount());
         }
     }
     
-    public synchronized int getModCount() {
-        return modCount;
+    public int getModCount() {
+        return modCount.get();
     }
     
-    public synchronized void setModCount(int i) {
-        modCount = i;
+    public void setModCount(int i) {
+        modCount.set(i);
     }
     
     @Override
-    public synchronized void add(int index, T element) {
-        ++modCount;
+    public void add(int index, T element) {
         super.add(index, element);
+        modCount.incrementAndGet();
     }
 
     @Override
-    public synchronized boolean add(T element) {
-        ++modCount;
-        return super.add(element);
+    public boolean add(T element) {
+        if (super.add(element)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized boolean addAll(Collection<? extends T> c) {
-        ++modCount;
-        return super.addAll(c);
+    public boolean addAll(Collection<? extends T> c) {
+        if (super.addAll(c)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized boolean addAll(int index, Collection<? extends T> c) {
-        ++modCount;
-        return super.addAll(index, c);
+    public boolean addAll(int index, Collection<? extends T> c) {
+        if (super.addAll(index, c)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized int addAllAbsent(Collection<? extends T> c) {
-        ++modCount;
-        return super.addAllAbsent(c);
+    public int addAllAbsent(Collection<? extends T> c) {
+        int i = super.addAllAbsent(c);
+        if (i > 0) {
+            modCount.incrementAndGet();
+        }
+        return i;
     }
 
     @Override
-    public synchronized boolean addIfAbsent(T element) {
-        ++modCount;
-        return super.addIfAbsent(element);
+    public boolean addIfAbsent(T element) {
+        if (super.addIfAbsent(element)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized void clear() {
-        ++modCount;
+    public void clear() {
         super.clear();
+        modCount.incrementAndGet();
     }
 
     @Override
-    public synchronized T remove(int index) {
-        ++modCount;
-        return super.remove(index);
+    public T remove(int index) {
+        T t = super.remove(index);
+        if (t != null) {
+            modCount.incrementAndGet();
+        }
+        return t;
     }
 
     @Override
-    public synchronized boolean remove(Object o) {
-        ++modCount;
-        return super.remove(o);
+    public boolean remove(Object o) {
+        if (super.remove(o)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized boolean removeAll(Collection c) {
-        ++modCount;
-        return super.removeAll(c);
+    public boolean removeAll(Collection c) {
+        if (super.removeAll(c)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
 
     @Override
-    public synchronized boolean retainAll(Collection c) {
-        ++modCount;
-        return super.retainAll(c);
+    public boolean retainAll(Collection c) {
+        if (super.retainAll(c)) {
+            modCount.incrementAndGet();
+            return true;
+        }
+        return false;
     }
     
-    public synchronized int hashCode() {
-        return super.hashCode() + modCount;
+    public int hashCode() {
+        return super.hashCode() + modCount.get();
     }
     
-    public synchronized boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (o instanceof ModCountCopyOnWriteArrayList) {
-            return super.equals(o) && modCount == ((ModCountCopyOnWriteArrayList)o).getModCount();
+            return super.equals(o) && modCount.get() == ((ModCountCopyOnWriteArrayList)o).getModCount();
         }
         return false;
     }

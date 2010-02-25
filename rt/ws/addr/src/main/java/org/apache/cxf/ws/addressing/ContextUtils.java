@@ -421,8 +421,8 @@ public final class ContextUtils {
                                 // ensure decoupled back channel input stream is closed
                                 c.setMessageObserver(new MessageObserver() {
                                     public void onMessage(Message m) {
-                                        if (m.getContentFormats().contains(InputStream.class)) {
-                                            InputStream is = m.getContent(InputStream.class);
+                                        InputStream is = m.getContent(InputStream.class);
+                                        if (is != null) {
                                             try {
                                                 is.close();
                                             } catch (Exception e) {

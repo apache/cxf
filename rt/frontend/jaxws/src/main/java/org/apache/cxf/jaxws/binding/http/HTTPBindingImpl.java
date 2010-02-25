@@ -27,11 +27,13 @@ import javax.xml.ws.handler.LogicalHandler;
 import javax.xml.ws.http.HTTPBinding;
 
 import org.apache.cxf.jaxws.binding.AbstractBindingImpl;
+import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class HTTPBindingImpl extends AbstractBindingImpl implements HTTPBinding {
         
-    public HTTPBindingImpl(BindingInfo sb) {       
+    public HTTPBindingImpl(BindingInfo sb, JaxWsEndpointImpl ep) {
+        super(ep);
     }
     
     public String getBindingID() {

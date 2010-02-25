@@ -252,6 +252,10 @@ public class HandlerChainInvokerTest extends Assert {
     
     @Test
     public void testHandleMessageThrowsProtocolExceptionOutbound() {
+        message = new SoapMessage(message);
+        lmc = new LogicalMessageContextImpl(message);
+        pmc = new WrappedMessageContext(message);      
+
         ProtocolException pe = new ProtocolException("banzai");
         protocolHandlers[2].setException(pe);
         
@@ -265,7 +269,7 @@ public class HandlerChainInvokerTest extends Assert {
         
         //create an empty SOAP body for testing
         try {
-            pmc = new SOAPMessageContextImpl(new SoapMessage(message));
+            pmc = new SOAPMessageContextImpl(message);
             MessageFactory factory = MessageFactory.newInstance();
             SOAPMessage soapMessage = factory.createMessage();      
             ((SOAPMessageContext)pmc).setMessage(soapMessage);            

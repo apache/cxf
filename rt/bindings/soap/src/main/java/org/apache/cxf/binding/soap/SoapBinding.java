@@ -22,7 +22,6 @@ package org.apache.cxf.binding.soap;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.BindingInfo;
 
 public class SoapBinding extends AbstractBasicInterceptorProvider implements Binding {
@@ -52,7 +51,9 @@ public class SoapBinding extends AbstractBasicInterceptorProvider implements Bin
     }
     
     public Message createMessage() {
-        return createMessage(new MessageImpl());
+        SoapMessage soapMessage = new SoapMessage(version);
+        soapMessage.put(Message.CONTENT_TYPE, soapMessage.getVersion().getContentType());
+        return soapMessage;
     }
 
     public Message createMessage(Message m) {

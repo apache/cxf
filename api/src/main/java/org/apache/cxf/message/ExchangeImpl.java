@@ -19,15 +19,19 @@
 
 package org.apache.cxf.message;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
 import org.apache.cxf.endpoint.ConduitSelector;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.PreexistingConduitSelector;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
 
 public class ExchangeImpl extends StringMapImpl implements Exchange {
-
+    
     private Destination destination;
     private boolean oneWay;
     private boolean synchronous = true;
@@ -38,6 +42,80 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
     private Message outFaultMessage;
     
     private Session session;
+    
+    private Bus bus;
+    private Endpoint endpoint;
+    private Service service;
+    private Binding binding;
+    private BindingOperationInfo bindingOp;
+    
+
+    /*
+    public <T> T get(Class<T> key) { 
+        if (key == Bus.class) {
+            return (T)bus;
+        } else if (key == Service.class) {
+            return (T)service;
+        } else if (key == Endpoint.class) {
+            return (T)endpoint;
+        } else if (key == BindingOperationInfo.class) {
+            return (T)bindingOp;
+        } else if (key == Binding.class) {
+            return (T)binding;
+        } else if (key == OperationInfo.class) {
+            return super.get(key);
+        }
+        return super.get(key);
+    }
+    */
+    private void resetContextCaches() {
+        if (inMessage != null) {
+            inMessage.resetContextCache();
+        }
+        if (outMessage != null) {
+            outMessage.resetContextCache();
+        }
+        if (inFaultMessage != null) {
+            inFaultMessage.resetContextCache();
+        }
+        if (outFaultMessage != null) {
+            outFaultMessage.resetContextCache();
+        }
+    }
+
+    public <T> void put(Class<T> key, T value) {
+        super.put(key, value);
+        if (key == Bus.class) {
+            resetContextCaches();
+            bus = (Bus)value;
+        } else if (key == Endpoint.class) {
+            resetContextCaches();
+            endpoint = (Endpoint)value;
+        } else if (key == Service.class) {
+            resetContextCaches();
+            service = (Service)value;
+        } else if (key == BindingOperationInfo.class) {
+            bindingOp = (BindingOperationInfo)value;
+        } else if (key == Binding.class) {
+            binding = (Binding)value;
+        }
+    }
+    public Object put(String key, Object value) {
+        if (inMessage != null) {
+            inMessage.setContextualProperty(key, value);
+        }
+        if (outMessage != null) {
+            outMessage.setContextualProperty(key, value);
+        }
+        if (inFaultMessage != null) {
+            inFaultMessage.setContextualProperty(key, value);
+        }
+        if (outFaultMessage != null) {
+            outFaultMessage.setContextualProperty(key, value);
+        }
+        return super.put(key, value);
+    }
+
     
     public Destination getDestination() {
         return destination;
@@ -124,6 +202,7 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
     
     public void clear() {
         super.clear();
+        resetContextCaches();
         destination = null;
         oneWay = false;
         inMessage = null;
@@ -131,5 +210,26 @@ public class ExchangeImpl extends StringMapImpl implements Exchange {
         inFaultMessage = null;
         outFaultMessage = null;
         session = null;
+        bus = null;
+    }
+
+    public Bus getBus() {
+        return bus;
+    }
+
+    public Endpoint getEndpoint() {
+        return endpoint;
+    }
+
+    public Service getService() {
+        return service;
+    }
+
+    public Binding getBinding() {
+        return binding;
+    }
+
+    public BindingOperationInfo getBindingOperationInfo() {
+        return bindingOp;
     }
 }

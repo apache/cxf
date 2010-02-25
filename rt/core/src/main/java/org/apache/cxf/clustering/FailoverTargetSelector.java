@@ -19,10 +19,9 @@
 
 package org.apache.cxf.clustering;
 
-import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -64,7 +63,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
      */
     public FailoverTargetSelector(Conduit c) {
         super(c);
-        inProgress = new HashMap<InvocationKey, InvocationContext>();
+        inProgress = new ConcurrentHashMap<InvocationKey, InvocationContext>();
     }
     
     /**
@@ -78,7 +77,7 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         if (!inProgress.containsKey(key)) {
             Endpoint endpoint = exchange.get(Endpoint.class);
             BindingOperationInfo bindingOperationInfo =
-                exchange.get(BindingOperationInfo.class);
+                exchange.getBindingOperationInfo();
             Object[] params = message.getContent(List.class).toArray();
             Map<String, Object> context =
                 CastUtils.cast((Map)message.get(Message.INVOCATION_CONTEXT));
@@ -197,18 +196,18 @@ public class FailoverTargetSelector extends AbstractConduitSelector {
         Exception ex = outMessage.get(Exception.class) != null
                        ? outMessage.get(Exception.class)
                        : exchange.get(Exception.class);
-        getLogger().log(Level.INFO,
+        getLogger().log(Level.FINE,
                         "CHECK_LAST_INVOKE_FAILED",
                         new Object[] {ex != null});
         Throwable curr = ex;
         boolean failover = false;
         while (curr != null) {
-            getLogger().log(Level.WARNING,
-                            "CHECK_FAILURE_IN_TRANSPORT",
-                            new Object[] {ex, curr instanceof IOException});
             failover = curr instanceof java.io.IOException;
             curr = curr.getCause();
         }
+        getLogger().log(Level.INFO,
+                        "CHECK_FAILURE_IN_TRANSPORT",
+                        new Object[] {ex, failover});
         return failover;
     }
     

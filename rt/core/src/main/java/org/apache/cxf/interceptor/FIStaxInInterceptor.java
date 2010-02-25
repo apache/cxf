@@ -51,7 +51,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
 
-    private synchronized StAXDocumentParser getParser(InputStream in) {
+    private StAXDocumentParser getParser(InputStream in) {
         StAXDocumentParser parser = new StAXDocumentParser(in);
         parser.setStringInterning(true);
         parser.setForceStreamClose(true);
@@ -60,7 +60,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     }
     
     public void handleMessage(Message message) {
-        if (message.getContentFormats().contains(XMLStreamReader.class)
+        if (message.getContent(XMLStreamReader.class) != null
             || !isHttpVerbSupported(message)) {
             return;
         }
@@ -81,7 +81,7 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
             if (isRequestor(message)) {
                 //record the fact that is worked so future requests will 
                 //automatically be FI enabled
-                Endpoint ep = message.getExchange().get(Endpoint.class);
+                Endpoint ep = message.getExchange().getEndpoint();
                 ep.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
             }
         }

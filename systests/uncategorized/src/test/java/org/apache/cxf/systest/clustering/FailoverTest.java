@@ -361,7 +361,8 @@ public class FailoverTest extends AbstractBusClientServerTestBase {
         // REVISIT: why doesn't the generic (i.e. non-Port-specific)
         // Service.getPort() load the <jaxws:client> configuration?
         greeter = cs.getReplicatedPortA();
-        assertTrue("unexpected conduit slector",
+        assertTrue("unexpected conduit selector: " 
+                   + ClientProxy.getClient(greeter).getConduitSelector().getClass().getName(),
                    ClientProxy.getClient(greeter).getConduitSelector()
                    instanceof FailoverTargetSelector);
     }

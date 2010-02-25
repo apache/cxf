@@ -53,14 +53,18 @@ public class JMSContinuationProvider implements ContinuationProvider {
     }
     
     public Continuation getContinuation() {
-        if (inMessage.getExchange().isOneWay()) {
+        Message m = inMessage;
+        if (m != null && m.getExchange() != null && m.getExchange().getInMessage() != null) {
+            m = m.getExchange().getInMessage();
+        }
+        if (m.getExchange().isOneWay()) {
             return null;
         }
-        JMSContinuation cw = inMessage.get(JMSContinuation.class);
+        JMSContinuation cw = m.get(JMSContinuation.class);
         if (cw == null) {
-            cw = new JMSContinuation(bus, inMessage,  incomingObserver, continuations, 
+            cw = new JMSContinuation(bus, m,  incomingObserver, continuations, 
                                      jmsListener, jmsConfig);
-            inMessage.put(JMSContinuation.class, cw);
+            m.put(JMSContinuation.class, cw);
         }
         return cw;
         

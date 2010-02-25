@@ -234,7 +234,7 @@ public class JettyHTTPDestinationTest extends Assert {
             new TestJettyDestination(transportFactory.getBus(), 
                                      transportFactory, ei);
         testDestination.finalizeConfig();
-        MessageImpl mi = testDestination.retrieveFromContinuation(httpRequest);
+        Message mi = testDestination.retrieveFromContinuation(httpRequest);
         assertSame("Message is lost", m, mi);
         EasyMock.verify(continuation);
         EasyMock.reset(httpRequest);
@@ -276,7 +276,7 @@ public class JettyHTTPDestinationTest extends Assert {
             new TestJettyDestination(transportFactory.getBus(), 
                                      transportFactory, ei);
         testDestination.finalizeConfig();
-        MessageImpl mi = testDestination.retrieveFromContinuation(httpRequest);
+        Message mi = testDestination.retrieveFromContinuation(httpRequest);
         assertNull("Continuations must be ignored", mi);
     }
     
@@ -1006,7 +1006,7 @@ public class JettyHTTPDestinationTest extends Assert {
         }
         
         @Override
-        public MessageImpl retrieveFromContinuation(HttpServletRequest request) {
+        public Message retrieveFromContinuation(HttpServletRequest request) {
             return super.retrieveFromContinuation(request);
         }
         

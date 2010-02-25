@@ -1401,6 +1401,10 @@ public class JAXRSUtilsTest extends Assert {
         m.setExchange(e);
         e.setInMessage(m);
         Endpoint endpoint = EasyMock.createMock(Endpoint.class);
+        endpoint.getEndpointInfo();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
+        endpoint.size();
+        EasyMock.expectLastCall().andReturn(0).anyTimes();
         endpoint.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(factory).anyTimes();
         EasyMock.replay(endpoint);

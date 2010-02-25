@@ -460,6 +460,7 @@ public class ServiceImpl extends ServiceDelegate {
         List<Handler> hc = jaxwsEndpoint.getJaxwsBinding().getHandlerChain();
         
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
+        jaxwsEndpoint.getJaxwsBinding().setHandlerChain(hc);
 
         LOG.log(Level.FINE, "created proxy", obj);
 

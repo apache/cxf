@@ -19,37 +19,90 @@
 
 package org.apache.cxf.message;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+
+import org.w3c.dom.Node;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.service.Service;
-import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 
 public class MessageImpl extends StringMapImpl implements Message {
-    static int count;
+    private static final Class<?> DEFAULT_CONTENTS[];
+    private static final int DEFAULT_CONTENTS_LENGTH;
     
-    private Collection<Attachment> attachments;
+    static {
+        Class<?> tmps[];
+        
+        try {
+            //if SAAJ is there, give it a slot
+            Class<?> cls = Class.forName("javax.xml.soap.SOAPMessage");
+            tmps = new Class<?>[] {
+                XMLStreamReader.class, XMLStreamWriter.class,
+                InputStream.class, OutputStream.class,
+                List.class, Exception.class, Node.class, DelegatingInputStream.class,
+                cls
+            };
+        } catch (Throwable e) {
+            tmps = new Class<?>[] {
+                XMLStreamReader.class, XMLStreamWriter.class,
+                InputStream.class, OutputStream.class,
+                List.class, Exception.class, Node.class, DelegatingInputStream.class
+            };
+        }
+        DEFAULT_CONTENTS = tmps;
+        DEFAULT_CONTENTS_LENGTH = tmps.length;
+    }
+    
+    
     private Exchange exchange;
     private String id;
     private InterceptorChain interceptorChain;
-    private Map<Class<?>, Object> contents = new IdentityHashMap<Class<?>, Object>(6);
+    
+    private Object[] defaultContents = new Object[DEFAULT_CONTENTS_LENGTH];
+    private Map<Class<?>, Object> contents;
+    private Map<String, Object> contextCache;
+    
     
     public MessageImpl() {
         //nothing
     }
+    public MessageImpl(Message m) {
+        super(m);
+        if (m instanceof MessageImpl) {
+            MessageImpl impl = (MessageImpl)m;
+            exchange = impl.getExchange();
+            id = impl.id;
+            interceptorChain = impl.interceptorChain;
+            defaultContents = impl.defaultContents;
+            contents = impl.contents;
+            contextCache = impl.contextCache;
+        } else {
+            throw new RuntimeException("Not a MessageImpl! " + m.getClass());
+        }
+    }
     
     public Collection<Attachment> getAttachments() {
-        return attachments;
+        return CastUtils.cast((Collection<?>)get(ATTACHMENTS));
     }
 
     public void setAttachments(Collection<Attachment> attachments) {
-        this.attachments = attachments;
         put(ATTACHMENTS, attachments);
     }
 
@@ -74,20 +127,55 @@ public class MessageImpl extends StringMapImpl implements Message {
         return this.interceptorChain;
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T getContent(Class<T> format) {
-        return format.cast(contents.get(format));
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                return (T)defaultContents[x];
+            }
+        }
+        return contents == null ? null : (T)contents.get(format);
     }
 
     public <T> void setContent(Class<T> format, Object content) {
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                defaultContents[x] = content;
+                return;
+            }
+        }
+        if (contents == null) {
+            contents = new IdentityHashMap<Class<?>, Object>(6);
+        }
         contents.put(format, content);
     }
     
     public <T> void removeContent(Class<T> format) {
-        contents.remove(format);
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (DEFAULT_CONTENTS[x] == format) {
+                defaultContents[x] = null;
+                return;
+            }
+        }
+        if (contents != null) {
+            contents.remove(format);
+        }
     }
 
     public Set<Class<?>> getContentFormats() {
-        return contents.keySet();
+        
+        Set<Class<?>> c;
+        if (contents == null) {
+            c = new HashSet<Class<?>>();
+        } else {
+            c = new HashSet<Class<?>>(contents.keySet());
+        }
+        for (int x = 0; x < DEFAULT_CONTENTS_LENGTH; x++) {
+            if (defaultContents[x] != null) {
+                c.add(DEFAULT_CONTENTS[x]);
+            }
+        }
+        return c;
     }
 
     public void setDestination(Destination d) {
@@ -105,56 +193,67 @@ public class MessageImpl extends StringMapImpl implements Message {
     public void setInterceptorChain(InterceptorChain ic) {
         this.interceptorChain = ic;
     }
-
+    public Object put(String key, Object value) {
+        if (contextCache != null) {
+            contextCache.put(key, value);
+        }
+        return super.put(key, value);
+    }
     public Object getContextualProperty(String key) {
-        Object val = get(key);
-        
-        Exchange ex = getExchange();
-        if (val == null && ex != null) {
-            val = ex.get(key);
+        if (contextCache == null) {
+            calcContextCache();
         }
-        
-        if (val == null) {
-            OperationInfo ep = get(OperationInfo.class); 
-            if (ep != null) {
-                val = ep.getProperty(key);
-            }
-        }
-        
-        if (val == null && ex != null) {
-            Endpoint ep = ex.get(Endpoint.class); 
-            if (ep != null) {
-                val = ep.get(key);
-                
-                if (val == null) {
-                    val = ep.getEndpointInfo().getProperty(key);
-                }
-
-                if (val == null) {
-                    val = ep.getEndpointInfo().getBinding().getProperty(key);
-                }
-
-            }
-            if (val == null) {
-                Service sv = ex.get(Service.class); 
-                if (sv != null) {
-                    val = sv.get(key);
-                }
-                if (val == null) {
-                    Bus bus = ex.get(Bus.class);
-                    if (bus != null) {
-                        val = bus.getProperty(key);
-                    }
-                }
-            }
-        }
-        
-        return val;
+        return contextCache.get(key);
     }
     
+    private void calcContextCache() {
+        Map<String, Object> o = new HashMap<String, Object>() {
+            public void putAll(Map<? extends String, ? extends Object> m) {
+                if (m != null) {
+                    super.putAll(m);
+                }
+            }
+        };
+        Exchange ex = getExchange();
+        if (ex != null) {
+            Bus b = ex.getBus();
+            if (b != null) {
+                o.putAll(b.getProperties());
+            }
+            Service sv = ex.getService(); 
+            if (sv != null) {
+                o.putAll(sv);
+            }
+            Endpoint ep = ex.getEndpoint(); 
+            if (ep != null) {
+                EndpointInfo ei = ep.getEndpointInfo();
+                if (ei != null) {
+                    o.putAll(ep.getEndpointInfo().getBinding().getProperties());
+                    o.putAll(ep.getEndpointInfo().getProperties());
+                }
+                o.putAll(ep);
+            }
+        }
+        o.putAll(ex);
+        o.putAll(this);
+        contextCache = o;
+    }
     public static void copyContent(Message m1, Message m2) {
         for (Class<?> c : m1.getContentFormats()) {
             m2.setContent(c, m1.getContent(c));
+        }
+    }
+
+    public void resetContextCache() {
+        if (contextCache != null) {
+            contextCache = null;
+        }
+    }
+
+    @Override
+    public void setContextualProperty(String key, Object v) {
+        if (contextCache != null && !containsKey(key)) {
+            contextCache.put(key, v);
         }
     }
 }

@@ -65,7 +65,7 @@ public class SoapHeaderInterceptor extends AbstractInDatabindingInterceptor {
             parameters = new MessageContentsList();
         }
 
-        BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
+        BindingOperationInfo bop = exchange.getBindingOperationInfo();
         if (null == bop) {
             return;
         }

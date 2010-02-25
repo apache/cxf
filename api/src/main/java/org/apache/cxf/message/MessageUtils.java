@@ -130,12 +130,15 @@ public final class MessageUtils {
      * Returns true if the underlying content format is a W3C DOM or a SAAJ message.
      */
     public static boolean isDOMPresent(Message m) {
+        return m.getContent(Node.class) != null;
+        /*
         for (Class c : m.getContentFormats()) {
             if (c.equals(Node.class) || c.getName().equals("javax.xml.soap.SOAPMessage")) {
                 return true;
             }   
         }
         return false;
+        */
     }
 
 }

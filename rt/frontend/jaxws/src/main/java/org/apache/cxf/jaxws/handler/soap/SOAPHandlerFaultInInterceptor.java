@@ -70,6 +70,9 @@ public class SOAPHandlerFaultInInterceptor extends
     }
 
     public void handleMessage(SoapMessage message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         if (getInvoker(message).getProtocolHandlers().isEmpty()) {
             return;
         }

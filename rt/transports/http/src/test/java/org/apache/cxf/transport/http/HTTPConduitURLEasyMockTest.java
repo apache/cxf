@@ -86,12 +86,11 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             connectionFactory = testFactory;
         }
         @Override
-        protected void retrieveConnectionFactory() {
+        protected HttpURLConnectionFactory retrieveConnectionFactory(String s) {
             // do nothing. i.e do not change the connectionFactory field.
+            return connectionFactory;
         }
-        protected void retrieveConnectionFactory(String s) {
-            // do nothing. i.e do not change the connectionFactory field.
-        }
+        
         
     }
     /**

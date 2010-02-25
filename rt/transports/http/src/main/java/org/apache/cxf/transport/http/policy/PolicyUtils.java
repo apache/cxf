@@ -77,8 +77,8 @@ public final class PolicyUtils {
         if (pol != null) {
             return intersect(pol, confPolicy);
         }
-        AssertionInfoMap amap =  message.get(AssertionInfoMap.class);
-        if (null == amap) {
+        AssertionInfoMap amap = message.get(AssertionInfoMap.class);
+        if (null == amap || amap.isEmpty()) {
             return confPolicy;
         }
         Collection<AssertionInfo> ais = amap.get(HTTPCLIENTPOLICY_ASSERTION_QNAME);

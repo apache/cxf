@@ -19,6 +19,11 @@
 
 package org.apache.cxf.message;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.binding.Binding;
+import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.service.Service;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.Session;
@@ -100,4 +105,11 @@ public interface Exchange extends StringMap {
      * {@inheritDoc}
      */
     void clear();
+    
+    Bus getBus();
+    Service getService();
+    Endpoint getEndpoint();
+    Binding getBinding();
+    BindingOperationInfo getBindingOperationInfo();
+    
 }

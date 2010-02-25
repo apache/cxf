@@ -58,6 +58,9 @@ public class LogicalHandlerFaultOutInterceptor
     }
     
     public void handleMessage(Message message) throws Fault {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;

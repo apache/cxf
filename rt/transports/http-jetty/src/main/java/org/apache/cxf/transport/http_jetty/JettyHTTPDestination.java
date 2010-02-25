@@ -31,7 +31,6 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
@@ -41,6 +40,7 @@ import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.ExchangeImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
@@ -162,7 +162,8 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         try {
             url = new URL(endpointInfo.getAddress());
         } catch (Exception e) {
-            throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG, e.getMessage()), e);
+            throw new Fault(new org.apache.cxf.common.i18n.Message("START_UP_SERVER_FAILED_MSG",
+                                                                   LOG, e.getMessage()), e);
         }
         engine.addServant(url, 
                           new JettyHTTPHandler(this, contextMatchOnExact()));
@@ -289,7 +290,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Service http request on thread: " + Thread.currentThread());
         }
-        MessageImpl inMessage = retrieveFromContinuation(req);
+        Message inMessage = retrieveFromContinuation(req);
         
         if (inMessage == null) {
             
@@ -301,7 +302,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             
             setupMessage(inMessage, context, req, resp);
             
-            inMessage.setDestination(this);
+            ((MessageImpl)inMessage).setDestination(this);
     
             ExchangeImpl exchange = new ExchangeImpl();
             exchange.setInMessage(inMessage);
@@ -339,8 +340,8 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
     }
 
-    protected MessageImpl retrieveFromContinuation(HttpServletRequest req) {
-        MessageImpl m = null;
+    protected Message retrieveFromContinuation(HttpServletRequest req) {
+        Message m = null;
         
         if (!engine.getContinuationsEnabled()) {
             return null;
@@ -351,7 +352,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             Object o = cont.getObject();
             if (o instanceof ContinuationInfo) {
                 ContinuationInfo ci = (ContinuationInfo)o;
-                m = (MessageImpl)ci.getMessage();
+                m = ci.getMessage();
                 
                 // now that we got the message we don't need ContinuationInfo
                 // as we don't know how continuation was suspended, by jetty wrapper

@@ -64,18 +64,18 @@ public class SoapActionInterceptorTest extends Assert {
         soapMessage = (SoapMessage) sb.createMessage(soapMessage);
         soapMessage.put(Message.REQUESTOR_ROLE, Boolean.TRUE);
         i.handleMessage(soapMessage);
-        String ct = (String) message.get(Message.CONTENT_TYPE);
+        String ct = (String) soapMessage.get(Message.CONTENT_TYPE);
         assertEquals("application/soap+xml", ct);
         
         BindingOperationInfo bop = createBindingOperation();
  
-        message.getExchange().put(BindingOperationInfo.class, bop);
+        soapMessage.getExchange().put(BindingOperationInfo.class, bop);
         SoapOperationInfo soapInfo = new SoapOperationInfo();
         soapInfo.setAction("foo");
         bop.addExtensor(soapInfo);
         
         i.handleMessage(soapMessage);
-        ct = (String) message.get(Message.CONTENT_TYPE);
+        ct = (String) soapMessage.get(Message.CONTENT_TYPE);
         assertEquals("application/soap+xml; action=\"foo\"", ct);
     }
 

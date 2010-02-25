@@ -41,7 +41,9 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     public void setDocumentation(String s) {
         documentation = s;
     }
-    
+    public Map<String, Object> getProperties() {
+        return propertyMap.get();
+    }
     public Object getProperty(String name) {
         if (null == propertyMap.get()) {
             return null;

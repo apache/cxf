@@ -23,6 +23,8 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.service.Service;
@@ -48,7 +50,9 @@ public class RoundTripTest extends AbstractSecurityTest {
         Service service = server.getEndpoint().getService();
         
         service.getInInterceptors().add(new SAAJInInterceptor());
+        service.getInInterceptors().add(new LoggingInInterceptor());
         service.getOutInterceptors().add(new SAAJOutInterceptor());
+        service.getOutInterceptors().add(new LoggingOutInterceptor());
 
         wsIn = new WSS4JInInterceptor();
         wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
@@ -74,8 +78,10 @@ public class RoundTripTest extends AbstractSecurityTest {
         echo = (Echo)proxyFac.create();
 
         client = ClientProxy.getClient(echo);
+        client.getInInterceptors().add(new LoggingInInterceptor());
         client.getInInterceptors().add(wsIn);
         client.getInInterceptors().add(new SAAJInInterceptor());
+        client.getOutInterceptors().add(new LoggingOutInterceptor());
         client.getOutInterceptors().add(wsOut);
         client.getOutInterceptors().add(new SAAJOutInterceptor());
     }

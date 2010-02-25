@@ -106,6 +106,9 @@ public class SOAPHandlerInterceptor extends
     }
 
     public void handleMessage(SoapMessage message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         if (getInvoker(message).getProtocolHandlers().isEmpty()) {
             return;
         }
@@ -283,6 +286,9 @@ public class SOAPHandlerInterceptor extends
     }
 
     public void handleFault(SoapMessage message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         if (getInvoker(message).getProtocolHandlers().isEmpty()) {
             return;
         }

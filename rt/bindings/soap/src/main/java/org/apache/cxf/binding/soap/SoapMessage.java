@@ -27,14 +27,19 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.message.AbstractWrappedMessage;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 
-public class SoapMessage extends AbstractWrappedMessage {
-    private SoapVersion version = Soap11.getInstance();
+public class SoapMessage extends MessageImpl {
+    private SoapVersion version;
 
     public SoapMessage(Message message) {
         super(message);
+        version = Soap11.getInstance();
+    }
+    public SoapMessage(SoapVersion ver) {
+        super();
+        version = ver;
     }
 
     public SoapVersion getVersion() {

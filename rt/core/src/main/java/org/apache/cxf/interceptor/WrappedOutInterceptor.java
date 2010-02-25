@@ -49,7 +49,7 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
 
     public void handleMessage(Message message) {
-        BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
+        BindingOperationInfo bop = message.getExchange().getBindingOperationInfo();
 
         if (bop != null && bop.isUnwrapped()) {
             XMLStreamWriter xmlWriter = message.getContent(XMLStreamWriter.class);

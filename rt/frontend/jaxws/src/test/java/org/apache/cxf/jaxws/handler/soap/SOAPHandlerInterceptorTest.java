@@ -124,6 +124,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
         IMocksControl control = createNiceControl();
         Binding binding = control.createMock(Binding.class);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
         Exchange exchange = control.createMock(Exchange.class);
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
         SoapMessage message = new SoapMessage(new MessageImpl());
@@ -227,6 +228,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
         IMocksControl control = createNiceControl();
         Binding binding = control.createMock(Binding.class);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
         Exchange exchange = control.createMock(Exchange.class);
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
         // This is to set direction to inbound
@@ -326,6 +328,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
         IMocksControl control = createNiceControl();
         Binding binding = control.createMock(Binding.class);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
         Exchange exchange = control.createMock(Exchange.class);
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
         SoapMessage message = new SoapMessage(new MessageImpl());
@@ -410,6 +413,7 @@ public class SOAPHandlerInterceptorTest extends Assert {
         IMocksControl control = createNiceControl();
         Binding binding = control.createMock(Binding.class);
         Exchange exchange = control.createMock(Exchange.class);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker).anyTimes();
         // This is to set direction to inbound
         expect(exchange.getOutMessage()).andReturn(null);
@@ -461,9 +465,9 @@ public class SOAPHandlerInterceptorTest extends Assert {
 
         IMocksControl control = createNiceControl();
         Binding binding = control.createMock(Binding.class);
+        expect(binding.getHandlerChain()).andReturn(list).anyTimes();
         SoapMessage message = control.createMock(SoapMessage.class);
         Exchange exchange = control.createMock(Exchange.class);
-        expect(binding.getHandlerChain()).andReturn(list);
         expect(message.getExchange()).andReturn(exchange).anyTimes();
         expect(message.keySet()).andReturn(new HashSet<String>());
         expect(exchange.get(HandlerChainInvoker.class)).andReturn(invoker);

@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.http;
 
-import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -149,12 +148,8 @@ public abstract class AbstractHTTPTransportFactory
         HttpURLConnectionFactory fac = null;
         boolean useHttps = false;
 
-        try {
-            if (address == null) {
-                address = configuredConduit.getAddress();
-            }
-        } catch (MalformedURLException e) {
-            //ignore, just use info based on Tls
+        if (address == null) {
+            address = configuredConduit.getAddress();
         }
         if (address != null 
             && address.startsWith(HttpsURLConnectionFactory.HTTPS_URL_PROTOCOL_ID + ":/")) {

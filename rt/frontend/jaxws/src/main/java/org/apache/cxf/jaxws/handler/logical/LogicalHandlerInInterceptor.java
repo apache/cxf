@@ -50,6 +50,9 @@ public class LogicalHandlerInInterceptor
     }
 
     public void handleMessage(Message message) {
+        if (binding.getHandlerChain().isEmpty()) {
+            return;
+        }
         HandlerChainInvoker invoker = getInvoker(message);
         if (invoker.getLogicalHandlers().isEmpty()) {
             return;

@@ -162,5 +162,13 @@ public abstract class AbstractWrappedMessage implements Message {
 
     public Object getContextualProperty(String key) {
         return message.getContextualProperty(key);
-    }       
+    }  
+    public void setContextualProperty(String key, Object v) {
+        message.setContextualProperty(key, v);
+    }  
+    
+    public void resetContextCache() {
+        message.resetContextCache();
+    }
+    
 }

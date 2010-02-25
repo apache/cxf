@@ -25,15 +25,29 @@ import java.util.List;
 import javax.xml.ws.Binding;
 import javax.xml.ws.handler.Handler;
 
+import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
+
 public abstract class AbstractBindingImpl implements Binding {
     private List<Handler> handlerChain = new ArrayList<Handler>();
+    private final JaxWsEndpointImpl endpoint;
+    
+    public AbstractBindingImpl(JaxWsEndpointImpl imp) {
+        endpoint = imp;
+    }
+    
     
     public List<Handler> getHandlerChain() {
-        return handlerChain;
+        //per spec, this should be a copy
+        return new ArrayList<Handler>(handlerChain);
     }
 
     public void setHandlerChain(List<Handler> hc) {
         handlerChain = hc;
+        if (handlerChain == null || handlerChain.isEmpty()) {
+            endpoint.removeHandlerInterceptors();
+        } else {
+            endpoint.addHandlerInterceptors();
+        }
     }
 
     public abstract String getBindingID();
