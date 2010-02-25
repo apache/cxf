@@ -30,7 +30,6 @@ import org.apache.cxf.transport.local.LocalTransportFactory;
 import org.apache.ws.security.handler.WSHandlerConstants;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class RoundTripTest extends AbstractSecurityTest {
@@ -90,7 +89,6 @@ public class RoundTripTest extends AbstractSecurityTest {
     }
 
     @Test
-    @Ignore("Seems to randomly hang on Linux")
     public void testEncryptionPlusSig() throws Exception {
         wsIn.setProperty(WSHandlerConstants.ACTION, WSHandlerConstants.ENCRYPT + " "
                                                     + WSHandlerConstants.SIGNATURE);
