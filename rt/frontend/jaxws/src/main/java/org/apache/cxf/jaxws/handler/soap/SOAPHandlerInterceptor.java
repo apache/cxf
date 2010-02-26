@@ -60,6 +60,7 @@ import org.apache.cxf.jaxws.handler.AbstractProtocolHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -176,7 +177,9 @@ public class SOAPHandlerInterceptor extends
                 if (!message.getExchange().isOneWay()
                     && observer != null) {
                     Endpoint e = message.getExchange().get(Endpoint.class);
-                    Message responseMsg = e.getBinding().createMessage();
+                    Message responseMsg = new MessageImpl();
+                    responseMsg.setExchange(message.getExchange());
+                    responseMsg = e.getBinding().createMessage(responseMsg);
     
                     // the request message becomes the response message
                     message.getExchange().setInMessage(responseMsg);
@@ -204,8 +207,10 @@ public class SOAPHandlerInterceptor extends
                 // server side inbound
                 message.getInterceptorChain().abort();
                 Endpoint e = message.getExchange().get(Endpoint.class);
-                Message responseMsg = e.getBinding().createMessage();
                 if (!message.getExchange().isOneWay()) {
+                    Message responseMsg = new MessageImpl();
+                    responseMsg.setExchange(message.getExchange());
+                    responseMsg = e.getBinding().createMessage(responseMsg);
                     message.getExchange().setOutMessage(responseMsg);
                     SOAPMessage soapMessage = ((SOAPMessageContext)context).getMessage();
 

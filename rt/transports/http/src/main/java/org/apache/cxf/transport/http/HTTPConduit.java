@@ -1758,7 +1758,7 @@ public class HTTPConduit
      * Wrapper output stream responsible for flushing headers and handling
      * the incoming HTTP-level response (not necessarily the MEP response).
      */
-    public class WrappedOutputStream extends AbstractThresholdOutputStream {
+    protected class WrappedOutputStream extends AbstractThresholdOutputStream {
         /**
          * This field contains the currently active connection.
          */
@@ -1831,7 +1831,7 @@ public class HTTPConduit
             }
         }
         
-        public void handleHeadersTrustCaching() throws IOException {
+        protected void handleHeadersTrustCaching() throws IOException {
             // Need to set the headers before the trust decision
             // because they are set before the connect().
             setURLRequestHeaders(outMessage);
