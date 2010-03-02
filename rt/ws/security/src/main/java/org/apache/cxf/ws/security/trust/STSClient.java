@@ -360,6 +360,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
         boolean wroteKeySize = false;
         String keyType = null;
         if (template != null) {
@@ -413,8 +414,9 @@ public class STSClient implements Configurable, InterceptorProvider {
             }
         } else if (keyType.endsWith("PublicKey")) {
             writer.writeStartElement("wst", "UseKey", namespace);
-            writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyInfo");
-            writer.writeStartElement("http://www.w3.org/2000/09/xmldsig#", "KeyValue");
+            writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
+            writer.writeNamespace("dsig", "http://www.w3.org/2000/09/xmldsig#");
+            writer.writeStartElement("dsig", "KeyValue", "http://www.w3.org/2000/09/xmldsig#");
             crypto = createCrypto(false);
             cert = getCert(crypto);
             PublicKey key = cert.getPublicKey();
@@ -524,6 +526,7 @@ public class STSClient implements Configurable, InterceptorProvider {
         
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + "/Validate");
         writer.writeEndElement();
@@ -597,6 +600,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
+        writer.writeNamespace("wst", namespace);
         writer.writeStartElement("wst", "RequestType", namespace);
         writer.writeCharacters(namespace + "/Cancel");
         writer.writeEndElement();
@@ -661,6 +665,7 @@ public class STSClient implements Configurable, InterceptorProvider {
 
         XmlSchemaDateFormat fmt = new XmlSchemaDateFormat();
         writer.writeStartElement("wst", "Lifetime", namespace);
+        writer.writeNamespace("wsu", WSConstants.WSU_NS);
         writer.writeStartElement("wsu", "Created", WSConstants.WSU_NS);
         writer.writeCharacters(fmt.format(creationTime));
         writer.writeEndElement();
@@ -674,7 +679,9 @@ public class STSClient implements Configurable, InterceptorProvider {
     private void addAppliesTo(XMLStreamWriter writer, String appliesTo) throws XMLStreamException {
         if (appliesTo != null && addressingNamespace != null) {
             writer.writeStartElement("wsp", "AppliesTo", "http://schemas.xmlsoap.org/ws/2004/09/policy");
+            writer.writeNamespace("wsp", "http://schemas.xmlsoap.org/ws/2004/09/policy");
             writer.writeStartElement("wsa", "EndpointReference", addressingNamespace);
+            writer.writeNamespace("wsa", addressingNamespace);
             writer.writeStartElement("wsa", "Address", addressingNamespace);
             writer.writeCharacters(appliesTo);
             writer.writeEndElement();
