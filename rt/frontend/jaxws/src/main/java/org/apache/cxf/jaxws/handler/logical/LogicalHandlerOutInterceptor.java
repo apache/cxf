@@ -39,6 +39,7 @@ import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.handler.AbstractJAXWSHandlerInterceptor;
 import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -141,7 +142,9 @@ public class LogicalHandlerOutInterceptor<T extends Message>
                     message.getInterceptorChain().abort();
                     if (!message.getExchange().isOneWay()) {
                         Endpoint e = message.getExchange().get(Endpoint.class);
-                        Message responseMsg = e.getBinding().createMessage();            
+                        Message responseMsg = new MessageImpl();
+                        responseMsg.setExchange(message.getExchange());
+                        responseMsg = e.getBinding().createMessage(responseMsg);            
     
                         MessageObserver observer = (MessageObserver)message.getExchange()
                                     .get(MessageObserver.class);

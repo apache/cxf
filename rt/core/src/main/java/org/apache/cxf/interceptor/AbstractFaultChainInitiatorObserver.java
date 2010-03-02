@@ -30,6 +30,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.BindingFaultInfo;
@@ -69,7 +70,9 @@ public abstract class AbstractFaultChainInitiatorObserver implements MessageObse
                 
                 faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {
-                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage();
+                    faultMessage = new MessageImpl();
+                    faultMessage.setExchange(exchange);
+                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage(faultMessage);
                 }
                 faultMessage.setContent(Exception.class, ex);
                 if (null != mode) {

@@ -35,6 +35,7 @@ import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.jaxws.handler.soap.SOAPHandlerInterceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -87,7 +88,9 @@ public class LogicalHandlerInInterceptor<T extends Message>
         if (!message.getExchange().isOneWay()) {
             //server side inbound
             Endpoint e = message.getExchange().get(Endpoint.class);
-            Message responseMsg = e.getBinding().createMessage();            
+            Message responseMsg = new MessageImpl();
+            responseMsg.setExchange(message.getExchange());
+            responseMsg = e.getBinding().createMessage(responseMsg);            
 
             message.getExchange().setOutMessage(responseMsg);
             XMLStreamReader reader = message.getContent(XMLStreamReader.class);

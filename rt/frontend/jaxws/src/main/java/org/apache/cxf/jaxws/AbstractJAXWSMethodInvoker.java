@@ -43,6 +43,7 @@ import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.invoker.Factory;
 import org.apache.cxf.service.invoker.FactoryInvoker;
 import org.apache.cxf.service.invoker.SingletonFactory;
@@ -115,7 +116,9 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         Message m = exchange.getOutMessage();
         if (m == null && !exchange.isOneWay()) {
             Endpoint ep = exchange.get(Endpoint.class);
-            m = ep.getBinding().createMessage();
+            m = new MessageImpl();
+            m.setExchange(exchange);
+            m = ep.getBinding().createMessage(m);
             exchange.setOutMessage(m);
         }
         return m;

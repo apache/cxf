@@ -40,6 +40,7 @@ import org.apache.cxf.jaxws.handler.HandlerChainInvoker;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
@@ -128,7 +129,9 @@ public class LogicalHandlerFaultOutInterceptor<T extends Message>
                 
                 Message faultMessage = exchange.getOutMessage();
                 if (null == faultMessage) {
-                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage();
+                    faultMessage = new MessageImpl();
+                    faultMessage.setExchange(message.getExchange());
+                    faultMessage = exchange.get(Endpoint.class).getBinding().createMessage(faultMessage);
                 }
                 faultMessage.setContent(Exception.class, ex);
                 if (null != mode) {

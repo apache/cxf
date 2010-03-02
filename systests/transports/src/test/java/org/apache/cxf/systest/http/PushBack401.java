@@ -32,6 +32,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.transport.Conduit;
@@ -178,7 +179,9 @@ public class PushBack401 extends AbstractPhaseInterceptor {
         Message outMessage = exchange.getOutMessage();
         if (outMessage == null) {
             Endpoint endpoint = exchange.get(Endpoint.class);
-            outMessage = endpoint.getBinding().createMessage();
+            outMessage = new MessageImpl();
+            outMessage.setExchange(exchange);
+            outMessage = endpoint.getBinding().createMessage(outMessage);
             exchange.setOutMessage(outMessage);
         }
         outMessage.putAll(message);
