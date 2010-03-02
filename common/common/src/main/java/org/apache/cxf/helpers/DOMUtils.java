@@ -186,7 +186,7 @@ public final class DOMUtils {
 
     public static void setAttribute(Node node, String attName, String val) {
         NamedNodeMap attributes = node.getAttributes();
-        Node attNode = node.getOwnerDocument().createAttribute(attName);
+        Node attNode = node.getOwnerDocument().createAttributeNS(null, attName);
         attNode.setNodeValue(val);
         attributes.setNamedItem(attNode);
     }
