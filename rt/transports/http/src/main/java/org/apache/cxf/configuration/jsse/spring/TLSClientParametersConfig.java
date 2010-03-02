@@ -63,6 +63,9 @@ public final class TLSClientParametersConfig {
         if (params.isDisableCNCheck()) {
             ret.setDisableCNCheck(true);
         }
+        if (params.isTrustAllCertificates()) {
+            ret.setTrustAllCertificates(true);
+        }
         if (params.isSetSecureSocketProtocol()) {
             ret.setSecureSocketProtocol(params.getSecureSocketProtocol());
         }

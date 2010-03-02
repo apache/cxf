@@ -175,27 +175,30 @@ public final class HttpsURLConnectionFactory
                       ? SSLContext.getInstance(protocol)
                       : SSLContext.getInstance(protocol, provider);
             
-                      
+            TrustManager[] trustManagers;
+            if (tlsClientParameters.isTrustAllCertificates()) {
+                trustManagers = new TrustManager[] {
+                    new javax.net.ssl.X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+                            return null;
+                        }
 
-            TrustManager[] trustAllCerts = tlsClientParameters.getTrustManagers();
-            /*
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                new javax.net.ssl.X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs,
+                                                       String authType) {
+                        }
+
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs,
+                                                       String authType) {
+                        }
                     }
-                    public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                    public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-            };
-            */         
+                };
+            } else {
+                trustManagers = tlsClientParameters.getTrustManagers();
+            }
+            
             ctx.init(
                 tlsClientParameters.getKeyManagers(),
-                trustAllCerts, 
+                trustManagers, 
                 tlsClientParameters.getSecureRandom());
             
             // The "false" argument means opposite of exclude.
@@ -211,12 +214,13 @@ public final class HttpsURLConnectionFactory
                                                         tlsClientParameters.getSecureSocketProtocol());
         }
         
-        HostnameVerifier verifier = tlsClientParameters.isDisableCNCheck() 
-            ? CertificateHostnameVerifier.ALLOW_ALL : CertificateHostnameVerifier.DEFAULT;
+        HostnameVerifier hostnameVerifier = tlsClientParameters.isDisableCNCheck() 
+            || tlsClientParameters.isTrustAllCertificates() ? CertificateHostnameVerifier.ALLOW_ALL 
+            : CertificateHostnameVerifier.DEFAULT;
         if (connection instanceof HttpsURLConnection) {
             // handle the expected case (javax.net.ssl)
             HttpsURLConnection conn = (HttpsURLConnection) connection;
-            conn.setHostnameVerifier(verifier);
+            conn.setHostnameVerifier(hostnameVerifier);
             conn.setSSLSocketFactory(socketFactory);
         } else {
             // handle the deprecated sun case and other possible hidden API's 
@@ -224,7 +228,7 @@ public final class HttpsURLConnectionFactory
             try {
                 Method method = connection.getClass().getMethod("getHostnameVerifier");
                 
-                InvocationHandler handler = new ReflectionInvokationHandler(verifier) {
+                InvocationHandler handler = new ReflectionInvokationHandler(hostnameVerifier) {
                     public Object invoke(Object proxy, 
                                          Method method, 
                                          Object[] args) throws Throwable {
