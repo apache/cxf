@@ -28,6 +28,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class TLSClientParameters extends TLSParameterBase {
     private boolean disableCNCheck;
     private SSLSocketFactory sslSocketFactory;    
+    private boolean trustAllCertificates;
 
     /**
      * Set whether or not JSEE should omit checking if the host name
@@ -46,6 +47,22 @@ public class TLSClientParameters extends TLSParameterBase {
      */
     public boolean isDisableCNCheck() {
         return disableCNCheck;
+    }
+
+    /**
+     * Returns whether or not JSSE omits checking X509 certificates 
+     * validity (using an 'accept all' X509TrustManager).
+     */
+    public boolean isTrustAllCertificates() {
+        return trustAllCertificates;
+    }
+
+    /**
+     * Set whether or not JSSE should omit checking X509 certificates 
+     * validity (using an 'accept all' {@link javax.net.ssl.X509TrustManager}).
+     */
+    public void setTrustAllCertificates(boolean trustAllCertificates) {
+        this.trustAllCertificates = trustAllCertificates;
     }
 
     /**

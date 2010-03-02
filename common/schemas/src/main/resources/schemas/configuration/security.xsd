@@ -443,6 +443,16 @@
                 </xs:documentation>
              </xs:annotation>
            </xs:attribute>
+           <xs:attribute name="trustAllCertificates" type="pt:ParameterizedBoolean" default="false">
+             <xs:annotation>
+                <xs:documentation>
+                This attribute specifies if JSSE should omit checking X509
+                certificates validity (using an 'accept all X509TrustManager').  
+                Default is false; this attribute should not be set to true during 
+                production use. Since 2.2.7.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
            <xs:attribute name="jsseProvider"          type="xs:string">
               <xs:annotation>
                 <xs:documentation>
