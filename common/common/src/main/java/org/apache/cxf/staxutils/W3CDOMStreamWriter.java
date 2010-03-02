@@ -97,7 +97,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeStartElement(String local) throws XMLStreamException {
-        newChild(document.createElement(local));
+        newChild(document.createElementNS(null, local));
     }
 
     protected void newChild(Element element) {
@@ -169,7 +169,12 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
     }
 
     public void writeAttribute(String local, String value) throws XMLStreamException {
-        Attr a = document.createAttribute(local);
+        Attr a;
+        if (local.startsWith("xmlns:")) {
+            a = document.createAttributeNS(XML_NS, local);
+        } else {
+            a = document.createAttributeNS(null, local);
+        }
         a.setValue(value);
         ((Element)currentNode).setAttributeNode(a);
     }
