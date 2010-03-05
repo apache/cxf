@@ -1966,24 +1966,31 @@ public class HTTPConduit
          * Perform any actions required on stream closure (handle response etc.)
          */
         public void close() throws IOException {
-            if (buffer != null && buffer.size() > 0) {
-                thresholdNotReached();
-                LoadingByteArrayOutputStream tmp = buffer;
-                buffer = null;
-                super.write(tmp.getRawBytes(), 0, tmp.size());
-            }
-            if (!written) {
-                handleHeadersTrustCaching();
-            }
-            if (!cachingForRetransmission) {
-                super.close();
-            } else if (cachedStream != null) {
-                super.flush();
-                cachedStream.getOut().close();
-                cachedStream.closeFlowthroughStream();
-            }
             try {
-                handleResponse();
+                if (buffer != null && buffer.size() > 0) {
+                    thresholdNotReached();
+                    LoadingByteArrayOutputStream tmp = buffer;
+                    buffer = null;
+                    super.write(tmp.getRawBytes(), 0, tmp.size());
+                }
+                if (!written) {
+                    handleHeadersTrustCaching();
+                }
+                if (!cachingForRetransmission) {
+                    super.close();
+                } else if (cachedStream != null) {
+                    super.flush();
+                    cachedStream.getOut().close();
+                    cachedStream.closeFlowthroughStream();
+                }
+
+                try {
+                    handleResponse();
+                } finally {
+                    if (cachingForRetransmission && cachedStream != null) {
+                        cachedStream.close();
+                    }
+                }
             } catch (HttpRetryException e) {
                 String msg = "HTTP response '" + e.responseCode() + ": "
                              + connection.getResponseMessage() + "' invoking " + connection.getURL();
@@ -2042,10 +2049,6 @@ public class HTTPConduit
                                    + " invoking " + connection.getURL() + ": "
                                    + e.getMessage(), e,
                                    RuntimeException.class);
-            } finally {
-                if (cachingForRetransmission && cachedStream != null) {
-                    cachedStream.close();
-                }
             }
         }
         private <T extends Exception> T mapException(String msg, 
