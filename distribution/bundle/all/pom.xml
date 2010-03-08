@@ -280,6 +280,7 @@
                             org.apache.log4j*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xmlbeans*;resolution:=optional,
+                            org.apache.xml.security*;resolution:=optional,
                             org.apache.ws.security*;resolution:=optional,
                             org.codehaus.jra*;resolution:=optional,
                             org.codehaus.jettison*;resolution:=optional,
