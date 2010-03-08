@@ -215,6 +215,9 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
 
             for (SoapHeaderInfo header : headers) {
                 MessagePartInfo part = header.getPart();
+                if (wrappedBmi != bmi) {
+                    part = wrappedBmi.getMessageInfo().addMessagePart(part.getName());
+                }
                 if (part.getIndex() >= objs.size()) {
                     // The optional out of band header is not a part of parameters of the method
                     continue;
