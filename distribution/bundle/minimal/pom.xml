@@ -155,7 +155,9 @@
                         <Specification-Version>${pom.version}</Specification-Version>
                         <DynamicImport-Package>
                             com.ctc.wstx.*,
+                            com.sun.xml.bind.api,
                             com.sun.xml.bind.api.*,
+                            com.sun.xml.internal.bind.api,
                             com.sun.xml.internal.bind.api.*,
                             org.apache.commons.logging.*,
                             org.slf4j.*,

@@ -254,7 +254,9 @@
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
                         <Specification-Version>${pom.version}</Specification-Version>
                         <DynamicImport-Package>
+                            com.sun.xml.bind.api,
                             com.sun.xml.bind.api.*,
+                            com.sun.xml.internal.bind.api,
                             com.sun.xml.internal.bind.api.*,
                             com.ctc.wstx.*,
                             org.apache.commons.logging.*,
