@@ -34,6 +34,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
         </jaxrs:serviceBeans>
         <jaxrs:providers>
             <bean class="org.apache.cxf.systest.jaxrs.BadgerFishProvider"/>
+            <bean class="org.apache.cxf.jaxrs.ext.codegen.CodeGeneratorProvider"/>
             <ref bean="exceptionMapper"/>
             <ref bean="exceptionMapper2"/>
         </jaxrs:providers>

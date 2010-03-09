@@ -164,13 +164,13 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (jaxbElementClassNames != null && jaxbElementClassNames.contains(cls.getName()) 
             || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(cls.getName())) {
             if (jaxbElementClassMap != null) {
-                name = convertStringToQName(jaxbElementClassMap.get(cls.getName()));
+                name = JAXRSUtils.convertStringToQName(jaxbElementClassMap.get(cls.getName()));
             } else {
                 name = getJaxbQName(cls, genericType, obj, false);
             }
         }
         if (name == null && marshalAsJaxbElement) {
-            name = convertStringToQName(cls.getSimpleName());
+            name = JAXRSUtils.convertStringToQName(cls.getSimpleName());
         }
         if (name != null) {
             return new JAXBElement(name, cls, null, obj);
@@ -221,22 +221,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             return getJaxbQName(cls, type, object, pluralName);
         }
             
-        return convertStringToQName(name);
-    }
-    
-    protected static QName convertStringToQName(String name) {
-        int ind1 = name.indexOf('{');
-        if (ind1 != 0) {
-            return new QName(name);
-        }
-        
-        int ind2 = name.indexOf('}');
-        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
-            return null;
-        }
-        String ns = name.substring(ind1 + 1, ind2);
-        String localName = name.substring(ind2 + 1);
-        return new QName(ns, localName);
+        return JAXRSUtils.convertStringToQName(name);
     }
     
     private String getCollectionWrapperName(Class<?> cls) {
@@ -591,7 +576,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         if (dropEls != null) {
             dropElements = new LinkedHashSet<QName>(dropEls.size());
             for (String val : dropEls) {
-                dropElements.add(convertStringToQName(val));
+                dropElements.add(JAXRSUtils.convertStringToQName(val));
             }
         }
         return dropElements;
@@ -634,8 +619,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                              Map<String, String> nsMap) {
         if (map != null) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                QName lname = convertStringToQName(entry.getKey());
-                QName rname = convertStringToQName(entry.getValue());
+                QName lname = JAXRSUtils.convertStringToQName(entry.getKey());
+                QName rname = JAXRSUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
                 if (nsMap != null) {
                     nsMap.put(lname.getNamespaceURI(), rname.getNamespaceURI());
@@ -648,8 +633,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                                                Map<QName, QName> elementsMap) {
         if (map != null) {
             for (Map.Entry<String, String> entry : map.entrySet()) {
-                QName lname = convertStringToQName(entry.getKey());
-                QName rname = convertStringToQName(entry.getValue());
+                QName lname = JAXRSUtils.convertStringToQName(entry.getKey());
+                QName rname = JAXRSUtils.convertStringToQName(entry.getValue());
                 elementsMap.put(lname, rname);
             }
         }

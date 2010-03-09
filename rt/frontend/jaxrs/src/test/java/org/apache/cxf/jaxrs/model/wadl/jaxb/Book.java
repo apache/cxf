@@ -18,9 +18,7 @@
  */
 package org.apache.cxf.jaxrs.model.wadl.jaxb;
 
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -31,12 +29,13 @@ import javax.xml.bind.annotation.XmlType;
 
 import org.apache.cxf.jaxrs.ext.Description;
 import org.apache.cxf.jaxrs.ext.xml.XMLName;
+import org.apache.cxf.jaxrs.model.wadl.FormInterface;
 
 @XmlRootElement(name = "thebook", namespace = "http://superbooks")
 @XmlType(name = "book", namespace = "http://superbooks")
 @Description("Book subresource")
 @XMLName(value = "{http://books}thesuperbook", prefix = "p1")
-public class Book {
+public class Book implements FormInterface {
 
     private int id;
     @XmlElement(name = "thechapter", namespace = "http://superbooks")
@@ -70,14 +69,10 @@ public class Book {
         return chapter;
     }
     
-    @Path("/form1")
-    @POST
     public void form1(MultivaluedMap map) {
     }
     
-    @Path("/form2")
-    @POST
-    public void form2(@FormParam("field1") String f1, @FormParam("field2") String f2) {
+    public void form2(String f1, String f2) {
     }
     
 }

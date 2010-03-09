@@ -62,6 +62,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XmlSchemaPrimitiveUtils;
@@ -113,6 +114,7 @@ public class WadlGenerator implements RequestHandler {
     private boolean ignoreMessageWriters = true;
     private boolean singleResourceMultipleMethods = true;
     private boolean useSingleSlashResource;
+    private boolean addResourceAndMethodIds;
     
     private boolean useJaxbContextForQnames = true;
     
@@ -121,6 +123,24 @@ public class WadlGenerator implements RequestHandler {
     private Map<String, List<String>> externalQnamesMap; 
     private ElementQNameResolver resolver;
     private List<String> privateAddresses;
+    
+    public WadlGenerator() {
+        
+    }
+    
+    public WadlGenerator(WadlGenerator other) {
+        this.wadlNamespace = other.wadlNamespace;
+        this.externalQnamesMap = other.externalQnamesMap;
+        this.externalSchemaLinks = other.externalSchemaLinks;
+        this.externalSchemasCache = other.externalSchemasCache;
+        this.ignoreMessageWriters = other.ignoreMessageWriters;
+        this.privateAddresses = other.privateAddresses;
+        this.resolver = other.resolver;
+        this.addResourceAndMethodIds = other.addResourceAndMethodIds;
+        this.singleResourceMultipleMethods = other.singleResourceMultipleMethods;
+        this.useJaxbContextForQnames = other.useJaxbContextForQnames;
+        this.useSingleSlashResource = other.useSingleSlashResource;
+    }
     
     public Response handleRequest(Message m, ClassResourceInfo resource) {
         
@@ -159,8 +179,7 @@ public class WadlGenerator implements RequestHandler {
         Map<Class<?>, QName> clsMap = new IdentityHashMap<Class<?>, QName>();
         Set<ClassResourceInfo> visitedResources = new HashSet<ClassResourceInfo>();
         for (ClassResourceInfo cri : cris) {
-            String path = cri.getURITemplate().getValue();
-            sbResources.append("<resource path=\"").append(path).append("\">");
+            startResourceTag(sbResources, cri.getServiceClass(), cri.getURITemplate().getValue());
             handleDocs(cri.getServiceClass().getAnnotations(), sbResources);
             handleResource(sbResources, allTypes, qnameResolver, clsMap, cri, visitedResources);
             sbResources.append("</resource>");
@@ -218,8 +237,7 @@ public class WadlGenerator implements RequestHandler {
                 Class<?> cls = ori.getMethodToInvoke().getReturnType();
                 ClassResourceInfo subcri = cri.findResource(cls, cls);
                 if (subcri != null && !visitedResources.contains(subcri)) {
-                    String path = ori.getURITemplate().getValue();
-                    sb.append("<resource path=\"").append(path).append("\">");
+                    startResourceTag(sb, subcri.getServiceClass(), ori.getURITemplate().getValue());
                     handleDocs(subcri.getServiceClass().getAnnotations(), sb);
                     handlePathAndMatrixParams(sb, ori);
                     handleResource(sb, jaxbTypes, qnameResolver, clsMap, subcri, 
@@ -234,6 +252,30 @@ public class WadlGenerator implements RequestHandler {
             resourceTagOpened = handleOperation(sb, jaxbTypes, qnameResolver, clsMap, ori, nextOp, 
                                                 resourceTagOpened, i);
         }
+    }
+    
+    private void startResourceTag(StringBuilder sb, Class<?> serviceClass, String path) {
+        sb.append("<resource path=\"").append(path).append("\"");
+        if (addResourceAndMethodIds) {
+            QName jaxbQname = null;
+            if (useJaxbContextForQnames) {
+                jaxbQname = getJaxbQName(null, serviceClass, new HashMap<Class<?>, QName>(0));
+            }
+            String pName = jaxbQname == null ? PackageUtils.getPackageName(serviceClass) 
+                : jaxbQname.getNamespaceURI();
+            String localName = jaxbQname == null ? serviceClass.getSimpleName() 
+                : jaxbQname.getLocalPart();
+            sb.append(" id=\"").append("{" + pName + "}" + localName).append("\"");
+        }
+        sb.append(">");
+    }
+    
+    private void startMethodTag(StringBuilder sb, OperationResourceInfo ori) {
+        sb.append("<method name=\"").append(ori.getHttpMethod()).append("\"");
+        if (addResourceAndMethodIds) {
+            sb.append(" id=\"").append(ori.getMethodToInvoke().getName()).append("\"");
+        }
+        sb.append(">");
     }
     
     //CHECKSTYLE:OFF
@@ -263,7 +305,7 @@ public class WadlGenerator implements RequestHandler {
             handlePathAndMatrixParams(sb, ori);
         }
         
-        sb.append("<method name=\"").append(ori.getHttpMethod()).append("\">");
+        startMethodTag(sb, ori);
         handleDocs(ori.getAnnotatedMethod().getAnnotations(), sb);
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
             sb.append("<request>");
@@ -342,7 +384,8 @@ public class WadlGenerator implements RequestHandler {
         } else {
             sb.append("<!-- Dynamic subresource -->");    
         }
-        sb.append("<resource path=\"").append(ori.getURITemplate().getValue()).append("\">");
+        startResourceTag(sb, subcri != null ? subcri.getServiceClass() : Object.class, 
+            ori.getURITemplate().getValue());
         handlePathAndMatrixParams(sb, ori);
         sb.append("</resource>");
     }
@@ -483,7 +526,7 @@ public class WadlGenerator implements RequestHandler {
                 URITemplate ut1 = op1.getURITemplate();
                 URITemplate ut2 = op2.getURITemplate();
                 int result = ut1.getValue().compareTo(ut2.getValue());
-                if (result == 0) {
+                if (result == 0 && !(sub1 && sub2)) {
                     result = op1.getHttpMethod().compareTo(op2.getHttpMethod());
                 }
                 return result;
@@ -1004,7 +1047,7 @@ public class WadlGenerator implements RequestHandler {
                 name = type.getAnnotation(XMLName.class);
             }
             if (name != null) {
-                QName qname = convertStringToQName(name.value(), name.prefix());
+                QName qname = JAXRSUtils.convertStringToQName(name.value(), name.prefix());
                 if (qname.getPrefix().length() > 0) {
                     return qname;
                 } else {
@@ -1043,21 +1086,6 @@ public class WadlGenerator implements RequestHandler {
         
     }
     
-    private QName convertStringToQName(String name, String prefix) {
-        int ind1 = name.indexOf('{');
-        if (ind1 != 0) {
-            return null;
-        }
-        
-        int ind2 = name.indexOf('}');
-        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
-            return null;
-        }
-        String ns = name.substring(ind1 + 1, ind2);
-        String localName = name.substring(ind2 + 1);
-        return new QName(ns, localName, prefix);
-    }
-
     public void setResolver(ElementQNameResolver resolver) {
         this.resolver = resolver;
     }
@@ -1074,6 +1102,10 @@ public class WadlGenerator implements RequestHandler {
         return MessageUtils.isTrue(m.getContextualProperty("org.apache.cxf.endpoint.private")); 
     }
     
+    public void setAddResourceAndMethodIds(boolean addResourceAndMethodIds) {
+        this.addResourceAndMethodIds = addResourceAndMethodIds;
+    }
+
     private static class SchemaConverter extends DelegatingXMLStreamWriter {
         private static final String SCHEMA_LOCATION = "schemaLocation";
         private Map<String, String> locsMap;    

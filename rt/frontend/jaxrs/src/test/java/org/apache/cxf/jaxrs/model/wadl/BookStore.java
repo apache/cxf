@@ -102,6 +102,11 @@ public class BookStore {
         return new Chapter(1);
     }
     
+    @Path("form")
+    public FormInterface getForm() {
+        return new Book(1);
+    }
+    
     @Path("itself")
     public BookStore getItself() {
         return this;

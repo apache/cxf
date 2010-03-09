@@ -30,10 +30,12 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import org.apache.cxf.jaxrs.ext.RequestHandler;
+import org.apache.cxf.jaxrs.ext.codegen.CodeGeneratorProvider;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.message.Message;
 
 public class RequestPreprocessor {
@@ -75,7 +77,13 @@ public class RequestPreprocessor {
         MultivaluedMap<String, String> queries = u.getQueryParameters();
         handleTypeQuery(m, queries);
         handleMethod(m, queries, new HttpHeadersImpl(m));
-        checkMetadataRequest(m);
+        Response r = checkMetadataRequest(m);
+        if (r == null) {
+            r = checkCodeRequest(m);
+        }
+        if (r != null) {
+            m.getExchange().put(Response.class, r);
+        }
         return new UriInfoImpl(m, null).getPath();
     }
     
@@ -159,7 +167,7 @@ public class RequestPreprocessor {
      * has been selected are handy. Consider implementing this method as part of the QueryHandler,
      * we will need to save the list of ClassResourceInfos on the EndpointInfo though
      */
-    public void checkMetadataRequest(Message m) {
+    public Response checkMetadataRequest(Message m) {
         String query = (String)m.get(Message.QUERY_STRING);
         if (query != null && query.contains(WadlGenerator.WADL_QUERY)) {
             String requestURI = (String)m.get(Message.REQUEST_URI);
@@ -169,12 +177,29 @@ public class RequestPreprocessor {
                 // this is actually being tested by ProviderFactory unit tests but just in case
                 // WadlGenerator, the custom or default one, must be the first one
                 if (shs.size() > 0 && shs.get(0).getProvider() instanceof WadlGenerator) {
-                    Response r = shs.get(0).getProvider().handleRequest(m, null);
-                    if (r != null) {
-                        m.getExchange().put(Response.class, r);
-                    }    
+                    return shs.get(0).getProvider().handleRequest(m, null);
                 }
             }
         }
+        return null;
+    }
+    
+    public Response checkCodeRequest(Message m) {
+        String query = (String)m.get(Message.QUERY_STRING);
+        if (query != null && (query.contains(CodeGeneratorProvider.CODE_QUERY) 
+            || query.contains(CodeGeneratorProvider.SOURCE_QUERY))) {
+            String requestURI = (String)m.get(Message.REQUEST_URI);
+            String baseAddress = HttpUtils.getBaseAddress(m);
+            if (baseAddress.equals(requestURI)) {
+                List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
+                for (ProviderInfo<RequestHandler> provider : shs) {
+                    if (provider.getProvider() instanceof CodeGeneratorProvider) { 
+                        InjectionUtils.injectContextMethods(provider.getProvider(), provider, m);
+                        return provider.getProvider().handleRequest(m, null);
+                    }
+                }
+            }
+        }
+        return null;
     }
 }

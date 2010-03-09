@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
@@ -258,24 +257,15 @@ public class DynamicClientFactory {
         //all SI's should have the same schemas
         Collection<SchemaInfo> schemas = svc.getServiceInfos().get(0).getSchemas();
 
-        SchemaCompiler compiler;
-        try {
-            compiler = JAXBUtils.createSchemaCompiler();
-        } catch (JAXBException e1) {
-            throw new IllegalStateException("Unable to create schema compiler", e1);
-        }
+        SchemaCompiler compiler = 
+            JAXBUtils.createSchemaCompilerWithDefaultAllocator(new HashSet<String>());
+        
         Object elForRun = ReflectionInvokationHandler
             .createProxyWrapper(new InnerErrorListener(wsdlUrl),
                                 JAXBUtils.getParamClass(compiler, "setErrorListener"));
         
         compiler.setErrorListener(elForRun);
         
-        Object allocator = ReflectionInvokationHandler
-            .createProxyWrapper(new ClassNameAllocatorImpl(),
-                                JAXBUtils.getParamClass(compiler, "setClassNameAllocator"));
-
-        compiler.setClassNameAllocator(allocator);
-
         addSchemas(wsdlUrl, schemas, compiler);
         addBindingFiles(bindingFiles, compiler);
         S2JJAXBModel intermediateModel = compiler.bind();
@@ -295,7 +285,7 @@ public class DynamicClientFactory {
             }
             sb.append(jpackage.name());
         }
-        outputDebug(codeModel);
+        JAXBUtils.logGeneratedClassNames(LOG, codeModel);
         
         String packageList = sb.toString();
 
@@ -411,30 +401,6 @@ public class DynamicClientFactory {
             }
         }
         return false;
-    }
-
-    private void outputDebug(JCodeModel codeModel) {
-        if (!LOG.isLoggable(Level.INFO)) {
-            return;
-        }
-        
-        StringBuilder sb = new StringBuilder();
-        boolean first = true;
-        for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
-            JPackage package1 = itr.next();
-            
-            for (Iterator<JDefinedClass> citr = package1.classes(); citr.hasNext();) {
-                if (!first) {
-                    sb.append(", ");
-                } else {
-                    first = false;
-                }
-                sb.append(citr.next().fullName());
-            }
-        }
-        
-        LOG.log(Level.INFO, "Created classes: " + sb.toString());
-        
     }
 
     private void addSchemas(String wsdlUrl, Collection<SchemaInfo> schemas, SchemaCompiler compiler) {
@@ -689,26 +655,4 @@ public class DynamicClientFactory {
         this.jaxbContextProperties = jaxbContextProperties;
     }
     
-    
-    
-    public static class ClassNameAllocatorImpl {
-        private final Set<String> typesClassNames = new HashSet<String>();
-
-        public ClassNameAllocatorImpl() {
-        }
-
-        public String assignClassName(String packageName, String className) {
-            String fullClassName = className;
-            String fullPckClass = packageName + "." + fullClassName;
-            int cnt = 0;
-            while (typesClassNames.contains(fullPckClass)) {
-                cnt++;
-                fullClassName = className + cnt;
-                fullPckClass = packageName + "." + fullClassName;
-            }
-            typesClassNames.add(fullPckClass);
-            return fullClassName;
-        }
-       
-    }
 }
