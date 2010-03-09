@@ -129,7 +129,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
     protected Map<String, String> keepInOrder(Map<String, String> params, 
                                               OperationInfo operation,
                                               List<String> order) {
-        if (params == null || params.size() == 0) {
+        if (params == null) {
             return params;
         }
         
