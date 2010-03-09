@@ -503,6 +503,9 @@ public class UriBuilderImpl extends UriBuilder {
             }
             list.add(value.toString());
         }
+        if (list.isEmpty()) {
+            list.add("");
+        }
         return list;
     }
 

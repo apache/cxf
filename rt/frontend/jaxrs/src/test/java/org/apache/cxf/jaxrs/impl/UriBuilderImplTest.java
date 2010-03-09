@@ -150,6 +150,20 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testQueryWithNoValue() throws Exception {
+        URI uri = new URI("http://bar");
+        URI newUri = new UriBuilderImpl(uri).queryParam("q").build();   
+        assertEquals("URI is not built correctly", "http://bar?q", newUri.toString());
+    }
+    
+    @Test
+    public void testMatrixWithNoValue() throws Exception {
+        URI uri = new URI("http://bar/foo");
+        URI newUri = new UriBuilderImpl(uri).matrixParam("q").build();   
+        assertEquals("URI is not built correctly", "http://bar/foo;q", newUri.toString());
+    }
+    
+    @Test
     public void testSchemeSpecificPart() throws Exception {
         URI uri = new URI("http://bar");
         URI newUri = new UriBuilderImpl(uri).scheme("https").schemeSpecificPart("//localhost:8080/foo/bar")

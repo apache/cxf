@@ -329,13 +329,14 @@ public class WadlGeneratorTest extends Assert {
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(6, resourceEls.size());        
+        assertEquals(7, resourceEls.size());        
         assertEquals("/book2", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(3).getAttribute("path"));
         assertEquals("/booksubresource", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/form", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(6).getAttribute("path"));
         
         // verify root resource starting with "/"
         // must have a single template parameter

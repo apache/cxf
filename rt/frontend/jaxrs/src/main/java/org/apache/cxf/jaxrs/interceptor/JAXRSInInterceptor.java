@@ -180,7 +180,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                 
             }
             InjectionUtils.injectContextFields(sh.getProvider(), sh, message);
-            InjectionUtils.injectContextFields(sh.getProvider(), sh, message);
+            InjectionUtils.injectContextMethods(sh.getProvider(), sh, message);
             Response response = sh.getProvider().handleRequest(message, resource);
             if (response != null) {
                 message.getExchange().put(Response.class, response);

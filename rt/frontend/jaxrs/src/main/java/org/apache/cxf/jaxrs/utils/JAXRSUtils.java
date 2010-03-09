@@ -1160,5 +1160,23 @@ public final class JAXRSUtils {
         }
         return new QName(nsURI, type.getSimpleName(), "ns1"); 
     }
+
+    public static QName convertStringToQName(String name) {
+        return convertStringToQName(name, "");
+    }
     
+    public static QName convertStringToQName(String name, String prefix) {
+        int ind1 = name.indexOf('{');
+        if (ind1 != 0) {
+            return new QName(name);
+        }
+        
+        int ind2 = name.indexOf('}');
+        if (ind2 <= ind1 + 1 || ind2 >= name.length() - 1) {
+            return null;
+        }
+        String ns = name.substring(ind1 + 1, ind2);
+        String localName = name.substring(ind2 + 1);
+        return new QName(ns, localName, prefix);
+    }
 }

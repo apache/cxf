@@ -664,6 +664,45 @@ public final class JAXBUtils {
             throw new JAXBException(ex);
         }
     }
+
+    public static SchemaCompiler createSchemaCompilerWithDefaultAllocator(Set<String> allocatorSet) {
+        
+        try {
+            SchemaCompiler compiler = JAXBUtils.createSchemaCompiler();
+            Object allocator = ReflectionInvokationHandler
+                .createProxyWrapper(new DefaultClassNameAllocator(allocatorSet),
+                                JAXBUtils.getParamClass(compiler, "setClassNameAllocator"));
+
+            compiler.setClassNameAllocator(allocator);
+            return compiler;    
+        } catch (JAXBException e1) {
+            throw new IllegalStateException("Unable to create schema compiler", e1);
+        }
+        
+    }
+    
+    public static void logGeneratedClassNames(Logger logger, JCodeModel codeModel) {
+        if (!logger.isLoggable(Level.INFO)) {
+            return;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        boolean first = true;
+        for (Iterator<JPackage> itr = codeModel.packages(); itr.hasNext();) {
+            JPackage package1 = itr.next();
+            
+            for (Iterator<JDefinedClass> citr = package1.classes(); citr.hasNext();) {
+                if (!first) {
+                    sb.append(", ");
+                } else {
+                    first = false;
+                }
+                sb.append(citr.next().fullName());
+            }
+        }
+        
+        logger.log(Level.INFO, "Created classes: " + sb.toString());
+    }
     
     public static Object createFileCodeWriter(File f) throws JAXBException {
         try {
@@ -832,6 +871,32 @@ public final class JAXBUtils {
             objectFactoryCache.put(objectFactoryPkg, 
                                      new CachedClass(ofactory));
         }
+    }
+    
+    public static class DefaultClassNameAllocator {
+        private final Set<String> typesClassNames;
+
+        public DefaultClassNameAllocator() {
+            this(new HashSet<String>());
+        }
+        
+        public DefaultClassNameAllocator(Set<String> set) {
+            typesClassNames = set;
+        }
+
+        public String assignClassName(String packageName, String className) {
+            String fullClassName = className;
+            String fullPckClass = packageName + "." + fullClassName;
+            int cnt = 0;
+            while (typesClassNames.contains(fullPckClass)) {
+                cnt++;
+                fullClassName = className + cnt;
+                fullPckClass = packageName + "." + fullClassName;
+            }
+            typesClassNames.add(fullPckClass);
+            return fullClassName;
+        }
+       
     }
     
     public static interface SchemaCompiler {

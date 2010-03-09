@@ -21,23 +21,39 @@ package org.apache.cxf.systest.jaxrs;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.Socket;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.net.URLConnection;
+import java.util.Collections;
 import java.util.List;
+import java.util.jar.Attributes;
+import java.util.jar.JarFile;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.client.WebClient;
+import org.apache.cxf.jaxrs.ext.codegen.CodeGeneratorProvider;
+import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -74,7 +90,70 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
                                                          "http://localhost:9080/webapp/petstore", 1);
         checkPetStoreInfo(resourceEls.get(0));
     }
+    
+    @Test
+    public void testPetStoreSource() throws Exception {
+        try {
+            WebClient wc = WebClient.create("http://localhost:9080/webapp/petstore");
+            HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
+            conduit.getClient().setReceiveTimeout(1000000);
+            conduit.getClient().setConnectionTimeout(1000000);
+            XMLSource source = wc.query("_code", "").query("_os", getOs()).get(XMLSource.class);
+            String link = source.getValue("ns:html/ns:body/ns:ul/ns:a/@href", 
+                                          Collections.singletonMap("ns", "http://www.w3.org/1999/xhtml"));
+            WebClient wc2 = WebClient.create(link);
+            HTTPConduit conduit2 = WebClient.getConfig(wc2).getHttpConduit();
+            conduit2.getClient().setReceiveTimeout(1000000);
+            conduit2.getClient().setConnectionTimeout(1000000);
+            InputStream is = wc2.accept("application/zip").get(InputStream.class);
+            String tmpdir = System.getProperty("java.io.tmpdir");
+            File classes = new File(tmpdir, "cxf-jaxrs-test-compiled-src");
+            if (!classes.mkdir()) {
+                fail();
+            }
+            File unzippedSrc = new File(tmpdir, "cxf-jaxrs-test-unzipped-src");
+            if (!unzippedSrc.mkdir()) {
+                fail();
+            }
+            try {             
+                compileSrc(classes, unzippedSrc, is);
+                verifyClasses(classes);
+            } finally {
+                FileUtils.removeDir(classes);
+                FileUtils.removeDir(unzippedSrc);
+            }
+        } finally {
+            ClassResourceInfo cri = 
+                ResourceUtils.createClassResourceInfo(PetStore.class, PetStore.class, true, true);
+            new CodeGeneratorProvider().removeCode(cri);
+        }
+    }
  
+    private void verifyClasses(File classesDir) {
+        List<File> clsFiles = FileUtils.getFilesRecurse(classesDir, ".+\\.class$");
+        assertEquals(1, clsFiles.size());
+        assertTrue(checkContains(clsFiles, "org.apache.cxf.systest.jaxrs.PetStore.class"));
+    }
+    
+    private boolean checkContains(List<File> clsFiles, String name) {
+        
+        for (File f : clsFiles) {
+            if (f.getAbsolutePath().replace(getPathSep(), ".").endsWith(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private String getPathSep() {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().contains("win")) {
+            return "\\";
+        } else {
+            return "/";
+        }
+    }
+    
     private void checkBookStoreInfo(Element resource) {
         assertEquals("/bookstore", resource.getAttribute("path"));
     }
@@ -221,4 +300,146 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         return IOUtils.toString(in);
     }
 
+    private void compileSrc(File classes, File unzippedSrc, InputStream zipFile) throws Exception {
+        unzip(zipFile, unzippedSrc);
+        StringBuilder classPath = new StringBuilder();
+        try {
+            setupClasspath(classPath, this.getClass().getClassLoader());
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        List<File> srcFiles = FileUtils.getFilesRecurse(unzippedSrc, ".+\\.java$"); 
+        if (!compileJavaSrc(classPath.toString(), srcFiles, classes.toString())) {
+            fail("Could not compile classes");
+        }
+    }
+
+    private void unzip(InputStream fin, File unzippedSrc) throws Exception {
+        ZipInputStream zin = new ZipInputStream(fin);
+        ZipEntry ze = null;
+        while ((ze = zin.getNextEntry()) != null) {
+            String entryName = ze.getName();
+            int index = entryName.lastIndexOf(System.getProperty("file.separator"));
+            File packageDir = new File(unzippedSrc, entryName.substring(0, index));
+            packageDir.mkdirs();
+            FileOutputStream fout = new FileOutputStream(
+                                        new File(packageDir, entryName.substring(index + 1)));
+            for (int c = zin.read(); c != -1; c = zin.read()) {
+                fout.write(c);
+            }
+            zin.closeEntry();
+            fout.close();
+        }
+        zin.close();
+    }
+    
+    protected boolean compileJavaSrc(String classPath, List<File> srcList, String dest) {
+        String[] javacCommand = new String[srcList.size() + 7];
+        
+        javacCommand[0] = "javac";
+        javacCommand[1] = "-classpath";
+        javacCommand[2] = classPath;        
+        javacCommand[3] = "-d";
+        javacCommand[4] = dest;
+        javacCommand[5] = "-target";
+        javacCommand[6] = "1.5";
+        
+        int i = 7;
+        for (File f : srcList) {
+            javacCommand[i++] = f.getAbsolutePath();            
+        }
+        org.apache.cxf.common.util.Compiler javaCompiler 
+            = new org.apache.cxf.common.util.Compiler();
+        
+        return javaCompiler.internalCompile(javacCommand, 7); 
+    }
+    
+    static void setupClasspath(StringBuilder classPath, ClassLoader classLoader)
+        throws URISyntaxException, IOException {
+        
+        ClassLoader scl = ClassLoader.getSystemClassLoader();        
+        ClassLoader tcl = classLoader;
+        do {
+            if (tcl instanceof URLClassLoader) {
+                URL[] urls = ((URLClassLoader)tcl).getURLs();
+                if (urls == null) {
+                    urls = new URL[0];
+                }
+                for (URL url : urls) {
+                    if (url.getProtocol().startsWith("file")) {
+                        File file;
+                        if (url.toURI().getPath() == null) {
+                            continue;
+                        }
+                        try { 
+                            file = new File(url.toURI().getPath()); 
+                        } catch (URISyntaxException urise) { 
+                            if (url.getPath() == null) {
+                                continue;
+                            }
+                            file = new File(url.getPath()); 
+                        } 
+    
+                        if (file.exists()) { 
+                            classPath.append(file.getAbsolutePath()) 
+                                .append(System 
+                                        .getProperty("path.separator")); 
+    
+                            if (file.getName().endsWith(".jar")) { 
+                                addClasspathFromManifest(classPath, file); 
+                            }                         
+                        }     
+                    }
+                }
+            }
+            tcl = tcl.getParent();
+            if (null == tcl) {
+                break;
+            }
+        } while(!tcl.equals(scl.getParent()));
+    }
+
+    static void addClasspathFromManifest(StringBuilder classPath, File file) 
+        throws URISyntaxException, IOException {
+        
+        JarFile jar = new JarFile(file);
+        Attributes attr = null;
+        if (jar.getManifest() != null) {
+            attr = jar.getManifest().getMainAttributes();
+        }
+        if (attr != null) {
+            String cp = attr.getValue("Class-Path");
+            while (cp != null) {
+                String fileName = cp;
+                int idx = fileName.indexOf(' ');
+                if (idx != -1) {
+                    fileName = fileName.substring(0, idx);
+                    cp =  cp.substring(idx + 1).trim();
+                } else {
+                    cp = null;
+                }
+                URI uri = new URI(fileName);
+                File f2;
+                if (uri.isAbsolute()) {
+                    f2 = new File(uri);
+                } else {
+                    f2 = new File(file, fileName);
+                }
+                if (f2.exists()) {
+                    classPath.append(f2.getAbsolutePath());
+                    classPath.append(System.getProperty("path.separator"));
+                }
+            }
+        }         
+    }
+    
+    private String getOs() {
+        String os = System.getProperty("os.name");
+        if (os.toLowerCase().contains("win")) {
+            return "win";
+        } else {
+            return "unix";
+        }
+    }
 }
