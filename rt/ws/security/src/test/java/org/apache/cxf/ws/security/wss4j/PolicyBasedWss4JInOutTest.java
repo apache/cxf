@@ -462,6 +462,118 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                         CoverageType.SIGNED));
     }
     
+    @Test
+    public void testProtectTokenAssertion() throws Exception {
+        
+        // ////////////////////////////////////////////////////
+        // x509 Direct Ref Tests
+        
+        /* REVISIT
+        No inbound validation is available for the PROTECT_TOKENS assertion.
+        We cannot yet test inbound in the standard manner.  Since we can't
+        test inbound, we can't test reound trip either and thus must take
+        a different approach for now.
+         
+        this.runInInterceptorAndValidate(
+                "signed_x509_direct_ref_token_prot.xml",
+                "protect_token_policy_asym_x509_direct_ref.xml",
+                SP12Constants.PROTECT_TOKENS,
+                null,
+                CoverageType.SIGNED);
+
+        this.runInInterceptorAndValidate(
+                "signed_x509_direct_ref.xml",
+                "protect_token_policy_asym_x509_direct_ref.xml",
+                null,
+                SP12Constants.PROTECT_TOKENS,
+                CoverageType.SIGNED);
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "protect_token_policy_asym_x509_direct_ref.xml",
+                null,
+                null,
+                Arrays.asList(new QName[] {SP12Constants.PROTECT_TOKENS }),
+                null,
+                Arrays.asList(new CoverageType[] {CoverageType.SIGNED }));
+        */
+        
+        // REVISIT
+        // We test using a policy with ProtectTokens enabled on
+        // the outbound but with a policy using a SignedElements policy
+        // on the inbound to validate that the correct thing got signed.
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "protect_token_policy_asym_x509_direct_ref.xml",
+                "protect_token_policy_asym_x509_direct_ref_complement.xml",
+                new AssertionsHolder(
+                        Arrays.asList(new QName[] {SP12Constants.ASYMMETRIC_BINDING}),
+                        null),
+                new AssertionsHolder(
+                        Arrays.asList(new QName[] {SP12Constants.SIGNED_ELEMENTS}),
+                        null),
+                Arrays.asList(new CoverageType[] {CoverageType.SIGNED }));
+        
+        // ////////////////////////////////////////////////////
+        // x509 Issuer Serial Tests
+        
+        /* REVISIT
+        No inbound validation is available for the PROTECT_TOKENS assertion.
+        We cannot yet test inbound in the standard manner.  Since we can't
+        test inbound, we can't test reound trip either and thus must take
+        a different approach for now.
+        
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial_token_prot.xml",
+                "protect_token_policy_asym_x509_issuer_serial.xml",
+                SP12Constants.PROTECT_TOKENS,
+                null,
+                CoverageType.SIGNED);
+
+        this.runInInterceptorAndValidate(
+                "signed_x509_issuer_serial.xml",
+                "protect_token_policy_asym_x509_issuer_serial.xml",
+                null,
+                SP12Constants.PROTECT_TOKENS,
+                CoverageType.SIGNED);
+
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "protect_token_policy_asym_x509_issuer_serial.xml",
+                null,
+                null,
+                Arrays.asList(new QName[] { SP12Constants.PROTECT_TOKENS }),
+                null,
+                Arrays.asList(new CoverageType[] { CoverageType.SIGNED }));
+        */
+        
+        // REVISIT
+        // We test using a policy with ProtectTokens enabled on
+        // the outbound but with a policy using a SignedElements policy
+        // on the inbound to validate that the correct thing got signed.
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "protect_token_policy_asym_x509_issuer_serial.xml",
+                "protect_token_policy_asym_x509_issuer_serial_complement.xml",
+                new AssertionsHolder(
+                        Arrays.asList(new QName[] {SP12Constants.ASYMMETRIC_BINDING}),
+                        null),
+                new AssertionsHolder(
+                        Arrays.asList(new QName[] {SP12Constants.SIGNED_ELEMENTS}),
+                        null),
+                Arrays.asList(new CoverageType[] {CoverageType.SIGNED }));
+
+        // ////////////////////////////////////////////////////
+        // x509 Key Identifier Tests
+
+        // TODO: Tests for Key Identifier are needed but require that the
+        // certificates used in the test cases be updated to version 3
+        // according to WSS4J.
+        
+        // TODO: Tests for derived keys.
+    }
+
+    
     protected Bus createBus() throws BusException {
         Bus b = super.createBus();
         this.policyBuilder = 
@@ -474,17 +586,39 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
             List<QName> assertedInAssertions, List<QName> notAssertedInAssertions,
             List<CoverageType> types) throws Exception {
         
-        final Element policyElement = 
-            this.readDocument(policyDocument).getDocumentElement();
+        this.runAndValidate(document, policyDocument, null,
+                new AssertionsHolder(assertedOutAssertions, notAssertedOutAssertions),
+                new AssertionsHolder(assertedInAssertions, notAssertedInAssertions),
+                types);
+    }
+    
+    private void runAndValidate(
+            String document,
+            String outPolicyDocument, String inPolicyDocument,
+            AssertionsHolder outAssertions,
+            AssertionsHolder inAssertions,
+            List<CoverageType> types) throws Exception {
         
-        final Policy outPolicy = this.policyBuilder.getPolicy(policyElement);
-        final Policy inPolicy = this.policyBuilder.getPolicy(policyElement);
+        final Element outPolicyElement = this.readDocument(outPolicyDocument)
+                .getDocumentElement();
+        final Element inPolicyElement;
+
+        if (inPolicyDocument != null) {
+            inPolicyElement = this.readDocument(inPolicyDocument)
+                    .getDocumentElement();
+        } else {
+            inPolicyElement = outPolicyElement;
+        }
+            
+        
+        final Policy outPolicy = this.policyBuilder.getPolicy(outPolicyElement);
+        final Policy inPolicy = this.policyBuilder.getPolicy(inPolicyElement);
         
         final Document originalDoc = this.readDocument(document);
         
         final Document inDoc = this.runOutInterceptorAndValidate(
-                originalDoc, outPolicy, assertedOutAssertions,
-                notAssertedOutAssertions);
+                originalDoc, outPolicy, outAssertions.getAssertedAssertions(),
+                outAssertions.getNotAssertedAssertions());
         
         // Can't use this method if you want output that is not mangled.
         // Such is the case when you want to capture output to use
@@ -500,8 +634,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         */
         
         this.runInInterceptorAndValidate(inDoc,
-                inPolicy, assertedInAssertions,
-                assertedOutAssertions, types);
+                inPolicy, inAssertions.getAssertedAssertions(),
+                inAssertions.getNotAssertedAssertions(), types);
     }
     
     private void runInInterceptorAndValidate(String document,
@@ -790,6 +924,28 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
 
         public void setOutFaultObserver(MessageObserver observer) {            
         }
+    }
+    
+    /**
+     * A simple container used to reduce argument numbers to satisfy
+     * project code conventions.
+     */
+    private static final class AssertionsHolder {
+        private List<QName> assertedAssertions;
+        private List<QName> notAssertedAssertions;
         
+        public AssertionsHolder(List<QName> assertedAssertions,
+                List<QName> notAssertedAssertions) {
+            super();
+            this.assertedAssertions = assertedAssertions;
+            this.notAssertedAssertions = notAssertedAssertions;
+        }
+        
+        public List<QName> getAssertedAssertions() {
+            return this.assertedAssertions;
+        }
+        public List<QName> getNotAssertedAssertions() {
+            return this.notAssertedAssertions;
+        }
     }
 }
