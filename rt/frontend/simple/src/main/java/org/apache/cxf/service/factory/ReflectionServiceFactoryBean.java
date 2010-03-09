@@ -782,6 +782,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                                      Class paramType, Type genericType) {
         boolean isIn = isInParam(method, i);
         boolean isOut = isOutParam(method, i);
+        boolean isHeader = isHeader(method, i);
         Annotation[] paraAnnos = null;
         if (i != -1 && o.getProperty(METHOD_PARAM_ANNOTATIONS) != null) {
             Annotation[][] anns = (Annotation[][])o.getProperty(METHOD_PARAM_ANNOTATIONS);
@@ -796,6 +797,20 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             part = o.getInput().getMessagePart(name);
             if (part == null && isFromWsdl()) {
                 part = o.getInput().getMessagePartByIndex(i);
+            }
+            if (part == null && isHeader && o.isUnwrapped()) {
+                part = ((UnwrappedOperationInfo)o).getWrappedOperation().getInput().getMessagePart(name);
+                if (part != null) {
+                    //header part in wsdl, need to get this mapped in to the unwrapped form
+                    MessagePartInfo inf = o.getInput().addMessagePart(part.getName());
+                    inf.setTypeQName(part.getTypeQName());
+                    inf.setElement(part.isElement());
+                    inf.setElementQName(part.getElementQName());
+                    inf.setConcreteName(part.getConcreteName());
+                    inf.setXmlSchema(part.getXmlSchema());
+                    part = inf;
+                    inf.setProperty(HEADER, Boolean.TRUE);
+                }
             }
             if (part == null) {
                 return false;
@@ -820,6 +835,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             part = o.getInput().getMessagePart(name);
             if (part == null && this.isFromWsdl()) {
                 part = o.getInput().getMessagePartByIndex(i);
+            }
+            if (part == null && isHeader && o.isUnwrapped()) {
+                part = o.getUnwrappedOperation().getInput().getMessagePart(name);
             }
             if (part == null) {
                 return false;

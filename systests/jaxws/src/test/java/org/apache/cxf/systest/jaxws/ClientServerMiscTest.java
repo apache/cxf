@@ -339,6 +339,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         assertEquals("Hello", echoMsg);
     }
     private void runDocLitTest(DocLitWrappedCodeFirstService port) throws Exception {
+        assertEquals("snarf", port.doBug2692("snarf"));
         CXF2411Result<CXF2411SubClass> o = port.doCXF2411();
         assertNotNull(o);
         assertNotNull(o.getContent());
@@ -347,7 +348,6 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         Foo foo = new Foo();
         foo.setName("blah");
         assertEquals("blah", port.modifyFoo(foo).getName());
-        
 
         assertEquals("hello", port.outOnly(new Holder<String>(), new Holder<String>()));
         

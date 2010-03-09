@@ -617,8 +617,11 @@ public class WSDLServiceBuilder {
         // The operation's input and output message (if present) each contain
         // only a single part
         // input message must exist
-        if (inputMessage == null || inputMessage.size() != 1
-            || (outputMessage != null && outputMessage.size() > 1)) {
+        if (inputMessage == null || inputMessage.size() == 0 
+            || (inputMessage.size() > 1 && !relaxed)) {
+            passedRule = false;
+        }
+        if (outputMessage != null && outputMessage.size() > 1) {
             passedRule = false;
         }
 

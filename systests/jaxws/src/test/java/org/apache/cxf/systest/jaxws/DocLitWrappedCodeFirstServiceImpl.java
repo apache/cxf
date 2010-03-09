@@ -230,5 +230,9 @@ public class DocLitWrappedCodeFirstServiceImpl implements DocLitWrappedCodeFirst
         ret.setContent(content);
         return ret;
     }
+
+    public String doBug2692(String name) {
+        return name;
+    }
     
 }

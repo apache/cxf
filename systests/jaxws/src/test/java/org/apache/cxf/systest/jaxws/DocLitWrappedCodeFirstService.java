@@ -147,6 +147,10 @@ public interface DocLitWrappedCodeFirstService {
         }
     }
     
+    @WebResult(name = "return")
+    String doBug2692(@WebParam(name = "name", header = true) String name);
+
+    
     Set<Foo> getFooSet();
     
     Foo modifyFoo(Foo foo);
