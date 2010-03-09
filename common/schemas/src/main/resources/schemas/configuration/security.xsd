@@ -433,6 +433,27 @@
               </xs:annotation>
            </xs:element>
         </xs:all>
+           <xs:attribute name="useHttpsURLConnectionDefaultSslSocketFactory" type="pt:ParameterizedBoolean" default="false">
+             <xs:annotation>
+                <xs:documentation>
+                This attribute specifies if HttpsURLConnection.defaultSslSocketFactory 
+                should be used to create https connections. If 'true', 'jsseProvider', 
+                'secureSocketProtocol', 'trustManagers', 'keyManagers', 'secureRandom', 
+                'cipherSuites' and 'cipherSuitesFilter' are ignored. 
+                Since 2.2.7.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
+           <xs:attribute name="useHttpsURLConnectionDefaultHostnameVerifier" type="pt:ParameterizedBoolean" default="false">
+             <xs:annotation>
+                <xs:documentation>
+                This attribute specifies if HttpsURLConnection.defaultHostnameVerifier 
+                should be used to create https connections. If 'true', 'disableCNCheck'
+                is ignored.
+                Since 2.2.7.
+                </xs:documentation>
+             </xs:annotation>
+           </xs:attribute>
            <xs:attribute name="disableCNCheck" type="pt:ParameterizedBoolean" default="false">
              <xs:annotation>
                 <xs:documentation>

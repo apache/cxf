@@ -26,18 +26,14 @@ import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
+import java.security.GeneralSecurityException;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-import javax.imageio.IIOException;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
@@ -134,7 +130,7 @@ public final class HttpsURLConnectionFactory
                     if (ex instanceof IOException) {
                         throw (IOException) ex;
                     }
-                    throw new IIOException("Error while initializing secure socket", ex);
+                    throw new IOException("Error while initializing secure socket", ex);
                 }
             }
         }
@@ -148,71 +144,55 @@ public final class HttpsURLConnectionFactory
      * which allows internal cast to potentially divergent subtype (https) implementations.
      */
     protected synchronized void decorateWithTLS(HttpURLConnection connection)
-        throws NoSuchAlgorithmException,
-               NoSuchProviderException,
-               KeyManagementException {
+        throws GeneralSecurityException {
 
-        // First see if an SSLSocketFactory was set.  This allows easy interop
-        // with not-yet-commons-ssl.jar, or even just people who like doing their
-        // own JSSE.
-        if (socketFactory == null) {
-            SSLSocketFactory preSetFactory = tlsClientParameters.getSSLSocketFactory();
-            if (preSetFactory != null) {
-                socketFactory = preSetFactory;
-            }
-        }
+        // always reload socketFactory from HttpsURLConnection.defaultSSLSocketFactory and 
+        // tlsClientParameters.sslSocketFactory to allow runtime configuration change
+        if (tlsClientParameters.isUseHttpsURLConnectionDefaultSslSocketFactory()) {
+            socketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
+            
+        } else if (tlsClientParameters.getSSLSocketFactory() != null) {
+            // see if an SSLSocketFactory was set. This allows easy interop
+            // with not-yet-commons-ssl.jar, or even just people who like doing their
+            // own JSSE.
+            socketFactory = tlsClientParameters.getSSLSocketFactory();
+            
+        } else if (socketFactory == null) {
+            // ssl socket factory not yet instantiated, create a new one with tlsClientParameters's Trust
+            // Managers, Key Managers, etc
 
-        // Okay, no SSLSocketFactory available in TLSClientParameters.  Maybe
-        // TrustManagers, KeyManagers, etc?
-        if (socketFactory == null) {
             String provider = tlsClientParameters.getJsseProvider();
-            
-            String protocol = tlsClientParameters.getSecureSocketProtocol() != null
-                      ? tlsClientParameters.getSecureSocketProtocol()
-                      : "TLS";
-                      
-            SSLContext ctx = provider == null
-                      ? SSLContext.getInstance(protocol)
-                      : SSLContext.getInstance(protocol, provider);
-            
-                      
 
-            TrustManager[] trustAllCerts = tlsClientParameters.getTrustManagers();
-            /*
-            TrustManager[] trustAllCerts = new TrustManager[] {
-                new javax.net.ssl.X509TrustManager() {
-                    public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                        return null;
-                    }
-                    public void checkClientTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                    public void checkServerTrusted(
-                        java.security.cert.X509Certificate[] certs, String authType) {
-                    }
-                }
-            };
-            */         
-            ctx.init(
-                tlsClientParameters.getKeyManagers(),
-                trustAllCerts, 
-                tlsClientParameters.getSecureRandom());
-            
+            String protocol = tlsClientParameters.getSecureSocketProtocol() != null ? tlsClientParameters
+                .getSecureSocketProtocol() : "TLS";
+
+            SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
+                .getInstance(protocol, provider);
+
+            ctx.init(tlsClientParameters.getKeyManagers(), tlsClientParameters.getTrustManagers(),
+                     tlsClientParameters.getSecureRandom());
+
             // The "false" argument means opposite of exclude.
-            String[] cipherSuites =
-                SSLUtils.getCiphersuites(tlsClientParameters.getCipherSuites(),
-                                         SSLUtils.getSupportedCipherSuites(ctx),
-                                         tlsClientParameters.getCipherSuitesFilter(),
-                                         LOG, false);
+            String[] cipherSuites = SSLUtils.getCiphersuites(tlsClientParameters.getCipherSuites(), SSLUtils
+                .getSupportedCipherSuites(ctx), tlsClientParameters.getCipherSuitesFilter(), LOG, false);
             // The SSLSocketFactoryWrapper enables certain cipher suites
             // from the policy.
-            socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(),
-                                                        cipherSuites,
+            socketFactory = new SSLSocketFactoryWrapper(ctx.getSocketFactory(), cipherSuites,
                                                         tlsClientParameters.getSecureSocketProtocol());
+        } else {
+           // ssl socket factory already initialized, reuse it to benefit of keep alive
         }
         
-        HostnameVerifier verifier = tlsClientParameters.isDisableCNCheck() 
-            ? CertificateHostnameVerifier.ALLOW_ALL : CertificateHostnameVerifier.DEFAULT;
+        
+        HostnameVerifier verifier;
+        if (tlsClientParameters.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
+            verifier = HttpsURLConnection.getDefaultHostnameVerifier();
+        } else if (tlsClientParameters.isDisableCNCheck()) {
+            verifier = CertificateHostnameVerifier.ALLOW_ALL;
+        } else {
+            verifier = CertificateHostnameVerifier.DEFAULT;
+        }
+        
         if (connection instanceof HttpsURLConnection) {
             // handle the expected case (javax.net.ssl)
             HttpsURLConnection conn = (HttpsURLConnection) connection;
