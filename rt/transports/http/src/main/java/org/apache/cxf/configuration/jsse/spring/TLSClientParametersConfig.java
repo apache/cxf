@@ -63,6 +63,12 @@ public final class TLSClientParametersConfig {
         if (params.isDisableCNCheck()) {
             ret.setDisableCNCheck(true);
         }
+        if (params.isUseHttpsURLConnectionDefaultHostnameVerifier()) {
+            ret.setUseHttpsURLConnectionDefaultHostnameVerifier(true);
+        }
+        if (params.isUseHttpsURLConnectionDefaultSslSocketFactory()) {
+            ret.setUseHttpsURLConnectionDefaultSslSocketFactory(true);
+        }
         if (params.isSetSecureSocketProtocol()) {
             ret.setSecureSocketProtocol(params.getSecureSocketProtocol());
         }

@@ -27,7 +27,9 @@ import javax.net.ssl.SSLSocketFactory;
  */
 public class TLSClientParameters extends TLSParameterBase {
     private boolean disableCNCheck;
-    private SSLSocketFactory sslSocketFactory;    
+    private SSLSocketFactory sslSocketFactory;
+    private boolean useHttpsURLConnectionDefaultSslSocketFactory;
+    private boolean useHttpsURLConnectionDefaultHostnameVerifier;
 
     /**
      * Set whether or not JSEE should omit checking if the host name
@@ -62,5 +64,46 @@ public class TLSClientParameters extends TLSParameterBase {
      */
     public final SSLSocketFactory getSSLSocketFactory() {
         return sslSocketFactory;
-    }    
+    }
+    
+    /**
+     * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()}Êshould be
+     * used to create https connections. If <code>true</code> , {@link #getJsseProvider()} ,
+     * {@link #getSecureSocketProtocol()}, {@link #getTrustManagers()}, {@link #getKeyManagers()},
+     * {@link #getSecureRandom()}, {@link #getCipherSuites()} and {@link #getCipherSuitesFilter()} are
+     * ignored.
+     */
+    public boolean isUseHttpsURLConnectionDefaultSslSocketFactory() {
+        return useHttpsURLConnectionDefaultSslSocketFactory;
+    }
+
+    /**
+     * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()}Êshould be
+     * used to create https connections.
+     * 
+     * @see #isUseHttpsURLConnectionDefaultSslSocketFactory()
+     */
+    public void setUseHttpsURLConnectionDefaultSslSocketFactory(
+                      boolean useHttpsURLConnectionDefaultSslSocketFactory) {
+        this.useHttpsURLConnectionDefaultSslSocketFactory = useHttpsURLConnectionDefaultSslSocketFactory;
+    }
+
+    /**
+     * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultHostnameVerifier()} should be
+     * used to create https connections. If <code>true</code>, {@link #isDisableCNCheck()} is ignored.
+     */
+    public boolean isUseHttpsURLConnectionDefaultHostnameVerifier() {
+        return useHttpsURLConnectionDefaultHostnameVerifier;
+    }
+
+    /**
+     * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultHostnameVerifier()} should be
+     * used to create https connections.
+     * 
+     * @see #isUseHttpsURLConnectionDefaultHostnameVerifier()
+     */
+    public void setUseHttpsURLConnectionDefaultHostnameVerifier(
+                      boolean useHttpsURLConnectionDefaultHostnameVerifier) {
+        this.useHttpsURLConnectionDefaultHostnameVerifier = useHttpsURLConnectionDefaultHostnameVerifier;
+    }
 }
