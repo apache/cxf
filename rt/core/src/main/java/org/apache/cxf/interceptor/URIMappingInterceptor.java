@@ -223,7 +223,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
             if (type != null && type.isPrimitive() && queries.get(key) != null) {
                 param = PrimitiveUtils.read(queries.get(key), type);
             } else {
-                param = queries.get(key);
+                param = readType(queries.get(key), type);
             }
             parameters.set(idx, param);
             
@@ -231,7 +231,27 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         }
         return parameters;
     }
-    
+    private Object readType(String value, Class<?> type) {
+        Object ret = value;
+        if (Integer.class == type) {
+            ret = Integer.valueOf(value);
+        } else if (Byte.class == type) {
+            ret = Byte.valueOf(value);
+        } else if (Short.class == type) {
+            ret = Short.valueOf(value);
+        } else if (Long.class == type) {
+            ret = Long.valueOf(value);
+        } else if (Float.class == type) {
+            ret = Float.valueOf(value);
+        } else if (Double.class == type) { 
+            ret = Double.valueOf(value);
+        } else if (Boolean.class == type) { 
+            ret = Boolean.valueOf(value);
+        } else if (Character.class == type) { 
+            ret = value.charAt(0); 
+        }
+        return ret;
+    }
     private String uriDecode(String query) {
         try {
             query = URLDecoder.decode(query, "UTF-8");
