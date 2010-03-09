@@ -130,7 +130,10 @@ public final class HttpsURLConnectionFactory
                     if (ex instanceof IOException) {
                         throw (IOException) ex;
                     }
-                    throw new IOException("Error while initializing secure socket", ex);
+                    // use exception.initCause(ex) to be java 5 compatible
+                    IOException ioException = new IOException("Error while initializing secure socket");
+                    ioException.initCause(ex);
+                    throw ioException;
                 }
             }
         }
