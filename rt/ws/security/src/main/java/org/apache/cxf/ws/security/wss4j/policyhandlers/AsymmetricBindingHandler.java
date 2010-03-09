@@ -386,17 +386,23 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
         } else {
             WSSecSignature sig = getSignatureBuider(wrapper, sigToken, false);
             sig.prependBSTElementToHeader(secHeader);
+            insertBeforeBottomUp(sig.getSignatureElement());
             
-            if (abinding.isTokenProtection()
-                    && sig.getBSTTokenId() != null) {
-                sigParts.add(new WSEncryptionPart(sig.getBSTTokenId()));
+            if (abinding.isTokenProtection()) {                
+                // Special flag telling WSS4J to sign the initiator token.
+                // Use this instead of the BST ID so that we don't
+                // have to deal with maintaining such logic here.
+                sigParts.add(new WSEncryptionPart("Token", null, 
+                        "Element", WSConstants.PART_TYPE_ELEMENT));
             }
+                    
+            sig.prependBSTElementToHeader(secHeader);
 
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
             signatures.add(sig.getSignatureValue());
 
-            insertBeforeBottomUp(sig.getSignatureElement());            
+                        
             mainSigId = addWsuIdToElement(sig.getSignatureElement());
         }
     }

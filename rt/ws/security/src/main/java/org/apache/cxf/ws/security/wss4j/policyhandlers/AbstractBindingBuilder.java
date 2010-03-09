@@ -1661,6 +1661,8 @@ public abstract class AbstractBindingBuilder {
      * @throws IllegalArgumentException
      *             if an element in {@code signedParts} contains a {@code
      *             WSEncryptionPart} with a {@code null} {@code id} value
+     *             and the {@code WSEncryptionPart} {@code name} value is not
+     *             "Token"
      */
     public void handleEncryptedSignedHeaders(Vector<WSEncryptionPart> encryptedParts, 
                                              Vector<WSEncryptionPart> signedParts) {
@@ -1671,7 +1673,13 @@ public abstract class AbstractBindingBuilder {
             final Iterator<WSEncryptionPart> signedPartsIt = signedParts.iterator();
             while (signedPartsIt.hasNext()) {
                 WSEncryptionPart signedPart = signedPartsIt.next();
-                if (signedPart.getId() == null) {
+                // Everything has to be ID based except for the case of a part
+                // indicating "Token" as the element name.  This name is a flag
+                // for WSS4J to sign the initiator token used in the signature.
+                // Since the encryption happened before the signature creation,
+                // this element can't possibly be encrypted so we can safely ignore
+                // if it were ever to be set before this method is called.
+                if (signedPart.getId() == null && !"Token".equals(signedPart.getName())) {
                     throw new IllegalArgumentException(
                             "WSEncryptionPart must be ID based but no id was found.");
                 } else if (encryptedPart.getEncModifier().equals("Element")
