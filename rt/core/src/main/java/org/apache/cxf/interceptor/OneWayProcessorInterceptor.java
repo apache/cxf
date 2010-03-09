@@ -82,6 +82,7 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             
             try {
                 Message partial = createMessage(message.getExchange());
+                partial.remove(Message.CONTENT_TYPE);
                 partial.setExchange(message.getExchange());
                 Conduit conduit = message.getExchange().getDestination()
                     .getBackChannel(message, null, null);
