@@ -136,7 +136,7 @@ public class Soap12FaultOutInterceptor extends AbstractSoapInterceptor {
         }
         
         private String getLangCode() {        
-            String code = LOG.getResourceBundle().getLocale().getDisplayLanguage();
+            String code = LOG.getResourceBundle().getLocale().getLanguage();
             if (StringUtils.isEmpty(code)) {
                 return "en";
             }
