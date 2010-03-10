@@ -112,6 +112,23 @@ public class HttpHeadersImplTest extends Assert {
         assertEquals("Nonce=\"bar\"", values.get(2));
     }
     
+    @Test
+    public void testGetHeaderWithQuotes3() throws Exception {
+        
+        Message m = control.createMock(Message.class);
+        m.get(Message.PROTOCOL_HEADERS);
+        MetadataMap<String, String> headers = 
+            createHeader("COMPLEX_HEADER", "\"value with space\"");
+        EasyMock.expectLastCall().andReturn(headers);
+        control.replay();
+        HttpHeaders h = new HttpHeadersImpl(m);
+        List<String> values = h.getRequestHeader("COMPLEX_HEADER");
+        assertNotNull(values);
+        assertEquals(1, values.size());
+        assertEquals("value with space", values.get(0));
+        
+    }
+    
     
     @Test
     public void testGetHeaders() throws Exception {

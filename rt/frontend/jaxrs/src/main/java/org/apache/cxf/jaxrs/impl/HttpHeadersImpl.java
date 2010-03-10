@@ -215,6 +215,11 @@ public class HttpHeadersImpl implements HttpHeaders {
                 return newValues;
             }
         }
+        if (originalValue.startsWith("\"") && originalValue.endsWith("\"")) {
+            String actualValue = originalValue.length() == 2 ? "" 
+                : originalValue.substring(1, originalValue.length() - 1);
+            return Collections.singletonList(actualValue);
+        }
         List<String> values = new ArrayList<String>(4);
         Matcher m = COMPLEX_HEADER_PATTERN.matcher(originalValue);
         while (m.find()) {
