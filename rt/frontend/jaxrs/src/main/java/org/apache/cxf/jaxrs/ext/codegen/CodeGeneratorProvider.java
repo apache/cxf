@@ -866,7 +866,7 @@ public class CodeGeneratorProvider implements RequestHandler {
         }
     }
 
-    private static class InnerErrorListener {
+    static class InnerErrorListener {
 
         public void error(SAXParseException ex) {
             throw new RuntimeException("Error compiling schema from WADL : "
