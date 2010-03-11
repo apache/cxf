@@ -94,9 +94,17 @@ public class MimeBodyPartInputStream extends InputStream {
         throws IOException {
         if (pointer < (off + len)) {
             return true;
-        } else {
+        } else if (pointer >= 1000000000) {
             inStream.unread(b, initialPointer, (off + len) - initialPointer);
-            return false;
+            return false;            
+        } else {
+            int x = inStream.read();
+            if (x != -1) {
+                inStream.unread(x);
+                inStream.unread(b, initialPointer, (off + len) - initialPointer);
+                return false;
+            }
+            return true;
         }
     }
 
