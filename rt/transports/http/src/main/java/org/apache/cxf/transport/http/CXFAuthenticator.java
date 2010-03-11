@@ -72,7 +72,7 @@ public class CXFAuthenticator extends Authenticator {
                         f.set(wrapped, f.get(this));
                     }
                 }
-                Method m = Authenticator.class.getMethod("getPasswordAuthentication");
+                Method m = Authenticator.class.getDeclaredMethod("getPasswordAuthentication");
                 m.setAccessible(true);
                 auth = (PasswordAuthentication)m.invoke(wrapped);
             } catch (Throwable t) {
