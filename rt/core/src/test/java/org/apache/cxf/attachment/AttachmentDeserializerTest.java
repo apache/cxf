@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -38,6 +39,8 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.XMLMessage;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -365,4 +368,33 @@ public class AttachmentDeserializerTest extends Assert {
         SAXParser parser = SAXParserFactory.newInstance().newSAXParser();
         parser.parse(inputStreamWithoutAttachments, new DefaultHandler());
     }
+    
+    @Test
+    public void imitateAttachmentInInterceptorForMessageWithMissingBoundary() throws Exception {
+        ByteArrayInputStream inputStream;
+        String contentType = "multipart/mixed;boundary=abc123";
+        String data = "--abc123\r\n\r\n<Document></Document>\r\n\r\n";
+
+        Message message;
+
+        inputStream = new ByteArrayInputStream(data.getBytes());
+
+        message = new XMLMessage(new MessageImpl());
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, inputStream);
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/mixed"));
+
+        ad.initializeAttachments();
+        message.getAttachments().size();
+
+    }
+
 }
