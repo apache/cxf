@@ -291,17 +291,28 @@ public class URIResolver {
             try {
                 uri = url.toURI();
             } catch (URISyntaxException e) {
-                // processing the jar:file:/ type value
-                String urlStr = url.toString();
-                if (urlStr.startsWith("jar:") 
-                    || urlStr.startsWith("zip:")
-                    || urlStr.startsWith("wsjar:")) {
-                    int pos = urlStr.indexOf('!');
-                    if (pos != -1) {
-                        try {
-                            uri = new URI("classpath:" + urlStr.substring(pos + 1));
-                        } catch (URISyntaxException ue) {
-                            // ignore
+                // yep, some versions of the JDK can't handle spaces when URL.toURI() is called, and lots of people
+                // on windows have their maven repositories at C:/Documents and Settings/<userid>/.m2/repository
+                // re: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6506304
+                if (url.toString().contains(" ")) {
+                    url = new URL(url.toString().replace(" ", "%20"));
+                }
+                //let's try this again
+                try {
+                    uri = url.toURI();
+                } catch (URISyntaxException e1) {
+                    // processing the jar:file:/ type value
+                    String urlStr = url.toString();
+                    if (urlStr.startsWith("jar:")
+                        || urlStr.startsWith("zip:")
+                        || urlStr.startsWith("wsjar:")) {
+                        int pos = urlStr.indexOf('!');
+                        if (pos != -1) {
+                            try {
+                                uri = new URI("classpath:" + urlStr.substring(pos + 1));
+                            } catch (URISyntaxException ue) {
+                                // ignore
+                            }
                         }
                     }
                 }
