@@ -291,8 +291,9 @@ public class URIResolver {
             try {
                 uri = url.toURI();
             } catch (URISyntaxException e) {
-                // yep, some versions of the JDK can't handle spaces when URL.toURI() is called, and lots of people
-                // on windows have their maven repositories at C:/Documents and Settings/<userid>/.m2/repository
+                // yep, some versions of the JDK can't handle spaces when URL.toURI() is called, 
+                // and lots of people on windows have their maven repositories at 
+                // C:/Documents and Settings/<userid>/.m2/repository
                 // re: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=6506304
                 if (url.toString().contains(" ")) {
                     url = new URL(url.toString().replace(" ", "%20"));
