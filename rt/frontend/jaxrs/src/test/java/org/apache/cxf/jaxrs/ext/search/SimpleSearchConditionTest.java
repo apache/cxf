@@ -26,9 +26,10 @@ import java.util.Map;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 public class SimpleSearchConditionTest {
 
@@ -65,6 +66,7 @@ public class SimpleSearchConditionTest {
     private static SearchCondition<DoubleAttr> dc2Leq;
 
     private static List<ConditionType> supported = Arrays.asList(ConditionType.EQUALS,
+                                                                 ConditionType.NOT_EQUALS,
                                                                  ConditionType.GREATER_OR_EQUALS,
                                                                  ConditionType.GREATER_THAN,
                                                                  ConditionType.LESS_OR_EQUALS,
@@ -121,7 +123,7 @@ public class SimpleSearchConditionTest {
     public void testCtorMapNull() {
         new SimpleSearchCondition<SingleAttr>((Map<String, ConditionType>)null, attr);
     }
-    
+
     @Test
     public void testCtorMapCondSupported() {
         for (ConditionType ct : ConditionType.values()) {
@@ -287,14 +289,48 @@ public class SimpleSearchConditionTest {
         Map<String, ConditionType> map = new HashMap<String, ConditionType>();
         map.put("foo", ConditionType.LESS_THAN);
         map.put("bar", ConditionType.GREATER_THAN);
-        
+
         // expression "template.getFoo() < pojo.getFoo() & template.getBar() > pojo.getBar()"
         assertTrue(new SimpleSearchCondition<DoubleAttr>(map, new DoubleAttr("bbb", "ccc"))
             .isMet(new DoubleAttr("aaa", "ddd")));
-        
+
         // expression "template.getBar() > pojo.getBar()"
         assertTrue(new SimpleSearchCondition<DoubleAttr>(map, new DoubleAttr(null, "ccc"))
             .isMet(new DoubleAttr("!not-interpreted!", "ddd")));
+    }
+
+    @Test
+    public void testIsMetWildcardEnds() {
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "bar*");
+        assertTrue(ssc.isMet("bar"));
+        assertTrue(ssc.isMet("barbaz"));
+        assertFalse(ssc.isMet("foobar"));
+    }
+
+    @Test
+    public void testIsMetWildcardStarts() {
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*bar");
+        assertTrue(ssc.isMet("bar"));
+        assertFalse(ssc.isMet("barbaz"));
+        assertTrue(ssc.isMet("foobar"));
+    }
+
+    @Test
+    public void testIsMetWildcardStartsEnds() {
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*bar*");
+        assertTrue(ssc.isMet("bar"));
+        assertTrue(ssc.isMet("barbaz"));
+        assertTrue(ssc.isMet("foobar"));
+    }
+
+    @Test
+    public void testIsMetWildcardMultiAsterisk() {
+        SimpleSearchCondition<String> ssc = new SimpleSearchCondition<String>(ConditionType.EQUALS, "*ba*r*");
+        assertFalse(ssc.isMet("bar"));
+        assertTrue(ssc.isMet("ba*r"));
+        assertTrue(ssc.isMet("fooba*r"));
+        assertTrue(ssc.isMet("fooba*rbaz"));
+        assertFalse(ssc.isMet("foobarbaz"));
     }
 
     static class SingleAttr {

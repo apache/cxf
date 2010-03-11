@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,8 +63,13 @@ public class OrSearchCondition<T> implements SearchCondition<T> {
     }
 
     public List<T> findAll(List<T> pojos) {
-        // TODO Auto-generated method stub
-        return null;
+        List<T> result = new ArrayList<T>();
+        for (T pojo : pojos) {
+            if (isMet(pojo)) {
+                result.add(pojo);
+            }
+        }
+        return result;
     }
 
 }

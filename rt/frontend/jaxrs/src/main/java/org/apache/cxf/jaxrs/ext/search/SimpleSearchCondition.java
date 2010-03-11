@@ -18,28 +18,35 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+/**
+ * Simple search condition comparing primitive objects or complex object by its getters. For details see
+ * {@link #isMet(Object)} description.
+ * 
+ * @param <T> type of search condition.
+ */
 public class SimpleSearchCondition<T> implements SearchCondition<T> {
 
     private static Set<ConditionType> supportedTypes = new HashSet<ConditionType>();
     static {
         supportedTypes.add(ConditionType.EQUALS);
+        supportedTypes.add(ConditionType.NOT_EQUALS);
         supportedTypes.add(ConditionType.GREATER_THAN);
         supportedTypes.add(ConditionType.GREATER_OR_EQUALS);
         supportedTypes.add(ConditionType.LESS_THAN);
         supportedTypes.add(ConditionType.LESS_OR_EQUALS);
     }
     private ConditionType cType;
-    private Map<String, ConditionType> getters2operators;
     private T condition;
-    private List<Method> getters;
+    private Map<String, ConditionType> getters2operators;
+    private Map<String, Object> getters2values;
+    private Beanspector<T> beanspector;
 
     /**
      * Creates search condition with same operator (equality, inequality) applied in all comparison; see
@@ -119,8 +126,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * inequalities requires type T implementing {@link Comparable}.
      * <p>
      * For other types comparison of given object against template object is done using these <b>getters</b>;
-     * returned "is met" value is <b>conjunction (*and*)</b> of comparisons per each getter. Getters of
-     * template object that return null or throw exception are not used in comparison, in extreme if all
+     * returned "is met" value is <b>conjunction ('and' operator)</b> of comparisons per each getter. Getters
+     * of template object that return null or throw exception are not used in comparison, in extreme if all
      * getters are excluded it means every given pojo object matches. If
      * {@link #SimpleSearchCondition(ConditionType, Object) constructor with shared operator} was used, then
      * getters are compared using the same operator. If {@link #SimpleSearchCondition(Map, Object) constructor
@@ -130,9 +137,19 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * {@link Object#equals(Object)}, using inequalities requires that getter type implements
      * {@link Comparable}.
      * <p>
+     * For equality comparison and String type in template object (either being primitive or getter from
+     * complex type) it is allowed to used asterisk at the beginning or at the end of text as wild card (zero
+     * or more of any characters) e.g. "foo*", "*foo" or "*foo*". Inner asterisks are not interpreted as wild
+     * cards.
+     * <p>
      * <b>Example:</b>
      * 
      * <pre>
+     * SimpleSearchCondition&lt;Integer&gt; ssc = new SimpleSearchCondition&lt;Integer&gt;(
+     *   ConditionType.GREATER_THAN, 10);    
+     * ssc.isMet(20);
+     * // true since 20&gt;10 
+     * 
      * class Entity {
      *   public String getName() {...
      *   public int getLevel() {...
@@ -140,17 +157,17 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
      * }
      * 
      * Entity template = new Entity("bbb", 10, null);
-     * SimpleSearchCondition&lt;Entity> ssc = new SimpleSearchCondition&lt;Entity>(
+     * ssc = new SimpleSearchCondition&lt;Entity&gt;(
      *   ConditionType.GREATER_THAN, template);    
      * 
      * ssc.isMet(new Entity("aaa", 20, "some mesage")); 
-     * // false: is not met, expression '"aaa">"bbb" and 20>10' is not true  
+     * // false: is not met, expression '"aaa"&gt;"bbb" and 20&gt;10' is not true  
      * // since "aaa" is not greater than "bbb"; not that message is null in template hence ingored
      * 
      * ssc.isMet(new Entity("ccc", 30, "other message"));
-     * // true: is met, expression '"ccc">"bbb" and 30>10' is true
+     * // true: is met, expression '"ccc"&gt;"bbb" and 30&gt;10' is true
      * 
-     * Map&lt;String,ConditionType> map;
+     * Map&lt;String,ConditionType&gt; map;
      * map.put("name", ConditionType.EQUALS);
      * map.put("level", ConditionType.GREATER_THAN);
      * ssc = new SimpleSearchCondition&lt;Entity&gt;(
@@ -168,16 +185,17 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             return compare(pojo, cType, condition);
         } else {
             boolean matches = false;
-            for (Method getter : loadGetters()) {
+            Map<String, Object> get2val = getGettersAndValues();
+            for (String getter : get2val.keySet()) {
                 ConditionType ct = cType;
                 if (ct == null) {
-                    ct = getters2operators.get(getterName(getter));
+                    ct = getters2operators.get(getter);
                     if (ct == null) {
                         continue;
                     }
                 }
                 Object lval = getValue(getter, pojo);
-                Object rval = getValue(getter, condition);
+                Object rval = get2val.get(getter);
                 matches = compare(lval, ct, rval);
                 if (!matches) {
                     break;
@@ -187,49 +205,55 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    private List<Method> loadGetters() {
-        if (getters == null) {
-            getters = new ArrayList<Method>();
-            for (Method m : condition.getClass().getMethods()) {
-                if (isGetter(m)) {
-                    getters.add(m);
-                }
+    /**
+     * Creates cache of getters from template (condition) object and its values returned during one-pass
+     * invocation. Method isMet() will use its keys to introspect getters of passed pojo object, and values
+     * from map in comparison.
+     * 
+     * @return template (condition) object getters mapped to their non-null values
+     */
+    private Map<String, Object> getGettersAndValues() {
+        if (getters2values == null) {
+            getters2values = new HashMap<String, Object>();
+            beanspector = new Beanspector<T>(condition);
+            for (String getter : beanspector.getGettersNames()) {
+                Object value = getValue(getter, condition);
+                getters2values.put(getter, value);
             }
+            //we do not need compare class objects
+            getters2values.keySet().remove("class");
         }
-        return getters;
+        return getters2values;
+    }
+
+    private Object getValue(String getter, T pojo) {
+        try {
+            return beanspector.swap(pojo).getValue(getter);
+        } catch (Throwable e) {
+            return null;
+        }
     }
 
     private boolean isPrimitive(T pojo) {
         return pojo.getClass().getName().startsWith("java.lang");
     }
 
-    private boolean isGetter(Method m) {
-        return m.getParameterTypes().length == 0
-               && (m.getName().startsWith("get") || m.getName().startsWith("is"));
-    }
-    
-    private String getterName(Method m) {
-        return m.getName().replace("is", "").replace("get", "").toLowerCase();
-    }
-
-    private Object getValue(Method getter, T pojo) {
-        try {
-            return getter.invoke(pojo);
-        } catch (IllegalArgumentException e) {
-            throw e;
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        } catch (InvocationTargetException e) {
-            // getter exception is null equivalent
-            return null;
-        }
-    }
-
     @SuppressWarnings("unchecked")
     private boolean compare(Object lval, ConditionType cond, Object rval) {
         boolean compares = true;
-        if (cond == ConditionType.EQUALS) {
-            compares = (lval != null) ? lval.equals(rval) : true;
+        if (cond == ConditionType.EQUALS || cond == ConditionType.NOT_EQUALS) {
+            if (rval == null) {
+                compares = true;
+            } else {
+                if (lval instanceof String) {
+                    compares = textCompare((String)lval, (String)rval);
+                } else {
+                    compares = lval.equals(rval);
+                }
+                if (cond == ConditionType.NOT_EQUALS) {
+                    compares = !compares;
+                }
+            }
         } else {
             if (lval instanceof Comparable && rval instanceof Comparable) {
                 Comparable lcomp = (Comparable)lval;
@@ -255,6 +279,32 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
             }
         }
         return compares;
+    }
+
+    private boolean textCompare(String lval, String rval) {
+        // check wild cards
+        boolean starts = false;
+        boolean ends = false;
+        if (rval.charAt(0) == '*') {
+            starts = true;
+            rval = rval.substring(1);
+        }
+        if (rval.charAt(rval.length() - 1) == '*') {
+            ends = true;
+            rval = rval.substring(0, rval.length() - 1);
+        }
+        if (starts || ends) {
+            // wild card tests
+            if (starts && !ends) {
+                return lval.endsWith(rval);
+            } else if (ends && !starts) {
+                return lval.startsWith(rval);
+            } else {
+                return lval.contains(rval);
+            }
+        } else {
+            return lval.equals(rval);
+        }
     }
 
     public List<T> findAll(List<T> pojos) {

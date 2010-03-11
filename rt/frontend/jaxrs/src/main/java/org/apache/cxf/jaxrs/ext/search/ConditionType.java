@@ -25,12 +25,12 @@ package org.apache.cxf.jaxrs.ext.search;
  */
 public enum ConditionType {
     EQUALS,
+    NOT_EQUALS,
     LESS_THAN,
     GREATER_THAN,
     LESS_OR_EQUALS,
     GREATER_OR_EQUALS,
     OR,
     AND,
-    NOT,
     CUSTOM
 }
