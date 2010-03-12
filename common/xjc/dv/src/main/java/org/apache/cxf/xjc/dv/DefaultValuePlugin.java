@@ -75,7 +75,8 @@ public class DefaultValuePlugin {
     private boolean containsDefaultValue(Outline outline, FieldOutline field) {
         ClassOutline fClass = null;
         for (ClassOutline classOutline : outline.getClasses()) {
-            if (classOutline.implClass == field.getRawType()) {
+            if (classOutline.implClass == field.getRawType() 
+                && !classOutline.implClass.isAbstract()) {
                 fClass = classOutline;
                 break;
             }
