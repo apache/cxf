@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.events.XMLEvent;
 import javax.xml.validation.Schema;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
@@ -175,7 +176,8 @@ public abstract class AbstractOutDatabindingInterceptor extends AbstractPhaseInt
 
     private void setSchemaOutMessage(Service service, Message message, DataWriter<?> writer) {
         if (shouldValidate(message)) {
-            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
+            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
+                                                             message.getExchange().get(Bus.class));
             writer.setSchema(schema);
         }
     }

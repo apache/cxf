@@ -31,6 +31,7 @@ import javax.xml.validation.Schema;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.databinding.DataBindingValidation2;
 import org.apache.cxf.databinding.DataReader;
@@ -106,7 +107,8 @@ public abstract class AbstractInDatabindingInterceptor extends AbstractPhaseInte
     private void setSchemaInMessage(Service service, Message message, DataReader<?> reader) {
         if (MessageUtils.getContextualBoolean(message, Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE)) {
             //all serviceInfos have the same schemas
-            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0));
+            Schema schema = EndpointReferenceUtils.getSchema(service.getServiceInfos().get(0),
+                                                             message.getExchange().get(Bus.class));
             reader.setSchema(schema);
             /* This might be a reader that wants to grab the schema from the
              * service info. 
