@@ -35,7 +35,7 @@ public class ClientCallback implements Future<Object[]> {
     protected Map<String, Object> context;
     protected Object[] result;
     protected Throwable exception;
-    protected boolean done;
+    protected volatile boolean done;
     protected boolean cancelled;
     protected boolean started;
     
