@@ -63,7 +63,7 @@ public class Compiler {
         outputDir = s.replace(File.pathSeparatorChar, '/');
     }
     public void setClassPath(String s) {
-        classPath = s;
+        classPath = StringUtils.isEmpty(s) ? null : s;
     }
     
     private void addArgs(List<String> list) {
@@ -75,17 +75,21 @@ public class Compiler {
             list.add(target);
         }
 
-        if (outputDir != null) {
+        if (!StringUtils.isEmpty(outputDir)) {
             list.add("-d");
             list.add(outputDir);
         }
         
-        if (classPath == null) {
+        if (StringUtils.isEmpty(classPath)) {
             String javaClasspath = System.getProperty("java.class.path");
             boolean classpathSetted = javaClasspath != null ? true : false;
             if (!classpathSetted) {
-                list.add("-extdirs");
-                list.add(getClass().getClassLoader().getResource(".").getFile() + "../lib/");
+                File f = new File(getClass().getClassLoader().getResource(".").getFile());
+                f = new File(f, "../lib");
+                if (f.exists() && f.isDirectory()) {
+                    list.add("-extdirs");
+                    list.add(f.toString());                    
+                }
             } else {
                 list.add("-classpath");
                 list.add(javaClasspath);
