@@ -67,6 +67,7 @@ import org.w3c.dom.ls.LSResourceResolver;
 import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -78,6 +79,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.resource.ExtendedURIResolver;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -111,9 +113,11 @@ public final class EndpointReferenceUtils {
         private final Map<String, byte[]> schemas;
         private final Set<String> done = new HashSet<String>();
         private final ExtendedURIResolver resolver = new ExtendedURIResolver();
+        private final Bus bus;
         
-        private SchemaLSResourceResolver(Map<String, byte[]> schemas) {
+        private SchemaLSResourceResolver(Map<String, byte[]> schemas, Bus b) {
             this.schemas = schemas;
+            this.bus = b;
         }
         
         public LSInput resolveResource(String type, String namespaceURI, String publicId,
@@ -139,38 +143,71 @@ public final class EndpointReferenceUtils {
             if (done.contains(newId + ":" + namespaceURI)) {
                 return null;
             }
+            LSInputImpl impl = null;
+            
             if (schemas.containsKey(newId + ":" + namespaceURI)) {
                 byte[] ds = schemas.remove(newId + ":" + namespaceURI);
-                LSInputImpl impl = new LSInputImpl();
+                impl = new LSInputImpl();
                 impl.setSystemId(newId);
                 impl.setBaseURI(newId);
                 impl.setByteStream(new ByteArrayInputStream(ds));
                 done.add(newId + ":" + namespaceURI);
+            }
+            if (impl == null && schemas.containsKey(newId + ":null")) {
+                byte[] ds = schemas.get(newId + ":null");
+                impl = new LSInputImpl();
+                impl.setSystemId(newId);
+                impl.setBaseURI(newId);
+                impl.setByteStream(new ByteArrayInputStream(ds));
+                done.add(newId + ":" + namespaceURI);
+            }
+            if (impl == null && bus != null) {
+                ResourceManager rm = bus.getExtension(ResourceManager.class);
+                URL url = rm == null ? null : rm.resolveResource(systemId, URL.class);
+                if (url != null) {
+                    newId = url.toString();
+                    if (done.contains(newId + ":" + namespaceURI)) {
+                        return null;
+                    }
+                    if (schemas.containsKey(newId + ":" + namespaceURI)) {
+                        byte[] ds = schemas.remove(newId + ":" + namespaceURI);
+                        impl = new LSInputImpl();
+                        impl.setSystemId(newId);
+                        impl.setBaseURI(newId);
+                        impl.setByteStream(new ByteArrayInputStream(ds));
+                        done.add(newId + ":" + namespaceURI);
+                    }
+                }
+            }
+            if (impl != null) {
                 return impl;
             }
-            if (schemas.containsKey(newId + ":null")) {
-                byte[] ds = schemas.get(newId + ":null");
-                LSInputImpl impl = new LSInputImpl();
-                impl.setSystemId(newId);
-                impl.setBaseURI(newId);
-                impl.setByteStream(new ByteArrayInputStream(ds));
-                done.add(newId + ":" + namespaceURI);
-                return impl;                
-            }
-
-            // handle case where given systemId is null (so that
-            // direct key lookup fails) by scanning through map
-            // searching for a namespace match
-            //
             for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
-                if (ent.getKey().endsWith(namespaceURI)) {
+                if (ent.getKey().endsWith(systemId + ":" + namespaceURI)) {
                     schemas.remove(ent.getKey());
-                    LSInputImpl impl = new LSInputImpl();
+                    impl = new LSInputImpl();
                     impl.setSystemId(newId);
                     impl.setBaseURI(newId);
                     impl.setCharacterStream(
                         new InputStreamReader(
                             new ByteArrayInputStream(ent.getValue())));
+                    done.add(newId + ":" + namespaceURI);
+                    return impl;
+                }
+            }
+            // handle case where given systemId is null (so that
+            // direct key lookup fails) by scanning through map
+            // searching for a namespace match
+            for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
+                if (ent.getKey().endsWith(namespaceURI)) {
+                    schemas.remove(ent.getKey());
+                    impl = new LSInputImpl();
+                    impl.setSystemId(newId);
+                    impl.setBaseURI(newId);
+                    impl.setCharacterStream(
+                        new InputStreamReader(
+                            new ByteArrayInputStream(ent.getValue())));
+                    done.add(newId + ":" + namespaceURI);
                     return impl;
                 }
             }
@@ -182,15 +219,14 @@ public final class EndpointReferenceUtils {
             if (systemId != null) {
                 InputSource source = resolver.resolve(systemId, baseURI);
                 if (source != null) {
-                    LSInputImpl impl = new LSInputImpl();
+                    impl = new LSInputImpl();
                     impl.setByteStream(source.getByteStream());
                     impl.setSystemId(source.getSystemId());
                     impl.setPublicId(source.getPublicId());
-                    return impl;
                 }
             }
             LOG.warning("Could not resolve Schema for " + systemId);
-            return null;
+            return impl;
         }
     }
 
@@ -605,7 +641,10 @@ public final class EndpointReferenceUtils {
     }
     
     
-    private static Schema createSchema(ServiceInfo serviceInfo) {
+    private static Schema createSchema(ServiceInfo serviceInfo, Bus b) {
+        if (b == null) {
+            b = BusFactory.getThreadDefaultBus(false);
+        }
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null) {
             SchemaFactory factory = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
@@ -665,17 +704,17 @@ public final class EndpointReferenceUtils {
                 } 
 
 
-                factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap));
+                factory.setResourceResolver(new SchemaLSResourceResolver(schemaSourcesMap, b));
                 schema = factory.newSchema(schemaSourcesMap2.values()
                                            .toArray(new Source[schemaSourcesMap2.size()]));
                 
                 
             } catch (Exception ex) {
                 // Something not right with the schema from the wsdl.
-                LOG.log(Level.WARNING, "SAXException for newSchema() on ", ex);
+                LOG.log(Level.WARNING, "SAXException for newSchema()", ex);
                 for (SchemaInfo schemaInfo : serviceInfo.getSchemas()) {
                     String s = XMLUtils.toString(schemaInfo.getElement(), 4);
-                    LOG.log(Level.WARNING, "Schema for: " + schemaInfo.getNamespaceURI() + "\n" + s);
+                    LOG.log(Level.INFO, "Schema for: " + schemaInfo.getNamespaceURI() + "\n" + s);
                 }
             }
             serviceInfo.setProperty(Schema.class.getName(), schema);
@@ -684,13 +723,16 @@ public final class EndpointReferenceUtils {
     }
     
     public static Schema getSchema(ServiceInfo serviceInfo) {
+        return getSchema(serviceInfo, null);
+    }
+    public static Schema getSchema(ServiceInfo serviceInfo, Bus b) {
         if (serviceInfo == null) {
             return null;
         }
         Schema schema = serviceInfo.getProperty(Schema.class.getName(), Schema.class);
         if (schema == null && !serviceInfo.hasProperty(Schema.class.getName())) {
             synchronized (serviceInfo) {
-                return createSchema(serviceInfo);
+                return createSchema(serviceInfo, b);
             }
         }
         return schema;

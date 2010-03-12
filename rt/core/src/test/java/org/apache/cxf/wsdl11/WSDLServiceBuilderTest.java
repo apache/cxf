@@ -459,7 +459,7 @@ public class WSDLServiceBuilderTest extends Assert {
         assertNotNull(serviceInfo.getSchemas());
         Element ele = serviceInfo.getSchemas().iterator().next().getElement();
         assertNotNull(ele);
-        Schema schema = EndpointReferenceUtils.getSchema(serviceInfo);        
+        Schema schema = EndpointReferenceUtils.getSchema(serviceInfo, null);        
         assertNotNull(schema);        
         control.verify();
     }
