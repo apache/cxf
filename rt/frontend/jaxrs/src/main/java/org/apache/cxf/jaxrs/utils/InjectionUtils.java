@@ -70,6 +70,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.ParameterHandler;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
@@ -81,6 +82,7 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
+import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSearchContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
@@ -720,8 +722,10 @@ public final class InjectionUtils {
             proxy = new ThreadLocalHttpServletResponse();
         } else if (MessageContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalMessageContext();
-        }  else if (ServletConfig.class.isAssignableFrom(type)) {
+        } else if (ServletConfig.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalServletConfig();
+        } else if (SearchContext.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalSearchContext();
         }
         return proxy;
     }
@@ -906,6 +910,23 @@ public final class InjectionUtils {
                     + " due to IllegalAccessException";
                 throw new WebApplicationException(Response.serverError().entity(msg).build());
             } 
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static <T> T convertStringToPrimitive(String value, Class<T> cls) {
+        if (String.class == cls) {
+            return cls.cast(value);
+        }
+        if (cls.isPrimitive()) {
+            return (T)PrimitiveUtils.read(value, cls);
+        } else {
+            try {
+                Method m = cls.getMethod("valueOf", new Class[]{String.class});
+                return cls.cast(m.invoke(null, value));
+            } catch (Exception ex) {
+                throw new RuntimeException(ex);
+            }
         }
     }
 }

@@ -66,6 +66,8 @@ import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.Oneway;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
@@ -333,6 +335,23 @@ public class BookStore {
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/books/search")
+    @Produces("application/xml")
+    public Book getBook(@Context SearchContext searchContext) 
+        throws BookNotFoundFault {
+        
+        SearchCondition<Book> sc = searchContext.getCondition(Book.class);
+        if (sc == null) {
+            throw new BookNotFoundFault("Search exception");
+        }
+        List<Book> found = sc.findAll(books.values());
+        if (found.size() != 1) {
+            throw new BookNotFoundFault("Single book is expected");
+        }
+        return found.get(0);
     }
     
     @GET

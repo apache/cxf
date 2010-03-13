@@ -482,6 +482,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                "application/xml", 200);
     }
     
+    @Test
+    public void testSearchBook123() throws Exception {
+        getAndCompareAsStrings("http://localhost:9080/bookstore/books/search"
+                               + "?_s=name==CXF*;id=ge=123;id=lt=124",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
     
     @Test
     public void testGetBook123() throws Exception {

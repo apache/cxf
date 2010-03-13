@@ -205,11 +205,11 @@ public class FiqlParserTest {
             this.name = name;
         }
 
-        public Integer getLevel() {
+        public int getLevel() {
             return level;
         }
 
-        public void setLevel(Integer level) {
+        public void setLevel(int level) {
             this.level = level;
         }
 

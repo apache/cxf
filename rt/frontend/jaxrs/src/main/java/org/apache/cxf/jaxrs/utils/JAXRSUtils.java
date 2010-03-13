@@ -75,6 +75,8 @@ import org.apache.cxf.jaxrs.ext.MessageContextImpl;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
 import org.apache.cxf.jaxrs.ext.ProtocolHeadersImpl;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.ext.search.SearchContext;
+import org.apache.cxf.jaxrs.ext.search.SearchContextImpl;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.HttpServletResponseFilter;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
@@ -784,6 +786,8 @@ public final class JAXRSUtils {
             o = createContextResolver(genericType, contextMessage);
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
+        } else if (SearchContext.class.isAssignableFrom(clazz)) {
+            o = new SearchContextImpl(m);
         }
         
         o = o == null ? createServletResourceValue(contextMessage, clazz) : o;

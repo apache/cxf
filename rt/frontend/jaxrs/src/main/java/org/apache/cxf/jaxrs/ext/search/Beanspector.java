@@ -138,7 +138,6 @@ class Beanspector<T> {
 
     public Beanspector<T> setValue(Method setter, Object value) throws Throwable {
         Class<?> paramType = setter.getParameterTypes()[0];
-        value = narrowNumerics(paramType, value);
         try {
             setter.invoke(tobj, value);
             return this;
@@ -151,40 +150,6 @@ class Beanspector<T> {
         } catch (Exception e) {
             throw e;
         }
-    }
-
-    // narrowing conversion is compile-time so in reflection is not supported
-    // this is clunky workaround for numeric datatypes
-    private Object narrowNumerics(Class<?> targetType, Object value) {
-        Class<?> sourceType = value.getClass();
-        if (sourceType == Double.class) {
-            if (targetType == Integer.class || targetType == Integer.TYPE) {
-                value = ((Double)value).intValue();
-            } else if (targetType == Short.class || targetType == Short.TYPE) {
-                value = ((Double)value).shortValue();
-            } else if (targetType == Byte.class || targetType == Byte.TYPE) {
-                value = ((Double)value).byteValue();
-            }
-        } else if (sourceType == Float.class) {
-            if (targetType == Integer.class || targetType == Integer.TYPE) {
-                value = ((Float)value).intValue();
-            } else if (targetType == Short.class || targetType == Short.TYPE) {
-                value = ((Float)value).shortValue();
-            } else if (targetType == Byte.class || targetType == Byte.TYPE) {
-                value = ((Float)value).byteValue();
-            }
-        } else if (sourceType == Integer.class) {
-            if (targetType == Short.class || targetType == Short.TYPE) {
-                value = ((Integer)value).shortValue();
-            } else if (targetType == Byte.class || targetType == Byte.TYPE) {
-                value = ((Integer)value).byteValue();
-            }
-        } else if (sourceType == Short.class 
-                && (targetType == Byte.class || targetType == Byte.TYPE)) {
-            value = ((Integer)value).byteValue();
-
-        }
-        return value;
     }
 
     public Object getValue(String getterName) throws Throwable {

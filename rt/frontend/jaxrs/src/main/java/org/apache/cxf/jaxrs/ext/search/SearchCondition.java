@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import java.util.Collection;
 import java.util.List;
 
 //CHECKSTYLE:OFF
@@ -47,7 +48,7 @@ public interface SearchCondition<T> {
      * @param pojos list of pojos
      * @return list of the matching pojos or null if none have been found
      */
-    List<T> findAll(List<T> pojos);
+    List<T> findAll(Collection<T> pojos);
     
     /**
      * Some SearchConditions may use instance of T to capture the actual search criteria

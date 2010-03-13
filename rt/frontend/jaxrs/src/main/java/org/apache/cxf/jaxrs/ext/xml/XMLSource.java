@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Array;
-import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.Collections;
 import java.util.Iterator;
@@ -50,7 +49,6 @@ import org.xml.sax.InputSource;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.PrimitiveUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
@@ -162,7 +160,7 @@ public class XMLSource {
     
     public <T> T getValue(String expression, Map<String, String> namespaces, Class<T> cls) {
         Object result = evaluate(expression, namespaces, XPathConstants.STRING);
-        return result == null ? null : convertStringToPrimitive(result.toString(), cls); 
+        return result == null ? null : InjectionUtils.convertStringToPrimitive(result.toString(), cls); 
     }
     
     
@@ -230,23 +228,7 @@ public class XMLSource {
             }
         } 
         
-        return convertStringToPrimitive(node.getNodeValue(), cls);
-    }
-    
-    private <T> T convertStringToPrimitive(String value, Class<T> cls) {
-        if (String.class == cls) {
-            return cls.cast(value);
-        }
-        if (cls.isPrimitive()) {
-            return cls.cast(PrimitiveUtils.read(value, cls));
-        } else {
-            try {
-                Method m = cls.getMethod("valueOf", new Class[]{String.class});
-                return cls.cast(m.invoke(null, value));
-            } catch (Exception ex) {
-                throw new RuntimeException(ex);
-            }
-        }
+        return InjectionUtils.convertStringToPrimitive(node.getNodeValue(), cls);
     }
     
     

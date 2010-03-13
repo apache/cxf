@@ -33,6 +33,8 @@ import java.util.regex.Pattern;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeFactory;
 
+import org.apache.cxf.jaxrs.utils.InjectionUtils;
+
 /**
  * Parses <a href="http://tools.ietf.org/html/draft-nottingham-atompub-fiql-00">FIQL</a> expression to
  * construct {@link SearchCondition} structure. Since this class operates on Java type T, not on XML
@@ -188,13 +190,7 @@ public class FiqlParser<T> {
         } catch (Exception e) {
             throw new FiqlParseException(e);
         }
-        if (Number.class.isAssignableFrom(valueType)) {
-            try {
-                castedValue = Float.parseFloat(value);
-            } catch (NumberFormatException e) {
-                throw new FiqlParseException("Cannot parse " + value + " as number", e);
-            }
-        } else if (Date.class.isAssignableFrom(valueType)) {
+        if (Date.class.isAssignableFrom(valueType)) {
             DateFormat df;
             try {
                 df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZ");
@@ -217,6 +213,13 @@ public class FiqlParser<T> {
                 } catch (IllegalArgumentException e1) {
                     throw new FiqlParseException("Can parse " + value + " neither as date nor duration", e);
                 }
+            }
+        } else {
+            try {
+                castedValue = InjectionUtils.convertStringToPrimitive(value, valueType);
+            } catch (Exception e) {
+                throw new FiqlParseException("Cannot convert String value \"" + value
+                                             + "\" to a value of class " + valueType.getName(), e);
             }
         }
         return castedValue;

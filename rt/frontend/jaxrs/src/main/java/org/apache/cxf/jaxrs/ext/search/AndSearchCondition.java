@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -62,7 +63,7 @@ public class AndSearchCondition<T> implements SearchCondition<T> {
         return Collections.unmodifiableList(conditions);
     }
 
-    public List<T> findAll(List<T> pojos) {
+    public List<T> findAll(Collection<T> pojos) {
         List<T> result = new ArrayList<T>();
         for (T pojo : pojos) {
             if (isMet(pojo)) {

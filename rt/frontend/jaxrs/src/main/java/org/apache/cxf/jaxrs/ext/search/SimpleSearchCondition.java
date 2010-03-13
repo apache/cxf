@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -244,6 +245,8 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         if (cond == ConditionType.EQUALS || cond == ConditionType.NOT_EQUALS) {
             if (rval == null) {
                 compares = true;
+            } else if (lval == null) {
+                compares = false;
             } else {
                 if (lval instanceof String) {
                     compares = textCompare((String)lval, (String)rval);
@@ -307,7 +310,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    public List<T> findAll(List<T> pojos) {
+    public List<T> findAll(Collection<T> pojos) {
         List<T> result = new ArrayList<T>();
         for (T pojo : pojos) {
             if (isMet(pojo)) {
