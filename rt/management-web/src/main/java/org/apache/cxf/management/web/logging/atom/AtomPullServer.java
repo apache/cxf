@@ -20,6 +20,7 @@ package org.apache.cxf.management.web.logging.atom;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -448,7 +449,7 @@ public class AtomPullServer extends AbstractAtomBean {
             return null;
         }
 
-        public List<LogRecord> findAll(List<LogRecord> pojos) {
+        public List<LogRecord> findAll(Collection<LogRecord> pojos) {
             List<LogRecord> list = new LinkedList<LogRecord>();
             for (LogRecord r : pojos) {
                 if (isMet(r)) {
