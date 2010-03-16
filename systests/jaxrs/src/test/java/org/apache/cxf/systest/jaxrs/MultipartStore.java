@@ -152,6 +152,9 @@ public class MultipartStore {
     @Produces("text/xml")
     public Response addBookFromFormParam(@FormParam("name") String title, 
                                          @FormParam("id") Long id) throws Exception {
+        if (!"CXF in Action - 2".equals(title)) {
+            throw new RuntimeException();
+        }
         Book b = new Book();
         b.setId(id);
         b.setName(title);
@@ -159,9 +162,17 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/formparam2")
+    @Produces("text/xml")
+    public Response addBookFromFormParam2(@Multipart("name") String title, 
+                                          @Multipart("id") Long id) throws Exception {
+        return addBookFromFormParam(title, id);
+    }
+    
+    @POST
     @Path("/books/formparambean")
     @Produces("text/xml")
-    public Response addBookFromFormParam(@FormParam("") Book b) throws Exception {
+    public Response addBookFromFormBean(@FormParam("") Book b) throws Exception {
         return Response.ok(b).build();
     }
     
