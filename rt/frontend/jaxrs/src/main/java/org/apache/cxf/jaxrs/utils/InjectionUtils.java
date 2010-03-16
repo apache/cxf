@@ -879,7 +879,7 @@ public final class InjectionUtils {
             || String.class == type;
     }
     
-    private static String decodeValue(String value, boolean decode, ParameterType param) {
+    public static String decodeValue(String value, boolean decode, ParameterType param) {
         if (!decode) {
             return value;
         }
