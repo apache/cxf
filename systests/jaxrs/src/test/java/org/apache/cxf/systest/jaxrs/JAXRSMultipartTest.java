@@ -155,12 +155,6 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testAddBookFormParam2() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparam2";
-        doAddBook("multipart/form-data", address, "attachmentForm", 200);               
-    }
-    
-    @Test
     public void testAddBookFormBody() throws Exception {
         String address = "http://localhost:9085/bookstore/books/formbody";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               

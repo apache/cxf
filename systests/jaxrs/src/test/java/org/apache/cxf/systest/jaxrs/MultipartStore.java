@@ -162,14 +162,6 @@ public class MultipartStore {
     }
     
     @POST
-    @Path("/books/formparam2")
-    @Produces("text/xml")
-    public Response addBookFromFormParam2(@Multipart("name") String title, 
-                                          @Multipart("id") Long id) throws Exception {
-        return addBookFromFormParam(title, id);
-    }
-    
-    @POST
     @Path("/books/formparambean")
     @Produces("text/xml")
     public Response addBookFromFormBean(@FormParam("") Book b) throws Exception {

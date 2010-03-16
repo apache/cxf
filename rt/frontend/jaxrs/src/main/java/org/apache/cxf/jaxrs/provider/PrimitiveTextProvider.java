@@ -24,7 +24,6 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 
-import javax.ws.rs.Encoded;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -32,7 +31,6 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.ParameterType;
-import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveTextProvider 
@@ -49,14 +47,8 @@ public class PrimitiveTextProvider
     public Object readFrom(Class<Object> type, Type genType, Annotation[] anns, MediaType mt, 
                            MultivaluedMap<String, String> headers, InputStream is) throws IOException {
         
-        String value = IOUtils.readStringFromStream(is);
-        if (type.isAssignableFrom(String.class)) {
-            value = InjectionUtils.decodeValue(value, 
-                              AnnotationUtils.getAnnotation(anns, Encoded.class) == null,
-                              ParameterType.REQUEST_BODY);
-        }
         return InjectionUtils.handleParameter(
-                    value, 
+                    IOUtils.readStringFromStream(is), 
                     type,
                     ParameterType.REQUEST_BODY, null);
         
