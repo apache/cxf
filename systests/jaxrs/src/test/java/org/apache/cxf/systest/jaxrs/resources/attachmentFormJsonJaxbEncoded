@@ -1,0 +1,17 @@
+
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="bookJson"
+Content-Type: application/json; charset=US-ASCII
+Content-Transfer-Encoding: base64
+Content-ID: <jsonPart>
+
+eyJCb29rIjp7Im5hbWUiOiJDWEYgaW4gQWN0aW9uIC0gMSIsImlkIjoxMjN9fQ==
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB
+Content-Disposition: form-data; name="bookXML"
+Content-Type: application/xml
+Content-Transfer-Encoding: quoted-printable
+Content-ID: <jaxbPart>
+
+<Book><name>CX=
+F in Action - 2</name></Book>
+--bqJky99mlBWa-ZuqjC53mG6EzbmlxB--
