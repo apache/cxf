@@ -65,6 +65,7 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     public void testClientServer() {
 
         String[] argv = new String[] {
+            "UserName",
             "UserNameOverTransport",
             "MutualCertificate10SignEncrypt",
             "MutualCertificate10SignEncryptRsa15TripleDes"
@@ -102,6 +103,8 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
         try {
             if ("UserNameOverTransport".equals(portPrefix)) {
                 return new URL("https://localhost:9001/" + portPrefix + "?wsdl");
+            } else if ("UserName".equals(portPrefix)) {
+                return new URL("http://localhost:9003/" + portPrefix + "?wsdl");
             } else if ("MutualCertificate10SignEncrypt".equals(portPrefix)) {
                 return new URL("http://localhost:9002/" + portPrefix + "?wsdl");
             } else if ("MutualCertificate10SignEncryptRsa15TripleDes".equals(portPrefix)) {
