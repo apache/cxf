@@ -26,27 +26,23 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.security.policy.SP12Constants;
-import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
-import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
+import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
 
 /**
  * 
  */
-public class WSSecurityInterceptorProvider extends AbstractPolicyInterceptorProvider {
+public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorProvider {
     private static final Collection<QName> ASSERTION_TYPES;
     static {
         ASSERTION_TYPES = new ArrayList<QName>();
         
-        ASSERTION_TYPES.add(SP12Constants.TRANSPORT_BINDING);
-        ASSERTION_TYPES.add(SP12Constants.ASYMMETRIC_BINDING);
-        ASSERTION_TYPES.add(SP12Constants.SYMMETRIC_BINDING);
+        ASSERTION_TYPES.add(SP12Constants.USERNAME_TOKEN);
     }
 
-    public WSSecurityInterceptorProvider() {
+    public UsernameTokenInterceptorProvider() {
         super(ASSERTION_TYPES);
-        this.getOutInterceptors().add(new PolicyBasedWSS4JOutInterceptor());
-        this.getOutFaultInterceptors().add(new PolicyBasedWSS4JOutInterceptor());
-        this.getInInterceptors().add(new PolicyBasedWSS4JInInterceptor());
-        this.getInFaultInterceptors().add(new PolicyBasedWSS4JInInterceptor());
+        this.getOutInterceptors().add(new UsernameTokenInterceptor());
+        this.getInInterceptors().add(new UsernameTokenInterceptor());
+        //not needed on fault chains
     }
 }

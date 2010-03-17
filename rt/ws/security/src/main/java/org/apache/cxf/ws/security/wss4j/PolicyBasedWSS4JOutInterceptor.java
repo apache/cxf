@@ -46,6 +46,8 @@ import org.apache.cxf.ws.security.wss4j.policyhandlers.TransportBindingHandler;
 import org.apache.ws.security.message.WSSecHeader;
 
 public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<SoapMessage> {
+    public static final String SECURITY_PROCESSED = PolicyBasedWSS4JOutInterceptor.class.getName() + ".DONE";
+
     private PolicyBasedWSS4JOutInterceptorInternal ending;
     private SAAJOutInterceptor saajOut = new SAAJOutInterceptor();    
 
@@ -60,6 +62,7 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
         if (mc.getContent(SOAPMessage.class) == null) {
             saajOut.handleMessage(mc);
         }
+        mc.put(SECURITY_PROCESSED, Boolean.TRUE);
         mc.getInterceptorChain().add(ending);
     }    
     public void handleFault(SoapMessage message) {

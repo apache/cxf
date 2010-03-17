@@ -49,6 +49,12 @@
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
         </jaxws:properties>
     </jaxws:client>
+    <jaxws:client name="{http://WSSec/wssec10}UserName_IPingService" createdFromAPI="true">
+        <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>
+        </jaxws:properties>
+    </jaxws:client>
     <http:conduit name="https://.*/UserNameOverTransport.*">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">

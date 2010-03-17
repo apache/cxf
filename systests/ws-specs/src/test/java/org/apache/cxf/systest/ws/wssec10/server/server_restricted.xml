@@ -90,6 +90,20 @@
         </jaxws:properties> 
      
     </jaxws:endpoint> 
+    <jaxws:endpoint 
+       id="UserName"
+       address="https://localhost:9003/UserName" 
+       serviceName="interop:PingService"
+       endpointName="interop:UserName_IPingService"
+       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+        </jaxws:properties> 
+     
+    </jaxws:endpoint> 
     
 
     <!-- -->

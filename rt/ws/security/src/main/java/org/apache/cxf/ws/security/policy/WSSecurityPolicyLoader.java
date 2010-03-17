@@ -22,10 +22,16 @@ package org.apache.cxf.ws.security.policy;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 
+import java.util.Arrays;
+import java.util.List;
+
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AssertionBuilderRegistry;
 import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyInterceptorProviderRegistry;
+import org.apache.cxf.ws.policy.builder.xml.XMLPrimitiveAssertionBuilder;
 import org.apache.cxf.ws.security.policy.builders.AlgorithmSuiteBuilder;
 import org.apache.cxf.ws.security.policy.builders.AsymmetricBindingBuilder;
 import org.apache.cxf.ws.security.policy.builders.ContentEncryptedElementsBuilder;
@@ -58,6 +64,7 @@ import org.apache.cxf.ws.security.policy.builders.X509TokenBuilder;
 import org.apache.cxf.ws.security.policy.interceptors.HttpsTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.IssuedTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.SecureConversationTokenInterceptorProvider;
+import org.apache.cxf.ws.security.policy.interceptors.UsernameTokenInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityInterceptorProvider;
 import org.apache.cxf.ws.security.policy.interceptors.WSSecurityPolicyInterceptorProvider;
 
@@ -117,6 +124,33 @@ public class WSSecurityPolicyLoader {
         reg.register(new WSS10Builder());
         reg.register(new WSS11Builder());
         reg.register(new X509TokenBuilder(pbuild));
+        
+        //add generic assertions for these known things to prevent warnings
+        List<QName> others = Arrays.asList(new QName[] {
+            SP12Constants.INCLUDE_TIMESTAMP, SP11Constants.INCLUDE_TIMESTAMP,
+            SP12Constants.ENCRYPT_SIGNATURE, SP11Constants.ENCRYPT_SIGNATURE,
+            SP12Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY, 
+            new QName(SP11Constants.SP_NS, SP11Constants.ONLY_SIGN_ENTIRE_HEADERS_AND_BODY),
+            SP12Constants.WSS_X509_V1_TOKEN_10,
+            SP12Constants.WSS_X509_V1_TOKEN_11,
+            SP12Constants.WSS_X509_V3_TOKEN_10,
+            SP12Constants.WSS_X509_V3_TOKEN_11,
+            SP11Constants.WSS_X509_V1_TOKEN_10,
+            SP11Constants.WSS_X509_V1_TOKEN_11,
+            SP11Constants.WSS_X509_V3_TOKEN_10,
+            SP11Constants.WSS_X509_V3_TOKEN_11,
+            SP12Constants.WSS_X509_PKCS7_TOKEN_11,
+            SP12Constants.WSS_X509_PKI_PATH_V1_TOKEN_11,
+            SP11Constants.WSS_X509_PKCS7_TOKEN_11,
+            SP11Constants.WSS_X509_PKI_PATH_V1_TOKEN_11,
+            SP12Constants.REQUIRE_THUMBPRINT_REFERENCE,
+            SP11Constants.REQUIRE_THUMBPRINT_REFERENCE,
+            SP12Constants.REQUIRE_DERIVED_KEYS,
+            SP11Constants.REQUIRE_DERIVED_KEYS,
+            new QName(SP12Constants.SP_NS, SP12Constants.ENCRYPT_BEFORE_SIGNING),
+            new QName(SP11Constants.SP_NS, SP11Constants.ENCRYPT_BEFORE_SIGNING),
+        });
+        reg.register(new XMLPrimitiveAssertionBuilder(others));
     }
     
     public void registerProviders() {
@@ -129,6 +163,7 @@ public class WSSecurityPolicyLoader {
         reg.register(new WSSecurityInterceptorProvider());
         reg.register(new HttpsTokenInterceptorProvider());
         reg.register(new IssuedTokenInterceptorProvider());
+        reg.register(new UsernameTokenInterceptorProvider());
         reg.register(new SecureConversationTokenInterceptorProvider());
     }
 

@@ -74,6 +74,9 @@
 		<wsdl:port name="UserNameOverTransport_IPingService" binding="wssec10test:UserNameOverTransport_IPingService">
 			<soap:address location="https://localhost:9001/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserNameOverTransport"/>
 		</wsdl:port>
+        <wsdl:port name="UserName_IPingService" binding="wssec10test:UserName_IPingService">
+            <soap:address location="http://localhost:9003/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/UserName"/>
+        </wsdl:port>
 		<wsdl:port name="MutualCertificate10SignEncrypt_IPingService" binding="wssec10test:MutualCertificate10SignEncrypt_IPingService">
 			<soap:address location="http://localhost:9002/Security_WsSecurity_Service_Indigo/WsSecurity10.svc/MutualCertificate10SignEncrypt"/>
 		</wsdl:port>
