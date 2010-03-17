@@ -424,9 +424,14 @@ final class WrapperHelperCompiler extends ASMHelper {
                     createObjectWrapper(mv, method.getReturnType());
                 }
                 if (JAXBElement.class.isAssignableFrom(method.getReturnType())) {
+                    Label jumpOverLabel = new Label();
+                    mv.visitInsn(Opcodes.DUP);
+                    mv.visitJumpInsn(Opcodes.IFNULL, jumpOverLabel);
+
                     mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
                                        "javax/xml/bind/JAXBElement",
                                        "getValue", "()Ljava/lang/Object;");
+                    mv.visitLabel(jumpOverLabel);
                 }
                 
                 mv.visitMethodInsn(Opcodes.INVOKEINTERFACE, "java/util/List", "add", "(Ljava/lang/Object;)Z");
@@ -463,11 +468,4 @@ final class WrapperHelperCompiler extends ASMHelper {
                            "valueOf", "(" + PRIMITIVE_MAP.get(cl) + ")L" 
                            + NONPRIMITIVE_MAP.get(cl) + ";");
     }
-    
-
-    
-    
-        
-
-
 }
