@@ -19,11 +19,11 @@
 
 package org.apache.cxf.ws.security.policy;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
-
 import java.util.Arrays;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 
 import javax.xml.namespace.QName;
 
