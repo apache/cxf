@@ -35,6 +35,7 @@ import java.util.logging.Logger;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.mail.internet.MimeUtility;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
@@ -165,11 +166,25 @@ public class MultipartProvider extends AbstractConfigurableProvider
             MessageBodyReader<Object> r = 
                 mc.getProviders().getMessageBodyReader((Class)c, t, anns, multipart.getContentType());
             if (r != null) {
+                InputStream is = multipart.getDataHandler().getInputStream();
+                is = decodeIfNeeded(multipart, is);
                 return r.readFrom((Class)c, t, anns, multipart.getContentType(), multipart.getHeaders(), 
-                                  multipart.getDataHandler().getInputStream());
+                                  is);
             }
         }
         return null;
+    }
+    
+    private InputStream decodeIfNeeded(Attachment multipart, InputStream is) {
+        String value = multipart.getHeader("Content-Transfer-Encoding");
+        if ("base64".equals(value) || "quoted-printable".equals(value)) {
+            try {
+                is = MimeUtility.decode(is, value);
+            } catch (Exception ex) {
+                LOG.warning("Problem with decoding an input stream, encoding : " + value);
+            }
+        }
+        return is;
     }
     
     private boolean mediaTypeSupported(MediaType mt) {
