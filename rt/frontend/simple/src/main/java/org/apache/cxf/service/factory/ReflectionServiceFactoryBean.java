@@ -240,11 +240,11 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     try {
                         res = new URIResolver(l);
                     } catch (IOException e) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG), e);
+                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l), e);
                     }
 
                     if (!res.isResolved()) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG));
+                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l));
                     }
                     url = res.getURL();
                 }
@@ -742,6 +742,10 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
 
             setFaultClassInfo(o, method);
+            if (o.getUnwrappedOperation() == null) {
+                throw new ServiceConstructionException(new Message("COULD_NOT_UNWRAP", LOG,
+                                                                   o.getName(), method));
+            }
             o = o.getUnwrappedOperation();
         } else if (o.isUnwrappedCapable()) {
             // remove the unwrapped operation because it will break the
