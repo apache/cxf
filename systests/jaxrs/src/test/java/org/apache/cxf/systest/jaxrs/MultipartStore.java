@@ -282,6 +282,16 @@ public class MultipartStore {
         return Response.ok(b2).build();
     }
     
+    @POST
+    @Path("/books/jsonjaxbformencoded")
+    @Produces("text/xml")
+    @Consumes("multipart/form-data")
+    public Response addBookJaxbJsonFormEncoded(@Multipart("jsonPart") Book b1, 
+                                        @Multipart("bookXML") Book b2) 
+        throws Exception {
+        return addBookJaxbJsonForm(b1, b2);
+    }
+    
     
     @POST
     @Path("/books/dsource2")

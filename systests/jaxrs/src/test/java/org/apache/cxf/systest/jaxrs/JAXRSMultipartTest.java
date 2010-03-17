@@ -107,6 +107,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookJSONJAXBFormEncoded() throws Exception {
+        String address = "http://localhost:9085/bookstore/books/jsonjaxbform";
+        doAddFormBook(address, "attachmentFormJsonJaxbEncoded", 200);
+    }
+    
+    @Test
     public void testBookJSONFormFiles() throws Exception {
         String address = "http://localhost:9085/bookstore/books/filesform";
         doAddFormBook(address, "attachmentFormJsonFiles", 200);               
