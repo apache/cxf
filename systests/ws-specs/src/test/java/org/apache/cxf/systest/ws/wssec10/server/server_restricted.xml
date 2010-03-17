@@ -92,7 +92,7 @@
     </jaxws:endpoint> 
     <jaxws:endpoint 
        id="UserName"
-       address="https://localhost:9003/UserName" 
+       address="http://localhost:9003/UserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService"
        implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
