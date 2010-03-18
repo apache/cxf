@@ -20,12 +20,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
     <artifactId>cxf-systests-java2ws</artifactId>
-    <version>2.2.7</version>
+    <version>2.2.8-SNAPSHOT</version>
     <name>Test for writing wsdl to repo</name>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.7</version>
+        <version>2.2.8-SNAPSHOT</version>
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
     <build>
