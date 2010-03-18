@@ -61,8 +61,6 @@ public class MapType extends Type {
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
         Map<Object, Object> map = instantiateMap();
         try {
-            Type kType = getKeyType();
-            Type vType = getValueType();
 
             while (reader.hasMoreElementReaders()) {
                 MessageReader entryReader = reader.getNextElementReader();
@@ -72,12 +70,18 @@ public class MapType extends Type {
                     Object value = null;
 
                     while (entryReader.hasMoreElementReaders()) {
-                                                
+
                         MessageReader evReader = entryReader.getNextElementReader();
 
                         if (evReader.getName().equals(getKeyName())) {
+                            Type kType = TypeUtil.getReadType(evReader.getXMLStreamReader(),
+                                                              context.getGlobalContext(), 
+                                                              getKeyType());
                             key = kType.readObject(evReader, context);
                         } else if (evReader.getName().equals(getValueName())) {
+                            Type vType = TypeUtil.getReadType(evReader.getXMLStreamReader(),
+                                                              context.getGlobalContext(),
+                                                              getValueType());
                             value = vType.readObject(evReader, context);
                         } else {
                             readToEnd(evReader);
@@ -107,7 +111,7 @@ public class MapType extends Type {
      * extends the <code>Map</code> interface a <code>HashMap</code> is
      * created. Otherwise the map classs (i.e. LinkedHashMap) is instantiated
      * using the default constructor.
-     * 
+     *
      * @return
      */
     @SuppressWarnings("unchecked")
@@ -167,10 +171,11 @@ public class MapType extends Type {
         MessageWriter keyWriter = entryWriter.getElementWriter(getKeyName());
         kType.writeObject(entry.getKey(), keyWriter, context);
         keyWriter.close();
-
-        MessageWriter valueWriter = entryWriter.getElementWriter(getValueName());
-        vType.writeObject(entry.getValue(), valueWriter, context);
-        valueWriter.close();
+        if (entry.getValue() != null) {
+            MessageWriter valueWriter = entryWriter.getElementWriter(getValueName());
+            vType.writeObject(entry.getValue(), valueWriter, context);
+            valueWriter.close();
+        }
 
         entryWriter.close();
     }
@@ -199,19 +204,24 @@ public class MapType extends Type {
         XmlSchemaSequence evSequence = new XmlSchemaSequence();
         evType.setParticle(evSequence);
 
-        createElement(evSequence, getKeyName(), kType);
-        createElement(evSequence, getValueName(), vType);
+        createElement(evSequence, getKeyName(), kType, false);
+        createElement(evSequence, getValueName(), vType, true);
     }
 
     /**
      * Creates a element in a sequence for the key type and the value type.
      */
-    private void createElement(XmlSchemaSequence seq, QName name, Type type) {
+    private void createElement(XmlSchemaSequence seq, QName name,
+                               Type type, boolean optional) {
         XmlSchemaElement element = new XmlSchemaElement();
         seq.getItems().add(element);
         element.setName(name.getLocalPart());
         element.setSchemaTypeName(type.getSchemaType());
-        element.setMinOccurs(0);
+        if (optional) {
+            element.setMinOccurs(0);
+        } else {
+            element.setMinOccurs(1);            
+        }
         element.setMaxOccurs(1);
     }
 
