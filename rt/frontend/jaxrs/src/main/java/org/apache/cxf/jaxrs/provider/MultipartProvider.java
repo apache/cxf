@@ -60,6 +60,8 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 
 @Provider
 @Consumes({"multipart/related", "multipart/mixed", "multipart/alternative", "multipart/form-data" })
@@ -334,7 +336,11 @@ public class MultipartProvider extends AbstractConfigurableProvider
             mimeType = id.type();
         }
         if (mimeType == null) {
-            mimeType = MediaType.APPLICATION_OCTET_STREAM;
+            if (MessageUtils.isTrue(mc.getContextualProperty(Message.MTOM_ENABLED))) {
+                mimeType = "text/xml";
+            } else {
+                mimeType = MediaType.APPLICATION_OCTET_STREAM;
+            }
         }
         return mimeType;
     }

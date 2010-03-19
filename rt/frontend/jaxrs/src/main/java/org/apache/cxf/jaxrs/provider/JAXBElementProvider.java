@@ -52,10 +52,13 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.message.Attachment;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 
@@ -148,6 +151,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (eventHandler != null) {
                 unmarshaller.setEventHandler(eventHandler);
             }
+            addAttachmentUnmarshaller(unmarshaller);
             Object response = null;
             if (JAXBElement.class.isAssignableFrom(type) 
                 || unmarshalAsJaxbElement 
@@ -310,7 +314,35 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         
         Marshaller ms = createMarshaller(obj, cls, genericType, enc);
+        addAttachmentMarshaller(ms);
         marshal(obj, cls, genericType, enc, os, mt, ms);
+    }
+    
+    protected void addAttachmentMarshaller(Marshaller ms) {
+        Collection<Attachment> attachments = getAttachments();
+        if (attachments != null) {
+            Object value = getContext().getContextualProperty(Message.MTOM_THRESHOLD);
+            Integer threshold = value != null ? Integer.valueOf(value.toString()) : 0;
+            ms.setAttachmentMarshaller(new JAXBAttachmentMarshaller(
+                attachments, threshold));
+        }
+    }
+    
+    protected void addAttachmentUnmarshaller(Unmarshaller um) {
+        Collection<Attachment> attachments = getAttachments();
+        if (attachments != null) {
+            um.setAttachmentUnmarshaller(new JAXBAttachmentUnmarshaller(
+                attachments));
+        }
+    }
+    
+    private Collection<Attachment> getAttachments() {
+        MessageContext mc = getContext();
+        if (mc != null) {
+            return CastUtils.cast((Collection<?>)mc.get(Message.ATTACHMENTS));
+        } else {
+            return null;
+        }
     }
     
     protected void marshal(Object obj, Class<?> cls, Type genericType, 
