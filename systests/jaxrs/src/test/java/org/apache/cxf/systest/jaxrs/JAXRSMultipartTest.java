@@ -19,16 +19,21 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.DataHandler;
+import javax.imageio.ImageIO;
+import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
@@ -39,6 +44,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
@@ -238,6 +244,46 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testXopWebClient() throws Exception {
+        String address = "http://localhost:9085/bookstore/xop";
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress(address);
+        bean.setProperties(Collections.singletonMap(org.apache.cxf.message.Message.MTOM_ENABLED, 
+                                                    (Object)"true"));
+        WebClient client = bean.createWebClient();
+        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
+        
+        client.type("multipart/related").accept("text/plain");
+        XopType xop = new XopType();
+        xop.setName("xopName");
+        InputStream is = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/book.xsd");
+        byte[] data = IOUtils.readBytesFromStream(is);
+        xop.setAttachinfo(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
+        
+        String bookXsd = IOUtils.readStringFromStream(getClass().getResourceAsStream(
+            "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
+        xop.setAttachinfo2(bookXsd.getBytes());
+     
+        if (Boolean.getBoolean("java.awt.headless")) {
+            System.out.println("Running headless. Ignoring an Image property.");
+        } else {
+            xop.setImage(getImage("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
+        }
+        
+        String response = client.post(xop, String.class);
+        
+        
+        assertEquals("xopName" + bookXsd + bookXsd, response);
+    }
+    
+    private Image getImage(String name) throws Exception {
+        return ImageIO.read(getClass().getResource(name));
+    }
+    
+    @Test
     public void testAddBookJaxbJsonImageWebClient() throws Exception {
         String address = "http://localhost:9085/bookstore/books/jaxbjsonimage";
         WebClient client = WebClient.create(address);
@@ -299,9 +345,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testAddGetJaxbBooksWebClient() throws Exception {
         String address = "http://localhost:9085/bookstore/books/jaxbonly";
         WebClient client = WebClient.create(address);
-        HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
+        
         client.type("multipart/mixed;type=application/xml").accept("multipart/mixed");
         
         Book b = new Book("jaxb", 1L);

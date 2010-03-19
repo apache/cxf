@@ -19,6 +19,7 @@
 
 package org.apache.cxf.attachment;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -37,10 +38,12 @@ import java.util.UUID;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.activation.FileDataSource;
 import javax.mail.Header;
 import javax.mail.internet.InternetHeaders;
 
 import org.apache.cxf.helpers.HttpHeaderHelper;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Attachment;
 
 public final class AttachmentUtil {
@@ -187,6 +190,70 @@ public final class AttachmentUtil {
             }
         }
         return false;
+    }
+
+    public static Attachment createMtomAttachment(boolean isXop, String mimeType, String elementNS, 
+                                                 byte[] data, int offset, int length, int threshold) {
+        if (!isXop || length < threshold) {
+            return null;
+        }        
+        if (mimeType == null) {
+            mimeType = "application/octet-stream";
+        }
+        
+        ByteDataSource source = new ByteDataSource(data, offset, length);
+        source.setContentType(mimeType);
+        DataHandler handler = new DataHandler(source);
+
+        String id;
+        try {
+            id = AttachmentUtil.createContentID(elementNS);
+        } catch (UnsupportedEncodingException e) {
+            throw new Fault(e);
+        }
+        AttachmentImpl att = new AttachmentImpl(id, handler);
+        att.setXOP(isXop);
+        return att;
+    }
+    
+    public static Attachment createMtomAttachmentFromDH(
+        boolean isXop, DataHandler handler, String elementNS, int threshold) {
+        if (!isXop) {
+            return null;
+        }        
+
+        // The following is just wrong. Even if the DataHandler has a stream, we should still
+        // apply the threshold.
+        try {
+            DataSource ds = handler.getDataSource();
+            if (ds instanceof FileDataSource) {
+                FileDataSource fds = (FileDataSource)ds;
+                File file = fds.getFile();
+                if (file.length() < threshold) {
+                    return null;
+                }
+            } else if (ds.getClass().getName().endsWith("ObjectDataSource")) {
+                Object o = handler.getContent();
+                if (o instanceof String 
+                    && ((String)o).length() < threshold) {
+                    return null;
+                } else if (o instanceof byte[] && ((byte[])o).length < threshold) {
+                    return null;
+                }
+            }
+        } catch (IOException e1) {
+        //      ignore, just do the normal attachment thing
+        }
+        
+        String id;
+        try {
+            id = AttachmentUtil.createContentID(elementNS);
+        } catch (UnsupportedEncodingException e) {
+            throw new Fault(e);
+        }
+        AttachmentImpl att = new AttachmentImpl(id, handler);
+        att.setXOP(isXop);
+        return att;
     }
     
 }

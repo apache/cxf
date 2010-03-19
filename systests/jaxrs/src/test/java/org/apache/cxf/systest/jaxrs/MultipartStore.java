@@ -43,6 +43,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.Multipart;
@@ -65,6 +66,27 @@ public class MultipartStore {
     public byte[] addBookImage(byte[] image) throws Exception {
         return image;
     }
+    
+    @POST
+    @Path("/xop")
+    @Consumes("multipart/related")
+    @Produces("text/plain")
+    public String addBookXop(XopType type) throws Exception {
+        if (!"xopName".equals(type.getName())) {
+            throw new RuntimeException("Wrong name property");
+        }
+        String bookXsd = IOUtils.readStringFromStream(type.getAttachinfo().getInputStream());
+        String bookXsd2 = IOUtils.readStringFromStream(
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
+        if (!bookXsd.equals(bookXsd2)) {
+            throw new RuntimeException("Wrong attachinfo property");
+        }
+        if (!Boolean.getBoolean("java.awt.headless") && type.getImage() == null) {
+            throw new RuntimeException("Wrong image property");
+        }
+        return type.getName() + bookXsd + new String(type.getAttachinfo2());
+    }
+    
     
     @POST
     @Path("/books/formimage")
