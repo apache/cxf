@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -39,6 +40,7 @@ import java.util.UUID;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.activation.URLDataSource;
 import javax.mail.Header;
 import javax.mail.internet.InternetHeaders;
 
@@ -254,6 +256,27 @@ public final class AttachmentUtil {
         AttachmentImpl att = new AttachmentImpl(id, handler);
         att.setXOP(isXop);
         return att;
+    }
+
+    public static DataSource getAttachmentDataSource(String contentId, Collection<Attachment> atts) {
+        // Is this right? - DD
+        if (contentId.startsWith("cid:")) {
+            try {
+                contentId = URLDecoder.decode(contentId.substring(4), "UTF-8");
+            } catch (UnsupportedEncodingException ue) {
+                contentId = contentId.substring(4);
+            }
+            return new LazyDataSource(contentId, atts);
+        } else if (contentId.indexOf("://") == -1) {
+            return new LazyDataSource(contentId, atts);
+        } else {
+            try {
+                return new URLDataSource(new URL(contentId));
+            } catch (MalformedURLException e) {
+                throw new Fault(e);
+            }
+        }
+        
     }
     
 }
