@@ -85,5 +85,30 @@ public class URIResolverTest extends Assert {
         InputStream is3 = uriResolver.getInputStream();
         assertNotNull(is3); 
     }
+    
+    
+    @Test
+    public void testResolveRelativeFile() throws Exception {
+        URIResolver wsdlResolver = new URIResolver();
+
+        // resolve the wsdl
+        wsdlResolver.resolve(null, "wsdl/foo.wsdl", this.getClass());
+        assertTrue(wsdlResolver.isResolved());
+        
+        // get the base uri from the resolved wsdl location
+        String baseUri = wsdlResolver.getURI().toString();
+        
+        // resolve the schema using relative location
+        String schemaLocation = "../schemas/configuration/bar.xsd";
+        URIResolver xsdResolver = new URIResolver();
+        xsdResolver.resolve(baseUri, schemaLocation, this.getClass());
+        assertNotNull(xsdResolver.getInputStream());
+        
+        // resolve the schema using relative location with base uri fragment
+        xsdResolver = new URIResolver();
+        xsdResolver.resolve(baseUri + "#type2", schemaLocation, this.getClass());
+        assertNotNull(xsdResolver.getInputStream());
+        
+    }
 
 }

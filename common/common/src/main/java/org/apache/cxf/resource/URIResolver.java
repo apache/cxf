@@ -167,9 +167,9 @@ public class URIResolver {
             } else if (!StringUtils.isEmpty(baseUriStr)) {
                 URI base;
                 File baseFile = new File(baseUriStr);
-
-                if (!baseFile.exists() && baseUriStr.startsWith("file:/")) {
-                    baseFile = new File(baseUriStr.substring(6));
+          
+                if (!baseFile.exists() && baseUriStr.startsWith("file:")) {
+                    baseFile = new File(getFilePathFromUri(baseUriStr));
                 }
 
                 if (baseFile.exists()) {
@@ -232,6 +232,30 @@ public class URIResolver {
         }
     }
     
+    /**
+     * Assumption: URI scheme is "file"
+     */
+    private String getFilePathFromUri(String uriString) {     
+        String path = null;
+        
+        try {
+            path = new URL(uriString).getPath();
+        } catch (MalformedURLException e) {
+            // ignore
+        }
+        
+        if (path == null) {
+            if (uriString.startsWith("file:/")) {
+                path = uriString.substring(6);
+            } else if (uriString.startsWith("file:")) {
+                // handle Windows file URI such as "file:C:/foo/bar"
+                path = uriString.substring(5);
+            } 
+        }
+        
+        return path;
+    }
+
     private void tryArchive(String baseStr, String uriStr) throws IOException {
         int i = baseStr.indexOf('!');
         if (i == -1) {
