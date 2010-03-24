@@ -117,7 +117,8 @@
                             com.ctc.wstx.*,
                             org.apache.commons.logging.*,
                             org.slf4j.*,
-                            org.slf4j.impl.*
+                            org.slf4j.impl.*,
+                            org.mortbay.management
                         </DynamicImport-Package>
                         <Import-Package>
                             !org.apache.cxf.*,
