@@ -25,13 +25,12 @@ import java.util.Date;
 
 import javax.xml.datatype.DatatypeFactory;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
-public class FiqlParserTest {
+public class FiqlParserTest extends Assert {
     private FiqlParser<Condition> parser = new FiqlParser<Condition>(Condition.class);
 
     @Test(expected = FiqlParseException.class)
@@ -155,6 +154,14 @@ public class FiqlParserTest {
         assertFalse(filter.isMet(new Condition("ami", 8, null)));
         assertFalse(filter.isMet(new Condition("am", 20, null)));
     }
+    
+    @Test
+    public void testSQL1() throws FiqlParseException {
+        SearchCondition<Condition> filter = parser.parse("name==ami*;level=gt=10");
+        String sql = filter.toSQL("table");
+        assertTrue("SELECT * FROM table WHERE name LIKE 'ami%' AND level > '10'".equals(sql)
+                   || "SELECT * FROM table WHERE level > '10' AND name LIKE 'ami%'".equals(sql));
+    }
 
     @Test
     public void testParseComplex2() throws FiqlParseException {
@@ -165,6 +172,14 @@ public class FiqlParserTest {
     }
 
     @Test
+    public void testSQL2() throws FiqlParseException {
+        SearchCondition<Condition> filter = parser.parse("name==ami*,level=gt=10");
+        String sql = filter.toSQL("table");
+        assertTrue("SELECT * FROM table WHERE (name LIKE 'ami%') OR (level > '10')".equals(sql)
+                   || "SELECT * FROM table WHERE (level > '10') OR (name LIKE 'ami%')".equals(sql));
+    }
+    
+    @Test
     public void testParseComplex3() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
         assertTrue(filter.isMet(new Condition("fooooo", 0, null)));
@@ -174,6 +189,16 @@ public class FiqlParserTest {
     }
 
     @Test
+    public void testSQL3() throws FiqlParseException {
+        SearchCondition<Condition> filter = parser.parse("name==foo*;(name!=*bar,level=gt=10)");
+        String sql = filter.toSQL("table");
+        assertTrue(("SELECT * FROM table WHERE (name LIKE 'foo%') AND ((name NOT LIKE '%bar') "
+                   + "OR (level > '10'))").equals(sql)
+                   || ("SELECT * FROM table WHERE (name LIKE 'foo%') AND "
+                   + "((level > '10') OR (name NOT LIKE '%bar'))").equals(sql));
+    }
+    
+    @Test
     public void testParseComplex4() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;name!=*bar,level=gt=10");
         assertTrue(filter.isMet(new Condition("zonk", 20, null)));
@@ -181,7 +206,7 @@ public class FiqlParserTest {
         assertTrue(filter.isMet(new Condition("foobar", 20, null)));
         assertFalse(filter.isMet(new Condition("fooxxxbar", 0, null)));
     }
-
+    
     @Ignore
     static class Condition {
         private String name;

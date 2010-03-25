@@ -18,29 +18,21 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 /**
  * Composite 'and' search condition   
  */
-public class AndSearchCondition<T> implements SearchCondition<T> {
+public class AndSearchCondition<T> extends AbstractComplexCondition<T> {
 
-    private List<SearchCondition<T>> conditions;
-    
     public AndSearchCondition() {
-        
+        super(ConditionType.AND);
     }
     
     public AndSearchCondition(List<SearchCondition<T>> conditions) {
-        this.conditions = conditions;    
+        super(conditions, ConditionType.AND);    
     }
     
-    public void setConditions(List<SearchCondition<T>> conditions) {
-        this.conditions = conditions;
-    }
     
     public boolean isMet(T pojo) {
         for (SearchCondition<T> sc : conditions) {
@@ -50,26 +42,5 @@ public class AndSearchCondition<T> implements SearchCondition<T> {
         }
         return true;
     }
-
-    public T getCondition() {
-        return null;
-    }
-
-    public ConditionType getConditionType() {
-        return ConditionType.AND;
-    }
-
-    public List<SearchCondition<T>> getConditions() {
-        return Collections.unmodifiableList(conditions);
-    }
-
-    public List<T> findAll(Collection<T> pojos) {
-        List<T> result = new ArrayList<T>();
-        for (T pojo : pojos) {
-            if (isMet(pojo)) {
-                result.add(pojo);
-            }
-        }
-        return result;
-    }
+    
 }

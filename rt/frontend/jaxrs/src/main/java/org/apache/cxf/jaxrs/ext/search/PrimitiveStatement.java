@@ -18,29 +18,32 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
-import java.util.List;
-
 /**
- * Composite 'or' search condition   
+ * Encapsulates a basic search statement such as a = b, i < 5, etc
  */
-public class OrSearchCondition<T> extends AbstractComplexCondition<T> {
 
-    public OrSearchCondition() {
-        super(ConditionType.OR);
+public class PrimitiveStatement {
+
+    private String propery;
+    private Object value;
+    private ConditionType condition;
+    
+    public PrimitiveStatement(String property, Object value, ConditionType condition) {
+        this.propery = property;
+        this.value = value;
+        this.condition = condition;
     }
     
-    public OrSearchCondition(List<SearchCondition<T>> conditions) {
-        super(conditions, ConditionType.OR);    
+    public String getPropery() {
+        return propery;
     }
     
-    
-    public boolean isMet(T pojo) {
-        for (SearchCondition<T> sc : conditions) {
-            if (sc.isMet(pojo)) {
-                return true;
-            }
-        }
-        return false;
+    public Object getValue() {
+        return value;
+    }
+    public ConditionType getCondition() {
+        return condition;
     }
 
+    
 }

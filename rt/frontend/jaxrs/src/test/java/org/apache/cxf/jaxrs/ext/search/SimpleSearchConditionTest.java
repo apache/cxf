@@ -155,7 +155,7 @@ public class SimpleSearchConditionTest {
 
     @Test
     public void testGetConditions() {
-        assertEquals(cGt.getConditions(), null);
+        assertEquals(cGt.getSearchConditions(), null);
     }
 
     @Test
