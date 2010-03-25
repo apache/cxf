@@ -44,6 +44,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
+import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.LogRecord;
@@ -445,7 +446,7 @@ public class AtomPullServer extends AbstractAtomBean {
             return ConditionType.CUSTOM;
         }
 
-        public List<SearchCondition<LogRecord>> getConditions() {
+        public List<SearchCondition<LogRecord>> getSearchConditions() {
             return null;
         }
 
@@ -457,6 +458,14 @@ public class AtomPullServer extends AbstractAtomBean {
                 }
             }
             return list;
+        }
+
+        public PrimitiveStatement getStatement() {
+            return null;
+        }
+
+        public String toSQL(String table, String... columns) {
+            return null;
         }
         
         
