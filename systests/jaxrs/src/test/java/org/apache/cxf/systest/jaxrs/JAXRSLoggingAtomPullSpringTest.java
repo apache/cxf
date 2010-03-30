@@ -52,7 +52,7 @@ import org.junit.Test;
 
 public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase {
 
-    private JAXBContext context; 
+    private static JAXBContext context; 
     private int fakyLogger;
     private int namedLogger;
     private int resourceLogger;
@@ -60,9 +60,16 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     
     @BeforeClass
     public static void beforeClass() throws Exception {
+        //make sure the Resource things have their static initializers called 
+        //to make sure the Loggers are created.  Otherwise, the Loggers that the server 
+        //sets the handler into could be garbage collected before the init is called
+        new Resource();
+        new Resource2();
+        new Resource3();
         // must be 'in-process' to communicate with inner class in single JVM
         // and to spawn class SpringServer w/o using main() method
         launchServer(SpringServer.class, true);
+        context = JAXBContext.newInstance(org.apache.cxf.management.web.logging.LogRecord.class);
     }
 
     @Ignore
@@ -74,7 +81,6 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
 
     @Before
     public void before() throws Exception {
-        context = JAXBContext.newInstance(org.apache.cxf.management.web.logging.LogRecord.class);
         Storage.clearRecords();
     }
 
