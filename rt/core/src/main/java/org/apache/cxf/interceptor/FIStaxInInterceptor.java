@@ -20,11 +20,11 @@
 package org.apache.cxf.interceptor;
 
 
+import java.io.InputStream;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import com.sun.xml.fastinfoset.stax.factory.StAXInputFactory;
+import com.sun.xml.fastinfoset.stax.StAXDocumentParser;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Message;
@@ -37,8 +37,6 @@ import org.apache.cxf.phase.Phase;
  */
 public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
     public static final String FI_GET_SUPPORTED = "org.apache.cxf.fastinfoset.get.supported";
-    
-    XMLInputFactory factory = new StAXInputFactory();
 
     public FIStaxInInterceptor() {
         this(Phase.POST_STREAM);
@@ -53,6 +51,14 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         return Boolean.TRUE.equals(message.containsKey(Message.REQUESTOR_ROLE));
     }
 
+    private StAXDocumentParser getParser(InputStream in) {
+        StAXDocumentParser parser = new StAXDocumentParser(in);
+        parser.setStringInterning(true);
+        parser.setForceStreamClose(true);
+        parser.setInputStream(in);
+        return parser;
+    }
+    
     public void handleMessage(Message message) {
         if (message.getContent(XMLStreamReader.class) != null
             || !isHttpVerbSupported(message)) {
@@ -60,8 +66,11 @@ public class FIStaxInInterceptor extends AbstractPhaseInterceptor<Message> {
         }
 
         String ct = (String)message.get(Message.CONTENT_TYPE);
-        if (ct != null && ct.indexOf("fastinfoset") != -1) {
-            message.put(XMLInputFactory.class.getName(), factory);
+        if (ct != null && ct.indexOf("fastinfoset") != -1 
+            && message.getContent(InputStream.class) != null
+            && message.getContent(XMLStreamReader.class) == null) {
+            message.setContent(XMLStreamReader.class, getParser(message.getContent(InputStream.class)));
+            
             ct = ct.replace("fastinfoset", "xml");
             if (ct.contains("application/xml")) {
                 ct = ct.replace("application/xml", "text/xml"); 

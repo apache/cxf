@@ -47,6 +47,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -169,9 +170,15 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         } else {
             message.put(Message.PROTOCOL_HEADERS, response.getMetadata());
         }
-        MultivaluedMap<String, Object> responseHeaders = 
-            (MultivaluedMap)message.get(Message.PROTOCOL_HEADERS);
-        setResponseDate(responseHeaders, firstTry);
+        Map<String, List<Object>> rh = 
+            (Map<String, List<Object>>)message.get(Message.PROTOCOL_HEADERS);
+        MultivaluedMap<String, Object> responseHeaders;
+        if (!(rh instanceof MultivaluedMap)) {
+            responseHeaders = new MetadataMap<String, Object>(rh);
+        } else {
+            responseHeaders = (MultivaluedMap)rh;
+        }
+        setResponseDate((MultivaluedMap)responseHeaders, firstTry);
         if (isResponseNull(responseObj)) {
             return;
         }

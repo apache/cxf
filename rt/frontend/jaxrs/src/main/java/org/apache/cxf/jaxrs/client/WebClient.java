@@ -41,6 +41,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.UriBuilder;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
@@ -632,7 +633,8 @@ public class WebClient extends AbstractClient {
         public void handleMessage(Message outMessage) throws Fault {
             
             OutputStream os = outMessage.getContent(OutputStream.class);
-            if (os == null) {
+            XMLStreamWriter writer = outMessage.getContent(XMLStreamWriter.class);
+            if (os == null && writer == null) {
                 return;
             }
             MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
@@ -645,7 +647,9 @@ public class WebClient extends AbstractClient {
             try {
                 writeBody(body, outMessage, body.getClass(), body.getClass(), new Annotation[]{}, 
                           headers, os);
-                os.flush();
+                if (os != null) {
+                    os.flush();
+                }
             } catch (Exception ex) {
                 throw new Fault(ex);
             }

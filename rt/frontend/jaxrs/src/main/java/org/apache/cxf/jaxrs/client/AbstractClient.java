@@ -390,7 +390,9 @@ public class AbstractClient implements Client {
         if (mbw != null) {
             try {
                 mbw.writeTo(o, cls, type, anns, contentType, headers, os);
-                os.flush();
+                if (os != null) {
+                    os.flush();
+                }
             } catch (Exception ex) {
                 throw new WebApplicationException(ex);
             }
