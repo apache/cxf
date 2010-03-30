@@ -133,6 +133,7 @@ public class XMLBeanTypeInfo extends BeanTypeInfo {
                     if (schemaType == null) {
                         schemaType = getTypeMapping().getTypeQName(pd.getPropertyType());
                     }
+                    customTypeObject.setTypeClass(typeClass);
                     customTypeObject.setSchemaType(schemaType);
                 } catch (ClassNotFoundException e1) {
                     //
