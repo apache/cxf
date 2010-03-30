@@ -213,6 +213,10 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 return o;
             } else {
                 Document document = StaxUtils.read(reader);
+                if (reader.hasNext()) {
+                    //need to actually consume the END_ELEMENT
+                    reader.next();
+                }
                 return new DOMSource(document);
             }
         } catch (XMLStreamException e) {
