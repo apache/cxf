@@ -59,6 +59,7 @@ import org.w3c.dom.CDATASection;
 import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
+import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
 import org.w3c.dom.EntityReference;
 import org.w3c.dom.NamedNodeMap;
@@ -745,6 +746,14 @@ public final class StaxUtils {
             }
             break;
         }
+        case Node.DOCUMENT_TYPE_NODE:
+            try {
+                writer.writeDTD(((DocumentType)n).getTextContent());
+            } catch (UnsupportedOperationException ex) {
+                //can we ignore?  DOM writers really don't allow this
+                //as there isn't a way to write a DTD in dom
+            }
+            break;
         default:
             throw new IllegalStateException("Found type: " + n.getClass().getName());
         }        
