@@ -44,7 +44,6 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
-
 public class SpringBeansTest extends Assert {
 
     @Test
@@ -79,6 +78,9 @@ public class SpringBeansTest extends Assert {
         bean = (ServerFactoryBean) ctx.getBean("simpleWithWSDL");
         assertNotNull(bean);
         assertEquals(bean.getWsdlLocation(), "org/apache/cxf/frontend/spring/simple.wsdl");
+        
+        bean = (ServerFactoryBean) ctx.getBean("proxyBean");
+        assertNotNull(bean);
     }
 
     @Test

@@ -88,4 +88,12 @@ http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd">
       <soap:soapBinding mtomEnabled="true" version="1.2"/>
     </simple:binding>
   </simple:server>
+  
+  <simple:server id="proxyBean" 
+    serviceClass="org.apache.cxf.service.factory.HelloService"
+    address="http://localhost:8080/proxyBean" >
+    <simple:serviceBean>
+      <bean class="org.apache.cxf.service.factory.HelloServiceProxyFactory"/> 
+    </simple:serviceBean>
+  </simple:server>
 </beans>
