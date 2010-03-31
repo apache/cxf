@@ -45,7 +45,10 @@ class SpringAopClassHelper extends ClassHelper {
                 Object target = advised.getTargetSource().getTarget();
                 
                 if (target == null) {
-                    return AopUtils.getTargetClass(o);
+                    Class targetClass = AopUtils.getTargetClass(o);
+                    if (targetClass != null) {
+                        return targetClass;
+                    }
                 } else {
                     return getRealClassInternal(target); 
                 }
