@@ -63,6 +63,7 @@ public class MultipleEndpointObserver implements MessageObserver {
             if (exchange == null) {
                 exchange = new ExchangeImpl();
                 exchange.setInMessage(message);
+                message.setExchange(exchange);
             }
             setExchangeProperties(exchange, message);
             
