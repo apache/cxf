@@ -123,7 +123,10 @@ public class TransportURIResolver extends ExtendedURIResolver {
                 //ignore
             }
         }
-        if (is == null && !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme())) {
+        if (is == null 
+            && (base == null 
+                || base.getScheme() == null 
+                || !DEFAULT_URI_RESOLVER_HANDLES.contains(base.getScheme()))) {
             is = super.resolve(curUri, baseUri);            
         }
         return is;
