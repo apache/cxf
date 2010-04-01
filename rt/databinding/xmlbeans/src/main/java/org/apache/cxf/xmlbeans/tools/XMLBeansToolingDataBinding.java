@@ -74,6 +74,7 @@ import org.apache.xmlbeans.impl.xb.substwsdl.TImport;
 import org.apache.xmlbeans.impl.xb.xmlconfig.ConfigDocument;
 import org.apache.xmlbeans.impl.xb.xmlconfig.Extensionconfig;
 import org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument;
+import org.apache.xmlbeans.impl.xb.xsdschema.SchemaDocument.Schema;
 
 /**
  * 
@@ -283,36 +284,9 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
             options.setEntityResolver(entResolver);
             options.setGenerateJavaVersion(XmlOptions.GENERATE_JAVA_15);
 
-            
-
-            XmlObject urldoc = loader.parse(url, null, options);
             state.addSourceUri(wsdlFile, null);
+            loadWSDLDoc(loader, url, options, scontentlist, errorListener);
 
-            if (urldoc instanceof org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument) {
-                org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument wsdldoc = 
-                    (org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument)urldoc;
-                
-                addWsdlSchemas(url.toString(),
-                               wsdldoc,
-                               errorListener, scontentlist);
-                
-                for (TImport imp : wsdldoc.getDefinitions().getImportArray()) {
-                    if (imp.getLocation().toLowerCase().endsWith(".xsd")) {
-                        URL url1 = new URL(url, imp.getLocation());
-                        XmlObject urldoc2 = loader.parse(url1, null, options);
-                        addSchema(url1.toString(), (SchemaDocument)urldoc2, errorListener, false,
-                                  scontentlist);
-                    }
-                }
-
-            } else if (urldoc instanceof SchemaDocument) {
-                addSchema(url.toString(), (SchemaDocument)urldoc, errorListener, false,
-                          scontentlist);
-            } else {
-                StscState.addError(errorListener, XmlErrorCodes.INVALID_DOCUMENT_TYPE, new Object[] {
-                    url, "wsdl or schema"
-                }, urldoc);
-            }
 
         } catch (XmlException e) {
             errorListener.add(e.getError());
@@ -414,7 +388,43 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     }
 
 
-    
+    private static void loadWSDLDoc(SchemaTypeLoader loader, URL url, 
+                                    XmlOptions options, 
+                                    List<Schema> scontentlist, 
+                                    XmlErrorWatcher errorListener)
+        throws XmlException, IOException {
+        XmlObject urldoc = loader.parse(url, null, options);
+
+        if (urldoc instanceof org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument) {
+            org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument wsdldoc = 
+                (org.apache.xmlbeans.impl.xb.substwsdl.DefinitionsDocument)urldoc;
+            
+            addWsdlSchemas(url.toString(),
+                           wsdldoc,
+                           errorListener,
+                           scontentlist);
+            
+            for (TImport imp : wsdldoc.getDefinitions().getImportArray()) {
+                URL url1 = new URL(url, imp.getLocation());
+                if (imp.getLocation().toLowerCase().endsWith(".xsd")) {
+                    XmlObject urldoc2 = loader.parse(url1, null, options);
+                    addSchema(url1.toString(), (SchemaDocument)urldoc2, 
+                              errorListener, false,
+                              scontentlist);
+                } else {
+                    loadWSDLDoc(loader, url1, options, scontentlist, errorListener);
+                }
+            }
+
+        } else if (urldoc instanceof SchemaDocument) {
+            addSchema(url.toString(), (SchemaDocument)urldoc, errorListener, false,
+                      scontentlist);
+        } else {
+            StscState.addError(errorListener, XmlErrorCodes.INVALID_DOCUMENT_TYPE, new Object[] {
+                url, "wsdl or schema"
+            }, urldoc);
+        }        
+    }
   
 
     private static void addSchema(String name, SchemaDocument schemadoc, XmlErrorWatcher errorListener,
