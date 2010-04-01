@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.ws.security.wss4j;
 
 
@@ -27,15 +26,9 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 import javax.xml.namespace.QName;
-import javax.xml.soap.MessageFactory;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
-import javax.xml.soap.SOAPPart;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -46,10 +39,7 @@ import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractAttributedInterceptorProvider;
-import org.apache.cxf.message.Exchange;
-import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -74,26 +64,7 @@ import org.junit.Test;
 
 public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     private PolicyBuilder policyBuilder;
-       
-    public static boolean checkUnrestrictedPoliciesInstalled() {
-        try {
-            byte[] data = {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07};
 
-            SecretKey key192 = new SecretKeySpec(
-                new byte[] {0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07,
-                            0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f,
-                            0x10, 0x11, 0x12, 0x13, 0x14, 0x15, 0x16, 0x17},
-                            "AES");
-            Cipher c = Cipher.getInstance("AES");
-            c.init(Cipher.ENCRYPT_MODE, key192);
-            c.doFinal(data);
-            return true;
-        } catch (Exception e) {
-            //ignore
-        }
-        return false;
-    }
-    
     @Test
     public void testSignedElementsPolicyWithIncompleteCoverage() throws Exception {
         this.runInInterceptorAndValidate(
@@ -828,15 +799,8 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     
     private SoapMessage getSoapMessageForDom(Document doc, AssertionInfoMap aim)
         throws SOAPException {
-        SOAPMessage saajMsg = MessageFactory.newInstance().createMessage();
-        SOAPPart part = saajMsg.getSOAPPart();
-        part.setContent(new DOMSource(doc));
-        saajMsg.saveChanges();
         
-        SoapMessage msg = new SoapMessage(new MessageImpl());
-        Exchange ex = new ExchangeImpl();
-        ex.setInMessage(msg);
-        msg.setContent(SOAPMessage.class, saajMsg);
+        SoapMessage msg = this.getSoapMessageForDom(doc);
         if (aim != null) {
             msg.put(AssertionInfoMap.class, aim);
         }
