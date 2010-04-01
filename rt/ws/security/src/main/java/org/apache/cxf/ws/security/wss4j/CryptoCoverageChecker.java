@@ -112,7 +112,6 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
      *             if there is an error evaluating an XPath or an element is not
      *             covered by the required cryptographic operation
      */
-    @Override
     public void handleMessage(SoapMessage message) throws Fault {
         final Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         final Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
