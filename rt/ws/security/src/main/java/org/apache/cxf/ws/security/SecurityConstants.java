@@ -46,6 +46,8 @@ public final class SecurityConstants {
 
     public static final String STS_CLIENT = "ws-security.sts.client";
     
+    public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
+    
     /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client

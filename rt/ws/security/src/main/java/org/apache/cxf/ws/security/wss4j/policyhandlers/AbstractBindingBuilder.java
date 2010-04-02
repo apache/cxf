@@ -347,6 +347,17 @@ public abstract class AbstractBindingBuilder {
         if (ais != null) {
             for (AssertionInfo ai : ais) {
                 timestampEl = new WSSecTimestamp();
+                Object o = message.getContextualProperty(SecurityConstants.TIMESTAMP_TTL);
+                int ttl = 300;  //default is 300 seconds
+                if (o instanceof Number) {
+                    ttl = ((Number)o).intValue();
+                } else if (o instanceof String) {
+                    ttl = Integer.parseInt((String)o);
+                }
+                if (ttl <= 0) {
+                    ttl = 300;
+                }
+                timestampEl.setTimeToLive(ttl);
                 timestampEl.prepare(saaj.getSOAPPart());
                 ai.setAsserted(true);
             }                    
