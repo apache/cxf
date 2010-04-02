@@ -248,7 +248,6 @@ public final class JMSFactory {
         }
         if (jmsConfig.getTaskExecutor() != null) {
             setTaskExecutor(jmsListener, jmsConfig.getTaskExecutor());
-            jmsListener.setTaskExecutor(jmsConfig.getTaskExecutor());
         } 
         
         if (jmsConfig.isAutoResolveDestination()) {
