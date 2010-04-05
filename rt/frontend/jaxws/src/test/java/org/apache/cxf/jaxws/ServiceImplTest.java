@@ -38,9 +38,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.calculator.CalculatorPortType;
+import org.apache.cxf.configuration.Configurer;
+import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.NullConduitSelector;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -60,6 +63,10 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     private static final QName SOAP_PORT1 =
         new QName("http://apache.org/hello_world_soap_http", "SoapPort1");
 
+    private boolean isJAXWSClientFactoryConfigured;
+    
+    private boolean isClientProxyFactoryBeanConfigured;
+    
     @Test
     public void testServiceImpl() throws Exception {
         SOAPService service = new SOAPService();
@@ -257,6 +264,34 @@ public class ServiceImplTest extends AbstractJaxWsTest {
             List<Handler> handlerList = new ArrayList<Handler>();
             this.info = portInfo;
             return handlerList;
+        }
+    }
+    
+    @Test
+    //CXF-2723 :Allow configuration of JaxWsClientFactoryBean during port creation
+    public void testConfigureBean() throws Exception {
+        Configurer oldConfiguer = this.getBus().getExtension(Configurer.class);
+        JAXWSClientFactoryCongfiguer clientConfiguer = new JAXWSClientFactoryCongfiguer();
+        getBus().setExtension(clientConfiguer, Configurer.class);
+        URL wsdl1 = getClass().getResource("/wsdl/calculator.wsdl");
+        ServiceImpl service = new ServiceImpl(getBus(), wsdl1, SERVICE_1, ServiceImpl.class);
+        service.createPort(PORT_1,  null, CalculatorPortType.class);
+        assertTrue("The JAXWSClientFcatoryBean is not configured by the new configurer", 
+                   isJAXWSClientFactoryConfigured);
+        assertTrue("The ClientProxyFcatoryBean is not configured by the new configurer", 
+                   isClientProxyFactoryBeanConfigured);        
+        getBus().setExtension(oldConfiguer, Configurer.class);
+    }
+    
+    class JAXWSClientFactoryCongfiguer extends ConfigurerImpl {
+        @Override
+        public synchronized void configureBean(String bn, Object beanInstance, boolean checkWildcards) {
+            if (beanInstance instanceof JaxWsClientFactoryBean) {
+                isJAXWSClientFactoryConfigured = true;
+            }
+            if (beanInstance instanceof ClientProxyFactoryBean) {
+                isClientProxyFactoryBeanConfigured = true;
+            }
         }
     }
     
