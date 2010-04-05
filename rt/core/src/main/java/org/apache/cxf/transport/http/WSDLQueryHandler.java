@@ -254,7 +254,15 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                 el.setAttribute("schemaLocation", base + "?xsd=" + sl);
             }
         }
-        
+        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                          "http://www.w3.org/2001/XMLSchema",
+                                                          "redefine");
+        for (Element el : elementList) {
+            String sl = el.getAttribute("schemaLocation");
+            if (smp.containsKey(sl)) {
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+            }
+        }
         elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                           "http://schemas.xmlsoap.org/wsdl/",
                                                           "import");
@@ -425,6 +433,31 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         }
         List<SchemaReference> includes = CastUtils.cast(schema.getIncludes());
         for (SchemaReference included : includes) {
+            String start = included.getSchemaLocationURI();
+
+            if (start != null) {
+                String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
+                if (resolvedSchemaLocation == null) {
+                    if (!doneSchemas.containsKey(start)) {
+                        try {
+                            //check to see if it's aleady in a URL format.  If so, leave it.
+                            new URL(start);
+                        } catch (MalformedURLException e) {
+                            if (doneSchemas.put(start, included) == null) {
+                                updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                            }
+                        }
+                    }
+                } else if (!doneSchemas.containsKey(start) 
+                    || !doneSchemas.containsKey(resolvedSchemaLocation)) {
+                    doneSchemas.put(start, included);
+                    doneSchemas.put(resolvedSchemaLocation, included);
+                    updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
+                }
+            }
+        }
+        List<SchemaReference> redefines = CastUtils.cast(schema.getRedefines());
+        for (SchemaReference included : redefines) {
             String start = included.getSchemaLocationURI();
 
             if (start != null) {
