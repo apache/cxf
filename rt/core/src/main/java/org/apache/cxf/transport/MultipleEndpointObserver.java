@@ -58,13 +58,15 @@ public class MultipleEndpointObserver implements MessageObserver {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
-            message = createMessage(message);
             Exchange exchange = message.getExchange();
             if (exchange == null) {
                 exchange = new ExchangeImpl();
                 exchange.setInMessage(message);
                 message.setExchange(exchange);
             }
+            message = createMessage(message);
+            message.setExchange(exchange);                
+            exchange.setInMessage(message);
             setExchangeProperties(exchange, message);
             
             // setup chain
