@@ -20,7 +20,13 @@
 package org.apache.cxf.management.jmx;
 
 public class HelloWorld implements HelloWorldMBean {
+    private String name;
+    
+    public HelloWorld(String name) {
+        this.name = name;
+    }
+    
     public String sayHi() {
-        return "Wazzzuuup!";
+        return "Wazzzuuup " + this.name;
     }
 }

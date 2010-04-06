@@ -223,18 +223,7 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 LOG.log(Level.SEVERE, "STOP_CONNECTOR_FAILURE_MSG", new Object[] {ex});
             }
         }
-    }
-
-    public void initComplete() {
         
-    }
-    
-    public void preShutdown() {
-                
-    }
-    
-   
-    public void postShutdown() {
         //Using the array to hold the busMBeans to avoid the CurrentModificationException
         Object[] mBeans = busMBeans.toArray();
         for (Object name : mBeans) {
@@ -245,6 +234,18 @@ public class InstrumentationManagerImpl extends JMXConnectorPolicyType
                 LOG.log(Level.SEVERE, "UNREGISTER_FAILURE_MSG", new Object[]{name, jmex});
             }
         }
+    }
+
+    public void initComplete() {
+        
+    }
+    
+    public void preShutdown() {
+                
+    }
+   
+    public void postShutdown() {
+        this.shutdown();
     }
     
     private void register(Object obj, ObjectName name, ModelMBeanInfo mbi, boolean forceRegistration) 
