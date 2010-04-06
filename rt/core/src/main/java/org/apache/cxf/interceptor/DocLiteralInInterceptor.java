@@ -48,6 +48,9 @@ import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 
 public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
+    public static final String KEEP_PARAMETERS_WRAPPER = DocLiteralInInterceptor.class.getName() 
+        + ".DocLiteralInInterceptor.keep-parameters-wrapper";
+
     private static final Logger LOG = LogUtils.getL7dLogger(DocLiteralInInterceptor.class);
 
     public DocLiteralInInterceptor() {
@@ -96,8 +99,8 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
                 // Wrapped case
                 MessageInfo msgInfo = setMessage(message, bop, client, si);
     
-                // Determine if there is a wrapper class
-                if (msgInfo.getMessageParts().get(0).getTypeClass() != null) {
+                // Determine if we should keep the parameters wrapper
+                if (shouldWrapParameters(msgInfo, message)) {
                     QName startQName = xmlReader.getName();
                     if (!msgInfo.getMessageParts().get(0).getConcreteName().equals(startQName)) {
                         throw new Fault("UNEXPECTED_WRAPPER_ELEMENT", LOG, null, startQName,
@@ -272,5 +275,14 @@ public class DocLiteralInInterceptor extends AbstractInDatabindingInterceptor {
             exchange.put(OperationInfo.class, bop.getOperationInfo());
         }
         return bop;
+    }
+    
+    protected boolean shouldWrapParameters(MessageInfo msgInfo, Message message) {
+        Object keepParametersWrapperFlag = message.get(KEEP_PARAMETERS_WRAPPER);
+        if (keepParametersWrapperFlag == null) {
+            return msgInfo.getMessageParts().get(0).getTypeClass() != null;
+        } else {
+            return Boolean.parseBoolean(keepParametersWrapperFlag.toString());
+        }
     }
 }
