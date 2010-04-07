@@ -43,9 +43,11 @@ public class ServerImpl implements Server {
     private Endpoint endpoint;
     private ServerRegistry serverRegistry;
     private Bus bus;
-    private ServerLifeCycleManager mgr;
+    private ServerLifeCycleManager slcMgr;
+    private InstrumentationManager iMgr;
     private BindingFactory bindingFactory;
     private MessageObserver messageObserver;
+    private ManagedEndpoint mep;
 
     public ServerImpl(Bus bus, 
                       Endpoint endpoint, 
@@ -90,17 +92,18 @@ public class ServerImpl implements Server {
         destination = destinationFactory.getDestination(ei);
         LOG.info("Setting the server's publish address to be " + ei.getAddress());
         serverRegistry = bus.getExtension(ServerRegistry.class);
-                 
-        ManagedEndpoint mep = new ManagedEndpoint(bus, endpoint, this);
-        mgr = bus.getExtension(ServerLifeCycleManager.class);
-        if (mgr != null) {
-            mgr.registerListener(mep);
+        
+        mep = new ManagedEndpoint(bus, endpoint, this);
+        
+        slcMgr = bus.getExtension(ServerLifeCycleManager.class);
+        if (slcMgr != null) {
+            slcMgr.registerListener(mep);
         }
         
-        InstrumentationManager manager = bus.getExtension(InstrumentationManager.class);        
-        if (manager != null) {   
+        iMgr = bus.getExtension(InstrumentationManager.class);        
+        if (iMgr != null) {   
             try {
-                manager.register(mep);
+                iMgr.register(mep);
             } catch (JMException jmex) {
                 LOG.log(Level.WARNING, "Registering ManagedEndpoint failed.", jmex);
             }
@@ -116,6 +119,8 @@ public class ServerImpl implements Server {
     }
 
     public void start() {     
+        LOG.fine("Server is starting.");
+        
         if (messageObserver != null) {
             destination.setMessageObserver(messageObserver);
         } else {
@@ -127,16 +132,22 @@ public class ServerImpl implements Server {
             LOG.fine("register the server to serverRegistry ");
             serverRegistry.register(this);
         }
-        mgr = bus.getExtension(ServerLifeCycleManager.class);
-        if (mgr != null) {
-            mgr.startServer(this);
+        
+        if (slcMgr != null) {
+            slcMgr.startServer(this);
         }
     }
 
     public void stop() {
         LOG.fine("Server is stopping.");
-        if (mgr != null) {
-            mgr.stopServer(this);
+        
+        if (slcMgr != null) {
+            slcMgr.stopServer(this);
+        }
+        
+        if (null != serverRegistry) {
+            LOG.fine("unregister the server to serverRegistry ");
+            serverRegistry.unregister(this);
         }
 
         MessageObserver mo = getDestination().getMessageObserver();
@@ -148,11 +159,19 @@ public class ServerImpl implements Server {
         }
         getDestination().setMessageObserver(null);
         getDestination().shutdown();
-
-        if (null != serverRegistry) {
-            LOG.fine("unregister the server to serverRegistry ");
-            serverRegistry.unregister(this);
+    }
+    
+    public void destroy() {
+        stop();
+        
+        if (iMgr != null) {   
+            try {
+                iMgr.unregister(mep);
+            } catch (JMException jmex) {
+                LOG.log(Level.WARNING, "Unregistering ManagedEndpoint failed.", jmex);
+            }
         }
+        
     }
 
     public Endpoint getEndpoint() {

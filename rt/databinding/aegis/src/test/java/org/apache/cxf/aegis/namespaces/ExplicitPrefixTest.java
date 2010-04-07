@@ -171,6 +171,6 @@ public class ExplicitPrefixTest extends AbstractAegisTest {
         String testPrefix = lookupPrefix(servicePrefixes, URN_AEGIS_NAMESPACE_TEST);
         assertEquals(AEGIS_TEST_NAMESPACE_PREFIX_XYZZY, testPrefix);        
 
-        serviceAndMapping.getServer().stop();
+        serviceAndMapping.getServer().destroy();
     }
 }

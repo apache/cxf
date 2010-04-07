@@ -80,7 +80,7 @@ public class ClientTest extends AbstractRestTest {
 //        customer.getId());
 //        assertTrue(objects == null || objects.length == 0);
 //        
-        svr.stop();
+        svr.destroy();
     }
 
 }

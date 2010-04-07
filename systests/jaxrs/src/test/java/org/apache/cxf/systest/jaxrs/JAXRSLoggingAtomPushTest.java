@@ -102,7 +102,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     @AfterClass
     public static void afterClass() throws Exception {
         if (server != null) {
-            server.stop();
+            server.destroy();
         }
         LogManager lm = LogManager.getLogManager();
         try {

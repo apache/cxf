@@ -86,7 +86,7 @@ public class InboundEndpoint {
         invoker = null;
         
         if (server != null) {
-            server.stop();
+            server.destroy();
             server = null;
         }     
     }
