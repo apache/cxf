@@ -162,7 +162,7 @@ public class BeanType extends Type {
 
                         writeProperty(name, target, writeObj, clazz, propertyTypeInfo);
                     } else {
-                        if (!propertyTypeInfo.isNillable(name)) {
+                        if (!alwaysAllowNillables() && !propertyTypeInfo.isNillable(name)) {
                             throw new DatabindingException(name.getLocalPart() 
                                                            + " is nil, but not nillable.");
 
@@ -186,6 +186,10 @@ public class BeanType extends Type {
         } catch (InvocationTargetException e) {
             throw new DatabindingException("Could not create class: " + e.getMessage(), e);
         }
+    }
+    
+    protected boolean alwaysAllowNillables() {
+        return false;
     }
 
     protected Type getElementType(QName name, BeanTypeInfo beanTypeInfo, 

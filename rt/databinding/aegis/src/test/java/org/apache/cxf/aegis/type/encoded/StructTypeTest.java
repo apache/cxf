@@ -102,6 +102,12 @@ public class StructTypeTest extends AbstractEncodedTest {
         // Test writing
         Element element = writeRef(po);
         validatePurchaseOrder(element);
+
+        // Test reading - no namespace on nested elements, xsi:nil (CXF-2695)
+        reader = new ElementReader(getClass().getResourceAsStream("struct5.xml"));
+        po = (PurchaseOrder) purchaseOrderType.readObject(reader, getLocalContext());
+        validatePurchaseOrder(po, true);
+        reader.getXMLStreamReader().close();
     }
 
     @Test
@@ -143,12 +149,19 @@ public class StructTypeTest extends AbstractEncodedTest {
     }
 
     private void validatePurchaseOrder(PurchaseOrder purchaseOrder) {
+        validatePurchaseOrder(purchaseOrder, false);
+    }
+    private void validatePurchaseOrder(PurchaseOrder purchaseOrder, boolean nilZip) {
         assertNotNull(purchaseOrder);
         assertNotNull(purchaseOrder.getShipping());
         assertEquals("1234 Riverside Drive", purchaseOrder.getShipping().getStreet());
         assertEquals("Gainesville", purchaseOrder.getShipping().getCity());
         assertEquals("FL", purchaseOrder.getShipping().getState());
-        assertEquals("30506", purchaseOrder.getShipping().getZip());
+        if (nilZip) {
+            assertNull(purchaseOrder.getShipping().getZip());
+        } else {
+            assertEquals("30506", purchaseOrder.getShipping().getZip());
+        }
         assertNotNull(purchaseOrder.getBilling());
         assertEquals("1234 Fake Street", purchaseOrder.getBilling().getStreet());
         assertEquals("Las Vegas", purchaseOrder.getBilling().getCity());

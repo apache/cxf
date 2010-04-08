@@ -50,6 +50,11 @@ public class StructType extends BeanType {
     public StructType(BeanTypeInfo info) {
         super(info);
     }
+    
+    //soap-encoding always allow xsi:nil=true to be set
+    protected boolean alwaysAllowNillables() {
+        return true;
+    }
 
     /**
      * Gets the BeanTypeInfo using an unqualified name.
