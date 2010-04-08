@@ -396,21 +396,25 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 msg.put(PRINCIPAL_RESULT, p);                   
                 SecurityContext sc = msg.get(SecurityContext.class);
                 if (sc == null || sc.getUserPrincipal() == null) {
-                    SecurityContext c = new SecurityContext() {
-                        public Principal getUserPrincipal() {
-                            return p;
-                        }
-                        public boolean isUserInRole(String role) {
-                            return false;
-                        }
-                    };
-                    msg.put(SecurityContext.class, c);
+                    msg.put(SecurityContext.class, createSecurityContext(p));
                     break;
                 }
             }            
         }
     }
 
+    
+    protected SecurityContext createSecurityContext(final Principal p) {
+        return new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return p;
+            }
+            public boolean isUserInRole(String role) {
+                return false;
+            }
+        };
+    }
+    
     private String getAction(SoapMessage msg, SoapVersion version) {
         String action = (String)getOption(WSHandlerConstants.ACTION);
         if (action == null) {
@@ -461,7 +465,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
     }
 
-    private CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
+    protected CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
         /*
          * To check a UsernameToken or to decrypt an encrypted message we need a
          * password.
@@ -519,7 +523,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * TODO the WSHandler base class defines secEngine to be static, which
      * is really bad, because the engine has mutable state on it.
      */
-    private WSSecurityEngine
+    protected WSSecurityEngine
     getSecurityEngine() {
         if (secEngineOverride != null) {
             return secEngineOverride;
@@ -535,7 +539,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * TODO The WSS4J APIs leave something to be desired here, but hopefully
      * we'll clean all this up in WSS4J-2.0
      */
-    private static WSSecurityEngine
+    protected static WSSecurityEngine
     createSecurityEngine(
         final Map<QName, Object> map
     ) {
