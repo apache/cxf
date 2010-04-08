@@ -440,7 +440,13 @@ public abstract class AbstractBindingBuilder {
                     ret.put(token, utBuilder);
                     //WebLogic and WCF always encrypt these
                     //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
-                    encryptedTokensIdList.add(utBuilder.getId());
+                    //encryptedTokensIdList.add(utBuilder.getId());
+                    if (suppTokens.isEncryptedToken()
+                        || MessageUtils.getContextualBoolean(message, 
+                                                             SecurityConstants.ALWAYS_ENCRYPT_UT,
+                                                             true)) {
+                        encryptedTokensIdList.add(utBuilder.getId());
+                    }
                 }
             } else if (isRequestor() 
                 && (token instanceof IssuedToken
