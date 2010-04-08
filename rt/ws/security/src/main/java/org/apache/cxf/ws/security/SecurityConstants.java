@@ -48,6 +48,12 @@ public final class SecurityConstants {
     
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
+    //WebLogic and WCF always encrypt UsernameTokens whenever possible
+    //See:  http://e-docs.bea.com/wls/docs103/webserv_intro/interop.html
+    //Be default, we will encrypt as well for interop reasons.  However, this
+    //setting can be set to false to turn that off. 
+    public static final String ALWAYS_ENCRYPT_UT = "ws-security.username-token.always.encrypted";
+    
     /**
      * WCF's trust server sometimes will encrypt the token in the response IN ADDITION TO
      * the full security on the message. These properties control the way the STS client
@@ -70,7 +76,7 @@ public final class SecurityConstants {
             SIGNATURE_USERNAME, SIGNATURE_PROPERTIES, SIGNATURE_CRYPTO,
             ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             TOKEN, TOKEN_ID, STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
-            STS_TOKEN_DO_CANCEL
+            STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, ALWAYS_ENCRYPT_UT
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
