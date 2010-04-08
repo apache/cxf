@@ -80,6 +80,14 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
     private ThreadLocal<Message> messages = new ThreadLocal<Message>();
     private boolean supportDigestPasswords;
     
+    public AbstractWSS4JSecurityContextProvidingInterceptor() {
+        super();
+    }
+    
+    public AbstractWSS4JSecurityContextProvidingInterceptor(Map<String, Object> properties) {
+        super(properties);
+    }
+    
     public void setSupportDigestPasswords(boolean support) {
         supportDigestPasswords = support;
     }
