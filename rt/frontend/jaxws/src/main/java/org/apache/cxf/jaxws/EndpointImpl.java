@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.jaxws;
 
 import java.security.AccessController;
@@ -104,6 +103,13 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
     private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
     private List<Handler> handlers = new ModCountCopyOnWriteArrayList<Handler>();
+    
+    /**
+     * Flag indicating internal state of this instance.  If true,
+     * the instance can have {@link #publish(String, Object)} called
+     * and/or settings changed.
+     */
+    private boolean publishable = true;
 
     public EndpointImpl(Object implementor) {
         this(BusFactory.getThreadDefaultBus(), implementor);
@@ -201,6 +207,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         return server != null;
     }
 
+    /**
+     * {@inheritDoc}
+     * <p/>
+     * This implementation performs no action except to check the publish permission.
+     */
     @Override
     public void publish(Object arg0) {
         // Since this does not do anything now, just check the permission
@@ -217,6 +228,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     }
     
     public void setMetadata(List<Source> metadata) {
+        checkPublishable();
         this.metadata = metadata;
     }
 
@@ -232,7 +244,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     @Override
     public void stop() {
         if (null != server) {
-            server.stop();
+            server.destroy();
             server = null;
         }
     }    
@@ -255,11 +267,28 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         }
     }
     
+    /**
+     * Performs the publication action by setting up a {@link Server}
+     * instance based on this endpoint's configuration.
+     *
+     * @param addr the optional endpoint address.
+     *
+     * @throws IllegalStateException if the endpoint cannot be published/republished
+     * @throws SecurityException if permission checking is enabled and policy forbids publishing
+     * @throws WebServiceException if there is an error publishing the endpoint
+     * 
+     * @see #checkPublishPermission()
+     * @see #checkPublishable()
+     * @see #getServer(String)
+     */
     protected void doPublish(String addr) {
         checkPublishPermission();
+        checkPublishable();
+        
+        ServerImpl serv = null;
         
         try {
-            ServerImpl serv = getServer(addr);
+            serv = getServer(addr);
             if (addr != null) {            
                 EndpointInfo endpointInfo = serv.getEndpoint().getEndpointInfo();
                 if (!endpointInfo.getAddress().contains(addr)) {
@@ -272,9 +301,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 this.address = endpointInfo.getAddress();
             }
             serv.start();
-        } catch (WebServiceException ex) {
-            throw ex;
+            publishable = false;
         } catch (Exception ex) {
+            try {
+                stop();
+            } catch (Exception e) {
+                // Nothing we can do.
+            }
+            
             throw new WebServiceException(ex);
         }
     }
@@ -282,6 +316,7 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
     public ServerImpl getServer() {
         return getServer(null);
     }
+    
     public synchronized ServerImpl getServer(String addr) {
         if (server == null) {
             checkProperties();
@@ -400,6 +435,19 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             sm.checkPermission(PUBLISH_PERMISSION);
         } else if (Boolean.getBoolean(CHECK_PUBLISH_ENDPOINT_PERMISSON_PROPERTY)) {
             AccessController.checkPermission(PUBLISH_PERMISSION);
+        }
+    }
+    
+    /**
+     * Checks the value of {@link #publishable} and throws
+     * an {@link IllegalStateException} if the value is {@code false}.
+     *
+     * @throws IllegalStateException if {@link #publishable} is false
+     */
+    protected void checkPublishable() {
+        if (!this.publishable) {
+            throw new IllegalStateException("Cannot invoke method "
+                    + "after endpoint has been published.");
         }
     }
 

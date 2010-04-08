@@ -57,7 +57,7 @@ public class UserServiceTest extends AbstractRestTest {
         addNamespace("c", "http://bare.http.binding.cxf.apache.org/");
         assertValid("/c:loginResponse/return", res);
 
-        svr.stop();
+        svr.destroy();
     }
 
 }

@@ -124,7 +124,7 @@ public class WrappedServiceTest extends AbstractRestTest {
         assertValid("/c:getCustomerResponse/c:customer/c:id[text()='123']", res);
         assertValid("/c:getCustomerResponse/c:customer/c:name[text()='Danno Manno']", res);
 
-        svr.stop();
+        svr.destroy();
     }
 
 }

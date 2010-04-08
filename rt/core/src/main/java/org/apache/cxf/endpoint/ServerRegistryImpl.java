@@ -84,7 +84,7 @@ public class ServerRegistryImpl implements ServerRegistry, BusLifeCycleListener 
         Object[] servers = serversList.toArray();
         for (int i = 0; i < servers.length; i++) {
             Server server = (Server) servers[i];
-            server.stop();
+            server.destroy();
         }        
     }
 

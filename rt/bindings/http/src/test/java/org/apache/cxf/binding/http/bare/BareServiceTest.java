@@ -164,7 +164,7 @@ public class BareServiceTest extends AbstractRestTest {
         String ct = c.getContentType();
         assertTrue(ct.startsWith("text/plain"));
 
-        svr.stop();
+        svr.destroy();
     }
 
     @Test
@@ -193,7 +193,7 @@ public class BareServiceTest extends AbstractRestTest {
         Message msg = new Message("SIMPLE_TYPE", IriDecoderHelper.BUNDLE);
         assertValid("//*[text()='" + msg.toString() + "']", doc);
 
-        svr.stop();
+        svr.destroy();
     }
 
     @Test
@@ -222,6 +222,6 @@ public class BareServiceTest extends AbstractRestTest {
         addNamespace("b", "http://bare.http.binding.cxf.apache.org/");
         assertValid("//b:getDataResponse", doc);
 
-        svr.stop();
+        svr.destroy();
     }
 }

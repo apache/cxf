@@ -21,6 +21,7 @@ package org.apache.cxf.systest.management;
 
 import java.util.Set;
 
+import javax.management.InstanceNotFoundException;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 import javax.xml.namespace.QName;
@@ -131,7 +132,14 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
         reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);
         assertEquals(response, reply);
-
+        
+        mbs.invoke(name, "destroy", new Object[0], new String[0]);
+        
+        try {
+            mbs.getMBeanInfo(name);
+            fail("destroy failed to unregister MBean.");
+        } catch (InstanceNotFoundException e) {
+            // Expected
+        }
     }
-
 }

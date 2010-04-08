@@ -62,6 +62,11 @@ public class ManagedEndpoint implements ManagedComponent, ServerLifeCycleListene
     public void stop() {
         server.stop();
     }
+    
+    @ManagedOperation
+    public void destroy() {
+        server.destroy();
+    }
 
     @ManagedAttribute(description = "Address Attribute", currencyTimeLimit = 60)
     public String getAddress() {

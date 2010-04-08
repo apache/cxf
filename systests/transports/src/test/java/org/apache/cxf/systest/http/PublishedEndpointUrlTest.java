@@ -86,7 +86,7 @@ public class PublishedEndpointUrlTest extends Assert {
             }
         }
         
-        server.stop();
+        server.destroy();
     }
 
 

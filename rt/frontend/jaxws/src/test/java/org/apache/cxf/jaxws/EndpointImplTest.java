@@ -22,6 +22,9 @@ package org.apache.cxf.jaxws;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.ArrayList;
+
+import javax.xml.transform.Source;
 import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.Bus;
@@ -49,14 +52,15 @@ public class EndpointImplTest extends AbstractJaxWsTest {
 
 
     @Test
-    public void testEndpoint() throws Exception {   
+    public void testEndpoint() throws Exception {
+        String address = "http://localhost:8080/test";
+        
         GreeterImpl greeter = new GreeterImpl();
         EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
  
         WebServiceContext ctx = greeter.getContext();
         assertNull(ctx);
         try {
-            String address = "http://localhost:8080/test";
             endpoint.publish(address);
         } catch (IllegalArgumentException ex) {
             assertTrue(ex.getCause() instanceof BusException);
@@ -66,17 +70,33 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         
         assertNotNull(ctx);
         
+        // Test that we can't change settings through the JAX-WS API after publishing
+        
+        try {
+            endpoint.publish(address);
+            fail("republished an already published endpoint.");
+        } catch (IllegalStateException e) {
+            // expected
+        }
+        
+        try {
+            endpoint.setMetadata(new ArrayList<Source>(0));
+            fail("set metadata on an already published endpoint.");
+        } catch (IllegalStateException e) {
+            // expected
+        }
     }
     
     @Test
     public void testEndpointStop() throws Exception {   
+        String address = "http://localhost:8080/test";
+        
         GreeterImpl greeter = new GreeterImpl();
         EndpointImpl endpoint = new EndpointImpl(getBus(), greeter, (String)null);
  
         WebServiceContext ctx = greeter.getContext();
         assertNull(ctx);
         try {
-            String address = "http://localhost:8080/test";
             endpoint.publish(address);
         } catch (IllegalArgumentException ex) {
             assertTrue(ex.getCause() instanceof BusException);
@@ -90,6 +110,14 @@ public class EndpointImplTest extends AbstractJaxWsTest {
         assertTrue(endpoint.isPublished());
         endpoint.stop();
         assertFalse(endpoint.isPublished());
+        
+        // Test that the Endpoint cannot be restarted.
+        try {
+            endpoint.publish(address);
+            fail("stopped endpoint restarted.");
+        } catch (IllegalStateException e) {
+            // expected.
+        }
         
     }
     

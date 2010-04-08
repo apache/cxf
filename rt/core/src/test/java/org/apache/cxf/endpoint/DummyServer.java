@@ -47,6 +47,10 @@ public class DummyServer implements Server {
         
     }
     
+    public void destroy() {
+        stop();
+    }
+    
     public MessageObserver getMessageObserver() {
         return null;
     }

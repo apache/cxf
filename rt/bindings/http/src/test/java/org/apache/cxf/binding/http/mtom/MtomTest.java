@@ -85,7 +85,7 @@ public class MtomTest extends AbstractRestTest {
 
         assertEquals(2, impl.getPeople().getPerson().size());
 
-        svr.stop();
+        svr.destroy();
     }
 
 }

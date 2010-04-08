@@ -174,7 +174,7 @@ public class JCABusFactory {
         synchronized (servantsCache) {
             for (Server servant : servantsCache) {
                 //REVISIT: seems using server.stop() doesn't release resource properly.
-                servant.stop();
+                servant.destroy();
                 LOG.info("Shutdown the EJB Endpoint: " + servant.getEndpoint().getEndpointInfo().getName());
             }
             servantsCache.clear();
