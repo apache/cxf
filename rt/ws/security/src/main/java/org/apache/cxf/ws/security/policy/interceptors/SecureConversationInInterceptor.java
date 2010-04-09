@@ -220,6 +220,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
         Destination destination = ex.getDestination();
         try {
             Endpoint endpoint = message.getExchange().get(Endpoint.class);
+            
             TokenStore store = (TokenStore)message.getContextualProperty(TokenStore.class.getName());
             if (store == null) {
                 store = new MemoryTokenStore();
@@ -227,7 +228,7 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             }
             endpoint = STSUtils.createSTSEndpoint(bus, 
                                                   namespace,
-                                                  null,
+                                                  endpoint.getEndpointInfo().getTransportId(),
                                                   destination.getAddress().getAddress().getValue(),
                                                   message.getVersion().getBindingId(), 
                                                   policy,
