@@ -16,41 +16,42 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.interceptor.security;
+package org.apache.cxf.common.security;
 
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.security.Principal;
 
+/**
+ * Simple Principal implementation
+ *
+ */
+public class SimplePrincipal implements Principal {
 
-public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInInterceptor {
-
-    private Map<String, List<String>> methodRolesMap = Collections.emptyMap();
-    private List<String> globalRoles = Collections.emptyList();
+    private String name;
     
-    
-    @Override
-    protected List<String> getExpectedRoles(Method method) {
-        List<String> roles = methodRolesMap.get(method.getName());
-        if (roles != null) {
-            return roles;
+    public SimplePrincipal(String name) {
+        if (name == null) {
+            throw new IllegalArgumentException("Principal name can not be null");
         }
-        return globalRoles;
-    }
-
-
-
-    public void setMethodRolesMap(Map<String, List<String>> rolesMap) {
-        this.methodRolesMap = rolesMap;
+        this.name = name;
     }
     
-    public void setGlobalRoles(List<String> roles) {
-        globalRoles = roles;
+    public String getName() {
+        return name;
     }
-
-
-
     
-
+    public boolean equals(Object obj) {
+        if (!(obj instanceof SimplePrincipal)) {
+            return false;
+        }
+        
+        return name.equals(((SimplePrincipal)obj).name);
+    }
+    
+    public int hashCode() {
+        return name.hashCode();
+    }
+    
+    public String toString() {
+        return name;
+    }
 }

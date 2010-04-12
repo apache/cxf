@@ -19,6 +19,7 @@
 package org.apache.cxf.interceptor.security;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.cxf.frontend.MethodDispatcher;
@@ -32,6 +33,9 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInterceptor<Message> {
 
+    private static final String ALL_ROLES = "*";
+    
+    
     public AbstractAuthorizingInInterceptor() {
         super(Phase.PRE_INVOKE);
     }
@@ -44,15 +48,8 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         
         Method method = getTargetMethod(message);
         
-        List<String> expectedRoles = getExpectedRoles(method);
-        if (expectedRoles == null || expectedRoles.isEmpty()) {
+        if (authorize(sc, method)) {
             return;
-        }
-        
-        for (String role : expectedRoles) {
-            if (sc.isUserInRole(role)) {
-                return;
-            }
         }
         
         throw new AccessDeniedException("Unauthorized");
@@ -65,5 +62,50 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         return md.getMethod(bop);
     }
 
+    protected boolean authorize(SecurityContext sc, Method method) {
+        List<String> expectedRoles = getExpectedRoles(method);
+        if (expectedRoles.isEmpty()) {
+            
+            List<String> denyRoles = getDenyRoles(method);
+            
+            return denyRoles.isEmpty() ? true : isUserInRole(sc, denyRoles, true);
+        }
+        
+        if (isUserInRole(sc, expectedRoles, false)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    private boolean isUserInRole(SecurityContext sc, List<String> roles, boolean deny) {
+        
+        if (roles.size() == 1 && ALL_ROLES.equals(roles.get(0))) {
+            return !deny;
+        }
+        
+        for (String role : roles) {
+            if (sc.isUserInRole(role)) {
+                return !deny;
+            }
+        }
+        return deny;
+    }
+    
+    /**
+     * Returns a list of expected roles for a given method. 
+     * @param method Method
+     * @return list, empty if no roles are available
+     */
     protected abstract List<String> getExpectedRoles(Method method);
+    
+       
+    /**
+     * Returns a list of roles to be denied for a given method. 
+     * @param method Method
+     * @return list, empty if no roles are available
+     */
+    protected List<String> getDenyRoles(Method method) {
+        return Collections.emptyList();
+    }
 }

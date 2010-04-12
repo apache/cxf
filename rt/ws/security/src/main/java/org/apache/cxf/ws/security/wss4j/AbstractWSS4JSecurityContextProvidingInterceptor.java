@@ -20,8 +20,6 @@ package org.apache.cxf.ws.security.wss4j;
 
 import java.io.IOException;
 import java.security.Principal;
-import java.security.acl.Group;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Vector;
@@ -36,9 +34,9 @@ import javax.xml.namespace.QName;
 
 import org.w3c.dom.Element;
 
-import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDocInfo;
@@ -77,7 +75,6 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractWSS4JSecurityContextProvidingInterceptor.class);
     
-    private ThreadLocal<Message> messages = new ThreadLocal<Message>();
     private boolean supportDigestPasswords;
     
     public AbstractWSS4JSecurityContextProvidingInterceptor() {
@@ -92,48 +89,48 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
         supportDigestPasswords = support;
     }
     
-    @Override
-    public void handleFault(SoapMessage m) {
-        messages.remove();
-        super.handleFault(m);
-    }
+    
     
     @Override
     protected SecurityContext createSecurityContext(final Principal p) {
-        Message msg = messages.get();
+        Message msg = PhaseInterceptorChain.getCurrentMessage();
         if (msg == null) {
             throw new IllegalStateException("Current message is not available");
         }
-        messages.remove();
-        final Subject subject = msg.get(Subject.class);
-        return new SecurityContext() {
-            public Principal getUserPrincipal() {
-                return p;
-            }
-            public boolean isUserInRole(String role) {
-                if (subject == null || subject.getPrincipals().size() <= 1) {
-                    return false;
-                }
-                for (Principal p : subject.getPrincipals()) {
-                    if (p instanceof Group && ((Group)p).getName().equals(role)) { 
-                        return true;
-                    }
-                }
-                return false;
-            }
-        };     
+        return doCreateSecurityContext(p, msg.get(Subject.class));
+    }
+    
+    /**
+     * Creates default SecurityContext which implements isUserInRole using the
+     * following approach : skip the first Subject principal, and then check optional
+     * Groups the principal is a member of. Subclasses can override this method and implement
+     * a custom strategy instead
+     *   
+     * @param p principal
+     * @param subject subject 
+     * @return security context
+     */
+    protected SecurityContext doCreateSecurityContext(final Principal p, final Subject subject) {
+        return new DefaultSecurityContext(p, subject);
     }
 
+        
     protected void setSubject(String name, 
                               String password, 
                               boolean isDigest,
                               String nonce,
                               String created) throws WSSecurityException {
-        Message msg = messages.get();
+        Message msg = PhaseInterceptorChain.getCurrentMessage();
         if (msg == null) {
             throw new IllegalStateException("Current message is not available");
         }
-        Subject subject = createSubject(name, password, isDigest, nonce, created);
+        Subject subject = null;
+        try {
+            subject = createSubject(name, password, isDigest, nonce, created);
+        } catch (Exception ex) {
+            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, 
+                                          "Subject has not been created", null, ex);
+        }
         if (subject == null || subject.getPrincipals().size() == 0
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
             throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null);
@@ -144,20 +141,21 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
     /**
      * Create a Subject representing a current user and its roles. 
      * This Subject is expected to contain at least one Principal representing a user
-     * and optionally followed by one or more principal Groups this user is a member of.  
+     * and optionally followed by one or more principal Groups this user is a member of.
+     * It will also be available in doCreateSecurityContext.   
      * @param name username
      * @param password password
      * @param isDigest true if a password digest is used
      * @param nonce optional nonce
      * @param created optional timestamp
      * @return subject
-     * @throws WSSecurityException
+     * @throws SecurityException
      */
     protected abstract Subject createSubject(String name, 
                                     String password, 
                                     boolean isDigest,
                                     String nonce,
-                                    String created) throws WSSecurityException;
+                                    String created) throws SecurityException;
     
     
     /**
@@ -168,19 +166,15 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
     protected CallbackHandler getCallback(RequestData reqData, int doAction) 
         throws WSSecurityException {
         
-        if ((doAction & WSConstants.UT) != 0) {
-            messages.set((Message)reqData.getMsgContext());
-            if (!supportDigestPasswords) {    
-                CallbackHandler pwdCallback = null;
-                try {
-                    pwdCallback = super.getCallback(reqData, doAction);
-                } catch (Exception ex) {
-                    // ignore
-                }
-                return new DelegatingCallbackHandler(pwdCallback);
+        if ((doAction & WSConstants.UT) != 0 && !supportDigestPasswords) {    
+            CallbackHandler pwdCallback = null;
+            try {
+                pwdCallback = super.getCallback(reqData, doAction);
+            } catch (Exception ex) {
+                // ignore
             }
+            return new DelegatingCallbackHandler(pwdCallback);
         }
-        
         
         return super.getCallback(reqData, doAction);
     }
@@ -294,51 +288,4 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
         }
     }
     
-    /**
-     * Simple Principal implementation
-     *
-     */
-    protected static class SimplePrincipal implements Principal {
-
-        private String name;
-        
-        public SimplePrincipal(String name) {
-            this.name = name;
-        }
-        
-        public String getName() {
-            return name;
-        }
-        
-    }
-    
-    /**
-     * Simple Group implementation
-     *
-     */
-    protected static class SimpleGroup extends SimplePrincipal implements Group {
-        
-        private String memberName;
-        
-        public SimpleGroup(String roleName, String memberName) {
-            super(roleName);
-            this.memberName = memberName;
-        }
-
-        public boolean isMember(Principal p) {
-            return memberName.equals(p.getName());
-        }
-
-        public boolean addMember(Principal p) {
-            throw new UnsupportedOperationException();
-        }
-        
-        public Enumeration<? extends Principal> members() {
-            throw new UnsupportedOperationException();
-        }
-
-        public boolean removeMember(Principal arg0) {
-            throw new UnsupportedOperationException();
-        }
-    }
 }

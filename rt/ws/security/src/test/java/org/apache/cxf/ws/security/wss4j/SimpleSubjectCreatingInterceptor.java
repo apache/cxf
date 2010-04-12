@@ -20,7 +20,8 @@ package org.apache.cxf.ws.security.wss4j;
 
 import javax.security.auth.Subject;
 
-import org.apache.ws.security.WSSecurityException;
+import org.apache.cxf.common.security.SimpleGroup;
+import org.apache.cxf.common.security.SimplePrincipal;
 
 public class SimpleSubjectCreatingInterceptor extends AbstractWSS4JSecurityContextProvidingInterceptor {
 
@@ -29,7 +30,7 @@ public class SimpleSubjectCreatingInterceptor extends AbstractWSS4JSecurityConte
                                     String password, 
                                     boolean isDigest,
                                     String nonce,
-                                    String created) throws WSSecurityException {
+                                    String created) throws SecurityException {
         Subject subject = new Subject();
          
         // delegate to the external security system if possible
