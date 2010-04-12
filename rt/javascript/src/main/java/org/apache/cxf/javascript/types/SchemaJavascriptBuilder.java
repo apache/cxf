@@ -659,6 +659,7 @@ public class SchemaJavascriptBuilder {
                              + localName + "'));");
         }
         utils.appendLine("newobject." + accessorName + "(item);");
+        utils.appendLine("var item = null;");
         if (!itemInfo.isArray()) {
             utils.startIf("curElement != null");
             utils.appendLine("curElement = cxfjsutils.getNextElementSibling(curElement);");
