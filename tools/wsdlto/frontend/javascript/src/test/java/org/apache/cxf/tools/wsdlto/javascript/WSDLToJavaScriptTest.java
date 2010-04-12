@@ -53,4 +53,16 @@ public class WSDLToJavaScriptTest extends ProcessorTestBase {
         String javascript = IOUtils.readStringFromStream(fis);
         assertTrue(javascript.contains("xmlns:murble='http://apache.org/hello_world_soap_http'"));
     }
+    
+    // just run with a minimum of fuss.
+    @Test
+    public void testGeneration2() throws Exception {
+        JavaScriptContainer container = new JavaScriptContainer(null);
+
+        ToolContext context = new ToolContext();
+        context.put(ToolConstants.CFG_WSDLURL, "/tmp/tmp.wsdl");
+        context.put(ToolConstants.CFG_OUTPUTDIR, output.toString()); 
+        container.setContext(context); 
+        container.execute();
+    }
 }

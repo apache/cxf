@@ -228,7 +228,7 @@ public class SchemaCollection {
      */
     public XmlSchema getSchemaByTargetNamespace(String namespaceURI) {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (schema.getTargetNamespace().equals(namespaceURI)) {
+            if (namespaceURI.equals(schema.getTargetNamespace())) {
                 return schema;
             }
         }
