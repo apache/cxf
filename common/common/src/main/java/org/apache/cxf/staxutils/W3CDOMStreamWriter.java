@@ -170,7 +170,7 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
 
     public void writeAttribute(String local, String value) throws XMLStreamException {
         Attr a;
-        if (local.startsWith("xmlns:")) {
+        if (local.startsWith("xmlns") && (local.length() == 5 || local.charAt(5) == ':')) {
             a = document.createAttributeNS(XML_NS, local);
         } else {
             a = document.createAttributeNS(null, local);
