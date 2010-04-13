@@ -19,7 +19,6 @@
 package org.apache.cxf.ws.security.wss4j;
 
 import java.util.Collections;
-import java.util.List;
 
 import javax.xml.ws.BindingProvider;
 
@@ -47,7 +46,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     private Echo echo;
     private Client client;
 
-    public void setUpService(List<String> expectedRoles,
+    public void setUpService(String expectedRoles,
                              boolean digest,
                              boolean encryptUsernameTokenOnly) throws Exception {
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
@@ -119,7 +118,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     
     @Test
     public void testDigestPasswordAuthorized() throws Exception {
-        setUpService(Collections.singletonList("developers"), true, false);
+        setUpService("developers", true, false);
         String actions = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " "
                          + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN;
 
@@ -132,7 +131,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     
     @Test
     public void testDigestPasswordUnauthorized() throws Exception {
-        setUpService(Collections.singletonList("managers"), true, false);
+        setUpService("managers", true, false);
         String actions = WSHandlerConstants.ENCRYPT + " " + WSHandlerConstants.SIGNATURE + " "
                          + WSHandlerConstants.TIMESTAMP + " " + WSHandlerConstants.USERNAME_TOKEN;
 
@@ -150,7 +149,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     
     @Test
     public void testEncryptedDigestPasswordAuthorized() throws Exception {
-        setUpService(Collections.singletonList("developers"), true, true);
+        setUpService("developers", true, true);
         String actions = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT;
 
         wsIn.setProperty(WSHandlerConstants.ACTION, actions);
@@ -161,7 +160,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     
     @Test
     public void testClearPasswordAuthorized() throws Exception {
-        setUpService(Collections.singletonList("developers"), false, false);
+        setUpService("developers", false, false);
         String actions = WSHandlerConstants.USERNAME_TOKEN;
 
         wsIn.setProperty(WSHandlerConstants.ACTION, actions);
@@ -172,7 +171,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
     
     @Test
     public void testEncyptedClearPasswordAuthorized() throws Exception {
-        setUpService(Collections.singletonList("developers"), false, true);
+        setUpService("developers", false, true);
         String actions = WSHandlerConstants.USERNAME_TOKEN + " " + WSHandlerConstants.ENCRYPT;
 
         wsIn.setProperty(WSHandlerConstants.ACTION, actions);

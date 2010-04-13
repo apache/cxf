@@ -128,12 +128,11 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
         try {
             subject = createSubject(name, password, isDigest, nonce, created);
         } catch (Exception ex) {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, 
-                                          "Subject has not been created", null, ex);
+            throw new WSSecurityException("Failed Authentication : Subject has not been created", ex);
         }
         if (subject == null || subject.getPrincipals().size() == 0
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
-            throw new WSSecurityException(WSSecurityException.FAILED_AUTHENTICATION, null, null);
+            throw new WSSecurityException("Failed Authentication : Invalid Subject");
         }
         msg.put(Subject.class, subject);
     }

@@ -19,7 +19,9 @@
 package org.apache.cxf.interceptor.security;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -41,12 +43,15 @@ public class SimpleAuthorizingInterceptor extends AbstractAuthorizingInIntercept
 
 
 
-    public void setMethodRolesMap(Map<String, List<String>> rolesMap) {
-        this.methodRolesMap = rolesMap;
+    public void setMethodRolesMap(Map<String, String> rolesMap) {
+        methodRolesMap = new HashMap<String, List<String>>();
+        for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
+            methodRolesMap.put(entry.getKey(), Arrays.asList(entry.getValue().split(" ")));
+        }
     }
     
-    public void setGlobalRoles(List<String> roles) {
-        globalRoles = roles;
+    public void setGlobalRoles(String roles) {
+        globalRoles = Arrays.asList(roles.split(" "));
     }
 
 

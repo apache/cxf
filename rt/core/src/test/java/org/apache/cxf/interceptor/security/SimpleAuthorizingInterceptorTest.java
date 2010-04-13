@@ -20,7 +20,6 @@ package org.apache.cxf.interceptor.security;
 
 import java.lang.reflect.Method;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -71,49 +70,35 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     @Test
     public void testPermitWithMethodRoles() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
-        List<String> roles = new ArrayList<String>();
-        roles.add("role1");
-        roles.add("testRole");
-        in.setMethodRolesMap(Collections.singletonMap("echo", roles));
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role1 testRole"));
         in.handleMessage(message);    
     }
     
     @Test
     public void testPermitAll() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
-        List<String> roles = new ArrayList<String>();
-        roles.add("*");
-        in.setMethodRolesMap(Collections.singletonMap("echo", roles));
+        in.setMethodRolesMap(Collections.singletonMap("echo", "*"));
         in.handleMessage(message);    
     }
     
     @Test
     public void testPermitWithClassRoles() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
-        List<String> roles = new ArrayList<String>();
-        roles.add("role1");
-        roles.add("testRole");
-        in.setGlobalRoles(roles);
+        in.setGlobalRoles("role1 testRole");
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithMethodRoles() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
-        List<String> roles = new ArrayList<String>();
-        roles.add("role1");
-        roles.add("role2");
-        in.setMethodRolesMap(Collections.singletonMap("echo", roles));
+        in.setMethodRolesMap(Collections.singletonMap("echo", "role1 role2"));
         in.handleMessage(message);    
     }
     
     @Test(expected = AccessDeniedException.class)
     public void testDenyWithClassRoles() {
         SimpleAuthorizingInterceptor in = new SimpleAuthorizingInterceptor();
-        List<String> roles = new ArrayList<String>();
-        roles.add("role1");
-        roles.add("role2");
-        in.setGlobalRoles(roles);
+        in.setGlobalRoles("role1 role2");
         in.handleMessage(message);    
     }
     
