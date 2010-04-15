@@ -379,27 +379,30 @@ public class Option {
         destination.setWsdlVersion(getWsdlVersion());
     }
     
-    private void setIfNull(Object dest, Object source) {
+    private <T> T setIfNull(T dest, T source) {
         if (dest == null) {
             dest = source;
         }
+        return dest;
     }
     
     public void merge(Option defaultOptions) {
-        setIfNull(wsdlList, defaultOptions.wsdlList);
-        setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
-        setIfNull(validateWsdl, defaultOptions.validateWsdl);
-        setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
-        setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
-        setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
-        setIfNull(defaultExcludesNamespace, defaultOptions.defaultExcludesNamespace);
-        setIfNull(defaultNamespacePackageMapping, defaultOptions.defaultNamespacePackageMapping);
-        setIfNull(frontEnd, defaultOptions.frontEnd);
-        setIfNull(dataBinding, defaultOptions.dataBinding);
-        setIfNull(wsdlVersion, defaultOptions.wsdlVersion);
-        setIfNull(catalog, defaultOptions.catalog);
-        setIfNull(serviceName, defaultOptions.serviceName);
-        setIfNull(outputDir, defaultOptions.outputDir);
+        wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
+        extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
+        validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);
+        autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
+        noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
+        allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
+        defaultExcludesNamespace = setIfNull(defaultExcludesNamespace, 
+                                             defaultOptions.defaultExcludesNamespace);
+        defaultNamespacePackageMapping = setIfNull(defaultNamespacePackageMapping,
+                                                   defaultOptions.defaultNamespacePackageMapping);
+        frontEnd = setIfNull(frontEnd, defaultOptions.frontEnd);
+        dataBinding = setIfNull(dataBinding, defaultOptions.dataBinding);
+        wsdlVersion = setIfNull(wsdlVersion, defaultOptions.wsdlVersion);
+        catalog = setIfNull(catalog, defaultOptions.catalog);
+        serviceName = setIfNull(serviceName, defaultOptions.serviceName);
+        outputDir = setIfNull(outputDir, defaultOptions.outputDir);
         extraargs.addAll(defaultOptions.extraargs);
         xjcargs.addAll(defaultOptions.xjcargs);
         bindingFiles = mergeList(bindingFiles, defaultOptions.bindingFiles, String.class);
