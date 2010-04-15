@@ -181,7 +181,8 @@ public class URIResolver {
                 base = base.resolve(relative);
                 if (base.isAbsolute() && "file".equalsIgnoreCase(base.getScheme())) {
                     try {
-                        baseFile = new File(base);
+                        // decode space before create a file
+                        baseFile = new File(base.getPath().replace("%20", " "));
                         if (baseFile.exists()) {
                             is = base.toURL().openStream();
                             uri = base;
@@ -253,7 +254,8 @@ public class URIResolver {
             } 
         }
         
-        return path;
+        // decode spaces before returning otherwise File.exists returns false 
+        return path.replace("%20", " ");
     }
 
     private void tryArchive(String baseStr, String uriStr) throws IOException {
