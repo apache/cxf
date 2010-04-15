@@ -45,6 +45,7 @@ public final class SecurityConstants {
     public static final String TOKEN_ID = "ws-security.token.id";
 
     public static final String STS_CLIENT = "ws-security.sts.client";
+    public static final String STS_APPLIES_TO = "ws-security.sts.applies-to";
     
     public static final String TIMESTAMP_TTL = "ws-security.timestamp.timeToLive";
     
