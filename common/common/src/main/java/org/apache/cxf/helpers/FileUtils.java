@@ -79,7 +79,7 @@ public final class FileUtils {
             Thread hook = new Thread() {
                 @Override
                 public void run() {
-                    removeDir(defaultTempDir);
+                    removeDir(defaultTempDir, true);
                 }
             };
             Runtime.getRuntime().addShutdownHook(hook);            
@@ -125,6 +125,9 @@ public final class FileUtils {
     }
 
     public static void removeDir(File d) {
+        removeDir(d, false);
+    }
+    private static void removeDir(File d, boolean inShutdown) {
         String[] list = d.list();
         if (list == null) {
             list = new String[0];
@@ -133,15 +136,18 @@ public final class FileUtils {
             String s = list[i];
             File f = new File(d, s);
             if (f.isDirectory()) {
-                removeDir(f);
+                removeDir(f, inShutdown);
             } else {
-                delete(f);
+                delete(f, inShutdown);
             }
         }
-        delete(d);
+        delete(d, inShutdown);
     }
 
     public static void delete(File f) {
+        delete(f, false);
+    }
+    public static void delete(File f, boolean inShutdown) {
         if (!f.delete()) {
             if (isWindows()) {
                 System.gc();
@@ -151,7 +157,7 @@ public final class FileUtils {
             } catch (InterruptedException ex) {
                 // Ignore Exception
             }
-            if (!f.delete()) {
+            if (!f.delete() && !inShutdown) {
                 f.deleteOnExit();
             }
         }

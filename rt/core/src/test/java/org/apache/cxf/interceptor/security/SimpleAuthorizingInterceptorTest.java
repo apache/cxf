@@ -139,6 +139,7 @@ public class SimpleAuthorizingInterceptorTest extends Assert {
     }
     
     private static class TestService {
+        @SuppressWarnings("unused")
         public void echo() {
             
         }
