@@ -122,7 +122,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                     tok = client.requestSecurityToken();
                                 } else {
                                     String s = message
-                                        .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
+                                        .getContextualProperty(SecurityConstants.STS_APPLIES_TO).toString();
+                                    s = s == null 
+                                        ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
+                                            : s;
                                     client.setAddressingNamespace(maps.getNamespaceURI());
                                     tok = client.requestSecurityToken(s);
                                 }
