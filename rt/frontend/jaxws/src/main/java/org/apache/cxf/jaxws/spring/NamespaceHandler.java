@@ -50,7 +50,12 @@ public class NamespaceHandler extends NamespaceHandlerSupport {
         public SpringServerFactoryBean(JaxWsServiceFactoryBean fact) {
             super(fact);
         }
-
+        public void destroy() {
+            if (getServer() != null) {
+                getServer().destroy();
+                setServer(null);
+            }
+        }
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();

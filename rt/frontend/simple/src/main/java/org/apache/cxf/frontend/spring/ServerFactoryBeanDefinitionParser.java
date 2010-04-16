@@ -87,6 +87,7 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         super.doParse(element, ctx, bean);
 
         bean.setInitMethodName("create");
+        bean.setDestroyMethodName("destroy");
         
         // We don't really want to delay the registration of our Server
         bean.setLazyInit(false);
@@ -119,7 +120,13 @@ public class ServerFactoryBeanDefinitionParser extends AbstractBeanDefinitionPar
         public SpringServerFactoryBean(ReflectionServiceFactoryBean fact) {
             super(fact);
         }
-        
+        public void destroy() {
+            if (getServer() != null) {
+                getServer().destroy();
+                setServer(null);
+            }
+        }
+
         public void setApplicationContext(ApplicationContext ctx) throws BeansException {
             if (getBus() == null) {
                 Bus bus = BusFactory.getThreadDefaultBus();

@@ -22,6 +22,7 @@ package org.apache.cxf.transport.servlet;
 import java.io.IOException;
 import java.io.InputStream;
 
+import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,6 +35,7 @@ import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.URIResolver;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
@@ -42,6 +44,7 @@ import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.context.support.AbstractApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.InputStreamResource;
 
@@ -103,7 +106,23 @@ public class CXFServlet extends AbstractCXFServlet implements ApplicationListene
         if (ctx instanceof ConfigurableApplicationContext) {
             ((ConfigurableApplicationContext)ctx).addApplicationListener(this);
         }
+        if (ctx instanceof AbstractApplicationContext) {
+            Collection<ApplicationListener> lst = getListeners(ctx);
+            if (lst != null && !lst.contains(this)) {
+                lst.add(this);
+            }
+        }
     }
+    private Collection<ApplicationListener> getListeners(ApplicationContext ctx) {
+        try {
+            Object o = ctx.getClass().getMethod("getApplicationListeners").invoke(ctx);
+            return CastUtils.cast((Collection<?>)o);
+        } catch (Exception e) {
+            //ignore
+        }
+        return null;
+    }
+    
     private void updateContext(ServletConfig servletConfig, ApplicationContext ctx) {
         /* If ctx is null, normally no ContextLoaderListener 
          * was defined in web.xml.  Default bus with all extensions
