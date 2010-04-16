@@ -76,10 +76,11 @@ public final class FileUtils {
                 f = new File(s, "cxf-tmp-" + x);
             }
             defaultTempDir = f;
+            final File f2 = f;
             Thread hook = new Thread() {
                 @Override
                 public void run() {
-                    removeDir(defaultTempDir, true);
+                    removeDir(f2, true);
                 }
             };
             Runtime.getRuntime().addShutdownHook(hook);            
