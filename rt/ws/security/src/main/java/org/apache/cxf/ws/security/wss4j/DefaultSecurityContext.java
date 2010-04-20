@@ -58,13 +58,13 @@ public class DefaultSecurityContext implements SecurityContext {
         return false;
     }
 
-    private static boolean checkGroup(Group group, String role) {
+    protected boolean checkGroup(Group group, String role) {
         if (group.getName().equals(role)) {
             return true;
         }
             
         for (Enumeration<? extends Principal> members = group.members(); members.hasMoreElements();) {
-            // this might be a plain role but could represent a group consisting of the pther groups/roles
+            // this might be a plain role but could represent a group consisting of other groups/roles
             Principal member = members.nextElement();
             if (member.getName().equals(role) 
                 || member instanceof Group && checkGroup((Group)member, role)) {

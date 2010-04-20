@@ -291,9 +291,23 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
                                                               BookStoreJaxrsJaxws.class);
         BookSubresource bs = proxy.getBookSubresource("139");
         Book bean = new Book("CXF Rocks", 139L);
-        Book b = bs.getTheBook4(bean, bean, bean);
+        Book b = bs.getTheBook4(bean, bean, bean, bean);
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
+    }
+    
+    @Test
+    public void testAddOrderFormBean() throws Exception {
+        
+        String baseAddress = "http://localhost:9092/test/services/rest";
+        BookStoreJaxrsJaxws proxy = JAXRSClientFactory.create(baseAddress,
+                                                              BookStoreJaxrsJaxws.class);
+        BookSubresource bs = proxy.getBookSubresource("139");
+        OrderBean order = new OrderBean();
+        order.setId(123L);
+        order.setWeight(100);
+        OrderBean order2 = bs.addOrder(order);
+        assertEquals(Long.valueOf(123L), Long.valueOf(order2.getId()));
     }
     
     @Test
@@ -303,7 +317,9 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         client.type(MediaType.TEXT_PLAIN_TYPE).accept(MediaType.APPLICATION_XML_TYPE);
         client.path("/bookstore/books/139/subresource4/139/CXF Rocks");
         Book bean = new Book("CXF Rocks", 139L);
-        Book b = client.matrix("", bean).query("", bean).get(Book.class);
+        Form form = new Form();
+        form.set("name", "CXF Rocks").set("id", Long.valueOf(139L));
+        Book b = readBook((InputStream)client.matrix("", bean).query("", bean).form(form).getEntity());
         assertEquals(139, b.getId());
         assertEquals("CXF Rocks", b.getName());
     }
