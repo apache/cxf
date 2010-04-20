@@ -382,7 +382,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
         List<Parameter> fm = getParameters(map, ParameterType.FORM);
         for (Parameter p : fm) {
             if (params[p.getIndex()] != null) {
-                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()].toString());
+                FormUtils.addPropertyToForm(form, p.getName(), params[p.getIndex()]);
             }
         }
         

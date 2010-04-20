@@ -47,7 +47,7 @@ public final class FormUtils {
     
     public static void addPropertyToForm(MultivaluedMap<String, Object> map, String name, Object value) {
         if (!"".equals(name)) {
-            map.add(name, value);
+            map.add(name, value.toString());
         } else {
             MultivaluedMap<String, Object> values = 
                 InjectionUtils.extractValuesFromBean(value, "");
