@@ -29,14 +29,16 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
+import javax.management.MBeanServer;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.buslifecycle.BusLifeCycleListener;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
-
-
+import org.apache.cxf.management.InstrumentationManager;
+import org.mortbay.component.Container;
 
 
 /**
@@ -81,6 +83,11 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
      * The bus.
      */
     private Bus bus;
+    
+    /**
+     * The Jetty {@link MBeanContainer} to use when enabling JMX in Jetty.
+     */
+    private Container.Listener mBeanContainer;
     
     public JettyHTTPServerEngineFactory() {
         // Empty
@@ -282,6 +289,34 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             }            
         }
     }
+    
+    public synchronized Container.Listener getMBeanContainer() {
+        if (this.mBeanContainer != null) {
+            return mBeanContainer;
+        }
+        
+        if (bus != null && bus.getExtension(InstrumentationManager.class) != null) {
+            MBeanServer mbs =  bus.getExtension(InstrumentationManager.class).getMBeanServer();
+            if (mbs != null) {
+                try {
+                    Class<?> cls = ClassLoaderUtils.loadClass("org.mortbay.management.MBeanContainer", 
+                                                          getClass());
+                    
+                    mBeanContainer = (Container.Listener) cls.
+                        getConstructor(MBeanServer.class).newInstance(mbs);
+                    
+                    cls.getMethod("start", (Class<?>[]) null).invoke(mBeanContainer, (Object[]) null);
+                } catch (Throwable ex) {
+                    //ignore - just won't instrument jetty.  Probably don't have the
+                    //jetty-management jar available
+                    LOG.info("Could not load or start org.mortbay.management.MBeanContainer.  "
+                             + "Jetty JMX support will not be enabled: " + ex.getMessage());
+                }
+            }
+        }
+        
+        return mBeanContainer;
+    }
 
     @PostConstruct
     public void finalizeConfig() {
@@ -294,7 +329,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
     }
 
     public void postShutdown() {
-        //shut down the jetty server in the portMap
+        // shut down the jetty server in the portMap
         // To avoid the CurrentModificationException, 
         // do not use portMap.vaules directly       
         JettyHTTPServerEngine[] engines = portMap.values().toArray(new JettyHTTPServerEngine[0]);
@@ -304,6 +339,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
         // clean up the collections
         threadingParametersMap.clear();
         tlsParametersMap.clear();
+        mBeanContainer = null;
     }
 
     public void preShutdown() {

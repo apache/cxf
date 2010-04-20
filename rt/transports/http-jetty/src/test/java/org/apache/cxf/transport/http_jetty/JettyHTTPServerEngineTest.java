@@ -23,17 +23,22 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+
+import javax.management.ObjectName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.management.InstrumentationManager;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.Assert;
@@ -62,6 +67,14 @@ public class JettyHTTPServerEngineTest extends Assert {
 
         bus.getExtension(Configurer.class);
         EasyMock.expectLastCall().andReturn(configurer).anyTimes();
+        
+        InstrumentationManager iManager = control.createMock(InstrumentationManager.class);
+        iManager.getMBeanServer();
+        EasyMock.expectLastCall().andReturn(ManagementFactory.getPlatformMBeanServer()).anyTimes();
+        
+        bus.getExtension(InstrumentationManager.class);
+        EasyMock.expectLastCall().andReturn(iManager).anyTimes();
+        
         control.replay();
     }
 
@@ -166,6 +179,11 @@ public class JettyHTTPServerEngineTest extends Assert {
         response = getResponse(urlStr);
         assertEquals("The jetty http handler did not take effect", response, "string1string2");
         engine.addServant(new URL(urlStr2), handler2);
+        
+        Set<ObjectName>  s = ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
+        
         engine.removeServant(new URL(urlStr));
         engine.shutdown();
         response = getResponse(urlStr2);
@@ -173,6 +191,53 @@ public class JettyHTTPServerEngineTest extends Assert {
         // set the get request
         factory.destroyForPort(9234);
 
+    }
+    
+    /**
+     * Test that multiple JettyHTTPServerEngine instances can be used simultaneously
+     * without having name collisions.
+     */
+    @Test
+    public void testJmxSupport() throws Exception {
+        String urlStr = "http://localhost:9234/hello/test";
+        String urlStr2 = "http://localhost:9235/hello/test";
+        JettyHTTPServerEngine engine =
+            factory.createJettyHTTPServerEngine(9234, "http");
+        JettyHTTPServerEngine engine2 =
+            factory.createJettyHTTPServerEngine(9235, "http");
+        JettyHTTPTestHandler handler1 = new JettyHTTPTestHandler("string1", true);
+        JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
+        
+        engine.addServant(new URL(urlStr), handler1);
+        
+        Set<ObjectName>  s = ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
+        
+        engine2.addServant(new URL(urlStr2), handler2);
+        
+        s = ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        assertEquals("Could not find 2 Jetty Server: " + s, 2, s.size());
+        
+        engine.removeServant(new URL(urlStr));
+        engine2.removeServant(new URL(urlStr2));
+        
+        
+        engine.shutdown();
+        
+        s = ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        assertEquals("Could not find 2 Jetty Server: " + s, 1, s.size());
+        
+        engine2.shutdown();
+        
+        s = ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        assertEquals("Could not find 0 Jetty Server: " + s, 0, s.size());
+        
+        factory.destroyForPort(9234);
+        factory.destroyForPort(9235);
     }
 
     @Test
@@ -183,6 +248,7 @@ public class JettyHTTPServerEngineTest extends Assert {
 
         JettyHTTPServerEngine engine = new JettyHTTPServerEngine();
         engine.setPort(9235);
+        engine.setJettyHTTPServerEngineFactory(factory);
 
         List<Handler> handlers = new ArrayList<Handler>();
         handlers.add(handler1);
@@ -212,6 +278,12 @@ public class JettyHTTPServerEngineTest extends Assert {
         JettyHTTPTestHandler handler2 = new JettyHTTPTestHandler("string2", true);
         engine.addServant(new URL(urlStr), handler1);
 
+        // Note: There appears to be an internal issue in Jetty that does not
+        // unregister the MBean for handler1 during this setHandler operation.
+        // This scenario may create a warning message in the logs 
+        //     (javax.management.InstanceAlreadyExistsException: org.apache.cxf.
+        //         transport.http_jetty:type=jettyhttptesthandler,id=0)
+        // when running subsequent tests.
         contextHandler = engine.getContextHandler(new URL(urlStr));
         contextHandler.setHandler(handler2);
         contextHandler.start();
