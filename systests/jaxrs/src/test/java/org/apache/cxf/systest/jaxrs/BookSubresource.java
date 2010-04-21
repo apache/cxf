@@ -30,6 +30,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 
 public interface BookSubresource {
     
@@ -60,13 +61,19 @@ public interface BookSubresource {
                      @FormParam("name") String name,
                      @FormParam("nameid") Integer nameid) throws BookNotFoundFault;
     
-    @GET
+    @POST
     @Path("/subresource4/{id}/{name}")
     @Produces("application/xml")
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     Book getTheBook4(@PathParam("") Book bookPath,
                      @QueryParam("") Book bookQuery,
-                     @MatrixParam("") Book matrixBook) throws BookNotFoundFault;
+                     @MatrixParam("") Book matrixBook,
+                     @FormParam("") Book formBook) throws BookNotFoundFault;
     
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces("application/xml")
+    OrderBean addOrder(@FormParam("") OrderBean order);
     
 }
 
