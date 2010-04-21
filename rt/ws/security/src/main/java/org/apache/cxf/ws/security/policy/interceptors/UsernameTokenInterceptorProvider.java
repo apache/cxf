@@ -24,6 +24,7 @@ import java.util.Collection;
 
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
@@ -40,9 +41,19 @@ public class UsernameTokenInterceptorProvider extends AbstractPolicyInterceptorP
     }
 
     public UsernameTokenInterceptorProvider() {
+        this(new UsernameTokenInterceptor());
+    }
+    
+    public UsernameTokenInterceptorProvider(Bus bus) {
+        this((UsernameTokenInterceptor)
+             bus.getProperty("org.apache.cxf.ws.security.usernametoken.interceptor"));
+    }
+    
+    public UsernameTokenInterceptorProvider(UsernameTokenInterceptor inInterceptor) {
         super(ASSERTION_TYPES);
         this.getOutInterceptors().add(new UsernameTokenInterceptor());
-        this.getInInterceptors().add(new UsernameTokenInterceptor());
+        this.getInInterceptors().add(inInterceptor == null ? new UsernameTokenInterceptor() : inInterceptor);
         //not needed on fault chains
     }
+    
 }

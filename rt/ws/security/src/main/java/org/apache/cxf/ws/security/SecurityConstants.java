@@ -30,6 +30,8 @@ import java.util.Set;
 public final class SecurityConstants {
     public static final String USERNAME = "ws-security.username";
     public static final String PASSWORD = "ws-security.password";
+    public static final String VALIDATE_PASSWORD = "ws-security.validate.password";
+    
     public static final String CALLBACK_HANDLER = "ws-security.callback-handler";
     
     public static final String SIGNATURE_USERNAME = "ws-security.signature.username";

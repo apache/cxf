@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.Vector;
 import java.util.logging.Logger;
 
+import javax.security.auth.Subject;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
@@ -74,7 +75,6 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         HEADERS.add(new QName(WSConstants.WSSE_NS, "Security"));
         HEADERS.add(new QName(WSConstants.WSSE11_NS, "Security"));
     }
-
 
     /**
      * @param p
@@ -124,11 +124,8 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         Element child = DOMUtils.getFirstElement(el);
         while (child != null) {
             if (SPConstants.USERNAME_TOKEN.equals(child.getLocalName())) {
-                UsernameTokenProcessor p = new UsernameTokenProcessor();
-                
                 try  {
-                    final WSUsernameTokenPrincipal princ = p.handleUsernameToken(child, 
-                                                                           getCallback(message));
+                    final WSUsernameTokenPrincipal princ = getPrincipal(child, message);
                     if (princ != null) {
                         Vector<WSSecurityEngineResult>v = new Vector<WSSecurityEngineResult>();
                         v.add(0, new WSSecurityEngineResult(WSConstants.UT, princ, null, null, null));
@@ -145,15 +142,10 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
                         SecurityContext sc = message.get(SecurityContext.class);
                         if (sc == null || sc.getUserPrincipal() == null) {
-                            SecurityContext c = new SecurityContext() {
-                                public Principal getUserPrincipal() {
-                                    return princ;
-                                }
-                                public boolean isUserInRole(String role) {
-                                    return false;
-                                }
-                            };
-                            message.put(SecurityContext.class, c);
+                            Subject subject = createSubject(princ.getName(), princ.getPassword(),
+                                princ.isPasswordDigest(), princ.getNonce(), princ.getCreatedTime());
+                            message.put(SecurityContext.class, 
+                                        createSecurityContext(princ, subject));
                         }
 
                     }
@@ -165,6 +157,56 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         }
     }
 
+    protected WSUsernameTokenPrincipal getPrincipal(Element tokenElement, SoapMessage message)
+        throws WSSecurityException {
+        
+        Object validateProperty = message.getContextualProperty(SecurityConstants.VALIDATE_PASSWORD);
+        if (validateProperty == null || MessageUtils.isTrue(validateProperty)) {
+            UsernameTokenProcessor p = new UsernameTokenProcessor();
+            return p.handleUsernameToken(tokenElement, getCallback(message));
+        } else {
+            return parseTokenAndCreatePrincipal(tokenElement);
+        }
+    }
+    
+    protected WSUsernameTokenPrincipal parseTokenAndCreatePrincipal(Element tokenElement) 
+        throws WSSecurityException {
+        org.apache.ws.security.message.token.UsernameToken ut = 
+            new org.apache.ws.security.message.token.UsernameToken(tokenElement, false);
+        
+        WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(ut.getName(), ut.isHashed());
+        principal.setNonce(ut.getNonce());
+        principal.setPassword(ut.getPassword());
+        principal.setCreatedTime(ut.getCreated());
+        principal.setPasswordType(ut.getPasswordType());
+
+        return principal;
+    }
+    
+    protected SecurityContext createSecurityContext(final Principal p, Subject subject) {
+        return new DefaultSecurityContext(p, subject);
+    }
+    
+    /**
+     * Create a Subject representing a current user and its roles. 
+     * This Subject is expected to contain at least one Principal representing a user
+     * and optionally followed by one or more principal Groups this user is a member of.
+     * @param name username
+     * @param password password
+     * @param isDigest true if a password digest is used
+     * @param nonce optional nonce
+     * @param created optional timestamp
+     * @return subject
+     * @throws SecurityException
+     */
+    protected Subject createSubject(String name, 
+                                    String password, 
+                                    boolean isDigest,
+                                    String nonce,
+                                    String created) throws SecurityException {
+        return null;
+    }
+    
     private UsernameToken assertUsernameTokens(SoapMessage message, WSUsernameTokenPrincipal princ) {
         AssertionInfoMap aim = message.get(AssertionInfoMap.class);
         Collection<AssertionInfo> ais = aim.getAssertionInfo(SP12Constants.USERNAME_TOKEN);
@@ -338,4 +380,6 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         }
         throw new PolicyException(reason);
     }
+    
+    
 }

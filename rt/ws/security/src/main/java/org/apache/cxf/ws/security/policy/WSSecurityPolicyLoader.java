@@ -158,7 +158,7 @@ public final class WSSecurityPolicyLoader implements PolicyInterceptorProviderLo
         reg.register(new WSSecurityInterceptorProvider());
         reg.register(new HttpsTokenInterceptorProvider());
         reg.register(new IssuedTokenInterceptorProvider());
-        reg.register(new UsernameTokenInterceptorProvider());
+        reg.register(new UsernameTokenInterceptorProvider(bus));
         reg.register(new SecureConversationTokenInterceptorProvider());
     }
 
