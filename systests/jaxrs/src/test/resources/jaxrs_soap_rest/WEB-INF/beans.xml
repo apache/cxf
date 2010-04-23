@@ -38,6 +38,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
+  <bean id="org.apache.cxf.ws.policy.PolicyEngine" class="org.apache.cxf.ws.policy.PolicyEngineImpl">
+      <property name="bus" ref="cxf"/>
+      <property name="enabled" value="true"/>
+   </bean>
+
   <jaxrs:client id="restClient"
          address="http://localhost:9092/test/services/rest"
          serviceClass="org.apache.cxf.systest.jaxrs.BookStoreJaxrsJaxws"

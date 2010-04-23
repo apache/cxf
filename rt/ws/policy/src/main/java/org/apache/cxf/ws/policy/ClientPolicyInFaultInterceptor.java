@@ -79,10 +79,13 @@ public class ClientPolicyInFaultInterceptor extends AbstractPolicyInterceptor {
         LOG.fine("ep: " + ep);
         
         List<Interceptor<? extends Message>> faultInterceptors = ep.getFaultInterceptors();
+        
         LOG.fine("faultInterceptors: " + faultInterceptors);
-        for (Interceptor<? extends Message> i : faultInterceptors) {
-            msg.getInterceptorChain().add(i);
-            LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+        if (null != faultInterceptors) {
+            for (Interceptor<? extends Message> i : faultInterceptors) {
+                msg.getInterceptorChain().add(i);
+                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            }
         }
         
         // insert assertions of endpoint's fault vocabulary into message
