@@ -119,25 +119,6 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     }
 
     @Test
-    public void testOneElementBatch() throws Exception {
-        configureLogging("resources/logging_atompush.properties");
-        logSixEvents(LOG);
-        // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
-        assertEquals("Different logged events count;", 6, Resource.feeds.size());
-    }
-
-    @Test
-    public void testMultiElementBatch() throws Exception {
-        configureLogging("resources/logging_atompush_batch.properties");
-        logSixEvents(LOG);
-        // need to wait: multithreaded and client-server journey
-        Thread.sleep(3000);
-        // 6 events / 3 element batch = 2 feeds expected
-        assertEquals("Different logged events count;", 2, Resource.feeds.size());
-    }
-
-    @Test
     public void testPrivateLogger() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
@@ -152,7 +133,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         // 6 events / 2 element batch = 3 feeds expected
         assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
-
+    
     @Test
     public void testPrivateLoggerCustomBuilders() throws Exception {
         configureLogging("resources/logging_atompush_disabled.properties");
@@ -172,8 +153,28 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         // 6 events / 2 element batch = 3 feeds expected
         assertEquals("Different logged events count;", 3, Resource.feeds.size());
     }
+    
+    @Test
+    public void testOneElementBatch() throws Exception {
+        configureLogging("resources/logging_atompush.properties");
+        logSixEvents(LOG);
+        // need to wait: multithreaded and client-server journey
+        Thread.sleep(3000);
+        assertEquals("Different logged events count;", 6, Resource.feeds.size());
+    }
 
+    @Test
+    public void testMultiElementBatch() throws Exception {
+        configureLogging("resources/logging_atompush_batch.properties");
+        logSixEvents(LOG);
+        // need to wait: multithreaded and client-server journey
+        Thread.sleep(3000);
+        // 6 events / 3 element batch = 2 feeds expected
+        assertEquals("Different logged events count;", 2, Resource.feeds.size());
+    }
 
+    
+    
     @Ignore
     private AbstractFeedBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> 
     createCustomFeedBuilder() {
