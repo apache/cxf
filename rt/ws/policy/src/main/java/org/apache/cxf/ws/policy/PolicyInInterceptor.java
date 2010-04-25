@@ -93,9 +93,11 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 EndpointPolicy ep = pe.getClientEndpointPolicy(ei, conduit);
                 
                 List<Interceptor> interceptors = ep.getInterceptors();
-                for (Interceptor i : interceptors) {
-                    msg.getInterceptorChain().add(i);
-                }
+                if (null != interceptors) {
+                    for (Interceptor i : interceptors) {
+                        msg.getInterceptorChain().add(i);
+                    }
+                } 
                 
                 // insert assertions of endpoint's vocabulary into message
                 
@@ -111,8 +113,10 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
                 EffectivePolicy ep = pe.getEffectiveClientResponsePolicy(ei, boi);
         
                 List<Interceptor> interceptors = ep.getInterceptors();
-                for (Interceptor i : interceptors) {
-                    msg.getInterceptorChain().add(i);
+                if (null != interceptors) {
+                    for (Interceptor i : interceptors) {
+                        msg.getInterceptorChain().add(i);
+                    }
                 }
                 // insert assertions of endpoint's vocabulary into message
                 if (ep.getPolicy() != null) {
@@ -129,9 +133,11 @@ public class PolicyInInterceptor extends AbstractPolicyInterceptor {
             EndpointPolicy ep = pe.getServerEndpointPolicy(ei, destination);
             
             List<Interceptor> interceptors = ep.getInterceptors();
-            for (Interceptor i : interceptors) {
-                msg.getInterceptorChain().add(i);
-                LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+            if (null != interceptors) {
+                for (Interceptor i : interceptors) {
+                    msg.getInterceptorChain().add(i);
+                    LOG.log(Level.FINE, "Added interceptor of type {0}", i.getClass().getSimpleName());
+                }
             }
             
             // insert assertions of endpoint's vocabulary into message
