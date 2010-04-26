@@ -75,7 +75,7 @@ public class Proxy {
         
         OperationInfo oi = reliableEndpoint.getEndpoint().getEndpointInfo().getService().getInterface()
             .getOperation(RMConstants.getSequenceAckOperationName());
-        invoke(oi, new Object[] {}, null);
+        invoke(oi, new Object[] {ds}, null);
     }
     
     void terminate(SourceSequence ss) throws RMException {
@@ -239,8 +239,23 @@ public class Proxy {
         Endpoint endpoint = reliableEndpoint.getEndpoint();
         BindingInfo bi = reliableEndpoint.getBindingInfo();
         Conduit c = reliableEndpoint.getConduit();
-        org.apache.cxf.ws.addressing.EndpointReferenceType replyTo = reliableEndpoint.getReplyTo();
-        Client client = createClient(bus, endpoint, c, replyTo);
+        Client client = null;
+        if (params.length > 0 && params[0] instanceof DestinationSequence) {
+            EndpointReferenceType acksTo = 
+                ((DestinationSequence)params[0]).getAcksTo();
+            String acksAddress = acksTo.getAddress().getValue();
+            org.apache.cxf.ws.addressing.AttributedURIType attrURIType = 
+                new org.apache.cxf.ws.addressing.AttributedURIType();
+            attrURIType.setValue(acksAddress);
+            org.apache.cxf.ws.addressing.EndpointReferenceType acks = 
+                new org.apache.cxf.ws.addressing.EndpointReferenceType();
+            acks.setAddress(attrURIType);
+            client = createClient(bus, endpoint, c, acks);
+            params = new Object[] {};
+        } else {
+            org.apache.cxf.ws.addressing.EndpointReferenceType replyTo = reliableEndpoint.getReplyTo();
+            client = createClient(bus, endpoint, c, replyTo);
+        }
         
         BindingOperationInfo boi = bi.getOperation(oi);
         try {
