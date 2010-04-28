@@ -31,6 +31,7 @@ import javax.ws.rs.ext.MessageBodyWriter;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.model.ParameterType;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class PrimitiveTextProvider 
@@ -65,7 +66,8 @@ public class PrimitiveTextProvider
     public void writeTo(Object obj, Class<?> type, Type genType, Annotation[] anns, 
                         MediaType mt, MultivaluedMap<String, Object> headers,
                         OutputStream os) throws IOException {
-        os.write(obj.toString().getBytes("UTF-8"));
+        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        os.write(obj.toString().getBytes(encoding));
     }
 
 }

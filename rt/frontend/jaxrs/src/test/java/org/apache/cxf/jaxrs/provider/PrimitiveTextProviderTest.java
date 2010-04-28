@@ -23,8 +23,12 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.Arrays;
 
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
+
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -84,13 +88,28 @@ public class PrimitiveTextProviderTest extends Assert {
     public void testWriteBoolean() throws Exception {
         MessageBodyWriter p = new PrimitiveTextProvider();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        p.writeTo(Boolean.TRUE, null, null, null, null, null, os);
+        p.writeTo(Boolean.TRUE, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
         assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
         
         os = new ByteArrayOutputStream();
         
         final boolean value = true;
-        p.writeTo(value, null, null, null, null, null, os);
+        p.writeTo(value, null, null, null, MediaType.TEXT_PLAIN_TYPE, null, os);
         assertTrue(Arrays.equals(new String("true").getBytes(), os.toByteArray()));
     }
+    
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testWriteStringISO() throws Exception {
+        MessageBodyWriter p = new PrimitiveTextProvider();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        MultivaluedMap<String, Object> headers = new MetadataMap<String, Object>();
+        p.writeTo("Hello, my name is Félix Agnès", 
+                  String.class, String.class, null, MediaType.valueOf("text/plain;charset=ISO-8859-1"),
+                  headers, os);
+        assertEquals("Hello, my name is Félix Agnès", new String(os.toByteArray()));
+    }
+    
+        
 }

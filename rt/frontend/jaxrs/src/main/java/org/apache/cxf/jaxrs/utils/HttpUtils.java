@@ -28,15 +28,21 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.TimeZone;
+import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 
+import org.apache.cxf.common.i18n.BundleUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.UrlUtils;
 import org.apache.cxf.jaxrs.impl.HttpHeadersImpl;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
@@ -47,10 +53,14 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public final class HttpUtils {
     
+    private static final ResourceBundle BUNDLE = BundleUtils.getBundle(HttpUtils.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(HttpUtils.class);
+    
     private static final String LOCAL_IP_ADDRESS = "127.0.0.1";
     private static final String LOCAL_HOST = "localhost";
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
-    
+    private static final String CHARSET_PARAMETER = "charset";
+        
     private HttpUtils() {
     }
     
@@ -244,5 +254,25 @@ public final class HttpUtils {
         }
         return Response.Status.BAD_REQUEST;
     }
-    
+ 
+    public static String getSetEncoding(MediaType mt, MultivaluedMap<String, Object> headers,
+                                        String defaultEncoding) {
+        String enc = mt.getParameters().get(CHARSET_PARAMETER);
+        if (enc == null) {
+            return defaultEncoding;
+        }
+        try {
+            "0".getBytes(enc);
+            return enc;
+        } catch (UnsupportedEncodingException ex) {
+            String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING", 
+                                 BUNDLE, enc, defaultEncoding).toString();
+            LOG.warning(message);
+            headers.putSingle(HttpHeaders.CONTENT_TYPE, 
+                JAXRSUtils.removeMediaTypeParameter(mt, CHARSET_PARAMETER) 
+                + ';' + CHARSET_PARAMETER + "=" 
+                + (defaultEncoding == null ? "UTF-8" : defaultEncoding));
+        }
+        return defaultEncoding;
+    }
 }
