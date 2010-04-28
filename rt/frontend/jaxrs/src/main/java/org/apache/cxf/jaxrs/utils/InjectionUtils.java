@@ -825,6 +825,9 @@ public final class InjectionUtils {
                 }
                 
                 Object value = extractFromMethod(bean, m);
+                if (value == null) {
+                    continue;
+                }
                 if (isPrimitive(value.getClass())) {
                     values.putSingle(propertyName, value);
                 } else if (isSupportedCollectionOrArray(value.getClass())) {

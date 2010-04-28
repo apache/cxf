@@ -100,6 +100,8 @@ public class InjectionUtilsTest extends Assert {
         private Long b;
         private List<String> c;
         private CustomerBean2 d;
+        private String e; 
+        
         public void setA(String aString) {
             this.a = aString;
         }
@@ -123,6 +125,13 @@ public class InjectionUtilsTest extends Assert {
         }
         public CustomerBean2 getD() {
             return d;
+        }
+        
+        public void setE(String e) {
+            this.e = e;
+        }
+        public String getE() {
+            return e;
         }
         
     }

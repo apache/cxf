@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
@@ -44,7 +43,6 @@ import java.util.logging.Logger;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -92,7 +90,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     
-    private static final String CHARSET_PARAMETER = "charset";
     private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
    
@@ -443,27 +440,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return marshaller;
     }
     
-    protected String getEncoding(MediaType mt, MultivaluedMap<String, Object> headers) {
-        String enc = mt.getParameters().get(CHARSET_PARAMETER);
-        if (enc == null) {
-            return null;
-        }
-        try {
-            "0".getBytes(enc);
-            return enc;
-        } catch (UnsupportedEncodingException ex) {
-            String message = new org.apache.cxf.common.i18n.Message("UNSUPPORTED_ENCODING", 
-                                 BUNDLE, enc).toString();
-            LOG.warning(message);
-            headers.putSingle(HttpHeaders.CONTENT_TYPE, 
-                JAXRSUtils.removeMediaTypeParameter(mt, CHARSET_PARAMETER) 
-                + ';' + CHARSET_PARAMETER + "=UTF-8");
-        }
-        return null;
-    }
         
-
-    
     protected Class<?> getActualType(Class<?> type, Type genericType, Annotation[] anns) {
         Class<?> theType = null;
         if (JAXBElement.class.isAssignableFrom(type)) {

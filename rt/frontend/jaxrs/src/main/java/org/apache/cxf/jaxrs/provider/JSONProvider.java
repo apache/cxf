@@ -51,6 +51,7 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 
@@ -258,10 +259,8 @@ public class JSONProvider extends AbstractJAXBProvider  {
             if (cls == genericType) {
                 genericType = actualClass;
             }
-            String encoding = getEncoding(m, headers);
-            if (encoding == null) {
-                encoding = "UTF-8";
-            }
+            String encoding = HttpUtils.getSetEncoding(m, headers, "UTF-8");
+            
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
                 actualClass = InjectionUtils.getActualType(genericType);
                 marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);

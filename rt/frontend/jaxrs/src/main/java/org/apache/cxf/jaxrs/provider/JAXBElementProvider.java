@@ -55,6 +55,7 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.message.Attachment;
@@ -230,7 +231,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         try {
             Object actualObject = checkAdapter(obj, anns, true);
             Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
-            String encoding = getEncoding(m, headers);
+            String encoding = HttpUtils.getSetEncoding(m, headers, null);
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
                 actualClass = InjectionUtils.getActualType(genericType);
                 marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);
