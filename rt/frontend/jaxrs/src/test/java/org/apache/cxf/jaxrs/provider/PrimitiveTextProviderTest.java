@@ -108,7 +108,7 @@ public class PrimitiveTextProviderTest extends Assert {
         p.writeTo("Hello, my name is Félix Agnès", 
                   String.class, String.class, null, MediaType.valueOf("text/plain;charset=ISO-8859-1"),
                   headers, os);
-        assertEquals("Hello, my name is Félix Agnès", new String(os.toByteArray()));
+        assertEquals("Hello, my name is Félix Agnès", os.toString("ISO-8859-1")); 
     }
     
         
