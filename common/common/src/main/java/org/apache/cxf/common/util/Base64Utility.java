@@ -176,8 +176,13 @@ public final class Base64Utility {
     }
 
     public static byte[] decode(String id) throws Base64Exception {
-        char[] cd = id.toCharArray();
-        return decodeChunk(cd, 0, cd.length);
+        try {
+            char[] cd = id.toCharArray();
+            return decodeChunk(cd, 0, cd.length);
+        } catch (Exception e) {
+            LOG.warning("Invalid base64 encoded string : " + id);
+            throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG), e);
+        }
     }
 
     public static void decode(char[] id,
@@ -188,8 +193,8 @@ public final class Base64Utility {
 
         try {
             ostream.write(decodeChunk(id, o, l));
-        } catch (IOException e) {
-            // convert exception to Base64Exception
+        } catch (Exception e) {
+            LOG.warning("Invalid base64 encoded string : " + id);
             throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG), e);
         }
     }
@@ -201,8 +206,11 @@ public final class Base64Utility {
         try {
             char[] cd = id.toCharArray();
             ostream.write(decodeChunk(cd, 0, cd.length));
-        } catch (IOException e) {
-            throw new Base64Exception(new Message("BASE64_DECODE_IOEXCEPTION", LOG), e);
+        } catch (IOException ioe) {
+            throw new Base64Exception(new Message("BASE64_DECODE_IOEXCEPTION", LOG), ioe);
+        } catch (Exception e) {
+            LOG.warning("Invalid base64 encoded string : " + id);
+            throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG), e);
         }
     }
 
