@@ -19,6 +19,7 @@
 
 package org.apache.cxf.endpoint;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -46,6 +47,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
 import org.apache.cxf.interceptor.ClientOutFaultObserver;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorChain;
 import org.apache.cxf.interceptor.InterceptorProvider;
@@ -479,9 +481,34 @@ public class ClientImpl
 
             // add additional interceptors and such
             modifyChain(chain, message, false);
-            
-            // execute chain
-            chain.doIntercept(message);
+            try {
+                // execute chain
+                chain.doIntercept(message);
+            } catch (Fault fault) {
+                if (fault.getCause().getCause() instanceof IOException
+                        || fault.getCause() instanceof IOException) {
+                    String soap11NS = "http://schemas.xmlsoap.org/soap/envelope/";
+                    String soap12NS = "http://www.w3.org/2003/05/soap-envelope";
+                    QName faultCode = fault.getFaultCode();
+                    //for SoapFault, if it's underlying cause is IOException, 
+                    //it means something like server is down or can't create 
+                    //connection, according to soap spec we should set fault as
+                    //Server Fault
+                    if (faultCode.getNamespaceURI().equals(
+                            soap11NS)
+                            && faultCode.getLocalPart().equals("Client")) {
+                        faultCode = new QName(soap11NS, "Server");
+                        fault.setFaultCode(faultCode);
+                    }
+                    if (faultCode.getNamespaceURI().equals(
+                            soap12NS)
+                            && faultCode.getLocalPart().equals("Sender")) {
+                        faultCode = new QName(soap12NS, "Receiver");
+                        fault.setFaultCode(faultCode);
+                    }
+                }
+                throw fault;
+            }
 
             return processResult(message, exchange, oi, resContext);
 
