@@ -47,8 +47,4 @@
         </cxf:features>
     </cxf:bus>
     
-    <http:conduit name="{http://cxf.apache.org/hello_world_soap_http}GreeterPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:9990/decoupled_endpoint"/>
-    </http:conduit>
-
 </beans>
