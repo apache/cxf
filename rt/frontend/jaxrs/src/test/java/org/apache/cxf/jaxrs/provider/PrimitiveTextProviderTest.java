@@ -21,7 +21,6 @@ package org.apache.cxf.jaxrs.provider;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import javax.ws.rs.core.MediaType;
@@ -114,9 +113,8 @@ public class PrimitiveTextProviderTest extends Assert {
                   String.class, String.class, null, MediaType.valueOf("text/plain;charset=ISO-8859-1"),
                   headers, os);
         
-        Charset iso88591charset = Charset.forName("ISO-8859-1");
-        byte[] iso88591bytes = helloStringUTF16.getBytes(iso88591charset);
-        String helloStringISO88591 = new String(iso88591bytes, iso88591charset);
+        byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
+        String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
         
         System.out.println(helloStringISO88591);
         
