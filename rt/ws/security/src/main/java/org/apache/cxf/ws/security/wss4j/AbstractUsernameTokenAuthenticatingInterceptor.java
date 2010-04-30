@@ -69,19 +69,19 @@ import org.apache.ws.security.processor.Processor;
  * an application is expected to provide a password callback handler for decrypting the token only.     
  *
  */
-public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends WSS4JInInterceptor 
+public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS4JInInterceptor 
     implements Processor {
     
     private static final Logger LOG = 
-        LogUtils.getL7dLogger(AbstractWSS4JSecurityContextProvidingInterceptor.class);
+        LogUtils.getL7dLogger(AbstractUsernameTokenAuthenticatingInterceptor.class);
     
     private boolean supportDigestPasswords;
     
-    public AbstractWSS4JSecurityContextProvidingInterceptor() {
+    public AbstractUsernameTokenAuthenticatingInterceptor() {
         super();
     }
     
-    public AbstractWSS4JSecurityContextProvidingInterceptor(Map<String, Object> properties) {
+    public AbstractUsernameTokenAuthenticatingInterceptor(Map<String, Object> properties) {
         super(properties);
     }
     
@@ -216,7 +216,7 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
                     WSPasswordCallback pc = (WSPasswordCallback)c;
                     if (WSConstants.PASSWORD_TEXT.equals(pc.getPasswordType()) 
                         && pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {
-                        AbstractWSS4JSecurityContextProvidingInterceptor.this.setSubject(
+                        AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
                             pc.getIdentifier(), pc.getPassword(), false, null, null);
                     } else if (pwdHandler != null) {
                         pwdHandler.handle(callbacks);
@@ -270,7 +270,7 @@ public abstract class AbstractWSS4JSecurityContextProvidingInterceptor extends W
                 LOG.fine("UsernameToken password " + password);
             }
             
-            AbstractWSS4JSecurityContextProvidingInterceptor.this.setSubject(
+            AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
                 user, password, ut.isHashed(), nonce, createdTime);    
             
             WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
