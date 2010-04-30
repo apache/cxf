@@ -23,7 +23,7 @@ import javax.security.auth.Subject;
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 
-public class SimpleSubjectCreatingInterceptor extends AbstractWSS4JSecurityContextProvidingInterceptor {
+public class SimpleSubjectCreatingInterceptor extends AbstractUsernameTokenAuthenticatingInterceptor {
 
     @Override
     protected Subject createSubject(String name, 
