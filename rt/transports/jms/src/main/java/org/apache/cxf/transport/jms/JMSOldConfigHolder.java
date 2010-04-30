@@ -105,6 +105,8 @@ public class JMSOldConfigHolder {
                 jmsConfig.setConduitSelectorPrefix(clientConfig.getConduitSelectorPrefix());
             }
             jmsConfig.setEnforceSpec(clientConfig.isEnforceSpec());
+            jmsConfig.setUseMessageIDAsCorrelationID(clientConfig.isSetUseMessageIDAsCorrelationID());
+            
             jmsConfig.setSubscriptionDurable(serverBehavior.isSetDurableSubscriberName());       
             jmsConfig.setDurableSubscriptionName(serverBehavior.getDurableSubscriberName());
             jmsConfig.setDurableSubscriptionClientId(serverConfig.getDurableSubscriptionClientId());
@@ -135,7 +137,7 @@ public class JMSOldConfigHolder {
                 // Use the default dynamic destination resolver
                 jmsConfig.setTargetDestination(address.getJmsDestinationName());
                 jmsConfig.setReplyDestination(address.getJmsReplyDestinationName());
-            }
+            }            
         }
         return jmsConfig;
     }

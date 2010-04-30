@@ -88,6 +88,7 @@ public class JMSConfiguration implements InitializingBean {
     private String cacheLevelName;
     private boolean enforceSpec = true;
     private boolean acceptMessagesWhileStopping;
+    private boolean useMessageIDAsCorrelationID;
     private boolean jmsProviderTibcoEms;
 
     private ConnectionFactory wrappedConnectionFactory;
@@ -506,5 +507,13 @@ public class JMSConfiguration implements InitializingBean {
      */
     public void setJmsProviderTibcoEms(boolean jmsProviderTibcoEms) {
         this.jmsProviderTibcoEms = jmsProviderTibcoEms;
+    }
+    
+    public boolean isUseMessageIDAsCorrelationID() {
+        return this.useMessageIDAsCorrelationID;
+    }
+    
+    public void setUseMessageIDAsCorrelationID(boolean useMessageIDAsCorrelationID) {
+        this.useMessageIDAsCorrelationID = useMessageIDAsCorrelationID;
     }
 }

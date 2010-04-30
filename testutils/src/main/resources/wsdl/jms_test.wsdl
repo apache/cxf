@@ -595,7 +595,20 @@
             
                <jms:server durableSubscriberName="CXF_subscriber"/>
            </port>
-    </service>        
+    </service>    
+
+    <service name="HelloWorldMessageIDAsCorrelationIDAsyncService">
+           <port binding="tns:HelloWorldPortBinding" name="HelloWorldMessageIDAsCorrelationIDAsyncPort">
+               <jms:clientConfig useMessageIDAsCorrelationID="true"/>
+               <jms:address
+                   jndiConnectionFactoryName="ConnectionFactory" 
+                   jndiDestinationName="dynamicQueues/test.jmstransport.text.message.id.as.correlation.id"
+                   jndiReplyDestinationName="dynamicQueues/test.jmstransport.text.message.id.as.correlation.id.reply">
+                   <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+               </jms:address>
+           </port>
+    </service>    
 
 </definitions>
 

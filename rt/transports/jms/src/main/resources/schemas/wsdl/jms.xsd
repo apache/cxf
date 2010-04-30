@@ -60,6 +60,7 @@
                 <xs:attribute name="conduitSelectorPrefix" type="xs:string" use="optional" default=""/>    				
                 <xs:attribute name="useConduitIdSelector" type="pt:ParameterizedBoolean" use="optional"/>
                 <xs:attribute name="enforceSpec" type="pt:ParameterizedBoolean" use="optional" default="true"/>
+		<xs:attribute name="useMessageIDAsCorrelationID" type="xs:boolean" use="optional" default="false"/>
     		</xs:extension>
     	</xs:complexContent>
     </xs:complexType>

@@ -25,13 +25,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.activation.DataHandler;
 import javax.xml.namespace.QName;
+import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Holder;
+import javax.xml.ws.Response;
 import javax.xml.ws.soap.SOAPBinding;
 
 
@@ -39,6 +43,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
 import org.apache.cxf.hello_world_jms.HWByteMsgService;
+import org.apache.cxf.hello_world_jms.HelloWorldMessageIDAsCorrelationIDAsyncService;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayPort;
 import org.apache.cxf.hello_world_jms.HelloWorldOneWayQueueService;
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
@@ -66,6 +71,7 @@ import org.apache.cxf.transport.jms.JMSPropertyType;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
+import org.apache.hello_world_doc_lit.SOAPService7;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -86,7 +92,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
 
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, false));
+                   launchServer(Server.class, true));
     }
     
     public URL getWSDLURL(String s) throws Exception {
@@ -874,5 +880,148 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         byte bytes[] = IOUtils.readBytesFromStream(handler1.value.getInputStream());
         assertEquals("The response file is not same with the sent file.", size, bytes.length);
     }
+    
+
+    @Test
+    //@Ignore
+    public void useMessageIDAsCorrelationIDTest() throws Exception {
+        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit", 
+                                 "SOAPService7"));
+        QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort7"));
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService7 service = new SOAPService7(wsdl, serviceName);        
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        
+        Collection<Thread> threads = new ArrayList<Thread>();
+        Collection<GreeterClientRunnable> clients = new ArrayList<GreeterClientRunnable>();
+        
+        for (int i = 0; i < 100; ++i) {
+            GreeterClientRunnable client = new GreeterClientRunnable(greeter, i);
+            
+            Thread thread = new Thread(client);
+            threads.add(thread);
+            clients.add(client);
+            thread.start();
+        }
+    
+        for (Thread t : threads) {
+            t.join();
+        }
+
+        for (GreeterClientRunnable client : clients) {
+            if (client.getException() != null) {
+                fail(client.getException().getMessage());            
+            }
+        }
+    }
+    
+    private static class GreeterClientRunnable implements Runnable {
+        private Greeter port;
+        private int client;
+        private Throwable ex;
+
+        public GreeterClientRunnable(Greeter port, int client) {
+            this.port = port;
+            this.client = client;
+        }
+        
+        public Throwable getException() {
+            return ex;
+        }
+        
+        public void run() {
+            try {     
+                for (int idx = 0; idx < 5; idx++) {
+                    String request = "Message: " + idx + " from Client: " + client;
+                    String expected = "Hello " + request;
+                    String response = port.greetMe(request);
+                    //System.out.println("RESPONSE: " + response);
+                    assertEquals("Response didn't match expected request", expected, response);
+                }
+            } catch (Throwable e) {
+                e.printStackTrace();
+                ex = e;
+            }
+        }
+    } 
+    
+    @Test
+    public void testAsyncCall() throws Exception {
+        QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms", 
+            "HelloWorldMessageIDAsCorrelationIDAsyncService"));
+        QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms",
+                                               "HelloWorldMessageIDAsCorrelationIDAsyncPort"));
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
+        assertNotNull(wsdl);
+        
+        HelloWorldMessageIDAsCorrelationIDAsyncService service =
+            new HelloWorldMessageIDAsCorrelationIDAsyncService(wsdl, serviceName);
+        assertNotNull(service);
+        HelloWorldPortType greeter = service.getPort(portName, HelloWorldPortType.class);
+        final Thread thread = Thread.currentThread(); 
+        
+        class TestAsyncHandler implements AsyncHandler<String> {
+            String expected;
+            
+            public TestAsyncHandler(String x) {
+                expected = x;
+            }
+            
+            public String getExpected() {
+                return expected;
+            }
+            public void handleResponse(Response<String> response) {
+                try {
+                    Thread thread2 = Thread.currentThread();
+                    assertNotSame(thread, thread2);
+                    assertEquals("Hello " + expected, response.get());
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        TestAsyncHandler h1 = new TestAsyncHandler("Homer");
+        TestAsyncHandler h2 = new TestAsyncHandler("Maggie");
+        TestAsyncHandler h3 = new TestAsyncHandler("Bart");
+        TestAsyncHandler h4 = new TestAsyncHandler("Lisa");
+        TestAsyncHandler h5 = new TestAsyncHandler("Marge");
+        
+        Future<?> f1 = greeter.greetMeAsync("Santa's Little Helper", 
+                                            new TestAsyncHandler("Santa's Little Helper"));
+        f1.get();
+        f1 = greeter.greetMeAsync("PauseForTwoSecs Santa's Little Helper", 
+                                  new TestAsyncHandler("Santa's Little Helper"));
+        long start = System.currentTimeMillis();
+        f1 = greeter.greetMeAsync("PauseForTwoSecs " + h1.getExpected(), h1);
+        Future<?> f2 = greeter.greetMeAsync("PauseForTwoSecs " + h2.getExpected(), h2);
+        Future<?> f3 = greeter.greetMeAsync("PauseForTwoSecs " + h3.getExpected(), h3);
+        Future<?> f4 = greeter.greetMeAsync("PauseForTwoSecs " + h4.getExpected(), h4);
+        Future<?> f5 = greeter.greetMeAsync("PauseForTwoSecs " + h5.getExpected(), h5);
+
+        long mid = System.currentTimeMillis();
+        assertEquals("Hello " + h1.getExpected(), f1.get());
+        assertEquals("Hello " + h2.getExpected(), f2.get());
+        assertEquals("Hello " + h3.getExpected(), f3.get());
+        assertEquals("Hello " + h4.getExpected(), f4.get());
+        assertEquals("Hello " + h5.getExpected(), f5.get());
+        long end = System.currentTimeMillis();
+
+        assertTrue("Time too long: " + (mid - start), (mid - start) < 1000);
+        assertTrue((end - mid) > 1000);
+        f1 = null;
+        f2 = null;
+        f3 = null;
+        f4 = null;
+        f5 = null;
+        
+        greeter = null;
+        service = null;
+        
+        System.gc();
+    }    
     
 }

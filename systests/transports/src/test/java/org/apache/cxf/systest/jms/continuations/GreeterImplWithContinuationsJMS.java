@@ -24,15 +24,16 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.hello_world_jms.types.TestRpcLitFaultResponse;
 
-
+import org.apache.cxf.systest.jms.TwoWayJMSImplBase;
 
 @WebService(serviceName = "HelloWorldService", 
             portName = "HelloWorldPort",
             endpointInterface = "org.apache.cxf.hello_world_jms.HelloWorldPortType",
             targetNamespace = "http://cxf.apache.org/hello_world_jms",
             wsdlLocation = "testutils/jms_test.wsdl")
-public class GreeterImplWithContinuationsJMS {    
+public class GreeterImplWithContinuationsJMS extends TwoWayJMSImplBase {    
     
     @Resource
     protected WebServiceContext context;
@@ -46,7 +47,7 @@ public class GreeterImplWithContinuationsJMS {
         throw new UnsupportedOperationException();
     }
     
-    public void testRpcLitFault(String s) {
+    public TestRpcLitFaultResponse testRpcLitFault(String faultType) {
         throw new UnsupportedOperationException();
     }
     
