@@ -18,7 +18,11 @@
  */
 package org.apache.cxf.systest.jms;
 
+import java.util.concurrent.Future;
+
 import javax.annotation.Resource;
+import javax.xml.ws.AsyncHandler;
+import javax.xml.ws.Response;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
 
@@ -38,6 +42,15 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
     @Resource
     protected WebServiceContext wsContext;
     public String greetMe(String me) {
+        if (me.startsWith("PauseForTwoSecs")) {
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                //ignore
+            }
+            me = me.substring("PauseForTwoSecs".length()).trim();
+        }
+
         MessageContext mc = wsContext.getMessageContext();
         JMSMessageHeadersType headers =
             (JMSMessageHeadersType) mc.get(JMSConstants.JMS_SERVER_REQUEST_HEADERS);
@@ -84,6 +97,36 @@ public class TwoWayJMSImplBase implements HelloWorldPortType {
         }
         
         return new TestRpcLitFaultResponse();
+    }
+
+    public Response<String> greetMeAsync(String stringParam0) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public Future<?> greetMeAsync(String stringParam0, AsyncHandler<String> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public Response<String> sayHiAsync() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public Future<?> sayHiAsync(AsyncHandler<String> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public Response<TestRpcLitFaultResponse> testRpcLitFaultAsync(String in) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+    
+    public Future<?> testRpcLitFaultAsync(String in, AsyncHandler<TestRpcLitFaultResponse> asyncHandler) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

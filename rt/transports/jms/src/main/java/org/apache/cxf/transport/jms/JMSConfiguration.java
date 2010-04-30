@@ -88,6 +88,7 @@ public class JMSConfiguration implements InitializingBean {
     private String cacheLevelName;
     private boolean enforceSpec = true;
     private boolean acceptMessagesWhileStopping;
+    private boolean useMessageIDAsCorrelationID;
 
     private ConnectionFactory wrappedConnectionFactory;
     
@@ -492,5 +493,13 @@ public class JMSConfiguration implements InitializingBean {
 
     public void setMessageListenerContainer(AbstractMessageListenerContainer messageListenerContainer) {
         this.messageListenerContainer = messageListenerContainer;
+    }
+    
+    public boolean isUseMessageIDAsCorrelationID() {
+        return this.useMessageIDAsCorrelationID;
+    }
+    
+    public void setUseMessageIDAsCorrelationID(boolean useMessageIDAsCorrelationID) {
+        this.useMessageIDAsCorrelationID = useMessageIDAsCorrelationID;
     }
 }
