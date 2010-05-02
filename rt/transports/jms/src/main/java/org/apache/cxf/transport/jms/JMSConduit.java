@@ -213,7 +213,7 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                                                           replyToName, 
                                                           jmsConfig.isPubSubDomain());
             }
-        }
+        }        
         
         final Destination replyToDestination = replyTo;
         final String cid = correlationId;
@@ -223,8 +223,19 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
             
             public javax.jms.Message createMessage(Session session) throws JMSException {
                 String messageType = jmsConfig.getMessageType();
+                
+                Destination destination = replyToDestination;
+                String replyToAddress = jmsConfig.getReplyToDestination();
+                if (replyToAddress != null) {
+                    destination = 
+                        JMSFactory.resolveOrCreateDestination(jmsTemplate, 
+                                                              replyToAddress, 
+                                                              jmsConfig.isPubSubDomain());
+                }
+                
                 jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(outMessage, request,
-                                                                    messageType, session, replyToDestination,
+                                                                    messageType, session, 
+                                                                    destination,
                                                                     cid);
                 LOG.log(Level.FINE, "client sending request: ", jmsMessage);
                 return jmsMessage;

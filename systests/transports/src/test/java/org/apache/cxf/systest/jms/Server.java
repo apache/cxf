@@ -37,6 +37,7 @@ public class Server extends AbstractBusTestServerBase {
         Object impl5 =  new SoapService6SoapPort6Impl();
         Object impl6 = new JmsDestPubSubImpl();
         Object impl7 =  new SoapService7SoapPort7Impl();
+        Object impl8 =  new SoapService8SoapPort8Impl();
         Object i1 = new GreeterImplTwoWayJMSAppCorrelationIDNoPrefix();
         Object i2 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixEng();
         Object i3 = new GreeterImplTwoWayJMSAppCorrelationIDStaticPrefixSales();
@@ -57,6 +58,7 @@ public class Server extends AbstractBusTestServerBase {
         Endpoint.publish("http://testaddr.not.required.jms/", impl5);
         Endpoint.publish("http://ignore", impl6);
         Endpoint.publish("", impl7);
+        Endpoint.publish("", impl8);
         Endpoint.publish("", i1);
         Endpoint.publish("", i2);
         Endpoint.publish("", i3);

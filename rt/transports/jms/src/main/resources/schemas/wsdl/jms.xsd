@@ -207,6 +207,26 @@
     				</xs:annotation>
     			</xs:attribute>
 
+    			<xs:attribute name="jndiReplyToDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+							Used when specifying a replyTo address separate from
+							address used to listen for reply.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jmsReplyToDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+							Used when specifying a replyTo address separate from
+							address used to listen for reply.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
     			<xs:attribute name="connectionUserName"
     				type="xs:string">
     				<xs:annotation>

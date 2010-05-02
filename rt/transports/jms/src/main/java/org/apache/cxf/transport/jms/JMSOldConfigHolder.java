@@ -133,10 +133,12 @@ public class JMSOldConfigHolder {
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
                 jmsConfig.setTargetDestination(address.getJndiDestinationName());
                 jmsConfig.setReplyDestination(address.getJndiReplyDestinationName());
+                jmsConfig.setReplyToDestination(address.getJndiReplyToDestinationName());
             } else {
                 // Use the default dynamic destination resolver
                 jmsConfig.setTargetDestination(address.getJmsDestinationName());
                 jmsConfig.setReplyDestination(address.getJmsReplyDestinationName());
+                jmsConfig.setReplyToDestination(address.getJmsReplyToDestinationName());
             }            
         }
         return jmsConfig;

@@ -24,11 +24,16 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.activation.DataHandler;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
 import javax.xml.namespace.QName;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
@@ -64,18 +69,29 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
+import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.JMSNamingPropertyType;
+import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.JMSPropertyType;
+import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
 import org.apache.hello_world_doc_lit.SOAPService7;
+import org.apache.hello_world_doc_lit.SOAPService8;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
+import org.springframework.jms.core.SessionCallback;
+import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.jndi.JndiTemplate;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
@@ -937,7 +953,6 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     String request = "Message: " + idx + " from Client: " + client;
                     String expected = "Hello " + request;
                     String response = port.greetMe(request);
-                    //System.out.println("RESPONSE: " + response);
                     assertEquals("Response didn't match expected request", expected, response);
                 }
             } catch (Throwable e) {
@@ -1022,6 +1037,79 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         service = null;
         
         System.gc();
+    }    
+    
+    @Test
+    public void testReplyToConfig() throws Exception {
+        JMSNamingPropertyType p1 = new JMSNamingPropertyType();
+        p1.setName("java.naming.factory.initial");
+        p1.setValue("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+        JMSNamingPropertyType p2 = new JMSNamingPropertyType();
+        p2.setName("java.naming.provider.url");
+        p2.setValue("tcp://localhost:61500");
+        final AddressType address = new AddressType();
+        address.setJndiConnectionFactoryName("ConnectionFactory");
+        List<JMSNamingPropertyType> props = address.getJMSNamingProperty();
+        props.add(p1);
+        props.add(p2);
+
+        final JMSConfiguration jmsConfig = new JMSConfiguration();
+        
+        JndiTemplate jt = new JndiTemplate();
+        jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(address));
+        
+        JNDIConfiguration jndiConfig = new JNDIConfiguration();
+        jndiConfig.setJndiConnectionFactoryName(address.getJndiConnectionFactoryName());
+        jmsConfig.setJndiTemplate(jt);
+        jmsConfig.setJndiConfig(jndiConfig);
+        
+        jmsConfig.setTargetDestination("dynamicQueues/SoapService8.replyto.queue");
+        jmsConfig.setReplyDestination("dynamicQueues/SoapService8.reply.queue");
+        
+        final JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, null);
+
+        Thread t = new Thread() {
+            public void run() {
+                Destination destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
+                        DestinationResolver resolv = jmsTemplate.getDestinationResolver();
+                        return resolv.resolveDestinationName(session, jmsConfig.getTargetDestination(),
+                                                             false);
+                    }
+                });
+                
+                final Message message = jmsTemplate.receive(destination);
+                MessageCreator messageCreator = new MessageCreator() {
+                    public Message createMessage(Session session) {
+                        return message;
+                    }
+                };
+                    
+                destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
+                        DestinationResolver resolv = jmsTemplate.getDestinationResolver();
+                        return resolv.resolveDestinationName(session,
+                                                             jmsConfig.getReplyDestination(),
+                                                             false);
+                    }
+                });
+                jmsTemplate.send(destination, messageCreator);
+            }
+        };
+
+        t.start();
+        
+        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit",
+                                                     "SOAPService8"));
+        QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort8"));
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService8 service = new SOAPService8(wsdl, serviceName);        
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        String name = "FooBar";
+        String reply = greeter.greetMe(name);
+        assertEquals(reply, "Hello " + name);
     }    
     
 }
