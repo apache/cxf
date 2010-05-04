@@ -38,6 +38,63 @@ import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
 
+    @Test
+    public void testQueryParamWithTemplateValues() {
+        URI uri;
+        uri = UriBuilder.fromPath("/index.jsp").queryParam("a", "{a}").queryParam("b", "{b}")
+            .build("valueA", "valueB");
+        assertEquals("/index.jsp?a=valueA&b=valueB", uri.toString());        
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void testQueryParamWithMissingTemplateValues() {
+        UriBuilder.fromPath("/index.jsp").queryParam("a", "{a}").queryParam("b", "{b}")
+            .build("valueA");
+    }
+
+    @Test
+    public void testPathAndQueryParamWithTemplateValues() {
+        URI uri;
+        uri = UriBuilder.fromPath("/index{ind}.jsp").queryParam("a", "{a}").queryParam("b", "{b}")
+            .build("1", "valueA", "valueB");
+        assertEquals("/index1.jsp?a=valueA&b=valueB", uri.toString());        
+    }
+
+    @Test
+    public void testReplaceQueryStringWithTemplateValues() {
+        URI uri;
+        uri = UriBuilder.fromUri("/index.jsp").replaceQuery("a={a}&b={b}")
+            .build("valueA", "valueB");
+        assertEquals("/index.jsp?a=valueA&b=valueB", uri.toString());        
+    }
+
+    @Test
+    public void testQueryParamUsingMapWithTemplateValues() {
+        Map<String, String> values = new HashMap<String, String>();
+        values.put("a", "valueA");
+        values.put("b", "valueB");
+        URI uri;
+        uri = UriBuilder.fromPath("/index.jsp")
+            .queryParam("a", "{a}")
+            .queryParam("b", "{b}")
+            .buildFromMap(values);
+        assertEquals("/index.jsp?a=valueA&b=valueB", uri.toString());        
+    }
+
+    @Test
+    public void testPathAndQueryParamUsingMapWithTemplateValues() {
+        Map<String, String> values = new HashMap<String, String>();
+        values.put("a", "valueA");
+        values.put("b", "valueB");
+        values.put("ind", "1");
+        URI uri;
+        uri = UriBuilder.fromPath("/index{ind}.jsp")
+            .queryParam("a", "{a}")
+            .queryParam("b", "{b}")
+            .buildFromMap(values);
+        assertEquals("/index1.jsp?a=valueA&b=valueB", uri.toString());        
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void testCtorNull() throws Exception {
         new UriBuilderImpl(null);
