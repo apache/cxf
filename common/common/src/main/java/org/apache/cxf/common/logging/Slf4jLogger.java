@@ -56,20 +56,16 @@ public class Slf4jLogger extends AbstractDelegatingLogger {
     @Override
     public Level getLevel() {
         Level level;
-        /*
-         * As we can use a "switch ... case" block but only a "if ... else if ..." block, the order of the
-         * comparisons is important. We assume the the logging framework is most probably configured at WARN
-         * DEBUG, TRACE, INFO, ... levels
-         */
-        if (logger.isWarnEnabled()) {
-            level = Level.WARNING;
+        // Verify from the wider (trace) to the narrower (error)
+        if (logger.isTraceEnabled()) {
+            level = Level.FINER; // FINEST
         } else if (logger.isDebugEnabled()) {
             // map to the lowest between FINER, FINE and CONFIG
             level = Level.FINER;
-        } else if (logger.isTraceEnabled()) {
-            level = Level.FINEST;
         } else if (logger.isInfoEnabled()) {
             level = Level.INFO;
+        } else if (logger.isWarnEnabled()) {
+            level = Level.WARNING;
         } else if (logger.isErrorEnabled()) {
             level = Level.SEVERE;
         } else {
