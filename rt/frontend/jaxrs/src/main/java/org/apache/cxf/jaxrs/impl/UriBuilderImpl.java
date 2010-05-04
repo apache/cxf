@@ -77,18 +77,28 @@ public class UriBuilderImpl extends UriBuilder {
     private URI doBuild(boolean fromEncoded, Object... values) {
         try {
             String thePath = buildPath(fromEncoded);
-            thePath = substituteVarargs(thePath, values);
-            return buildURI(fromEncoded, thePath);
+            URITemplate pathTempl = new URITemplate(thePath);
+            thePath = substituteVarargs(pathTempl, values, 0);
+            
+            String theQuery = buildQuery(fromEncoded);
+            if (theQuery != null) {
+                URITemplate queryTempl = new URITemplate(theQuery);
+                int lengthDiff = values.length - pathTempl.getVariables().size(); 
+                if (lengthDiff > 0) {
+                    theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
+                }
+            }
+            
+            return buildURI(fromEncoded, thePath, theQuery);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
     
-    private URI buildURI(boolean fromEncoded, String thePath) throws URISyntaxException {
-        String theQuery = buildQuery(fromEncoded);
+    private URI buildURI(boolean fromEncoded, String thePath, String theQuery) throws URISyntaxException {
         // TODO : do encodePartiallyEncoded only once here, do not do it inside buildPath()
         // buildFromEncoded and buildFromEncodedMap - we'll need to be careful such that 
-        // path '/' seperators are not encoded so probably we'll need to create PathSegments
+        // path '/' separators are not encoded so probably we'll need to create PathSegments
         // again if fromEncoded is set
         if (fromEncoded) {
             StringBuilder b = new StringBuilder();
@@ -126,9 +136,9 @@ public class UriBuilderImpl extends UriBuilder {
         return schemeSpecificPart != null;
     }
     
-    private String substituteVarargs(String path, Object... values) {
+    private String substituteVarargs(URITemplate templ, Object[] values, int ind) {
         Map<String, String> varValueMap = new HashMap<String, String>();
-        URITemplate templ = new URITemplate(path);
+        
         // vars in set are properly ordered due to linking in hash set
         Set<String> uniqueVars = new LinkedHashSet<String>(templ.getVariables());
         if (values.length < uniqueVars.size()) {
@@ -136,7 +146,7 @@ public class UriBuilderImpl extends UriBuilder {
                                                + " value(s) given for " + uniqueVars.size()
                                                + " unique variable(s)");
         }
-        int idx = 0;
+        int idx = ind;
         for (String var : uniqueVars) {
             Object oval = values[idx++];
             varValueMap.put(var, oval.toString());
@@ -170,14 +180,22 @@ public class UriBuilderImpl extends UriBuilder {
         try {
             String thePath = buildPath(fromEncoded);
             thePath = substituteMapped(thePath, map);
-            return buildURI(fromEncoded, thePath);
+            
+            String theQuery = buildQuery(fromEncoded);
+            if (theQuery != null) {
+                theQuery = substituteMapped(theQuery, map);
+            }
+            
+            return buildURI(fromEncoded, thePath, theQuery);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
     
     private String substituteMapped(String path, Map<String, ? extends Object> varValueMap) {
+    
         URITemplate templ = new URITemplate(path);
+        
         Set<String> uniqueVars = new HashSet<String>(templ.getVariables());
         if (varValueMap.size() < uniqueVars.size()) {
             throw new IllegalArgumentException("Unresolved variables; only " + varValueMap.size()
