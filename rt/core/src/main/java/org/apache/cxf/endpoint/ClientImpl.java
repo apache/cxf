@@ -70,6 +70,7 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.workqueue.SynchronousExecutor;
 import org.apache.cxf.wsdl11.WSDLServiceFactory;
 
 public class ClientImpl
@@ -943,7 +944,9 @@ public class ClientImpl
 
 
     public void setExecutor(Executor executor) {
-        this.executor = executor;
+        if (!SynchronousExecutor.isA(executor)) {
+            this.executor = executor;
+        }
     }
 
 

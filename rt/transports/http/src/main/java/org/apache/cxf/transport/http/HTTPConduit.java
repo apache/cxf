@@ -2138,6 +2138,7 @@ public class HTTPConduit
                         try {
                             handleResponseInternal();
                         } catch (Exception e) {
+                            ((PhaseInterceptorChain)outMessage.getInterceptorChain()).abort();
                             ((PhaseInterceptorChain)outMessage.getInterceptorChain()).unwind(outMessage);
                             outMessage.setContent(Exception.class, e);
                             outMessage.getInterceptorChain().getFaultObserver().onMessage(outMessage);
