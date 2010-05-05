@@ -742,8 +742,7 @@ public final class ContextUtils {
                         action = cachedAction;
                     }
                     if (action == null && ContextUtils.isRequestor(message)) {
-                        SoapOperationInfo soi = 
-                            bindingOpInfo.getExtensor(SoapOperationInfo.class);
+                        SoapOperationInfo soi = getSoapOperationInfo(bindingOpInfo);
                         action = soi == null ? null : soi.getAction();
                         action = StringUtils.isEmpty(action) ? null : action; 
                     }
@@ -780,6 +779,15 @@ public final class ContextUtils {
         }
         LOG.fine("action determined from service model: " + action);
         return action;
+    }
+
+    private static SoapOperationInfo getSoapOperationInfo(BindingOperationInfo bindingOpInfo) {
+        SoapOperationInfo soi = bindingOpInfo.getExtensor(SoapOperationInfo.class);
+        if (soi == null && bindingOpInfo.isUnwrapped()) {
+            soi = bindingOpInfo.getWrappedOperation()
+                .getExtensor(SoapOperationInfo.class);
+        }
+        return soi;
     }
 
     /**
