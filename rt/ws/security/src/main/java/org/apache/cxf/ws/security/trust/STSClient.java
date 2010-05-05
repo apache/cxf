@@ -273,6 +273,12 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setEndpointQName(QName qn) {
         endpointName = qn;
     }
+    public void setKeySize(int i) {
+        keySize = i;
+    }
+    public int getKeySize() {
+        return keySize;
+    }
 
 
     private void createClient() throws BusException, EndpointException {
@@ -392,8 +398,11 @@ public class STSClient implements Configurable, InterceptorProvider {
         X509Certificate cert = null;
         Crypto crypto = null;
 
+        if (keySize <= 0) {
+            keySize = 256;
+        }
         if (keyType.endsWith("SymmetricKey")) {
-            if (!wroteKeySize && !isSecureConv) {
+            if (!wroteKeySize && (!isSecureConv || keySize != 256)) {
                 writer.writeStartElement("wst", "KeySize", namespace);
                 writer.writeCharacters(Integer.toString(keySize));
                 writer.writeEndElement();
@@ -404,7 +413,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 writer.writeStartElement("wst", "BinarySecret", namespace);
                 writer.writeAttribute("Type", namespace + "/Nonce");
                 if (algorithmSuite == null) {
-                    requestorEntropy = WSSecurityUtil.generateNonce(8);
+                    requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
                 } else {
                     requestorEntropy = WSSecurityUtil
                         .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);

@@ -48,6 +48,8 @@ import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
+import org.apache.cxf.ws.security.policy.model.AlgorithmSuite;
+import org.apache.cxf.ws.security.policy.model.Binding;
 import org.apache.cxf.ws.security.policy.model.SecureConversationToken;
 import org.apache.cxf.ws.security.policy.model.SupportingToken;
 import org.apache.cxf.ws.security.policy.model.Trust10;
@@ -168,11 +170,47 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         String s = message
             .getContextualProperty(Message.ENDPOINT_ADDRESS).toString();
         client.setLocation(s);
-        
+        AlgorithmSuite suite = getAlgorithmSuite(aim);
+        if (suite != null) {
+            client.setAlgorithmSuite(suite);
+            int x = suite.getMaximumSymmetricKeyLength();
+            if (x < 256) {
+                client.setKeySize(x);
+            }
+        }
         Map<String, Object> ctx = client.getRequestContext();
         mapSecurityProps(message, ctx);
         return s;
     }
+    
+    private static AlgorithmSuite getAlgorithmSuite(AssertionInfoMap aim) {
+        Binding transport = null;
+        Collection<AssertionInfo> ais = aim.get(SP12Constants.TRANSPORT_BINDING);
+        if (ais != null) {
+            for (AssertionInfo ai : ais) {
+                transport = (Binding)ai.getAssertion();
+            }                    
+        } else {
+            ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
+            if (ais != null) {
+                for (AssertionInfo ai : ais) {
+                    transport = (Binding)ai.getAssertion();
+                }                    
+            } else {
+                ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
+                if (ais != null) {
+                    for (AssertionInfo ai : ais) {
+                        transport = (Binding)ai.getAssertion();
+                    }                    
+                }
+            }
+        }
+        if (transport != null) {
+            return transport.getAlgorithmSuite();
+        }
+        return null;
+    }
+    
     private static void mapSecurityProps(Message message, Map<String, Object> ctx) {
         for (String s : SecurityConstants.ALL_PROPERTIES) {
             Object v = message.getContextualProperty(s + ".sct");

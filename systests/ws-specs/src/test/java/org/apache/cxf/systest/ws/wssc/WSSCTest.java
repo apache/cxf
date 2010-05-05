@@ -26,17 +26,11 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.systest.ws.wssc.server.Server;
-import org.apache.cxf.systest.ws.wssec11.WSSecurity11Common;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.ws.security.SecurityConstants;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xmlsoap.ping.Ping;
-
-import wssec.wssc.IPingService;
-import wssec.wssc.PingRequest;
-import wssec.wssc.PingResponse;
-import wssec.wssc.PingService;
 
 /**
  *
@@ -45,70 +39,153 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
 
        
     private static final String OUT = "CXF : ping";
-
+    private static wssec.wssc.PingService svc;
+    
     @BeforeClass
     public static void startServers() throws Exception {
-        if (!WSSecurity11Common.checkUnrestrictedPoliciesInstalled()) {
-            //do nothing
-            return;
-        } 
         assertTrue(
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
             launchServer(Server.class, true)
         );
-    }
-
-    @Test
-    public void testClientServer() throws Exception {
-        if (!WSSecurity11Common.checkUnrestrictedPoliciesInstalled()) {
-            //do nothing
-            return;
-        }
-        String[] argv = new String[] {
-            "SecureConversation_MutualCertificate10SignEncrypt_IPingService",
-            "AC_IPingService",
-            "ADC_IPingService",
-            "ADC-ES_IPingService",   
-            "_A_IPingService",
-            "_AD_IPingService",
-            "_AD-ES_IPingService",
-            
-            "UXC_IPingService", 
-            "UXDC_IPingService",
-            "UXDC-SEES_IPingService",
-            "_UX_IPingService",
-            "_UXD_IPingService",
-            "_UXD-SEES_IPingService", 
-            
-            
-            "XC_IPingService", 
-            "XDC_IPingService", 
-            "XDC_IPingService1", 
-            "XDC-ES_IPingService", 
-            "XDC-SEES_IPingService", 
-            "_X_IPingService", 
-            "_X10_IPingService", 
-            "_XD_IPingService", 
-            "_XD-SEES_IPingService", 
-            "_XD-ES_IPingService",
-        };
-        //argv = new String[] {argv[1]};
+        
         final Bus bus = 
             new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssc/client/client.xml");
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
         
-        PingService svc = new PingService();
+        svc = new wssec.wssc.PingService();
+    }
+    
+    
+    @Test
+    public void testSecureConversationMutualCertificate10SignEncryptIPingService() throws Exception {
+        runTest("SecureConversation_MutualCertificate10SignEncrypt_IPingService");
+    }
+
+    @Test
+    public void testACIPingService() throws Exception {
+        runTest("AC_IPingService");
+    }
+
+    @Test
+    public void testADCIPingService() throws Exception {
+        runTest("ADC_IPingService");
+    }
+
+    @Test
+    public void testADCESIPingService() throws Exception {
+        runTest("ADC-ES_IPingService");
+    }
+
+    @Test
+    public void testAIPingService() throws Exception {
+        runTest("_A_IPingService");
+    }
+
+    @Test
+    public void testADIPingService() throws Exception {
+        runTest("_AD_IPingService");
+    }
+
+    @Test
+    public void testADESIPingService() throws Exception {
+        runTest("_AD-ES_IPingService");
+    }
+
+    @Test
+    public void testUXCIPingService() throws Exception {
+        runTest("UXC_IPingService");
+    }
+
+    @Test
+    public void testUXDCIPingService() throws Exception {
+        runTest("UXDC_IPingService");
+    }
+
+    @Test
+    public void testUXDCSEESIPingService() throws Exception {
+        runTest("UXDC-SEES_IPingService");
+    }
+
+    @Test
+    public void testUXIPingService() throws Exception {
+        runTest("_UX_IPingService");
+    }
+
+    @Test
+    public void testUXDIPingService() throws Exception {
+        runTest("_UXD_IPingService");
+    }
+
+    @Test
+    public void testUXDSEESIPingService() throws Exception {
+        runTest("_UXD-SEES_IPingService");
+    }
+
+    @Test
+    public void testXCIPingService() throws Exception {
+        runTest("XC_IPingService");
+    }
+
+    @Test
+    public void testXDCIPingService() throws Exception {
+        runTest("XDC_IPingService");
+    }
+
+    @Test
+    public void testXDCIPingService1() throws Exception {
+        runTest("XDC_IPingService1");
+    }
+
+    @Test
+    public void testXDCESIPingService() throws Exception {
+        runTest("XDC-ES_IPingService");
+    }
+
+    @Test
+    public void testXDCSEESIPingService() throws Exception {
+        runTest("XDC-SEES_IPingService");
+    }
+
+    @Test
+    public void testXIPingService() throws Exception {
+        runTest("_X_IPingService");
+    }
+
+    @Test
+    public void testX10IPingService() throws Exception {
+        runTest("_X10_IPingService");
+    }
+
+    @Test
+    public void testXDIPingService() throws Exception {
+        runTest("_XD_IPingService");
+    }
+
+    @Test
+    public void testXDSEESIPingService() throws Exception {
+        runTest("_XD-SEES_IPingService");
+    }
+
+    @Test
+    public void testXDESIPingService() throws Exception {
+        runTest("_XD-ES_IPingService");
+    }
+
+
+
+
+    private void runTest(String ... argv) throws Exception {
         for (String portPrefix : argv) {
-            final IPingService port = 
+            final wssec.wssc.IPingService port = 
                 svc.getPort(
                     new QName(
                         "http://WSSec/wssc",
                         portPrefix
                     ),
-                    IPingService.class
+                    wssec.wssc.IPingService.class
                 );
            
             ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
@@ -118,14 +195,14 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 ((BindingProvider)port).getRequestContext()
                     .put(SecurityConstants.STS_TOKEN_DO_CANCEL, Boolean.TRUE);
             }
-            PingRequest params = new PingRequest();
-            Ping ping = new Ping();
+            wssec.wssc.PingRequest params = new wssec.wssc.PingRequest();
+            org.xmlsoap.ping.Ping ping = new org.xmlsoap.ping.Ping();
             ping.setOrigin("CXF");
             ping.setScenario("Scenario5");
             ping.setText("ping");
             params.setPing(ping);
             try {
-                PingResponse output = port.ping(params);
+                wssec.wssc.PingResponse output = port.ping(params);
                 assertEquals(OUT, output.getPingResponse().getText());
             } catch (Exception ex) {
                 throw new Exception("Error doing " + portPrefix, ex);
