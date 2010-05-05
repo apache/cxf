@@ -59,4 +59,9 @@ public class AegisJaxWsImpl implements AegisJaxWs {
     public List<String> getStringList() {
         return Arrays.asList("a", "b", "c");
     }
+    
+    public java.util.List<String> echoBigList(java.util.List<String> l) {
+        return l;
+    }
+
 }

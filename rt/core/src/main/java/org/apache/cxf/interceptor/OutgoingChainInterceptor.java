@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
@@ -58,6 +59,7 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         Exchange ex = message.getExchange();
         BindingOperationInfo bin = ex.get(BindingOperationInfo.class);
         if (null != bin && null != bin.getOperationInfo() && bin.getOperationInfo().isOneWay()) {
+            closeInput(message);
             return;
         }
         Message out = ex.getOutMessage();
@@ -77,6 +79,18 @@ public class OutgoingChainInterceptor extends AbstractPhaseInterceptor<Message> 
         }
     }
     
+    private void closeInput(Message message) {
+        InputStream is = message.getContent(InputStream.class);
+        if (is != null) {
+            try {
+                is.close();
+                message.removeContent(InputStream.class);
+            } catch (IOException ioex) {
+                //ignore
+            }
+        }
+    }
+
     protected static Conduit getBackChannelConduit(Message message) {
         Conduit conduit = null;
         Exchange ex = message.getExchange();

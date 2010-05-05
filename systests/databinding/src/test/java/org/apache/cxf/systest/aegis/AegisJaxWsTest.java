@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.aegis;
 
+import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +28,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.bean.Item;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
@@ -112,5 +115,23 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
 
         List<String> item = client.getStringList();
         Assert.assertEquals(Arrays.asList("a", "b", "c"), item);
+    }
+    @Test
+    public void testBigList() throws Exception {
+        int size = 1000;
+        List<String> l = new ArrayList<String>(size);
+        for (int x = 0; x < size; x++) {
+            l.add("Need to create a pretty big soap message to make sure we go over "
+                  + "some of the default buffer sizes and such so we can see what really"
+                  + "happens when we do that - " + x);
+        }
+        
+        setupForTest(false);
+        List<String> item = client.echoBigList(l);
+        Assert.assertEquals(size, item.size());
+        
+        //CXF-2768
+        File f = FileUtils.getDefaultTempDir();
+        Assert.assertEquals(0, f.listFiles().length);
     }
 }

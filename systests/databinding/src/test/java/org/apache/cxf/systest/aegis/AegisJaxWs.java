@@ -54,4 +54,7 @@ public interface AegisJaxWs {
     //try comment this method
     @WebMethod
     java.util.List<String> getStringList();
+    
+    @WebMethod
+    java.util.List<String> echoBigList(java.util.List<String> l);
 }

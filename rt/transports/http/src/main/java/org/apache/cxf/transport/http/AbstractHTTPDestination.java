@@ -586,6 +586,27 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                                new WrappedOutputStream(message, response));
             }
         }
+        
+        @Override
+        public void close(Message msg) throws IOException {
+            super.close(msg);
+            if (msg.getExchange() == null) {
+                return;
+            }
+            Message m = msg.getExchange().getInMessage();
+            if (m == null || msg.getExchange().isOneWay()) {
+                return;
+            }
+            InputStream is = m.getContent(InputStream.class);
+            if (is != null) {
+                try {
+                    is.close();
+                    m.removeContent(InputStream.class);
+                } catch (IOException ioex) {
+                    //ignore
+                }
+            }
+        }
     }
 
     /**
@@ -628,6 +649,21 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                 wrappedStream.close();
                 response.flushBuffer();
             }
+            /*
+            try {
+                //make sure the input stream is also closed in this 
+                //case so that any resources it may have is cleaned up
+                Message m = outMessage.getExchange().getInMessage();
+                if (m != null) {
+                    InputStream ins = m.getContent(InputStream.class);
+                    if (ins != null) {
+                        ins.close();
+                    }
+                }
+            } catch (IOException ex) {
+                //ignore
+            }
+            */
         }
         
         public void flush() throws IOException {
