@@ -18,6 +18,9 @@
  */
 package com.example.customerservice.client;
 
+import java.io.File;
+import java.net.URL;
+
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
 import com.example.customerservice.NoSuchCustomerException;
@@ -26,9 +29,23 @@ public class CustomerServiceClient {
     protected CustomerServiceClient() {
     }
     
-    public static void main(String args[]) throws NoSuchCustomerException {
-        // Create the service client with its default wsdlurl
-        CustomerServiceService customerServiceService = new CustomerServiceService();
+    public static void main(String args[]) throws Exception {
+        CustomerServiceService customerServiceService;
+        if (args.length != 0 && args[0].length() != 0) {
+            File wsdlFile = new File(args[0]);
+            URL wsdlURL;
+            if (wsdlFile.exists()) {
+                wsdlURL = wsdlFile.toURL();
+            } else {
+                wsdlURL = new URL(args[0]);
+            }
+            // Create the service client with specified wsdlurl
+            customerServiceService = new CustomerServiceService(wsdlURL);
+        } else {
+            // Create the service client with its default wsdlurl
+            customerServiceService = new CustomerServiceService();
+        }
+
         CustomerService customerService = customerServiceService.getCustomerServicePort();
         
         // Initialize the test class and call the tests

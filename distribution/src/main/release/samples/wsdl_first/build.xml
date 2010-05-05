@@ -51,6 +51,6 @@
 
     <target name="client-servlet" description="run demo client hitting servlet" depends="build">
         <property name="param" value=""/>
-        <cxfrun classname="com.example.customerservice.client.Client" param1="${base.url}/helloworld/services/hello_world?wsdl" param2="${op}" param3="${param}"/>
+        <cxfrun classname="com.example.customerservice.client.CustomerServiceClient" param1="${base.url}/helloworld/services/CustomerServicePort?wsdl" param2="${op}" param3="${param}"/>
     </target> 
 </project>
