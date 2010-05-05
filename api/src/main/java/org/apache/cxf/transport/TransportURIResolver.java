@@ -61,6 +61,10 @@ public class TransportURIResolver extends ExtendedURIResolver {
     }
     
     public InputSource resolve(String curUri, String baseUri) {
+        
+        // Spaces must be encoded or URI.resolve() will choke
+        curUri = curUri.replace(" ", "%20");
+        
         InputSource is = null;
         URI base;
         try {
