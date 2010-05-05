@@ -773,13 +773,20 @@ public class ClientImpl
         if (exchange.isSynchronous() || executor == null) {
             exchange.put(MessageObserver.class, this);
         } else {
+            exchange.put(Executor.class, executor);
             exchange.put(MessageObserver.class, new MessageObserver() {
                 public void onMessage(final Message message) {
-                    executor.execute(new Runnable() {
-                        public void run() {
-                            ClientImpl.this.onMessage(message);
-                        }
-                    });
+                    if (!message.getExchange()
+                        .containsKey(Executor.class.getName() + ".USING_SPECIFIED")) {
+                        
+                        executor.execute(new Runnable() {
+                            public void run() {
+                                ClientImpl.this.onMessage(message);
+                            }
+                        });
+                    } else {
+                        ClientImpl.this.onMessage(message);
+                    }
                 }
             });
         }
