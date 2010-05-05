@@ -194,7 +194,7 @@ public final class Base64Utility {
         try {
             ostream.write(decodeChunk(id, o, l));
         } catch (Exception e) {
-            LOG.warning("Invalid base64 encoded string : " + id);
+            LOG.warning("Invalid base64 encoded string : " + new String(id));
             throw new Base64Exception(new Message("BASE64_RUNTIME_EXCEPTION", LOG), e);
         }
     }
