@@ -115,12 +115,6 @@
             <version>1.5.11</version>
             <optional>true</optional>
         </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jul-to-slf4j</artifactId>
-            <version>1.5.11</version>
-            <optional>true</optional>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework</groupId>
