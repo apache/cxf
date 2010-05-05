@@ -39,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -78,7 +79,6 @@ import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
-import org.apache.cxf.workqueue.AutomaticWorkQueue;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
@@ -2144,13 +2144,19 @@ public class HTTPConduit
                         }
                     }
                 };
-                WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
-                    .getExtension(WorkQueueManager.class);
-                AutomaticWorkQueue queue = mgr.getNamedWorkQueue("http-conduit");
-                if (queue == null) {
-                    queue = mgr.getAutomaticWorkQueue();
+                Executor ex = outMessage.getExchange().get(Executor.class);
+                if (ex == null) {
+                    WorkQueueManager mgr = outMessage.getExchange().get(Bus.class)
+                        .getExtension(WorkQueueManager.class);
+                    ex = mgr.getNamedWorkQueue("http-conduit");
+                    if (ex == null) {
+                        ex = mgr.getAutomaticWorkQueue();
+                    }
+                } else {
+                    outMessage.getExchange().put(Executor.class.getName() 
+                                                 + ".USING_SPECIFIED", Boolean.TRUE);
                 }
-                queue.execute(runnable);
+                ex.execute(runnable);
             }
         }
         protected void handleResponseInternal() throws IOException {

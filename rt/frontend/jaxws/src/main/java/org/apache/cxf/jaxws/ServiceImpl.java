@@ -454,13 +454,15 @@ public class ServiceImpl extends ServiceDelegate {
         configureObject(service);
                 
         // Configure the JaxWsEndpoitnImpl
-        JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) ClientProxy.getClient(obj).getEndpoint();
+        Client client = ClientProxy.getClient(obj);
+        client.getEndpoint().setExecutor(executor);
+        client.setExecutor(executor);
+        JaxWsEndpointImpl jaxwsEndpoint = (JaxWsEndpointImpl) client.getEndpoint();
         configureObject(jaxwsEndpoint);  
         List<Handler> hc = jaxwsEndpoint.getJaxwsBinding().getHandlerChain();
         
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
         jaxwsEndpoint.getJaxwsBinding().setHandlerChain(hc);
-
         LOG.log(Level.FINE, "created proxy", obj);
 
         ports.add(portName);
