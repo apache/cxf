@@ -46,7 +46,7 @@
     <!-- Any services listening on port 9002 must use the following -->
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
-    <httpj:engine-factory bus="cxf">
+    <!-- httpj:engine-factory bus="cxf">
         <httpj:engine port="9002">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
@@ -55,7 +55,7 @@
 
             </httpj:tlsServerParameters>
         </httpj:engine>
-    </httpj:engine-factory>
+    </httpj:engine-factory-->
 
 
     
