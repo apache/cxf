@@ -271,7 +271,6 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
         }
 
         public void handleMessage(SoapMessage message) throws Fault {
-            SoapVersion soapVersion = message.getVersion();
             try {
                 XMLStreamWriter xtw = message.getContent(XMLStreamWriter.class);
                 if (xtw != null) {
@@ -283,6 +282,7 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     xtw.flush();
                 }
             } catch (XMLStreamException e) {
+                SoapVersion soapVersion = message.getVersion();
                 throw new SoapFault(new org.apache.cxf.common.i18n.Message("XML_WRITE_EXC", BUNDLE), e,
                                     soapVersion.getSender());
             }
