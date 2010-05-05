@@ -101,7 +101,7 @@ public class Base64UtilityTest extends Assert {
     public void testDecodeInvalidString() throws Exception {
         try {
             String in = "QWxhZGRpbjpcGVuIHNlc2FtZQ==";
-            byte bytes[] = Base64Utility.decode(in);
+            Base64Utility.decode(in);
             fail("This test should be fail");
         } catch (Base64Exception e) {
             //nothing to do
