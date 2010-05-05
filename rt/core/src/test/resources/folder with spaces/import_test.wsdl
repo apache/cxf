@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements. See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership. The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied. See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+
+<wsdl:definitions xmlns="http://schemas.xmlsoap.org/wsdl/"
+                  xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1"
+                  xmlns:S1importsS2S3Test="urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1/S1importsS2S3Test/types"
+                  xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+                  xmlns:xmime="http://www.w3.org/2005/05/xmlmime" targetNamespace="urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1"
+                  name="S1importsS2S3Test1">
+  <wsdl:types>
+    <schema
+       targetNamespace="urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1/S1importsS2S3Test/types"
+       xmlns="http://www.w3.org/2001/XMLSchema" xmlns:prefix0="urn:Schema1_Out"
+       xmlns:prefix="urn:Schema1_In" elementFormDefault="qualified">
+
+      <xsd:import namespace="urn:Schema1_Out"
+                  schemaLocation="../schema/folder with spaces/Schema1_Out.xsd" />
+      <xsd:import namespace="urn:Schema1_In"
+                  schemaLocation="../schema/folder with spaces/Schema1_In.xsd" />d
+
+      <element name="S1importsS2S3Test">
+        <complexType>
+          <sequence>
+            <element name="DefaultInputElem" type="prefix:UseImportedElements_In" />
+          </sequence>
+        </complexType>
+      </element>
+
+      <element name="S1importsS2S3TestResponse">
+        <complexType>
+          <sequence>
+            <element name="DefaultOutputElem" type="prefix0:UseImportedElements_Out" />
+          </sequence>
+        </complexType>
+      </element>
+
+    </schema>
+  </wsdl:types>
+
+  <wsdl:message name="S1importsS2S3TestRequest">
+    <wsdl:part name="in" element="S1importsS2S3Test:S1importsS2S3Test" />
+  </wsdl:message>
+
+  <wsdl:message name="S1importsS2S3TestResponse">
+    <wsdl:part name="out"
+               element="S1importsS2S3Test:S1importsS2S3TestResponse" />
+  </wsdl:message>
+
+
+  <wsdl:portType name="S1importsS2S3TestPortType">
+    <wsdl:operation name="S1importsS2S3Test">
+      <wsdl:input message="tns:S1importsS2S3TestRequest" />
+      <wsdl:output message="tns:S1importsS2S3TestResponse" />
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="S1importsS2S3TestSOAP_11Binding" type="tns:S1importsS2S3TestPortType">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http" />
+    <wsdl:operation name="S1importsS2S3Test">
+      <soap:operation soapAction="" style="document" />
+      <wsdl:input>
+        <soap:body use="literal" />
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal" />
+      </wsdl:output>
+
+    </wsdl:operation>
+  </wsdl:binding>
+
+
+  <wsdl:service name="S1importsS2S3TestService">
+    <wsdl:port name="S1importsS2S3TestPort" binding="tns:S1importsS2S3TestSOAP_11Binding">
+      <soap:address location="http://localhost:3580/connect/S1importsS2S3Test" />
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
+

@@ -119,7 +119,14 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             }
 
             String wsdl = params.get("wsdl");
+            if (wsdl != null) {
+                wsdl = wsdl.replace("%20", " ");
+            }
+            
             String xsd =  params.get("xsd");
+            if (xsd != null) {
+                xsd = xsd.replace("%20", " ");
+            }
             
             Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
                                                         .getProperty(WSDLQueryHandler.class.getName()));
@@ -241,7 +248,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         for (Element el : elementList) {
             String sl = el.getAttribute("schemaLocation");
             if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
             }
         }
         
@@ -251,7 +258,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         for (Element el : elementList) {
             String sl = el.getAttribute("schemaLocation");
             if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
             }
         }
         elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -260,7 +267,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         for (Element el : elementList) {
             String sl = el.getAttribute("schemaLocation");
             if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl);
+                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
             }
         }
         elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
@@ -269,7 +276,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
         for (Element el : elementList) {
             String sl = el.getAttribute("location");
             if (mp.containsKey(sl)) {
-                el.setAttribute("location", base + "?wsdl=" + sl);
+                el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
             }
         }
         

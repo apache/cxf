@@ -103,4 +103,28 @@ public class WSDLDefinitionBuilderTest extends Assert {
         assertNotNull(part);
         assertEquals(new QName("http://apache.org/hello_world/types", "sayHi"), part.getElementName());
     }    
+    
+    @Test
+    public void testBuildImportedWSDLSpacesInPath() throws Exception {
+        WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(BusFactory.getDefaultBus());
+        String wsdlUrl = getClass().getResource("/folder with spaces/import_test.wsdl").toString();
+
+        Definition def = builder.build(wsdlUrl);
+        assertNotNull(def);
+        
+        Map services = def.getServices();
+        assertNotNull(services);
+        assertEquals(1, services.size());
+
+        String serviceQName = "urn:S1importS2S3/resources/wsdl/S1importsS2S3Test1";
+        Service service = (Service)services.get(new QName(serviceQName, "S1importsS2S3TestService"));
+        assertNotNull(service);
+        
+        Map ports = service.getPorts();
+        assertNotNull(ports);
+        assertEquals(1, ports.size());
+        Port port = service.getPort("S1importsS2S3TestPort");
+        assertNotNull(port);
+    }
+    
 }
