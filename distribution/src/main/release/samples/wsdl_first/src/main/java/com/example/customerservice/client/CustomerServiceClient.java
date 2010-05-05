@@ -23,7 +23,6 @@ import java.net.URL;
 
 import com.example.customerservice.CustomerService;
 import com.example.customerservice.CustomerServiceService;
-import com.example.customerservice.NoSuchCustomerException;
 
 public class CustomerServiceClient {
     protected CustomerServiceClient() {
