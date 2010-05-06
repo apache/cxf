@@ -154,6 +154,25 @@ public class WebClientTest extends Assert {
     }
     
     @Test
+    public void testResetQueryAndBack() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz").query("foo", "bar");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz?foo=bar"), wc.getCurrentURI());
+        wc.resetQuery().back(false);
+        assertEquals(URI.create("http://foo/bar"), wc.getCurrentURI());
+    }
+    
+    @Test
+    public void testFragment() {
+        WebClient wc = WebClient.create(URI.create("http://foo"));
+        wc.path("bar").path("baz").query("foo", "bar").fragment("1");
+        assertEquals(URI.create("http://foo"), wc.getBaseURI());
+        assertEquals(URI.create("http://foo/bar/baz?foo=bar#1"), wc.getCurrentURI());
+    }
+    
+    
+    @Test
     public void testPathWithTemplates() {
         WebClient wc = WebClient.create(URI.create("http://foo"));
         assertEquals(URI.create("http://foo"), wc.getBaseURI());
