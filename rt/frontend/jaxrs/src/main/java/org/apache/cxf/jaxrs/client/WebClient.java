@@ -447,6 +447,16 @@ public class WebClient extends AbstractClient {
     }
     
     /**
+     * Updates the current URI fragment
+     * @param name fragment name
+     * @return updated WebClient
+     */
+    public WebClient fragment(String name) {
+        getCurrentBuilder().fragment(name);
+        return this;
+    }
+    
+    /**
      * Moves WebClient to a new baseURI or forwards to new currentURI  
      * @param newAddress new URI
      * @param forward if true then currentURI will be based on baseURI  
@@ -486,6 +496,15 @@ public class WebClient extends AbstractClient {
             }
             
         }
+        return this;
+    }
+    
+    /**
+     * Resets the current query
+     * @return updated WebClient
+     */
+    public WebClient resetQuery() {
+        getCurrentBuilder().replaceQuery(null);
         return this;
     }
     
