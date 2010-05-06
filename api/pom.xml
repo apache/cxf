@@ -210,6 +210,7 @@
                         </execution>
                     </executions>
                     <configuration>
+                        <detectOfflineLinks>false</detectOfflineLinks>
                         <header>Apache CXF API</header>
                         <footer>Apache CXF API</footer>
                     </configuration>
