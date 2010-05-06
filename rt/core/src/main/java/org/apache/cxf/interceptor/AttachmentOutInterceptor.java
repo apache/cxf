@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -54,6 +55,9 @@ public class AttachmentOutInterceptor extends AbstractPhaseInterceptor<Message> 
             || (message.getAttachments() != null && !message.getAttachments().isEmpty());
         
         if (!mtomEnabled && !writeAtts) {
+            return;
+        }
+        if (message.getContent(OutputStream.class) == null) {
             return;
         }
 

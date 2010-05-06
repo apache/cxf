@@ -119,6 +119,9 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             // remember the original output stream, we will write compressed
             // data to this later
             OutputStream os = message.getContent(OutputStream.class);
+            if (os == null) {
+                return;
+            }
             message.put(ORIGINAL_OUTPUT_STREAM_KEY, os);
             message.put(USE_GZIP_KEY, use);
 

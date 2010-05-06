@@ -18,6 +18,10 @@
  */
 package org.apache.cxf.transport.http.gzip;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -59,8 +63,10 @@ public class GZIPAcceptEncodingTest extends Assert {
         Exchange exchange = new ExchangeImpl();
         exchange.setInMessage(inMessage);
         inMessage.setExchange(exchange);
+        inMessage.setContent(InputStream.class, new ByteArrayInputStream(new byte[0]));
         exchange.setOutMessage(outMessage);
         outMessage.setExchange(exchange);
+        outMessage.setContent(OutputStream.class, new ByteArrayOutputStream());
         outInterceptors = EasyMock.createMock(InterceptorChain.class);
         outMessage.setInterceptorChain(outInterceptors);
     }
