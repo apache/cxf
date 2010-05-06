@@ -297,7 +297,7 @@
                     <plugin>
                         <inherited>true</inherited>
                         <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.4</version>
+                        <version>2.5</version>
                         <configuration>
                             <altDeploymentRepository>${deploy.altRepository}</altDeploymentRepository>
                             <updateReleaseInfo>true</updateReleaseInfo>
@@ -306,7 +306,7 @@
                     <!-- We want to sign the artifact, the POM, and all attached artifacts -->
                     <plugin>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.0-alpha-4</version>
+                        <version>1.0</version>
                         <executions>
                             <execution>
                                 <goals>
@@ -329,7 +329,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>2.1</version>
+                        <version>2.1.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -365,22 +365,22 @@
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>build-helper-maven-plugin</artifactId>
-                    <version>1.4</version>
+                    <version>1.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.codehaus.mojo</groupId>
                     <artifactId>xmlbeans-maven-plugin</artifactId>
-                    <version>2.3.2</version>
+                    <version>2.3.3</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.felix</groupId>
                     <artifactId>maven-bundle-plugin</artifactId>
-                    <version>2.0.0</version>
+                    <version>2.1.0</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-clean-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.4</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -390,7 +390,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-release-plugin</artifactId>
-                    <version>2.0-beta-9</version>
+                    <version>2.0</version>
                     <configuration>
                         <tagBase>https://svn.apache.org/repos/asf/cxf/tags</tagBase>
                         <useReleaseProfile>false</useReleaseProfile>
@@ -403,7 +403,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.7</version>
                     <configuration>
                         <attach>true</attach>
                         <source>1.5</source>
@@ -422,12 +422,13 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>2.0.2</version>
+                    <version>2.3</version>
                     <configuration>
                         <source>1.5</source>
                         <target>1.5</target>
                         <maxmem>256M</maxmem>
                         <fork>${compiler.fork}</fork>
+                        <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -438,7 +439,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-jar-plugin</artifactId>
-                    <version>2.2</version>
+                    <version>2.3</version>
                     <configuration>
                         <archive>
                             <manifestEntries>
@@ -456,7 +457,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-resources-plugin</artifactId>
-                    <version>2.3</version>
+                    <version>2.4.2</version>
                     <configuration>
                         <encoding>UTF-8</encoding>
                     </configuration>
@@ -464,7 +465,7 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-assembly-plugin</artifactId>
-                    <version>2.2-beta-4</version>
+                    <version>2.2-beta-5</version>
                 </plugin>
 
                 <plugin>
@@ -475,17 +476,24 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-shade-plugin</artifactId>
-                    <version>1.2.1</version>
+                    <version>1.3.2</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.cxf.build-utils</groupId>
+                            <artifactId>cxf-buildtools</artifactId>
+                            <version>${pom.version}</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-site-plugin</artifactId>
-                    <version>2.0.1</version>
+                    <version>2.1</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-deploy-plugin</artifactId>
-                    <version>2.4</version>
+                    <version>2.5</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -495,17 +503,17 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-project-info-reports-plugin</artifactId>
-                    <version>2.1.1</version>
+                    <version>2.1.2</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-plugin-plugin</artifactId>
-                    <version>2.5</version>
+                    <version>2.6</version>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
-                    <version>2.7</version>
+                    <version>2.8</version>
                     <dependencies>
                         <dependency>
                             <groupId>org.apache.cxf</groupId>

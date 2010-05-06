@@ -21,6 +21,7 @@ package org.apache.cxf.maven;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Iterator;
+import java.util.List;
 import java.util.jar.JarEntry;
 import java.util.jar.JarOutputStream;
 
@@ -53,6 +54,9 @@ public class PluginTransformer implements ResourceTransformer {
         return false;
     }
 
+    public void processResource(String resource, InputStream is, List relocators) throws IOException {
+        processResource(is);
+    }
     public void processResource(InputStream is) throws IOException {
         Document r;
         try {
@@ -89,4 +93,5 @@ public class PluginTransformer implements ResourceTransformer {
         new XMLOutputter(Format.getPrettyFormat()).output(doc, jos);
         doc = null;
     }
+
 }

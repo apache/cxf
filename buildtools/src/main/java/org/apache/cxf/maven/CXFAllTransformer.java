@@ -62,6 +62,9 @@ public class CXFAllTransformer implements ResourceTransformer {
         return !extensions.isEmpty();
     }
 
+    public void processResource(String resource, InputStream is, List relocators) throws IOException {
+        processResource(is);
+    }
     public void processResource(InputStream is) throws IOException {
         ByteArrayOutputStream bout = new ByteArrayOutputStream(1024);
         int i = is.read(buffer);

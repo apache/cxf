@@ -379,13 +379,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>${pom.groupId}</groupId>
-                        <artifactId>cxf-buildtools</artifactId>
-                        <version>${pom.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

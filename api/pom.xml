@@ -217,25 +217,26 @@
         </plugins>
 
         <pluginManagement>
-             <plugins>
-                 <plugin>
-                     <groupId>org.apache.maven.plugins</groupId>
-                     <artifactId>maven-javadoc-plugin</artifactId>
-                     <executions>
-                         <execution>
-                             <id>package</id>
-                             <phase>package</phase>
-                             <goals>
-                                 <goal>jar</goal>
-                             </goals>
-                         </execution>
-                     </executions>
-                     <configuration>
-                         <header>Apache CXF API</header>
-                         <footer>Apache CXF API</footer>
-                     </configuration>
-                 </plugin>
-             </plugins>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <id>package</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>jar</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <detectOfflineLinks>false</detectOfflineLinks>
+                        <header>Apache CXF API</header>
+                        <footer>Apache CXF API</footer>
+                    </configuration>
+                </plugin>
+            </plugins>
         </pluginManagement>
     </build>
 
