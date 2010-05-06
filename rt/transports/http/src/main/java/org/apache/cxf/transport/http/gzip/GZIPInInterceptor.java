@@ -73,6 +73,9 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
                 try {
                     LOG.fine("Uncompressing response");
                     InputStream is = message.getContent(InputStream.class);
+                    if (is == null) {
+                        return;
+                    }
 
                     // wrap an unzipping stream around the original one
                     GZIPInputStream zipInput = new GZIPInputStream(is);

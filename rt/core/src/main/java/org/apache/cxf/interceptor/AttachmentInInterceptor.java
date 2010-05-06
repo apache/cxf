@@ -20,6 +20,7 @@
 package org.apache.cxf.interceptor;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.logging.Logger;
@@ -50,6 +51,9 @@ public class AttachmentInInterceptor extends AbstractPhaseInterceptor<Message> {
     public void handleMessage(Message message) {
         if (isGET(message)) {
             LOG.fine("AttachmentInInterceptor skipped in HTTP GET method");
+            return;
+        }
+        if (message.getContent(InputStream.class) == null) {
             return;
         }
         
