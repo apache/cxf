@@ -411,6 +411,7 @@
                         <bottom>Apache CXF</bottom>
                         <javadocVersion>1.5</javadocVersion>
                         <encoding>UTF-8</encoding>
+                        <detectOfflineLinks>false</detectOfflineLinks>
                         <!--subpackages>org.apache.cxf</subpackages-->
                     </configuration>
                 </plugin>
