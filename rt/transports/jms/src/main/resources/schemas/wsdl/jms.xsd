@@ -232,6 +232,28 @@
     					</xs:documentation>
     				</xs:annotation>
     			</xs:attribute>
+    			
+    			<xs:attribute name="jndiReplyToDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						Used when the ReplyTo address on the message needs to be different
+    						than the listening address of the consumer. This mostly applies to 
+    						MQSeries users who are interacting with remote queues.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>
+
+    			<xs:attribute name="jmsReplyToDestinationName"
+    				type="xs:string">
+    				<xs:annotation>
+    					<xs:documentation>
+    						Used when the ReplyTo address on the message needs to be different
+    						than the listening address of the consumer. This mostly applies to 
+    						MQSeries users who are interacting with remote queues.
+    					</xs:documentation>
+    				</xs:annotation>
+    			</xs:attribute>    			
 
     			<xs:attribute name="connectionUserName"
     				type="xs:string">

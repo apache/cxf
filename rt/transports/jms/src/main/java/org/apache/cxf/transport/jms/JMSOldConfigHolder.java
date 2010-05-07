@@ -268,10 +268,16 @@ public class JMSOldConfigHolder {
                 jmsConfig.setDestinationResolver(jndiDestinationResolver);
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());
                 jmsConfig.setReplyDestination(endpoint.getReplyToName());
+                if (address != null) {
+                    jmsConfig.setReplyToDestination(address.getJndiReplyToDestinationName());
+                }
             } else {
                 // Use the default dynamic destination resolver
                 jmsConfig.setTargetDestination(endpoint.getDestinationName());
                 jmsConfig.setReplyDestination(endpoint.getReplyToName());
+                if (address != null) {
+                    jmsConfig.setReplyToDestination(address.getJmsReplyToDestinationName());
+                }
             }
         }
         

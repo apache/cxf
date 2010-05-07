@@ -80,6 +80,7 @@ public class JMSConfiguration implements InitializingBean {
 
     private String targetDestination;
     private String replyDestination;
+    private String replyToDestination;
     private String messageType = JMSConstants.TEXT_MESSAGE_TYPE;
     private boolean pubSubDomain;
     private Boolean useConduitIdSelector;
@@ -277,6 +278,14 @@ public class JMSConfiguration implements InitializingBean {
         this.replyDestination = replyDestination;
     }
 
+    public String getReplyToDestination() {
+        return replyToDestination;
+    }
+
+    public void setReplyToDestination(String replyToDestination) {
+        this.replyToDestination = replyToDestination;
+    }
+    
     public String getMessageType() {
         return messageType;
     }

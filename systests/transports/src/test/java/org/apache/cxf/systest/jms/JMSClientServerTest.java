@@ -30,6 +30,10 @@ import java.util.concurrent.Future;
 
 import javax.activation.DataHandler;
 import javax.jms.DeliveryMode;
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
 import javax.xml.namespace.QName;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
@@ -70,18 +74,29 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.AddressType;
 import org.apache.cxf.transport.jms.JMSConduit;
+import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSConstants;
+import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
 import org.apache.cxf.transport.jms.JMSNamingPropertyType;
+import org.apache.cxf.transport.jms.JMSOldConfigHolder;
 import org.apache.cxf.transport.jms.JMSPropertyType;
+import org.apache.cxf.transport.jms.JNDIConfiguration;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.hello_world_doc_lit.Greeter;
 import org.apache.hello_world_doc_lit.PingMeFault;
 import org.apache.hello_world_doc_lit.SOAPService2;
+import org.apache.hello_world_doc_lit.SOAPService7;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
+import org.springframework.jms.core.SessionCallback;
+import org.springframework.jms.support.destination.DestinationResolver;
+import org.springframework.jndi.JndiTemplate;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
@@ -1192,4 +1207,70 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         }
 
     }
+    
+    @Test
+    public void testReplyToConfig() throws Exception {
+        JMSEndpoint endpoint = new JMSEndpoint();
+        endpoint.setJndiInitialContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
+        endpoint.setJndiURL("tcp://localhost:61500");
+        endpoint.setJndiConnectionFactoryName("ConnectionFactory");
+
+        final JMSConfiguration jmsConfig = new JMSConfiguration();        
+        JndiTemplate jt = new JndiTemplate();
+        
+        jt.setEnvironment(JMSOldConfigHolder.getInitialContextEnv(endpoint));
+        
+        JNDIConfiguration jndiConfig = new JNDIConfiguration();
+        jndiConfig.setJndiConnectionFactoryName(endpoint.getJndiConnectionFactoryName());
+        jmsConfig.setJndiTemplate(jt);
+        jmsConfig.setJndiConfig(jndiConfig);
+        
+        jmsConfig.setTargetDestination("dynamicQueues/SoapService7.replyto.queue");
+        jmsConfig.setReplyDestination("dynamicQueues/SoapService7.reply.queue");
+        
+        final JmsTemplate jmsTemplate = JMSFactory.createJmsTemplate(jmsConfig, null);
+
+        Thread t = new Thread() {
+            public void run() {
+                Destination destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
+                        DestinationResolver resolv = jmsTemplate.getDestinationResolver();
+                        return resolv.resolveDestinationName(session, jmsConfig.getTargetDestination(),
+                                                             false);
+                    }
+                });
+                
+                final Message message = jmsTemplate.receive(destination);
+                MessageCreator messageCreator = new MessageCreator() {
+                    public Message createMessage(Session session) {
+                        return message;
+                    }
+                };
+                    
+                destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                    public Object doInJms(Session session) throws JMSException {
+                        DestinationResolver resolv = jmsTemplate.getDestinationResolver();
+                        return resolv.resolveDestinationName(session,
+                                                             jmsConfig.getReplyDestination(),
+                                                             false);
+                    }
+                });
+                jmsTemplate.send(destination, messageCreator);
+            }
+        };
+
+        t.start();
+        
+        QName serviceName = getServiceName(new QName("http://apache.org/hello_world_doc_lit",
+                                                     "SOAPService7"));
+        QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort7"));
+        URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService7 service = new SOAPService7(wsdl, serviceName);        
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        String name = "FooBar";
+        String reply = greeter.greetMe(name);
+        assertEquals(reply, "Hello " + name);
+    }    
 }

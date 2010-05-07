@@ -213,8 +213,14 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
 
             public javax.jms.Message createMessage(Session session) throws JMSException {
                 String messageType = jmsConfig.getMessageType();
+                Destination destination = rtd;
+                String replyToAddress = jmsConfig.getReplyToDestination();
+                if (replyToAddress != null) {
+                    destination = JMSFactory.resolveOrCreateDestination(jmsTemplate, replyToAddress,
+                                                                        jmsConfig.isPubSubDomain());
+                }
                 jmsMessage = JMSUtils.buildJMSMessageFromCXFMessage(jmsConfig, outMessage, request,
-                                                                    messageType, session, rtd,
+                                                                    messageType, session, destination,
                                                                     cid);
                 if (!exchange.isSynchronous() && !exchange.isOneWay()) {
                     correlationMap.put(cid, exchange);
