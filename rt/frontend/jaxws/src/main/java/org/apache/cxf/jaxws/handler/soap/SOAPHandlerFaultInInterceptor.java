@@ -34,6 +34,7 @@ import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 
+import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
 import org.apache.cxf.helpers.CastUtils;
@@ -77,6 +78,7 @@ public class SOAPHandlerFaultInInterceptor extends
             return;
         }
 
+        checkUnderstoodHeaders(message);
         MessageContext context = createProtocolMessageContext(message);
         HandlerChainInvoker invoker = getInvoker(message);
         invoker.setProtocolMessageContext(context);
@@ -91,6 +93,18 @@ public class SOAPHandlerFaultInInterceptor extends
             message.setContent(XMLStreamReader.class, xmlReader);
         }
 
+    }
+
+    private void checkUnderstoodHeaders(SoapMessage soapMessage) {
+        Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
+        if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
+            //the TCK expects the getHeaders method to always be
+            //called.   If there aren't any headers in the message,
+            //THe MustUnderstandInterceptor quickly returns without 
+            //trying to calculate the understood headers.   Thus, 
+            //we need to call it here.
+            getUnderstoodHeaders();
+        }
     }
 
     private void handleAbort(SoapMessage message, MessageContext context) {
