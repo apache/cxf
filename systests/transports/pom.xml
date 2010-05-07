@@ -21,14 +21,14 @@
     <parent>
         <artifactId>cxf-parent</artifactId>
         <groupId>org.apache.cxf</groupId>
-        <version>2.2.8</version>
+        <version>2.2.9-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-systests-transports</artifactId>
     <name>Apache CXF Transport System Tests</name>
-    <version>2.2.8</version>
+    <version>2.2.9-SNAPSHOT</version>
     <url>http://cxf.apache.org</url>
     <build>
         <plugins>
