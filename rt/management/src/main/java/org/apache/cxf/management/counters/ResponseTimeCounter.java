@@ -84,6 +84,18 @@ public class ResponseTimeCounter implements ResponseTimeCounterMBean, Counter {
             minHandlingTime = handlingTime;
         }
     }
+
+    public void reset() {
+        invocations.set(0);
+        checkedApplicationFaults.set(0);
+        unCheckedApplicationFaults.set(0);
+        runtimeFaults.set(0);
+        logicalRuntimeFaults.set(0);
+        
+        totalHandlingTime = 0;    
+        maxHandlingTime = 0;
+        minHandlingTime = Integer.MAX_VALUE;   
+    }
     
     public ObjectName getObjectName() {
         return objectName;
