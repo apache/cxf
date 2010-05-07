@@ -1,8 +1,8 @@
-Apache CXF 2.2.7 Release Notes
+Apache CXF 2.2.8 Release Notes
 
 1. Overview
  
-Apache CXF 2.2.7 delivers the third major version of 
+Apache CXF 2.2.8 delivers the third major version of 
 the Celtix project (http://celtix.objectweb.org) and the XFire project
 (http://xfire.codehaus.org) merge.  This release is a major update from 
 the 2.1.x series.   The major new additions include:
@@ -13,7 +13,7 @@ the 2.1.x series.   The major new additions include:
  * Initial support for JAX-RS 1.0 including a client API for accessing 
    REST services   
 
-2.2.7 fixes over 55 JIRA issues reported by users and the community.
+2.2.8 fixes over 44 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -76,76 +76,58 @@ for caveats when upgrading from CXF 2.1.x to 2.2.x.
 
 6. Specific issues, features, and improvements fixed in this version
 
-Release Notes - CXF - Version 2.2.7
+
+Release Notes - CXF - Version 2.2.8
 
 
 ** Bug
-    * [CXF-2384] - SOAPFaultExcption thrown instead of a WebServiceException
-    * [CXF-2462] - CXF REST is not parsing the header value correctly if a comma is specified in a parameter value.
-    * [CXF-2531] - Wrong "transport" attribute in soap12:binding
-    * [CXF-2627] - Return Type List gets null on client if an empty list is returned
-    * [CXF-2628] - StaxUtils.writeStartElement(XMLStreamReader reader, XMLStreamWriter writer) does not write namespace for header elements that have a namespace URI and an empty prefix
-    * [CXF-2629] - WS-Addressing Action on response is not being returned as specified in the WSDL
     * [CXF-2630] - JmsConfiguration with custom TaskExecutor with Spring 3.0 => NoSuchMethodError 
-    * [CXF-2632] - Misleading error message in cxf-codegen-plugin URISyntaxException: Illegal character when path contains \
-    * [CXF-2633] - wrong cipher suites reported for webservice-server with https
-    * [CXF-2635] - JAXBUtils#getValidClass ignores classes with private default constructors
-    * [CXF-2638] - WS-SecurityPolicy SignedElements, SignedParts, EncryptedParts, EncryptedElements, and ContentEncryptedElements assertions incorrectly verified
-    * [CXF-2640] - WSDLToJavaContainer ignores CFG_SUPPRESS_GEN for outputdir creation
-    * [CXF-2645] - CXF codegen plugin does not properly expose "disableDependencyScan" config parameter
-    * [CXF-2647] - Fail to Create Top Down  Web Service from WSDL, if WSDL path has spaces in between
-    * [CXF-2650] - Long schema truncated prior to validation
-    * [CXF-2651] - LogUtils does not recognize SLF4J due to invallid Class.forName()  
-    * [CXF-2652] - UriInfo.getAbsolutePath throws "java.net.URISyntaxException: Illegal character in path" when there is an encoded space in the request URI
-    * [CXF-2654] - Outbound handling of WS-SP Signed/Encrypted/ContentEncrypted Parts and Elements policies incorrect
-    * [CXF-2655] - WS-SP token protection security binding property not correctly applied to X509 token in outbound interceptors
-    * [CXF-2658] - BindingType for SOAP 1.2 cannot be used for servlet transport
-    * [CXF-2660] - Cannot load WSDL from HTTPS URL if HTTPConduit configuration has AutoRedirect set to true
-    * [CXF-2661] - Customized JAXWS bindings with Codegen plug-in ignored with abstract WSDLs
-    * [CXF-2663] - JAXBUtils.scanPackages - iterator returns null class
-    * [CXF-2665] - "Remote procedure call" by couple JaxWsProxyFactoryBean and JaxWsServerFactoryBean doesnt work.
-    * [CXF-2667] - bus configure should provides bus attribute to set the bus
-    * [CXF-2668] - JaxWsProxyFactoryBean and JaxWsServerFactoryBean communication broken
-    * [CXF-2671] - Can't execute an operation with more than 128 arguments
-    * [CXF-2675] - Single quotes must be doubled in message formats (ie in Message.properties resource bundles)
-    * [CXF-2676] - JMX InstanceAlreadyExistsException under high load initialization
-    * [CXF-2677] - UriInfoImpl.getRequestUri() fails on URLs that require escaping
-    * [CXF-2692] - NPE when calling a web service with header
-    * [CXF-2694] - The CXF bundle has a required import on org.apache.xml.security
-    * [CXF-2696] - The dynamic imports of the bundles are invalid
-    * [CXF-2697] - REST and web methods taking arguments called without argument leads to IllegalArgumentException: wrong number of arguments exception
-    * [CXF-2698] - REST type conversion to Byte, Integer, ... (non primitives) not working
-    * [CXF-2699] - MapType does not output XML that matches the generated schema
-    * [CXF-2700] - Invalid method is used to get the value of the xml:lang attribute in the SOAP1.2 Text Element
-    * [CXF-2702] - NullPointerException in CxfAuthenticator
-    * [CXF-2703] - cxf-codegen-plugin problem resolving schemas in jars that have spaces in the path (patch attached)
-    * [CXF-2705] - CXFAuthenticator does not correctly retrieve authentication from Authenticator class; NoSuchMethodException is thrown
-    * [CXF-2706] - AttachmentDeserializer/LazyLoading Attachment Collection enters into continuous while loop for input with missing boundary
-    * [CXF-2707] - CXF-XJC-DV doesn not respect Abstract schema types
-    * [CXF-2708] - endpoint validation fails if WSDL referenced schemas exist on classpath outside the jar the endpoint exists
-    * [CXF-2711] - Concurrency issue with AsyncHandler
-    * [CXF-2713] - wsdl2js throws NPE
-    * [CXF-2715] - JAXRSOutInterceptor throws ClassCastException with ContentTypeOutInterceptor
-    * [CXF-2717] - Some Content-Transfer-Encoding values are not supported for multiparts
-    * [CXF-2719] - minOccurs=0 and nillable=true throws NPE for wrapper element if not specified.
-    * [CXF-2720] - MapType doesn't deserialize subclass instances
+    * [CXF-2695] - NullPointerException when reading a soap encoded struct with a nested element that's nil
+    * [CXF-2714] - SupportingToken UsernameToken is always encrypted
+    * [CXF-2724] - Relative schema location import fails on Windows machines
+    * [CXF-2728] - CXF-1977 is still valid for CXF 2.2.7
+    * [CXF-2729] - Cannot enable JMX extensions for Jetty through Jetty HTTP Transport in OSGi
+    * [CXF-2730] - Servlet controller is not updated after ApplicationContext refresh with Spring 3
+    * [CXF-2731] - NPE when using wsdl2js
+    * [CXF-2732] - DocLiteralInInterceptor on unmarshal the first message part when uisng SourceDataBinding
+    * [CXF-2733] - MultipleEndpointObserver does not set the exchange on the incoming Message in onMessage method
+    * [CXF-2739] - NPE When Mapping two xsd:dates in same object with Aegis Databinding
+    * [CXF-2740] - CXF does not unregister Endpoint MBeans for JAX-WS API published endpoints when endpoint is stopped through JAX-WS API
+    * [CXF-2742] - CXF MBeans are not unregistered/reregistered properly on CXF Bus shutdown and restart controlled by Spring DM
+    * [CXF-2743] - java2ws generates date into *.xjb header --> causign change where there is no change
+    * [CXF-2744] - Schema redefine element does not have its schemaLocation rewritten
+    * [CXF-2748] - Unmarshalling error when using fastinfoset
+    * [CXF-2752] - Regression - CXF Client Spring Context Fails
+    * [CXF-2761] - JavaScript variable "item" wont be reinitialized
+    * [CXF-2763] - Maven plugin extendedSoapHeaders option not under defaultOptions
+    * [CXF-2765] - Schema location import fails if there is space in the file path
+    * [CXF-2767] - Unable to handle schema location with spaces and serve up WSDL URL with unencoded spaces
+    * [CXF-2768] - Temporary files are not deleted for requests >64kb when using LoggingInInterceptor
+    * [CXF-2773] - should specify version range for net.sf.cglib optional import
+    * [CXF-2780] - Wrong soap fault code thrown on network connection failure
+    * [CXF-2781] - Charset encoding other than UTF-8 (as ISO-8859-1) not working
+    * [CXF-2784] - URIBuilder does not expand template variables in query parameters.
+    * [CXF-2785] - Base64Utils.decode should handle/wrap all exception types.
+    * [CXF-2786] - ws-rm Proxy should send SequenceAcknowledgement according to AcksTo URI header
+    * [CXF-2787] - CXF Extension bit @QueryParam("") does not allow null values in the bean
+    * [CXF-2792] - Custom Executor for Service object is ignored by the CXF JAX-WS run-time when Disaptch.invokeAsync is used
+    * [CXF-2798] - WS-addressing action not picked up on wrapped style operations
+    * [CXF-2799] - ant client-servlet doesn't work for  wsdl-first demo anymore
+    * [CXF-2801] - WebClient back() operation doesn't clear query parameters
 
 ** Improvement
-    * [CXF-2537] - Proposal : enhancement of HTTP exceptions messages
-    * [CXF-2662] - improve JMSFactory to use an external MessageListenerContainer
-    * [CXF-2669] - MTOM producer - different content-id in XOP:Include and MIME part for the same attachment
-    * [CXF-2672] - Enhance CXF client message in case of HttpRetryException (http codes 401 and 407)  
-    * [CXF-2685] - CXFBusFactory should provides a option which could disable the setDefaultBus action.
+    * [CXF-2639] - Expose Cryptographic coverage checking code from PolicyBasedWSS4JInInterceptor in a non-WS-Policy based interceptor
+    * [CXF-2723] - CLONE -Allow configuration of JaxWsClientFactoryBean during port creation
+    * [CXF-2727] - NullPointerException at org.apache.cxf.transport.TransportURIResolver when the WSDL is not found instead of an exception with a useful message
+    * [CXF-2745] - Add ability to define custom TimeToLive value for WSSecTimestamp
+    * [CXF-2753] - Need a way to preserve parameters wrapper in DocLiteralInInterceptor
+    * [CXF-2755] - Add a utility AuthorizationInInterceptor which can check if current SecurityContext matches expected roles
+    * [CXF-2771] - Jetty-HTTP Transport Jetty JMX support causes MBean name collisions
+    * [CXF-2790] - ws-rm example server side configuration contain unnecessary DecoupledEndpoint configuration
 
 ** New Feature
-    * [CXF-2693] - Allow to use HttpsURLConnection's defaultSSLSocketFactory and defaultHostnameVerifier in CXF client
+    * [CXF-2751] - Slf4jLogger
+    * [CXF-2793] - Provide capability for JMS client to specify separate ReplyTo queue and listener queue
 
-
-
-
-
-
-
-
-
-
+** Task
+    * [CXF-2802] - The ws-rm example should also be deployable in Tomcat
