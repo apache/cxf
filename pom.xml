@@ -479,9 +479,9 @@
                     <version>1.3.2</version>
                     <dependencies>
                         <dependency>
-                            <groupId>org.apache.cxf.build-utils</groupId>
+                            <groupId>org.apache.cxf</groupId>
                             <artifactId>cxf-buildtools</artifactId>
-                            <version>${pom.version}</version>
+                            <version>${project.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
