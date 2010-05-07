@@ -132,6 +132,16 @@ public class CounterRepositoryTest extends Assert {
                      opCounter.getMinResponseTime(), (long)1000);
         assertEquals("The Service counter isn't increased", sCounter.getNumInvocations(), 2);
         
+        opCounter.reset();
+        assertTrue(opCounter.getNumCheckedApplicationFaults().intValue() == 0);
+        assertTrue(opCounter.getNumInvocations().intValue() == 0);
+        assertTrue(opCounter.getNumLogicalRuntimeFaults().intValue() == 0);
+        assertTrue(opCounter.getNumRuntimeFaults().intValue() == 0);
+        assertTrue(opCounter.getNumUnCheckedApplicationFaults().intValue() == 0);
+        assertTrue(opCounter.getTotalHandlingTime().intValue() == 0);
+        assertTrue(opCounter.getMinResponseTime().longValue() == Integer.MAX_VALUE);
+        assertTrue(opCounter.getMaxResponseTime().intValue() == 0);
+        
         EasyMock.verify(bus);
         EasyMock.verify(mhtr1);
         EasyMock.verify(mhtr2);
