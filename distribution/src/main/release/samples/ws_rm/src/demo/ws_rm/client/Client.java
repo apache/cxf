@@ -19,6 +19,7 @@
 
 package demo.ws_rm.client;
 
+import java.io.File;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
 
@@ -38,15 +39,26 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {
         try {
-
+            
             SpringBusFactory bf = new SpringBusFactory();
             URL busFile = Client.class.getResource("ws_rm.xml");
             Bus bus = bf.createBus(busFile.toString());
             BusFactory.setDefaultBus(bus);
 
             bus.getOutInterceptors().add(new MessageLossSimulator());
-
-            GreeterService service = new GreeterService();
+            GreeterService service;
+            if (args.length != 0 && args[0].length() != 0) {
+                File wsdlFile = new File(args[0]);
+                URL wsdlURL;
+                if (wsdlFile.exists()) {
+                    wsdlURL = wsdlFile.toURL();
+                } else {
+                    wsdlURL = new URL(args[0]);
+                }
+                service = new GreeterService(wsdlURL);
+            } else {
+                service = new GreeterService();
+            }
             Greeter port = service.getGreeterPort();
 
             String[] names = new String[] {"Anne",

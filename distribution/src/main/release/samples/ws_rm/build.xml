@@ -35,4 +35,16 @@
         <echo level="info" message="Generating code using wsdl2java..."/>
         <wsdl2java file="hello_world_rm.wsdl"/>
     </target>
+  
+    <property name="cxf.war.file.name" value="helloworld"/>
+    <target name="war" depends="build">
+        <cxfwar wsdl="hello_world_rm.wsdl" filename="${cxf.war.file.name}.war"/>
+    </target>
+
+    <target name="client-servlet" description="run demo client hitting servlet" depends="build">        
+        <property name="param" value=""/>
+        <cxfrun classname="demo.ws_rm.client.Client" param1="${base.url}/helloworld/services/hello_world_ws_rm?wsdl" param2="${op}" param3="${p
+aram}" logging-properties-file="${basedir}/logging.properties"/>
+    </target>
+
 </project>
