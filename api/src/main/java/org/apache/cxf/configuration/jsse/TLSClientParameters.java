@@ -67,7 +67,7 @@ public class TLSClientParameters extends TLSParameterBase {
     }
     
     /**
-     * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()}Êshould be
+     * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()} should be
      * used to create https connections. If <code>true</code> , {@link #getJsseProvider()} ,
      * {@link #getSecureSocketProtocol()}, {@link #getTrustManagers()}, {@link #getKeyManagers()},
      * {@link #getSecureRandom()}, {@link #getCipherSuites()} and {@link #getCipherSuitesFilter()} are
@@ -78,7 +78,7 @@ public class TLSClientParameters extends TLSParameterBase {
     }
 
     /**
-     * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()}Êshould be
+     * Sets whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()} should be
      * used to create https connections.
      * 
      * @see #isUseHttpsURLConnectionDefaultSslSocketFactory()
