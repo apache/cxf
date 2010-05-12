@@ -136,6 +136,11 @@ public class Option {
     Boolean validateWsdl;
 
     /**
+     * Enables generation of fault Exception's SUID based on hash of classname.
+     */
+    Boolean useFQCNForFaultSerialVersionUID;
+
+    /**
      * The WSDL service name to use for the generated code
      */
     String serviceName;
@@ -305,6 +310,14 @@ public class Option {
         this.validateWsdl = validateWsdl;
     }
 
+    public boolean isUseFQCNForFaultSerialVersionUID() {
+        return useFQCNForFaultSerialVersionUID == null ? false : useFQCNForFaultSerialVersionUID;
+    }
+
+    public void setUseFQCNForFaultSerialVersionUID(boolean useFQCNForFaultSerialVersionUID) {
+        this.useFQCNForFaultSerialVersionUID = useFQCNForFaultSerialVersionUID;
+    }
+
     public Boolean getDefaultExcludesNamespace() {
         return defaultExcludesNamespace;
     }
@@ -372,6 +385,7 @@ public class Option {
         destination.setPackagenames(getPackagenames());
         destination.setServiceName(getServiceName());
         destination.setValidateWsdl(isValidateWsdl());
+        destination.setUseFQCNForFaultSerialVersionUID(isUseFQCNForFaultSerialVersionUID());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -390,6 +404,8 @@ public class Option {
         wsdlList = setIfNull(wsdlList, defaultOptions.wsdlList);
         extendedSoapHeaders = setIfNull(extendedSoapHeaders, defaultOptions.extendedSoapHeaders);
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);
+        useFQCNForFaultSerialVersionUID = setIfNull(useFQCNForFaultSerialVersionUID,
+            defaultOptions.useFQCNForFaultSerialVersionUID);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);

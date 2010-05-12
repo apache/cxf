@@ -81,7 +81,11 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                     exceptionClasses.get(expClassName);
     
                 clearAttributes();
-                setAttributes("suid", getSUID());
+                if (penv.containsKey(ToolConstants.CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID)) {
+                    setAttributes("suid", generateHashSUID(expClz.getFullClassName()));
+                } else {
+                    setAttributes("suid", generateTimestampSUID());
+                }
                 setAttributes("expClass", expClz);
                 for (JavaField jf : expClz.getFields()) {
                     setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
@@ -93,7 +97,11 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
         }
     }
 
-    private String getSUID() {
+    private String generateHashSUID(String className) {
+        return Long.toString(className.hashCode());
+    }
+
+    private String generateTimestampSUID() {
         return new SimpleDateFormat("yyyyMMddHHmmss").format(new Date());
     }
 

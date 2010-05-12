@@ -19,6 +19,7 @@
 package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
+import java.io.ObjectStreamClass;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -1330,6 +1331,24 @@ public class CodeGenTest extends AbstractCodeGenTest {
         assertTrue(m[0].getParameterAnnotations()[1][0] instanceof WebParam);
         WebParam wp = (WebParam)m[0].getParameterAnnotations()[1][0];
         assertTrue(wp.header());
+    }
+
+    @Test
+    public void testCXF2808() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID, Boolean.TRUE);
+        processor.setContext(env);
+        processor.execute();
+
+        File faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/NoSuchCodeLitFault.java");
+        assertTrue(faultFile.exists());
+        faultFile = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/BadRecordLitFault.java");
+        assertTrue(faultFile.exists());
+
+        Class<?> fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.NoSuchCodeLitFault");
+        assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
+        fault = classLoader.loadClass("org.apache.cxf.w2j.hello_world_soap_http.BadRecordLitFault");
+        assertEquals(fault.getName().hashCode(), ObjectStreamClass.lookup(fault).getSerialVersionUID());
     }
 
 }
