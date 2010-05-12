@@ -150,6 +150,7 @@ public class WsdlOption extends Option {
         }
         addIfTrue(list, isAllowElementRefs(), "-allowElementRefs");
         addIfTrue(list, isValidateWsdl(), "-validate");
+        addIfTrue(list, isUseFQCNForFaultSerialVersionUID(), "-useFQCNForFaultSerialVersionUID");
         addIfNotNull(list, getDefaultExcludesNamespace(), "-dex");
         addIfNotNull(list, getDefaultNamespacePackageMapping(), "-dns");
         addIfNotNull(list, getServiceName(), "-sn");

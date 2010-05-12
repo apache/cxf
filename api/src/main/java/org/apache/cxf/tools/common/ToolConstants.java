@@ -91,7 +91,7 @@ public final class ToolConstants {
     public static final String CFG_NO_ADDRESS_BINDING = "noAddressBinding";
     public static final String CFG_ALLOW_ELEMENT_REFS = "allowElementReferences";
     public static final String CFG_RESERVE_NAME = "reserveClass";
-
+    public static final String CFG_USE_FQCN_FAULT_SERIAL_VERSION_UID = "useFQCNForFaultSerialVersionUID";
 
 
     //Internal Flag to generate

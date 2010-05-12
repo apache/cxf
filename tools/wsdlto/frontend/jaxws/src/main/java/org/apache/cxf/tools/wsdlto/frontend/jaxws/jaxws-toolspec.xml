@@ -306,6 +306,14 @@ Examples:
                 <switch>noAddressBinding</switch>
             </option>
 
+            <option id="useFQCNForFaultSerialVersionUID" maxOccurs="1">
+                <annotation>
+                    Enable generation of Serial Version UID in fault Exception(s) based on hashcode
+                    of the fully qualified class name of the Exception.
+                </annotation>
+                <switch>useFQCNForFaultSerialVersionUID</switch>
+            </option>
+
         </optionGroup>
         <optionGroup id="common_options">
             <option id="help" maxOccurs="1">
