@@ -42,6 +42,8 @@ import org.apache.velocity.runtime.RuntimeConstants;
 
 public final class VelocityGenerator {
     private static final Logger LOG = LogUtils.getL7dLogger(VelocityGenerator.class);
+    private static boolean initialized;
+    
     private final Map<String, Object> attributes = new HashMap<String, Object>();
     private String baseDir;
     
@@ -52,7 +54,7 @@ public final class VelocityGenerator {
         initVelocity(log);
     }
 
-    private String getVelocityLogFile(String logfile) {
+    private static String getVelocityLogFile(String logfile) {
         String logdir = System.getProperty("user.home");
         if (logdir == null || logdir.length() == 0) {
             logdir = System.getProperty("user.dir");
@@ -60,7 +62,11 @@ public final class VelocityGenerator {
         return logdir + File.separator + logfile;
     }
 
-    private void initVelocity(boolean log) throws ToolException {
+    private static synchronized void initVelocity(boolean log) throws ToolException {
+        if (initialized) {
+            return;
+        }
+        initialized = true;
         try {
             Properties props = new Properties();
             String clzName = "org.apache.velocity.runtime.resource.loader.ClasspathResourceLoader";
