@@ -523,7 +523,7 @@ public final class DOMUtils {
             String name = node.getNodeName();
             if (ns.equals(node.getNodeValue())
                 && (name != null && (XMLNAMESPACE.equals(name) || name.startsWith(XMLNAMESPACE + ":")))) {
-                return node.getPrefix();
+                return node.getLocalName();
             }
         }
         return null;
@@ -648,7 +648,20 @@ public final class DOMUtils {
             elem = getNextElement(elem);
         }
     }
+    public static boolean hasElementInNS(Element el, String namespace) {
 
+        if (namespace.equals(el.getNamespaceURI())) {
+            return true;
+        }
+        Element elem = getFirstElement(el);
+        while (elem != null) {
+            if (hasElementInNS(elem, namespace)) {
+                return true;
+            }
+            elem = getNextElement(elem);
+        }
+        return false;
+    }
     /**
      * Set a namespace/prefix on an element if it is not set already. First off, it searches for the element
      * for the prefix associated with the specified namespace. If the prefix isn't null, then this is
