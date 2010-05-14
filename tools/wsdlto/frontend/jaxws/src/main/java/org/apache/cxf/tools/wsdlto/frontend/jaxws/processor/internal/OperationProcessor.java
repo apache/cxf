@@ -130,7 +130,7 @@ public class OperationProcessor  extends AbstractProcessor {
                 enableWrapper = opBinding.isEnableWrapperStyle();
             }
         }
-        method.setWrapperStyle(enableWrapper);
+        method.setWrapperStyle(enableWrapper && method.isWrapperStyle());
         
         
         paramProcessor.process(method,

@@ -362,6 +362,9 @@ public final class ProcessorUtil {
 
     public static List<QName> getWrappedElementQNames(ToolContext context, QName partElement) {
         List<QName> qnames = new ArrayList<QName>();
+        if (partElement == null) {
+            return qnames;
+        }
         for (WrapperElement element : getWrappedElement(context, partElement)) {
             qnames.add(element.getElementName());
         }

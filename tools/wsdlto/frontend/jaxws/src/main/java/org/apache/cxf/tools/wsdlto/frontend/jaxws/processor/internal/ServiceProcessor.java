@@ -170,6 +170,11 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (serviceBinding.getJaxwsClass() != null
                     && serviceBinding.getJaxwsClass().getClassName() != null) {
                     name = serviceBinding.getJaxwsClass().getClassName();  
+                    if (name.contains(".")) {
+                        jaxwsBinding.setPackage(name.substring(0, name.lastIndexOf('.')));
+                        name = name.substring(name.lastIndexOf('.') + 1);
+                    }
+                    
                     sclz.setClassJavaDoc(serviceBinding.getJaxwsClass().getComments());          
                 }
                 sclz.setPackageJavaDoc(serviceBinding.getPackageJavaDoc());
@@ -193,6 +198,10 @@ public class ServiceProcessor extends AbstractProcessor {
                 if (serviceBinding2.getJaxwsClass() != null
                     && serviceBinding2.getJaxwsClass().getClassName() != null) {
                     name = serviceBinding2.getJaxwsClass().getClassName();                
+                    if (name.contains(".")) {
+                        jaxwsBinding.setPackage(name.substring(0, name.lastIndexOf('.')));
+                        name = name.substring(name.lastIndexOf('.') + 1);
+                    }
                 }
                 if (serviceBinding2.getJaxwsClass().getComments() != null) {
                     jaxwsBinding.setClassJavaDoc(serviceBinding2.getJaxwsClass().getComments());

@@ -756,7 +756,8 @@ public class JAXBDataBinding implements DataBindingProfile {
         List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
                                                                      ToolConstants.SCHEMA_URI, 
                                                                      "include");
-        if (impElemList.size() == 0 && incElemList.size() == 0) {
+        boolean hasJAXB = DOMUtils.hasElementInNS(element, ToolConstants.NS_JAXB_BINDINGS);
+        if (impElemList.size() == 0 && incElemList.size() == 0 && !hasJAXB) {
             return element;
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
@@ -780,6 +781,16 @@ public class JAXBDataBinding implements DataBindingProfile {
         for (Element elem : incElemList) {
             Attr val = elem.getAttributeNode("schemaLocation");
             val.setNodeValue(mapSchemaLocation(val.getNodeValue(), sysId, catalog));
+        }
+        
+        if (hasJAXB) {
+            //need to add ns and version
+            String pfx = DOMUtils.getPrefix(element, ToolConstants.NS_JAXB_BINDINGS);
+            if (StringUtils.isEmpty(pfx)) {
+                pfx = DOMUtils.createNamespace(element, ToolConstants.NS_JAXB_BINDINGS);
+            }
+            element.setAttributeNS(ToolConstants.NS_JAXB_BINDINGS,
+                                   pfx + ":version", "2.0");
         }
         return element;
     }

@@ -83,6 +83,10 @@ public class FaultProcessor extends AbstractProcessor {
             if (jaxwsBinding.getJaxwsClass() != null
                 && jaxwsBinding.getJaxwsClass().getClassName() != null) {
                 name = jaxwsBinding.getJaxwsClass().getClassName();
+                if (name.contains(".")) {
+                    packageName = name.substring(0, name.lastIndexOf('.'));
+                    name = name.substring(name.lastIndexOf('.') + 1);
+                }
             }
         }
 
