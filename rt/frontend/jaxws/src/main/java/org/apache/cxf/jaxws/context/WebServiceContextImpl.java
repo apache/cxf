@@ -19,6 +19,8 @@
 
 package org.apache.cxf.jaxws.context;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Principal;
 import java.util.logging.Logger;
 
@@ -70,7 +72,6 @@ public class WebServiceContextImpl implements WebServiceContext {
         return ctx.isUserInRole(role);
     }
     
-    //  TODO JAX-WS 2.1
     public EndpointReference getEndpointReference(Element... referenceParameters) {
         WrappedMessageContext ctx = (WrappedMessageContext)getMessageContext();
         org.apache.cxf.message.Message msg = ctx.getWrappedMessage();
@@ -80,8 +81,24 @@ public class WebServiceContextImpl implements WebServiceContext {
         builder.address(ep.getEndpointInfo().getAddress());
         builder.serviceName(ep.getService().getName());
         builder.endpointName(ep.getEndpointInfo().getName());
-
-//        builder.wsdlDocumentLocation(wsdlLocation);        
+        URI wsdlDescription = ep.getEndpointInfo().getProperty("URI", URI.class);
+        if (wsdlDescription == null) {
+            String address = ep.getEndpointInfo().getAddress();
+            try {
+                wsdlDescription = new URI(address + "?wsdl");
+            } catch (URISyntaxException e) {
+                // do nothing
+            }
+            ep.getEndpointInfo().setProperty("URI", wsdlDescription);
+        }
+        builder.wsdlDocumentLocation(wsdlDescription.toString());
+        
+        /*
+        if (ep.getEndpointInfo().getService().getDescription() != null) {
+            builder.wsdlDocumentLocation(ep.getEndpointInfo().getService()
+                                     .getDescription().getBaseURI());
+        }
+        */
         if (referenceParameters != null) {
             for (Element referenceParameter : referenceParameters) {
                 builder.referenceParameter(referenceParameter);

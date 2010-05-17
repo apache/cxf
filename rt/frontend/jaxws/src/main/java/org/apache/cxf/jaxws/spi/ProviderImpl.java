@@ -19,9 +19,9 @@
 
 package org.apache.cxf.jaxws.spi;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.wsdl.Definition;
@@ -29,8 +29,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.EndpointReference;
@@ -46,11 +44,11 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
@@ -63,6 +61,16 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     public ServiceDelegate createServiceDelegate(URL url, QName qname, Class cls) {
         Bus bus = BusFactory.getThreadDefaultBus();
         return new ServiceImpl(bus, url, qname, cls);
+    }
+    //new in 2.2
+    public ServiceDelegate createServiceDelegate(URL wsdlDocumentLocation,
+                                                 QName serviceName,
+                                                 Class serviceClass,
+                                                 WebServiceFeature ... features) {
+        Bus bus = BusFactory.getThreadDefaultBus();
+        return new ServiceImpl(bus, wsdlDocumentLocation,
+                               serviceName, serviceClass, features);
+        
     }
 
     @Override
@@ -77,6 +85,19 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
         }
     }
+    //new in 2.2
+    public Endpoint createEndpoint(String bindingId,
+                                   Object implementor,
+                                   WebServiceFeature ... features) {
+        EndpointImpl ep = null;
+        if (EndpointUtils.isValidImplementor(implementor)) {
+            Bus bus = BusFactory.getThreadDefaultBus();
+            ep = new EndpointImpl(bus, implementor, bindingId, features);
+            return ep;
+        } else {
+            throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
+        }
+    }
 
     @Override
     public Endpoint createAndPublishEndpoint(String url, Object implementor) {
@@ -84,31 +105,53 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         ep.publish(url);
         return ep;
     }
+    //new in 2.2
+    public Endpoint createAndPublishEndpoint(String address,
+                                             Object implementor, WebServiceFeature ... features) {
+        Endpoint ep = createEndpoint(null, implementor, features);
+        ep.publish(address);
+        return ep;
+    }
 
-    public W3CEndpointReference createW3CEndpointReference(String address, QName serviceName, QName portName,
+    public W3CEndpointReference createW3CEndpointReference(String address, 
+                                                           QName serviceName, 
+                                                           QName portName,
                                                            List<Element> metadata,
                                                            String wsdlDocumentLocation,
                                                            List<Element> referenceParameters) {
-        QName portType = null;
-        if (serviceName != null && portName != null && wsdlDocumentLocation != null) {
+        return createW3CEndpointReference(address, null, serviceName, portName,
+                                          metadata, wsdlDocumentLocation, referenceParameters,
+                                          null, null);
+    }
+    //CHECKSTYLE:OFF - spec requires a bunch of params
+    public W3CEndpointReference createW3CEndpointReference(String address,
+                                                           QName interfaceName, 
+                                                           QName serviceName, 
+                                                           QName portName,
+                                                           List<Element> metadata,
+                                                           String wsdlDocumentLocation,
+                                                           List<Element> referenceParameters,
+                                                           List<Element> elements,
+                                                           Map<QName, String> attributes) {
+        //CHECKSTYLE:ON
+        if (serviceName != null && portName != null 
+            && wsdlDocumentLocation != null && interfaceName == null) {
             Bus bus = BusFactory.getThreadDefaultBus();
             WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);          
             try {
                 Definition def = wsdlManager.getDefinition(wsdlDocumentLocation);
-                portType = def.getService(serviceName).getPort(portName.getLocalPart()).getBinding()
+                interfaceName = def.getService(serviceName).getPort(portName.getLocalPart()).getBinding()
                     .getPortType().getQName();
             } catch (Exception e) {
                 // do nothing
             }
         }
-        CachedOutputStream cos = new CachedOutputStream();
-        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(cos);
+        if (serviceName == null && portName == null && address == null) {
+            throw new IllegalStateException("Address in an EPR cannot be null, "
+                                            + " when serviceName or portName is null");
+        }
         try {
-            // TODO: when serviceName/portName is null
-            if (serviceName == null && portName == null && address == null) {
-                throw new IllegalStateException("Address in an EPR cannot be null, "
-                                                + " when serviceName or portName is null");
-            }
+            W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
             writer.setPrefix(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.NS_WSA);
             writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_ERF_NAME,
                                      JAXWSAConstants.NS_WSA);
@@ -133,16 +176,25 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_METADATA_NAME,
                                      JAXWSAConstants.NS_WSA);
             writer.writeNamespace(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.NS_WSAW);
-
-            if (portType != null) {
-                writer.writeStartElement(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.WSAW_INTERFACE_NAME,
-                                         JAXWSAConstants.NS_WSAW);
-                String portTypePrefix = portType.getPrefix();
+            writer.writeNamespace(JAXWSAConstants.WSAM_PREFIX, JAXWSAConstants.NS_WSAM);
+            if (wsdlDocumentLocation != null) {
+                writer.writeNamespace(JAXWSAConstants.WSDLI_PFX,
+                                      JAXWSAConstants.NS_WSDLI);
+                writer.writeAttribute(JAXWSAConstants.WSDLI_PFX,
+                                      JAXWSAConstants.NS_WSDLI,
+                                      JAXWSAConstants.WSDLI_WSDLLOCATION,
+                                      wsdlDocumentLocation);
+            }
+            if (interfaceName != null) {
+                writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
+                                         JAXWSAConstants.WSAM_INTERFACE_NAME,
+                                         JAXWSAConstants.NS_WSAM);
+                String portTypePrefix = interfaceName.getPrefix();
                 if (portTypePrefix == null || portTypePrefix.equals("")) {
                     portTypePrefix = "ns1";
                 }
-                writer.writeNamespace(portTypePrefix, portType.getNamespaceURI());
-                writer.writeCharacters(portTypePrefix + ":" + portType.getLocalPart());
+                writer.writeNamespace(portTypePrefix, interfaceName.getNamespaceURI());
+                writer.writeCharacters(portTypePrefix + ":" + interfaceName.getLocalPart());
                 writer.writeEndElement();
             }
 
@@ -153,11 +205,12 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 serviceNamePrefix = (serviceName.getPrefix() == null || serviceName.getPrefix().length() == 0)
                     ? "ns2" : serviceName.getPrefix();
 
-                writer.writeStartElement(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.WSAW_SERVICENAME_NAME,
-                                         JAXWSAConstants.NS_WSAW);
+                writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
+                                         JAXWSAConstants.WSAM_SERVICENAME_NAME,
+                                         JAXWSAConstants.NS_WSAM);
 
                 if (portName != null) {
-                    writer.writeAttribute(JAXWSAConstants.WSAW_ENDPOINT_NAME, portName.getLocalPart());
+                    writer.writeAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName.getLocalPart());
                 }
                 writer.writeNamespace(serviceNamePrefix, serviceName.getNamespaceURI());
                 writer.writeCharacters(serviceNamePrefix + ":" + serviceName.getLocalPart());
@@ -188,21 +241,18 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             }
 
             writer.writeEndElement();
+            
+            if (elements != null) {
+                for (Element e : elements) {
+                    StaxUtils.writeElement(e, writer, true);
+                }
+            }
             writer.writeEndElement();
             writer.flush();
-        } catch (XMLStreamException e) {
-            throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
-                                          e);
-        }
 
-        try {
             Unmarshaller unmarshaller = getJAXBContext().createUnmarshaller();
-            return (W3CEndpointReference)unmarshaller.unmarshal(cos.getInputStream());
-
-        } catch (JAXBException e) {
-            throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
-                                          e);
-        } catch (IOException e) {
+            return (W3CEndpointReference)unmarshaller.unmarshal(writer.getDocument());
+        } catch (Exception e) {
             throw new WebServiceException(new Message("ERROR_UNMARSHAL_ENDPOINTREFERENCE", LOG).toString(),
                                           e);
         }
@@ -235,5 +285,11 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         }
         return jaxbContext;
     }
-
+    /*
+    //new in 2.2, but introduces a new class not found in 2.1
+    public Endpoint createEndpoint(String bindingId, Class<?> implementorClass,
+                                   Invoker invoker, WebServiceFeature ... features) {
+        //TODO - JAXWS 2.2
+    }
+    */
 }

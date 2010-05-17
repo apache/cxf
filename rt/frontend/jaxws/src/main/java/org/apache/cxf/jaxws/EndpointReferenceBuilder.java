@@ -50,10 +50,11 @@ public class EndpointReferenceBuilder {
         builder.address(this.endpoint.getEndpointInfo().getAddress());
         builder.serviceName(this.endpoint.getService().getName());
         builder.endpointName(this.endpoint.getEndpointInfo().getName());
-        
-        //TODO: get wsdlDocumentLocation
-        //builder.wsdlDocumentLocation(endpoint.getService().getServiceInfos().toString());        
-        
+        if (this.endpoint.getEndpointInfo().getService()
+                .getDescription() != null) {
+            builder.wsdlDocumentLocation(this.endpoint.getEndpointInfo().getService()
+                                         .getDescription().getBaseURI());
+        }
         return builder.build();
     }
 
