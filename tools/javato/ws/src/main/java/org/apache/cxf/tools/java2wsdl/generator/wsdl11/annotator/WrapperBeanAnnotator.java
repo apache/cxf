@@ -27,6 +27,7 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.tools.common.model.Annotator;
 import org.apache.cxf.tools.common.model.JAnnotation;
 import org.apache.cxf.tools.common.model.JAnnotationElement;
@@ -34,7 +35,15 @@ import org.apache.cxf.tools.common.model.JavaAnnotatable;
 import org.apache.cxf.tools.common.model.JavaField;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.model.WrapperBeanClass;
 public class WrapperBeanAnnotator implements Annotator {
-
+    Class<?> sourceClass;
+    
+    public WrapperBeanAnnotator() {
+        
+    }
+    public WrapperBeanAnnotator(Class<?> cls) {
+        this.sourceClass = cls;
+    }
+    
     public void annotate(final JavaAnnotatable clz) {
         WrapperBeanClass beanClass = null;
         if (clz instanceof WrapperBeanClass) {
@@ -52,12 +61,36 @@ public class WrapperBeanAnnotator implements Annotator {
         JAnnotation xmlAccessorType = new JAnnotation(XmlAccessorType.class);
         xmlAccessorType.addElement(new JAnnotationElement(null, XmlAccessType.FIELD));
 
+        XmlType tp = null;
+        if (sourceClass != null) {
+            tp = sourceClass.getAnnotation(XmlType.class);
+        }
         JAnnotation xmlType = new JAnnotation(XmlType.class);
-        xmlType.addElement(new JAnnotationElement("name", 
+        if (tp == null) {
+            xmlType.addElement(new JAnnotationElement("name", 
                                                   beanClass.getElementName().getLocalPart()));
-        xmlType.addElement(new JAnnotationElement("namespace", 
+            xmlType.addElement(new JAnnotationElement("namespace", 
                                                   beanClass.getElementName().getNamespaceURI()));
-        
+        } else {
+            if (!"##default".equals(tp.name())) {
+                xmlType.addElement(new JAnnotationElement("name", 
+                                                          tp.name()));
+            }
+            if (!"##default".equals(tp.namespace())) {
+                xmlType.addElement(new JAnnotationElement("namespace", 
+                                                          tp.namespace()));
+            }
+            if (!StringUtils.isEmpty(tp.factoryMethod())) {
+                xmlType.addElement(new JAnnotationElement("factoryMethod",
+                                                          tp.factoryMethod()));
+            }
+            if (tp.propOrder().length != 1 
+                || !StringUtils.isEmpty(tp.propOrder()[0])) {
+                xmlType.addElement(new JAnnotationElement("propOrder", 
+                                                      tp.propOrder()));
+            }
+            
+        }
         List<String> props = new ArrayList<String>();
         for (JavaField f : beanClass.getFields()) {
             props.add(f.getParaName());

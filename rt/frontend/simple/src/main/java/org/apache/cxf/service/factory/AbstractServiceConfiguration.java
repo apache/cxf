@@ -162,6 +162,9 @@ public abstract class AbstractServiceConfiguration {
     public String getResponseWrapperPartName(OperationInfo op, Method method) {
         return null;        
     }  
+    public String getRequestWrapperPartName(OperationInfo op, Method method) {
+        return null;        
+    }  
  
     public Class getResponseWrapper(Method selected) {
         return null;
@@ -200,6 +203,10 @@ public abstract class AbstractServiceConfiguration {
         return null;
     }
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        return null;
+    }
+
+    public String getFaultMessageName(OperationInfo op, Class<?> exClass, Class<?> beanClass) {
         return null;
     }
 }

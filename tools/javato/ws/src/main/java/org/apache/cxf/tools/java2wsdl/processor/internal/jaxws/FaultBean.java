@@ -87,7 +87,7 @@ public final class FaultBean {
             jClass.setElementName(new QName(URIParserUtil.getNamespace(ToolConstants.DEFAULT_PACKAGE_NAME),
                                         exceptionClass.getSimpleName()));
         }
-        jClass.annotate(new WrapperBeanAnnotator());
+        jClass.annotate(new WrapperBeanAnnotator(exceptionClass));
         
         return jClass;
     }
