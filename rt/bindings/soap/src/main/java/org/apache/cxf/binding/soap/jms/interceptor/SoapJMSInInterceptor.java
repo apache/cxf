@@ -77,10 +77,38 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
      * @param headers
      */
     private void checkSoapAction(SoapMessage message, Map<String, List<String>> headers) {
+        JMSFault jmsFault = null;
+        String soapAction = null;
+        String contentType = null;
+        String contentTypeAction = null;
+        List<String> ct = headers.get(SoapJMSConstants.CONTENTTYPE_FIELD);
         List<String> sa = headers.get(SoapJMSConstants.SOAPACTION_FIELD);
         if (sa != null && sa.size() > 0) {
-            //String soapAction = sa.get(0);
-            // ToDO
+            soapAction = sa.get(0);
+            if (soapAction != null && soapAction.startsWith("\"")) {
+                soapAction = soapAction.substring(1, soapAction.lastIndexOf("\""));
+            }
+        }
+        if (ct != null && ct.size() > 0) {
+            contentType = ct.get(0);
+        }
+        if (contentType != null && contentType.indexOf("action=") != -1) {
+            contentTypeAction = contentType.substring(contentType.indexOf("action=") + 7);
+            if (contentTypeAction.indexOf(";") != -1) {
+                contentTypeAction = contentTypeAction.substring(0, contentTypeAction.indexOf(";"));
+            }
+            if (contentTypeAction.startsWith("\"")) {
+                contentTypeAction = contentTypeAction.substring(1, contentTypeAction.lastIndexOf("\""));
+            }
+        }
+        if (soapAction != null && contentTypeAction != null && !soapAction.equals(contentTypeAction)) {
+            jmsFault = JMSFaultFactory.createMismatchedSoapActionFault(contentTypeAction);
+        }
+        if (jmsFault != null) {
+            Fault f = createFault(message, jmsFault);
+            if (f != null) {
+                throw f;
+            }
         }
     }
 

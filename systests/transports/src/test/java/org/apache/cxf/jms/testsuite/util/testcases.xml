@@ -74,6 +74,64 @@
 		</responseMessage>
 	</testCase>
 	
+	<testCase id="test0101" mep="inonly">
+		<address>jms:jndi:dynamicQueues/testqueue0101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue0101</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue0101
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+	</testCase>
+	
+	<testCase id="test0102" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue0101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue0101</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; action="echo"; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue0101
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue0101</requestURI>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+
 	<testCase id="test0003" mep="inonly">
 		<address>jms:jndi:dynamicQueues/testqueue0003?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
 		<requestMessage>
@@ -226,6 +284,32 @@
 		</requestMessage>
 		<responseMessage>
 			<destination>queue://replyqueue0001</destination>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test0013" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue0013?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<deliveryMode>2</deliveryMode>
+			<priority>5</priority>
+			<expiration>360000</expiration>
+			<destination>queue://testqueue0013</destination>
+		</requestMessage>
+		<responseMessage>
+			<destination>queue://replyqueue0013</destination>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test0014" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue0014?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<deliveryMode>2</deliveryMode>
+			<priority>5</priority>
+			<expiration>360000</expiration>
+			<destination>queue://testqueue0014</destination>
+		</requestMessage>
+		<responseMessage>
+			<destination>queue://replyqueue0014</destination>
 		</responseMessage>
 	</testCase>
 	
@@ -472,6 +556,383 @@
 			<contentType>text/xml; charset=UTF-8</contentType>
 			<soapAction></soapAction>
 			<requestURI>jms:jndi:dynamicQueues/testqueue1008?targetService=EchoPort
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>text/xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI></requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1009" mep="inout">
+		<address>jms:XXXX:dynamicQueues/testqueue1009?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1009</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>text/xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:XXXX:dynamicQueues/testqueue1009?targetService=EchoPort
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>text/xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI></requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+
+	<testCase id="test1101" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1101?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1101</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>0.3</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; action="echo"; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1101
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1101</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1102" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1102?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>stream</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1102</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1102
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>byte</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1102</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1103" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1103?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1103</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>text/plain; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1103
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1103</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1104" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1104?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1104</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:domain:dynamicQueues/testqueue1104</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:domain:dynamicQueues/testqueue1104</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1105" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1105?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1105</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService>EchoPort</targetService>
+			<contentType>application/soap+xml; charset=UTF-8; action="echo"</contentType>
+			<soapAction>ping</soapAction>
+			<requestURI>jms:domain:dynamicQueues/testqueue1105</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService>EchoPort</targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:domain:dynamicQueues/testqueue1105</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+
+	<testCase id="test1106" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1106?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1106</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType></contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1106
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1106</requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1107" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1107?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1107</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI></requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI></requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+	
+	<testCase id="test1108" mep="inout">
+		<address>jms:jndi:dynamicQueues/testqueue1108?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1108</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:jndi:dynamicQueues/testqueue1108?targetService=EchoPort
+			</requestURI>
+			<messageBody></messageBody>
+		</requestMessage>
+		<responseMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination></destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>application/soap+xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI></requestURI>
+			<isFault>true</isFault>
+			<messageBody></messageBody>
+		</responseMessage>
+	</testCase>
+
+	<testCase id="test1109" mep="inout">
+		<address>jms:XXXX:dynamicQueues/testqueue1109?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500</address>
+		<requestMessage>
+			<messageType>text</messageType>
+			<deliveryMode>2</deliveryMode>
+			<priority>4</priority>
+			<expiration>0</expiration>
+			<replyTo></replyTo>
+			<correlationID></correlationID>
+			<destination>queue://testqueue1109</destination>
+			<redelivered>false</redelivered>
+			<bindingVersion>1.0</bindingVersion>
+			<targetService></targetService>
+			<contentType>text/xml; charset=UTF-8</contentType>
+			<soapAction></soapAction>
+			<requestURI>jms:XXXX:dynamicQueues/testqueue1109?targetService=EchoPort
 			</requestURI>
 			<messageBody></messageBody>
 		</requestMessage>

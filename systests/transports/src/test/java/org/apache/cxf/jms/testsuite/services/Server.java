@@ -29,6 +29,9 @@ public class Server extends AbstractBusTestServerBase {
         Test0001Impl t0001 = new Test0001Impl();
         Endpoint.publish(JMSTestUtil.getTestCase("test0001").getAddress().trim(), t0001);
         
+        Test0101Impl t0101 = new Test0101Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test0101").getAddress().trim(), t0101);
+
         Test0003Impl t0003 = new Test0003Impl();
         Endpoint.publish(JMSTestUtil.getTestCase("test0003").getAddress().trim(), t0003);
         
@@ -53,6 +56,12 @@ public class Server extends AbstractBusTestServerBase {
         Test0012Impl t0012 = new Test0012Impl();
         Endpoint.publish(JMSTestUtil.getTestCase("test0012").getAddress().trim(), t0012);
         
+        Test0013Impl t0013 = new Test0013Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test0013").getAddress().trim(), t0013);
+        
+        Test0014Impl t0014 = new Test0014Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test0014").getAddress().trim(), t0014);
+        
         Test1001Impl t1001 = new Test1001Impl();
         Endpoint.publish(JMSTestUtil.getTestCase("test1001").getAddress().trim(), t1001);
         
@@ -73,6 +82,30 @@ public class Server extends AbstractBusTestServerBase {
         
         Test1008Impl t1008 = new Test1008Impl();
         Endpoint.publish(JMSTestUtil.getTestCase("test1008").getAddress().trim(), t1008);
+        
+        Test1101Impl t1101 = new Test1101Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1101").getAddress().trim(), t1101);
+        
+        Test1102Impl t1102 = new Test1102Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1102").getAddress().trim(), t1102);
+        
+        Test1103Impl t1103 = new Test1103Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1103").getAddress().trim(), t1103);
+        
+        Test1104Impl t1104 = new Test1104Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1104").getAddress().trim(), t1104);
+        
+        Test1105Impl t1105 = new Test1105Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1105").getAddress().trim(), t1105);
+        
+        Test1106Impl t1106 = new Test1106Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1106").getAddress().trim(), t1106);
+        
+        Test1107Impl t1107 = new Test1107Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1107").getAddress().trim(), t1107);
+        
+        Test1108Impl t1108 = new Test1108Impl();
+        Endpoint.publish(JMSTestUtil.getTestCase("test1108").getAddress().trim(), t1108);
     }
 
     public static void main(String[] args) {

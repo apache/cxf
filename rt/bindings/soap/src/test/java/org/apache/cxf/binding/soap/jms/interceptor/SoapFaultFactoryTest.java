@@ -69,7 +69,7 @@ public class SoapFaultFactoryTest extends Assert {
         assertEquals("reason", fault.getReason());
         assertEquals(Soap11.getInstance().getSender(), fault.getFaultCode());
         assertEquals(SoapJMSConstants.getContentTypeMismatchQName(), fault.getSubCode());
-        assertNull(fault.getDetail());
+        assertNotNull(fault.getDetail());
         assertSame(jmsFault, fault.getCause());
         control.verify();        
     }

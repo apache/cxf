@@ -22,6 +22,7 @@ package org.apache.cxf.binding.soap.jms.interceptor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
@@ -63,12 +64,29 @@ public class SoapFaultFactory  {
     Fault createSoap11Fault(JMSFault jmsFault) {
         SoapFault fault = new SoapFault(jmsFault.getReason(),
             jmsFault.isSender() ? version.getSender() : version.getReceiver());
-        fault.setSubCode(jmsFault.getSubCode());
+        QName subCode = jmsFault.getSubCode();
+        fault.setSubCode(subCode);
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            Document doc = factory.newDocumentBuilder().newDocument();
+            Element detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
+            Element detailChild = doc.createElementNS(subCode.getNamespaceURI(), subCode.getLocalPart());
+            detailChild.setTextContent(fault.getReason());
+            detail.appendChild(detailChild);
+            fault.setDetail(detail);
+        } catch (Exception ex) {
+            LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex); 
+            ex.printStackTrace();
+        }
         return fault;
     }
     
     Fault createSoap12Fault(JMSFault jmsFault) {
-        SoapFault fault = (SoapFault)createSoap11Fault(jmsFault);
+        SoapFault fault = new SoapFault(jmsFault.getReason(),
+            jmsFault.isSender() ? version.getSender() : version.getReceiver());
+        QName subCode = jmsFault.getSubCode();
+        fault.setSubCode(subCode);
         Object detail = jmsFault.getDetail();
         if (null == detail) {
             return fault;
