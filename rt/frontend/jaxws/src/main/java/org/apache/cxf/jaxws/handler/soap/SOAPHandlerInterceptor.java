@@ -43,6 +43,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 
+import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
 import org.apache.cxf.binding.soap.interceptor.MustUnderstandInterceptor;
@@ -114,6 +115,8 @@ public class SOAPHandlerInterceptor extends
             return;
         }
 
+        checkUnderstoodHeaders(message);
+
         if (getInvoker(message).isOutbound()) {
             if (!chainAlreadyContainsSAAJ(message)) {
                 SAAJ_OUT.handleMessage(message);
@@ -140,6 +143,18 @@ public class SOAPHandlerInterceptor extends
                     
                 }
             }
+        }
+    }
+
+    private void checkUnderstoodHeaders(SoapMessage soapMessage) {
+        Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
+        if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
+            //the TCK expects the getHeaders method to always be
+            //called.   If there aren't any headers in the message,
+            //THe MustUnderstandInterceptor quickly returns without
+            //trying to calculate the understood headers.   Thus,
+            //we need to call it here.
+            getUnderstoodHeaders();
         }
     }
 

@@ -36,6 +36,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Node;
 
+import org.apache.cxf.binding.soap.HeaderUtil;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
@@ -96,6 +97,8 @@ public class SOAPHandlerFaultOutInterceptor extends
             return;
         }
 
+        checkUnderstoodHeaders(message);
+
         if (getInvoker(message).isOutbound()) {
             //The SOAPMessage might be set from the outchain, in this case, 
             //we need to clean it up and create a new SOAPMessage dedicated to fault.
@@ -107,6 +110,18 @@ public class SOAPHandlerFaultOutInterceptor extends
         } 
     }
     
+    private void checkUnderstoodHeaders(SoapMessage soapMessage) {
+        Set<QName> paramHeaders = HeaderUtil.getHeaderQNameInOperationParam(soapMessage);
+        if (soapMessage.getHeaders().isEmpty() && paramHeaders.isEmpty()) {
+            //the TCK expects the getHeaders method to always be
+            //called.   If there aren't any headers in the message,
+            //THe MustUnderstandInterceptor quickly returns without
+            //trying to calculate the understood headers.   Thus,
+            //we need to call it here.
+            getUnderstoodHeaders();
+        }
+    }
+
     private void handleMessageInternal(SoapMessage message) {
         MessageContext context = createProtocolMessageContext(message);
         HandlerChainInvoker invoker = getInvoker(message);
