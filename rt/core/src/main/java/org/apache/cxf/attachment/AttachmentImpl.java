@@ -41,6 +41,7 @@ public class AttachmentImpl implements Attachment {
     public AttachmentImpl(String idParam, DataHandler handlerParam) {
         this.id = idParam;
         this.dataHandler = handlerParam;
+        this.dataHandler.setCommandMap(AttachmentUtil.getCommandMap());
     }
 
     public String getId() {
@@ -53,6 +54,7 @@ public class AttachmentImpl implements Attachment {
 
     public void setDataHandler(DataHandler dataHandler) {
         this.dataHandler = dataHandler;
+        this.dataHandler.setCommandMap(AttachmentUtil.getCommandMap());
     }
 
     public void setHeader(String name, String value) {
