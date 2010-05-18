@@ -22,6 +22,7 @@ package org.apache.cxf.jaxws;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
@@ -116,12 +117,13 @@ public class ServiceImpl extends ServiceDelegate {
 
     private final Collection<QName> ports = new HashSet<QName>();
     private Map<QName, PortInfoImpl> portInfos = new HashMap<QName, PortInfoImpl>();
+    private WebServiceFeature serviceFeatures[];
 
-
-    public ServiceImpl(Bus b, URL url, QName name, Class<?> cls) {
+    public ServiceImpl(Bus b, URL url, QName name, Class<?> cls, WebServiceFeature ... f) {
         bus = b;
         this.serviceName = name;
         clazz = cls;
+        serviceFeatures = f;
         
         handlerResolver = new HandlerResolverImpl(bus, name, clazz);
         
@@ -220,6 +222,17 @@ public class ServiceImpl extends ServiceDelegate {
         portInfos.put(portName, portInfo);
     }
 
+    private WebServiceFeature[] getAllFeatures(WebServiceFeature features[]) {
+        if (serviceFeatures == null || serviceFeatures.length == 0) {
+            return features;
+        } else if (features == null || features.length == 0) {
+            return serviceFeatures;
+        }
+        List<WebServiceFeature> f = new ArrayList<WebServiceFeature>(Arrays.asList(features));
+        f.addAll(Arrays.asList(serviceFeatures));
+        return f.toArray(new WebServiceFeature[f.size()]);
+    }
+    
     private JaxWsClientEndpointImpl getJaxwsEndpoint(QName portName, AbstractServiceFactoryBean sf, 
                                       WebServiceFeature...features) {
         Service service = sf.getService();
@@ -246,7 +259,8 @@ public class ServiceImpl extends ServiceDelegate {
         }
 
         try {
-            return new JaxWsClientEndpointImpl(bus, service, ei, this, features);
+            return new JaxWsClientEndpointImpl(bus, service, ei, this,
+                                               getAllFeatures(features));
         } catch (EndpointException e) {
             throw new WebServiceException(e);
         }
@@ -392,7 +406,10 @@ public class ServiceImpl extends ServiceDelegate {
         JaxWsClientFactoryBean clientFac = (JaxWsClientFactoryBean) proxyFac.getClientFactoryBean();
         JaxWsServiceFactoryBean serviceFactory = (JaxWsServiceFactoryBean) proxyFac.getServiceFactory();
         proxyFac.initFeatures();
-        serviceFactory.setWsFeatures(Arrays.asList(features));
+        WebServiceFeature f[] = getAllFeatures(features);
+        if (f != null) {
+            serviceFactory.setWsFeatures(Arrays.asList(f));
+        }
         
         proxyFac.setBus(bus);
         proxyFac.setServiceClass(serviceEndpointInterface);

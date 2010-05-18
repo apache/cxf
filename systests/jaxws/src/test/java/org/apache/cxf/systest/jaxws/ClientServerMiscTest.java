@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.SOAPBinding;
@@ -236,6 +237,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         DocLitWrappedCodeFirstServiceMissingOps port = service.getPort(portName,
                                   DocLitWrappedCodeFirstServiceMissingOps.class);
 
+        ((BindingProvider)port).getEndpointReference();
         int[] ret = port.echoIntArray(new int[] {1, 2});
         assertNotNull(ret);
         ret = port.echoIntArray(new int[] {1, 2});

@@ -20,6 +20,7 @@ package org.apache.cxf.jaxws;
 
 import java.security.AccessController;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -34,6 +35,7 @@ import javax.xml.transform.Source;
 import javax.xml.ws.Binding;
 import javax.xml.ws.EndpointReference;
 import javax.xml.ws.WebServiceException;
+import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.WebServicePermission;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.http.HTTPBinding;
@@ -131,15 +133,24 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
      * WebService annotation. Optional.
      */
     public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl) {
+        this(b, i, bindingUri, wsdl, null);
+    }
+    public EndpointImpl(Bus b, Object i, String bindingUri, String wsdl, WebServiceFeature f[]) {
         bus = b;
         implementor = i;
         this.bindingUri = bindingUri;
         wsdlLocation = wsdl == null ? null : new String(wsdl);
         serverFactory = new JaxWsServerFactoryBean();
+        if (f != null) {
+            ((JaxWsServiceFactoryBean)serverFactory.getServiceFactory()).setWsFeatures(Arrays.asList(f));
+        }
     }
         
     public EndpointImpl(Bus b, Object i, String bindingUri) {
         this(b, i, bindingUri, (String)null);
+    }
+    public EndpointImpl(Bus b, Object i, String bindingUri, WebServiceFeature features[]) {
+        this(b, i, bindingUri, (String)null, features);
     }
    
     public EndpointImpl(Bus bus, Object implementor) {
@@ -746,4 +757,11 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 .getName()).toString());
         }
     }
+    
+    /*
+    //new in 2.2, but introduces a new class not found in 2.1
+    public void setEndpointContext(EndpointContext ctxt) {
+        //TODO - JAXWS 2.2
+    }
+    */
 }
