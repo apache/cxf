@@ -37,9 +37,11 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
+import javax.activation.CommandMap;
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
 import javax.activation.FileDataSource;
+import javax.activation.MailcapCommandMap;
 import javax.activation.URLDataSource;
 import javax.mail.Header;
 import javax.mail.internet.InternetHeaders;
@@ -56,11 +58,22 @@ public final class AttachmentUtil {
     private static final String ATT_UUID = UUID.randomUUID().toString();
     
     private static final Random BOUND_RANDOM = new Random();
-    
+    private static final MailcapCommandMap COMMAND_MAP = new MailcapCommandMap();
+
+
     private AttachmentUtil() {
 
     }
+    
+    static {
+        COMMAND_MAP.addMailcap("image/*;;x-java-content-handler=" 
+                               + ImageDataContentHandler.class.getName());
+    }
 
+    public static CommandMap getCommandMap() {
+        return COMMAND_MAP;
+    }
+    
     /**
      * @param ns
      * @return

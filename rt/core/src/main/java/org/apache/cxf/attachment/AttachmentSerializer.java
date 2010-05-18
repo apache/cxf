@@ -30,12 +30,11 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.activation.DataHandler;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
 
-
 public class AttachmentSerializer {
-
     private Message message;
     private String bodyBoundary;
     private OutputStream out;
@@ -221,11 +220,14 @@ public class AttachmentSerializer {
                     headers = Collections.emptyMap();
                 }
                 
-                writeHeaders(a.getDataHandler().getContentType(), a.getId(),
+                
+                DataHandler handler = a.getDataHandler();
+                handler.setCommandMap(AttachmentUtil.getCommandMap());
+                
+                writeHeaders(handler.getContentType(), a.getId(),
                              headers, writer);
                 out.write(writer.getBuffer().toString().getBytes(encoding));
-                
-                a.getDataHandler().writeTo(out);
+                handler.writeTo(out);
             }
         }
         StringWriter writer = new StringWriter();                
@@ -244,5 +246,5 @@ public class AttachmentSerializer {
     public void setXop(boolean xop) {
         this.xop = xop;
     }
-    
+
 }
