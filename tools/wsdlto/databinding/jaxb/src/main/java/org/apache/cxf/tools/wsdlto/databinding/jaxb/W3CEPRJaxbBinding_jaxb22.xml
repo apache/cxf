@@ -19,23 +19,29 @@ under the License.
 -->
 <bindings xmlns="http://java.sun.com/xml/ns/jaxb" 
 	xmlns:wsa="http://www.w3.org/2005/08/addressing"
-	version="2.1">
+	version="2.1"
+	xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
 	<bindings scd="x-schema::wsa" if-exists="true">
 		<schemaBindings map="false" />
 		<bindings scd="wsa:EndpointReference">
-			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"/>
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"
+				xjc:recursive="true" />
 		</bindings>
 		<bindings scd="wsa:ReplyTo">
-			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"/>
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"
+				xjc:recursive="true" />
 		</bindings>
 		<bindings scd="wsa:FaultTo">
-			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"/>
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"
+				xjc:recursive="true" />
 		</bindings>
 		<bindings scd="wsa:From">
-			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"/>
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"
+				xjc:recursive="true" />
 		</bindings>
 		<bindings scd="~wsa:EndpointReferenceType">
-			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"/>
+			<class ref="javax.xml.ws.wsaddressing.W3CEndpointReference"
+				xjc:recursive="true" />
 		</bindings>
 	</bindings>
 </bindings>
