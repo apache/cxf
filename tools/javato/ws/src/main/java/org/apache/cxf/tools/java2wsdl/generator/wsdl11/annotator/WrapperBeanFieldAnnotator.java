@@ -44,15 +44,7 @@ public class WrapperBeanFieldAnnotator implements Annotator {
             throw new RuntimeException("WrapperBeanFiledAnnotator expect JavaField as input");
         }
         String rawName = jField.getRawName();
-        JAnnotation xmlElementAnnotation = new JAnnotation(XmlElement.class);
-        xmlElementAnnotation.addElement(new JAnnotationElement("name", rawName));
-        if (!StringUtils.isEmpty(jField.getTargetNamespace())) {
-            xmlElementAnnotation.addElement(new JAnnotationElement("namespace", 
-                                                                          jField.getTargetNamespace()));
-        }
-
-        jField.addAnnotation(xmlElementAnnotation);
-        
+        boolean hasEl = false;
         for (Annotation ann : jField.getJaxbAnnotaions()) {
             if (ann instanceof XmlMimeType) {
                 JAnnotation mimeAnno = new JAnnotation(XmlMimeType.class);
@@ -69,7 +61,39 @@ public class WrapperBeanFieldAnnotator implements Annotator {
             } else if (ann instanceof XmlList) {
                 JAnnotation jaxbAnn = new JAnnotation(XmlList.class);
                 jField.addAnnotation(jaxbAnn);
+            } else if (ann instanceof XmlElement) {
+                hasEl = true;
+                XmlElement el = (XmlElement)ann;
+                JAnnotation xmlElementAnnotation = new JAnnotation(XmlElement.class);
+                xmlElementAnnotation.addElement(new JAnnotationElement("name", el.name()));
+                if (!StringUtils.isEmpty(el.namespace())) {
+                    xmlElementAnnotation.addElement(new JAnnotationElement("namespace", 
+                                                                           el.namespace()));
+                }
+                if (el.nillable()) {
+                    xmlElementAnnotation.addElement(new JAnnotationElement("nillable", 
+                                                                           el.nillable(), true));
+                }
+                if (el.required()) {
+                    xmlElementAnnotation.addElement(new JAnnotationElement("required",
+                                                                           el.required(), true));
+                }
+                if (!StringUtils.isEmpty(el.defaultValue())) {
+                    xmlElementAnnotation.addElement(new JAnnotationElement("defaultValue", 
+                                                                           el.defaultValue()));
+                }
+                jField.addAnnotation(xmlElementAnnotation);
             }
+        }
+        if (!hasEl) {
+            JAnnotation xmlElementAnnotation = new JAnnotation(XmlElement.class);
+            xmlElementAnnotation.addElement(new JAnnotationElement("name", rawName));
+            if (!StringUtils.isEmpty(jField.getTargetNamespace())) {
+                xmlElementAnnotation.addElement(new JAnnotationElement("namespace", 
+                                                                              jField.getTargetNamespace()));
+            }
+
+            jField.addAnnotation(xmlElementAnnotation);
         }
     }
 }

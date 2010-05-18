@@ -32,6 +32,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAttachmentRef;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlNsForm;
@@ -314,22 +315,23 @@ public final class WrapperClassGenerator extends ASMHelper {
                                         fieldDescriptor,
                                         null);
         
-        
-        AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
-        av0.visit("name", name);
-        if (factory.isWrapperPartQualified(mpi)) {
-            av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
-        }
-        if (factory.isWrapperPartNillable(mpi)) {
-            av0.visit("nillable", Boolean.TRUE);
-        }
-        if (factory.getWrapperPartMinOccurs(mpi) == 1) {
-            av0.visit("required", Boolean.TRUE);
-        }
-        av0.visitEnd();
+
 
         List<Annotation> jaxbAnnos = getJaxbAnnos(mpi);
-        addJAXBAnnotations(fv, jaxbAnnos);
+        if (!addJAXBAnnotations(fv, jaxbAnnos)) {
+            AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
+            av0.visit("name", name);
+            if (factory.isWrapperPartQualified(mpi)) {
+                av0.visit("namespace", mpi.getConcreteName().getNamespaceURI());            
+            }
+            if (factory.isWrapperPartNillable(mpi)) {
+                av0.visit("nillable", Boolean.TRUE);
+            }
+            if (factory.getWrapperPartMinOccurs(mpi) == 1) {
+                av0.visit("required", Boolean.TRUE);
+            }
+            av0.visitEnd();            
+        }
         fv.visitEnd();
 
         String methodName = JAXBUtils.nameToIdentifier(name, JAXBUtils.IdentifierType.GETTER);
@@ -358,8 +360,9 @@ public final class WrapperClassGenerator extends ASMHelper {
 
     }
      
-    private void addJAXBAnnotations(FieldVisitor fv, List<Annotation> jaxbAnnos) {
+    private boolean addJAXBAnnotations(FieldVisitor fv, List<Annotation> jaxbAnnos) {
         AnnotationVisitor av0;
+        boolean addedEl = false;
         for (Annotation ann : jaxbAnnos) {
             if (ann instanceof XmlMimeType) {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlMimeType;", true);
@@ -381,8 +384,21 @@ public final class WrapperClassGenerator extends ASMHelper {
             } else if (ann instanceof XmlList) {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlList;", true);
                 av0.visitEnd();
+            } else if (ann instanceof XmlElement) {
+                addedEl = true;   
+                XmlElement el = (XmlElement)ann;
+                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
+                av0.visit("name", el.name());
+                av0.visit("nillable", el.nillable());
+                av0.visit("requried", el.required());
+                av0.visit("namespace", el.namespace());
+                av0.visit("defaultValue", el.defaultValue());
+                av0.visit("type", el.type());
+                av0.visitEnd(); 
+                
             }
         }
+        return addedEl;
     }
     
     

@@ -26,6 +26,7 @@ import java.util.List;
 
 import javax.jws.Oneway;
 import javax.xml.bind.annotation.XmlAttachmentRef;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -82,7 +83,8 @@ public final class WrapperUtil {
                     if (ann.annotationType() == XmlAttachmentRef.class
                         || ann.annotationType() == XmlMimeType.class
                         || ann.annotationType() == XmlJavaTypeAdapter.class
-                        || ann.annotationType() == XmlList.class) {
+                        || ann.annotationType() == XmlList.class
+                        || ann.annotationType() == XmlElement.class) {
                         jaxbAnnotation.add(ann);
                     }                   
                 }
