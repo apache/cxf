@@ -102,6 +102,7 @@ public class Compiler {
     }
     
     public boolean compileFiles(String[] files) {
+        String endorsed = System.getProperty("java.endorsed.dirs");
         if (!forceFork) {
             try { 
                 Class.forName("javax.tools.JavaCompiler");
@@ -135,6 +136,10 @@ public class Compiler {
         list.add(javacstr);
         // End of honoring java.home for used javac
 
+        if (!StringUtils.isEmpty(endorsed)) {
+            list.add("-endorseddirs");
+            list.add(endorsed);
+        }
 
         //fix for CXF-2081, set maximum heap of this VM to javac.
         list.add("-J-Xmx" + maxMemory);
