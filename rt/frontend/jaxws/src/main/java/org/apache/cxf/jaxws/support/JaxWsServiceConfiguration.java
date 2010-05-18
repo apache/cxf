@@ -348,27 +348,76 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             return null;
         }
     }
+    @Override
+    public String getRequestWrapperPartName(OperationInfo op, Method method) {
+        method = getDeclaredMethod(method);
+        RequestWrapper rw = method.getAnnotation(RequestWrapper.class);
+        if (rw != null) {
+            return getWithReflection(RequestWrapper.class, rw, "partName");
+        }
+        return null;
+    }
 
     @Override
     public String getResponseWrapperPartName(OperationInfo op, Method method) {
         method = getDeclaredMethod(method);
         WebResult webResult = getWebResult(method);
+        ResponseWrapper rw = method.getAnnotation(ResponseWrapper.class);
+        if (rw != null) {
+            String pn = getWithReflection(ResponseWrapper.class, rw, "partName");
+            if (pn != null) {
+                return pn;
+            }
+        }
+        int countOut = 0;
+        int countHeaders = 0;
+        
         if (webResult != null
             && webResult.header()) {
-            for (int x = 0; x < method.getParameterTypes().length; x++) {
-                WebParam parm = getWebParam(method, x);
-                if (parm != null
-                    && !parm.header()
-                    && parm.mode() != WebParam.Mode.IN) {
-                    return null;
+            countHeaders++;
+        } else if (method.getReturnType() != Void.TYPE) {
+            countOut++;
+        }
+        
+        for (int x = 0; x < method.getParameterTypes().length; x++) {
+            WebParam parm = getWebParam(method, x);
+            if (parm != null) {                
+                if (parm.header()) {
+                    countHeaders++;
+                }
+                if (parm.mode() != WebParam.Mode.IN) {
+                    countOut++;
                 }
             }
+        }
+        if (countHeaders > 0 && countOut == 0) {
             //all outs are headers, thus it's an empty body part
             //thus return the default for an empty part of "result"
             return "result";
         }
         return null;
     }  
+    public String getFaultMessageName(OperationInfo op, Class<?> exClass, Class<?> beanClass) {
+        WebFault f = exClass.getAnnotation(WebFault.class);
+        if (f != null) {
+            return getWithReflection(WebFault.class, f, "messageName");
+        }
+        
+        System.out.println(exClass.getName() + " has no WebFault");
+        return null;
+    }
+
+    private  <T> String getWithReflection(Class<T> cls, T obj, String name) {
+        try {
+            String s = cls.getMethod(name).invoke(obj).toString();
+            if (!StringUtils.isEmpty(s)) {
+                return s;
+            }
+        } catch (Exception e) {
+            //ignore = possibly JAX-WS 2.1
+        }
+        return null;
+    }
 
     @Override
     public QName getOutParameterName(OperationInfo op, Method method, int paramNumber) {       

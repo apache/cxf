@@ -1609,7 +1609,18 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     
 
     protected void createInputWrappedMessageParts(OperationInfo op, Method method, MessageInfo inMsg) {
-        MessagePartInfo part = inMsg.addMessagePart("parameters");
+        String partName = null;
+        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
+            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+            partName = c.getRequestWrapperPartName(op, method);
+            if (partName != null) {
+                break;
+            }
+        }
+        if (partName == null) {
+            partName = "parameters";
+        }
+        MessagePartInfo part = inMsg.addMessagePart(partName);
         part.setElement(true);
         for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
             AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
@@ -2023,14 +2034,25 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (beanClass == null) {
             return null;
         }
+        String faultMsgName = null;
+        for (Iterator itr = serviceConfigurations.iterator(); itr.hasNext();) {
+            AbstractServiceConfiguration c = (AbstractServiceConfiguration)itr.next();
+            faultMsgName = c.getFaultMessageName(op, exClass, beanClass);
+            if (faultMsgName != null) {
+                break;
+            }
+        }
+        if (faultMsgName == null) {
+            faultMsgName = exClass.getSimpleName();
+        }
 
         QName faultName = getFaultName(service, op, exClass, beanClass);
-        FaultInfo fi = op.addFault(new QName(op.getName().getNamespaceURI(), exClass.getSimpleName()),
-                                   new QName(op.getName().getNamespaceURI(), exClass.getSimpleName()));
+        FaultInfo fi = op.addFault(new QName(op.getName().getNamespaceURI(), faultMsgName),
+                                   new QName(op.getName().getNamespaceURI(), faultMsgName));
         fi.setProperty(Class.class.getName(), exClass);
         fi.setProperty("elementName", faultName);
-        MessagePartInfo mpi = fi.addMessagePart(new QName(faultName.getNamespaceURI(), exClass
-            .getSimpleName()));
+        MessagePartInfo mpi = fi.addMessagePart(new QName(faultName.getNamespaceURI(), 
+                                                          exClass.getSimpleName()));
         mpi.setElementQName(faultName);
         mpi.setTypeClass(beanClass);
         return fi;

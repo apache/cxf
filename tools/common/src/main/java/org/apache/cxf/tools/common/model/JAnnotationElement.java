@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.common.model;
 
+import java.lang.reflect.Array;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -78,9 +79,18 @@ public final class JAnnotationElement {
                 for (int i = 0; i < list.size(); i++) {
                     appendValue(sb, list.get(i));
                     if (i < list.size() - 1) {
-                        sb.append(",");
+                        sb.append(", ");
                     }
                 }
+                sb.append("}");
+            } else if (value instanceof String[]) {
+                sb.append("{");
+                for (int i = 0; i < Array.getLength(value); i++) {
+                    appendValue(sb, Array.get(value, i));
+                    if (i < Array.getLength(value) - 1) {
+                        sb.append(", ");
+                    }
+                }                
                 sb.append("}");
             } else {
                 appendValue(sb, value);
