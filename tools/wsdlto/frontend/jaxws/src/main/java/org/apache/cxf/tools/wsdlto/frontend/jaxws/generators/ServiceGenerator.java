@@ -23,6 +23,7 @@ import java.util.Map;
 
 import javax.jws.HandlerChain;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
 
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.helpers.CastUtils;
@@ -135,6 +136,10 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 }
                 setAttributes("wsdlUrl", url);
                 setCommonAttributes();
+                
+                if (Service.class.getDeclaredConstructors().length == 2) {
+                    setAttributes("jaxws22", true);
+                }
     
                 doWrite(SERVICE_TEMPLATE, parseOutputName(js.getPackageName(), 
                                                           js.getName()));

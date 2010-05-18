@@ -85,6 +85,19 @@ public class ${service.Name} extends ${serviceSuperclass} {
     public ${service.Name}() {
         super(WSDL_LOCATION, SERVICE);
     }
+    
+#if ($jaxws22)     
+    public ${service.Name}(WebServiceFeature ... features) {
+        super(WSDL_LOCATION, SERVICE, features);
+    }
+    public ${service.Name}(URL wsdlLocation, WebServiceFeature ... features) {
+        super(wsdlLocation, SERVICE, features);
+    }
+
+    public ${service.Name}(URL wsdlLocation, QName serviceName, WebServiceFeature ... features) {
+        super(wsdlLocation, serviceName, features);
+    }
+#end
 
 #foreach ($port in $service.Ports)
     /**
