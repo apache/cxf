@@ -352,28 +352,42 @@ public final class StaxUtils {
     }
     public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
         if (source instanceof SAXSource) {
-            InputSource src = ((SAXSource)source).getInputSource();
-            if (src.getSystemId() == null && src.getPublicId() == null
-                && ((SAXSource)source).getXMLReader() != null) {
-                //OK - reader is OK.  We'll use that out
-                StreamWriterContentHandler ch = new StreamWriterContentHandler(writer);
-                XMLReader reader = ((SAXSource)source).getXMLReader();
-                reader.setContentHandler(ch);
-                try {
+            SAXSource ss = (SAXSource)source;
+            InputSource src = ss.getInputSource();
+            if (src == null || (src.getSystemId() == null && src.getPublicId() == null)) {
+                if (ss.getXMLReader() != null) {
+                    //OK - reader is OK.  We'll use that out
+                    StreamWriterContentHandler ch = new StreamWriterContentHandler(writer);
+                    XMLReader reader = ((SAXSource)source).getXMLReader();
+                    reader.setContentHandler(ch);
                     try {
-                        reader.setFeature("http://xml.org/sax/features/namespaces", true);
-                    } catch (Throwable t) {
-                        //ignore
+                        try {
+                            reader.setFeature("http://xml.org/sax/features/namespaces", true);
+                        } catch (Throwable t) {
+                            //ignore
+                        }
+                        reader.parse(((SAXSource)source).getInputSource());
+                        return;
+                    } catch (Exception e) {
+                        throw new XMLStreamException(e);
                     }
-                    reader.parse(((SAXSource)source).getInputSource());
+                } else if (ss.getInputSource() == null) {
+                    //nothing to copy, just return
                     return;
-                } catch (Exception e) {
-                    throw new XMLStreamException(e);
                 }
             }
        
         }
-        
+
+        if (source instanceof StreamSource) {
+            StreamSource ss = (StreamSource)source;
+            if (ss.getInputStream() == null
+                && ss.getReader() == null
+                && ss.getSystemId() == null) {
+                //nothing to copy, just return
+                return;
+            }
+        }
         XMLStreamReader reader = createXMLStreamReader(source);
         copy(reader, writer);
         reader.close();

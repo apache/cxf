@@ -262,7 +262,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
             }
             Object ret[] = client.invokeWrapped(opName,
                                                 obj);
-            if (isOneWay) {
+            if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }
             return (T)ret[0];
