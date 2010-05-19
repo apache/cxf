@@ -68,6 +68,11 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                                  Class serviceClass,
                                                  WebServiceFeature ... features) {
         Bus bus = BusFactory.getThreadDefaultBus();
+        for (WebServiceFeature f : features) {
+            if (!f.getClass().getName().startsWith("javax.xml.ws")) {
+                throw new WebServiceException("Unknown feature error: " + f.getClass().getName());
+            }
+        }
         return new ServiceImpl(bus, wsdlDocumentLocation,
                                serviceName, serviceClass, features);
         
