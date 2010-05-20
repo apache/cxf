@@ -217,12 +217,12 @@ public class PrettyPrintXMLStreamWriter implements XMLStreamWriter {
     }
      
     public void writeStartElement(java.lang.String localName) throws XMLStreamException {
-        writeStartElement(null, null, localName);
+        writeStartElement(null, localName, null);
     }
      
     public void writeStartElement(java.lang.String namespaceURI, java.lang.String localName)
         throws XMLStreamException {
-        writeStartElement(null, namespaceURI, localName);
+        writeStartElement(null, localName, namespaceURI);
     }
      
     public void writeStartElement(java.lang.String prefix,
