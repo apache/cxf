@@ -228,8 +228,8 @@ public class CachedOutputStream extends OutputStream {
             } else {
                 // read the file
                 currentStream.close();
-                FileInputStream fin = new FileInputStream(tempFile);
                 if (copyOldContent) {
+                    FileInputStream fin = new FileInputStream(tempFile);
                     IOUtils.copyAndCloseInput(fin, out);
                 }
                 streamList.remove(currentStream);
