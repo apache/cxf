@@ -79,8 +79,10 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
         assertTrue(output.toString().indexOf("http://cxf.apache.org/input") != -1);
         String expectedFault = 
-            "http://server.addr_fromjava.ws.systest.cxf.apache.org/AddNumberImpl/Fault/AddNumbersException";
-        assertTrue(input.toString().indexOf(expectedFault) != -1);
+            "http://server.addr_fromjava.ws.systest.cxf.apache.org/AddNumberImpl/"
+            + "addNumbers/Fault/AddNumbersException";
+        assertTrue(input.toString(),
+                   input.toString().indexOf(expectedFault) != -1);
     }
 
     @Test
