@@ -61,7 +61,10 @@ public final class WSActionAnnotator implements Annotator {
             action = (QName)mi.getExtensionAttribute(WSAW_OLD_ACTION_QNAME);
         }
         if (action != null) {
-            return action.getLocalPart();
+            String s = action.getLocalPart();
+            if (!StringUtils.isEmpty(s)) {
+                return s;
+            }
         } 
         return null;
     }
