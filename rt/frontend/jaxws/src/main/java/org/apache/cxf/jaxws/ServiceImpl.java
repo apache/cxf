@@ -40,7 +40,6 @@ import javax.wsdl.Definition;
 import javax.wsdl.Port;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.soap.SOAPAddress;
-import javax.wsdl.extensions.soap.SOAPBinding;
 import javax.wsdl.extensions.soap12.SOAP12Address;
 import javax.wsdl.extensions.soap12.SOAP12Binding;
 import javax.xml.bind.JAXBContext;
@@ -52,6 +51,7 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.HandlerResolver;
+import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.spi.ServiceDelegate;
 
 import org.apache.cxf.Bus;
@@ -169,16 +169,15 @@ public class ServiceImpl extends ServiceDelegate {
                 
                 String tpId = null;
                 String address = null;
+                String bindingID = null;
                 List<? extends ExtensibilityElement> extensions 
                     = CastUtils.cast(port.getBinding().getExtensibilityElements());
                 if (!extensions.isEmpty()) {
                     ExtensibilityElement e = extensions.get(0);
                     if (e instanceof SoapBinding) {
-                        tpId = ((SoapBinding)e).getTransportURI();
+                        bindingID = SOAPBinding.SOAP11HTTP_BINDING;
                     } else if (e instanceof SOAP12Binding) {
-                        tpId = ((SOAP12Binding)e).getTransportURI();
-                    } else if (e instanceof SOAPBinding) {
-                        tpId = ((SOAPBinding)e).getTransportURI();
+                        bindingID = SOAPBinding.SOAP12HTTP_BINDING;
                     }
                 }
                 extensions = CastUtils.cast(port.getExtensibilityElements());
@@ -198,7 +197,6 @@ public class ServiceImpl extends ServiceDelegate {
                     }
                 }
                 this.ports.add(name);
-                String bindingID = BindingID.getJaxwsBindingID(tpId);
                 addPort(name, bindingID, address);
             }
         } catch (WebServiceException e) {
