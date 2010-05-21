@@ -106,7 +106,7 @@ public class AttachmentSerializer {
             .append(bodyBoundary)
             .append("\"; ")
             .append("start=\"<")
-            .append(rootContentId)
+            .append(checkAngleBrackets(rootContentId))
             .append(">\"; ")
             .append("start-info=\"")
             .append(bodyCt)
@@ -167,11 +167,8 @@ public class AttachmentSerializer {
         writer.write("Content-Transfer-Encoding: binary\r\n");
 
         if (attachmentId != null) {
+            attachmentId = checkAngleBrackets(attachmentId);
             writer.write("Content-ID: <");
-            if (attachmentId.charAt(0) == '<'
-                && attachmentId.charAt(attachmentId.length() - 1) == '>') {
-                attachmentId = attachmentId.substring(1, attachmentId.length() - 1);
-            }
             writer.write(URLDecoder.decode(attachmentId, "UTF-8"));
             writer.write(">\r\n");
         }
@@ -196,6 +193,13 @@ public class AttachmentSerializer {
         writer.write("\r\n");
     }
 
+    private static String checkAngleBrackets(String value) { 
+        if (value.charAt(0) == '<' && value.charAt(value.length() - 1) == '>') {
+            return value.substring(1, value.length() - 1);
+        }    
+        return value;
+    }
+    
     /**
      * Write the end of the body boundary and any attachments included.
      * @throws IOException

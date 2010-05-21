@@ -35,6 +35,7 @@ import javax.activation.DataHandler;
 import javax.imageio.ImageIO;
 import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 
@@ -49,6 +50,7 @@ import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.provider.JSONProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
@@ -323,7 +325,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         InputStream is1 = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
         List<Attachment> objects = new ArrayList<Attachment>();
-        objects.add(new Attachment("theroot", MediaType.APPLICATION_XML, jaxb));
+        objects.add(new Attachment("<theroot>", MediaType.APPLICATION_XML, jaxb));
         objects.add(new Attachment("thejson", MediaType.APPLICATION_JSON, json));
         objects.add(new Attachment("theimage", MediaType.APPLICATION_OCTET_STREAM, is1));
         Collection<? extends Attachment> coll = client.postAndGetCollection(objects, Attachment.class);
@@ -393,7 +395,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         client.type("multipart/form-data").accept("multipart/form-data");
         
         ContentDisposition cd = new ContentDisposition("attachment;filename=java.jpg");
-        Attachment att = new Attachment("image", is1, cd);
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-ID", "image");
+        headers.putSingle("Content-Disposition", cd.toString());
+        headers.putSingle("Content-Location", "http://host/bar");
+        headers.putSingle("custom-header", "custom");
+        Attachment att = new Attachment(is1, headers);
         
         MultipartBody body = new MultipartBody(att);
         MultipartBody body2 = client.post(body, MultipartBody.class);
@@ -405,13 +412,14 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         ContentDisposition cd2 = body2.getRootAttachment().getContentDisposition();
         assertEquals("attachment;filename=java.jpg", cd2.toString());
         assertEquals("java.jpg", cd2.getParameter("filename"));
+        assertEquals("http://host/location", body2.getRootAttachment().getHeader("Content-Location"));
     }
     
     @Test
     public void testUploadImageFromForm2() throws Exception {
         File file = 
             new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg").getFile());
-        String address = "http://localhost:9085/bookstore/books/formimage";
+        String address = "http://localhost:9085/bookstore/books/formimage2";
         WebClient client = WebClient.create(address);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);

@@ -89,11 +89,36 @@ public class MultipartStore {
     
     
     @POST
+    @Path("/books/formimage2")
+    @Consumes("multipart/form-data")
+    @Produces("multipart/form-data")
+    public MultipartBody addBookFormImage2(MultipartBody image) throws Exception {
+        image.getAllAttachments();
+        return image;
+    }
+    
+    @POST
     @Path("/books/formimage")
     @Consumes("multipart/form-data")
     @Produces("multipart/form-data")
     public MultipartBody addBookFormImage(MultipartBody image) throws Exception {
-        return image;
+        List<Attachment> atts = image.getAllAttachments();
+        if (atts.size() != 1) {
+            throw new WebApplicationException();
+        }
+        List<Attachment> newAtts = new ArrayList<Attachment>();
+        Attachment at = atts.get(0);
+        MultivaluedMap<String, String> headers = at.getHeaders();
+        if (!"http://host/bar".equals(headers.getFirst("Content-Location"))) {
+            throw new WebApplicationException();
+        }
+        if (!"custom".equals(headers.getFirst("Custom-Header"))) {
+            throw new WebApplicationException();
+        }
+        headers.putSingle("Content-Location", "http://host/location");
+        newAtts.add(new Attachment(at.getContentId(), at.getDataHandler(), headers));
+        
+        return new MultipartBody(newAtts);
     }
     
     @POST
