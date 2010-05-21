@@ -120,7 +120,7 @@ public class Attachment {
     }
 
     public MultivaluedMap<String, String> getHeaders() {
-        return new MetadataMap<String, String>(headers);
+        return new MetadataMap<String, String>(headers, false, true);
     }
     
     @Override
