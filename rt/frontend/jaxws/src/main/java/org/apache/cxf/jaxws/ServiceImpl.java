@@ -178,6 +178,8 @@ public class ServiceImpl extends ServiceDelegate {
                         bindingID = SOAPBinding.SOAP11HTTP_BINDING;
                     } else if (e instanceof SOAP12Binding) {
                         bindingID = SOAPBinding.SOAP12HTTP_BINDING;
+                    } else if (e instanceof javax.wsdl.extensions.soap.SOAPBinding) {
+                        bindingID = SOAPBinding.SOAP11HTTP_BINDING;
                     }
                 }
                 extensions = CastUtils.cast(port.getExtensibilityElements());
