@@ -351,6 +351,7 @@ public final class ContextUtils {
     public static void rebaseResponse(final EndpointReferenceType reference,
                                       AddressingProperties inMAPs,
                                       final Message inMessage) {
+        
         String namespaceURI = inMAPs.getNamespaceURI();
         if (!retrievePartialResponseSent(inMessage)) {
             storePartialResponseSent(inMessage);
