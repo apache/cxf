@@ -19,6 +19,7 @@
 package org.apache.cxf.jaxws.dispatch;
 
 import java.net.URL;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
@@ -32,10 +33,16 @@ import javax.xml.ws.soap.SOAPFaultException;
 
 import org.w3c.dom.Document;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.AbstractJaxWsTest;
+import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.jaxws.MessageReplayObserver;
 import org.apache.cxf.jaxws.ServiceImpl;
+import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -136,4 +143,25 @@ public class DispatchTest extends AbstractJaxWsTest {
         
         fail("SOAPFaultException was not thrown");
     }
+    
+    @Test
+    // CXF-2822
+    public void testInterceptorsConfiguration() throws Exception {
+        String cfgFile = "org/apache/cxf/jaxws/dispatch/bus-dispatch.xml";
+        Bus bus = new SpringBusFactory().createBus(cfgFile, true);
+        ServiceImpl service = new ServiceImpl(bus, getClass().getResource("/wsdl/hello_world.wsdl"),
+                                              serviceName, null);
+
+        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
+        List<Interceptor<? extends Message>> interceptors = ((DispatchImpl)disp).getClient()
+            .getInInterceptors();
+        boolean exists = false;
+        for (Interceptor interceptor : interceptors) {
+            if (interceptor instanceof LoggingInInterceptor) {
+                exists = true;
+            }
+        }
+        assertTrue("The LoggingInInterceptor is not configured to dispatch client", exists);
+    }
+    
 }
