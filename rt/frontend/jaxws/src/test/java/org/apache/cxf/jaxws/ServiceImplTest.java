@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.jaxws;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Proxy;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
@@ -45,6 +47,7 @@ import org.apache.cxf.endpoint.NullConduitSelector;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.jaxb.JAXBDataBinding;
+import org.apache.cxf.jaxws.handler.PortInfoImpl;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.Test;
@@ -79,7 +82,7 @@ public class ServiceImplTest extends AbstractJaxWsTest {
         assertTrue("unexpected ConduitSelector",
                    client.getConduitSelector() instanceof NullConduitSelector);
     }
-    
+        
     @Test
     public void testNonSpecificGetPort() throws Exception {
         SOAPService service = new SOAPService();
@@ -282,6 +285,24 @@ public class ServiceImplTest extends AbstractJaxWsTest {
                    isClientProxyFactoryBeanConfigured);        
         getBus().setExtension(oldConfiguer, Configurer.class);
     }
+    
+    
+    
+    @Test
+    @SuppressWarnings("unchecked")
+    // CXF-2819:<protocl-bindings>##SOAP12_Binding <protocl-bindings> in handler chain is not correctly
+    // matched
+    public void testGetSOAP12BindingIDFromWSDL() throws Exception {
+        QName serviceName = new QName("http://apache.org/hello_world_soap12_http", "SOAPService");
+        URL wsdlURL = getClass().getResource("/wsdl/hello_world_soap12.wsdl");
+        ServiceImpl seviceImpl = new ServiceImpl(this.getBus(), wsdlURL, serviceName,
+                                                 org.apache.hello_world_soap12_http.Greeter.class);
+        Field f = seviceImpl.getClass().getDeclaredField("portInfos");
+        f.setAccessible(true);
+        Map<QName, PortInfoImpl> portInfoMap = (Map<QName, PortInfoImpl>)f.get(seviceImpl);
+        assertEquals(portInfoMap.values().iterator().next().getBindingID(), SOAPBinding.SOAP12HTTP_BINDING);
+    }
+    
     
     class JAXWSClientFactoryCongfiguer extends ConfigurerImpl {
         @Override
