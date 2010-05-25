@@ -50,8 +50,8 @@
         <activemq.version>5.3.0</activemq.version>
         <derby.version>10.2.2.0</derby.version>
         <jaxb.version>2.1</jaxb.version>
-        <jaxb.impl.version>2.1.12</jaxb.impl.version>
-        <jaxb.xjc.version>2.1.12</jaxb.xjc.version>
+        <jaxb.impl.version>2.1.13</jaxb.impl.version>
+        <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
         <jdom.version>1.0</jdom.version>
         <jetty.version>6.1.21</jetty.version>
         <msv.version>2009.1</msv.version>
