@@ -142,8 +142,8 @@ public class W3CDOMStreamWriter implements XMLStreamWriter {
         writeEndElement();
     }
 
-    public void writeEmptyElement(String prefix, String namespace, String local) throws XMLStreamException {
-        writeStartElement(prefix, namespace, local);
+    public void writeEmptyElement(String prefix, String local, String namespace) throws XMLStreamException {
+        writeStartElement(prefix, local, namespace);
         writeEndElement();
     }
 

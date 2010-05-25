@@ -22,9 +22,9 @@ package org.apache.cxf.jaxws.support;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
+import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.xml.ws.Binding;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebServiceFeature;
@@ -32,6 +32,8 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
+
+import org.w3c.dom.Element;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBinding;
@@ -41,6 +43,7 @@ import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.AbstractInDatabindingInterceptor;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.binding.DefaultBindingImpl;
@@ -63,9 +66,12 @@ import org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassOutInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**
@@ -229,22 +235,93 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                                                                             WSAW_USINGADDRESSING_QNAME);
                 el.setRequired(addressing.required());
                 bindingInfo.addExtensor(el);
-            } catch (WSDLException e) {
-                // TODO Auto-generated catch block
+                
+                StringBuilder polRefId = new StringBuilder(bindingInfo.getName().getLocalPart());
+                polRefId.append("_WSAM_Addressing_Policy");
+                UnknownExtensibilityElement uel = new UnknownExtensibilityElement();
+                
+                W3CDOMStreamWriter writer = new W3CDOMStreamWriter();
+                writer.writeStartElement("wsp", "PolicyReference", PolicyConstants.NAMESPACE_WS_POLICY);
+                writer.writeAttribute("URI", "#" + polRefId.toString());
+                writer.writeEndElement();
+                Element pr = writer.getDocument().getDocumentElement();
+                uel.setElement(pr);
+                uel.setElementType(DOMUtils.getElementQName(pr));
+                bindingInfo.addExtensor(uel);
+                
+                writer = new W3CDOMStreamWriter();
+                writer.writeStartElement("wsp", "Policy", PolicyConstants.NAMESPACE_WS_POLICY);
+                writer.writeAttribute("wsu", PolicyConstants.WSU_NAMESPACE_URI,
+                                      PolicyConstants.WSU_ID_ATTR_NAME, polRefId.toString());
+                writer.writeStartElement("wsam", "Addressing", JAXWSAConstants.NS_WSAM);
+                if (!addressing.required()) {
+                    writer.writeAttribute("wsp", PolicyConstants.NAMESPACE_WS_POLICY,
+                                          "Optional", "true");
+                }
+                writer.writeStartElement("wsp", "Policy", PolicyConstants.NAMESPACE_WS_POLICY);
+                
+                String s = getAddressingRequirement(addressing);
+                if (s != null) {
+                    writer.writeEmptyElement("wsam", s, JAXWSAConstants.NS_WSAM);
+                }
+                
+                writer.writeEndElement();
+                writer.writeEndElement();
+                writer.writeEndElement();
+                
+                pr = writer.getDocument().getDocumentElement();
+                
+                uel = new UnknownExtensibilityElement();
+                uel.setElement(pr);
+                uel.setElementType(DOMUtils.getElementQName(pr));
+                if (bindingInfo.getService().getDescription() == null) {
+                    DescriptionInfo description = new DescriptionInfo();
+                    description.setName(bindingInfo.getService().getName());
+                    bindingInfo.getService().setDescription(description);
+                }
+                bindingInfo.getService().getDescription().addExtensor(uel);
+                
+            } catch (Exception e) {
+                //ignore
                 e.printStackTrace();
             }
         }        
     }
 
+    private String getAddressingRequirement(Addressing addressing) {
+        try {
+            Object o = Addressing.class.getMethod("responses").invoke(addressing);
+            if (o != null) {
+                String s = o.toString();
+                if ("ANONYMOUS".equals(s)) {
+                    return "AnonymousResponses";
+                } else if ("NON_ANONYMOUS".equals(s)) {
+                    return "NonAnonymousResponses";
+                }
+            }
+        } catch (Throwable ex) {
+            //ignore - probably JAX-WS 2.1
+        }
+        return null;
+    }
+
     private Addressing getAddressing() {
-        Class<?> serviceClass = implInfo.getSEIClass();
-        if (serviceClass == null) {
-            serviceClass = implInfo.getImplementorClass();
+        Class<?> serviceClass = implInfo.getImplementorClass();
+        if (serviceClass != null) {
+            Addressing ad = serviceClass.getAnnotation(Addressing.class);
+            if (ad != null) {
+                return ad;
+            }
         }
-        if (serviceClass == null) {
-            return null;
+        
+        serviceClass = implInfo.getSEIClass();
+        if (serviceClass != null) {
+            Addressing ad = serviceClass.getAnnotation(Addressing.class);
+            if (ad != null) {
+                return ad;
+            }
         }
-        return serviceClass.getAnnotation(Addressing.class);
+        return null;
     }
 
     public Binding getJaxwsBinding() {

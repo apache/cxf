@@ -34,6 +34,7 @@ public final class JAXWSAConstants {
     public static final String NS_WSAM = "http://www.w3.org/2007/05/addressing/metadata";
 
     public static final QName WSAW_ACTION_QNAME = new QName(NS_WSAW,  "Action");
+    public static final QName WSAM_ACTION_QNAME = new QName(NS_WSAM,  "Action");
     
     public static final QName WSAW_USINGADDRESSING_QNAME = new QName(NS_WSAW, "UsingAddressing");
     

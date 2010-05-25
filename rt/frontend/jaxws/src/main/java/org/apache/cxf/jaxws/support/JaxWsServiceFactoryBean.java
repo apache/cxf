@@ -480,11 +480,19 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         MessageInfo input = operation.getInput();
         if (!StringUtils.isEmpty(action.input())) {
             input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.input());
+            input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.input());
+        } else {
+            input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                        computeAction(operation, "Request"));
         }
         
         MessageInfo output = operation.getOutput();
         if (output != null && !StringUtils.isEmpty(action.output())) {
             output.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.output());
+            output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.output());
+        } else if (output != null) {
+            output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                         computeAction(operation, "Response"));            
         }
         
         FaultAction[] faultActions = action.fault();
@@ -495,15 +503,41 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 FaultInfo faultInfo = getFaultInfo(operation, faultAction.className());
                 faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, 
                                                 faultAction.value());
+                faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                                faultAction.value());
                 if (operation.isUnwrappedCapable()) {
                     faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
                     faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, 
                                                     faultAction.value());
+                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                                    faultAction.value());
                 }
             }
-        }        
+        } 
+        for (FaultInfo fi : operation.getFaults()) {
+            if (fi.getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME) == null) {
+                String f = "/Fault/" + fi.getName().getLocalPart();
+                fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                         computeAction(operation, f));
+                if (operation.isUnwrappedCapable()) {
+                    fi = operation.getUnwrappedOperation().getFault(fi.getName());
+                    fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                                             computeAction(operation, f));
+                }                
+            }
+        }
     }
     
+    private Object computeAction(OperationInfo op, String postFix) {
+        StringBuilder s = new StringBuilder(op.getName().getNamespaceURI());
+        if (s.charAt(s.length() - 1) != '/') {
+            s.append('/');
+        }
+        s.append(op.getInterface().getName().getLocalPart())
+            .append('/').append(op.getName().getLocalPart()).append(postFix);
+        return s.toString();
+    }
+
     @Override
     protected OperationInfo createOperation(ServiceInfo serviceInfo, InterfaceInfo intf, Method m) {
         OperationInfo op = super.createOperation(serviceInfo, intf, m);
