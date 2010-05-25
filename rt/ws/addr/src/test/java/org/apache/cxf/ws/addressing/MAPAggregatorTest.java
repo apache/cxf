@@ -585,7 +585,7 @@ public class MAPAggregatorTest extends Assert {
                 if (fault) {
                     message.setContent(Exception.class, new SoapFault("blah",
                             (Throwable) new Exception(), Fault.FAULT_CODE_SERVER));
-                    expectedAction = "http://foo/bar/SEI/Fault/Exception";
+                    expectedAction = "http://foo/bar/SEI/op/Fault/Exception";
                 } else {
                     expectedAction = "http://foo/bar/SEI/opResponse";
                 }

@@ -62,7 +62,7 @@ public class RMPolicyTest extends AbstractBusClientServerTestBase {
     private static final String PINGME_RESPONSE_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/pingMeResponse";
     private static final String GREETER_FAULT_ACTION 
-        = "http://cxf.apache.org/greeter_control/Greeter/Fault/faultDetail";
+        = "http://cxf.apache.org/greeter_control/Greeter/pingMe/Fault/faultDetail";
 
     public static class Server extends AbstractBusTestServerBase {
     
