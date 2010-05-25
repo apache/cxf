@@ -621,7 +621,8 @@ public class ServiceImpl extends ServiceDelegate {
         for (AbstractFeature af : endpoint.getFeatures()) {
             af.initialize(client, bus);
         }
-        
+        //CXF-2822
+        initIntercepors(client, clientFac);
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
@@ -669,6 +670,8 @@ public class ServiceImpl extends ServiceDelegate {
         for (AbstractFeature af : clientFac.getFeatures()) {
             af.initialize(client, bus);
         }
+        //CXF-2822
+        initIntercepors(client, clientFac);
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
@@ -695,5 +698,12 @@ public class ServiceImpl extends ServiceDelegate {
         return getPort(VersionTransformer.convertToInternal(endpointReference), serviceEndpointInterface,
                        features);
 
+    }
+    
+    private void initIntercepors(Client client, JaxWsClientFactoryBean clientFact) {
+        client.getInInterceptors().addAll(clientFact.getInInterceptors());
+        client.getOutInterceptors().addAll(clientFact.getOutInterceptors());
+        client.getInFaultInterceptors().addAll(clientFact.getInFaultInterceptors());
+        client.getOutFaultInterceptors().addAll(clientFact.getOutFaultInterceptors());
     }
 }
