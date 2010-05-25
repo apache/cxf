@@ -622,7 +622,6 @@ public class ServiceImpl extends ServiceDelegate {
         }
         Dispatch<T> disp = new DispatchImpl<T>(client, mode, type);
         configureObject(disp);
-
         return disp;
     }
     

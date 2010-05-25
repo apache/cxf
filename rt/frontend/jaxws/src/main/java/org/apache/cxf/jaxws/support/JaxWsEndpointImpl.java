@@ -278,6 +278,7 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                     DescriptionInfo description = new DescriptionInfo();
                     description.setName(bindingInfo.getService().getName());
                     bindingInfo.getService().setDescription(description);
+                    bindingInfo.setDescription(description);
                 }
                 bindingInfo.getService().getDescription().addExtensor(uel);
                 
@@ -354,6 +355,8 @@ public class JaxWsEndpointImpl extends EndpointImpl {
             feature.setAddressingRequired(addressing.isRequired());
         } else {
             removeAddressingFeature();
+            getEndpointInfo().setProperty("org.apache.cxf.ws.addressing.MAPAggregator.addressingDisabled",
+                                          Boolean.TRUE);
         }
     }
     

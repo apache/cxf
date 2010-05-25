@@ -22,12 +22,18 @@ package org.apache.cxf.systest.ws.addr_fromwsdl;
 import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.soap.AddressingFeature;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersFault_Exception;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
+import org.apache.cxf.ws.addressing.AttributedURIType;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -145,7 +151,43 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
+    
+    @Test
+    public void testAnonToNonAnon() throws Exception {
+        AddNumbersPortType port = getPort();
+        ((BindingProvider)port).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 "http://localhost:9091/jaxws/addNonAnon");
+        try {
+            port.addNumbers3(-1, 2);
+        } catch (SOAPFaultException e) {
+            assertTrue(e.getFault().getFaultCode().contains("OnlyNonAnonymousAddressSupported"));
+        }
+    } 
+    @Test
+    public void testNonAnonToAnon() throws Exception {
+        AddNumbersPortType port = getPort();
+        ((BindingProvider)port).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                 "http://localhost:9091/jaxws/addAnon");
+        
+        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        EndpointReferenceType ref = new EndpointReferenceType();
+        AttributedURIType add = new AttributedURIType();
+        add.setValue("http://localhost:9095/not/a/real/url");
+        ref.setAddress(add);
+        maps.setReplyTo(ref);
+        maps.setFaultTo(ref);
 
+        ((BindingProvider)port).getRequestContext()
+            .put("javax.xml.ws.addressing.context", maps);
+
+        try {
+            port.addNumbers3(-1, 2);
+        } catch (SOAPFaultException e) {
+            assertTrue(e.getFault().getFaultCode().contains("OnlyAnonymousAddressSupported"));
+        }
+    }
     private AddNumbersPortType getPort() {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);

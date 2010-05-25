@@ -1,144 +1,251 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-Licensed to the Apache Software Foundation (ASF) under one
-or more contributor license agreements. See the NOTICE file
-distributed with this work for additional information
-regarding copyright ownership. The ASF licenses this file
-to you under the Apache License, Version 2.0 (the
-"License"); you may not use this file except in compliance
-with the License. You may obtain a copy of the License at
+	<!--
+		Licensed to the Apache Software Foundation (ASF) under one or more
+		contributor license agreements. See the NOTICE file distributed with
+		this work for additional information regarding copyright ownership.
+		The ASF licenses this file to you under the Apache License, Version
+		2.0 (the "License"); you may not use this file except in compliance
+		with the License. You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+		http://www.apache.org/licenses/LICENSE-2.0 Unless required by
+		applicable law or agreed to in writing, software distributed under the
+		License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR
+		CONDITIONS OF ANY KIND, either express or implied. See the License for
+		the specific language governing permissions and limitations under the
+		License.
+	-->
+<definitions name="AddNumbers"
+	targetNamespace="http://apache.org/cxf/systest/ws/addr_feature/"
+	xmlns:tns="http://apache.org/cxf/systest/ws/addr_feature/" xmlns="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+	xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata"
+	xmlns:wsp="http://www.w3.org/ns/ws-policy">
+	<types>
+		<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified" targetNamespace="http://apache.org/cxf/systest/ws/addr_feature/">
+			<complexType name="addNumbersResponse">
+				<sequence>
+					<element name="return" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<element name="addNumbersResponse" type="tns:addNumbersResponse" />
+			<element name="addNumbers2Response" type="tns:addNumbersResponse" />
+			<element name="addNumbers3Response" type="tns:addNumbersResponse" />
 
-Unless required by applicable law or agreed to in writing,
-software distributed under the License is distributed on an
-"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-KIND, either express or implied. See the License for the
-specific language governing permissions and limitations
-under the License.
--->
-<definitions name="AddNumbers"  
-	     targetNamespace="http://apache.org/cxf/systest/ws/addr_feature/" 
-	     xmlns:tns="http://apache.org/cxf/systest/ws/addr_feature/"
-	     xmlns="http://schemas.xmlsoap.org/wsdl/" 
-	     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
-	     xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
-	     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	     xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
-	     xmlns:wsam="http://www.w3.org/2007/05/addressing/metadata">
-    <types>
-	<xsd:schema xmlns="http://www.w3.org/2001/XMLSchema" 
-		    elementFormDefault="qualified" 
-		    targetNamespace="http://apache.org/cxf/systest/ws/addr_feature/">
-	    <complexType name="addNumbersResponse">
-		<sequence>
-		    <element name="return" type="xsd:int" />
-		</sequence>
-	    </complexType>
-	    <element name="addNumbersResponse" type="tns:addNumbersResponse" />
-	    <element name="addNumbers2Response" type="tns:addNumbersResponse" />
-	    <element name="addNumbers3Response" type="tns:addNumbersResponse" />
+			<complexType name="addNumbers">
+				<sequence>
+					<element name="number1" type="xsd:int" />
+					<element name="number2" type="xsd:int" />
+				</sequence>
+			</complexType>
+			<element name="addNumbers" type="tns:addNumbers" />
+			<element name="addNumbers2" type="tns:addNumbers" />
+			<element name="addNumbers3" type="tns:addNumbers" />
 
-	    <complexType name="addNumbers">
-		<sequence>
-		    <element name="number1" type="xsd:int" />
-		    <element name="number2" type="xsd:int" />
-		</sequence>
-	    </complexType>
-	    <element name="addNumbers" type="tns:addNumbers" />
-	    <element name="addNumbers2" type="tns:addNumbers" />
-	    <element name="addNumbers3" type="tns:addNumbers" />
+			<element name="AddNumbersFault" type="tns:AddNumbersFault" />
+			<complexType name="AddNumbersFault">
+				<sequence>
+					<element name="detail" type="xsd:string" />
+					<element name="message" type="xsd:string" />
+				</sequence>
+			</complexType>
+		</xsd:schema>
+	</types>
+	<message name="addNumbers">
+		<part name="parameters" element="tns:addNumbers" />
+	</message>
+	<message name="addNumbersResponse">
+		<part name="result" element="tns:addNumbersResponse" />
+	</message>
+	<message name="addNumbersFault">
+		<part name="AddNumbersFault" element="tns:AddNumbersFault" />
+	</message>
+	<message name="addNumbers2">
+		<part name="parameters" element="tns:addNumbers2" />
+	</message>
+	<message name="addNumbers2Response">
+		<part name="result" element="tns:addNumbers2Response" />
+	</message>
+	<message name="addNumbers3">
+		<part name="parameters" element="tns:addNumbers3" />
+	</message>
+	<message name="addNumbers3Response">
+		<part name="result" element="tns:addNumbers3Response" />
+	</message>
+	<portType name="AddNumbersPortType">
+		<operation name="addNumbers">
+			<input message="tns:addNumbers" />
+			<output message="tns:addNumbersResponse" />
+			<fault name="addNumbersFault" message="tns:addNumbersFault" />
+		</operation>
+		<operation name="addNumbers2">
+			<input message="tns:addNumbers2" name="add2In" />
+			<output message="tns:addNumbers2Response" name="add2Out" />
+			<!--
+				<fault name="addNumbersFault" message="tns:addNumbersFault"/>
+			-->
+		</operation>
+		<operation name="addNumbers3">
+			<input message="tns:addNumbers3" wsam:Action="3in" />
+			<output message="tns:addNumbers3Response" wsam:Action="3out" />
+			<fault name="addNumbersFault" message="tns:addNumbersFault"
+				wsam:Action="3fault" />
+		</operation>
+	</portType>
+	<binding name="AddNumbersBinding" type="tns:AddNumbersPortType">
+		<wsaw:UsingAddressing wsdl:required="false" />
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+		<operation name="addNumbers">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+		<operation name="addNumbers2">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<!-- 	    <fault name="addNumbersFault"> -->
+			<!-- 		<soap:fault name="addNumbersFault" use="literal" /> -->
+			<!-- 	    </fault> -->
+		</operation>
+		<operation name="addNumbers3">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+	</binding>
+	<binding name="AddNumbersBindingOnlyAnon" type="tns:AddNumbersPortType">
+		<wsaw:UsingAddressing wsdl:required="false" />
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+	    <wsp:PolicyReference URI="#AddNumbersOnlyAnon_WSAM_Addressing_Policy"/>
+		<operation name="addNumbers">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+		<operation name="addNumbers2">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<!-- 	    <fault name="addNumbersFault"> -->
+			<!-- 		<soap:fault name="addNumbersFault" use="literal" /> -->
+			<!-- 	    </fault> -->
+		</operation>
+		<operation name="addNumbers3">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+	</binding>
+	<binding name="AddNumbersBindingNonAnon" type="tns:AddNumbersPortType">
+		<wsaw:UsingAddressing wsdl:required="false" />
+		<soap:binding transport="http://schemas.xmlsoap.org/soap/http"
+			style="document" />
+	    <wsp:PolicyReference URI="#AddNumbersNonAnon_WSAM_Addressing_Policy"/>
+		<operation name="addNumbers">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+		<operation name="addNumbers2">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<!-- 	    <fault name="addNumbersFault"> -->
+			<!-- 		<soap:fault name="addNumbersFault" use="literal" /> -->
+			<!-- 	    </fault> -->
+		</operation>
+		<operation name="addNumbers3">
+			<soap:operation soapAction="" />
+			<input>
+				<soap:body use="literal" />
+			</input>
+			<output>
+				<soap:body use="literal" />
+			</output>
+			<fault name="addNumbersFault">
+				<soap:fault name="addNumbersFault" use="literal" />
+			</fault>
+		</operation>
+	</binding>
+	<service name="AddNumbersService">
+		<port name="AddNumbersPort" binding="tns:AddNumbersBinding">
+			<soap:address location="http://localhost:9091/jaxws/add" />
+		</port>
+		<port name="AddNumbersOnlyAnonPort" binding="tns:AddNumbersBindingOnlyAnon">
+			<soap:address location="http://localhost:9091/jaxws/addAnon" />
+		</port>
+		<port name="AddNumbersNonAnonPort" binding="tns:AddNumbersBindingNonAnon">
+			<soap:address location="http://localhost:9091/jaxws/addNonAnon" />
+		</port>
+	</service>
 
-	    <element name="AddNumbersFault" type="tns:AddNumbersFault" />
-	    <complexType name="AddNumbersFault">
-		<sequence>
-		    <element name="detail" type="xsd:string" />
-		    <element name="message" type="xsd:string" />
-		</sequence>
-	    </complexType>
-	</xsd:schema>
-    </types>
-    <message name="addNumbers">
-	<part name="parameters" element="tns:addNumbers" />
-    </message>
-    <message name="addNumbersResponse">
-	<part name="result" element="tns:addNumbersResponse" />
-    </message>
-    <message name="addNumbersFault">
-	<part name="AddNumbersFault" element="tns:AddNumbersFault" />
-    </message>
-    <message name="addNumbers2">
-	<part name="parameters" element="tns:addNumbers2" />
-    </message>
-    <message name="addNumbers2Response">
-	<part name="result" element="tns:addNumbers2Response" />
-    </message>
-    <message name="addNumbers3">
-	<part name="parameters" element="tns:addNumbers3" />
-    </message>
-    <message name="addNumbers3Response">
-	<part name="result" element="tns:addNumbers3Response" />
-    </message>
-    <portType name="AddNumbersPortType">
-	<operation name="addNumbers">
-	    <input message="tns:addNumbers"/>
-	    <output message="tns:addNumbersResponse"/>
-	    <fault name="addNumbersFault" message="tns:addNumbersFault"/>
-	</operation>
-	<operation name="addNumbers2">
-	    <input message="tns:addNumbers2" name="add2In"/>
-	    <output message="tns:addNumbers2Response" name="add2Out"/>
-<!-- 	    <fault name="addNumbersFault" message="tns:addNumbersFault"/> -->
-	</operation>
-	<operation name="addNumbers3">
-	    <input message="tns:addNumbers3" wsam:Action="3in"/>
-	    <output message="tns:addNumbers3Response" wsam:Action="3out"/>
-	    <fault name="addNumbersFault" message="tns:addNumbersFault" wsam:Action="3fault"/>
-	</operation>
-    </portType>
-    <binding name="AddNumbersBinding" type="tns:AddNumbersPortType">
-	<wsaw:UsingAddressing wsdl:required="false" />
-	<soap:binding transport="http://schemas.xmlsoap.org/soap/http" style="document" />
-	<operation name="addNumbers">
-	    <soap:operation soapAction="" />
-	    <input>
-		<soap:body use="literal" />
-	    </input>
-	    <output>
-		<soap:body use="literal" />
-	    </output>
-	    <fault name="addNumbersFault">
-		<soap:fault name="addNumbersFault" use="literal" />
-	    </fault>
-	</operation>
-	<operation name="addNumbers2">
-	    <soap:operation soapAction="" />
-	    <input>
-		<soap:body use="literal" />
-	    </input>
-	    <output>
-		<soap:body use="literal" />
-	    </output>
-<!-- 	    <fault name="addNumbersFault"> -->
-<!-- 		<soap:fault name="addNumbersFault" use="literal" /> -->
-<!-- 	    </fault> -->
-	</operation>
-	<operation name="addNumbers3">
-	    <soap:operation soapAction="" />
-	    <input>
-		<soap:body use="literal" />
-	    </input>
-	    <output>
-		<soap:body use="literal" />
-	    </output>
-	    <fault name="addNumbersFault">
-		<soap:fault name="addNumbersFault" use="literal" />
-	    </fault>
-	</operation>
-    </binding>
-    <service name="AddNumbersService">
-	<port name="AddNumbersPort" binding="tns:AddNumbersBinding">
-	    <soap:address location="http://localhost:9091/jaxws/add"/>
-	</port>
-    </service>
+	<wsp:Policy wsu:Id="AddNumbersNonAnon_WSAM_Addressing_Policy"
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+		<wsam:Addressing>
+			<wsp:Policy>
+				<wsam:NonAnonymousResponses />
+			</wsp:Policy>
+		</wsam:Addressing>
+	</wsp:Policy>
+
+	<wsp:Policy wsu:Id="AddNumbersOnlyAnon_WSAM_Addressing_Policy"
+		xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd">
+		<wsam:Addressing>
+			<wsp:Policy>
+				<wsam:AnonymousResponses />
+			</wsp:Policy>
+		</wsam:Addressing>
+	</wsp:Policy>
+
 </definitions>

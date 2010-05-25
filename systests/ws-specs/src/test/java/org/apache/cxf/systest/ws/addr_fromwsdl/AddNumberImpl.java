@@ -32,8 +32,7 @@ import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 
 // Jax-WS 2.1 WS-Addressing FromWsdl
 
-@WebService(serviceName = "AddNumbersService",
-            targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
+@WebService()
 public class AddNumberImpl implements AddNumbersPortType {
     public int addNumbers(int number1, int number2) throws AddNumbersFault_Exception {
         return execute(number1, number2);
