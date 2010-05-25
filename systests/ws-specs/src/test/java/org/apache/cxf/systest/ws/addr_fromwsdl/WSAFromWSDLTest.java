@@ -123,7 +123,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
         }
 
         String expectedOut = BASE_URI + "addNumbersRequest";
-        String expectedIn = BASE_URI + "Fault/addNumbersFault";
+        String expectedIn = BASE_URI + "addNumbers/Fault/addNumbersFault";
 
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(input.toString().indexOf(expectedIn) != -1);

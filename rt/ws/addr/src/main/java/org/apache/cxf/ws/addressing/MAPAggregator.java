@@ -564,12 +564,15 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                             return faultAction;
                         }
                     }
-                    return addPath(addPath(getActionBaseUri(operation), "Fault"), 
-                                   faultInfo.getName().getLocalPart());
+                    return addPath(addPath(addPath(getActionBaseUri(operation),
+                                                   operation.getName().getLocalPart()),
+                                           "Fault"), 
+                                   faultInfo.getFaultName().getLocalPart());
                 }
             }
         }
-        return addPath(addPath(getActionBaseUri(operation), "Fault"), faultName);
+        return addPath(addPath(addPath(getActionBaseUri(operation),
+                                       operation.getName().getLocalPart()), "Fault"), faultName);
     }
 
     private String getFaultNameFromMessage(final Message message) {
