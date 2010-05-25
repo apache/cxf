@@ -38,6 +38,7 @@ import javax.xml.stream.Location;
 import javax.xml.stream.StreamFilter;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLResolver;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -136,8 +137,7 @@ public final class StaxUtils {
     private static XMLInputFactory getXMLInputFactory() {
         XMLInputFactory f = NS_AWARE_INPUT_FACTORY_POOL.poll();
         if (f == null) {
-            f = XMLInputFactory.newInstance();
-            f.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, true);
+            f = createXMLInputFactory(true);
         }
         return f;
     }
@@ -166,6 +166,16 @@ public final class StaxUtils {
     public static XMLInputFactory createXMLInputFactory(boolean nsAware) {
         XMLInputFactory factory = XMLInputFactory.newInstance();
         factory.setProperty(XMLInputFactory.IS_NAMESPACE_AWARE, nsAware);
+        factory.setProperty(XMLInputFactory.SUPPORT_DTD, Boolean.FALSE);
+        factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, Boolean.FALSE);
+        factory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, Boolean.FALSE);
+        factory.setXMLResolver(new XMLResolver() {
+            public Object resolveEntity(String publicID, String systemID,
+                                        String baseURI, String namespace)
+                throws XMLStreamException {
+                throw new XMLStreamException("Reading external entities is disabled");
+            }
+        });
         return factory;
     }
 
