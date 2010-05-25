@@ -21,6 +21,7 @@ package org.apache.cxf.jaxws.support;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.HashMap;
@@ -162,12 +163,14 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             } else {
                 return Boolean.TRUE;
             }
-        } 
+        }
         if (method.getDeclaringClass().isInterface()) {
             return hasWebServiceAnnotation(method);
         }
         if (implInfo.getSEIClass() == null) {
-            return hasWebServiceAnnotation(method);
+            return hasWebServiceAnnotation(method)
+                && !Modifier.isFinal(method.getModifiers())
+                && !Modifier.isStatic(method.getModifiers());
         }
         return implInfo.getSEIClass().isAssignableFrom(method.getDeclaringClass());
     }
