@@ -42,7 +42,6 @@ import org.apache.cxf.jaxws.AbstractJaxWsTest;
 import org.apache.cxf.jaxws.DispatchImpl;
 import org.apache.cxf.jaxws.MessageReplayObserver;
 import org.apache.cxf.jaxws.ServiceImpl;
-import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.hello_world_soap_http.SOAPService;
