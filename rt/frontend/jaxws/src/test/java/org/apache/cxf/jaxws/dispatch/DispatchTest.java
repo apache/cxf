@@ -153,7 +153,7 @@ public class DispatchTest extends AbstractJaxWsTest {
                                               serviceName, null);
 
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
-        List<Interceptor<? extends Message>> interceptors = ((DispatchImpl)disp).getClient()
+        List<Interceptor> interceptors = ((DispatchImpl)disp).getClient()
             .getInInterceptors();
         boolean exists = false;
         for (Interceptor interceptor : interceptors) {
