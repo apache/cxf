@@ -405,8 +405,6 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (f != null) {
             return getWithReflection(WebFault.class, f, "messageName");
         }
-        
-        System.out.println(exClass.getName() + " has no WebFault");
         return null;
     }
 
