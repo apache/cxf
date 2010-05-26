@@ -24,12 +24,12 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.xmlbeans.XmlObject;
 
 /**
@@ -61,7 +61,7 @@ public class XMLBeanStreamSerializer {
             xObj.save(tmpFile);
 
             InputStream tmpIn = new FileInputStream(tmpFile);
-            XMLStreamReader rdr = XMLInputFactory.newInstance().createXMLStreamReader(tmpIn);
+            XMLStreamReader rdr = StaxUtils.createXMLStreamReader(tmpIn);
 
             while (rdr.hasNext()) {
 
