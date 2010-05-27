@@ -121,8 +121,9 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                 if (maps == null) {
                                     tok = client.requestSecurityToken();
                                 } else {
-                                    String s = message
-                                        .getContextualProperty(SecurityConstants.STS_APPLIES_TO).toString();
+                                    Object o = message
+                                        .getContextualProperty(SecurityConstants.STS_APPLIES_TO);
+                                    String s = o == null ? null : o.toString();
                                     s = s == null 
                                         ? message.getContextualProperty(Message.ENDPOINT_ADDRESS).toString()
                                             : s;
