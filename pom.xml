@@ -148,6 +148,27 @@
             </modules>
         </profile>
         <profile>
+            <!-- default profile enables checkstyle and Xlint stuff -->
+            <id>rat</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.rat</groupId>
+                        <artifactId>apache-rat-plugin</artifactId>
+                        <inherited>false</inherited>
+                        <executions>
+                          <execution>
+                            <phase>verify</phase>
+                            <goals>
+                              <goal>check</goal>
+                            </goals>
+                          </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>setup.eclipse</id>
             <properties>
                 <eclipse.workspace.dir>${basedir}/../workspace</eclipse.workspace.dir>
@@ -522,6 +543,28 @@
                             <version>${project.version}</version>
                         </dependency>
                     </dependencies>
+                </plugin>
+                <plugin>
+                  <groupId>org.apache.rat</groupId>
+                  <artifactId>apache-rat-plugin</artifactId>
+                  <version>0.6</version>
+                  <configuration>
+                      <numUnapprovedLicenses>350</numUnapprovedLicenses>
+                      <excludeSubProjects>false</excludeSubProjects>
+                      <excludes>
+                          <exclude>.git/**</exclude>
+                          <exclude>.gitignore</exclude>
+                          <exclude>velocity.log</exclude>
+                          <exclude>**/target/**</exclude>
+                          <exclude>distribution/**</exclude>
+                          <exclude>**/jaxb.index</exclude>
+                          <exclude>**/META-INF/MANIFEST</exclude>
+                          <exclude>**/src/test/**/*.txt</exclude>
+                          <exclude>**/.classpath</exclude>
+                          <exclude>**/.settings/**/*</exclude>
+                          <exclude>**/.project</exclude>
+                      </excludes>
+                  </configuration>
                 </plugin>
             </plugins>
         </pluginManagement>
