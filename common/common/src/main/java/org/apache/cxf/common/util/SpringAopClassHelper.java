@@ -37,7 +37,21 @@ class SpringAopClassHelper extends ClassHelper {
         }
         return cls;
     }
-    
+    protected Object getRealObjectInternal(Object o) {
+        if (o instanceof Advised) {
+            try {
+
+                Advised advised = (Advised)o;
+                Object target = advised.getTargetSource().getTarget();
+                //could be a proxy of a proxy.....   
+                return getRealObjectInternal(target);
+            } catch (Exception ex) {
+                // ignore
+            }
+        }
+        return o;
+    }
+
     protected Class getRealClassInternal(Object o) {
         if (AopUtils.isAopProxy(o)) {
             Advised advised = (Advised)o;
