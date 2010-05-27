@@ -208,12 +208,15 @@ public class JAXBDataBinding extends AbstractDataBinding
     private boolean unwrapJAXBElement = true;
 
     private boolean qualifiedSchemas;
-    private Service service;
     
-    private List<Interceptor> in = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> out = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> outFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
-    private List<Interceptor> inFault  = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private ModCountCopyOnWriteArrayList<Interceptor> in 
+        = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private ModCountCopyOnWriteArrayList<Interceptor> out
+        = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private ModCountCopyOnWriteArrayList<Interceptor> outFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor>();
+    private ModCountCopyOnWriteArrayList<Interceptor> inFault 
+        = new ModCountCopyOnWriteArrayList<Interceptor>();
 
     public JAXBDataBinding() {
     }
@@ -289,11 +292,10 @@ public class JAXBDataBinding extends AbstractDataBinding
     }
 
     @SuppressWarnings("unchecked")
-    public void initialize(Service aservice) {
-        this.service = aservice;
+    public synchronized void initialize(Service service) {
         
-        getInInterceptors().add(JAXBAttachmentSchemaValidationHack.INSTANCE);
-        getInFaultInterceptors().add(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        in.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
+        inFault.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
         
         // context is already set, don't redo it
         if (context != null) {
@@ -313,7 +315,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         }
 
-        String tns = getNamespaceToUse();
+        String tns = getNamespaceToUse(service);
         CachedContextAndSchemas cachedContextAndSchemas = null;
         JAXBContext ctx = null;
         try {
@@ -419,7 +421,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
     }
     
-    private String getNamespaceToUse() {
+    private String getNamespaceToUse(Service service) {
         if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
             return null;    
         }
