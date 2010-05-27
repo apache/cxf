@@ -38,6 +38,7 @@ import javax.annotation.Resources;
 import org.apache.cxf.common.annotation.AbstractAnnotationVisitor;
 import org.apache.cxf.common.annotation.AnnotationProcessor;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.resource.ResourceResolver;
 
@@ -280,7 +281,7 @@ public class ResourceInjector extends AbstractAnnotationVisitor {
         try {
             if (field.getType().isAssignableFrom(resource.getClass())) { 
                 field.setAccessible(true); 
-                field.set(getTarget(), resource);
+                field.set(ClassHelper.getRealObject(getTarget()), resource);
             }
         } catch (IllegalAccessException e) { 
             e.printStackTrace();

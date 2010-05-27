@@ -45,6 +45,10 @@ public class ClassHelper {
     protected Class getRealClassFromClassInternal(Class cls) {
         return cls;
     }
+    protected Object getRealObjectInternal(Object o) {
+        return o;
+    }
+    
     
     
     public static Class getRealClass(Object o) {
@@ -54,4 +58,10 @@ public class ClassHelper {
     public static Class getRealClassFromClass(Class cls) {
         return HELPER.getRealClassFromClassInternal(cls);
     }
+    
+    public static Object getRealObject(Object o) {
+        return HELPER.getRealObjectInternal(o);
+    }
+
+    
 }
