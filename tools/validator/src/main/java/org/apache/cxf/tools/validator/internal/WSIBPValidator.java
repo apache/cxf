@@ -297,6 +297,10 @@ public class WSIBPValidator extends AbstractDefinitionValidator {
             Binding binding = (Binding)ite.next();
 
             String style = SOAPBindingUtil.getCanonicalBindingStyle(binding);
+            
+            if (binding.getPortType() == null) {
+                return true;
+            }
 
             //
 
