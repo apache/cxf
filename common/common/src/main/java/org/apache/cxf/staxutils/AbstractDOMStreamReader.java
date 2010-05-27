@@ -56,9 +56,6 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         boolean started;
         boolean ended;
         
-        int currentAttribute = -1;
-        int currentNamespace = -1;
-
         List<String> uris;
         List<String> prefixes;
         List<Object> attributes;
@@ -144,12 +141,6 @@ public abstract class AbstractDOMStreamReader<T, I> implements XMLStreamReader {
         if (!frame.started) {
             frame.started = true;
             currentEvent = frame.isDocument() ? START_DOCUMENT : START_ELEMENT;
-        } else if (frame.currentAttribute < getAttributeCount() - 1) {
-            frame.currentAttribute++;
-            currentEvent = ATTRIBUTE;
-        } else if (frame.currentNamespace < getNamespaceCount() - 1) {
-            frame.currentNamespace++;
-            currentEvent = NAMESPACE;
         } else if (hasMoreChildren()) {
             currentEvent = nextChild();
 
