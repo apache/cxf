@@ -161,7 +161,7 @@ public final class EndpointReferenceUtils {
                 impl.setByteStream(new ByteArrayInputStream(ds));
                 done.add(newId + ":" + namespaceURI);
             }
-            if (impl == null && bus != null) {
+            if (impl == null && bus != null && systemId != null) {
                 ResourceManager rm = bus.getExtension(ResourceManager.class);
                 URL url = rm == null ? null : rm.resolveResource(systemId, URL.class);
                 if (url != null) {
