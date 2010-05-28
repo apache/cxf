@@ -502,6 +502,12 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         }
         File wsdlFile = new File(output, "add_numbers.wsdl");
         assertTrue("Generate Wsdl Fail", wsdlFile.exists());
+        //To test there is wsam:action generated for the 
+        String wsdlString = getStringFromFile(wsdlFile);
+        assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
+            .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request") > -1);
+        assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
+            .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response") > -1);
         URI expectedFile = getClass().getResource("expected/add_numbers_expected.wsdl").toURI();
         assertWsdlEquals(new File(expectedFile), wsdlFile);
     }
