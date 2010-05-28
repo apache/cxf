@@ -37,37 +37,37 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-common-utilities</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-core</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
               <groupId>com.sun.xml.fastinfoset</groupId>
@@ -78,7 +78,7 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-bindings-xml</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                <exclusion>
                   <groupId>org.apache.cxf</groupId>
@@ -109,10 +109,10 @@
                         <Implementation-Title>Apache CXF</Implementation-Title>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${pom.version}</Implementation-Version>
+                        <Implementation-Version>${project.version}</Implementation-Version>
                         <Specification-Title>Apache CXF</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${pom.version}</Specification-Version>
+                        <Specification-Version>${project.version}</Specification-Version>
                         <DynamicImport-Package>
                             com.ctc.wstx.*,
                             org.apache.commons.logging.*,
@@ -157,7 +157,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
+                            org.apache.cxf.*;version=${project.version};-split-package:=merge-first,
                             '=META-INF.cxf.osgi',
                             '=META-INF.cxf'
                         </Export-Package>
