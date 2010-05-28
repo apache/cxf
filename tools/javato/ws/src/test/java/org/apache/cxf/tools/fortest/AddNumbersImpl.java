@@ -46,6 +46,14 @@ public class AddNumbersImpl {
     public int addNumbers3(int number1, int number2) throws AddNumbersException {
         return execute(number1, number2);
     }
+    
+    @Action(input = "http://cxf.apache.org/input4", output = "http://cxf.apache.org/output4",
+            fault = {@FaultAction(className = AddNumbersException.class, 
+                                  value = "") })
+    public int addNumbers4(int number1, int number2) throws AddNumbersException {
+        return execute(number1, number2);
+    }
+    
 
     int execute(int number1, int number2) throws AddNumbersException {
         if (number1 < 0 || number2 < 0) {

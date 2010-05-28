@@ -7,6 +7,8 @@
   <xs:element name="addNumbers2Response" type="tns:addNumbers2Response"/>
   <xs:element name="addNumbers3" type="tns:addNumbers3"/>
   <xs:element name="addNumbers3Response" type="tns:addNumbers3Response"/>
+  <xs:element name="addNumbers4" type="tns:addNumbers4"/>
+  <xs:element name="addNumbers4Response" type="tns:addNumbers4Response"/>
   <xs:element name="addNumbersResponse" type="tns:addNumbersResponse"/>
   <xs:complexType name="addNumbers">
     <xs:sequence>
@@ -15,6 +17,17 @@
     </xs:sequence>
   </xs:complexType>
   <xs:complexType name="addNumbersResponse">
+    <xs:sequence>
+      <xs:element name="return" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="addNumbers4">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:int"/>
+      <xs:element name="arg1" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:complexType name="addNumbers4Response">
     <xs:sequence>
       <xs:element name="return" type="xs:int"/>
     </xs:sequence>
@@ -71,31 +84,47 @@
     <wsdl:part name="parameters" element="tns:addNumbers3">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="addNumbers4">
+    <wsdl:part name="parameters" element="tns:addNumbers4">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="addNumbers3Response">
     <wsdl:part name="parameters" element="tns:addNumbers3Response">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="addNumbers4Response">
+    <wsdl:part name="parameters" element="tns:addNumbers4Response">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="AddNumbersImpl">
     <wsdl:operation name="addNumbers">
-      <wsdl:input name="addNumbers" message="tns:addNumbers" wsaw:Action="http://cxf.apache.org/input">
+      <wsdl:input name="addNumbers" message="tns:addNumbers" wsam:Action="http://cxf.apache.org/input" wsaw:Action="http://cxf.apache.org/input">
     </wsdl:input>
-      <wsdl:output name="addNumbersResponse" message="tns:addNumbersResponse" wsaw:Action="http://cxf.apache.org/output">
+      <wsdl:output name="addNumbersResponse" message="tns:addNumbersResponse" wsam:Action="http://cxf.apache.org/output" wsaw:Action="http://cxf.apache.org/output">
     </wsdl:output>
       <wsdl:fault name="AddNumbersException" message="tns:AddNumbersException" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers/Fault/AddNumbersException">
     </wsdl:fault>
     </wsdl:operation>
-    <wsdl:operation name="addNumbers3">
-      <wsdl:input name="addNumbers3" message="tns:addNumbers3" wsaw:Action="http://cxf.apache.org/input3">
+    <wsdl:operation name="addNumbers4">
+      <wsdl:input name="addNumbers4" message="tns:addNumbers4" wsam:Action="http://cxf.apache.org/input4" wsaw:Action="http://cxf.apache.org/input4">
     </wsdl:input>
-      <wsdl:output name="addNumbers3Response" message="tns:addNumbers3Response" wsaw:Action="http://cxf.apache.org/output3">
+      <wsdl:output name="addNumbers4Response" message="tns:addNumbers4Response" wsam:Action="http://cxf.apache.org/output4" wsaw:Action="http://cxf.apache.org/output4">
+    </wsdl:output>
+      <wsdl:fault name="AddNumbersException" message="tns:AddNumbersException" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers4/Fault/AddNumbersException">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="addNumbers3">
+      <wsdl:input name="addNumbers3" message="tns:addNumbers3" wsam:Action="http://cxf.apache.org/input3" wsaw:Action="http://cxf.apache.org/input3">
+    </wsdl:input>
+      <wsdl:output name="addNumbers3Response" message="tns:addNumbers3Response" wsam:Action="http://cxf.apache.org/output3" wsaw:Action="http://cxf.apache.org/output3">
     </wsdl:output>
       <wsdl:fault name="AddNumbersException" message="tns:AddNumbersException" wsam:Action="http://cxf.apache.org/fault3" wsaw:Action="http://cxf.apache.org/fault3">
     </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="addNumbers2">
-      <wsdl:input name="addNumbers2" message="tns:addNumbers2" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request">
+      <wsdl:input name="addNumbers2" message="tns:addNumbers2" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request" wsaw:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request">
     </wsdl:input>
-      <wsdl:output name="addNumbers2Response" message="tns:addNumbers2Response" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response">
+      <wsdl:output name="addNumbers2Response" message="tns:addNumbers2Response" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response" wsaw:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response">
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>
@@ -109,6 +138,18 @@
         <soap:body use="literal"/>
       </wsdl:input>
       <wsdl:output name="addNumbersResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="AddNumbersException">
+        <soap:fault name="AddNumbersException" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="addNumbers4">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="addNumbers4">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="addNumbers4Response">
         <soap:body use="literal"/>
       </wsdl:output>
       <wsdl:fault name="AddNumbersException">
