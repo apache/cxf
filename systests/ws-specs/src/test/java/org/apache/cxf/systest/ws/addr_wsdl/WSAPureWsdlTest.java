@@ -33,6 +33,7 @@ import javax.xml.ws.Dispatch;
 import javax.xml.ws.Response;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -42,6 +43,7 @@ import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersResponse;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
 import org.junit.Before;
@@ -183,6 +185,39 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertTrue(input.toString().indexOf(expectedIn) != -1);
 
         
+    }
+    
+    @Test
+    public void testDispatchActionMissmatch() throws Exception {
+        String req = "<S:Envelope xmlns:S=\"http://schemas.xmlsoap.org/soap/envelope/\">"
+                    + "<S:Body><addNumbers3 xmlns=\"http://apache.org/cxf/systest/ws/addr_feature/\">"
+                    + "<number1>1</number1><number2>2</number2></addNumbers3>"
+                    + "</S:Body></S:Envelope>";
+        //String base = "http://apache.org/cxf/systest/ws/addr_feature/AddNumbersPortType/";
+        String expectedOut = "http://bad.action";
+        
+        URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
+        assertNotNull("WSDL is null", wsdl);
+        AddNumbersService service = new AddNumbersService(wsdl, serviceName);
+
+
+        Dispatch<Source> disp = service.createDispatch(AddNumbersService.AddNumbersPort,
+                                                       Source.class, Mode.MESSAGE);
+
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                     "http://localhost:9094/jaxws/add");
+
+        //manually set the action
+        disp.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY,
+                                     expectedOut);
+        disp.getRequestContext().put(ContextUtils.ACTION,
+                                     expectedOut + "/wsaAction");
+        try {
+            disp.invoke(new StreamSource(new StringReader(req)));
+            fail("no exception");
+        } catch (SOAPFaultException f) {
+            //expected
+        }
     }
 
     private AddNumbersPortType getPort() {

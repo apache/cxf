@@ -20,7 +20,6 @@
 package org.apache.cxf.service.model;
 
 import java.util.Collection;
-import java.util.List;
 
 import javax.xml.namespace.QName;
 
@@ -30,6 +29,7 @@ public class UnwrappedOperationInfo extends OperationInfo {
     public UnwrappedOperationInfo(OperationInfo op) {
         super(op);
         wrappedOp = op;
+        setDelegate(wrappedOp, true);
     }
     
     public OperationInfo getWrappedOperation() {
@@ -52,27 +52,15 @@ public class UnwrappedOperationInfo extends OperationInfo {
         return wrappedOp.getFaults();
     }
     
-    public Object getProperty(String name) {
-        return wrappedOp.getProperty(name);
-    }
     
-    public <T> T getProperty(String name, Class<T> cls) {
-        return wrappedOp.getProperty(name, cls);
-    }
-    
-    public void setProperty(String name, Object v) {
-        wrappedOp.setProperty(name, v);
-    }
-    
-    public void addExtensor(Object el) {
-        wrappedOp.addExtensor(el);
-    }
+    public void setOutput(String nm, MessageInfo out) {
+        super.setOutput(nm, out);
+        out.setDelegate(wrappedOp.getOutput(), false);
+    }    
 
-    public <T> T getExtensor(Class<T> cls) {
-        return wrappedOp.getExtensor(cls);
-    }
-    public <T> List<T> getExtensors(Class<T> cls) {
-        return wrappedOp.getExtensors(cls);
+    public void setInput(String nm, MessageInfo in) {
+        super.setInput(nm, in);
+        in.setDelegate(wrappedOp.getInput(), false);
     }
 
 }
