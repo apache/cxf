@@ -778,7 +778,9 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 if (ContextUtils.retrieveDeferUncorrelatedMessageAbort(message)) {
                     LOG.fine("deferring uncorrelated message abort");
                     ContextUtils.storeDeferredUncorrelatedMessageAbort(message);
-                } else {
+                } else if (!MessageUtils.getContextualBoolean(message,
+                                          "org.apache.cxf.ws.addressing.MAPAggregator.addressingDisabled",
+                                          false)) {
                     LOG.log(Level.WARNING, "CORRELATION_FAILURE_MSG");
                     message.getInterceptorChain().abort();
                 }

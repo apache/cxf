@@ -20,14 +20,20 @@
 package org.apache.cxf.systest.ws.addr_disable;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.net.URL;
+
 import javax.xml.namespace.QName;
+import javax.xml.soap.MessageFactory;
+import javax.xml.soap.SOAPMessage;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.Dispatch;
 import javax.xml.ws.soap.AddressingFeature;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersPortType;
 import org.apache.cxf.systest.ws.addr_feature.AddNumbersService;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -84,6 +90,28 @@ public class WSADisableTest extends AbstractWSATestBase {
         
         assertTrue(output.toString().indexOf(expectedOut) == -1);
         assertTrue(input.toString().indexOf(expectedIn) == -1);
+    }
+    
+    
+    @Test
+    public void testDiaptchWithWsaDisable() throws Exception {
+
+        QName port = new QName("http://apache.org/cxf/systest/ws/addr_feature/", "AddNumbersPort");
+        Dispatch<SOAPMessage> disptch = getService().createDispatch(port, SOAPMessage.class,
+                                                                    javax.xml.ws.Service.Mode.MESSAGE,
+                                                                    new AddressingFeature(false));
+        ((BindingProvider)disptch).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                           "http://localhost:9095/jaxws/add");
+
+        InputStream is = getClass().getResourceAsStream("resources/AddNumbersDispatchReq.xml");
+        SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
+        assertNotNull(soapReqMsg);
+        try {
+            disptch.invoke(soapReqMsg);
+            fail("The MAPcodec ate the SOAPFaultException");
+        } catch (javax.xml.ws.soap.SOAPFaultException e) {
+            //expected
+        }
     }
 
     private AddNumbersService getService() {
