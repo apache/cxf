@@ -42,10 +42,6 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         if (delegate == null) {
             return;
         }
-        if (documentation != null) {
-            delegate.setDocumentation(documentation);
-            documentation = null;
-        }
         if (extensionAttributes != null) {
             delegate.setExtensionAttributes(extensionAttributes);
             extensionAttributes = null;
@@ -64,20 +60,6 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         }
     }
     
-    public String getDocumentation() {
-        if (delegate != null) {
-            return delegate.getDocumentation();
-        }
-        return documentation;
-    }
-    public void setDocumentation(String s) {
-        if (delegate != null) {
-            delegate.setDocumentation(s);
-        } else {
-            documentation = s;
-        }
-    }
-
     public Map<String, Object> getProperties() {
         if (delegate != null && delegateProperties) {
             return delegate.getProperties();
