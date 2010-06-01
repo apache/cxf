@@ -1,8 +1,8 @@
-Apache CXF 2.2.8 Release Notes
+Apache CXF 2.2.9 Release Notes
 
 1. Overview
  
-Apache CXF 2.2.8 delivers the third major version of 
+Apache CXF 2.2.9 delivers the third major version of 
 the Celtix project (http://celtix.objectweb.org) and the XFire project
 (http://xfire.codehaus.org) merge.  This release is a major update from 
 the 2.1.x series.   The major new additions include:
@@ -13,7 +13,7 @@ the 2.1.x series.   The major new additions include:
  * Initial support for JAX-RS 1.0 including a client API for accessing 
    REST services   
 
-2.2.8 fixes over 44 JIRA issues reported by users and the community.
+2.2.9 fixes over 21 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -76,58 +76,34 @@ for caveats when upgrading from CXF 2.1.x to 2.2.x.
 
 6. Specific issues, features, and improvements fixed in this version
 
-
-Release Notes - CXF - Version 2.2.8
-
+Release Notes - CXF - Version 2.2.9
 
 ** Bug
-    * [CXF-2630] - JmsConfiguration with custom TaskExecutor with Spring 3.0 => NoSuchMethodError 
-    * [CXF-2695] - NullPointerException when reading a soap encoded struct with a nested element that's nil
-    * [CXF-2714] - SupportingToken UsernameToken is always encrypted
-    * [CXF-2724] - Relative schema location import fails on Windows machines
-    * [CXF-2728] - CXF-1977 is still valid for CXF 2.2.7
-    * [CXF-2729] - Cannot enable JMX extensions for Jetty through Jetty HTTP Transport in OSGi
-    * [CXF-2730] - Servlet controller is not updated after ApplicationContext refresh with Spring 3
-    * [CXF-2731] - NPE when using wsdl2js
-    * [CXF-2732] - DocLiteralInInterceptor on unmarshal the first message part when uisng SourceDataBinding
-    * [CXF-2733] - MultipleEndpointObserver does not set the exchange on the incoming Message in onMessage method
-    * [CXF-2739] - NPE When Mapping two xsd:dates in same object with Aegis Databinding
-    * [CXF-2740] - CXF does not unregister Endpoint MBeans for JAX-WS API published endpoints when endpoint is stopped through JAX-WS API
-    * [CXF-2742] - CXF MBeans are not unregistered/reregistered properly on CXF Bus shutdown and restart controlled by Spring DM
-    * [CXF-2743] - java2ws generates date into *.xjb header --> causign change where there is no change
-    * [CXF-2744] - Schema redefine element does not have its schemaLocation rewritten
-    * [CXF-2748] - Unmarshalling error when using fastinfoset
-    * [CXF-2752] - Regression - CXF Client Spring Context Fails
-    * [CXF-2761] - JavaScript variable "item" wont be reinitialized
-    * [CXF-2763] - Maven plugin extendedSoapHeaders option not under defaultOptions
-    * [CXF-2765] - Schema location import fails if there is space in the file path
-    * [CXF-2767] - Unable to handle schema location with spaces and serve up WSDL URL with unencoded spaces
-    * [CXF-2768] - Temporary files are not deleted for requests >64kb when using LoggingInInterceptor
-    * [CXF-2773] - should specify version range for net.sf.cglib optional import
-    * [CXF-2780] - Wrong soap fault code thrown on network connection failure
-    * [CXF-2781] - Charset encoding other than UTF-8 (as ISO-8859-1) not working
-    * [CXF-2784] - URIBuilder does not expand template variables in query parameters.
-    * [CXF-2785] - Base64Utils.decode should handle/wrap all exception types.
-    * [CXF-2786] - ws-rm Proxy should send SequenceAcknowledgement according to AcksTo URI header
-    * [CXF-2787] - CXF Extension bit @QueryParam("") does not allow null values in the bean
-    * [CXF-2792] - Custom Executor for Service object is ignored by the CXF JAX-WS run-time when Disaptch.invokeAsync is used
-    * [CXF-2798] - WS-addressing action not picked up on wrapped style operations
-    * [CXF-2799] - ant client-servlet doesn't work for  wsdl-first demo anymore
-    * [CXF-2801] - WebClient back() operation doesn't clear query parameters
+    * [CXF-2492] - NPE in DatatypeConverter after updating to 2.2.4
+    * [CXF-2788] - Bus.shutdown() did not close all the created Jms connection
+    * [CXF-2803] - ConcurrentModificationException in JAXB-WS frontend
+    * [CXF-2806] - PrettyPrintXMLStreamWriter - method writeStartElement(localname) calls method writeStartElement(prefix, localName, namespaceURI) with wrong paramters
+    * [CXF-2815] - Handler.getHeaders() should always be called
+    * [CXF-2816] - CachedOutputStream leaves behind temp files if resetOut() is called
+    * [CXF-2817] - The NON_UNIQUE_BODY message misspells signature signaure
+    * [CXF-2818] - The INITIAL_APP_CONTEXT_CREATION_FAILED_MSG message misspells create as crate 
+    * [CXF-2819] - <protocol-bindings>##SOAP12_Binding</protocol-bindings> in handler chain is not correctly matched  
+    * [CXF-2821] - NPE during WSDL validation
+    * [CXF-2822] - The interceptor is not added to the ClientImpl when create the dispatch to invoke service
+    * [CXF-2827] - JAXWS2.2: wsam:action attribute is not generated in <wsdl:input> and <wsdl:ouput> element when the SEI method is not annotated with @Action
+    * [CXF-2828] - JSR 250 @Resource annotation on field does not work for proxied service implementations
+    * [CXF-2829] - W3CDOMStreamReader is not compatible with wstx XMLEventReader
+    * [CXF-2830] - NullPointerException in EndpointReferenceUtils.SchemaLSResourceResolver resolveResource when systemId is null
+    * [CXF-2832] - WSA needs to validate incoming action
+    * [CXF-2834] - JAXWS2.2:MAPCodec.restoreExchange() does not honor the addressingDisabled property
+    * [CXF-2835] - ConcurrentModificationException in ClientImpl caused by toString-method on requestContext
 
 ** Improvement
-    * [CXF-2639] - Expose Cryptographic coverage checking code from PolicyBasedWSS4JInInterceptor in a non-WS-Policy based interceptor
-    * [CXF-2723] - CLONE -Allow configuration of JaxWsClientFactoryBean during port creation
-    * [CXF-2727] - NullPointerException at org.apache.cxf.transport.TransportURIResolver when the WSDL is not found instead of an exception with a useful message
-    * [CXF-2745] - Add ability to define custom TimeToLive value for WSSecTimestamp
-    * [CXF-2753] - Need a way to preserve parameters wrapper in DocLiteralInInterceptor
-    * [CXF-2755] - Add a utility AuthorizationInInterceptor which can check if current SecurityContext matches expected roles
-    * [CXF-2771] - Jetty-HTTP Transport Jetty JMX support causes MBean name collisions
-    * [CXF-2790] - ws-rm example server side configuration contain unnecessary DecoupledEndpoint configuration
+    * [CXF-2808] - WSDL2JAVA: generated serialVersionUID on @WebFault exceptions
+    * [CXF-2809] - Upgrade to Jaxen 1.1.1
+    * [CXF-2826] - Should check for angular bracket "<>" when generating "start" tag for Content-Type for HTTP header 
 
-** New Feature
-    * [CXF-2751] - Slf4jLogger
-    * [CXF-2793] - Provide capability for JMS client to specify separate ReplyTo queue and listener queue
 
-** Task
-    * [CXF-2802] - The ws-rm example should also be deployable in Tomcat
+
+
+
