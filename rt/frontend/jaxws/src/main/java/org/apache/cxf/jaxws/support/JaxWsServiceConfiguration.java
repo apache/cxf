@@ -40,6 +40,7 @@ import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.jws.soap.SOAPBinding.Style;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Action;
 import javax.xml.ws.Holder;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.Response;
@@ -798,11 +799,17 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     public String getAction(OperationInfo op, Method method) {
         method = getDeclaredMethod(method);
         WebMethod wm = method.getAnnotation(WebMethod.class);
+        String action = "";
         if (wm != null) {
-            return wm.action();
-        } else {
-            return "";
+            action = wm.action();
         }
+        if (StringUtils.isEmpty(action)) {
+            Action act = method.getAnnotation(Action.class);
+            if (act != null) {
+                action = act.input();
+            }
+        }
+        return action;
     }
     public Boolean isHolder(Class<?> cls, Type type) {
         return Holder.class.equals(cls);

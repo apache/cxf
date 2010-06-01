@@ -31,6 +31,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jws.WebMethod;
 import javax.wsdl.Operation;
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
@@ -478,11 +479,22 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         if (action == null && addressing == null) {
             return;
         }
+        WebMethod wm = method.getAnnotation(WebMethod.class);
+        String inputAction = "";
+        if (action != null) {
+            inputAction = action.input();
+        }
+        if (wm != null && StringUtils.isEmpty(inputAction)) {
+            inputAction = wm.action(); 
+        }
+        if (StringUtils.isEmpty(inputAction)) {
+            inputAction = computeAction(operation, "Request");
+        }
         if (action == null && addressing != null) {
             operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
-                                                       computeAction(operation, "Request"));
+                                                       inputAction);
             operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
-                                                       computeAction(operation, "Request"));
+                                                       inputAction);
             operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
                                                        computeAction(operation, "Response"));
             operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
@@ -490,13 +502,9 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
         } else {
             MessageInfo input = operation.getInput();
+            input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, inputAction);
             if (!StringUtils.isEmpty(action.input())) {
-                input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.input());
-                input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.input());
-            } else {
-                input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, computeAction(operation,
-                                                                                             "Request"));
-                
+                input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, inputAction);
             }
 
             MessageInfo output = operation.getOutput();
@@ -544,7 +552,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
     }
     
-    private Object computeAction(OperationInfo op, String postFix) {
+    private String computeAction(OperationInfo op, String postFix) {
         StringBuilder s = new StringBuilder(op.getName().getNamespaceURI());
         if (s.charAt(s.length() - 1) != '/') {
             s.append('/');

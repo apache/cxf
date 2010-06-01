@@ -133,7 +133,7 @@
     <wsaw:UsingAddressing wsdl:required="false"/>
     <wsp:PolicyReference URI="#AddNumbersImplServiceSoapBinding_WSAM_Addressing_Policy"/>
     <wsdl:operation name="addNumbers">
-      <soap:operation soapAction="" style="document"/>
+      <soap:operation soapAction="http://cxf.apache.org/input" style="document"/>
       <wsdl:input name="addNumbers">
         <soap:body use="literal"/>
       </wsdl:input>
@@ -145,7 +145,7 @@
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="addNumbers4">
-      <soap:operation soapAction="" style="document"/>
+      <soap:operation soapAction="http://cxf.apache.org/input4" style="document"/>
       <wsdl:input name="addNumbers4">
         <soap:body use="literal"/>
       </wsdl:input>
@@ -157,7 +157,7 @@
       </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="addNumbers3">
-      <soap:operation soapAction="" style="document"/>
+      <soap:operation soapAction="http://cxf.apache.org/input3" style="document"/>
       <wsdl:input name="addNumbers3">
         <soap:body use="literal"/>
       </wsdl:input>
