@@ -560,7 +560,7 @@ public class ClientImpl
             if (null != resContext) {
                 resContext.putAll(inMsg);
                 if (LOG.isLoggable(Level.FINE)) {
-                    LOG.fine("set responseContext to be" + responseContext);
+                    LOG.fine("set responseContext to be" + resContext);
                 }
             }
             resList = inMsg.getContent(List.class);
