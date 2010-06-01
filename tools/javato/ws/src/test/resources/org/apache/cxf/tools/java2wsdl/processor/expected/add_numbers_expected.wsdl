@@ -77,25 +77,25 @@
   </wsdl:message>
   <wsdl:portType name="AddNumbersImpl">
     <wsdl:operation name="addNumbers">
-      <wsdl:input name="addNumbers" message="tns:addNumbers" wsam:Action="http://cxf.apache.org/input" wsaw:Action="http://cxf.apache.org/input">
+      <wsdl:input name="addNumbers" message="tns:addNumbers" wsaw:Action="http://cxf.apache.org/input">
     </wsdl:input>
-      <wsdl:output name="addNumbersResponse" message="tns:addNumbersResponse" wsam:Action="http://cxf.apache.org/output" wsaw:Action="http://cxf.apache.org/output">
+      <wsdl:output name="addNumbersResponse" message="tns:addNumbersResponse" wsaw:Action="http://cxf.apache.org/output">
     </wsdl:output>
       <wsdl:fault name="AddNumbersException" message="tns:AddNumbersException" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers/Fault/AddNumbersException">
     </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="addNumbers3">
-      <wsdl:input name="addNumbers3" message="tns:addNumbers3" wsam:Action="http://cxf.apache.org/input3" wsaw:Action="http://cxf.apache.org/input3">
+      <wsdl:input name="addNumbers3" message="tns:addNumbers3" wsaw:Action="http://cxf.apache.org/input3">
     </wsdl:input>
-      <wsdl:output name="addNumbers3Response" message="tns:addNumbers3Response" wsam:Action="http://cxf.apache.org/output3" wsaw:Action="http://cxf.apache.org/output3">
+      <wsdl:output name="addNumbers3Response" message="tns:addNumbers3Response" wsaw:Action="http://cxf.apache.org/output3">
     </wsdl:output>
       <wsdl:fault name="AddNumbersException" message="tns:AddNumbersException" wsam:Action="http://cxf.apache.org/fault3" wsaw:Action="http://cxf.apache.org/fault3">
     </wsdl:fault>
     </wsdl:operation>
     <wsdl:operation name="addNumbers2">
-      <wsdl:input name="addNumbers2" message="tns:addNumbers2">
+      <wsdl:input name="addNumbers2" message="tns:addNumbers2" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request">
     </wsdl:input>
-      <wsdl:output name="addNumbers2Response" message="tns:addNumbers2Response">
+      <wsdl:output name="addNumbers2Response" message="tns:addNumbers2Response" wsam:Action="http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Response">
     </wsdl:output>
     </wsdl:operation>
   </wsdl:portType>

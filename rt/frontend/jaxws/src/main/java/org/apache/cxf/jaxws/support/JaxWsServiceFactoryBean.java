@@ -474,46 +474,49 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
 
         Action action = method.getAnnotation(Action.class);
-        if (action == null) {
+        Addressing addressing = method.getDeclaringClass().getAnnotation(Addressing.class);
+        if (action == null && addressing == null) {
             return;
         }
-        MessageInfo input = operation.getInput();
-        if (!StringUtils.isEmpty(action.input())) {
-            input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.input());
-            input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.input());
+        if (action == null && addressing != null) {
+            operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
+                                                       computeAction(operation, "Request"));
+            operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
+                                                       computeAction(operation, "Response"));
+
         } else {
-            input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
-                                        computeAction(operation, "Request"));
-        }
-        
-        MessageInfo output = operation.getOutput();
-        if (output != null && !StringUtils.isEmpty(action.output())) {
-            output.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.output());
-            output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.output());
-        } else if (output != null) {
-            output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
-                                         computeAction(operation, "Response"));            
-        }
-        
-        FaultAction[] faultActions = action.fault();
-        if (faultActions != null 
-            && faultActions.length > 0 
-            && operation.getFaults() != null) {
-            for (FaultAction faultAction : faultActions) {                
-                FaultInfo faultInfo = getFaultInfo(operation, faultAction.className());
-                faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, 
-                                                faultAction.value());
-                faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
-                                                faultAction.value());
-                if (operation.isUnwrappedCapable()) {
-                    faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
-                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, 
-                                                    faultAction.value());
-                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
-                                                    faultAction.value());
+            MessageInfo input = operation.getInput();
+            if (!StringUtils.isEmpty(action.input())) {
+                input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.input());
+            } else {
+                input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, computeAction(operation,
+                                                                                             "Request"));
+            }
+
+            MessageInfo output = operation.getOutput();
+            if (output != null && !StringUtils.isEmpty(action.output())) {
+                output.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.output());
+            } else if (output != null) {
+                output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, computeAction(operation,
+                                                                                              "Response"));
+            }
+
+            FaultAction[] faultActions = action.fault();
+            if (faultActions != null && faultActions.length > 0 && operation.getFaults() != null) {
+                for (FaultAction faultAction : faultActions) {
+                    FaultInfo faultInfo = getFaultInfo(operation, faultAction.className());
+                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction.value());
+                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction.value());
+                    if (operation.isUnwrappedCapable()) {
+                        faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
+                        faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction
+                            .value());
+                        faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction
+                            .value());
+                    }
                 }
             }
-        } 
+        }
         for (FaultInfo fi : operation.getFaults()) {
             if (fi.getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME) == null) {
                 String f = "/Fault/" + fi.getName().getLocalPart();
