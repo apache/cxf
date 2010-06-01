@@ -1115,6 +1115,8 @@ public final class StaxUtils {
                 } catch (Exception ex) {
                     //ignore
                 }
+            } else if (source instanceof StaxSource) {
+                return ((StaxSource)source).getXMLStreamReader();
             } else if (source instanceof SAXSource) {
                 return createXMLStreamReader(((SAXSource)source).getInputSource());
             }

@@ -29,24 +29,87 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.xml.namespace.QName;
 
 public abstract class AbstractPropertiesHolder implements Extensible {
+    private AbstractPropertiesHolder delegate;
+    private boolean delegateProperties;
+    
     private AtomicReference<Map<String, Object>> propertyMap = new AtomicReference<Map<String, Object>>();
     private AtomicReference<Object[]> extensors = new AtomicReference<Object[]>();
     private Map<QName, Object> extensionAttributes;
     
+    public final void setDelegate(AbstractPropertiesHolder p, boolean props) {
+        delegate = p;
+        delegateProperties = props;
+        if (delegate == null) {
+            return;
+        }
+        if (documentation != null) {
+            delegate.setDocumentation(documentation);
+            documentation = null;
+        }
+        if (extensionAttributes != null) {
+            delegate.setExtensionAttributes(extensionAttributes);
+            extensionAttributes = null;
+        }
+        if (extensors.get() != null) {
+            for (Object el : extensors.get()) {
+                delegate.addExtensor(el);
+            }
+            extensors.set(null);
+        }
+        if (delegateProperties && propertyMap.get() != null) {
+            for (Map.Entry<String, Object> p2 : propertyMap.get().entrySet()) {
+                delegate.setProperty(p2.getKey(), p2.getValue());
+            }
+            propertyMap.set(null);
+        }
+    }
+    
+    public String getDocumentation() {
+        if (delegate != null) {
+            return delegate.getDocumentation();
+        }
+        return documentation;
+    }
+    public void setDocumentation(String s) {
+        if (delegate != null) {
+            delegate.setDocumentation(s);
+        } else {
+            documentation = s;
+        }
+    }
+
     public Map<String, Object> getProperties() {
+        if (delegate != null && delegateProperties) {
+            return delegate.getProperties();
+        }
         return propertyMap.get();
     }
     public Object getProperty(String name) {
+        if (delegate != null && delegateProperties) {
+            return delegate.getProperty(name);
+        }
         if (null == propertyMap.get()) {
             return null;
         }
         return propertyMap.get().get(name);
+    }
+    public Object removeProperty(String name) {
+        if (delegate != null && delegateProperties) {
+            delegate.removeProperty(name);
+        }
+        if (null == propertyMap.get()) {
+            return null;
+        }
+        return propertyMap.get().remove(name);
     }
     
     public <T> T getProperty(String name, Class<T> cls) {
         return cls.cast(getProperty(name));
     }
     public boolean hasProperty(String name) {
+        if (delegate != null && delegateProperties) {
+            return delegate.hasProperty(name);
+        }
         Map<String, Object> map = propertyMap.get();
         if (map != null) {
             return map.containsKey(name);
@@ -55,6 +118,10 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
     
     public void setProperty(String name, Object v) {
+        if (delegate != null && delegateProperties) {
+            delegate.setProperty(name, v);
+            return;
+        }
         if (null == propertyMap.get()) {
             propertyMap.compareAndSet(null, new ConcurrentHashMap<String, Object>(4));
         }
@@ -66,6 +133,10 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
     
     public boolean containsExtensor(Object el) {
+        if (delegate != null) {
+            return delegate.containsExtensor(el);
+        }
+
         Object exts[] = extensors.get();
         if (exts != null) {
             for (Object o : exts) {
@@ -77,6 +148,10 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         return false;
     }
     public void addExtensor(Object el) {
+        if (delegate != null) {
+            delegate.addExtensor(el);
+            return;
+        }
         Object exts[] = extensors.get();
         Object exts2[];
         if (exts == null) {
@@ -95,6 +170,9 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
 
     public <T> T getExtensor(Class<T> cls) {
+        if (delegate != null) {
+            return delegate.getExtensor(cls);
+        }
         Object exts[] = extensors.get();
         if (exts == null) {
             return null;
@@ -107,6 +185,10 @@ public abstract class AbstractPropertiesHolder implements Extensible {
         return null;
     }
     public <T> List<T> getExtensors(Class<T> cls) {
+        if (delegate != null) {
+            return delegate.getExtensors(cls);
+        }
+   
         Object exts[] = extensors.get();
         if (exts == null) {
             return null;
@@ -121,19 +203,32 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
 
     public AtomicReference<Object[]> getExtensors() {
+        if (delegate != null) {
+            return delegate.getExtensors();
+        }
         return extensors;
     }
     
       
     public Object getExtensionAttribute(QName name) {        
+        if (delegate != null) {
+            return delegate.getExtensionAttribute(name);
+        }
         return null == extensionAttributes ? null : extensionAttributes.get(name);
     }
 
     public Map<QName, Object> getExtensionAttributes() {
+        if (delegate != null) {
+            return delegate.getExtensionAttributes();
+        }
         return extensionAttributes;
     }
     
     public void addExtensionAttribute(QName name, Object attr) {
+        if (delegate != null) {
+            delegate.addExtensionAttribute(name, attr);
+            return;
+        }
         if (null == extensionAttributes) {
             extensionAttributes = new HashMap<QName, Object>();
         }
@@ -141,6 +236,10 @@ public abstract class AbstractPropertiesHolder implements Extensible {
     }
    
     public void setExtensionAttributes(Map<QName, Object> attrs) {
+        if (delegate != null) {
+            delegate.setExtensionAttributes(attrs);
+            return;
+        }
         extensionAttributes = attrs;        
     }
 
@@ -154,6 +253,9 @@ public abstract class AbstractPropertiesHolder implements Extensible {
      * @return the configuration value or the default
      */
     public <T> T getTraversedExtensor(T defaultValue, Class<T> type) {
+        if (delegate != null) {
+            return delegate.getTraversedExtensor(defaultValue, type);
+        }
         T extensor = getExtensor(type);
         if (extensor == null) {
             return defaultValue;

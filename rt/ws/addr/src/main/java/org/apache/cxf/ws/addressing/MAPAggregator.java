@@ -35,6 +35,8 @@ import javax.xml.ws.WebFault;
 
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.model.SoapOperationInfo;
+import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
@@ -510,7 +512,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
             if (ContextUtils.hasEmptyAction(maps)
                 && ContextUtils.isOutbound(message)) {
-                maps.setAction(ContextUtils.getAttributedURI(getActionUri(message)));
+                maps.setAction(ContextUtils.getAttributedURI(getActionUri(message, true)));
             }
         }
 
@@ -590,9 +592,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         return cause.getClass().getSimpleName();    
     }
 
-    protected String getActionUri(Message message) {
+    protected String getActionUri(Message message, boolean checkMessage) {
         BindingOperationInfo bop = message.getExchange().get(BindingOperationInfo.class);
-        if (bop == null) {
+        if (bop == null || Boolean.TRUE.equals(bop.getProperty("operation.is.synthetic"))) {
             return null;
         }
         OperationInfo op = bop.getOperationInfo();
@@ -600,24 +602,38 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             op = ((UnwrappedOperationInfo)op).getWrappedOperation();
         }
         
-        String actionUri = (String) message.get(SoapBindingConstants.SOAP_ACTION);
+        String actionUri = null;
+        if (checkMessage) {
+            actionUri = (String) message.get(ContextUtils.ACTION);
+            if (actionUri == null) {
+                actionUri = (String) message.get(SoapBindingConstants.SOAP_ACTION);
+            }
+        }
         if (actionUri != null) {
             return actionUri;
         }
         String opNamespace = getActionBaseUri(op);
         
-        if (ContextUtils.isRequestor(message)) {
+        boolean inbound = !ContextUtils.isOutbound(message);
+        boolean requestor = ContextUtils.isRequestor(message);
+        boolean inMsg = requestor ^ inbound;
+        if (ContextUtils.isFault(message)) {
+            String faultName = getFaultNameFromMessage(message);
+            actionUri = getActionFromFaultMessage(op, faultName);
+        } else if (inMsg) {
             String explicitAction = getActionFromInputMessage(op);
-            if (explicitAction != null) {
+            if (StringUtils.isEmpty(explicitAction)) {
+                SoapOperationInfo soi = ContextUtils.getSoapOperationInfo(bop);
+                explicitAction = soi == null ? null : soi.getAction();
+            }            
+            
+            if (!StringUtils.isEmpty(explicitAction)) {
                 actionUri = explicitAction;
             } else if (null == op.getInputName()) {
                 actionUri = addPath(opNamespace, op.getName().getLocalPart() + "Request");
             } else {
                 actionUri = addPath(opNamespace, op.getInputName());
             }
-        } else if (ContextUtils.isFault(message)) {
-            String faultName = getFaultNameFromMessage(message);
-            actionUri = getActionFromFaultMessage(op, faultName);
         } else {
             String explicitAction = getActionFromOutputMessage(op);
             if (explicitAction != null) {
@@ -805,27 +821,10 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             Map<String, List<String>> headers 
                 = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
             List<String> s = headers == null ? null : headers.get(Names.SOAP_ACTION_HEADER);
+            String s1 = this.getActionUri(message, false);
             if (s == null && headers != null) {
                 s = headers.get(Names.SOAP_ACTION_HEADER.toLowerCase());
             }
-            if (s != null && s.size() > 0) {
-                String sa = s.get(0);
-                if (sa.startsWith("\"")) {
-                    sa = sa.substring(1, sa.lastIndexOf('"'));
-                }
-                if (!StringUtils.isEmpty(sa)
-                    && !sa.equals(maps.getAction().getValue())) {
-                    //don't match, must send fault back....
-                    String reason =
-                        BUNDLE.getString("INVALID_SOAPACTION_MESSAGE");
-    
-                    ContextUtils.storeMAPFaultName(Names.ACTION_MISMATCH_NAME,
-                                                   message);
-                    ContextUtils.storeMAPFaultReason(reason, message);
-                    return false;
-                }
-            }
-            
             if (maps.getAction() == null || maps.getAction().getValue() == null) {
                 String reason =
                     BUNDLE.getString("MISSING_ACTION_MESSAGE");
@@ -834,8 +833,44 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                                message);
                 ContextUtils.storeMAPFaultReason(reason, message);
                 return false;
+            }
+            if (s != null && s.size() > 0) {
+                String sa = s.get(0);
+                if (sa.startsWith("\"")) {
+                    sa = sa.substring(1, sa.lastIndexOf('"'));
+                }
+                String action = maps.getAction() == null ? "" : maps.getAction().getValue();
+                if (!StringUtils.isEmpty(sa)
+                    && !sa.equals(action)) {
+                    //don't match, must send fault back....
+                    String reason =
+                        BUNDLE.getString("INVALID_SOAPACTION_MESSAGE");
+    
+                    ContextUtils.storeMAPFaultName(Names.ACTION_MISMATCH_NAME,
+                                                   message);
+                    ContextUtils.storeMAPFaultReason(reason, message);
+                    return false;
+                } else if (!StringUtils.isEmpty(s1)
+                    && !action.equals(s1)
+                    && !action.equals(s1 + "Request")
+                    && !s1.equals(action + "Request")) {
+                    //if java first, it's likely to have "Request", if wsdl first,
+                    //it will depend if the wsdl:input has a name or not. Thus, we'll
+                    //check both plain and with the "Request" trailer
+                    
+                    //doesn't match what's in the wsdl/annotations
+                    String reason =
+                        BundleUtils.getFormattedString(BUNDLE,
+                                "ACTION_NOT_SUPPORTED_MSG", action);
+                    
+                    ContextUtils.storeMAPFaultName(Names.ACTION_NOT_SUPPORTED_NAME,
+                                                   message);
+                    ContextUtils.storeMAPFaultReason(reason, message);
+                    return false;
+                }
                 
             }
+            
         
             if (!allowDuplicates) {
                 AttributedURIType messageID = maps.getMessageID();

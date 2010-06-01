@@ -90,6 +90,9 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public void setOutput(String nm, MessageInfo out) {
         outName = nm;
         outputMessage = out;
+        if (unwrappedOperation != null && unwrappedOperation.getOutput() != null) {
+            unwrappedOperation.getOutput().setDelegate(out, false);
+        }
     }    
     public boolean hasOutput() {
         return outputMessage != null;
@@ -104,6 +107,9 @@ public class OperationInfo extends AbstractPropertiesHolder implements NamedItem
     public void setInput(String nm, MessageInfo in) {
         inName = nm;
         inputMessage = in;
+        if (unwrappedOperation != null && unwrappedOperation.getInput() != null) {
+            unwrappedOperation.getInput().setDelegate(in, false);
+        }
     }
     public boolean hasInput() {
         return inputMessage != null;

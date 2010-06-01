@@ -52,6 +52,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
@@ -155,13 +156,15 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param message the messsage message
      */     
     private void mediate(SoapMessage message) {
-        if (ContextUtils.isOutbound(message)) {
-            encode(message, ContextUtils.retrieveMAPs(message, false, true));
-        } else if (null == ContextUtils.retrieveMAPs(message, false, false, false)) {            
-            AddressingProperties maps = decode(message);
-            ContextUtils.storeMAPs(maps, message, false);
-            markPartialResponse(message, maps);
-            restoreExchange(message, maps);     
+        if (!MessageUtils.getContextualBoolean(message, MAPAggregator.ADDRESSING_DISABLED, false)) {
+            if (ContextUtils.isOutbound(message)) {
+                encode(message, ContextUtils.retrieveMAPs(message, false, true));
+            } else if (null == ContextUtils.retrieveMAPs(message, false, false, false)) {            
+                AddressingProperties maps = decode(message);
+                ContextUtils.storeMAPs(maps, message, false);
+                markPartialResponse(message, maps);
+                restoreExchange(message, maps);     
+            }
         }
     }
 

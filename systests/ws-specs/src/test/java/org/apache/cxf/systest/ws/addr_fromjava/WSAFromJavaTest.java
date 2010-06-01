@@ -23,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 import java.net.URL;
 import java.util.Map;
 import javax.xml.ws.BindingProvider;
+import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.systest.ws.AbstractWSATestBase;
 import org.apache.cxf.systest.ws.addr_fromjava.client.AddNumberImpl;
@@ -124,7 +125,6 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
 
     @Test
     public void testAddNumbersJaxWsContext() throws Exception {
-        ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
         AddNumberImpl port = getPort();
@@ -133,14 +133,15 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         java.util.Map<String, Object> requestContext = bp.getRequestContext();
         requestContext.put(BindingProvider.SOAPACTION_URI_PROPERTY, "cxf");
 
-        assertEquals(3, port.addNumbers(1, 2));
-
+        try {
+            assertEquals(3, port.addNumbers(1, 2));
+            fail("Should have thrown an ActionNotSupported exception");
+        } catch (SOAPFaultException ex) {
+            //expected
+        }
         String expectedOut = "cxf</Action>";
         assertTrue(output.toString().indexOf(expectedOut) != -1);
         assertTrue(output.toString().indexOf("SOAPAction=[\"cxf\"]") != -1);
-        
-        String expectedIn = "http://cxf.apache.org/output";
-        assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
 
     private AddNumberImpl getPort() {

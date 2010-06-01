@@ -74,12 +74,12 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.SERVER_ADDRESSING_PRO
 public final class ContextUtils {
 
     public static final ObjectFactory WSA_OBJECT_FACTORY = new ObjectFactory();
+    public static final String ACTION = ContextUtils.class.getName() + ".ACTION";
 
     private static final EndpointReferenceType NONE_ENDPOINT_REFERENCE = 
         EndpointReferenceUtils.getEndpointReference(Names.WSA_NONE_ADDRESS);
     
     private static final Logger LOG = LogUtils.getL7dLogger(ContextUtils.class);
-    private static final String ACTION = ContextUtils.class.getName() + ".ACTION";
     
     /**
      * Used to fabricate a Uniform Resource Name from a UUID string
@@ -730,7 +730,10 @@ public final class ContextUtils {
                 bindingOpInfo = bindingOpInfo.getUnwrappedOperation();
             }
             if (fault == null) {
-                action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
+                action = (String)message.get(ACTION);
+                if (StringUtils.isEmpty(action)) {
+                    action = (String) message.get(SoapBindingConstants.SOAP_ACTION);
+                }
                 if (action == null || "".equals(action)) {
                     MessageInfo msgInfo = 
                         ContextUtils.isRequestor(message)
@@ -782,7 +785,7 @@ public final class ContextUtils {
         return action;
     }
 
-    private static SoapOperationInfo getSoapOperationInfo(BindingOperationInfo bindingOpInfo) {
+    public static SoapOperationInfo getSoapOperationInfo(BindingOperationInfo bindingOpInfo) {
         SoapOperationInfo soi = bindingOpInfo.getExtensor(SoapOperationInfo.class);
         if (soi == null && bindingOpInfo.isUnwrapped()) {
             soi = bindingOpInfo.getWrappedOperation()
