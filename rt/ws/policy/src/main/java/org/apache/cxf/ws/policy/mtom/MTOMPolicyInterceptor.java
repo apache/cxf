@@ -23,6 +23,7 @@ import java.util.Collection;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.ws.policy.AssertionInfo;
@@ -40,13 +41,18 @@ public class MTOMPolicyInterceptor extends AbstractPhaseInterceptor<Message> {
         if (aim != null) {
             Collection<AssertionInfo> ais = aim.get(MetadataConstants.MTOM_ASSERTION_QNAME);
             for (AssertionInfo ai : ais) {
-                
-                // set mtom enabled and assert the policy if we find an mtom request
-                String contentType = (String)message.getExchange().getInMessage()
-                    .get(Message.CONTENT_TYPE);
-                if (contentType != null && contentType.contains("type=\"application/xop+xml\"")) {
-                    ai.setAsserted(true);
+                if (MessageUtils.isRequestor(message)) {
+                    //just turn on MTOM
                     message.put(Message.MTOM_ENABLED, Boolean.TRUE);
+                    ai.setAsserted(true);
+                } else {
+                    // set mtom enabled and assert the policy if we find an mtom request
+                    String contentType = (String)message.getExchange().getInMessage()
+                        .get(Message.CONTENT_TYPE);
+                    if (contentType != null && contentType.contains("type=\"application/xop+xml\"")) {
+                        ai.setAsserted(true);
+                        message.put(Message.MTOM_ENABLED, Boolean.TRUE);
+                    }
                 }
             }
         }
