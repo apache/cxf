@@ -481,21 +481,28 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         if (action == null && addressing != null) {
             operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
                                                        computeAction(operation, "Request"));
+            operation.getInput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
+                                                       computeAction(operation, "Request"));
             operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
                                                        computeAction(operation, "Response"));
+            operation.getOutput().addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME,
+                                                        computeAction(operation, "Response"));
 
         } else {
             MessageInfo input = operation.getInput();
             if (!StringUtils.isEmpty(action.input())) {
                 input.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.input());
+                input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.input());
             } else {
                 input.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, computeAction(operation,
                                                                                              "Request"));
+                
             }
 
             MessageInfo output = operation.getOutput();
             if (output != null && !StringUtils.isEmpty(action.output())) {
                 output.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, action.output());
+                output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, action.output());
             } else if (output != null) {
                 output.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, computeAction(operation,
                                                                                               "Response"));
@@ -505,14 +512,20 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             if (faultActions != null && faultActions.length > 0 && operation.getFaults() != null) {
                 for (FaultAction faultAction : faultActions) {
                     FaultInfo faultInfo = getFaultInfo(operation, faultAction.className());
-                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction.value());
-                    faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction.value());
-                    if (operation.isUnwrappedCapable()) {
-                        faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
+                    if (!StringUtils.isEmpty(faultAction.value())) {
                         faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction
                             .value());
                         faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction
                             .value());
+                    }
+                    if (operation.isUnwrappedCapable()) {
+                        faultInfo = getFaultInfo(operation.getUnwrappedOperation(), faultAction.className());
+                        if (!StringUtils.isEmpty(faultAction.value())) {
+                            faultInfo.addExtensionAttribute(JAXWSAConstants.WSAW_ACTION_QNAME, faultAction
+                                .value());
+                            faultInfo.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, faultAction
+                                .value());
+                        }
                     }
                 }
             }
