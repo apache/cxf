@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-tools-wsdlto</artifactId>
     <packaging>pom</packaging>
-    <version>2.1.10-SNAPSHOT</version>
+    <version>2.1.10</version>
     <name>Apache CXF Command Line Tools WSDLTo</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-tools</artifactId>
-        <version>2.1.10-SNAPSHOT</version>
+        <version>2.1.10</version>
     </parent>
 
     <modules>
