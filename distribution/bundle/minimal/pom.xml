@@ -36,100 +36,100 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-common-utilities</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-common-schemas</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-api</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-core</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-bindings-soap</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-databinding-aegis</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-ws-security</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-ws-rm</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-frontend-jaxrs</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
         </dependency> 
         <dependency>
                <groupId>com.sun.xml.fastinfoset</groupId>
@@ -149,10 +149,10 @@
                         <Implementation-Title>Apache CXF</Implementation-Title>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${pom.version}</Implementation-Version>
+                        <Implementation-Version>${project.version}</Implementation-Version>
                         <Specification-Title>Apache CXF</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${pom.version}</Specification-Version>
+                        <Specification-Version>${project.version}</Specification-Version>
                         <DynamicImport-Package>
                             com.ctc.wstx.*,
                             com.sun.xml.bind.api,
@@ -168,7 +168,7 @@
                             !org.apache.cxf.*,
                             !META-INF.cxf,
                             !schemas*,
-                            org.apache.cxf.tools.*;version=${pom.version};resolution:=optional,
+                            org.apache.cxf.tools.*;version=${project.version};resolution:=optional,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
@@ -206,7 +206,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.*;version=${pom.version};-split-package:=merge-first,
+                            org.apache.cxf.*;version=${project.version};-split-package:=merge-first,
                             '=META-INF.cxf',
                             '=META-INF.cxf.osgi',
                             '=schemas',

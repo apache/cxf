@@ -35,7 +35,7 @@
 
     <properties>
         <maven.test.skip>true</maven.test.skip>
-        <cxf.version>${pom.version}</cxf.version>
+        <cxf.version>${project.version}</cxf.version>
         <createSourcesJar>false</createSourcesJar>
     </properties>
 

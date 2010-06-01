@@ -465,13 +465,13 @@
                     <configuration>
                         <archive>
                             <manifestEntries>
-                                <Specification-Title>${name}</Specification-Title>
+                                <Specification-Title>${project.name}</Specification-Title>
                                 <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                                <Specification-Version>${version}</Specification-Version>
-                                <Implementation-Title>${name}</Implementation-Title>
+                                <Specification-Version>${project.version}</Specification-Version>
+                                <Implementation-Title>${project.name}</Implementation-Title>
                                 <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
                                 <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
-                                <Implementation-Version>${version}</Implementation-Version>
+                                <Implementation-Version>${project.version}</Implementation-Version>
                             </manifestEntries>
                         </archive>
                     </configuration>

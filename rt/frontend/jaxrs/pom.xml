@@ -65,7 +65,7 @@
         <dependency>
             <groupId>${pom.groupId}</groupId>
             <artifactId>cxf-rt-bindings-xml</artifactId>
-            <version>${pom.version}</version>
+            <version>${project.version}</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.apache.cxf</groupId>
