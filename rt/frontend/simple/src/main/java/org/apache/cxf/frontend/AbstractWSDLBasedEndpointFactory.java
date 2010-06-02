@@ -32,7 +32,6 @@ import org.apache.cxf.endpoint.AbstractEndpointFactory;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
-import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
@@ -328,42 +327,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
         return ei;
     }
 
-    /**
-     * Add annotationed Interceptors and Features to the Endpoint
-     * @param ep
-     */
-    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> cls) {
-        AnnotationInterceptors provider = new AnnotationInterceptors(cls);
-        if (initializeAnnotationInterceptors(provider, ep)) {
-            LOG.fine("Added annotation based interceptors and features");
-        }
-    }    
     
-    protected boolean initializeAnnotationInterceptors(AnnotationInterceptors provider, Endpoint ep) {
-        boolean hasAnnotation = false;
-        if (provider.getInFaultInterceptors() != null) {
-            ep.getInFaultInterceptors().addAll(provider.getInFaultInterceptors());
-            hasAnnotation = true;
-        }
-        if (provider.getInInterceptors() != null) {
-            ep.getInInterceptors().addAll(provider.getInInterceptors());
-            hasAnnotation = true;
-        }
-        if (provider.getOutFaultInterceptors() != null) {
-            ep.getOutFaultInterceptors().addAll(provider.getOutFaultInterceptors());
-            hasAnnotation = true;
-        }
-        if (provider.getOutInterceptors() != null) {
-            ep.getOutInterceptors().addAll(provider.getOutInterceptors());
-            hasAnnotation = true;
-        }
-        if (provider.getFeatures() != null) {
-            getFeatures().addAll(provider.getFeatures());
-            hasAnnotation = true;
-        }
-        
-        return hasAnnotation;
-    }
     protected SoapBindingConfiguration createSoapBindingConfig() {
         return new SoapBindingConfiguration();
     }
