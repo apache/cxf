@@ -184,6 +184,12 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (getOutFaultInterceptors() != null) {
             ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
         }
+        
+        List<ClassResourceInfo> list = serviceFactory.getRealClassResourceInfo();
+        for (ClassResourceInfo cri : list) {
+            initializeAnnotationInterceptors(ep, cri.getServiceClass());
+        }
+            
         return ep;
     }
     

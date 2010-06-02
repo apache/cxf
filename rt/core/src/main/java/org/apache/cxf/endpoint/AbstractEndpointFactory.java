@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
 
@@ -30,9 +31,11 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AbstractBasicInterceptorProvider;
+import org.apache.cxf.interceptor.AnnotationInterceptors;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -40,7 +43,7 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 
 public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorProvider {
-    
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractEndpointFactory.class);
     private static final String PRIVATE_ENDPOINT = "org.apache.cxf.endpoint.private";
     private static final String PRIVATE_ENDPOINTS = "org.apache.cxf.private.endpoints";
     
@@ -210,5 +213,42 @@ public abstract class AbstractEndpointFactory extends AbstractBasicInterceptorPr
             return true;
         }
         return false;
+    }
+    
+    /**
+     * Add annotationed Interceptors and Features to the Endpoint
+     * @param ep
+     */
+    protected void initializeAnnotationInterceptors(Endpoint ep, Class<?> cls) {
+        AnnotationInterceptors provider = new AnnotationInterceptors(cls);
+        if (initializeAnnotationInterceptors(provider, ep)) {
+            LOG.fine("Added annotation based interceptors and features");
+        }
+    }    
+    
+    protected boolean initializeAnnotationInterceptors(AnnotationInterceptors provider, Endpoint ep) {
+        boolean hasAnnotation = false;
+        if (provider.getInFaultInterceptors() != null) {
+            ep.getInFaultInterceptors().addAll(provider.getInFaultInterceptors());
+            hasAnnotation = true;
+        }
+        if (provider.getInInterceptors() != null) {
+            ep.getInInterceptors().addAll(provider.getInInterceptors());
+            hasAnnotation = true;
+        }
+        if (provider.getOutFaultInterceptors() != null) {
+            ep.getOutFaultInterceptors().addAll(provider.getOutFaultInterceptors());
+            hasAnnotation = true;
+        }
+        if (provider.getOutInterceptors() != null) {
+            ep.getOutInterceptors().addAll(provider.getOutInterceptors());
+            hasAnnotation = true;
+        }
+        if (provider.getFeatures() != null) {
+            getFeatures().addAll(provider.getFeatures());
+            hasAnnotation = true;
+        }
+        
+        return hasAnnotation;
     }
 }
