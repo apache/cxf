@@ -22,7 +22,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-java2ws-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>2.2.9-SNAPSHOT</version>
+    <version>2.2.9</version>
     <name>Apache CXF Java2WS Maven2 Plugin</name>
     <url>http://cxf.apache.org</url>
 
@@ -30,7 +30,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.2.9-SNAPSHOT</version>
+        <version>2.2.9</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
