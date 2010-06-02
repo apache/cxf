@@ -21,14 +21,14 @@
     <groupId>org.apache.cxf.systests</groupId>
     <artifactId>cxf-wsdl-maven</artifactId>
     <packaging>pom</packaging>
-    <version>2.2.9</version>
+    <version>2.2.10-SNAPSHOT</version>
     <name>Apache CXF System Tests for WSDL generation and retrieval</name>
     <url>http://cxf.apache.org</url>
 
     <parent>
         <groupId>org.apache.cxf.systests</groupId>
         <artifactId>cxf-systests</artifactId>
-        <version>2.2.9</version>
+        <version>2.2.10-SNAPSHOT</version>
     </parent>
 
     <modules>
