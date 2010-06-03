@@ -37,12 +37,13 @@ import org.junit.Test;
  * 
  */
 public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(ServerNoBodyParts.class);
+
     public static class Server extends AbstractBusTestServerBase {
         
         protected void run()  {            
             GreeterImpl implementor = new GreeterImpl();
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             javax.xml.ws.Endpoint.publish(address, implementor);
         }
         
@@ -97,6 +98,7 @@ public class JaxwsExecutorTest  extends AbstractBusClientServerTestBase {
         assertSame(executor, service.getExecutor());
         
         Greeter proxy = service.getGreeterPort();
+        updateAddressPort(proxy, PORT);
         
         assertEquals(0, executor.getCount());
         

@@ -31,10 +31,13 @@ import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.no_body_parts.types.Operation1;
 import org.apache.cxf.no_body_parts.types.Operation1Response;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
+    static final String PORT = TestUtil.getPortNumber(ServerNoBodyParts.class);
 
     private String md5(byte[] bytes) {
         MessageDigest algorithm;
@@ -64,7 +67,7 @@ public class JaxWsDynamicClientTest extends AbstractBusClientServerTestBase {
     public void testInvocation() throws Exception {
         JaxWsDynamicClientFactory dcf = 
             JaxWsDynamicClientFactory.newInstance();
-        URL wsdlURL = new URL("http://localhost:9020/NoBodyParts/NoBodyPartsService?wsdl");
+        URL wsdlURL = new URL("http://localhost:" + PORT + "/NoBodyParts/NoBodyPartsService?wsdl");
         Client client = dcf.createClient(wsdlURL);
         byte[] bucketOfBytes = 
             IOUtils.readBytesFromStream(getClass().getResourceAsStream("/wsdl/no_body_parts.wsdl"));

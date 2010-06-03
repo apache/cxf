@@ -39,6 +39,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(MyServer.class);
 
     static final Logger LOG = LogUtils.getLogger(LocatorClientServerTest.class);
     private final QName serviceName = new QName("http://apache.org/locator", "LocatorService");
@@ -47,7 +48,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
         protected void run() {
             Object implementor = new LocatorServiceImpl();
-            String address = "http://localhost:6006/services/LocatorService";
+            String address = "http://localhost:" + PORT + "/services/LocatorService";
             Endpoint.publish(address, implementor);
 
         }
@@ -78,7 +79,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
         LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
         LocatorService port = ss.getLocatorServicePort();
-
+        updateAddressPort(port, PORT);
         W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
         W3CEndpointReference w3cEpr = builder.build();
         port.registerPeerManager(w3cEpr,
