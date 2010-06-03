@@ -33,6 +33,7 @@ import org.apache.cxf.systest.jaxb.model.ExtendedWidget;
 import org.apache.cxf.systest.jaxb.model.Widget;
 import org.apache.cxf.systest.jaxb.service.TestService;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -42,6 +43,7 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 @ContextConfiguration(locations = { "classpath:extrajaxbclass.xml" })
 public class TestServiceTest extends AbstractJUnit4SpringContextTests {
+    static final String PORT = TestUtil.getPortNumber(TestServiceTest.class);
 
     private TestUtilities testUtilities;
 
@@ -65,7 +67,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
         TestService testClient = getTestClient();
         ((BindingProvider)testClient).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                 "http://localhost:7081/service/TestEndpoint");
+                 "http://localhost:" + PORT + "/service/TestEndpoint");
         Widget widgetFromService = testClient.getWidgetById((long)42);
 
         Assert.assertEquals(expected, widgetFromService);
@@ -74,7 +76,7 @@ public class TestServiceTest extends AbstractJUnit4SpringContextTests {
     
     @Test
     public void testSchema() throws Exception {
-        URL url = new URL("http://localhost:7081/service/TestService?wsdl");
+        URL url = new URL("http://localhost:" + PORT + "/service/TestService?wsdl");
         String s = IOUtils.toString(url.openStream());
         Assert.assertTrue(s, s.contains("application/octet-stream"));
     }

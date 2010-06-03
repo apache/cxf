@@ -31,6 +31,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 
 
 public class AegisServer extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(AegisServer.class);
 
     private org.mortbay.jetty.Server server;
     
@@ -40,7 +41,7 @@ public class AegisServer extends AbstractBusTestServerBase {
         server = new org.mortbay.jetty.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(9002);
+        connector.setPort(Integer.parseInt(PORT));
         server.setConnectors(new Connector[] {connector});
 
         WebAppContext webappcontext = new WebAppContext();

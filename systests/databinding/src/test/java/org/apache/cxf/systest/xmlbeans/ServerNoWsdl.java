@@ -26,8 +26,10 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class ServerNoWsdl extends AbstractBusTestServerBase {
+    static final String PORT = TestUtil.getPortNumber(ServerNoWsdl.class);
 
     protected void run() {
         // set the configuration file
@@ -36,11 +38,11 @@ public class ServerNoWsdl extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(bus);
         setBus(bus);
         Object implementor = new GreeterImpl();
-        String address = "http://localhost:9010/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
         implementor = new PutLastTradePriceImpl();
-        Endpoint.publish("http://localhost:9010/SOAPDocLitBareService/SoapPort", implementor);
+        Endpoint.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort", implementor);
     }
 
     public static void main(String args[]) {

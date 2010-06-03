@@ -37,7 +37,9 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import
 		resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
-
+		
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+	
 	<bean id="aegisBean"
 		class="org.apache.cxf.aegis.databinding.AegisDatabinding"
 		scope="prototype" />
@@ -51,7 +53,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<bean id="impl" class="org.apache.cxf.systest.aegis.AegisJaxWsImpl" />
 
 	<jaxws:endpoint id="aegisRPCImpl" implementor="#impl"
-		address="http://localhost:9167/aegisJaxWs">
+		address="http://localhost:${testutil.ports.AegisJaxWsTest}/aegisJaxWs">
 		<jaxws:serviceFactory>
 			<ref bean='jaxws-and-aegis-service-factory' />
 		</jaxws:serviceFactory>
@@ -66,7 +68,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 		class="org.apache.cxf.systest.aegis.ServerPasswordCallback"/>
 	
 	<jaxws:endpoint id="aegisRPCImplUN" implementor="#impl"
-		address="http://localhost:9167/aegisJaxWsUN">
+		address="http://localhost:${testutil.ports.AegisJaxWsTest}/aegisJaxWsUN">
 		<jaxws:serviceFactory>
 			<ref bean='jaxws-and-aegis-service-factory' />
 		</jaxws:serviceFactory>

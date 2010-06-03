@@ -30,6 +30,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.type.basic.CharacterAsStringType;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -43,7 +44,8 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  */
 @ContextConfiguration(locations = { "classpath:aegisSportsServiceBeans.xml" })
 public class CharacterSchemaTest extends AbstractJUnit4SpringContextTests {
-    
+    static final String PORT = TestUtil.getPortNumber(CharacterSchemaTest.class);
+
     private TestUtilities testUtilities;
     
     public CharacterSchemaTest() {

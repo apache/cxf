@@ -33,9 +33,11 @@ under the License.
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
 	<!-- Services -->
-	<jaxws:server id="testServer" serviceClass="org.apache.cxf.systest.jaxb.service.TestService" address="http://localhost:7081/service/TestService">
+	<jaxws:server id="testServer" serviceClass="org.apache.cxf.systest.jaxb.service.TestService"
+		 address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService">
 	
 		<jaxws:properties>
 			<entry key="jaxb.additionalContextClasses">
@@ -58,7 +60,7 @@ under the License.
 	<!-- Endpoint -->
 	<jaxws:endpoint id="testEndpoint" 
 		implementor="org.apache.cxf.systest.jaxb.service.TestServiceImpl" 
-		address="http://localhost:7081/service/TestEndpoint">
+		address="http://localhost:${testutil.ports.TestServiceTest}/service/TestEndpoint">
 	
 		<jaxws:properties>
 			<entry key="jaxb.additionalContextClasses">
@@ -75,7 +77,7 @@ under the License.
 	
 	
 	<!-- Client Proxy -->
-	<jaxws:client id="testClient" address="http://localhost:7081/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
+	<jaxws:client id="testClient" address="http://localhost:${testutil.ports.TestServiceTest}/service/TestService" serviceClass="org.apache.cxf.systest.jaxb.service.TestService">
 		<jaxws:inInterceptors>
 			<bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
 		</jaxws:inInterceptors>

@@ -33,6 +33,7 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument;
 import org.apache.helloWorldSoapHttp.xmlbeans.types.FaultDetailDocument.FaultDetail;
 import org.apache.hello_world_soap_http.xmlbeans.GreetMeFault;
@@ -45,9 +46,10 @@ import org.junit.Test;
 /**
  * 
  */
-//@org.junit.Ignore("randomly fails on Hudson, but dkulp cannot reproduce yet")
 public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
-    
+    static final String WSDL_PORT = TestUtil.getPortNumber(Server.class);
+    static final String NOWSDL_PORT = TestUtil.getPortNumber(ServerNoWsdl.class);
+
     private static final QName SERVICE_NAME 
         = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SOAPService");
     
@@ -68,6 +70,7 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         Greeter port = ss.getSoapPort();
+        updateAddressPort(port, WSDL_PORT);
         String resp; 
         ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
         ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor());
@@ -115,7 +118,8 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         
         SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
         QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
-        ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:9010/SoapContext/SoapPort");
+        ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" 
+                   + NOWSDL_PORT + "/SoapContext/SoapPort");
         Greeter port = ss.getPort(soapPort, Greeter.class);
         String resp; 
         ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());

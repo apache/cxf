@@ -31,6 +31,7 @@ import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.bean.Item;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.security.wss4j.WSS4JOutInterceptor;
 
 import org.junit.Assert;
@@ -44,7 +45,8 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  */
 @ContextConfiguration(locations = { "classpath:aegisJaxWsBeans.xml" })
 public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
-    
+    static final String PORT = TestUtil.getPortNumber(AegisJaxWsTest.class);
+
     private AegisJaxWs client;
     
     public AegisJaxWsTest() {
@@ -55,7 +57,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(AegisJaxWs.class);
         if (sec) {
-            factory.setAddress("http://localhost:9167/aegisJaxWsUN");
+            factory.setAddress("http://localhost:" + PORT + "/aegisJaxWsUN");
             WSS4JOutInterceptor wss4jOut = new WSS4JOutInterceptor();
             wss4jOut.setProperty("action", "UsernameToken");
             wss4jOut.setProperty("user", "alice");
@@ -65,7 +67,7 @@ public class AegisJaxWsTest extends AbstractJUnit4SpringContextTests {
             factory.getProperties().put("password", "pass");
             factory.getOutInterceptors().add(wss4jOut);
         } else {
-            factory.setAddress("http://localhost:9167/aegisJaxWs");            
+            factory.setAddress("http://localhost:" + PORT + "/aegisJaxWs");            
         }
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
 

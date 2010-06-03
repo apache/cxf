@@ -37,10 +37,12 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 	
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+	
 	<bean id="sportsImpl"
 		class="org.apache.cxf.systest.aegis.SportsServiceImpl" />
 
-	<simple:server id="sports-server" address="http://localhost:9002/sports"
+	<simple:server id="sports-server" address="http://localhost:${testutil.ports.CharacterSchemaTest}/sports"
 		serviceClass="org.apache.cxf.systest.aegis.SportsService">
 		<simple:dataBinding>
 			<bean
