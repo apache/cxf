@@ -66,14 +66,7 @@ public final class PluginLoader {
 
     private Unmarshaller unmarshaller;
 
-    private ClassLoader classLoader = getClass().getClassLoader();
-
     private PluginLoader() {
-        init();
-    }
-
-    private PluginLoader(final ClassLoader l) {
-        this.classLoader = l;
         init();
     }
 
@@ -97,14 +90,6 @@ public final class PluginLoader {
         init();
     }
 
-    public void setClassLoader(final ClassLoader l) {
-        this.classLoader = l;
-    }
-
-    public ClassLoader getClassLoader() {
-        return this.classLoader;
-    }
-
     private void loadPlugins(List<URL> pluginFiles) throws IOException {
         if (pluginFiles == null) {
             LOG.log(Level.WARNING, "FOUND_NO_PLUGINS");
@@ -115,17 +100,12 @@ public final class PluginLoader {
             loadPlugin(url);
         }
     }
-
+    public static PluginLoader newInstance() {
+        return new PluginLoader();
+    }
     public static PluginLoader getInstance() {
         if (pluginLoader == null) {
             pluginLoader = new PluginLoader();
-        }
-        return pluginLoader;
-    }
-
-    public static PluginLoader getInstance(final ClassLoader cl) {
-        if (pluginLoader == null) {
-            pluginLoader = new PluginLoader(cl);
         }
         return pluginLoader;
     }
@@ -281,7 +261,7 @@ public final class PluginLoader {
         try {
             for (Generator generator : frontend.getGenerators().getGenerator()) {
                 fullClzName = getGeneratorClass(frontend, generator);
-                Class clz = this.classLoader.loadClass(fullClzName);
+                Class clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
                 generators.add((FrontEndGenerator)clz.newInstance());
             }
         } catch (Exception e) {
@@ -296,7 +276,7 @@ public final class PluginLoader {
     private FrontEndProfile loadFrontEndProfile(String fullClzName) {
         FrontEndProfile profile = null;
         try {
-            Class clz = this.classLoader.loadClass(fullClzName);
+            Class clz = ClassLoaderUtils.loadClass(fullClzName, this.getClass());
             profile = (FrontEndProfile)clz.newInstance();
         } catch (Exception e) {
             Message msg = new Message("FRONTEND_PROFILE_LOAD_FAIL", LOG, fullClzName);

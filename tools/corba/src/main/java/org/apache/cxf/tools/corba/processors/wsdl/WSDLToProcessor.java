@@ -57,7 +57,7 @@ public class WSDLToProcessor implements Processor {
 
     public void parseWSDL(String wsdlUrl) {
         try {           
-            Bus bus = BusFactory.getDefaultBus();
+            Bus bus = BusFactory.getThreadDefaultBus();
             WSDLManager mgr = bus.getExtension(WSDLManager.class);
             wsdlDefinition = mgr.getDefinition(wsdlUrl);
             WSDLServiceBuilder builder = new WSDLServiceBuilder(bus);

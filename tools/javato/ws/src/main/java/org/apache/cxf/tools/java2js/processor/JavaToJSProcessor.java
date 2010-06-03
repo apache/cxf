@@ -296,7 +296,7 @@ public class JavaToJSProcessor implements Processor {
     }
 
     public Bus getBus() {
-        return BusFactory.getDefaultBus();
+        return BusFactory.getThreadDefaultBus();
     }
 
     public void setEnvironment(ToolContext env) {

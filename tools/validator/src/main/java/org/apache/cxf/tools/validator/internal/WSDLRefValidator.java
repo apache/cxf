@@ -98,7 +98,7 @@ public class WSDLRefValidator extends AbstractDefinitionValidator {
     private boolean suppressWarnings;
 
     public WSDLRefValidator(Definition wsdl, Document doc) {
-        this(wsdl, doc, BusFactory.getDefaultBus());
+        this(wsdl, doc, BusFactory.getThreadDefaultBus());
     }
 
     public WSDLRefValidator(Definition wsdl, Document doc, Bus bus) {

@@ -110,7 +110,7 @@ public class AbstractWSDLToProcessor implements Processor {
     protected void parseWSDL(String wsdlURL) throws ToolException {
         Bus bus = env.get(Bus.class);
         if (bus == null) {
-            bus = BusFactory.getDefaultBus();
+            bus = BusFactory.getThreadDefaultBus();
             env.put(Bus.class, bus);
         }
         WSDLDefinitionBuilder builder = new WSDLDefinitionBuilder(bus);

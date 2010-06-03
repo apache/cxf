@@ -90,7 +90,7 @@ public class JavaScriptContainer extends WSDLToJavaContainer {
         if (serviceList == null) {
             serviceList = new ArrayList<ServiceInfo>();
 
-            PluginLoader pluginLoader = PluginLoader.getInstance();
+            PluginLoader pluginLoader = PluginLoader.newInstance();
             // for JavaScript generation, we always use JAX-WS.
             FrontEndProfile frontend = pluginLoader.getFrontEndProfile("jaxws");
 
