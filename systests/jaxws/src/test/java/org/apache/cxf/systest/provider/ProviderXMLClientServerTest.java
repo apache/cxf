@@ -38,6 +38,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String ADDRESS = XMLServer.ADDRESS;
+    
     private final QName serviceName = new QName(
             "http://apache.org/hello_world_xml_http/wrapped", "XMLService");
 
@@ -52,7 +54,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
 
     @Test
     public void testEmptyPost() throws Exception {
-        URL url = new URL("http://localhost:9022/XMLService/XMLProviderPort");
+        URL url = new URL(ADDRESS);
         HttpURLConnection connection = (HttpURLConnection)url.openConnection();
         connection.setRequestMethod("POST");
         connection.setDoInput(true);
@@ -76,6 +78,7 @@ public class ProviderXMLClientServerTest extends AbstractBusClientServerTestBase
 
         Dispatch<DOMSource> disp = service.createDispatch(portName,
                 DOMSource.class, Service.Mode.PAYLOAD);
+        setAddress(disp, ADDRESS);
         DOMSource result = disp.invoke(reqMsg);
         assertNotNull(result);
 

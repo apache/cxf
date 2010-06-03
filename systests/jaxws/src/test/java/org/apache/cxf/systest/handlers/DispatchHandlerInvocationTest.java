@@ -53,6 +53,7 @@ import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbersService;
 import org.apache.handlers.types.AddNumbersResponse;
 import org.apache.handlers.types.ObjectFactory;
@@ -62,12 +63,19 @@ import org.junit.Test;
 
 
 public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBase {
+    private static String addNumbersAddress
+        = "http://localhost:" + TestUtil.getPortNumber(HandlerServer.class, 1)
+            + "/handlers/AddNumbersService/AddNumbersPort";
+    private static String greeterAddress = "http://localhost:"
+            +  TestUtil.getPortNumber(HandlerServer.class, 2) + "/XMLService/XMLDispatchPort";
 
     private final QName serviceName = new QName("http://apache.org/handlers", "AddNumbersService");
     private final QName portName = new QName("http://apache.org/handlers", "AddNumbersPort");
 
     private final QName portNameXML = new QName("http://apache.org/hello_world_xml_http/wrapped",
                                                 "XMLDispatchPort");
+    
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(HandlerServer.class));
@@ -83,7 +91,8 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.handlers.types");
         Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
-
+        setAddress(disp, addNumbersAddress);
+        
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
         addHandlersProgrammatically(disp, handler, soapHandler);
@@ -109,6 +118,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DOMSource> disp = service.createDispatch(portName, DOMSource.class, Mode.MESSAGE);
+        setAddress(disp, addNumbersAddress);
 
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
@@ -132,6 +142,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DOMSource> disp = service.createDispatch(portName, DOMSource.class, Mode.PAYLOAD);
+        setAddress(disp, addNumbersAddress);
 
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
@@ -155,6 +166,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<SOAPMessage> disp = service.createDispatch(portName, SOAPMessage.class, Mode.MESSAGE);
+        setAddress(disp, addNumbersAddress);
 
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
@@ -178,6 +190,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<SOAPMessage> disp = service.createDispatch(portName, SOAPMessage.class, Mode.PAYLOAD);
+        setAddress(disp, addNumbersAddress);
 
         TestHandler handler = new TestHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler();
@@ -205,6 +218,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DOMSource> disp = service.createDispatch(portNameXML, DOMSource.class, Mode.MESSAGE);
+        setAddress(disp, addNumbersAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);
@@ -227,6 +241,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DOMSource> disp = service.createDispatch(portNameXML, DOMSource.class, Mode.PAYLOAD);
+        setAddress(disp, addNumbersAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);
@@ -249,6 +264,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DataSource> disp = service.createDispatch(portNameXML, DataSource.class, Mode.MESSAGE);
+        setAddress(disp, addNumbersAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);
@@ -273,6 +289,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         assertNotNull(service);
 
         Dispatch<DataSource> disp = service.createDispatch(portNameXML, DataSource.class, Mode.PAYLOAD);
+        setAddress(disp, addNumbersAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);
@@ -299,6 +316,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_xml_http.wrapped.types");
         Dispatch<Object> disp = service.createDispatch(portNameXML, jc, Mode.MESSAGE);
+        setAddress(disp, greeterAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);
@@ -324,6 +342,7 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.hello_world_xml_http.wrapped.types");
         Dispatch<Object> disp = service.createDispatch(portNameXML, jc, Mode.PAYLOAD);
+        setAddress(disp, greeterAddress);
 
         TestHandlerXMLBinding handler = new TestHandlerXMLBinding();
         addHandlersProgrammatically(disp, handler);

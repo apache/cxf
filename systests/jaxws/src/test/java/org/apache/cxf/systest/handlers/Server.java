@@ -25,12 +25,15 @@ import javax.xml.ws.Endpoint;
 // import javax.xml.ws.handler.Handler;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class Server extends AbstractBusTestServerBase {
     
     protected void run()  {
+        String port = TestUtil.getPortNumber(Server.class);
+
         Object implementor = new HandlerTestImpl();
-        String address = "http://localhost:9005/HandlerTest/SoapPort";
+        String address = "http://localhost:" + port + "/HandlerTest/SoapPort";
         Endpoint.publish(address, implementor);
     }
     

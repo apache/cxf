@@ -59,6 +59,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
+    static final String REG_PORT = allocatePort(ServerXMLBinding.class);
+    static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);
+    static final String MIX_PORT = allocatePort(ServerXMLBinding.class, 2);
 
     private final QName barePortName = new QName("http://apache.org/hello_world_xml_http/bare", "XMLPort");
 
@@ -90,6 +93,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         String response2 = "Bonjour";
         try {
             Greeter greeter = service.getPort(barePortName, Greeter.class);
+            updateAddressPort(greeter, REG_PORT);
             String username = System.getProperty("user.name");
             String reply = greeter.greetMe(username);
 
@@ -123,7 +127,8 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBareGetGreetMe() throws Exception {
         HttpURLConnection httpConnection =
-            getHttpConnection("http://localhost:9031/XMLService/XMLPort/greetMe/requestType/cxf");
+            getHttpConnection("http://localhost:" + REG_PORT 
+                              + "/XMLService/XMLPort/greetMe/requestType/cxf");
         httpConnection.connect();
 
         assertEquals(200, httpConnection.getResponseCode());
@@ -157,6 +162,8 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         try {
             org.apache.hello_world_xml_http.wrapped.Greeter greeter = service.getPort(wrapPortName,
                     org.apache.hello_world_xml_http.wrapped.Greeter.class);
+            updateAddressPort(greeter, WRAP_PORT);
+
             String username = System.getProperty("user.name");
             String reply = greeter.greetMe(username);
 
@@ -187,6 +194,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         try {
             org.apache.hello_world_xml_http.mixed.Greeter greeter = service.getPort(mixedPortName,
                     org.apache.hello_world_xml_http.mixed.Greeter.class);
+            updateAddressPort(greeter, MIX_PORT);
             String username = System.getProperty("user.name");
             String reply = greeter.greetMe(username);
 
@@ -214,13 +222,14 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         service.addPort(wrapFakePortName, "http://cxf.apache.org/bindings/xformat",
-                "http://localhost:9032/XMLService/XMLPort");
+                "http://localhost:" + WRAP_PORT + "/XMLService/XMLPort");
 
         String response1 = new String("Hello ");
         String response2 = new String("Bonjour");
 
         org.apache.hello_world_xml_http.wrapped.Greeter greeter = service.getPort(wrapPortName,
                 org.apache.hello_world_xml_http.wrapped.Greeter.class);
+        updateAddressPort(greeter, WRAP_PORT);
 
         try {
             String username = System.getProperty("user.name");
@@ -254,6 +263,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
         org.apache.hello_world_xml_http.wrapped.Greeter greeter = service.getPort(wrapPortName,
                 org.apache.hello_world_xml_http.wrapped.Greeter.class);
+        updateAddressPort(greeter, WRAP_PORT);
         try {
             greeter.pingMe();
             fail("did not catch expected PingMeFault exception");
@@ -270,6 +280,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
         }
 
         org.apache.hello_world_xml_http.wrapped.Greeter greeterFault = service.getXMLFaultPort();
+        updateAddressPort(greeterFault, REG_PORT);
         try {
             greeterFault.pingMe();
             fail("did not catch expected runtime exception");
@@ -283,6 +294,7 @@ public class ClientServerXMLTest extends AbstractBusClientServerTestBase {
     public void testXMLBindingOfSoapHeaderWSDL() throws Exception {
         XMLHeaderService service = new XMLHeaderService();
         HeaderTester port = service.getXMLPort9000();
+        updateAddressPort(port, REG_PORT);
         try {
             verifyInHeader(port);
             verifyInOutHeader(port);

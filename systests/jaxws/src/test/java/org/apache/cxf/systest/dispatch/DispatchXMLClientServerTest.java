@@ -27,6 +27,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Dispatch;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
@@ -36,6 +37,7 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_xml_http.wrapped.XMLService;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMe;
 import org.apache.hello_world_xml_http.wrapped.types.GreetMeResponse;
@@ -44,28 +46,32 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase {
-    private final QName serviceName = new QName("http://apache.org/hello_world_xml_http/wrapped", 
-                                                "XMLService");
-    private final QName portName = new QName("http://apache.org/hello_world_xml_http/wrapped", 
-                                             "XMLDispatchPort");
+    private static final QName SERVICE_NAME 
+        = new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLService");
+    private static final QName PORT_NAME 
+        = new QName("http://apache.org/hello_world_xml_http/wrapped", "XMLDispatchPort");
 
+    private static String port = TestUtil.getPortNumber(DispatchXMLClientServerTest.class);
     @BeforeClass
     public static void startServers() throws Exception {
+        
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
 
     @Test
     public void testJAXBMESSAGE() throws Exception {
-        Service service = Service.create(serviceName);       
+        Service service = Service.create(SERVICE_NAME);       
         assertNotNull(service);
-        service.addPort(portName, "http://cxf.apache.org/bindings/xformat", 
-                        "http://localhost:9007/XMLService/XMLDispatchPort");
+        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat", 
+                        "http://localhost:"
+                        + port
+                        + "/XMLService/XMLDispatchPort");
         
         
         GreetMe gm = new GreetMe();
         gm.setRequestType("CXF");
         JAXBContext ctx = JAXBContext.newInstance(ObjectFactory.class);
-        Dispatch<Object> disp = service.createDispatch(portName, ctx, Service.Mode.MESSAGE);
+        Dispatch<Object> disp = service.createDispatch(PORT_NAME, ctx, Service.Mode.MESSAGE);
         GreetMeResponse resp = (GreetMeResponse)disp.invoke(gm);
         assertNotNull(resp);
         assertEquals("Hello CXF", resp.getResponseType());
@@ -85,16 +91,18 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
 
         XMLService service = new XMLService(wsdl, serviceName);
         assertNotNull(service);*/
-        Service service = Service.create(serviceName);       
+        Service service = Service.create(SERVICE_NAME);       
         assertNotNull(service);
-        service.addPort(portName, "http://cxf.apache.org/bindings/xformat", 
-                        "http://localhost:9007/XMLService/XMLDispatchPort");        
+        service.addPort(PORT_NAME, "http://cxf.apache.org/bindings/xformat", 
+                        "http://localhost:"
+                        + port
+                        + "/XMLService/XMLDispatchPort");        
 
         InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");        
         StreamSource reqMsg = new StreamSource(is);
         assertNotNull(reqMsg);
 
-        Dispatch<Source> disp = service.createDispatch(portName, Source.class, Service.Mode.MESSAGE);
+        Dispatch<Source> disp = service.createDispatch(PORT_NAME, Source.class, Service.Mode.MESSAGE);
         Source source = disp.invoke(reqMsg);
         assertNotNull(source);
                 
@@ -109,7 +117,7 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         URL wsdl = getClass().getResource("/wsdl/hello_world_xml_wrapped.wsdl");
         assertNotNull(wsdl);
 
-        XMLService service = new XMLService(wsdl, serviceName);
+        XMLService service = new XMLService(wsdl, SERVICE_NAME);
         assertNotNull(service);
 
         InputStream is = getClass().getResourceAsStream("/messages/XML_GreetMeDocLiteralReq.xml");
@@ -117,7 +125,12 @@ public class DispatchXMLClientServerTest extends AbstractBusClientServerTestBase
         DOMSource reqMsg = new DOMSource(doc);
         assertNotNull(reqMsg);
 
-        Dispatch<DOMSource> disp = service.createDispatch(portName, DOMSource.class, Service.Mode.PAYLOAD);
+        Dispatch<DOMSource> disp = service.createDispatch(PORT_NAME, DOMSource.class,
+                                                          Service.Mode.PAYLOAD);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                     "http://localhost:"
+                                     + port
+                                     + "/XMLService/XMLDispatchPort");
         DOMSource result = disp.invoke(reqMsg);
         assertNotNull(result);
               

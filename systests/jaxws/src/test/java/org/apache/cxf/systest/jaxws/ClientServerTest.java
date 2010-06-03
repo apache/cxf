@@ -25,7 +25,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -79,7 +78,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerTest extends AbstractBusClientServerTestBase {
-  
+    static final String PORT = allocatePort(Server.class);
+    static final String BARE_PORT = allocatePort(Server.class, 1);
+    static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
+
+    static final String BOGUS_PORT = allocatePort(Server.class, 3);
+    static final String PUB_PORT = allocatePort(Server.class, 4);
+    
+    
+
     static final Logger LOG = LogUtils.getLogger(ClientServerTest.class);
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
                                                 "SOAPService");    
@@ -104,14 +111,16 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertTrue("server did not launch correctly", launchServer(Server.class));
     }
     @Test
-    public void testCXF2419() {
+    public void testCXF2419() throws Exception {
         org.apache.cxf.hello_world.elrefs.SOAPService serv 
             = new org.apache.cxf.hello_world.elrefs.SOAPService();
-        assertEquals("Hello CXF", serv.getSoapPort().greetMe("CXF"));
+        org.apache.cxf.hello_world.elrefs.Greeter g = serv.getSoapPort();
+        updateAddressPort(g, PORT);
+        assertEquals("Hello CXF", g.greetMe("CXF"));
     }
     
     @Test
-    public void testBase64() throws URISyntaxException  {
+    public void testBase64() throws Exception  {
         URL wsdl = getClass().getResource("/wsdl/others/dynamic_client_base64.wsdl");
         assertNotNull(wsdl);
         String wsdlUrl = null;
@@ -144,7 +153,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         Greeter greeter = service.getPort(portName, Greeter.class);
-
+        updateAddressPort(greeter, PORT);
         try {
             greeter.greetMe("test");
             
@@ -166,6 +175,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
 
         try {
             String reply = greeter.testNillable("test", 100);
@@ -182,7 +192,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testAddPortWithSpecifiedSoap12Binding() throws Exception {
         Service service = Service.create(serviceName);
         service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING, 
-                        "http://localhost:9009/SoapContext/SoapPort");
+                        "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
         String response = new String("Bonjour");
@@ -202,7 +212,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testAddPortWithSpecifiedSoap11Binding() throws Exception {
         Service service = Service.create(serviceName);
         service.addPort(fakePortName, javax.xml.ws.soap.SOAPBinding.SOAP11HTTP_BINDING, 
-            "http://localhost:9000/SoapContext/SoapPort");
+            "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
         String response = new String("Bonjour");
@@ -225,7 +235,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testAddPort() throws Exception {
         Service service = Service.create(serviceName);
         service.addPort(fakePortName, "http://schemas.xmlsoap.org/soap/", 
-                        "http://localhost:9000/SoapContext/SoapPort");
+                        "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
         String response = new String("Bonjour");
@@ -251,7 +261,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         try {
             ((BindingProvider)greeter).getRequestContext()
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                     "http://localhost:9000/SoapContext/SoapPort");
+                     "http://localhost:" + PORT + "/SoapContext/SoapPort");
             greeter.greetMe("test");
             String reply = greeter.sayHi();
             assertNotNull("no response received from service", reply);
@@ -268,6 +278,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         DocLitBare greeter = service.getPort(portName1, DocLitBare.class);
+        updateAddressPort(greeter, BARE_PORT);
         try {
        
             BareDocumentResponse bareres = greeter.testDocLitBare("MySimpleDocument");
@@ -288,6 +299,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
         
         Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
         
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
@@ -325,7 +337,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Greeter greeter = service.getPort(Greeter.class);
         ((BindingProvider)greeter).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                 "http://localhost:9000/SoapContext/SoapPort");
+                 "http://localhost:" + PORT + "/SoapContext/SoapPort");
         
         String response1 = new String("Hello Milestone-");
         String response2 = new String("Bonjour");
@@ -362,7 +374,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Greeter greeter = service.getPort(portName, Greeter.class);
         
         assertNotNull(service);
-        
+        updateAddressPort(greeter, PORT);
+
         long before = System.currentTimeMillis();
 
         long delay = 3000;
@@ -435,6 +448,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         }
         
         Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
         long before = System.currentTimeMillis();
 
         
@@ -512,7 +526,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         
         
         assertEquals(((TestExecutor)executor).getCount(), 0);
-        Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
         List<Response<GreetMeResponse>> responses = new ArrayList<Response<GreetMeResponse>>();
         for (int i = 0; i < 5; i++) {
             responses.add(greeter.greetMeAsync("asyn call" + i));
@@ -540,6 +555,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String expectedString = new String("Hello, finally!");
         try {
             Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
+            updateAddressPort(greeter, PORT);
             long before = System.currentTimeMillis();
             long delay = 3000;
             Future<?> f = greeter.greetMeLaterAsync(delay, h);
@@ -606,7 +622,9 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
             }
         }
         
-        Greeter greeter = (Greeter)service.getPort(portName, Greeter.class);
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
+
         long before = System.currentTimeMillis();
         long delay = 3000;
         Future<?> f = greeter.greetMeLaterAsync(delay, h);
@@ -645,6 +663,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         String badRecordFault = "BadRecordLitFault";
 
         Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
         for (int idx = 0; idx < 2; idx++) {
             try {
                 greeter.testDocLitFault(noSuchCodeFault);
@@ -683,6 +702,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         service.setExecutor(ex);
         assertNotNull(service);        
         Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
         try {
             // trigger runtime exception throw of implementor method
             greeter.testDocLitFault("");
@@ -696,7 +716,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetSayHi() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9000/SoapContext/SoapPort/sayHi");
+            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/sayHi");
         httpConnection.connect(); 
         
         httpConnection.connect();
@@ -727,7 +747,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetGreetMe() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9000/SoapContext/SoapPort/greetMe/requestType/cxf");    
+            getHttpConnection("http://localhost:" + PORT 
+                              + "/SoapContext/SoapPort/greetMe/requestType/cxf");    
         httpConnection.connect();        
         
         assertEquals(200, httpConnection.getResponseCode());
@@ -755,7 +776,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetWSDL() throws Exception {
-        String url = "http://localhost:9000/SoapContext/SoapPort?wsdl";
+        String url = "http://localhost:" + PORT + "/SoapContext/SoapPort?wsdl";
         HttpURLConnection httpConnection = getHttpConnection(url);    
         httpConnection.connect();        
         
@@ -775,7 +796,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetGreetMeFromQuery() throws Exception {
-        String url = "http://localhost:9000/SoapContext/SoapPort/greetMe?requestType=" 
+        String url = "http://localhost:" + PORT + "/SoapContext/SoapPort/greetMe?requestType=" 
             + URLEncoder.encode("cxf (was CeltixFire)", "UTF-8"); 
         
         HttpURLConnection httpConnection = getHttpConnection(url);    
@@ -808,7 +829,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     public void testBasicAuth() throws Exception {
         Service service = Service.create(serviceName);
         service.addPort(fakePortName, "http://schemas.xmlsoap.org/soap/", 
-                        "http://localhost:9000/SoapContext/SoapPort");
+                        "http://localhost:" + PORT + "/SoapContext/SoapPort");
         Greeter greeter = service.getPort(fakePortName, Greeter.class);
 
         try {
@@ -839,7 +860,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testBogusAddress() throws Exception {
-        String realAddress = "http://localhost:9015/SoapContext/SoapPort";
+        String realAddress = "http://localhost:" + BOGUS_REAL_PORT + "/SoapContext/SoapPort";
         SOAPServiceBogusAddressTest service = new SOAPServiceBogusAddressTest();
         Greeter greeter = service.getSoapPort();
         try {
@@ -903,6 +924,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         //TODO test fault exceptions 
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
         Client client = dcf.createClient(wsdlUrl, serviceName, portName);
+        updateAddressPort(client, PORT);
         client.invoke("greetMe", "test");        
         Object[] result = client.invoke("sayHi");
         assertNotNull("no response received from service", result);
@@ -914,6 +936,7 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         jaxbContextProperties.put("com.sun.xml.bind.defaultNamespaceRemap", "uri:ultima:thule");
         dcf.setJaxbContextProperties(jaxbContextProperties);
         client = dcf.createClient(wsdlUrl, serviceName, portName);
+        updateAddressPort(client, PORT);
         client.invoke("greetMe", "test");        
         result = client.invoke("sayHi");
         assertNotNull("no response received from service", result);
@@ -927,13 +950,15 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         QName sname = new QName("http://apache.org/hello_world_soap_http",
                                 "SOAPServiceMultiPortTypeTest");
         SOAPServiceMultiPortTypeTest service = new SOAPServiceMultiPortTypeTest(wsdl, sname);
-        
-        BareDocumentResponse resp = service.getDocLitBarePort().testDocLitBare("CXF");
+        DocLitBare b = service.getDocLitBarePort();
+        updateAddressPort(b, PORT);
+        BareDocumentResponse resp = b.testDocLitBare("CXF");
         assertNotNull(resp);
         assertEquals("CXF", resp.getCompany());
         
-                                                                                
-        String result = service.getGreeterPort().greetMe("CXF");
+        Greeter g = service.getGreeterPort();
+        updateAddressPort(g, PORT);
+        String result = g.greetMe("CXF");
         assertEquals("Hello CXF", result);
     }
 
@@ -950,8 +975,8 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         Object implementor4 = Proxy.newProxyInstance(this.getClass().getClassLoader(),
                                                      new Class<?>[] {DocLitWrappedCodeFirstService.class},
                                                      handler);
-        Endpoint.publish("http://localhost:9023/DocLitWrappedCodeFirstService/", implementor4);
-        URL url = new URL("http://localhost:9023/DocLitWrappedCodeFirstService/?wsdl");
+        Endpoint.publish("http://localhost:" + PUB_PORT + "/DocLitWrappedCodeFirstService/", implementor4);
+        URL url = new URL("http://localhost:" + PUB_PORT + "/DocLitWrappedCodeFirstService/?wsdl");
         InputStream ins = url.openStream();
         ins.close();
     }

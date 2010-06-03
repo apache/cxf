@@ -28,6 +28,8 @@ import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.testutil.common.AbstractClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -36,12 +38,14 @@ import org.junit.Test;
  * returns true instead.
  */
 public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
-
+    static String address =  "http://localhost:"
+        + TestUtil.getPortNumber(Server.class) 
+        + "/SoapContext/GreeterPort"; 
+    
     public static class Server extends AbstractBusTestServerBase {
         
         protected void run()  {            
             Object implementor = new TrivialSOAPHandlerAnnotatedGreeterImpl();
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
             Endpoint.publish(address, implementor);
         }
         
@@ -74,6 +78,7 @@ public class TrivialSOAPHandlerTest extends AbstractClientServerTestBase {
 
         try {
             Greeter greeter = service.getGreeterPort();
+            setAddress(greeter, address);
             
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);

@@ -27,18 +27,22 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.SOAPService;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String ADDRESS 
+        = "http://localhost:" + TestUtil.getPortNumber(Server.class)
+            + "/SoapContext/SoapProviderPort";
+    
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new HWSoapMessageDocProvider();
-            String address = "http://localhost:9003/SoapContext/SoapProviderPort";
-            Endpoint.publish(address, implementor);                                 
+            Endpoint.publish(ADDRESS, implementor);                                 
         }
 
         public static void main(String[] args) {
@@ -77,6 +81,7 @@ public class ProviderClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            setAddress(greeter, ADDRESS);
             try {
                 greeter.greetMe("Return sayHi");
                 fail("Should have thrown an exception");

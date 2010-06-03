@@ -63,6 +63,7 @@ import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handler_test.HandlerTest;
 import org.apache.handler_test.HandlerTestService;
 import org.apache.handler_test.PingException;
@@ -73,6 +74,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
+    private static String port = TestUtil.getPortNumber(Server.class);
 
     private final QName serviceName = new QName("http://apache.org/handler_test", "HandlerTestService");
     private final QName portName = new QName("http://apache.org/handler_test", "SoapPort");
@@ -94,6 +96,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             wsdl = HandlerInvocationTest.class.getResource("/wsdl/handler_test.wsdl");
             service = new HandlerTestService(wsdl, serviceName);
             handlerTest = service.getPort(portName, HandlerTest.class);
+            setAddress(handlerTest, "http://localhost:" + port + "/HandlerTest/SoapPort");
         } catch (Exception ex) {
             ex.printStackTrace();
             fail(ex.toString());
@@ -110,6 +113,7 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
         service.setHandlerResolver(myHandlerResolver);
 
         HandlerTest handlerTestNew = service.getPort(portName, HandlerTest.class);
+        setAddress(handlerTestNew, "http://localhost:" + port + "/HandlerTest/SoapPort");
 
         handlerTestNew.pingOneWay();
 
@@ -1141,6 +1145,8 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
     public void testHandlersInvokedForDispatch() throws Exception {
         Dispatch<SOAPMessage> disp = service
             .createDispatch(portName, SOAPMessage.class, Service.Mode.MESSAGE);
+        setAddress(disp, "http://localhost:" + port + "/HandlerTest/SoapPort");
+
         TestHandler<LogicalMessageContext> handler1 = new TestHandler<LogicalMessageContext>(false);
         TestHandler<LogicalMessageContext> handler2 = new TestHandler<LogicalMessageContext>(false);
         TestSOAPHandler soapHandler1 = new TestSOAPHandler(false);

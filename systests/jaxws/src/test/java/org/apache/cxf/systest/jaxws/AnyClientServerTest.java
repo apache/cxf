@@ -43,7 +43,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
-
+    static final String PORT = allocatePort(MyServer.class);
+    
     static final Logger LOG = LogUtils.getLogger(AnyClientServerTest.class);
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http/any", 
                                                 "SOAPService");
@@ -52,7 +53,7 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
 
         protected void run() {
             Object implementor = new GreeterImpl();
-            String address = "http://localhost:9000/SoapContext/SoapPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             Endpoint.publish(address, implementor);
 
         }
@@ -82,7 +83,8 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService ss = new SOAPService(wsdl, serviceName);
         Greeter port = ss.getSoapPort();
-
+        updateAddressPort(port, PORT);
+        
         List<Port> any = new ArrayList<Port>();
         Port anyPort = new Port();
         Port anyPort1 = new Port();
@@ -109,6 +111,8 @@ public final class AnyClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService ss = new SOAPService(wsdl, serviceName);
         Greeter port = ss.getSoapPort();
+        updateAddressPort(port, PORT);
+
         List<org.apache.hello_world_soap_http.any_types.SayHi1.Port> list = 
                 new ArrayList<org.apache.hello_world_soap_http.any_types.SayHi1.Port>();
         org.apache.hello_world_soap_http.any_types.SayHi1.Port port1 = 

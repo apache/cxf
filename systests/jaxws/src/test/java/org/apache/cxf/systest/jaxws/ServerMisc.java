@@ -35,16 +35,19 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
 public class ServerMisc extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(ServerMisc.class);
+
+    
     public static final String DOCLIT_CODEFIRST_URL = 
-        "http://localhost:9003/DocLitWrappedCodeFirstService/";
+        "http://localhost:" + PORT + "/DocLitWrappedCodeFirstService/";
     public static final String RPCLIT_CODEFIRST_URL = 
-        "http://localhost:9003/RpcLitCodeFirstService/";
+        "http://localhost:" + PORT + "/RpcLitCodeFirstService/";
     public static final String DOCLIT_CODEFIRST_BASE_URL =
-        "http://localhost:9003/DocLitWrappedCodeFirstServiceBaseService/";
+        "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceBaseService/";
     public static final String DOCLITBARE_CODEFIRST_URL = 
-        "http://localhost:9003/DocLitBareCodeFirstService/";
+        "http://localhost:" + PORT + "/DocLitBareCodeFirstService/";
     public static final String DOCLIT_CODEFIRST_SETTINGS_URL = 
-        "http://localhost:9003/DocLitWrappedCodeFirstServiceSettings/";
+        "http://localhost:" + PORT + "/DocLitWrappedCodeFirstServiceSettings/";
     
     protected void run() {
         
@@ -85,15 +88,15 @@ public class ServerMisc extends AbstractBusTestServerBase {
         Endpoint.publish(DOCLIT_CODEFIRST_BASE_URL, implementor6);
         
         Object implementor1 = new AnonymousComplexTypeImpl();
-        String address = "http://localhost:9000/anonymous_complex_typeSOAP";
+        String address = "http://localhost:" + PORT + "/anonymous_complex_typeSOAP";
         Endpoint.publish(address, implementor1);
 
         Object implementor2 = new JaxbElementTestImpl();
-        address = "http://localhost:9001/jaxb_element_test";
+        address = "http://localhost:" + PORT + "/jaxb_element_test";
         Endpoint.publish(address, implementor2);
 
         Object implementor3 = new OrderedParamHolderImpl();
-        address = "http://localhost:9002/ordered_param_holder/";
+        address = "http://localhost:" + PORT + "/ordered_param_holder/";
         Endpoint.publish(address, implementor3);
         
         //Object implementor4 = new DocLitWrappedCodeFirstServiceImpl();
@@ -102,7 +105,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
         Object implementor5 = new RpcLitCodeFirstServiceImpl();
         Endpoint.publish(RPCLIT_CODEFIRST_URL, implementor5);
         
-        Endpoint.publish("http://localhost:9000/InheritContext/InheritPort",
+        Endpoint.publish("http://localhost:" + PORT + "/InheritContext/InheritPort",
                          new InheritImpl());
     }
 

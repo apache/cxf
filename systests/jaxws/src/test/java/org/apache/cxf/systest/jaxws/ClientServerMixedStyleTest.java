@@ -37,6 +37,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
+    static final String PORT = allocatePort(ServerMixedStyle.class);
 
     private final QName portName = new QName("http://apache.org/hello_world_mixedstyle", "SoapPort");
 
@@ -54,6 +55,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
 
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            updateAddressPort(greeter, PORT);
             
             GreetMe1 request = new GreetMe1();
             request.setRequestType("Bonjour");
@@ -80,7 +82,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
         Service serv = Service.create(new QName("http://example.com", "MixedTest"));
         MixedTest test = serv.getPort(MixedTest.class);
         ((BindingProvider)test).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                        "http://localhost:9027/cxf885");
+                                                        "http://localhost:" + PORT + "/cxf885");
         String ret = test.hello("A", "B");
         assertEquals("Hello A and B", ret);
         
@@ -93,7 +95,7 @@ public class ClientServerMixedStyleTest extends AbstractClientServerTestBase {
         String ret4 = test.simple2(24);
         assertEquals("Int: 24", ret4);
         
-        serv = Service.create(new URL("http://localhost:9027/cxf885?wsdl"),
+        serv = Service.create(new URL("http://localhost:" + PORT + "/cxf885?wsdl"),
                               new QName("http://example.com", "MixedTestImplService"));
         test = serv.getPort(new QName("http://example.com", "MixedTestImplPort"),
                             MixedTest.class);

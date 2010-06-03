@@ -116,5 +116,13 @@ public abstract class AbstractTestServerBase extends Assert {
      */
     protected boolean verify(Logger log) {
         return true;
-    }    
+    }
+    
+    protected static String allocatePort(Class<?> cls) {
+        return TestUtil.getPortNumber(cls);
+    }
+    protected static String allocatePort(Class<?> cls, int i) {
+        return TestUtil.getPortNumber(cls, i);
+    }
+    
 }

@@ -29,18 +29,20 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
 <import resource="classpath:META-INF/cxf/cxf-extension-http.xml" /> 
 <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" /> 
-<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" /> 
-
+<import resource="classpath:META-INF/cxf/cxf-extension-jaxws.xml" />
+ 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+	
 	<jaxws:endpoint id="cxfHandlerTestEndpoint"
 		implementor="org.apache.cxf.systest.handlers.AddNumbersNoHandlers"
-		address="http://localhost:9025/SpringEndpoint">
+		address="http://localhost:${testutil.ports.springport}/SpringEndpoint">
     	<jaxws:handlers>
     		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
     	</jaxws:handlers>
     </jaxws:endpoint> 
 	<jaxws:server id="cxfHandlerTestServer"
 		serviceClass="org.apache.handlers.AddNumbers"
-		address="http://localhost:9025/SpringServer">
+		address="http://localhost:${testutil.ports.springport}/SpringServer">
 		<jaxws:serviceBean>
                 <bean class="org.apache.cxf.systest.handlers.AddNumbersNoHandlers" />
         </jaxws:serviceBean>
@@ -52,18 +54,18 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 
     <jaxws:client id="cxfHandlerTestClientEndpoint"
     	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:9025/SpringEndpoint">
+    	address="http://localhost:${testutil.ports.springport}/SpringEndpoint">
     	<jaxws:handlers>
     		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
     	</jaxws:handlers>
     </jaxws:client> 
     <jaxws:client id="cxfHandlerTestClientEndpointNoHandler"
     	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:9025/SpringEndpoint">
+    	address="http://localhost:${testutil.ports.springport}/SpringEndpoint">
     </jaxws:client> 
     <jaxws:client id="cxfHandlerTestClientServer"
     	serviceClass="org.apache.handlers.AddNumbers"
-    	address="http://localhost:9025/SpringServer">
+    	address="http://localhost:${testutil.ports.springport}/SpringServer">
     	<jaxws:handlers>
     		<bean class="org.apache.cxf.systest.handlers.ModifyNumberHandler"/>
     	</jaxws:handlers>

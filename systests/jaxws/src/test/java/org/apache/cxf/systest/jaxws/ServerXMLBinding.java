@@ -28,26 +28,29 @@ import org.apache.hello_world_xml_http.wrapped.GreeterFaultImpl;
 
 
 public class ServerXMLBinding extends AbstractBusTestServerBase {
+    static final String REG_PORT = allocatePort(ServerXMLBinding.class);
+    static final String WRAP_PORT = allocatePort(ServerXMLBinding.class, 1);
+    static final String MIX_PORT = allocatePort(ServerXMLBinding.class, 2);
 
     protected void run() {
         Object implementor = new GreeterImpl();
-        String address = "http://localhost:9031/XMLService/XMLPort";
+        String address = "http://localhost:" + REG_PORT + "/XMLService/XMLPort";
         Endpoint.publish(address, implementor);
 
         Object implementor1 = new org.apache.hello_world_xml_http.wrapped.GreeterImpl();
-        address = "http://localhost:9032/XMLService/XMLPort";
+        address = "http://localhost:" + WRAP_PORT + "/XMLService/XMLPort";
         Endpoint.publish(address, implementor1);
 
         Object faultImplementor = new GreeterFaultImpl();
-        String faultAddress = "http://localhost:9033/XMLService/XMLFaultPort";
+        String faultAddress = "http://localhost:" + REG_PORT + "/XMLService/XMLFaultPort";
         Endpoint.publish(faultAddress, faultImplementor);
 
         Object implementor2 = new HeaderTesterImpl();
-        address = "http://localhost:9034/XMLContext/XMLPort";
+        address = "http://localhost:" + REG_PORT + "/XMLContext/XMLPort";
         Endpoint.publish(address, implementor2);
         
         Object implementor3 = new org.apache.hello_world_xml_http.mixed.GreeterImpl();
-        address = "http://localhost:9028/XMLService/XMLPort";
+        address = "http://localhost:" + MIX_PORT + "/XMLService/XMLPort";
         Endpoint.publish(address, implementor3);
     }
 

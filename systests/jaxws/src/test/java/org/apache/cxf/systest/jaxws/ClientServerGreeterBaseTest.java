@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(ServerGreeterBase.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -44,6 +45,7 @@ public class ClientServerGreeterBaseTest extends AbstractBusClientServerTestBase
 
         try {
             Greeter greeter = service.getGreeterPort();
+            updateAddressPort(greeter, PORT);
             
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);

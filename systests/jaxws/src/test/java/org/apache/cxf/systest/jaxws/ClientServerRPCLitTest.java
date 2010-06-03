@@ -66,6 +66,7 @@ import org.junit.Test;
 
 
 public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(Server.class);
 
     private final QName portName = new QName("http://apache.org/hello_world_rpclit", "SoapPortRPCLit");
 
@@ -74,9 +75,9 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         protected void run()  {
             String address;
             Object implementor = new RPCLitGreeterImpl();
-            address = "http://localhost:9002/SOAPServiceRPCLit/SoapPort";
+            address = "http://localhost:" + PORT + "/SOAPServiceRPCLit/SoapPort";
             Endpoint.publish(address, implementor);  
-            address = "http://localhost:9002/TestRPCWsdl";
+            address = "http://localhost:" + PORT + "/TestRPCWsdl";
             Endpoint.publish(address, new MyService());  
         }
 
@@ -108,6 +109,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+            updateAddressPort(greeter, PORT);
             for (int idx = 0; idx < 1; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);
@@ -128,7 +130,8 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
         Dispatch<Source> disp = service.createDispatch(portName, Source.class, 
                                                        javax.xml.ws.Service.Mode.PAYLOAD);
-        
+        updateAddressPort(disp, PORT);
+
         String req = "<ns1:sendReceiveData xmlns:ns1=\"http://apache.org/hello_world_rpclit\">"
             + "<in xmlns:ns2=\"http://apache.org/hello_world_rpclit/types\">"
             + "<ns2:elem1>elem1</ns2:elem1><ns2:elem2>elem2</ns2:elem2><ns2:elem3>45</ns2:elem3>"
@@ -150,6 +153,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         GreeterRPCLit greeter = service.getPort(portName, GreeterRPCLit.class);
+        updateAddressPort(greeter, PORT);
 
         MyComplexStruct in = new MyComplexStruct(); 
         in.setElem1("elem1");
@@ -181,7 +185,7 @@ public class ClientServerRPCLitTest extends AbstractBusClientServerTestBase {
     @Test
     public void testNoElementParts() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9002/TestRPCWsdl?wsdl");    
+            getHttpConnection("http://localhost:" + PORT + "/TestRPCWsdl?wsdl");    
         httpConnection.connect();        
         
         assertEquals(200, httpConnection.getResponseCode());
