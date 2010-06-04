@@ -359,7 +359,7 @@ public class JettyHTTPServerEngine
                     }
                 }
             } catch (Exception e) {
-                LOG.log(Level.SEVERE, "START_UP_SERVER_FAILED_MSG", new Object[] {e.getMessage()});
+                LOG.log(Level.SEVERE, "START_UP_SERVER_FAILED_MSG", new Object[] {e.getMessage(), port});
                 //problem starting server
                 try {                    
                     server.stop();
@@ -368,7 +368,7 @@ public class JettyHTTPServerEngine
                     //ignore - probably wasn't fully started anyway
                 }
                 server = null;
-                throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG, e.getMessage()), e);
+                throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG, e.getMessage(), port), e);
             }
         }        
         
