@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxws;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.util.Map;
 import java.util.concurrent.Future;
@@ -28,9 +30,13 @@ import java.util.logging.Logger;
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPFault;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.Binding;
 import javax.xml.ws.BindingProvider;
@@ -46,19 +52,26 @@ import javax.xml.ws.http.HTTPException;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.databinding.DataWriter;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.ClientCallback;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.jaxws.interceptors.MessageModeInInterceptor;
 import org.apache.cxf.jaxws.interceptors.MessageModeOutInterceptor;
+import org.apache.cxf.jaxws.support.JaxWsClientEndpointImpl;
 import org.apache.cxf.jaxws.support.JaxWsEndpointImpl;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -67,6 +80,10 @@ import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.DepthXMLStreamReader;
+import org.apache.cxf.staxutils.StaxSource;
+import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private static final Logger LOG = LogUtils.getL7dLogger(DispatchImpl.class);
@@ -81,12 +98,14 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     private final Class<T> cl;
     private final JAXBContext context;
     private Message error;
+    private Service.Mode mode;
     
     DispatchImpl(Client client, Service.Mode m, JAXBContext ctx, Class<T> clazz) {
         this.binding = ((JaxWsEndpointImpl)client.getEndpoint()).getJaxwsBinding();
         this.builder = new EndpointReferenceBuilder((JaxWsEndpointImpl)client.getEndpoint());
 
         this.client = client;
+        this.mode = m;
         context = ctx;
         cl = clazz;
         setupEndpointAddressContext(client.getEndpoint());
@@ -247,7 +266,8 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     
     @SuppressWarnings("unchecked")
     public T invoke(T obj, boolean isOneWay) {
-        checkError();
+        StaxSource createdSource = null;
+        checkError();        
         try {
             if (obj instanceof SOAPMessage) {
                 SOAPMessage msg = (SOAPMessage)obj;
@@ -256,12 +276,59 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                 }
             }
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
+                       
             if (opName == null) {
                 opName = new QName(DISPATCH_NS,
                                    isOneWay ? INVOKE_ONEWAY_NAME : INVOKE_NAME);
             }
+            
+            //CXF-2836 : find the operation for the dispatched object 
+            boolean wsaEnabled = false;
+            for (AbstractFeature feature : ((JaxWsClientEndpointImpl)client.getEndpoint()).getFeatures()) {
+                if (feature instanceof WSAddressingFeature) {
+                    wsaEnabled = true; 
+                }
+            }
+            if (wsaEnabled) {
+                QName dispatchedOpName = null;
+
+                if (obj instanceof javax.xml.transform.Source) {
+                    try {
+                        XMLStreamReader reader = StaxUtils
+                            .createXMLStreamReader((javax.xml.transform.Source)obj);
+                        Document document = StaxUtils.read(reader);
+                        dispatchedOpName = getDispatchedOpName(document.getDocumentElement());
+                        if (dispatchedOpName != null) {
+                            createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
+                        }
+                    } catch (Exception e) {
+                        createdSource = null;
+                        opName = null;
+                        // ignore, we are tring to get the operation name
+                    }
+                }
+                if (obj instanceof SOAPMessage) {
+                    dispatchedOpName = getDispatchedOpName((SOAPMessage)obj);
+
+                }
+
+                if (this.context != null) {
+                    dispatchedOpName = getDispatchedOpName(obj);
+                }
+
+                if (dispatchedOpName != null) {
+
+                    BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
+                        .getOperation(opName);
+                    if (bop != null) {
+                        bop.setProperty("dispatchToOperation", dispatchedOpName);
+                    }
+                }
+            } 
+            
+            
             Object ret[] = client.invokeWrapped(opName,
-                                                obj);
+                                                createdSource == null ? obj : createdSource);
             if (isOneWay || ret == null || ret.length == 0) {
                 return null;
             }
@@ -307,4 +374,82 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
     public Client getClient() {
         return client;
     }
+    
+    @SuppressWarnings("unchecked")
+    private QName getDispatchedOpName(Element ele) {
+        String payLoadName = null;
+        Map<String, QName> map = (Map<String, QName>)client.getEndpoint().getEndpointInfo().getBinding()
+            .getProperty("payloadElementOpNameMap");
+        
+        XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(ele);
+        DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
+        try {
+            if (this.mode == Service.Mode.PAYLOAD) {
+
+                StaxUtils.skipToStartOfElement(reader);
+
+                payLoadName = reader.getName().toString();
+            }
+            if (this.mode == Service.Mode.MESSAGE) {
+                StaxUtils.skipToStartOfElement(reader);
+                StaxUtils.toNextTag(reader,
+                                    new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
+                reader.nextTag();
+                payLoadName = reader.getName().toString();
+            }
+        } catch (XMLStreamException e) {
+            // ignore
+        }
+        if (map != null && payLoadName != null) {
+            return map.get(payLoadName);
+        }
+        return null;
+        
+    }
+    
+    
+    @SuppressWarnings("unchecked")
+    private QName getDispatchedOpName(SOAPMessage soapMessage) {
+        String payLoadName = null;
+        Map<String, QName> map = (Map<String, QName>)client.getEndpoint().getEndpointInfo().getBinding()
+            .getProperty("payloadElementOpNameMap");
+        try {            
+            SOAPElement element  = (SOAPElement)soapMessage.getSOAPBody().getChildElements().next();
+            payLoadName = new QName(element.getNamespaceURI(), element.getLocalName()).toString(); 
+        } catch (Exception e) {
+            //ignore
+        }
+        
+        if (map != null && payLoadName != null) {
+            return map.get(payLoadName);
+        }
+        return null;
+        
+    }
+    
+    private QName getDispatchedOpName(Object object) {
+        JAXBDataBinding dataBinding = new JAXBDataBinding();
+        dataBinding.setContext(context);
+        DataWriter<XMLStreamWriter> dbwriter = dataBinding.createWriter(XMLStreamWriter.class);
+        StringWriter stringWriter = new StringWriter();
+        XMLStreamWriter resultWriter = StaxUtils.createXMLStreamWriter(stringWriter);
+        try {
+            dbwriter.write(object, resultWriter);
+            resultWriter.flush();
+            if (!StringUtils.isEmpty(stringWriter.toString())) {
+                ByteArrayInputStream binput = new ByteArrayInputStream(stringWriter.getBuffer().toString()
+                    .getBytes());
+                XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(binput);
+                DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
+
+                StaxUtils.skipToStartOfElement(reader);
+
+                return reader.getName();
+
+            }
+        } catch (XMLStreamException e) {
+            // ignore
+        }
+        return null;
+    }   
 }
