@@ -33,6 +33,7 @@ import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSMessageHeadersType;
@@ -58,7 +59,7 @@ public abstract class AbstractSOAPJMSTestSuite extends AbstractBusClientServerTe
         QName qServiceName = new QName(namespace, serviceName);
         QName qPortName = new QName(namespace, portName);
         URL wsdl = getClass().getResource("/wsdl/jms_spec_testsuite.wsdl");
-
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
         Class<? extends Service> svcls = serviceClass.asSubclass(Service.class);
 
         Constructor<? extends Service> serviceConstructor = svcls.getConstructor(URL.class,

@@ -35,7 +35,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAFromJavaTest extends AbstractWSATestBase {
-
+    static final String PORT = allocatePort(Server.class);
+    
     @Before
     public void setUp() throws Exception {
         createBus();
@@ -63,7 +64,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
     }
 
     @Test
-    public void testAddNumbersFault() {
+    public void testAddNumbersFault() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
@@ -104,7 +105,7 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
     }
 
     @Test
-    public void testAddNumbers3Fault() {
+    public void testAddNumbers3Fault() throws Exception {
         ByteArrayOutputStream input = setupInLogging();
         ByteArrayOutputStream output = setupOutLogging();
 
@@ -144,14 +145,16 @@ public class WSAFromJavaTest extends AbstractWSATestBase {
         assertTrue(output.toString().indexOf("SOAPAction=[\"cxf\"]") != -1);
     }
 
-    private AddNumberImpl getPort() {
+    private AddNumberImpl getPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers-fromjava.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumberImplService service = new AddNumberImplService(wsdl);
         assertNotNull("Service is null ", service);
 
-        return service.getAddNumberImplPort();
+        AddNumberImpl port = service.getAddNumberImplPort();
+        updateAddressPort(port, PORT);
+        return port;
     }
     
     @Test 

@@ -62,7 +62,7 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = allocatePort(Server.class); 
     public static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
     public static final String GREETME_ACTION
@@ -90,7 +90,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
                 .setMilliseconds(new BigInteger("60000"));
             
             GreeterImpl implementor = new GreeterImpl();
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             Endpoint ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("schema-validation-enabled", Boolean.TRUE);
@@ -150,7 +150,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
         verifyRecovery();
     }
     
-    void startClient() {
+    void startClient() throws Exception {
         LOG.fine("Creating greeter client");
         SpringBusFactory bf = new SpringBusFactory();
         bus = bf.createBus("/org/apache/cxf/systest/ws/rm/persistent.xml");
@@ -158,6 +158,7 @@ public class ClientPersistenceTest extends AbstractBusClientServerTestBase {
 
         GreeterService gs = new GreeterService();
         greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
 
         out = new OutMessageRecorder();

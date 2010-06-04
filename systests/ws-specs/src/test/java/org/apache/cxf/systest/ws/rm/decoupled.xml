@@ -23,9 +23,10 @@
        xsi:schemaLocation="
 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
     <http:conduit name="{http://cxf.apache.org/greeter_control}GreeterPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:9995/decoupled_endpoint"/>
+      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.decoupled.port}/decoupled_endpoint"/>
     </http:conduit>
     
     <bean id="mapAggregator" class="org.apache.cxf.ws.addressing.MAPAggregator"/>

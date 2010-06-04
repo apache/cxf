@@ -34,6 +34,8 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
  <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
  <import resource="classpath:META-INF/cxf/cxf-extension-jms.xml" />
  
+ <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+ 
  <jaxws:endpoint implementor="#transactionalImplementor" 
  	implementorClass="org.apache.hello_world_doc_lit.Greeter"
  	wsdlLocation="testutils/hello_world_doc_lit.wsdl"
@@ -47,7 +49,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     
   
   <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="tcp://localhost:61500"
+  	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"
   />
   
   <bean id="singleConnectionFactory"

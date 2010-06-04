@@ -31,6 +31,8 @@
         http://www.springframework.org/schema/beans/spring-beans.xsd
         http://cxf.apache.org/jaxws                                     
         http://cxf.apache.org/schemas/jaxws.xsd">
+  
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
     <!--    
          Enable logging at all endpoints    
@@ -49,7 +51,7 @@
     <jaxws:endpoint
         id="UsernameTokenEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:9000/GreeterService/UsernameTokenPort"
+        address="http://localhost:${testutil.ports.Server}/GreeterService/UsernameTokenPort"
         serviceName="test:GreeterService"
         endpointName="test:UsernameTokenPort"
         >
@@ -86,7 +88,7 @@
     <jaxws:endpoint 
         id="TimestampSignEncryptEndpoint"
         implementor="org.apache.cxf.systest.ws.security.GreeterImpl"
-        address="http://localhost:9000/GreeterService/TimestampSignEncryptPort"
+        address="http://localhost:${testutil.ports.Server}/GreeterService/TimestampSignEncryptPort"
         serviceName="test:GreeterService"
         endpointName="test:TimestampSignEncryptPort"
         >

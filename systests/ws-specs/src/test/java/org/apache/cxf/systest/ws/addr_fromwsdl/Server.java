@@ -29,6 +29,8 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(Server.class);
+    
     @WebService(serviceName = "AddNumbersService",
                 portName = "AddNumbersPort",
                 targetNamespace = "http://apache.org/cxf/systest/ws/addr_feature/")
@@ -49,7 +51,7 @@ public class Server extends AbstractBusTestServerBase {
     }
     protected void run()  {    
         Object implementor = new AddNumberReg();
-        String address = "http://localhost:9091/jaxws/add";
+        String address = "http://localhost:" + PORT + "/jaxws/add";
         EndpointImpl ep;
         ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
                                            implementor, 
@@ -60,7 +62,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish(address);
 
         implementor = new AddNumberNonAnon();
-        address = "http://localhost:9091/jaxws/addNonAnon";
+        address = "http://localhost:" + PORT + "/jaxws/addNonAnon";
         
         ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
                                            implementor, 
@@ -71,7 +73,7 @@ public class Server extends AbstractBusTestServerBase {
         ep.publish(address);
 
         implementor = new AddNumberOnlyAnon();
-        address = "http://localhost:9091/jaxws/addAnon";
+        address = "http://localhost:" + PORT + "/jaxws/addAnon";
         
         ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
                                            implementor, 

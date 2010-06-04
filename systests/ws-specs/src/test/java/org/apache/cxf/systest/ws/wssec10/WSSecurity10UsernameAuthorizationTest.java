@@ -42,7 +42,8 @@ import wssec.wssec10.PingService;
  *
  */
 public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(AuthorizedServer.class);
+
     private static final String INPUT = "foo";
     
     @BeforeClass
@@ -99,7 +100,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     
     private static URL getWsdlLocation() {
         try {
-            return new URL("http://localhost:9003/" + "UserName" + "?wsdl");
+            return new URL("http://localhost:" + PORT + "/" + "UserName" + "?wsdl");
         } catch (MalformedURLException mue) {
             return null;
         }

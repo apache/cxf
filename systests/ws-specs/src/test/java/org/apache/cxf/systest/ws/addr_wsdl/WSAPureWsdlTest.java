@@ -51,7 +51,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAPureWsdlTest extends AbstractWSATestBase {
-
+    static final String PORT = allocatePort(Server.class);
+    
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
 
@@ -74,7 +75,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         AddNumbersPortType port = getPort();
 
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:9094/jaxws/add");
+                                                        "http://localhost:" + PORT + "/jaxws/add");
 
         assertEquals(3, port.addNumbers(1, 2));
 
@@ -90,7 +91,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         assertEquals(3, resp.get().getReturn());
 
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                        "http://localhost:9094/doesntexist");
+                                                        "http://localhost:" + PORT + "/doesntexist");
         resp = port.addNumbers3Async(1, 2);
         try {
             resp.get();
@@ -115,7 +116,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
 
         AddNumbersPortType port = getPort();
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:9094/jaxws/add-provider");
+                                                        "http://localhost:" + PORT + "/jaxws/add-provider");
         assertEquals(3, port.addNumbers(1, 2));
 
 
@@ -126,7 +127,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
         input.reset();
         
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-            "http://localhost:9094/jaxws/add-providernows");
+            "http://localhost:" + PORT + "/jaxws/add-providernows");
         assertEquals(3, port.addNumbers(1, 2));
 
         assertTrue(output.toString().indexOf(expectedOut) != -1);
@@ -154,7 +155,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
                                                        Source.class, Mode.PAYLOAD);
 
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                     "http://localhost:9094/jaxws/add");
+                                     "http://localhost:" + PORT + "/jaxws/add");
 
         //manually set the action
         disp.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY,
@@ -172,7 +173,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
                                       Source.class, Mode.PAYLOAD);
 
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                     "http://localhost:9094/jaxws/add");
+                                     "http://localhost:" + PORT + "/jaxws/add");
         
         //set the operation name so action can be pulled from the wsdl
         disp.getRequestContext().put(MessageContext.WSDL_OPERATION, 
@@ -205,7 +206,7 @@ public class WSAPureWsdlTest extends AbstractWSATestBase {
                                                        Source.class, Mode.MESSAGE);
 
         disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                     "http://localhost:9094/jaxws/add");
+                                     "http://localhost:" + PORT + "/jaxws/add");
 
         //manually set the action
         disp.getRequestContext().put(BindingProvider.SOAPACTION_URI_PROPERTY,

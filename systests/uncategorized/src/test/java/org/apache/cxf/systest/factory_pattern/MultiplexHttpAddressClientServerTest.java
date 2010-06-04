@@ -51,6 +51,7 @@ import org.junit.Test;
  * exercise with multiplexWithAddress config rather than ws-a headers
  */
 public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServerTestBase {
+    static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
     
     public static class Server extends AbstractBusTestServerBase {        
 
@@ -87,6 +88,7 @@ public class MultiplexHttpAddressClientServerTest extends AbstractBusClientServe
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
+        updateAddressPort(factory, NumberFactoryImpl.PORT);
         
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);

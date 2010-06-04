@@ -46,6 +46,8 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
 
     private static final Logger LOG = LogUtils.getLogger(DecoupledClientServerTest.class);
     private Bus bus;
@@ -66,7 +68,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
             GreeterImpl implementor = new GreeterImpl();
             implementor.useLastOnewayArg(true);
             implementor.setDelay(5000);
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             
             Endpoint ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
@@ -122,6 +124,7 @@ public class DecoupledClientServerTest extends AbstractBusClientServerTestBase {
         
         GreeterService gs = new GreeterService();
         final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", 
                                                            shouldValidate());
         LOG.fine("Created greeter client.");

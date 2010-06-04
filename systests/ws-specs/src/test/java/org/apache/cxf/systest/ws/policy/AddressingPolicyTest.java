@@ -30,6 +30,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.greeter_control.BasicGreeterService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.PingMeFault;
+import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
@@ -44,12 +45,22 @@ import org.junit.Test;
  * WS-RM in response to Policies defined for the endpoint via an external policy attachment.
  */
 public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String TEMPDIR = FileUtils.getDefaultTempDir().toURI().toString(); 
+    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(AddressingPolicyTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
-    
-        protected void run()  {            
+        String tmpDir = TEMPDIR;
+        public Server() {
+        }
+        public Server(String dir) {
+            tmpDir = dir;
+        }
+        protected void run()  {
+            
+            System.setProperty("temp.location", tmpDir);
             SpringBusFactory bf = new SpringBusFactory();
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr.xml");
             BusFactory.setDefaultBus(bus);
@@ -61,7 +72,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
             bus.getOutFaultInterceptors().add(out);
             
             GreeterImpl implementor = new GreeterImpl();
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
         }
@@ -69,7 +80,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
 
         public static void main(String[] args) {
             try { 
-                Server s = new Server(); 
+                Server s = new Server(args[0]); 
                 s.start();
             } catch (Exception ex) {
                 ex.printStackTrace();
@@ -82,7 +93,11 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        PolicyTestHelper.updatePolicyRef("addr-external.xml", ":9020", ":" + PORT);
+        System.setProperty("temp.location", TEMPDIR);
+
+        assertTrue("server did not launch correctly", launchServer(Server.class, null,
+                                                                   new String[] {TEMPDIR}));
     }
          
     @Test
@@ -99,6 +114,7 @@ public class AddressingPolicyTest extends AbstractBusClientServerTestBase {
         
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");     
         ConnectionHelper.setKeepAliveConnection(greeter, true);
 

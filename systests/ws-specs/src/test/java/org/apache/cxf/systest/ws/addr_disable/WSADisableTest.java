@@ -39,6 +39,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSADisableTest extends AbstractWSATestBase {
+    static final String PORT = allocatePort(Server.class);
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
@@ -61,7 +62,8 @@ public class WSADisableTest extends AbstractWSATestBase {
         AddNumbersPortType port = getService().getAddNumbersPort();
 
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:9095/jaxws/add");
+                                                        "http://localhost:" 
+                                                        + PORT + "/jaxws/add");
 
         assertEquals(3, port.addNumbers(1, 2));
 
@@ -81,7 +83,8 @@ public class WSADisableTest extends AbstractWSATestBase {
         AddNumbersPortType port = getService().getAddNumbersPort(new AddressingFeature(false));
 
         ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-                                                        "http://localhost:9095/jaxws/add");
+                                                        "http://localhost:" 
+                                                        + PORT + "/jaxws/add");
 
         assertEquals(3, port.addNumbers(1, 2));
 
@@ -101,7 +104,8 @@ public class WSADisableTest extends AbstractWSATestBase {
                                                                     javax.xml.ws.Service.Mode.MESSAGE,
                                                                     new AddressingFeature(false));
         ((BindingProvider)disptch).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                           "http://localhost:9095/jaxws/add");
+                                                           "http://localhost:" 
+                                                           + PORT + "/jaxws/add");
 
         InputStream is = getClass().getResourceAsStream("resources/AddNumbersDispatchReq.xml");
         SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);

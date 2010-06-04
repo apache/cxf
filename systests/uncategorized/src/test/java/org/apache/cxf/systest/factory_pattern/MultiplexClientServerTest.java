@@ -26,6 +26,7 @@ import java.util.Map;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.factory_pattern.Number;
 import org.apache.cxf.factory_pattern.NumberFactory;
 import org.apache.cxf.factory_pattern.NumberFactoryService;
@@ -42,6 +43,8 @@ import org.junit.Test;
 
 
 public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
+    static final String PORT = NumberFactoryImpl.PORT;
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     
     public static class Server extends AbstractBusTestServerBase {        
 
@@ -74,11 +77,11 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         props.put("java.util.logging.config.file", 
                   System.getProperty("java.util.logging.config.file"));
         assertTrue("server did not launch correctly", 
-                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
+                   launchServer(EmbeddedJMSBrokerLauncher.class, props, null, true));
         
         props.put("cxf.config.file", defaultConfigFileName);
         assertTrue("server did not launch correctly",
-                   launchServer(Server.class, props, null));
+                   launchServer(Server.class, props, null, true));
     }
 
     
@@ -87,6 +90,7 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
+        updateAddressPort(factory, PORT);
         
         NumberService numService = new NumberService();
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);
@@ -107,13 +111,17 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
+        updateAddressPort(factory, PORT);
         
-        NumberService numService = new NumberService();
 
         // use values >= 30 to create JMS eprs - see NumberFactoryImpl.create
         
         // verify it is JMS, 999 for JMS will throw a fault
         W3CEndpointReference ref = factory.create("999");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(),
+                                                      NumberService.WSDL_LOCATION.toString());        
+        NumberService numService = new NumberService();
+
         assertNotNull("reference", ref);
         ServiceImpl serviceImpl = ServiceDelegateAccessor.get(numService);    
         Number num =  (Number)serviceImpl.getPort(ref, Number.class); 

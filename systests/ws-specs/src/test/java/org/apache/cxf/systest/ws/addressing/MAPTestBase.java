@@ -64,7 +64,9 @@ import static org.apache.cxf.ws.addressing.JAXWSAConstants.CLIENT_ADDRESSING_PRO
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public abstract class MAPTestBase extends AbstractClientServerTestBase implements VerificationCache {
-
+    protected static final String PORT = allocatePort(MAPTestBase.class);
+    protected static final String DECOUPLE_PORT = allocatePort(MAPTestBase.class, 1);
+    
     protected static Bus staticBus;
 
     static final String INBOUND_KEY = "inbound";
@@ -142,10 +144,12 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
     public URL getWSDLURL() {
         return getClass().getResource("/wsdl/hello_world.wsdl");
     }
-    public Greeter createGreeter(EndpointReferenceType target) {
+    public Greeter createGreeter(EndpointReferenceType target) throws Exception {
         ServiceImpl serviceImpl = 
             ServiceDelegateAccessor.get(new SOAPService(getWSDLURL(), SERVICE_NAME));
-        return serviceImpl.getPort(target, Greeter.class);        
+        Greeter g = serviceImpl.getPort(target, Greeter.class);
+        updateAddressPort(g, PORT);
+        return g;
     }
     
     @After

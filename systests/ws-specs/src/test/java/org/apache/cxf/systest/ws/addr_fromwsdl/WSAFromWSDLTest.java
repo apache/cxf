@@ -39,7 +39,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAFromWSDLTest extends AbstractWSATestBase {
-
+    static final String PORT = allocatePort(Server.class);
+    static final String INVALID_PORT = allocatePort(Server.class, 1);
+    
     private static final String BASE_URI = "http://apache.org/cxf/systest/ws/addr_feature/" 
         + "AddNumbersPortType/";
 
@@ -157,7 +159,7 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
         AddNumbersPortType port = getPort();
         ((BindingProvider)port).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                 "http://localhost:9091/jaxws/addNonAnon");
+                 "http://localhost:" + PORT + "/jaxws/addNonAnon");
         try {
             port.addNumbers3(-1, 2);
         } catch (SOAPFaultException e) {
@@ -169,12 +171,12 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
         AddNumbersPortType port = getPort();
         ((BindingProvider)port).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                 "http://localhost:9091/jaxws/addAnon");
+                 "http://localhost:" + PORT + "/jaxws/addAnon");
         
         AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
         EndpointReferenceType ref = new EndpointReferenceType();
         AttributedURIType add = new AttributedURIType();
-        add.setValue("http://localhost:9095/not/a/real/url");
+        add.setValue("http://localhost:" + INVALID_PORT + "/not/a/real/url");
         ref.setAddress(add);
         maps.setReplyTo(ref);
         maps.setFaultTo(ref);
@@ -188,12 +190,14 @@ public class WSAFromWSDLTest extends AbstractWSATestBase {
             assertTrue(e.getFault().getFaultCode().contains("OnlyAnonymousAddressSupported"));
         }
     }
-    private AddNumbersPortType getPort() {
+    private AddNumbersPortType getPort()throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        return service.getAddNumbersPort(new AddressingFeature());
+        AddNumbersPortType port = service.getAddNumbersPort(new AddressingFeature());
+        updateAddressPort(port, PORT);
+        return port;
     }
 }

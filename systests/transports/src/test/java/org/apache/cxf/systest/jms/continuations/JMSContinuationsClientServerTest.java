@@ -33,8 +33,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JMSContinuationsClientServerTest extends AbstractBusClientServerTestBase {
-    
     protected static boolean serversStarted;
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    static final String PORT = Server.PORT;
+
 
     @Before
     public void startServers() throws Exception {
@@ -74,6 +76,8 @@ public class JMSContinuationsClientServerTest extends AbstractBusClientServerTes
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         assertNotNull(wsdl);
+        
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
 
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
         assertNotNull(service);

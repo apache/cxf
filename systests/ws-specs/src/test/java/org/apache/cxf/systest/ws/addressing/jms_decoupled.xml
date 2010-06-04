@@ -24,12 +24,14 @@
        xsi:schemaLocation="
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
     <import resource="wsa_interceptors.xml"/>
     <jaxws:client name="{http://apache.org/hello_world_soap_http}GreeterPort"
         createdFromAPI="true">
         <jaxws:properties>
-            <entry key="org.apache.cxf.ws.addressing.replyto" value="jms:jndi:dynamicQueues/testreplyto?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:61500" />
+            <entry key="org.apache.cxf.ws.addressing.replyto" 
+            	value="jms:jndi:dynamicQueues/testreplyto?jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory&amp;jndiConnectionFactoryName=ConnectionFactory&amp;jndiURL=tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}" />
         </jaxws:properties>
     </jaxws:client>
 </beans>

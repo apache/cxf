@@ -30,7 +30,7 @@ import org.junit.Test;
  * in the non-decoupled case.
  */
 public class NonDecoupledTest extends MAPTestBase {
-    static final String ADDRESS = "http://localhost:9008/SoapContext/SoapPort";
+    static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private static final String CONFIG =
         "org/apache/cxf/systest/ws/addressing/wsa_interceptors.xml";

@@ -56,6 +56,7 @@ import org.junit.Test;
  * the use of multiple compatible or incompatible assertions.
  */
 public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
 
     private static final Logger LOG = LogUtils.getLogger(HTTPClientPolicyTest.class);
     private static final String POLICY_ENGINE_ENABLED_CFG =
@@ -80,7 +81,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
             
             HttpGreeterImpl implementor = new HttpGreeterImpl();
             implementor.setThrowAlways(true);
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
         }
@@ -123,6 +124,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         
         BasicGreeterService gs = new BasicGreeterService(url, GREETER_QNAME);
         final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
         
         // sayHi - this operation has message policies that are incompatible with
@@ -180,6 +182,8 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         BasicGreeterService gs = new BasicGreeterService(url, GREETER_QNAME);
         final Greeter greeter = gs.getGreeterPort();
         LOG.fine("Created greeter client.");
+        updateAddressPort(greeter, PORT);
+
         
         greeter.greetMeOneWay("CXF");
         
@@ -189,7 +193,7 @@ public class HTTPClientPolicyTest extends AbstractBusClientServerTestBase {
         assertNotNull("expected DecoupledEndpoint", 
                       c.getClient().getDecoupledEndpoint());
         assertEquals("unexpected DecoupledEndpoint", 
-                     "http://localhost:9990/decoupled_endpoint",
+                     "http://localhost:9909/decoupled_endpoint",
                      c.getClient().getDecoupledEndpoint());
     }
 }

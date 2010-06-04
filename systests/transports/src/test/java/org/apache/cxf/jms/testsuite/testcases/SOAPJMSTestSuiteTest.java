@@ -60,7 +60,8 @@ import org.junit.Test;
  * 
  */
 public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
-
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         Map<String, String> props = new HashMap<String, String>();
@@ -73,7 +74,7 @@ public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
                                                                    props, null));
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
     }
-
+    
     private void oneWayTest(TestCaseType testcase, JMSSimplePortType port) throws Exception {
         InvocationHandler handler = Proxy.getInvocationHandler(port);
         BindingProvider bp = (BindingProvider)handler;

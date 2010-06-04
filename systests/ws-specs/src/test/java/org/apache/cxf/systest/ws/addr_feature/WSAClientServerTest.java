@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSAClientServerTest extends AbstractWSATestBase {
+    static final String PORT = allocatePort(Server.class);
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/ws/addr_feature/",
                                                 "AddNumbersService");
@@ -53,7 +54,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(AddNumbersPortType.class);
-        factory.setAddress("http://localhost:9091/jaxws/add");
+        factory.setAddress("http://localhost:" + PORT + "/jaxws/add");
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
 
         assertEquals(3, port.addNumbers(1, 2));
@@ -72,7 +73,7 @@ public class WSAClientServerTest extends AbstractWSATestBase {
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(AddNumbersPortType.class);
-        factory.setAddress("http://localhost:9091/jaxws/add");
+        factory.setAddress("http://localhost:" + PORT + "/jaxws/add");
         factory.getFeatures().add(new WSAddressingFeature());
         AddNumbersPortType port = (AddNumbersPortType) factory.create();
 
@@ -101,12 +102,14 @@ public class WSAClientServerTest extends AbstractWSATestBase {
         assertTrue(input.toString().indexOf(expectedIn) != -1);
     }
 
-    private AddNumbersPortType getPort() {
+    private AddNumbersPortType getPort() throws Exception {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        return service.getAddNumbersPort(new AddressingFeature());
+        AddNumbersPortType port = service.getAddNumbersPort(new AddressingFeature());
+        updateAddressPort(port, PORT);
+        return port;
     }
 }

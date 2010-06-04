@@ -22,13 +22,16 @@ import javax.xml.ws.Binding;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 public class Server extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run()  {
         Object implementor = new GreeterImplTwoWayJMS();
@@ -49,8 +52,12 @@ public class Server extends AbstractBusTestServerBase {
         Object i8 = new GreeterImplTwoWayJMSAppCorrelationIDSales();
         Object mtom = new JMSMTOMImpl();
         
+        Bus bus = BusFactory.getDefaultBus();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
         Endpoint.publish(null, impleDoc);
-        String address = "http://localhost:9000/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         Endpoint.publish("http://testaddr.not.required/", impl2);
         Endpoint.publish("http://testaddr.not.required.topic/", impl3);
@@ -74,14 +81,16 @@ public class Server extends AbstractBusTestServerBase {
         String address1 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue2"
                          + "?jndiInitialContextFactory"
                          + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+                         + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
+                         + EmbeddedJMSBrokerLauncher.PORT;
         Endpoint.publish(address1, spec1);
         
         Object spec2 = new GreeterSpecWithPortError();
         String address2 = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue5"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
+            + EmbeddedJMSBrokerLauncher.PORT;
         Endpoint.publish(address2, spec2);
         
         initNoWsdlServer();
@@ -95,7 +104,8 @@ public class Server extends AbstractBusTestServerBase {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
+            + EmbeddedJMSBrokerLauncher.PORT;
         Hello implementor = new HelloImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(Hello.class);

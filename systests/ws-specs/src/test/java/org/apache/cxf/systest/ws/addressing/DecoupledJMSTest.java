@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.ws.addressing;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +39,8 @@ import org.junit.Test;
 public class DecoupledJMSTest extends MAPTestBase {
     private static final String ADDRESS = "jms:jndi:dynamicQueues/testqueue0001?"
         + "jndiInitialContextFactory=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-        + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+        + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:" 
+        + EmbeddedJMSBrokerLauncher.PORT;
     
     
     private static final String CONFIG =
@@ -47,7 +49,9 @@ public class DecoupledJMSTest extends MAPTestBase {
     public String getConfigFileName() {
         return CONFIG;
     }
-    
+    protected void updateAddressPort(Object o, int port) throws MalformedURLException {
+    }
+
     @Test
     @Override
     public void testImplicitMAPs() throws Exception {

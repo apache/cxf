@@ -32,7 +32,8 @@ import org.apache.ws.security.WSSConfig;
 
 
 public class Server extends AbstractBusTestServerBase {
-    
+    static final String PORT = allocatePort(Server.class);
+
     public Server() throws Exception {
         
     }
@@ -86,7 +87,7 @@ public class Server extends AbstractBusTestServerBase {
     protected void run()  {
         try {
             WSSConfig.getDefaultWSConfig();
-            new Server("http://localhost:9001/");
+            new Server("http://localhost:" + PORT + "/");
             Bus busLocal = new SpringBusFactory().createBus(
                     "org/apache/cxf/systest/ws/wssc/server/server.xml");
             BusFactory.setDefaultBus(busLocal);

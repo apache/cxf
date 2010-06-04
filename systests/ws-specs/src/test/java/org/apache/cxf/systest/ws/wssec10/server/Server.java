@@ -25,6 +25,8 @@ import org.apache.cxf.systest.ws.wssec11.WSSecurity11Common;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(Server.class);
+    static final String SSL_PORT = allocatePort(Server.class, 1);
 
     private static boolean unrestrictedPoliciesInstalled;
     private static String configFileName;

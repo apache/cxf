@@ -33,7 +33,7 @@ import org.junit.Test;
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public class MAPTest extends MAPTestBase {
-    static final String ADDRESS = "http://localhost:9008/SoapContext/SoapPort";
+    static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private static final String CONFIG;
     static {

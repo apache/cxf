@@ -53,7 +53,7 @@ public class ManualNumberFactoryImpl extends NumberFactoryImpl {
         EndpointImpl ep = 
             new EndpointImpl(BusFactory.getDefaultBus(), servant, bindingId, wsdlLocation);
         ep.setEndpointName(new QName(NUMBER_SERVICE_QNAME.getNamespaceURI(), "NumberPort"));
-        ep.publish();
+        ep.publish(NUMBER_SERVANT_ADDRESS_ROOT);
         templateEpr = ep.getServer().getDestination().getAddress();
     }
 }

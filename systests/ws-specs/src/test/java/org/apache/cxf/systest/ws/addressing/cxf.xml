@@ -23,9 +23,10 @@
        xsi:schemaLocation="
 http://cxf.apache.org/transports/http/configuration http://cxf.apache.org/schemas/configuration/http-conf.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
     <http:conduit name="{http://apache.org/hello_world_soap_http}SoapPort.http-conduit">
-      <http:client DecoupledEndpoint="http://localhost:9999/decoupled_endpoint"/>
+      <http:client DecoupledEndpoint="http://localhost:${testutil.ports.MAPTestBase.1}/decoupled_endpoint"/>
     </http:conduit>
     
     <import resource="wsa_interceptors.xml"/>

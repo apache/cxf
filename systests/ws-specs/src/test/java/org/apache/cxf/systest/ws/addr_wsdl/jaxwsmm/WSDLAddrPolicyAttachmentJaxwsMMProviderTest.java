@@ -45,10 +45,13 @@ import messaging.AsyncMessaging;
 import messaging.AsyncMessagingService;
 
 public class WSDLAddrPolicyAttachmentJaxwsMMProviderTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(WSDLAddrPolicyAttachmentJaxwsMMProviderTest.class);
 
-    private static final String ADDRESS = "http://localhost:9000/AsyncMessagingServiceProvider";
+    private static final String ADDRESS = "http://localhost:" 
+            + PORT + "/AsyncMessagingServiceProvider";
     private static final String WSDL_ADDRESS = ADDRESS + "?wsdl";
     private static final QName ENDPOINT_NAME = new QName("http://messaging/", "AsyncMessagingService");
 

@@ -36,6 +36,7 @@ import org.junit.Test;
  *
  */
 public class WSSCTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(Server.class);
 
        
     private static final String OUT = "CXF : ping";
@@ -189,7 +190,7 @@ public class WSSCTest extends AbstractBusClientServerTestBase {
                 );
            
             ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                                            "http://localhost:9001/" + portPrefix);
+                                                            "http://localhost:" + PORT + "/" + portPrefix);
             if (portPrefix.charAt(0) == '_') {
                 //MS would like the _ versions to send a cancel
                 ((BindingProvider)port).getRequestContext()

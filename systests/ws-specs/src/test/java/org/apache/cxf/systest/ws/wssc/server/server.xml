@@ -42,21 +42,5 @@
         </cxf:features>
     </cxf:bus>
     
-    <!-- -->
-    <!-- Any services listening on port 9002 must use the following -->
-    <!-- Transport Layer Security (TLS) settings -->
-    <!-- -->
-    <!-- httpj:engine-factory bus="cxf">
-        <httpj:engine port="9002">
-            <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="pkcs12" password="password" resource="org/apache/cxf/systest/ws/wssc/certs/alice.p12"/>
-                </sec:keyManagers>
-
-            </httpj:tlsServerParameters>
-        </httpj:engine>
-    </httpj:engine-factory-->
-
-
     
 </beans>

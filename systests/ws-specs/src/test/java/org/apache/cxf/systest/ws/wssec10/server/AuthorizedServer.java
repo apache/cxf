@@ -24,6 +24,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class AuthorizedServer extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(AuthorizedServer.class);
 
     private static String configFileName =
         "org/apache/cxf/systest/ws/wssec10/server/server_restricted_authorized.xml";

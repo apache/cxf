@@ -20,14 +20,19 @@ package org.apache.cxf.systest.jms.continuations;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 public class Server2 extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server2.class);
 
    
     protected void run()  {
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(),
+                                                      "org/apache/cxf/systest/jms/continuations/test.wsdl");
         Object implementor = new HelloWorldWithContinuationsJMS();        
-        String address = "http://localhost:9000/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
     }
 

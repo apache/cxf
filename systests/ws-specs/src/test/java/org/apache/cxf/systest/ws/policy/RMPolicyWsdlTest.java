@@ -53,6 +53,8 @@ import org.junit.Test;
  * in response to Policies defined for the endpoint via an direct attachment to the wsdl.
  */
 public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(RMPolicyWsdlTest.class);
     private static final String GREETMEONEWAY_ACTION 
@@ -115,7 +117,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
          
     @Test
@@ -130,6 +132,7 @@ public class RMPolicyWsdlTest extends AbstractBusClientServerTestBase {
         
         ReliableGreeterService gs = new ReliableGreeterService();
         final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);

@@ -37,6 +37,7 @@
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
         http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
     <cxf:bus>
         <cxf:features>
@@ -50,7 +51,7 @@
     <!-- Transport Layer Security (TLS) settings -->
     <!-- -->
     <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="9001">
+        <httpj:engine port="${testutil.ports.Server.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
                     <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/bob.jks"/>
@@ -78,7 +79,7 @@
     <!-- -->
     <jaxws:endpoint 
        id="UserNameOverTransport"
-       address="https://localhost:9001/UserNameOverTransport" 
+       address="https://localhost:${testutil.ports.Server.1}/UserNameOverTransport" 
        serviceName="interop:PingService"
        endpointName="interop:UserNameOverTransport_IPingService"
        implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport"
@@ -92,7 +93,7 @@
     </jaxws:endpoint> 
     <jaxws:endpoint 
        id="UserName"
-       address="http://localhost:9003/UserName" 
+       address="http://localhost:${testutil.ports.Server}/UserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService"
        implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransport">
@@ -110,7 +111,7 @@
     <jaxws:endpoint 
        name="{http://WSSec/wssec10}MutualCertificate10SignEncrypt_IPingService"
        id="MutualCertificate10SignEncrypt"
-       address="http://localhost:9002/MutualCertificate10SignEncrypt" 
+       address="http://localhost:${testutil.ports.Server}/MutualCertificate10SignEncrypt" 
        serviceName="interop:PingService"
        endpointName="interop:MutualCertificate10SignEncrypt_IPingService"
        implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncrypt">
@@ -131,7 +132,7 @@
     <jaxws:endpoint 
        name="{http://WSSec/wssec10}MutualCertificate10SignEncryptRsa15TripleDes_IPingService"
        id="MutualCertificate10SignEncryptRsa15TripleDes"
-       address="http://localhost:9000/MutualCertificate10SignEncryptRsa15TripleDes" 
+       address="http://localhost:${testutil.ports.Server}/MutualCertificate10SignEncryptRsa15TripleDes" 
        serviceName="interop:PingService"
        endpointName="interop:MutualCertificate10SignEncryptRsa15TripleDes_IPingService"
        implementor="org.apache.cxf.systest.ws.wssec10.server.MutualCertificate10SignEncryptRsa15TripleDes">

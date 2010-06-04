@@ -35,10 +35,14 @@ import org.apache.cxf.systest.http_jetty.continuations.HelloContinuation;
 import org.apache.cxf.systest.http_jetty.continuations.HelloContinuationService;
 import org.apache.cxf.systest.http_jetty.continuations.HelloWorker;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class HelloWorldContinuationsClientServerTest extends AbstractBusClientServerTestBase {
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    static final String PORT = Server2.PORT;
     
     private static boolean serversStarted;
     private static final String CONFIG_FILE =

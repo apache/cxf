@@ -37,6 +37,7 @@
         http://cxf.apache.org/configuration/security                    http://cxf.apache.org/schemas/configuration/security.xsd
         http://schemas.iona.com/soa/security-config                     http://schemas.iona.com/soa/security-config.xsd
     ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
     <cxf:bus>
         <cxf:features>
@@ -52,23 +53,7 @@
 
     <bean id="customUTInterceptor" class="org.apache.cxf.systest.ws.wssec10.server.CustomUsernameTokenInterceptor"/>
 
-    <!-- -->
-    <!-- Any services listening on port 9001 must use the following -->
-    <!-- Transport Layer Security (TLS) settings -->
-    <!-- -->
-    <httpj:engine-factory id="tls-settings">
-        <httpj:engine port="9001">
-            <httpj:tlsServerParameters>
-                <sec:keyManagers keyPassword="password">
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/bob.jks"/>
-                </sec:keyManagers>
-                <sec:trustManagers>
-                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/alice.jks"/>
-                </sec:trustManagers> 
-            </httpj:tlsServerParameters>
-        </httpj:engine>
-    </httpj:engine-factory>
-    
+
     <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
         <property name="methodRolesMap">
             <map>
@@ -79,11 +64,10 @@
     
     <jaxws:endpoint 
        id="UserName"
-       address="http://localhost:9003/UserName" 
+       address="http://localhost:${testutil.ports.AuthorizedServer}/UserName" 
        serviceName="interop:PingService"
        endpointName="interop:UserName_IPingService"
-       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
-       depends-on="tls-settings">
+       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted">
         
        <jaxws:inInterceptors>
             <ref bean="authorizationInterceptor"/>

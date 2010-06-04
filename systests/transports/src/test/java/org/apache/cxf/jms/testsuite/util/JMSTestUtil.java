@@ -37,6 +37,7 @@ import javax.xml.bind.Unmarshaller;
 import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
 import org.apache.cxf.testsuite.testcase.TestCasesType;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSConfiguration;
 import org.apache.cxf.transport.jms.JMSFactory;
 import org.apache.cxf.transport.jms.JMSOldConfigHolder;
@@ -91,6 +92,19 @@ public final class JMSTestUtil {
         JAXBElement e = (JAXBElement)unmarshaller.unmarshal(new JMSTestUtil().getClass()
             .getResource("/org/apache/cxf/jms/testsuite/util/testcases.xml"));
         testcases = (TestCasesType)e.getValue();
+        for (TestCaseType tct : testcases.getTestCase()) {
+            if (tct.isSetAddress()) {
+                String add = tct.getAddress();
+                int idx = add.indexOf("jndiURL=");
+                if (idx != -1) {
+                    int idx2 = add.indexOf("&", idx);
+                    add = add.substring(0, idx)
+                        + "jndiURL=tcp://localhost:" + EmbeddedJMSBrokerLauncher.PORT
+                        + (idx2 == -1 ? "" : add.substring(idx2));
+                    tct.setAddress(add);
+                }
+            }
+        }
     }
 
     public static JmsTemplate getJmsTemplate(String address) throws Exception {

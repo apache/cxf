@@ -42,7 +42,9 @@ import wssec.wssec10.PingService;
  *
  */
 public class WSSecurity10Test extends AbstractBusClientServerTestBase {
-    
+    static final String PORT = allocatePort(Server.class);
+    static final String SSL_PORT = allocatePort(Server.class, 1);
+
     private static final String INPUT = "foo";
     private static boolean unrestrictedPoliciesInstalled;
     
@@ -102,13 +104,13 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
     private static URL getWsdlLocation(String portPrefix) {
         try {
             if ("UserNameOverTransport".equals(portPrefix)) {
-                return new URL("https://localhost:9001/" + portPrefix + "?wsdl");
+                return new URL("https://localhost:" + SSL_PORT + "/" + portPrefix + "?wsdl");
             } else if ("UserName".equals(portPrefix)) {
-                return new URL("http://localhost:9003/" + portPrefix + "?wsdl");
+                return new URL("http://localhost:" + PORT + "/" + portPrefix + "?wsdl");
             } else if ("MutualCertificate10SignEncrypt".equals(portPrefix)) {
-                return new URL("http://localhost:9002/" + portPrefix + "?wsdl");
+                return new URL("http://localhost:" + PORT + "/" + portPrefix + "?wsdl");
             } else if ("MutualCertificate10SignEncryptRsa15TripleDes".equals(portPrefix)) {
-                return new URL("http://localhost:9000/" + portPrefix + "?wsdl");
+                return new URL("http://localhost:" + PORT + "/" + portPrefix + "?wsdl");
             }
         } catch (MalformedURLException mue) {
             return null;

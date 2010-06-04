@@ -28,8 +28,10 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
-   
-    private static final String ADDRESS = "http://localhost:9001/SoapContext/ControlPort";
+    public static final String PORT = allocatePort(Server.class);
+    private static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/ControlPort";
+    private static final String GREETER_ADDRESS 
+        = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
  
     protected void run()  {
 
@@ -40,6 +42,7 @@ public class Server extends AbstractBusTestServerBase {
 
         System.out.println("Created control bus " + bus);
         ControlImpl implementor = new ControlImpl();
+        implementor.setAddress(GREETER_ADDRESS);
         GreeterImpl greeterImplementor = new GreeterImpl();
         implementor.setImplementor(greeterImplementor);
         Endpoint.publish(ADDRESS, implementor);

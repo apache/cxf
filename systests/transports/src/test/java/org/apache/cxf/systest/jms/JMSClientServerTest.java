@@ -45,6 +45,8 @@ import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.soap.SOAPFaultException;
 
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.hello_world_jms.BadRecordLitFault;
@@ -99,7 +101,8 @@ import org.springframework.jms.support.destination.DestinationResolver;
 import org.springframework.jndi.JndiTemplate;
 
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
-    
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    static final String PORT = Server.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         Map<String, String> props = new HashMap<String, String>();                
@@ -114,10 +117,13 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         assertTrue("server did not launch correctly", 
                    launchServer(Server.class, false));
+        
     }
     
     public URL getWSDLURL(String s) throws Exception {
-        return getClass().getResource(s);
+        URL u = getClass().getResource(s);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), u.toString());
+        return u;
     }
     public QName getServiceName(QName q) {
         return q;
@@ -141,6 +147,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            
             Client client = ClientProxy.getClient(greeter);
             EndpointInfo ei = client.getEndpoint().getEndpointInfo();
             AddressType address = ei.getTraversedExtensor(new AddressType(), AddressType.class);
@@ -414,7 +421,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                  "HelloWorldPubSubService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                              "HelloWorldPubSubPort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldPubSubService service = new HelloWorldPubSubService(wsdl, serviceName);
@@ -438,7 +445,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                  "JmsDestinationPubSubService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                              "JmsDestinationPubSubPort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldPubSubService service = new HelloWorldPubSubService(wsdl, serviceName);
@@ -458,10 +465,14 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test 
     public void testConnectionsWithinSpring() throws Exception {
+        BusFactory.setDefaultBus(null);
+        BusFactory.setThreadDefaultBus(null);
+        
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext(
                 new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
-               
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors((Bus)ctx.getBean("cxf"),
+                                                      "classpath:wsdl/jms_test.wsdl");   
         HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
         assertNotNull(greeter);
         
@@ -505,7 +516,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         } catch (Exception ex) {
             fail("There should not throw the exception" + ex);
         }
-        
+        ctx.close();
+        BusFactory.setDefaultBus(getBus());
+        BusFactory.setThreadDefaultBus(getBus());
     }
     
     @Test
@@ -514,7 +527,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                  "HelloWorldOneWayQueueService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                              "HelloWorldOneWayQueuePort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldOneWayQueueService service = new HelloWorldOneWayQueueService(wsdl, serviceName);
@@ -538,8 +551,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                                      "HelloWorldQueueDecoupledOneWaysService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldQueueDecoupledOneWaysPort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), "testutils/jms_test.wsdl");
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
@@ -606,8 +621,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                                      "HelloWorldQueueDecoupledOneWaysService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldQueueDecoupledOneWaysPort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), "testutils/jms_test.wsdl");
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);
@@ -725,7 +741,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName portNameSales = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldPortAppCorrelationIDSales"));
 
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldServiceAppCorrelationID service = 
@@ -783,7 +799,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName portNameSales = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldPortAppCorrelationIDStaticPrefixSales"));
 
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldServiceAppCorrelationIDStaticPrefix service = 
@@ -834,7 +850,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                  "HelloWorldServiceAppCorrelationIDNoPrefix"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldPortAppCorrelationIDNoPrefix"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldServiceAppCorrelationIDNoPrefix service = 
@@ -904,7 +920,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName portNameSales = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                   "HelloWorldPortRuntimeCorrelationIDStaticPrefixSales"));
 
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldServiceRuntimeCorrelationIDStaticPrefix service = 
@@ -950,7 +966,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", 
                                                "HelloWorldPortRuntimeCorrelationIDDynamicPrefix"));
         
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldServiceRuntimeCorrelationIDDynamicPrefix service = 
@@ -989,7 +1005,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName serviceName = getServiceName(new QName("http://cxf.apache.org/hello_world_jms",
                                  "HelloWorldService"));
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
-        URL wsdl = getClass().getResource("/wsdl/jms_test.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
 
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
@@ -1045,7 +1061,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         QName serviceName = new QName("http://cxf.apache.org/jms_mtom", "JMSMTOMService");
         QName portName = new QName("http://cxf.apache.org/jms_mtom", "MTOMPort");
 
-        URL wsdl = getClass().getResource("/wsdl/jms_test_mtom.wsdl");
+        URL wsdl = getWSDLURL("/wsdl/jms_test_mtom.wsdl");
         assertNotNull(wsdl);
 
         JMSMTOMService service = new JMSMTOMService(wsdl, serviceName);
@@ -1138,7 +1154,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             throw (Exception)ex.getCause();
         }
     }
-    
+
     @Test
     public void testWsdlExtensionSpecJMSPortError() throws Exception {
         QName serviceName = getServiceName(new QName("http://cxf.apache.org/jms_greeter",
@@ -1162,7 +1178,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         String address = "jms:jndi:dynamicQueues/test.cxf.jmstransport.queue3"
             + "?jndiInitialContextFactory"
             + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
-            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:61500";
+            + "&jndiConnectionFactoryName=ConnectionFactory&jndiURL=tcp://localhost:"
+            + JMS_PORT;
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
@@ -1212,7 +1229,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     public void testReplyToConfig() throws Exception {
         JMSEndpoint endpoint = new JMSEndpoint();
         endpoint.setJndiInitialContextFactory("org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        endpoint.setJndiURL("tcp://localhost:61500");
+        endpoint.setJndiURL("tcp://localhost:" + JMS_PORT);
         endpoint.setJndiConnectionFactoryName("ConnectionFactory");
 
         final JMSConfiguration jmsConfig = new JMSConfiguration();        

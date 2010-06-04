@@ -54,6 +54,8 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
+    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
 
     public static final String GREETMEONEWAY_ACTION 
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeOneWayRequest";
@@ -88,10 +90,6 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
                 System.clearProperty("derby.system.home");
             }
         }
-        
-        // run server in process to avoid a problem with UUID generation
-        // during asynchronous invocations
-
         assertTrue("server did not launch correctly", launchServer(Server.class));  
     }
     
@@ -103,7 +101,8 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         LOG.fine("Created bus " + bus + " with default cfg");
         ControlService cs = new ControlService();
         Control control = cs.getControlPort();
-
+        updateAddressPort(control, PORT);
+        
         assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG)); 
         LOG.fine("Started greeter server.");
         
@@ -116,6 +115,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
             .setMilliseconds(new BigInteger("60000"));
         GreeterService gs = new GreeterService();
         Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         
         LOG.fine("Created greeter client.");
  
@@ -124,7 +124,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         Client c = ClientProxy.getClient(greeter);
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
         HTTPClientPolicy cp = hc.getClient();
-        cp.setDecoupledEndpoint("http://localhost:9994/decoupled_endpoint");
+        cp.setDecoupledEndpoint("http://localhost:" + DECOUPLE_PORT + "/decoupled_endpoint");
 
         out = new OutMessageRecorder();
         in = new InMessageRecorder();
