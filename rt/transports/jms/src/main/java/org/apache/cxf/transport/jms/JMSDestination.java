@@ -218,8 +218,10 @@ public class JMSDestination extends AbstractMultiplexDestination
             // handle the incoming message
             incomingObserver.onMessage(inMessage);
             
-            inMessage = inMessage.getExchange().getInMessage();
-            
+            if (inMessage.getExchange() != null 
+                && inMessage.getExchange().getInMessage() != null) {
+                inMessage = inMessage.getExchange().getInMessage();
+            }
             //need to propagate any exceptions back to Spring container 
             //so transactions can occur
             if (inMessage.getContent(Exception.class) != null && session != null) {
