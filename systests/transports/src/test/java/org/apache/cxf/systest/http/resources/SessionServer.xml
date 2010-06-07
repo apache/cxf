@@ -32,9 +32,10 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
               
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="9020">
+	 <httpj:engine port="${testutil.ports.SessionServer}">
 	     <httpj:sessionSupport>true</httpj:sessionSupport>	    
 	  </httpj:engine>
    </httpj:engine-factory>  

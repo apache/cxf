@@ -31,6 +31,9 @@ import org.mortbay.jetty.servlet.Context;
 import org.mortbay.jetty.servlet.ServletHolder;
 
 public class NoSpringServletServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(NoSpringServletServer.class);
+
+    
     Server httpServer;
     @Override
     protected void run() {
@@ -38,7 +41,7 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
         String busFactory = System.getProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
         System.setProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME, "org.apache.cxf.bus.CXFBusFactory");
         try {
-            httpServer = new Server(9000);
+            httpServer = new Server(Integer.parseInt(PORT));
             ContextHandlerCollection contexts = new ContextHandlerCollection();
             httpServer.setHandler(contexts);
 

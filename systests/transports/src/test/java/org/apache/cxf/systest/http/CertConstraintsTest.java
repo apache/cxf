@@ -36,7 +36,15 @@ import org.junit.Test;
  * constraints logic.
  */
 public class CertConstraintsTest extends AbstractBusClientServerTestBase {
-    
+    public static final String PORT0 = BusServer.PORT0;
+    public static final String PORT1 = BusServer.PORT1;
+    public static final String PORT2 = BusServer.PORT2;
+    public static final String PORT3 = BusServer.PORT3;
+    public static final String PORT4 = BusServer.PORT4;
+    public static final String PORT5 = BusServer.PORT5;
+    public static final String PORT6 = BusServer.PORT6;
+    public static final String PORT7 = BusServer.PORT7;
+    public static final String PORT8 = BusServer.PORT8;
     //
     // data
     //
@@ -122,35 +130,35 @@ public class CertConstraintsTest extends AbstractBusClientServerTestBase {
         //
         // Good Subject DN
         //
-        testSuccessfulCall("https://localhost:9006/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + PORT0 + "/SoapContext/HttpsPort");
         //
         // Bad Subject DN
         //
-        testFailedCall("https://localhost:9007/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
         //
         // Mixed Subject DN (ALL)
         //
-        testFailedCall("https://localhost:9008/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + PORT2 + "/SoapContext/HttpsPort");
         //
         // Mixed Subject DN (ANY)
         //
-        testSuccessfulCall("https://localhost:9009/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + PORT3 + "/SoapContext/HttpsPort");
         //
         // Mixed Issuer DN (ALL)
         //
-        testFailedCall("https://localhost:9010/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + PORT4 + "/SoapContext/HttpsPort");
         //
         // Mixed Issuer DN (ANY)
         //
-        testSuccessfulCall("https://localhost:9011/SoapContext/HttpsPort");
+        testSuccessfulCall("https://localhost:" + PORT5 + "/SoapContext/HttpsPort");
         //
         // Bad server Subject DN
         //
-        testFailedCall("https://localhost:9012/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + PORT6 + "/SoapContext/HttpsPort");
         //
         // Bad server Issuer DN
         //
-        testFailedCall("https://localhost:9013/SoapContext/HttpsPort");
+        testFailedCall("https://localhost:" + PORT7 + "/SoapContext/HttpsPort");
         
         stopServers();
     }

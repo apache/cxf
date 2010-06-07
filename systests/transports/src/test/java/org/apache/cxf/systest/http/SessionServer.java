@@ -28,6 +28,7 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class SessionServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(SessionServer.class);
 
     @Override
     protected void run() {
@@ -43,7 +44,7 @@ public class SessionServer extends AbstractBusTestServerBase {
         Bus bus = new SpringBusFactory().createBus(configure, true);
         SpringBusFactory.setDefaultBus(bus);
         implementor = new GreeterSessionImpl();
-        address = "http://localhost:9020/SoapContext/GreeterPort";
+        address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
         Endpoint.publish(address, implementor);
         
     }

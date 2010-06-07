@@ -36,6 +36,7 @@ import org.junit.Test;
  */
 
 public class ThreadPoolTest extends AbstractClientServerTestBase {
+    private static final String ADDRESS = Server.ADDRESS;
     private static final QName SERVICE_NAME = 
         new QName("http://apache.org/hello_world_soap_http", "SOAPServiceAddressing");
 
@@ -53,7 +54,7 @@ public class ThreadPoolTest extends AbstractClientServerTestBase {
         greeter = new SOAPService(wsdl, SERVICE_NAME).getPort(Greeter.class);
         BindingProvider bp = (BindingProvider)greeter;
         bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
-                                   Server.ADDRESS);
+                                   ADDRESS);
     }
 
     @Test

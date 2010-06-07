@@ -37,7 +37,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerWrappedContinuationTest extends AbstractClientServerTestBase {
-
+    public static final String PORT = allocatePort(Server.class);
+    
     private static final String CLIENT_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/cxf.xml";
     private static final String SERVER_CONFIG_FILE =
@@ -51,7 +52,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
             BusFactory.setDefaultBus(bus);
             
             Object implementor = new HelloImplWithWrapppedContinuation();
-            String address = "http://localhost:9092/hellocontinuation";
+            String address = "http://localhost:" + PORT + "/hellocontinuation";
             Endpoint.publish(address, implementor);
         }
 
@@ -81,7 +82,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
-        URL wsdlURL = new URL("http://localhost:9092/hellocontinuation?wsdl");
+        URL wsdlURL = new URL("http://localhost:" + PORT + "/hellocontinuation?wsdl");
         
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);

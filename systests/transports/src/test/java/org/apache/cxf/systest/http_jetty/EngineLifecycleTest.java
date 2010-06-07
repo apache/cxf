@@ -39,6 +39,7 @@ import org.apache.cxf.endpoint.ServerRegistry;
 import org.apache.cxf.helpers.IOUtils;
 
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.http_jetty.JettyHTTPDestination;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.junit.After;
@@ -60,6 +61,8 @@ import org.springframework.core.io.Resource;
  * is extra jetty configuration.
  */
 public class EngineLifecycleTest extends Assert {
+    private static final String PORT1 = TestUtil.getPortNumber(EngineLifecycleTest.class, 1);
+    private static final String PORT2 = TestUtil.getPortNumber(EngineLifecycleTest.class, 2);
     private String close;
     private GenericApplicationContext applicationContext;
     
@@ -127,7 +130,7 @@ public class EngineLifecycleTest extends Assert {
     
     private void getTestHtml() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:8808/test.html");    
+            getHttpConnection("http://localhost:" + PORT2 + "/test.html");    
         httpConnection.connect();
         InputStream in = httpConnection.getInputStream();        
         assertNotNull(in);
@@ -187,14 +190,14 @@ public class EngineLifecycleTest extends Assert {
         getTestHtml();
         invokeService();        
         shutdownService();
-        verifyNoServer(8808);
-        verifyNoServer(8801);
+        verifyNoServer(PORT2);
+        verifyNoServer(PORT1);
     }
     
         
-    private void verifyNoServer(int port) {
+    private void verifyNoServer(String port) {
         try {
-            Socket socket = new Socket(InetAddress.getLocalHost(), port);
+            Socket socket = new Socket(InetAddress.getLocalHost(), Integer.parseInt(port));
             socket.close();
         } catch (UnknownHostException e) {
             fail("Unknown host for local address");
@@ -218,8 +221,8 @@ public class EngineLifecycleTest extends Assert {
         invokeService();    
         invokeService8801();
         shutdownService();
-        verifyNoServer(8808);
-        verifyNoServer(8801);
+        verifyNoServer(PORT2);
+        verifyNoServer(PORT1);
         
         
         setUpBus(true);
@@ -228,8 +231,8 @@ public class EngineLifecycleTest extends Assert {
         invokeService8801();
         getTestHtml();
         shutdownService();
-        verifyNoServer(8808);
-        verifyNoServer(8801);
+        verifyNoServer(PORT2);
+        verifyNoServer(PORT1);
         
 
     }

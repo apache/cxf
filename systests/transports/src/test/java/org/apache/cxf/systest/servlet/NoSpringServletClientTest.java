@@ -36,8 +36,10 @@ import org.junit.Test;
 
 
 public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
+    private static final String PORT = NoSpringServletServer.PORT;
+    
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
-    private final String serviceURL = "http://localhost:9000/soap/";
+    private final String serviceURL = "http://localhost:" + PORT + "/soap/";
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(NoSpringServletServer.class));

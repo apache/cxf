@@ -29,6 +29,7 @@
         http://cxf.apache.org/transports/http/configuration         http://cxf.apache.org/schemas/configuration/http-conf.xsd
         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
  ">
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <bean id="aegisBean" class="org.apache.cxf.aegis.databinding.AegisDatabinding" scope='prototype'>
   <property name='configuration'>
@@ -47,7 +48,7 @@
 
  <jaxws:endpoint id="dummy-service-endpoint" 
     implementor="org.apache.cxf.systest.http_jetty.Dummy" 
-    address="http://localhost:8808/Dummy">
+    address="http://localhost:${testutil.ports.EngineLifecycleTest.2}/Dummy">
   <jaxws:serviceFactory>
    <ref bean='jaxws-and-aegis-service-factory' />
   </jaxws:serviceFactory>
@@ -55,7 +56,7 @@
 
  <jaxws:endpoint id="dummy-8801-service-endpoint"  
                  implementor="org.apache.cxf.systest.http_jetty.Dummy" 
-                 address="http://localhost:8801/Dummy">
+                 address="http://localhost:${testutil.ports.EngineLifecycleTest.1}/Dummy">
   <jaxws:serviceFactory>
    <ref bean='jaxws-and-aegis-service-factory' />
   </jaxws:serviceFactory>
@@ -65,14 +66,14 @@
 
  <bean id="clientFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
   <property name="serviceClass" value="org.apache.cxf.systest.http_jetty.DummyInterface" />
-  <property name="address" value="http://localhost:8808/Dummy" />
+  <property name="address" value="http://localhost:${testutil.ports.EngineLifecycleTest.2}/Dummy" />
  </bean>
 
 <bean id="dummy-client-8801" class="org.apache.cxf.systest.http_jetty.DummyInterface" factory-bean="clientFactory-8801" factory-method="create" />
 
  <bean id="clientFactory-8801" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
   <property name="serviceClass" value="org.apache.cxf.systest.http_jetty.DummyInterface" />
-  <property name="address" value="http://localhost:8801/Dummy" />
+  <property name="address" value="http://localhost:${testutil.ports.EngineLifecycleTest.1}/Dummy" />
  </bean>
 
 </beans>

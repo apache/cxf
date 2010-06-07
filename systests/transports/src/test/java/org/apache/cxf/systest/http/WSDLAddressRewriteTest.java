@@ -34,7 +34,7 @@ import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.junit.Test;
 
 public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = allocatePort(WSDLAddressRewriteTest.class);
     @Test
     public void testWithSameAddress() throws Exception {
         Endpoint endpoint = null;
@@ -84,7 +84,7 @@ public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
     }
 
     private String getSoapAddressLine(String address) throws Exception {
-        Socket s = new Socket(address, 9020);
+        Socket s = new Socket(address, Integer.parseInt(PORT));
         OutputStream os = s.getOutputStream();
         os.write("GET /SoapContext/GreeterPort?wsdl HTTP/1.1\r\n".getBytes());
         os.write(("Host:" + address + "\r\n\r\n").getBytes());
@@ -105,7 +105,7 @@ public class WSDLAddressRewriteTest extends AbstractBusClientServerTestBase {
     }
 
     private Endpoint publishEndpoint(boolean autoRewriteSoapAddress) {
-        Endpoint endpoint = Endpoint.publish("http://localhost:9020/SoapContext/GreeterPort",
+        Endpoint endpoint = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort",
                                              new GreeterImpl());
         EndpointInfo ei = ((EndpointImpl)endpoint).getServer().getEndpoint().getEndpointInfo();
         ei.setProperty("autoRewriteSoapAddress", autoRewriteSoapAddress);

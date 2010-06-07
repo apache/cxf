@@ -35,12 +35,14 @@ import junit.framework.Assert;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.Test;
 
 
 public class PublishedEndpointUrlTest extends Assert {
-    
+    public static final String PORT = TestUtil.getPortNumber(PublishedEndpointUrlTest.class);
+
     @Test
     public void testPublishedEndpointUrl() throws Exception {
         
@@ -49,7 +51,7 @@ public class PublishedEndpointUrlTest extends Assert {
         
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(Greeter.class);
-        svrFactory.setAddress("http://localhost:9000/publishedEndpointUrl");
+        svrFactory.setAddress("http://localhost:" + PORT + "/publishedEndpointUrl");
         svrFactory.setPublishedEndpointUrl(publishedEndpointUrl);
         svrFactory.setServiceBean(implementor);
         
