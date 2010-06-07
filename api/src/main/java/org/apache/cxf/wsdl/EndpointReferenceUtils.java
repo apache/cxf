@@ -235,8 +235,10 @@ public final class EndpointReferenceUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(EndpointReferenceUtils.class);
 
     private static final String NS_WSAW_2005 = "http://www.w3.org/2005/02/addressing/wsdl";
-    private static final String WSDL_INSTANCE_NAMESPACE = 
+    private static final String WSDL_INSTANCE_NAMESPACE2 = 
         "http://www.w3.org/2006/01/wsdl-instance";
+    private static final String WSDL_INSTANCE_NAMESPACE = 
+            "http://www.w3.org/ns/wsdl-instance";
     
     private static final QName WSA_WSDL_NAMESPACE_NS =
         new QName("xmlns:" + JAXWSAConstants.WSAW_PREFIX);
@@ -247,6 +249,8 @@ public final class EndpointReferenceUtils {
         new QName("xmlns:" + XML_SCHEMA_NAMESPACE_PREFIX);
     private static final String XML_SCHEMA_INSTANCE_NAMESPACE =
         "http://www.w3.org/2001/XMLSchema-instance";
+    private static final QName WSDL_LOCATION2 =
+        new QName(WSDL_INSTANCE_NAMESPACE2, "wsdlLocation");
     private static final QName WSDL_LOCATION =
         new QName(WSDL_INSTANCE_NAMESPACE, "wsdlLocation");
     private static final QName XSI_TYPE = 
@@ -533,6 +537,9 @@ public final class EndpointReferenceUtils {
 
         if (metadata != null) {
             wsdlLocation = metadata.getOtherAttributes().get(WSDL_LOCATION);
+            if (wsdlLocation == null) {
+                wsdlLocation = metadata.getOtherAttributes().get(WSDL_LOCATION2);
+            }
         }
 
         if (null == wsdlLocation) {

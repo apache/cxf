@@ -428,6 +428,9 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
             if (serviceName == null) {
                 setServiceName(serverFactory.getServiceFactory().getServiceQName());
             }
+            if (endpointName == null) {
+                endpointName = endpoint.getEndpointInfo().getName();
+            }
 
         }
         return (ServerImpl) server;
