@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.type_substitution;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
@@ -33,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {    
+    public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/type_substitution/",
                                                 "CarDealerService");
@@ -90,13 +92,15 @@ public class TypeSubClientServerTest extends AbstractBusClientServerTestBase {
         }
     }
 
-    private CarDealer getCardealer() {
+    private CarDealer getCardealer() throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl/cardealer.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         CarDealerService service = new CarDealerService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
         
-        return service.getCarDealerPort();
+        CarDealer dealer = service.getCarDealerPort();
+        updateAddressPort(dealer, PORT);
+        return dealer;
     }
 }

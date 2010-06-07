@@ -37,6 +37,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ValidationClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = ValidationServer.PORT;
 
     private final QName serviceName = new QName("http://apache.org/schema_validation",
                                                 "SchemaValidationService");
@@ -60,6 +61,7 @@ public class ValidationClientServerTest extends AbstractBusClientServerTestBase 
         assertNotNull(service);
 
         SchemaValidation validation = service.getPort(portName, SchemaValidation.class);
+        updateAddressPort(validation, PORT);
         ((BindingProvider)validation).getRequestContext()
             .put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.TRUE);
 

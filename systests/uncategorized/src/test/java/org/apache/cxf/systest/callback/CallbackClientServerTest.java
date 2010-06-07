@@ -22,37 +22,30 @@ package org.apache.cxf.systest.callback;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 import javax.xml.ws.Endpoint;
+import javax.xml.ws.EndpointReference;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.callback.SOAPService;
 import org.apache.callback.ServerPortType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
+    public static final String CB_PORT = allocatePort(CallbackClientServerTest.class);
+    
     private static final QName SERVICE_NAME 
         = new QName("http://apache.org/callback", "SOAPService");
-    private static final QName SERVICE_NAME_CALLBACK 
-        = new QName("http://apache.org/callback", "CallbackService");
 
     private static final QName PORT_NAME 
         = new QName("http://apache.org/callback", "SOAPPort");
-
-    private static final QName PORT_NAME_CALLBACK 
-        = new QName("http://apache.org/callback", "CallbackPort");
-    
-    private static final QName PORT_TYPE_CALLBACK
-        = new QName("http://apache.org/callback", "CallbackPortType");
     
     
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(Server.class));
+        assertTrue("server did not launch correctly", launchServer(Server.class, true));
     }
 
     @Test
@@ -60,28 +53,18 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
 
                     
         Object implementor = new CallbackImpl();
-        String address = "http://localhost:9005/CallbackContext/CallbackPort";
-        Endpoint.publish(address, implementor);
+        String address = "http://localhost:" + CB_PORT + "/CallbackContext/CallbackPort";
+        Endpoint ep = Endpoint.publish(address, implementor);
     
         URL wsdlURL = getClass().getResource("/wsdl/basic_callback_test.wsdl");
     
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getPort(PORT_NAME, ServerPortType.class);
+        updateAddressPort(port, PORT);
    
-        EndpointReferenceType ref = null;
-        try {
-            ref = EndpointReferenceUtils.getEndpointReference(wsdlURL, 
-                                                              SERVICE_NAME_CALLBACK, 
-                                                              PORT_NAME_CALLBACK.getLocalPart());
-            EndpointReferenceUtils.setInterfaceName(ref, PORT_TYPE_CALLBACK);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        
-       
-        Source source = EndpointReferenceUtils.convertToXML(ref);
-        W3CEndpointReference  w3cEpr = new W3CEndpointReference(source);              
-        String resp = port.registerCallback(w3cEpr);
+
+        EndpointReference w3cEpr = ep.getEndpointReference();              
+        String resp = port.registerCallback((W3CEndpointReference)w3cEpr);
         assertEquals("registerCallback called", resp);
             
     }

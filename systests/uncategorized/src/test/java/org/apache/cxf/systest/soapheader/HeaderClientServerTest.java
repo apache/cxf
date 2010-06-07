@@ -42,6 +42,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://cxf.apache.org/pizza", "PizzaService");
 
@@ -53,7 +54,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBasicConnection() throws Exception {
         Pizza port = getPort();
-
+        updateAddressPort(port, PORT);
         OrderPizzaType req = new OrderPizzaType();
         ToppingsListType t = new ToppingsListType();
         t.getTopping().add("test");
@@ -70,6 +71,7 @@ public class HeaderClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testBasicConnectionNoHeader() throws Exception {
         PizzaNoHeader port = getPortNoHeader();
+        updateAddressPort(port, PORT);
 
         OrderPizzaType req = new OrderPizzaType();
         ToppingsListType t = new ToppingsListType();

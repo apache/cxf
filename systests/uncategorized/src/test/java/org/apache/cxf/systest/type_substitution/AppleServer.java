@@ -27,10 +27,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
  *
  */
 public class AppleServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(AppleServer.class);
     protected void run()  {
         Object implementor = new AppleFinderImpl();
-        Endpoint.publish("http://localhost:9052/appleFind", implementor);
+        Endpoint.publish("http://localhost:" + PORT + "/appleFind", implementor);
     }
 
 

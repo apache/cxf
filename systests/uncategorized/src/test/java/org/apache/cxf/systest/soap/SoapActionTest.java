@@ -25,6 +25,7 @@ import org.apache.cxf.binding.soap.Soap12;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_action.Greeter;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -32,9 +33,12 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class SoapActionTest extends Assert {
+    static final String PORT1 = TestUtil.getPortNumber(SoapActionTest.class, 1);
+    static final String PORT2 = TestUtil.getPortNumber(SoapActionTest.class, 2);
+    
     static Bus bus;
-    static String add11 = "http://localhost:9036/test11";
-    static String add12 = "http://localhost:9036/test12";
+    static String add11 = "http://localhost:" + PORT1 + "/test11";
+    static String add12 = "http://localhost:" + PORT2 + "/test12";
 
 
     @BeforeClass

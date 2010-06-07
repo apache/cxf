@@ -32,7 +32,8 @@ import org.junit.Test;
  * 
  */
 public class AppleFindClientServerTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = AppleServer.PORT;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(AppleServer.class));
@@ -45,7 +46,7 @@ public class AppleFindClientServerTest extends AbstractBusClientServerTestBase {
         QName portName = new QName("http://type_substitution.systest.cxf.apache.org/", "AppleFinderPort");
 
         Service service = Service.create(serviceName);
-        String endpointAddress = "http://localhost:9052/appleFind";
+        String endpointAddress = "http://localhost:" + PORT + "/appleFind";
 
         service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, endpointAddress);
 

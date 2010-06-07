@@ -28,7 +28,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.type_test.xml.TypeTestPortType;
 
 public class XMLServerImpl extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(XMLServerImpl.class);
     public void run()  {
         SpringBusFactory sf = new SpringBusFactory();
         BusFactory.setDefaultBus(null);
@@ -36,7 +36,7 @@ public class XMLServerImpl extends AbstractBusTestServerBase {
             sf.createBus("org/apache/cxf/systest/type_test/databinding-schema-validation.xml"));
 
         Object implementor = new XMLTypeTestImpl();
-        String address = "http://localhost:9008/XMLService/XMLPort/";
+        String address = "http://localhost:" + PORT + "/XMLService/XMLPort/";
         Endpoint.publish(address, implementor);
     }
 

@@ -24,10 +24,11 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run()  {
         Object implementor = new PizzaImpl();
-        String address = "http://localhost:9013/pizza_service/services/PizzaService";
+        String address = "http://localhost:" + PORT + "/pizza_service/services/PizzaService";
         Endpoint.publish(address, implementor);
     }
 

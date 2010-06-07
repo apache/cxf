@@ -23,6 +23,7 @@ package org.apache.cxf.systest.soap12;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -45,6 +46,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {    
+    public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap12_http",
                                                 "SOAPService");
@@ -82,7 +84,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetSayHi() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9012/SoapContext/SoapPort/sayHi");    
+            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/sayHi");    
         httpConnection.connect();        
         
         InputStream in = httpConnection.getInputStream();        
@@ -106,7 +108,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetPingMe() throws Exception  {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9012/SoapContext/SoapPort/pingMe");    
+            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/pingMe");    
         httpConnection.connect();
         
         assertEquals(500, httpConnection.getResponseCode());
@@ -147,7 +149,7 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetMethodNotExist() throws Exception  {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9012/SoapContext/SoapPort/greetMe");
+            getHttpConnection("http://localhost:" + PORT + "/SoapContext/SoapPort/greetMe");
         httpConnection.connect();
         
         assertEquals(500, httpConnection.getResponseCode());
@@ -177,14 +179,16 @@ public class Soap12ClientServerTest extends AbstractBusClientServerTestBase {
     }
     
 
-    private Greeter getGreeter() {
+    private Greeter getGreeter() throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl/hello_world_soap12.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is ull ", service);
         
-        return service.getPort(portName, Greeter.class);
+        Greeter g = service.getPort(portName, Greeter.class);
+        updateAddressPort(g, PORT);
+        return g;
     }
 
 }
