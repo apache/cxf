@@ -223,6 +223,9 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
                     continue;
                 }
                 Object arg = objs.get(part);
+                if (arg == null) {
+                    continue;
+                }
                 objs.remove(part);
                 if (!(startedHeader || preexistingHeaders)) {
                     try {
