@@ -31,11 +31,14 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.apache.cxf.management.ManagementConstants;
 import org.apache.cxf.management.jmx.InstrumentationManagerImpl;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.junit.Assert;
 import org.junit.Test;
 
 public class ManagedBusTest extends Assert {
+    public static final String JMX_PORT1 = TestUtil.getPortNumber("Server.1");
+    public static final String JMX_PORT2 = TestUtil.getPortNumber(ManagedBusTest.class, 3);
 
     @Test
     public void testManagedSpringBus() throws Exception {
@@ -45,7 +48,8 @@ public class ManagedBusTest extends Assert {
         assertNotNull(im);
                 
         InstrumentationManagerImpl imi = (InstrumentationManagerImpl)im;
-        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi", imi.getJMXServiceURL());
+        assertEquals("service:jmx:rmi:///jndi/rmi://localhost:9913/jmxrmi", 
+                     imi.getJMXServiceURL());
         assertTrue(!imi.isEnabled());
         assertNull(imi.getMBeanServer());
         
@@ -59,14 +63,14 @@ public class ManagedBusTest extends Assert {
     public void testManagedBusWithTransientId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/management/managed-spring.xml", true);
-        doManagedBusTest(bus, bus.getId(), "cxf_managed_bus_test", 9916);
+        doManagedBusTest(bus, bus.getId(), "cxf_managed_bus_test", Integer.parseInt(JMX_PORT1));
     }
     
     @Test
     public void testManagedBusWithPersistentId() throws Exception {
         SpringBusFactory factory = new SpringBusFactory();
         Bus bus = factory.createBus("org/apache/cxf/systest/management/persistent-id.xml", true);
-        doManagedBusTest(bus, "cxf_managed_bus_test", bus.getId(), 9917);
+        doManagedBusTest(bus, "cxf_managed_bus_test", bus.getId(), Integer.parseInt(JMX_PORT2));
     }
     
     private void doManagedBusTest(Bus bus, String expect, String reject, int port) throws Exception {

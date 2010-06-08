@@ -34,7 +34,10 @@ import org.junit.Test;
 
 
 public class JSClientServerTest extends AbstractBusClientServerTestBase {
-
+    
+    public static final String JS_PORT = Server.JS_PORT;
+    public static final String JSX_PORT = Server.JSX_PORT;
+    
     private static final String NS = "http://apache.org/hello_world_soap_http";
     
     @BeforeClass
@@ -57,6 +60,7 @@ public class JSClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("TestSayHiResponse");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            updateAddressPort(greeter, JS_PORT);
             String greeting = greeter.greetMe("TestGreetMeRequest");
             assertNotNull("no response received from service", greeting);
             assertEquals(response1, greeting);
@@ -85,6 +89,7 @@ public class JSClientServerTest extends AbstractBusClientServerTestBase {
         String response2 = new String("TestSayHiResponse");
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            updateAddressPort(greeter, JSX_PORT);
             String greeting = greeter.greetMe("TestGreetMeRequest");
             assertNotNull("no response received from service", greeting);
             assertEquals(response1, greeting);

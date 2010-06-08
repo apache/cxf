@@ -44,7 +44,10 @@ import org.junit.Test;
 
 
 public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = allocatePort(Server.class);
+    public static final String JMX_PORT = allocatePort(Server.class, 1);
+    
+    
     private final QName portName =
         new QName("http://apache.org/hello_world_soap_http",
                   "SoapPort");
@@ -56,7 +59,8 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
             Bus bus = bf.createBus("org/apache/cxf/systest/management/managed-spring.xml", true);
             BusFactory.setDefaultBus(bus);
             Object implementor = new GreeterImpl();
-            Endpoint.publish(null, implementor);
+            Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
+                implementor);
         }
 
         public static void main(String[] args) {
@@ -105,7 +109,7 @@ public class ManagedClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         Greeter greeter = service.getPort(portName, Greeter.class);
-
+        updateAddressPort(greeter, PORT);
         String response = new String("Bonjour");
         String reply = greeter.sayHi();
         assertNotNull("no response received from service", reply);

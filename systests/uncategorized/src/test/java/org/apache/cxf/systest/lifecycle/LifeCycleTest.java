@@ -34,6 +34,7 @@ import org.apache.cxf.endpoint.ServerLifeCycleListener;
 import org.apache.cxf.endpoint.ServerLifeCycleManager;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.greeter_control.ControlImpl;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 import org.junit.After;
@@ -42,12 +43,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class LifeCycleTest extends Assert {
+    public static final String PORT1 = TestUtil.getPortNumber(LifeCycleTest.class, 1);
+    public static final String PORT2 = TestUtil.getPortNumber(LifeCycleTest.class, 2);
+    public static final String PORT3 = TestUtil.getPortNumber(LifeCycleTest.class, 3);
+    public static final String PORT4 = TestUtil.getPortNumber(LifeCycleTest.class, 4);
+    
     private static final int RECURSIVE_LIMIT = 3;
     private static final String[] ADDRESSES = 
-    {"http://localhost:9056/SoapContext/SoapPort",
-     "http://localhost:9057/SoapContext/SoapPort",
-     "http://localhost:9058/SoapContext/SoapPort",
-     "http://localhost:9059/SoapContext/SoapPort"};
+    {"http://localhost:" + PORT1 + "/SoapContext/SoapPort",
+     "http://localhost:" + PORT2 + "/SoapContext/SoapPort",
+     "http://localhost:" + PORT3 + "/SoapContext/SoapPort",
+     "http://localhost:" + PORT4 + "/SoapContext/SoapPort"};
     private static final String CONFIG =
         "org/apache/cxf/systest/lifecycle/cxf.xml";
 

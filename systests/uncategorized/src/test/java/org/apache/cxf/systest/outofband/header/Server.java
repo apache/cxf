@@ -33,6 +33,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
 
     Bus bus;
 
@@ -55,7 +56,7 @@ public class Server extends AbstractBusTestServerBase {
                                                    "SOAPService"));
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         ep.setProperties(props);
-        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPort");
+        ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort");
         
         ep = Endpoint.create(implementor);
         props = new HashMap<String, Object>(2);
@@ -64,7 +65,7 @@ public class Server extends AbstractBusTestServerBase {
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         props.put("endpoint-processes-headers", "");
         ep.setProperties(props);
-        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortNoHeader");
+        ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortNoHeader");
         
         ep = Endpoint.create(implementor);
         props = new HashMap<String, Object>(2);
@@ -73,7 +74,7 @@ public class Server extends AbstractBusTestServerBase {
         props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
         props.put("endpoint-processes-headers", "{http://cxf.apache.org/outofband/Header}outofbandHeader");
         ep.setProperties(props);
-        ep.publish("http://localhost:9107/SOAPDocLitBareService/SoapPortHeader");
+        ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader");
 
     }
 

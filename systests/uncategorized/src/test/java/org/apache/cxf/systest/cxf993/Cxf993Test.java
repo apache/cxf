@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.cxf993;
 
+import java.net.MalformedURLException;
 import java.net.URL;
 import javax.xml.namespace.QName;
 
@@ -30,7 +31,7 @@ import testnotification.NotificationServicePort;
 import testnotification.SendNotification;
 
 public class Cxf993Test extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("urn://testnotification", "NotificationService");
 
     @BeforeClass
@@ -43,13 +44,16 @@ public class Cxf993Test extends AbstractBusClientServerTestBase {
         assertEquals("dummy", getPort().sendNotification(new SendNotification()));
     }
 
-    private NotificationServicePort getPort() {
+    private NotificationServicePort getPort() 
+        throws NumberFormatException, MalformedURLException {
         URL wsdl = getClass().getResource("/wsdl_systest/cxf-993.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         NotificationService service = new NotificationService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
 
-        return service.getNotificationServicePort();
+        NotificationServicePort port =  service.getNotificationServicePort();
+        updateAddressPort(port, PORT);
+        return port;
     }
 }

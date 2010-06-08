@@ -26,11 +26,12 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PERSIST_PORT = allocatePort(Server.class);
     
     protected void run()  {
         System.out.println("Starting Server");
         System.setProperty("com.sun.CORBA.POA.ORBServerId", "1");
-        System.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", "40000");
+        System.setProperty("com.sun.CORBA.POA.ORBPersistentServerPort", PERSIST_PORT);
         new SpringBusFactory().createBus("org/apache/cxf/systest/corba/hello_world_server.xml");
         Object implementor = new BaseGreeterImpl();
         String address = "file:./HelloWorld.ref";

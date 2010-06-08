@@ -24,10 +24,10 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(Server.class);
     protected void run() {
         Object implementor = new RestSourcePayloadProvider();
-        String address = "http://localhost:9023/XMLService/RestProviderPort/Customer";
+        String address = "http://localhost:" + PORT + "/XMLService/RestProviderPort/Customer";
         Endpoint.publish(address, implementor);
     }
     

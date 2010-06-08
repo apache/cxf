@@ -41,6 +41,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -53,7 +54,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MtomServerTest extends AbstractCXFTest {
-
+    public static final String PORT = TestUtil.getPortNumber(MtomServerTest.class);
 
     private static final String HTTP_ID = "http://schemas.xmlsoap.org/wsdl/http/";
 
@@ -72,7 +73,7 @@ public class MtomServerTest extends AbstractCXFTest {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new EchoService());
         sf.setBus(getBus());
-        String address = "http://localhost:9036/EchoService";
+        String address = "http://localhost:" + PORT + "/EchoService";
         sf.setAddress(address);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Message.MTOM_ENABLED, "true");
@@ -134,7 +135,7 @@ public class MtomServerTest extends AbstractCXFTest {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.setServiceBean(new EchoService());
         sf.setBus(getBus());
-        String address = "http://localhost:9036/EchoService";
+        String address = "http://localhost:" + PORT + "/EchoService";
         sf.setAddress(address);
         Map<String, Object> props = new HashMap<String, Object>();
         props.put(Message.MTOM_ENABLED, "true");
@@ -143,7 +144,7 @@ public class MtomServerTest extends AbstractCXFTest {
         server.getEndpoint().getService().getDataBinding().setMtomThreshold(0);
 
         servStatic(getClass().getResource("mtom-policy.xml"),
-                   "http://localhost:9036/policy.xsd");
+                   "http://localhost:" + PORT + "/policy.xsd");
 
         EndpointInfo ei = new EndpointInfo(null, HTTP_ID);
         ei.setAddress(address);
@@ -169,9 +170,12 @@ public class MtomServerTest extends AbstractCXFTest {
         if (is == null) {
             throw new RuntimeException("Could not find resource " + "request");
         }
+        ByteArrayOutputStream bout = new ByteArrayOutputStream();
+        IOUtils.copy(is, bout);
+        String s = bout.toString("UTF-8");
+        s = s.replaceAll(":9036/", ":" + PORT + "/");
 
-        IOUtils.copy(is, os);
-
+        os.write(s.getBytes("UTF-8"));
         os.flush();
         is.close();
         os.close();
@@ -195,7 +199,7 @@ public class MtomServerTest extends AbstractCXFTest {
         assertTrue("Wrong size: " + out.size()
                    + "\n" + out.toString(),
                    out.size() > 970 && out.size() < 1020);
-        unregisterServStatic("http://localhost:9036/policy.xsd");
+        unregisterServStatic("http://localhost:" + PORT + "/policy.xsd");
 
     }
 

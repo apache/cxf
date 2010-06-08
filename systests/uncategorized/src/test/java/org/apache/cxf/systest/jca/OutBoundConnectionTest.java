@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
                                                 "SOAPService");
     
@@ -47,10 +48,10 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
                                              "SoapPort");
 
     public static class Server extends AbstractBusTestServerBase {        
-        
+        public static final String PORT = allocatePort(Server.class);
         protected void run() {
             Object implementor = new GreeterImpl();
-            String address = "http://localhost:9000/SoapContext/SoapPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             Endpoint.publish(address, implementor);
             
         }
@@ -85,6 +86,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
                                            wsdl,
                                            service.getServiceName(),
                                            portName);
+        cri.setAddress("http://localhost:" + PORT + "/SoapContext/SoapPort");
         ManagedConnectionFactory managedFactory = new ManagedConnectionFactoryImpl();
         Subject subject = new Subject();
         ManagedConnection mc = managedFactory.createManagedConnection(subject, cri);        
@@ -106,7 +108,7 @@ public class OutBoundConnectionTest extends AbstractBusClientServerTestBase {
     public void testGetConnectionFromSEI() throws Exception {
         CXFConnectionRequestInfo requestInfo = new CXFConnectionRequestInfo();
         requestInfo.setInterface(Greeter.class);
-        requestInfo.setAddress("http://localhost:9000/SoapContext/SoapPort");
+        requestInfo.setAddress("http://localhost:" + PORT + "/SoapContext/SoapPort");
         
         ManagedConnectionFactory factory = new ManagedConnectionFactoryImpl();
         ManagedConnection mc = factory.createManagedConnection(null, requestInfo);

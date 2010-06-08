@@ -51,6 +51,7 @@ import org.junit.Test;
 
 
 public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServer.PORT;
     static final Logger LOG = LogUtils.getLogger(RestClientServerBookTest.class);
 
     @BeforeClass
@@ -68,7 +69,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
 
         // Use the HTTP Binding which understands the Java Rest Annotations
         sf.getClientFactoryBean().setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sf.setAddress("http://localhost:9080/xml/");
+        sf.setAddress("http://localhost:" + PORT + "/xml/");
         BookService bs = (BookService)sf.create();
         GetBook getBook = new GetBook();
         getBook.setId(123);
@@ -87,7 +88,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
 
         // Use the HTTP Binding which understands the Java Rest Annotations
         sf.getClientFactoryBean().setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sf.setAddress("http://localhost:9080/xml/");
+        sf.setAddress("http://localhost:" + PORT + "/xml/");
         BookService bs = (BookService)sf.create();
         GetAnotherBook getAnotherBook = new GetAnotherBook();
         getAnotherBook.setId(123);
@@ -104,7 +105,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
 
         // Use the HTTP Binding which understands the Java Rest Annotations
         sf.getClientFactoryBean().setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sf.setAddress("http://localhost:9080/xmlwrapped/");
+        sf.setAddress("http://localhost:" + PORT + "/xmlwrapped/");
         BookServiceWrapped bs = (BookServiceWrapped)sf.create();
         Book book = bs.getBook(123);
         assertEquals(book.getId(), (long)123);
@@ -114,7 +115,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookWrappedUsingURL() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/xmlwrapped/books/123"; 
+            "http://localhost:" + PORT + "/xmlwrapped/books/123"; 
         URL url = new URL(endpointAddress);
         InputStream in = url.openStream();
         assertNotNull(in);           
@@ -138,7 +139,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBooksJSON() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/json/books"; 
+            "http://localhost:" + PORT + "/json/books"; 
         URL url = new URL(endpointAddress);
         InputStream in = url.openStream();
         assertNotNull(in);           
@@ -151,7 +152,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetBookJSON() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/json/books/123"; 
+            "http://localhost:" + PORT + "/json/books/123"; 
         URL url = new URL(endpointAddress);
         InputStream in = url.openStream();
         assertNotNull(in);           
@@ -164,7 +165,7 @@ public class RestClientServerBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testAddBookJSON() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/json/books"; 
+            "http://localhost:" + PORT + "/json/books"; 
 
         File input = new File(getClass().getResource("resources/add_book_json.txt").toURI());         
         PostMethod post = new PostMethod(endpointAddress);

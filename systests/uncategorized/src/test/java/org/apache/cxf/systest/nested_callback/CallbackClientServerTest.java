@@ -37,6 +37,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
+    public static final String CB_PORT = allocatePort(CallbackClientServerTest.class);
+    
     private static final QName SERVICE_NAME 
         = new QName("http://apache.org/nested_callback", "SOAPService");
     private static final QName SERVICE_NAME_CALLBACK 
@@ -62,13 +65,14 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
 
                     
         Object implementor = new CallbackImpl();
-        String address = "http://localhost:9005/CallbackContext/NestedCallbackPort";
+        String address = "http://localhost:" + CB_PORT + "/CallbackContext/NestedCallbackPort";
         Endpoint.publish(address, implementor);
     
         URL wsdlURL = getClass().getResource("/wsdl/nested_callback.wsdl");
     
         SOAPService ss = new SOAPService(wsdlURL, SERVICE_NAME);
         ServerPortType port = ss.getPort(PORT_NAME, ServerPortType.class);
+        updateAddressPort(port, PORT);
    
         EndpointReferenceType ref = null;
         try {
@@ -76,6 +80,7 @@ public class CallbackClientServerTest extends AbstractBusClientServerTestBase {
                                                               SERVICE_NAME_CALLBACK, 
                                                               PORT_NAME_CALLBACK.getLocalPart());
             EndpointReferenceUtils.setInterfaceName(ref, PORT_TYPE_CALLBACK);
+            EndpointReferenceUtils.setAddress(ref, address);
         } catch (Exception e) {
             e.printStackTrace();
         }

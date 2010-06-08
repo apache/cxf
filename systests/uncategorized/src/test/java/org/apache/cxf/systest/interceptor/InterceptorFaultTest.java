@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.interceptor;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -62,6 +63,8 @@ import org.junit.Test;
  * 
  */
 public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    
     private static final Logger LOG = LogUtils.getLogger(InterceptorFaultTest.class);
 
     private static final QName SOAP_FAULT_CODE = new QName("http://schemas.xmlsoap.org/soap/envelope/",
@@ -69,9 +72,9 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
     private static final String FAULT_MESSAGE = "Could not send Message.";
     
     private static final String CONTROL_PORT_ADDRESS = 
-        "http://localhost:9001/SoapContext/ControlPort";
+        "http://localhost:" + PORT + "/SoapContext/ControlPort";
     
-    private static int decoupledEndpointPort = 10000;
+    private static int decoupledEndpointPort = 1;
     private static String decoupledEndpoint;
     
 
@@ -93,6 +96,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
             setBus(bus);
 
             ControlImpl implementor = new ControlImpl();
+            implementor.setAddress("http://localhost:" + PORT + "/SoapContext/GreeterPort");
             GreeterImpl greeterImplementor = new GreeterImpl();
             greeterImplementor.setThrowAlways(true);
             implementor.setImplementor(greeterImplementor);
@@ -286,7 +290,8 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
    
     
     
-    private void setupGreeter(String cfgResource, boolean useDecoupledEndpoint) {
+    private void setupGreeter(String cfgResource, boolean useDecoupledEndpoint) 
+        throws NumberFormatException, MalformedURLException {
         
         SpringBusFactory bf = new SpringBusFactory();
         
@@ -295,6 +300,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
         ControlService cs = new ControlService();
         control = cs.getControlPort();
+        updateAddressPort(control, PORT);
         
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));
         
@@ -317,6 +323,7 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
         GreeterService gs = new GreeterService();
 
         greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
        
         if (!useDecoupledEndpoint) {
@@ -325,9 +332,10 @@ public class InterceptorFaultTest extends AbstractBusClientServerTestBase {
 
         // programatically configure decoupled endpoint that is guaranteed to
         // be unique across all test cases
-        
-        decoupledEndpointPort--;
-        decoupledEndpoint = "http://localhost:" + decoupledEndpointPort + "/decoupled_endpoint";
+        decoupledEndpointPort++;
+        decoupledEndpoint = "http://localhost:" 
+            + allocatePort("decoupled-" + decoupledEndpointPort)
+            + "/decoupled_endpoint";
 
         Client c = ClientProxy.getClient(greeter);
         HTTPConduit hc = (HTTPConduit)(c.getConduit());

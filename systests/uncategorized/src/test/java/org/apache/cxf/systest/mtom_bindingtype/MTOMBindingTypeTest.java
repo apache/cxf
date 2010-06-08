@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
 
     private final QName serviceName = new QName("http://apache.org/cxf/systest/mtom_feature",
                                                 "HelloService");
@@ -129,6 +130,14 @@ public class MTOMBindingTypeTest extends AbstractBusClientServerTestBase {
 
         HelloService service = new HelloService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        return service.getHelloPort();
+        Hello hello = service.getHelloPort();
+        try {
+            updateAddressPort(hello, PORT);
+        } catch (Exception ex) {
+            //ignore
+        }
+        
+        return hello;
+        
     }
 }

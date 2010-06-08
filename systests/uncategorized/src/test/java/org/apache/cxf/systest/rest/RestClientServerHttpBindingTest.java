@@ -44,6 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class RestClientServerHttpBindingTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = HttpBindingServer.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_xml_http/wrapped",
                                                 "XMLService");
 
@@ -51,7 +52,7 @@ public class RestClientServerHttpBindingTest extends AbstractBusClientServerTest
                                              "RestProviderPort");
 
     private final String endpointAddress =
-        "http://localhost:9024/XMLService/RestProviderPort/Customer"; 
+        "http://localhost:" + PORT + "/XMLService/RestProviderPort/Customer"; 
    
     @BeforeClass
     public static void startServers() throws Exception {

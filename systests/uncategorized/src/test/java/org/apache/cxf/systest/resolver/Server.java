@@ -25,9 +25,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
     protected void run() {
         Object implementor = new GreeterImpl();
-        String address = "http://localhost:9000/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
     }

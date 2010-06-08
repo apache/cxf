@@ -26,7 +26,7 @@ import org.junit.Test;
 
 
 public class ColocWrappedDocLitTest extends AbstractWrappedDocLitTest {
-    static final String TRANSPORT_URI = "http://localhost:9000/SoapContext/SoapPort";
+    static final String TRANSPORT_URI = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private Log logger = LogFactory.getLog(ColocWrappedDocLitTest.class);
 
