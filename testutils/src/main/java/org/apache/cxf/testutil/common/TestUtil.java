@@ -30,7 +30,9 @@ import java.util.Properties;
 
 
 public final class TestUtil {
-    static Properties ports = new Properties();
+    private static boolean useRandomPorts = Boolean.getBoolean("useRandomPorts");
+    private static int portNum = 9000;
+    private static Properties ports = new Properties();
     
     private TestUtil() {
         //Complete
@@ -96,15 +98,19 @@ public final class TestUtil {
             }
         }
         if (p == null) {
-            try {
-                ServerSocket sock = new ServerSocket(0);
-                p = Integer.toString(sock.getLocalPort());
-                ports.put("testutil.ports." + name, p);
-                System.setProperty("testutil.ports." + name, p);
-                sock.close();
-            } catch (IOException ex) {
-                //
+            if (useRandomPorts) {
+                try {
+                    ServerSocket sock = new ServerSocket(0);
+                    p = Integer.toString(sock.getLocalPort());
+                    sock.close();
+                } catch (IOException ex) {
+                    //
+                }
+            } else {
+                p = Integer.toString(portNum++);
             }
+            ports.put("testutil.ports." + name, p);
+            System.setProperty("testutil.ports." + name, p);
         }
         return p;
     }
