@@ -29,8 +29,11 @@ under the License.
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         ">
 
+	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+	
+
     <httpj:engine-factory id="port-9095-tls-config">
-        <httpj:engine port="9095">
+        <httpj:engine port="${testutil.ports.jaxrs-https}">
             <httpj:tlsServerParameters>
                <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
@@ -64,7 +67,7 @@ under the License.
     <!-- -->
     <!-- HTTP/S configuration for web clients -->
     <!-- -->
-    <http:conduit name="{https://localhost:9095}WebClient.http-conduit">
+    <http:conduit name="\{https://localhost\:.*\}WebClient\.http-conduit">
         <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">

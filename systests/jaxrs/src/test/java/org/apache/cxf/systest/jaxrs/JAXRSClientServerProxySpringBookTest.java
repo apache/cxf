@@ -31,6 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServerProxySpring.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -42,7 +43,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     public void testGetBookNotFound() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/test/bookstore/books/12345"; 
+            "http://localhost:" + PORT + "/test/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
         connect.addRequestProperty("Accept", "text/plain,application/xml");
@@ -60,43 +61,43 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetThatBook123() throws Exception {
-        getBook("http://localhost:9080/test/bookstorestorage/thosebooks/123");
+        getBook("http://localhost:" + PORT + "/test/bookstorestorage/thosebooks/123");
     }
     
     @Test
     public void testGetThatBookSingleton() throws Exception {
-        getBook("http://localhost:9080/test/4/bookstore/books/123");
-        getBook("http://localhost:9080/test/4/bookstore/books/123");
+        getBook("http://localhost:" + PORT + "/test/4/bookstore/books/123");
+        getBook("http://localhost:" + PORT + "/test/4/bookstore/books/123");
     }
     
     @Test
     public void testGetThatBookInterfaceSingleton() throws Exception {
-        getBook("http://localhost:9080/test/4/bookstorestorage/thosebooks/123");
+        getBook("http://localhost:" + PORT + "/test/4/bookstorestorage/thosebooks/123");
     }
     
     @Test
     public void testGetThatBookPrototype() throws Exception {
-        getBook("http://localhost:9080/test/5/bookstore/books/123");
+        getBook("http://localhost:" + PORT + "/test/5/bookstore/books/123");
     }
     
     @Test
     public void testGetThatBookInterfacePrototype() throws Exception {
-        getBook("http://localhost:9080/test/5/bookstorestorage/thosebooks/123");
+        getBook("http://localhost:" + PORT + "/test/5/bookstorestorage/thosebooks/123");
     }
     
     @Test
     public void testGetThatBookInterface2Prototype() throws Exception {
-        getBook("http://localhost:9080/test/6/bookstorestorage/thosebooks/123");
+        getBook("http://localhost:" + PORT + "/test/6/bookstorestorage/thosebooks/123");
     }
     
     @Test
     public void testGetThatBook123UserResource() throws Exception {
-        getBook("http://localhost:9080/test/2/bookstore/books/123");
+        getBook("http://localhost:" + PORT + "/test/2/bookstore/books/123");
     }
     
     @Test
     public void testGetThatBook123UserResourceInterface() throws Exception {
-        getBook("http://localhost:9080/test/3/bookstore2/books/123");
+        getBook("http://localhost:" + PORT + "/test/3/bookstore2/books/123");
     }
     
     private void getBook(String endpointAddress) throws Exception {
@@ -113,18 +114,18 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
     
     @Test
     public void testGetThatBookOverloaded() throws Exception {
-        getBook("http://localhost:9080/test/bookstorestorage/thosebooks/123/123");
+        getBook("http://localhost:" + PORT + "/test/bookstorestorage/thosebooks/123/123");
     }
     
     @Test
     public void testGetThatBookOverloaded2() throws Exception {
-        getBook("http://localhost:9080/test/bookstorestorage/thosebooks");
+        getBook("http://localhost:" + PORT + "/test/bookstorestorage/thosebooks");
     }
     
     @Test
     public void testGetBook123() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/test/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/test/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");

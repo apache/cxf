@@ -26,9 +26,11 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.systest.jaxrs.BookStore;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
     
 public class BookHttpsServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = TestUtil.getPortNumber("jaxrs-https");
+    
     private static final String SERVER_CONFIG_FILE =
         "org/apache/cxf/systest/jaxrs/security/jaxrs-https.xml";
     
@@ -43,7 +45,7 @@ public class BookHttpsServer extends AbstractBusTestServerBase {
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore()));
-        sf.setAddress("https://localhost:9095/");
+        sf.setAddress("https://localhost:" + PORT + "/");
 
         sf.create();        
     }

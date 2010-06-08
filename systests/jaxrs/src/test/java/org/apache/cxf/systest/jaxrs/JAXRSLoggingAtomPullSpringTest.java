@@ -51,6 +51,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase {
+    public static final String PORT = SpringServer.PORT;
 
     private static JAXBContext context; 
     private int fakyLogger;
@@ -87,17 +88,17 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testFeed() throws Exception {
-        String listing = WebClient.create("http://localhost:9080/services").get(String.class);
-        assertTrue(listing, listing.contains("http://localhost:9080/atom/logs"));
-        WebClient wc = WebClient.create("http://localhost:9080/resource/root");
+        String listing = WebClient.create("http://localhost:" + PORT + "/services").get(String.class);
+        assertTrue(listing, listing.contains("http://localhost:" + PORT + "/atom/logs"));
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource/root");
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        checkSimpleFeed(getFeed("http://localhost:9080/atom/logs").getEntries());
-        checkSimpleFeed(getFeed("http://localhost:9080/atom/logs").getEntries());
+        checkSimpleFeed(getFeed("http://localhost:" + PORT + "/atom/logs").getEntries());
+        checkSimpleFeed(getFeed("http://localhost:" + PORT + "/atom/logs").getEntries());
      
         List<Entry> entries = new LinkedList<Entry>();
-        WebClient wcEntry = WebClient.create("http://localhost:9080/atom/logs",
+        WebClient wcEntry = WebClient.create("http://localhost:" + PORT + "/atom/logs",
             Collections.singletonList(new AtomEntryProvider()))
             .accept("application/atom+xml;type=entry");
         HTTPConduit conduit = WebClient.getConfig(wcEntry).getHttpConduit();
@@ -125,35 +126,38 @@ public class JAXRSLoggingAtomPullSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testPagedFeed() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/resource2/paged");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource2/paged");
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        verifyPages("http://localhost:9080/atom2/logs", "next", 3, 2, "theNamedLogger");
-        verifyPages("http://localhost:9080/atom2/logs/3", "previous", 2, 3, "theNamedLogger");
+        verifyPages("http://localhost:" + PORT + "/atom2/logs", "next", 3, 2, "theNamedLogger");
+        verifyPages("http://localhost:" + PORT + "/atom2/logs/3", "previous", 2, 3, "theNamedLogger");
     }
     
     @Test
     public void testPagedFeedWithReadWriteStorage() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/resource3/storage");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/resource3/storage");
         HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
         conduit.getClient().setConnectionTimeout(1000000);
         wc.path("/log").get();
         Thread.sleep(3000);
         
-        verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
+        verifyStoragePages("http://localhost:" 
+                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger");
         List<org.apache.cxf.management.web.logging.LogRecord> list = Storage.getRecords();
         assertEquals(4, list.size());
-        verifyStoragePages("http://localhost:9080/atom3/logs", "next", "Resource3", "theStorageLogger");
-        verifyStoragePages("http://localhost:9080/atom3/logs/2", "previous", "Resource3", 
+        verifyStoragePages("http://localhost:" 
+                           + PORT + "/atom3/logs", "next", "Resource3", "theStorageLogger");
+        verifyStoragePages("http://localhost:" + PORT + "/atom3/logs/2", "previous", "Resource3", 
                            "theStorageLogger");
     }
     
     @Test
     public void testPagedFeedWithReadOnlyStorage() throws Exception {
-        verifyStoragePages("http://localhost:9080/atom4/logs", "next", "Resource4", "readOnlyStorageLogger");
-        verifyStoragePages("http://localhost:9080/atom4/logs/2", "previous", "Resource4", 
+        verifyStoragePages("http://localhost:" 
+                           + PORT + "/atom4/logs", "next", "Resource4", "readOnlyStorageLogger");
+        verifyStoragePages("http://localhost:" + PORT + "/atom4/logs/2", "previous", "Resource4", 
                            "readOnlyStorageLogger");
     }
     

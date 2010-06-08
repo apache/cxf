@@ -31,6 +31,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(AbstractSpringServer.class);
 
     private org.mortbay.jetty.Server server;
     private String resourcePath;
@@ -38,11 +39,14 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
     private int port;
     
     protected AbstractSpringServer(String path) {
-        this(path, "/", 9080);
+        this(path, "/", Integer.parseInt(PORT));
     }
     
     protected AbstractSpringServer(String path, int portNumber) {
         this(path, "/", portNumber);
+    }
+    protected AbstractSpringServer(String path, String cPath) {
+        this(path, cPath, Integer.parseInt(PORT));
     }
     
     protected AbstractSpringServer(String path, String cPath, int portNumber) {

@@ -46,6 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase {
+    public static final String PORT = SpringServer.PORT;
 
     private JAXBContext context; 
     private int fakyLogger;
@@ -80,7 +81,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
 
     @Test
     public void testFeedsWithLogRecordsOneEntry() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/root");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/root");
         wc.path("/log").get();
         Thread.sleep(3000);
         List<Feed> elements = Resource.getElements();
@@ -103,7 +104,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testFeedsWithBatchLogRecordsOneEntry() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/batch");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/batch");
         wc.path("/log").get();
         Thread.sleep(3000);
         List<Feed> elements = Resource2.getElements();
@@ -125,7 +126,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testEntriesWithLogRecordsOneEntry() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/entries");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/entries");
         wc.path("/log").get();
         Thread.sleep(3000);
         List<Entry> elements = Resource3.getElements();
@@ -143,7 +144,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testManyEntries() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/entriesMany");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/entriesMany");
         wc.path("/log").get();
         Thread.sleep(3000);
         List<Entry> elements = Resource4.getElements();
@@ -166,7 +167,7 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     
     @Test
     public void testFeedsWithLogRecordsExtension() throws Exception {
-        WebClient wc = WebClient.create("http://localhost:9080/extensions");
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/extensions");
         wc.path("/log").get();
         Thread.sleep(3000);
         List<Feed> elements = Resource5.getElements();

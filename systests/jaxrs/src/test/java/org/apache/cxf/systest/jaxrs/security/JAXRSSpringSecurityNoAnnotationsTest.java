@@ -23,6 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurityTest {
+    public static final String PORT = BookServerSecuritySpringInterface.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -33,14 +34,14 @@ public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurity
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "ba", 401);
     }
     
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -49,7 +50,7 @@ public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurity
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -57,7 +58,7 @@ public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurity
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }

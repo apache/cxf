@@ -40,6 +40,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookDataBindingServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -50,7 +51,8 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookJAXB() throws Exception {
-        WebClient client = WebClient.create("http://localhost:9080/databinding/jaxb/bookstore/books/123");
+        WebClient client = WebClient.create("http://localhost:" 
+                                            + PORT + "/databinding/jaxb/bookstore/books/123");
         Book book = client.accept("application/xml").get(Book.class);
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());
@@ -59,7 +61,8 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     //@org.junit.Ignore
     @Test
     public void testGetBookAegis() throws Exception {
-        WebClient client = WebClient.create("http://localhost:9080/databinding/aegis/bookstore/books/123",
+        WebClient client = WebClient.create("http://localhost:"
+                                            + PORT + "/databinding/aegis/bookstore/books/123",
                                             Collections.singletonList(new AegisElementProvider<Book>()));
         Book book = client.accept("application/xml").get(Book.class);
         assertEquals(123L, book.getId());
@@ -70,7 +73,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     public void testSDOStructure() throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setDataBinding(new SDODataBinding());
-        bean.setAddress("http://localhost:9080/databinding/sdo");
+        bean.setAddress("http://localhost:" + PORT + "/databinding/sdo");
         bean.setResourceClass(SDOResource.class);
         SDOResource client = bean.create(SDOResource.class);
         Structure struct = client.getStructure();
@@ -88,7 +91,7 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
         provider.setNamespaceMap(Collections.singletonMap("http://apache.org/structure/types", "p0"));
         provider.setDataBinding(db);
         bean.setProvider(provider);
-        bean.setAddress("http://localhost:9080/databinding/sdo");
+        bean.setAddress("http://localhost:" + PORT + "/databinding/sdo");
         bean.setResourceClass(SDOResource.class);
         List<Interceptor<? extends Message>> list = new ArrayList<Interceptor<? extends Message>>();
         list.add(new LoggingInInterceptor());

@@ -23,19 +23,20 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(BookServerResourceCreatedOutside.class);
 
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         BookStore bs = new BookStore();
         sf.setServiceBeans(bs);
-        sf.setAddress("http://localhost:9080/");
-
-        sf.create();        
+        sf.setAddress("http://localhost:" + PORT + "/");
+        sf.create();
+        
     }
 
     public static void main(String[] args) {
         try {
-            BookServer s = new BookServer();
+            BookServerResourceCreatedOutside s = new BookServerResourceCreatedOutside();
             s.start();
         } catch (Exception ex) {
             ex.printStackTrace();

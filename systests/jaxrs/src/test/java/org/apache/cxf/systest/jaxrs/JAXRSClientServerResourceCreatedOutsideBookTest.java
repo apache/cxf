@@ -34,6 +34,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServerResourceCreatedOutside.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -45,7 +46,7 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/bookstore/books/123";
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -61,7 +62,7 @@ public class JAXRSClientServerResourceCreatedOutsideBookTest extends AbstractBus
     @Test
     public void testAddBookHTTPURL() throws Exception {        
         String endpointAddress =
-            "http://localhost:9080/bookstore/books";
+            "http://localhost:" + PORT + "/bookstore/books";
 
         URL url = new URL(endpointAddress);   
         HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  

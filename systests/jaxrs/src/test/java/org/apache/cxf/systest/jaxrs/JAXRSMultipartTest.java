@@ -59,6 +59,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = MultipartServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -68,169 +69,169 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testBookAsRootAttachmentStreamSource() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/stream";
+        String address = "http://localhost:" + PORT + "/bookstore/books/stream";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsRootAttachmentStreamSourceNoContentId() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/stream";
+        String address = "http://localhost:" + PORT + "/bookstore/books/stream";
         doAddBook(address, "attachmentData3", 200);               
     }
     
     @Test
     public void testBookAsRootAttachmentInputStream() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/istream";
+        String address = "http://localhost:" + PORT + "/bookstore/books/istream";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsMessageContextDataHandler() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/mchandlers";
+        String address = "http://localhost:" + PORT + "/bookstore/books/mchandlers";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookAsMessageContextAttachments() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/attachments";
+        String address = "http://localhost:" + PORT + "/bookstore/books/attachments";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testBookJSONForm() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jsonform";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jsonform";
         doAddFormBook(address, "attachmentFormJson", 200);               
     }
     
     @Test
     public void testBookJaxbForm() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbform";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbform";
         doAddFormBook(address, "attachmentFormJaxb", 200);               
     }
     
     @Test
     public void testBookJSONJAXBForm() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jsonjaxbform";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jsonjaxbform";
         doAddFormBook(address, "attachmentFormJsonJaxb", 200);               
     }
     
     @Test
     public void testBookJSONJAXBFormEncoded() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jsonjaxbform";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jsonjaxbform";
         doAddFormBook(address, "attachmentFormJsonJaxbEncoded", 200);
     }
     
     @Test
     public void testBookJSONFormFiles() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/filesform";
+        String address = "http://localhost:" + PORT + "/bookstore/books/filesform";
         doAddFormBook(address, "attachmentFormJsonFiles", 200);               
     }
     
     @Test
     public void testBookAsMessageContextAttachment() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/attachment";
+        String address = "http://localhost:" + PORT + "/bookstore/books/attachment";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsRootAttachmentJAXB() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxb";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxb";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/dsource";
+        String address = "http://localhost:" + PORT + "/bookstore/books/dsource";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsDataSource2() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/dsource2";
+        String address = "http://localhost:" + PORT + "/bookstore/books/dsource2";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsBody() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/body";
+        String address = "http://localhost:" + PORT + "/bookstore/books/body";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookFormData() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/form";
+        String address = "http://localhost:" + PORT + "/bookstore/books/form";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
     @Test
     public void testAddBookFormParam() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparam";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formparam";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
     @Test
     public void testAddBookFormBody() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formbody";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formbody";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
     @Test
     public void testAddBookFormBody2() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formbody2";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formbody2";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
     @Test
     public void testAddBookFormParamBean() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/formparambean";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formparambean";
         doAddBook("multipart/form-data", address, "attachmentForm", 200);               
     }
     
     @Test
     public void testAddBookAsJAXB2() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxb2";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxb2";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsListOfAttachments() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/listattachments";
+        String address = "http://localhost:" + PORT + "/bookstore/books/listattachments";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsListOfStreams() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/lististreams";
+        String address = "http://localhost:" + PORT + "/bookstore/books/lististreams";
         doAddBook(address, "attachmentData", 200);               
     }
     
     @Test
     public void testAddBookAsJAXBJSON() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbjson";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjson";
         doAddBook(address, "attachmentData2", 200);               
     }
     
     @Test
     public void testAddBookAsJAXBJSONMixed() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbjson";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjson";
         doAddBook("multipart/mixed", address, "attachmentData2", 200);               
     }
     
     @Test
     public void testConsumesMismatch() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/mismatch1";
+        String address = "http://localhost:" + PORT + "/bookstore/books/mismatch1";
         doAddBook(address, "attachmentData2", 415);               
     }
     
     @Test
     public void testConsumesMismatch2() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/mismatch2";
+        String address = "http://localhost:" + PORT + "/bookstore/books/mismatch2";
         doAddBook(address, "attachmentData2", 415);               
     }
     
     @Test
     public void testAddBookAsDataHandler() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/dhandler";
+        String address = "http://localhost:" + PORT + "/bookstore/books/dhandler";
         doAddBook(address, "attachmentData", 200);               
     }
     
@@ -238,7 +239,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testAddBookWebClient() {
         InputStream is1 = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/add_book.txt");
-        String address = "http://localhost:9085/bookstore/books/jaxb";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxb";
         WebClient client = WebClient.create(address);
         client.type("multipart/related;type=text/xml").accept("text/xml");
         Book book = client.post(is1, Book.class);
@@ -247,7 +248,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testXopWebClient() throws Exception {
-        String address = "http://localhost:9085/bookstore/xop";
+        String address = "http://localhost:" + PORT + "/bookstore/xop";
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setAddress(address);
         bean.setProperties(Collections.singletonMap(org.apache.cxf.message.Message.MTOM_ENABLED, 
@@ -287,7 +288,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBookJaxbJsonImageWebClient() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbjsonimage";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbjsonimage";
         WebClient client = WebClient.create(address);
         client.type("multipart/mixed").accept("multipart/mixed");
         
@@ -316,7 +317,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddBookJaxbJsonImageAttachments() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbimagejson";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbimagejson";
         WebClient client = WebClient.create(address);
         client.type("multipart/mixed").accept("multipart/mixed");
         
@@ -345,7 +346,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddGetJaxbBooksWebClient() throws Exception {
-        String address = "http://localhost:9085/bookstore/books/jaxbonly";
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxbonly";
         WebClient client = WebClient.create(address);
         
         client.type("multipart/mixed;type=application/xml").accept("multipart/mixed");
@@ -369,7 +370,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testAddGetImageWebClient() throws Exception {
         InputStream is1 = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        String address = "http://localhost:9085/bookstore/books/image";
+        String address = "http://localhost:" + PORT + "/bookstore/books/image";
         WebClient client = WebClient.create(address);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
@@ -387,7 +388,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testUploadImageFromForm() throws Exception {
         InputStream is1 = 
             getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/java.jpg");
-        String address = "http://localhost:9085/bookstore/books/formimage";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formimage";
         WebClient client = WebClient.create(address);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
@@ -419,7 +420,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     public void testUploadImageFromForm2() throws Exception {
         File file = 
             new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg").getFile());
-        String address = "http://localhost:9085/bookstore/books/formimage2";
+        String address = "http://localhost:" + PORT + "/bookstore/books/formimage2";
         WebClient client = WebClient.create(address);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
         conduit.getClient().setReceiveTimeout(1000000);
@@ -439,7 +440,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testMultipartRequestNoBody() throws Exception { 
-        PostMethod post = new PostMethod("http://localhost:9085/bookstore/books/image");
+        PostMethod post = new PostMethod("http://localhost:" + PORT + "/bookstore/books/image");
         String ct = "multipart/mixed";
         post.setRequestHeader("Content-Type", ct);
         HttpClient httpclient = new HttpClient();

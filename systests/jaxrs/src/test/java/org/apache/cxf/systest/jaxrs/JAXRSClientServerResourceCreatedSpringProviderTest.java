@@ -59,6 +59,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerResourceCreatedSpringProviderTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServerResourceCreatedSpringProviders.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -68,8 +69,8 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     
     @Test
     public void testMultipleRootsWadl() throws Exception {
-        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:9080/webapp/",
-                                                         "http://localhost:9080/webapp/", 2);
+        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/",
+                                                         "http://localhost:" + PORT + "/webapp/", 2);
         String path1 = resourceEls.get(0).getAttribute("path");
         int bookStoreInd = path1.contains("/bookstore") ? 0 : 1;
         int petStoreInd = bookStoreInd == 0 ? 1 : 0;
@@ -79,22 +80,22 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     
     @Test
     public void testBookStoreWadl() throws Exception {
-        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:9080/webapp/",
-                                                         "http://localhost:9080/webapp/bookstore", 1);
+        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/",
+                                                         "http://localhost:" + PORT + "/webapp/bookstore", 1);
         checkBookStoreInfo(resourceEls.get(0));
     }
     
     @Test
     public void testPetStoreWadl() throws Exception {
-        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:9080/webapp/",
-                                                         "http://localhost:9080/webapp/petstore", 1);
+        List<Element> resourceEls = getWadlResourcesInfo("http://localhost:" + PORT + "/webapp/",
+                                                         "http://localhost:" + PORT + "/webapp/petstore", 1);
         checkPetStoreInfo(resourceEls.get(0));
     }
     
     @Test
     public void testPetStoreSource() throws Exception {
         try {
-            WebClient wc = WebClient.create("http://localhost:9080/webapp/petstore");
+            WebClient wc = WebClient.create("http://localhost:" + PORT + "/webapp/petstore");
             HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
             conduit.getClient().setReceiveTimeout(1000000);
             conduit.getClient().setConnectionTimeout(1000000);
@@ -184,7 +185,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/webapp/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
@@ -205,7 +206,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBookNotFound() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/books/12345"; 
+            "http://localhost:" + PORT + "/webapp/bookstore/books/12345"; 
         URL url = new URL(endpointAddress);
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
         connect.addRequestProperty("Accept", "text/plain,application/xml");
@@ -225,7 +226,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testGetBookNotExistent() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/nonexistent"; 
+            "http://localhost:" + PORT + "/webapp/bookstore/nonexistent"; 
         URL url = new URL(endpointAddress);
         HttpURLConnection connect = (HttpURLConnection)url.openConnection();
         connect.addRequestProperty("Accept", "application/xml");
@@ -242,7 +243,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/petstore/pets";
+            "http://localhost:" + PORT + "/webapp/petstore/pets";
 
         URL url = new URL(endpointAddress);   
         HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  
@@ -283,7 +284,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
     public void testPostPetStatus2() throws Exception {
         
         
-        Socket s = new Socket("localhost", 9080);
+        Socket s = new Socket("localhost", Integer.parseInt(PORT));
         IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(), 
                                   s.getOutputStream());
 

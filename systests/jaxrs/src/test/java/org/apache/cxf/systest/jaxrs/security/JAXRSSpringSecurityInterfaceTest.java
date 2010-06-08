@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest {
+    public static final String PORT = BookServerSecuritySpringInterface.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -40,14 +41,14 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "ba", 401);
     }
     
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -55,7 +56,7 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
         getBook(endpointAddress, "baddy", "baddyspassword", 403);
@@ -64,7 +65,7 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
@@ -72,32 +73,32 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
     @Test
     public void testGetBookSubresource() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/subresource"; 
+            "http://localhost:" + PORT + "/bookstorestorage/subresource"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }   
     
     @Test
     public void testWebClientAdmin() throws Exception {
-        String address = "http://localhost:9080/bookstorestorage/thosebooks";
+        String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
         doGetBookWebClient(address, "foo", "bar",  200);
     }
     
     @Test
     public void testProxyClientAdmin() throws Exception {
-        String address = "http://localhost:9080/bookstorestorage";
+        String address = "http://localhost:" + PORT + "/bookstorestorage";
         doGetBookProxyClient(address, "foo", "bar",  200);
     }
     
     @Test
     public void testWebClientUserUnauthorized() throws Exception {
-        String address = "http://localhost:9080/bookstorestorage/thosebooks";
+        String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks";
         doGetBookWebClient(address, "bob", "bobspassword", 403);
     }
     
     @Test
     public void testWebClientUserAuthorized() throws Exception {
-        String address = "http://localhost:9080/bookstorestorage/thosebooks/123/123";
+        String address = "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123";
         doGetBookWebClient(address, "bob", "bobspassword", 200);
     }
     
@@ -124,7 +125,7 @@ public class JAXRSSpringSecurityInterfaceTest extends AbstractSpringSecurityTest
     @Test
     public void testGetBookSubresourceAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/securebook/self"; 
+            "http://localhost:" + PORT + "/bookstorestorage/securebook/self"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }

@@ -35,6 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerResourceJacksonSpringProviderTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServerResourceJacksonSpringProviders.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -46,7 +47,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testGetBook123() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/bookstore/books/123"; 
+            "http://localhost:" + PORT + "/webapp/bookstore/books/123"; 
         URL url = new URL(endpointAddress);
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Accept", "application/json");
@@ -62,7 +63,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testPostPetStatus() throws Exception {
         
         String endpointAddress =
-            "http://localhost:9080/webapp/petstore/pets";
+            "http://localhost:" + PORT + "/webapp/petstore/pets";
 
         URL url = new URL(endpointAddress);   
         HttpURLConnection httpUrlConnection = (HttpURLConnection)url.openConnection();  
@@ -103,7 +104,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
     public void testPostPetStatus2() throws Exception {
         
         
-        Socket s = new Socket("localhost", 9080);
+        Socket s = new Socket("localhost", Integer.parseInt(PORT));
         IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(), 
                                   s.getOutputStream());
 

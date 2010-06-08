@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs;
 
+import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -36,6 +37,7 @@ import org.apache.abdera.model.Entry;
 import org.apache.abdera.model.Feed;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.ext.atom.AbstractEntryBuilder;
 import org.apache.cxf.jaxrs.ext.atom.AbstractFeedBuilder;
@@ -49,6 +51,7 @@ import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Mu
 import org.apache.cxf.management.web.logging.atom.converter.StandardConverter.Output;
 import org.apache.cxf.management.web.logging.atom.deliverer.Deliverer;
 import org.apache.cxf.management.web.logging.atom.deliverer.WebClientDeliverer;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -58,6 +61,8 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSLoggingAtomPushTest extends Assert {
+    public static final String PORT = TestUtil.getPortNumber(JAXRSLoggingAtomPushTest.class);
+    
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class);
     private static Server server;
     
@@ -70,7 +75,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
 
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(JAXRSLoggingAtomPushTest.Resource.class);
-        sf.setAddress("http://localhost:9080/");
+        sf.setAddress("http://localhost:" + PORT + "/");
         sf.setProviders(Arrays.asList(new AtomFeedProvider(), new AtomEntryProvider()));
         server = sf.create();
         server.start();
@@ -80,7 +85,10 @@ public class JAXRSLoggingAtomPushTest extends Assert {
     private static void configureLogging(String propFile) throws Exception {
         LogManager lm = LogManager.getLogManager();
         InputStream ins = JAXRSLoggingAtomPushTest.class.getResourceAsStream(propFile);
-        lm.readConfiguration(ins);
+        String s = IOUtils.readStringFromStream(ins);
+        ins.close();
+        s = s.replaceAll("9080", PORT);
+        lm.readConfiguration(new ByteArrayInputStream(s.getBytes("UTF-8")));
     }
 
     private static void logSixEvents(Logger log) {
@@ -123,7 +131,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         configureLogging("resources/logging_atompush_disabled.properties");
         Logger log = LogUtils.getL7dLogger(JAXRSLoggingAtomPushTest.class, null, "private-log");
         Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT);
-        Deliverer d = new WebClientDeliverer("http://localhost:9080");
+        Deliverer d = new WebClientDeliverer("http://localhost:" + PORT);
         Handler h = new AtomPushHandler(2, c, d);
         log.addHandler(h);
         log.setLevel(Level.ALL);
@@ -143,7 +151,7 @@ public class JAXRSLoggingAtomPushTest extends Assert {
         AbstractEntryBuilder<List<org.apache.cxf.management.web.logging.LogRecord>> eb =
             createCustomEntryBuilder(); 
         Converter c = new StandardConverter(Output.FEED, Multiplicity.ONE, Format.CONTENT, fb, eb);
-        Deliverer d = new WebClientDeliverer("http://localhost:9080");
+        Deliverer d = new WebClientDeliverer("http://localhost:" + PORT);
         Handler h = new AtomPushHandler(2, c, d);
         log.addHandler(h);
         log.setLevel(Level.ALL);

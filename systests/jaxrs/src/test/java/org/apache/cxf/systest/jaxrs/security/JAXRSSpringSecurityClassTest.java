@@ -33,7 +33,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
-
+    public static final String PORT = BookServerSecuritySpringClass.PORT;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
@@ -43,14 +44,14 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testFailedAuthentication() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "ba", 401);
     }
     
     @Test
     public void testBookFromForm() throws Exception {
         
-        WebClient wc = WebClient.create("http://localhost:9080/bookstorestorage/bookforms", 
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms", 
                                         "foo", "bar", null);
         
         Response r = wc.form(new Form().set("name", "CXF Rocks").set("id", "123"));
@@ -63,7 +64,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -72,7 +73,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testGetBookUser() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks/123/123"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123/123"; 
         getBook(endpointAddress, "foo", "bar", 200);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -80,7 +81,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testGetBookAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/thosebooks"; 
+            "http://localhost:" + PORT + "/bookstorestorage/thosebooks"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
@@ -94,7 +95,7 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     @Test
     public void testGetBookSubresourceAdmin() throws Exception {
         String endpointAddress =
-            "http://localhost:9080/bookstorestorage/securebook/self"; 
+            "http://localhost:" + PORT + "/bookstorestorage/securebook/self"; 
         getBook(endpointAddress, "foo", "bar", 200); 
         getBook(endpointAddress, "bob", "bobspassword", 403);
     }
