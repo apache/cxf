@@ -141,7 +141,6 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             
             boolean doDebug = LOG.isLoggable(Level.FINE);
             boolean doTimeDebug = TIME_LOG.isLoggable(Level.FINE);
-            SoapVersion version = mc.getVersion();
     
             long t0 = 0;
             long t1 = 0;
@@ -154,7 +153,14 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
             if (doDebug) {
                 LOG.fine("WSS4JOutInterceptor: enter handleMessage()");
             }
-    
+            /**
+             * There is nothing to send...Usually happens when the provider
+             * needs to send a HTTP 202 message (with no content)
+             */
+            if (mc == null) {
+                return;
+            }
+            SoapVersion version = mc.getVersion();
             RequestData reqData = new RequestData();
     
             reqData.setMsgContext(mc);
@@ -232,7 +238,8 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                  * over the wire. Therefore this must shall be the last (or only)
                  * handler in a chain. Now we can perform our security operations on
                  * this request.
-                 */
+                 */              
+    
                 SOAPMessage saaj = mc.getContent(SOAPMessage.class);
     
                 if (saaj == null) {
@@ -242,14 +249,7 @@ public class WSS4JOutInterceptor extends AbstractWSS4JInterceptor {
                 }
     
                 Document doc = saaj.getSOAPPart();
-                /**
-                 * There is nothing to send...Usually happens when the provider
-                 * needs to send a HTTP 202 message (with no content)
-                 */
-                if (mc == null) {
-                    return;
-                }
-    
+
                 if (doTimeDebug) {
                     t1 = System.currentTimeMillis();
                 }

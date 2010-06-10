@@ -263,12 +263,12 @@ public class RetransmissionQueueImpl implements RetransmissionQueue {
         if (null != maps) {
             to = maps.getTo();
         }
-        if (RMUtils.getAddressingConstants().getAnonymousURI().equals(to.getValue())) {
-            LOG.log(Level.FINE, "Cannot resend to anonymous target");
-            return;
-        }
         if (null == to) {
             LOG.log(Level.SEVERE, "NO_ADDRESS_FOR_RESEND_MSG");
+            return;
+        }
+        if (RMUtils.getAddressingConstants().getAnonymousURI().equals(to.getValue())) {
+            LOG.log(Level.FINE, "Cannot resend to anonymous target");
             return;
         }
         

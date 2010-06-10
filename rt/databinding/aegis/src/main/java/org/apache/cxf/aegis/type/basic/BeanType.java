@@ -565,14 +565,7 @@ public class BeanType extends AegisType {
             }
         }
 
-        BeanTypeInfo elementTypeInfo;
-        if (beanType != null) {
-            elementTypeInfo = beanType.getTypeInfo();
-        } else {
-            // didn't find a bean type so just use this bean's type info
-            elementTypeInfo = getTypeInfo();
-        }
-        return elementTypeInfo;
+        return beanType.getTypeInfo();
     }
 
     /**

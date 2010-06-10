@@ -69,7 +69,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 fail("Element wsdl:service serviceins Missed!");
             }
             Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (service == null) {
+            if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
             boolean found = false;
@@ -117,7 +117,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 fail("Element wsdl:service serviceins Missed!");
             }
             Iterator it = service.getPort("SoapPort").getExtensibilityElements().iterator();
-            if (service == null) {
+            if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
 
@@ -159,7 +159,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 fail("Element wsdl:service serviceins Missed!");
             }
             Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (service == null) {
+            if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
             boolean found = false;
@@ -208,7 +208,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 fail("Element wsdl:service serviceins Missed!");
             }
             Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (service == null) {
+            if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
             boolean found = false;
@@ -265,7 +265,7 @@ public class WSDLToServiceProcessorTest extends ProcessorTestBase {
                 fail("Element wsdl:service serviceins Missed!");
             }
             Iterator it = service.getPort("portins").getExtensibilityElements().iterator();
-            if (service == null) {
+            if (it == null || !it.hasNext()) {
                 fail("Element wsdl:port portins Missed!");
             }
             boolean found = false;

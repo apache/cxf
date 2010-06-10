@@ -258,12 +258,11 @@ public class SoapOutInterceptor extends AbstractSoapInterceptor {
     protected DataWriter<XMLStreamWriter> getDataWriter(Message message) {
         Service service = ServiceModelUtil.getService(message.getExchange());
         DataWriter<XMLStreamWriter> dataWriter = service.getDataBinding().createWriter(XMLStreamWriter.class);
-        dataWriter.setAttachments(message.getAttachments());
-        
         if (dataWriter == null) {
             throw new Fault(new org.apache.cxf.common.i18n.Message("NO_DATAWRITER", BUNDLE, service
                 .getName()));
         }
+        dataWriter.setAttachments(message.getAttachments());
 
         return dataWriter;
     }
