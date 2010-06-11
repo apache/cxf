@@ -25,6 +25,8 @@ import java.util.List;
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
+import javax.xml.namespace.QName;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.ws.Binding;
 import javax.xml.ws.Service.Mode;
 import javax.xml.ws.WebServiceFeature;
@@ -32,6 +34,7 @@ import javax.xml.ws.soap.Addressing;
 import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.MTOMFeature;
 import javax.xml.ws.soap.SOAPBinding;
+import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.w3c.dom.Element;
 
@@ -69,7 +72,10 @@ import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.DescriptionInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.Names;
+import org.apache.cxf.ws.addressing.VersionTransformer;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.wsdl.WSDLManager;
@@ -193,6 +199,28 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 feature.setAddressingRequired(true);
             }
             addAddressingFeature(feature);
+        }
+        extractWsdlEprs(endpoint);
+    }
+    
+    private void extractWsdlEprs(EndpointInfo endpoint) {
+        //parse the EPR in wsdl
+        List<ExtensibilityElement> portExtensors = endpoint.getExtensors(ExtensibilityElement.class);
+        if (portExtensors != null) {
+            Iterator<ExtensibilityElement> extensionElements = portExtensors.iterator();
+            QName wsaEpr = new QName(Names.WSA_NAMESPACE_NAME, "EndpointReference");
+            while (extensionElements.hasNext()) {
+                ExtensibilityElement ext = (ExtensibilityElement)extensionElements.next();
+                if (ext instanceof UnknownExtensibilityElement && wsaEpr.equals(ext.getElementType())) {
+                    DOMSource domSource = new DOMSource(((UnknownExtensibilityElement)ext).getElement());
+                    W3CEndpointReference w3cEPR = new W3CEndpointReference(domSource);
+                    EndpointReferenceType ref = VersionTransformer.convertToInternal(w3cEPR);
+                    endpoint.getTarget().setMetadata(ref.getMetadata());
+                    endpoint.getTarget().setReferenceParameters(ref.getReferenceParameters());
+                    endpoint.getTarget().getOtherAttributes().putAll(ref.getOtherAttributes());
+                }
+
+            }
         }
     }
     
