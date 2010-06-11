@@ -247,6 +247,7 @@
                         <argLine>${surefire.fork.vmargs}</argLine>
                         <parallel>${surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
+                                <useRandomPorts>true</useRandomPorts>
                                 <cxf.validateServiceSchemas>${cxf.validateServices}</cxf.validateServiceSchemas>
                                 <java.awt.headless>${java.awt.headless}</java.awt.headless>
                                 <java.util.logging.config.file>${basedir}/target/test-classes/logging.properties</java.util.logging.config.file>
