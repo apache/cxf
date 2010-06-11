@@ -524,7 +524,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
         if (inputMessage.getExtensionAttributes() != null) {
             String inputAction = ContextUtils.getAction(inputMessage);
-            if (inputAction != null) {
+            if (!StringUtils.isEmpty(inputAction)) {
                 return inputAction;
             }
         }
@@ -535,7 +535,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         MessageInfo outputMessage = operation.getOutput();
         if (outputMessage != null && outputMessage.getExtensionAttributes() != null) {
             String outputAction = ContextUtils.getAction(outputMessage);
-            if (outputAction != null) {
+            if (!StringUtils.isEmpty(outputAction)) {
                 return outputAction;
             }
         }
@@ -562,7 +562,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 if (isSameFault(faultInfo, faultName)) {
                     if (faultInfo.getExtensionAttributes() != null) {
                         String faultAction = ContextUtils.getAction(faultInfo);
-                        if (faultAction != null) {
+                        if (!StringUtils.isEmpty(faultAction)) {
                             return faultAction;
                         }
                     }
@@ -656,7 +656,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             if (explicitAction != null) {
                 actionUri = explicitAction;
             } else if (null == op.getOutputName()) {
-                actionUri = addPath(opNamespace, op.getOutput().getName().getLocalPart());
+                actionUri = addPath(opNamespace, op.getName().getLocalPart() + "Response");
             } else {
                 actionUri = addPath(opNamespace, op.getOutputName());
             }

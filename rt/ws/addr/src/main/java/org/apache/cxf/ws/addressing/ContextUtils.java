@@ -806,7 +806,7 @@ public final class ContextUtils {
         if (msgInfo != null
             && msgInfo.getExtensionAttributes() != null) {
             String attr = getAction(msgInfo);
-            if (attr != null) {
+            if (!StringUtils.isEmpty(attr)) {
                 action = attr;
                 msgInfo.setProperty(ACTION, action);
             }
