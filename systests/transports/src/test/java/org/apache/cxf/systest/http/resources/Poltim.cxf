@@ -40,13 +40,14 @@
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
 
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <http:destination name="{http://apache.org/hello_world}Poltim.http-destination">
-    <http:server RedirectURL="http://localhost:9000/Mortimer"/>
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.0}/Mortimer"/>
   </http:destination>
   
   <httpj:engine-factory bus="cxf">
-	 <httpj:engine port="9005">
+	 <httpj:engine port="${testutil.ports.BusServer.5}">
 	     <httpj:tlsServerParameters>
 	      <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 

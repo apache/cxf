@@ -29,7 +29,8 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 
 public class Server extends AbstractBusTestServerBase  {
-    static final String ADDRESS = "http://localhost:9077/SoapContext/SoapPort";
+    static final String PORT = allocatePort(Server.class);
+    static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     protected void run()  {
 

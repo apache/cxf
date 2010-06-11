@@ -38,6 +38,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = SessionServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         
@@ -57,6 +58,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
             Greeter greeter = service.getGreeterPort();
             
             BindingProvider bp = (BindingProvider)greeter;
+            updateAddressPort(bp, PORT);
             bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
             
             
@@ -118,6 +120,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
 
         try {
             Greeter greeter = service.getGreeterPort();
+            updateAddressPort(greeter, PORT);
 
             String greeting = greeter.greetMe("Bonjour");
             
@@ -145,7 +148,7 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         boolean isWindows = System.getProperty("os.name").startsWith("Windows");
         
         GreeterSessionImpl implementor = new GreeterSessionImpl();
-        String address = "http://localhost:9020/SoapContext/GreeterPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
         try {
             Endpoint.publish(address, implementor);
             if (!isWindows) {

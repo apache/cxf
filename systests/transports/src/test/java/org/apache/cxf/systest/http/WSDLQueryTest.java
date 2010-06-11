@@ -30,6 +30,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class WSDLQueryTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BareServer.PORT;
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -43,7 +44,7 @@ public class WSDLQueryTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testCorrectHostHeader() throws Exception {
-        sendQuery("localhost:9020", "HTTP/1.1 200 OK");
+        sendQuery("localhost:" + PORT, "HTTP/1.1 200 OK");
     }
 
     @Test
@@ -53,7 +54,7 @@ public class WSDLQueryTest extends AbstractBusClientServerTestBase {
 
     @Test
     public void testBogusHostHeader() throws Exception {
-        sendQuery("foobar:9020", "HTTP/1.1 200 OK");
+        sendQuery("foobar:" + PORT, "HTTP/1.1 200 OK");
     }
 
     @Test
@@ -68,7 +69,7 @@ public class WSDLQueryTest extends AbstractBusClientServerTestBase {
 
     private void sendQuery(String hostHeader, String expectedResponseLine)
         throws Exception {
-        Socket s = new Socket("localhost", 9020);
+        Socket s = new Socket("localhost", Integer.parseInt(PORT));
         OutputStream os = s.getOutputStream();
         os.write("GET /SoapContext/GreeterPort?wsdl HTTP/1.1\r\n".getBytes());
         os.write(("Host:" + hostHeader + "\r\n\r\n").getBytes());

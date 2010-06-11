@@ -30,6 +30,7 @@ under the License.
         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         ">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
     <!-- -->
     <!-- This Spring config file is designed to represent a minimal -->
@@ -48,7 +49,7 @@ under the License.
     <jaxws:endpoint 
         id="JaxwsHttpsEndpoint"
         implementor="org.apache.cxf.systest.http.GreeterImpl"
-        address="https://localhost:9005/SoapContext/HttpsPort"
+        address="https://localhost:${testutil.ports.BusServer.5}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
@@ -61,7 +62,7 @@ under the License.
     <!-- This test exercises the resource attribute in a keyStore element -->
     <!-- -->
     <httpj:engine-factory id="port-9005-tls-config">
-        <httpj:engine port="9005">
+        <httpj:engine port="${testutil.ports.BusServer.5}">
             <httpj:tlsServerParameters>
                <sec:keyManagers keyPassword="password">
                <sec:keyStore type="JKS" password="password" 
@@ -80,7 +81,7 @@ under the License.
     <!-- -->
     <!-- This test exercises the resource attribute in a keyStore and certStore element -->
     <!-- -->
-    <http:conduit name="https://localhost:9005/SoapContext/HttpsPort">
+    <http:conduit name="https://localhost:.*/SoapContext/HttpsPort">
         <http:tlsClientParameters disableCNCheck="true">
             <sec:keyManagers keyPassword="password">
                <sec:keyStore type="pkcs12" password="password" 

@@ -33,6 +33,7 @@
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd
            http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
  
 
 	<import resource="classpath:org/apache/cxf/systest/http/resources/BethalClientConfig.cxf" />
@@ -42,6 +43,6 @@
     serviceName="s:SOAPService"
     endpointName="s:Bethal"
     xmlns:s="http://apache.org/hello_world"
-    address="https://localhost:9002/Bethal"/>
+    address="https://localhost:${testutil.ports.BusServer.2}/Bethal"/>
    
 </beans>

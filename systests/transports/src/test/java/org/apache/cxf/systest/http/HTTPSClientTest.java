@@ -36,7 +36,12 @@ import org.junit.Test;
  * HTTP/S service.
  */
 public class HTTPSClientTest extends AbstractBusClientServerTestBase {
-    
+    public static final String PORT1 = BusServer.PORT1;
+    public static final String PORT2 = BusServer.PORT2;
+    public static final String PORT3 = BusServer.PORT3;
+    public static final String PORT4 = BusServer.PORT4;
+    public static final String PORT5 = BusServer.PORT5;
+    public static final String PORT6 = BusServer.PORT6;
     //
     // data
     //
@@ -106,34 +111,34 @@ public class HTTPSClientTest extends AbstractBusClientServerTestBase {
     @Test
     public final void testJaxwsServer() throws Exception {
         testSuccessfulCall("resources/jaxws-server.xml", 
-                           "https://localhost:9002/SoapContext/HttpsPort");        
+                           "https://localhost:" + PORT2 + "/SoapContext/HttpsPort");        
     }
     @Test
     public final void testJaxwsServerChangeHttpsToHttp() throws Exception {
         testSuccessfulCall("resources/jaxws-server.xml", 
-                            "http://localhost:9003/SoapContext/HttpPort");    
+                            "http://localhost:" + PORT3 + "/SoapContext/HttpPort");    
     }    
     @Test
     public final void testJaxwsEndpoint() throws Exception {
         testSuccessfulCall("resources/jaxws-publish.xml",
-                           "https://localhost:9001/SoapContext/HttpsPort");
+                           "https://localhost:" + PORT1 + "/SoapContext/HttpsPort");
     }
     
     @Test
     public final void testPKCS12Endpoint() throws Exception {
         testSuccessfulCall("resources/pkcs12.xml",
-                           "https://localhost:9006/SoapContext/HttpsPort");
+                           "https://localhost:" + PORT6 + "/SoapContext/HttpsPort");
     }
     
     @Test
     public final void testResourceKeySpecEndpoint() throws Exception {
         testSuccessfulCall("resources/resource-key-spec.xml",
-                           "https://localhost:9004/SoapContext/HttpsPort");
+                           "https://localhost:" + PORT4 + "/SoapContext/HttpsPort");
     }
     @Test
     public final void testResourceKeySpecEndpointURL() throws Exception {
         testSuccessfulCall("resources/resource-key-spec-url.xml",
-                           "https://localhost:9005/SoapContext/HttpsPort",
-                           new URL("https://localhost:9005/SoapContext/HttpsPort?wsdl"));
+                           "https://localhost:" + PORT5 + "/SoapContext/HttpsPort",
+                           new URL("https://localhost:" + PORT5 + "/SoapContext/HttpsPort?wsdl"));
     }
 }

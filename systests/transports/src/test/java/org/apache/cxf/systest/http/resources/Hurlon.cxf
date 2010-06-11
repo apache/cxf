@@ -39,9 +39,10 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <http:destination name="{http://apache.org/hello_world}Hurlon.http-destination">
-    <http:server RedirectURL="http://localhost:9007/Abost"/>
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.7}/Abost"/>
   </http:destination>
   
 </beans>

@@ -32,15 +32,17 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+ <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+              
  <httpj:engine-factory bus="cxf">
-  <httpj:engine port='8801'>
+  <httpj:engine port='${testutil.ports.EngineLifecycleTest.1}'>
    <httpj:connector>
     <bean class="org.mortbay.jetty.bio.SocketConnector">
-     <property name="port" value="8801"/>
+     <property name="port" value="${testutil.ports.EngineLifecycleTest.1}"/>
     </bean>
    </httpj:connector>
   </httpj:engine>
-  <httpj:engine port="8808">
+  <httpj:engine port="${testutil.ports.EngineLifecycleTest.2}">
    <httpj:handlers>
     <bean class="org.mortbay.jetty.webapp.WebAppContext">
       <constructor-arg value="."/>

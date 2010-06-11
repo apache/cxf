@@ -102,6 +102,15 @@ import org.springframework.context.ApplicationContext;
  * the Hostname Verifier.
  */
 public class HTTPConduitTest extends AbstractBusClientServerTestBase {
+    public static final String PORT0 = BusServer.PORT0;
+    public static final String PORT1 = BusServer.PORT1;
+    public static final String PORT2 = BusServer.PORT2;
+    public static final String PORT3 = BusServer.PORT3;
+    public static final String PORT4 = BusServer.PORT4;
+    public static final String PORT5 = BusServer.PORT5;
+    public static final String PORT6 = BusServer.PORT6;
+    public static final String PORT7 = BusServer.PORT7;
+    public static final String PORT8 = BusServer.PORT8;
 
     private static final boolean IN_PROCESS = true;
     
@@ -110,15 +119,15 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
     private static List<String> servers = new ArrayList<String>();
 
     static {
-        addrMap.put("Mortimer", "http://localhost:9000/");
-        addrMap.put("Tarpin",   "https://localhost:9003/");
-        addrMap.put("Rethwel",  "http://localhost:9004/");
-        addrMap.put("Poltim",   "https://localhost:9005/");
-        addrMap.put("Gordy",    "https://localhost:9001/");
-        addrMap.put("Bethal",   "https://localhost:9002/");
-        addrMap.put("Abost",    "http://localhost:9007/");
-        addrMap.put("Hurlon",   "http://localhost:9006/");
-        addrMap.put("Morpit",   "https://localhost:9008/");
+        addrMap.put("Mortimer", "http://localhost:" + PORT0 + "/");
+        addrMap.put("Tarpin",   "https://localhost:" + PORT3 + "/");
+        addrMap.put("Rethwel",  "http://localhost:" + PORT4 + "/");
+        addrMap.put("Poltim",   "https://localhost:" + PORT5 + "/");
+        addrMap.put("Gordy",    "https://localhost:" + PORT1 + "/");
+        addrMap.put("Bethal",   "https://localhost:" + PORT2 + "/");
+        addrMap.put("Abost",    "http://localhost:" + PORT7 + "/");
+        addrMap.put("Hurlon",   "http://localhost:" + PORT6 + "/");
+        addrMap.put("Morpit",   "https://localhost:" + PORT8 + "/");
         tlsClientParameters.setDisableCNCheck(true);
     }
     
@@ -270,7 +279,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter mortimer = service.getPort(mortimerQ, Greeter.class);
         assertNotNull("Port is null", mortimer);
-        
+        updateAddressPort(mortimer, PORT0);
+
         String answer = mortimer.sayHi();
         assertTrue("Unexpected answer: " + answer, 
                 "Bonjour from Mortimer".equals(answer));
@@ -299,7 +309,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter rethwel = service.getPort(rethwelQ, Greeter.class);
         assertNotNull("Port is null", rethwel);
-        
+        updateAddressPort(rethwel, PORT5);
+
         String answer = null;
         try {
             answer = rethwel.sayHi();
@@ -346,6 +357,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         Greeter rethwel = service.getPort(rethwelQ, Greeter.class);
+        updateAddressPort(rethwel, PORT4);
         assertNotNull("Port is null", rethwel);
         
         String answer = rethwel.sayHi();
@@ -379,6 +391,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter hurlon = service.getPort(hurlonQ, Greeter.class);
         assertNotNull("Port is null", hurlon);
+        updateAddressPort(hurlon, PORT6);
         
         String answer = null;
         try {
@@ -413,6 +426,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
         assertNotNull("Port is null", bethal);
+        updateAddressPort(bethal, PORT2);
         verifyBethalClient(bethal);        
     }
     
@@ -428,6 +442,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
         ApplicationContext context = bus.getExtension(BusApplicationContext.class);
         Greeter bethal = (Greeter)context.getBean("Bethal");        
+        updateAddressPort(bethal, PORT2);
         // verify the client side's setting
         verifyBethalClient(bethal);         
     }
@@ -477,6 +492,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
         assertNotNull("Port is null", bethal);
+        updateAddressPort(bethal, PORT2);
         
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
@@ -517,7 +533,8 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter poltim = service.getPort(poltimQ, Greeter.class);
         assertNotNull("Port is null", poltim);
-        
+        updateAddressPort(poltim, PORT5);
+
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
         Client client = ClientProxy.getClient(poltim);
@@ -601,6 +618,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter bethal = service.getPort(bethalQ, Greeter.class);
         assertNotNull("Port is null", bethal);
+        updateAddressPort(bethal, PORT2);
         
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
@@ -657,6 +675,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter tarpin = service.getPort(tarpinQ, Greeter.class);
         assertNotNull("Port is null", tarpin);
+        updateAddressPort(tarpin, PORT3);
         
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.
@@ -804,6 +823,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
 
         Greeter gordy = service.getPort(gordyQ, Greeter.class);
         assertNotNull("Port is null", gordy);
+        updateAddressPort(gordy, PORT1);
         
         // Okay, I'm sick of configuration files.
         // This also tests dynamic configuration of the conduit.

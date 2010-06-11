@@ -39,10 +39,11 @@
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
   <http:destination name="{http://apache.org/hello_world}Rethwel.http-destination">
 
-    <http:server RedirectURL="http://localhost:9000/Mortimer"/>
+    <http:server RedirectURL="http://localhost:${testutil.ports.BusServer.0}/Mortimer"/>
   </http:destination>
   
 </beans>

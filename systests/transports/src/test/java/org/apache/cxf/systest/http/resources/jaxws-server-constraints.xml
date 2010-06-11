@@ -30,6 +30,7 @@ under the License.
         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
     <!-- -->
     <!-- This Spring config file is designed to represent a minimal -->
@@ -46,114 +47,114 @@ under the License.
     <!-- Spring-load an HTTPS servant -->
     <!-- -->
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9006"        
-        address="https://localhost:9006/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-0"        
+        address="https://localhost:${testutil.ports.BusServer.0}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9006-tls-config">
+        depends-on="port-testutil.ports.BusServer.0-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>  
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9007"        
-        address="https://localhost:9007/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-1"        
+        address="https://localhost:${testutil.ports.BusServer.1}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9007-tls-config">
+        depends-on="port-testutil.ports.BusServer.1-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server> 
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9008"        
-        address="https://localhost:9008/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-2"        
+        address="https://localhost:${testutil.ports.BusServer.2}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9008-tls-config">
+        depends-on="port-testutil.ports.BusServer.2-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>   
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9009"        
-        address="https://localhost:9009/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-3"        
+        address="https://localhost:${testutil.ports.BusServer.3}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9009-tls-config">
+        depends-on="port-testutil.ports.BusServer.3-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>   
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9010"        
-        address="https://localhost:9010/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-4"        
+        address="https://localhost:${testutil.ports.BusServer.4}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9010-tls-config">
+        depends-on="port-testutil.ports.BusServer.4-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>   
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9011"        
-        address="https://localhost:9011/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-5"        
+        address="https://localhost:${testutil.ports.BusServer.5}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9011-tls-config">
+        depends-on="port-testutil.ports.BusServer.5-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>    
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9012"        
-        address="https://localhost:9012/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-6"        
+        address="https://localhost:${testutil.ports.BusServer.6}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9012-tls-config">
+        depends-on="port-testutil.ports.BusServer.6-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server> 
     
     <jaxws:server 
-        id="JaxwsHttpsEndpoint9013"        
-        address="https://localhost:9013/SoapContext/HttpsPort"
+        id="JaxwsHttpsEndpoint-testutil-ports-BusServer-7"        
+        address="https://localhost:${testutil.ports.BusServer.7}/SoapContext/HttpsPort"
         serviceName="s:SOAPService"
         endpointName="e:HttpsPort"
         xmlns:e="http://apache.org/hello_world/services"
         xmlns:s="http://apache.org/hello_world/services"
-        depends-on="port-9013-tls-config">
+        depends-on="port-testutil.ports.BusServer.7-tls-config">
         <jaxws:serviceBean>
            <bean class="org.apache.cxf.systest.http.GreeterImpl"/>
         </jaxws:serviceBean>
     </jaxws:server>      
     
     <!-- -->
-    <!-- TLS Port configuration parameters for port 9006 -->
+    <!-- TLS Port configuration parameters for port 9000 -->
     <!-- -->
-    <httpj:engine-factory id="port-9006-tls-config">
-        <httpj:engine port="9006">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.0-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.0}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -176,8 +177,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9007 -->
     <!-- -->
-    <httpj:engine-factory id="port-9007-tls-config">
-        <httpj:engine port="9007">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.1-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.1}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -199,8 +200,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9008 -->
     <!-- -->
-    <httpj:engine-factory id="port-9008-tls-config">
-        <httpj:engine port="9008">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.2-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.2}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -223,8 +224,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9009 -->
     <!-- -->
-    <httpj:engine-factory id="port-9009-tls-config">
-        <httpj:engine port="9009">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.3-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.3}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -247,8 +248,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9010 -->
     <!-- -->
-    <httpj:engine-factory id="port-9010-tls-config">
-        <httpj:engine port="9010">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.4-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.4}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -272,8 +273,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9011 -->
     <!-- -->
-    <httpj:engine-factory id="port-9011-tls-config">
-        <httpj:engine port="9011">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.5-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.5}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -296,8 +297,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9012 -->
     <!-- -->
-    <httpj:engine-factory id="port-9012-tls-config">
-        <httpj:engine port="9012">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.6-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.6}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
@@ -315,8 +316,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9013 -->
     <!-- -->
-    <httpj:engine-factory id="port-9013-tls-config">
-        <httpj:engine port="9013">
+    <httpj:engine-factory id="port-testutil.ports.BusServer.7-tls-config">
+        <httpj:engine port="${testutil.ports.BusServer.7}">
             <httpj:tlsServerParameters>
                 <sec:keyManagers keyPassword="password">
 	            <sec:keyStore type="JKS" password="password" 
