@@ -25,10 +25,11 @@ import org.apache.cxf.no_body_parts.NoBodyPartsImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ServerNoBodyParts extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(ServerNoBodyParts.class);
 
     protected void run() {
         Object implementor = new NoBodyPartsImpl();
-        String address = "http://localhost:9020/NoBodyParts/NoBodyPartsService";
+        String address = "http://localhost:" + PORT + "/NoBodyParts/NoBodyPartsService";
         Endpoint.publish(address, implementor);
     }
 

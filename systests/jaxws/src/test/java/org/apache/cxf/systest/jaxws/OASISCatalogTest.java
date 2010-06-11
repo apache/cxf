@@ -35,6 +35,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.catalog.CatalogWSDLLocator;
 import org.apache.cxf.catalog.OASISCatalogManager;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.WSDLManagerImpl;
 
@@ -46,7 +47,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class OASISCatalogTest extends Assert {
-        
+    static final String PORT = TestUtil.getPortNumber(OASISCatalogTest.class);
+
     private final QName serviceName = 
         new QName("http://apache.org/hello_world/services",
                   "SOAPService");    
@@ -57,21 +59,22 @@ public class OASISCatalogTest extends Assert {
 
     @Test
     public void testWSDLPublishWithCatalogs() throws Exception {
-        Endpoint ep = Endpoint.publish(null, new GreeterImpl());
+        Endpoint ep = Endpoint.publish("http://localhost:" + PORT + "/SoapContext/SoapPort",
+                                       new GreeterImpl());
         try {
-            URL url = new URL("http://localhost:9000/SoapContext/SoapPort?"
+            URL url = new URL("http://localhost:" + PORT + "/SoapContext/SoapPort?"
                               + "xsd=hello_world_schema2.xsd");
             assertNotNull(url.getContent());
             String result = IOUtils.toString((InputStream)url.getContent());
             assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
             
             
-            url = new URL("http://localhost:9000/SoapContext/SoapPort"
+            url = new URL("http://localhost:" + PORT + "/SoapContext/SoapPort"
                           + "?xsd=hello_world_schema.xsd");
             result = IOUtils.toString((InputStream)url.getContent());
             assertTrue(result, result.contains("xsd=hello_world_schema2.xsd"));
 
-            url = new URL("http://localhost:9000/SoapContext/SoapPort"
+            url = new URL("http://localhost:" + PORT + "/SoapContext/SoapPort"
                           + "?wsdl=testutils/others/hello_world_messages_catalog.wsdl");
             result = IOUtils.toString((InputStream)url.getContent());
             assertTrue(result, result.contains("xsd=hello_world_schema.xsd"));
