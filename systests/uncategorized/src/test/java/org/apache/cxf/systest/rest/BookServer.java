@@ -37,7 +37,7 @@ import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLOutputFactory;
     
 public class BookServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(BookServer.class);
     protected void run() {
         //book service in unwrapped style
         BookServiceImpl serviceObj = new BookServiceImpl();
@@ -45,7 +45,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setServiceClass(BookService.class);
         // Use the HTTP Binding which understands the Java Rest Annotations
         sf.setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sf.setAddress("http://localhost:9080/xml/");
+        sf.setAddress("http://localhost:" + PORT + "/xml/");
         sf.getServiceFactory().setInvoker(new BeanInvoker(serviceObj));
 
         // Turn the "wrapped" style off. This means that CXF won't generate
@@ -62,7 +62,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sfWrapped.setServiceClass(BookServiceWrapped.class);
         // Use the HTTP Binding which understands the Java Rest Annotations
         sfWrapped.setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sfWrapped.setAddress("http://localhost:9080/xmlwrapped");
+        sfWrapped.setAddress("http://localhost:" + PORT + "/xmlwrapped");
         sfWrapped.getServiceFactory().setInvoker(new BeanInvoker(serviceWrappedObj));
         sfWrapped.create();
         
@@ -71,7 +71,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sfJson.setServiceClass(BookService.class);
         // Use the HTTP Binding which understands the Java Rest Annotations
         sfJson.setBindingId(HttpBindingFactory.HTTP_BINDING_ID);
-        sfJson.setAddress("http://localhost:9080/json");
+        sfJson.setAddress("http://localhost:" + PORT + "/json");
         sfJson.getServiceFactory().setInvoker(new BeanInvoker(serviceObj));
 
         // Turn the "wrapped" style off. This means that CXF won't generate

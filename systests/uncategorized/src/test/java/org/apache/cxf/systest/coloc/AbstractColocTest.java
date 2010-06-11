@@ -22,6 +22,7 @@ package org.apache.cxf.systest.coloc;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.Service;
 
@@ -30,12 +31,15 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 
 public abstract class AbstractColocTest extends Assert {
+    public static final String PORT = TestUtil.getPortNumber(AbstractColocTest.class);
+    
     /**
      * Cxf Bus
      */
@@ -103,7 +107,10 @@ public abstract class AbstractColocTest extends Assert {
         Service srv = Service.create(
                          AbstractColocTest.class.getResource(wsdlLocation),
                          serviceName);
-        return srv.getPort(portName, cls);
+        T t = srv.getPort(portName, cls);
+        ((BindingProvider)t).getRequestContext()
+            .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, getTransportURI());
+        return t;
     }
     /**
      * @return the greeter impl object

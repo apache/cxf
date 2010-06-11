@@ -26,13 +26,13 @@ import javax.xml.ws.Service;
 
 import org.apache.cxf.endpoint.ServiceContractResolverRegistry;
 import org.apache.cxf.endpoint.ServiceContractResolverRegistryImpl;
-import org.apache.cxf.systest.jca.OutBoundConnectionTest.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.hello_world_soap_http.Greeter;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JarResolverTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http", "SOAPService");
 
     private final QName portName = new QName("http://apache.org/hello_world_soap_http", "SoapPort");
@@ -62,6 +62,7 @@ public class JarResolverTest extends AbstractBusClientServerTestBase {
         //service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING,
         //                "http://localhost:9000/SoapContext/SoapPort"); 
         Greeter greeter = service.getPort(portName,  Greeter.class);
+        updateAddressPort(greeter, PORT);
 
         String resp = greeter.sayHi();
         assertNotNull(resp);

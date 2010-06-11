@@ -25,7 +25,7 @@ import org.junit.Test;
 
 
 public class ColocHeaderRpcLitTest extends AbstractHeaderServiceRpcLitTest {
-    static final String TRANSPORT_URI = "http://localhost:9222/headers";
+    static final String TRANSPORT_URI = "http://localhost:" + PORT + "/headers";
 
     private Log logger = LogFactory.getLog(ColocHeaderRpcLitTest.class);
 

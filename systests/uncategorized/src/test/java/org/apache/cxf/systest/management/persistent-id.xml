@@ -21,12 +21,13 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
   
     <bean id="org.apache.cxf.management.InstrumentationManager"
         class="org.apache.cxf.management.jmx.InstrumentationManagerImpl">
         <property name="bus" ref="cxf" />
         <property name="enabled" value="true" />
-        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:9917/jmxrmi" />
+        <property name="JMXServiceURL" value="service:jmx:rmi:///jndi/rmi://localhost:${testutil.ports.ManagedBusTest.3}/jmxrmi" />
         <property name="persistentBusId" value="cxf:managed,bus=test" />
     </bean> 
  

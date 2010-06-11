@@ -26,17 +26,19 @@ import org.apache.cxf.js.rhino.ProviderFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
-
+    public static final String JS_PORT = allocatePort(Server.class);
+    public static final String JSX_PORT = allocatePort(Server.class, 1);
     protected void run()  {
         
         try {            
             ProviderFactory pf = new ProviderFactory();            
             String f = getClass().getResource("resources/hello_world.js").toURI().getPath();
             f = URLDecoder.decode(f, "UTF-8");
-            pf.createAndPublish(new File(f), "http://localhost:9000/SoapContext/SoapPort", false);
+            pf.createAndPublish(new File(f), "http://localhost:" + JS_PORT 
+                                + "/SoapContext/SoapPort", false);
             f = getClass().getResource("resources/hello_world.jsx").toURI().getPath();
             f = URLDecoder.decode(f, "UTF-8");
-            pf.createAndPublish(new File(f), "http://localhost:9100", false);
+            pf.createAndPublish(new File(f), "http://localhost:" + JSX_PORT, false);
         } catch (Exception ex) {
             ex.printStackTrace();
         }

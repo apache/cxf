@@ -53,11 +53,10 @@ public abstract class AbstractWrappedDocLitTest extends AbstractColocTest {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        port = getPort(
-                         getServiceQname(),
-                         getPortQName(),
-                         getWsdlLocation(),
-                         Greeter.class);
+        port = getPort(getServiceQname(),
+                       getPortQName(),
+                       getWsdlLocation(),
+                       Greeter.class);
     }
 
     @Test

@@ -31,7 +31,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {    
-
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/intfault",
                                                 "SOAPService");
     @BeforeClass
@@ -48,6 +48,7 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         Greeter greeter = service.getSoapPort();
+        updateAddressPort(greeter, PORT);
         try {
             greeter.testDocLitFault("fault");
         } catch (BadRecordLitFault e) {

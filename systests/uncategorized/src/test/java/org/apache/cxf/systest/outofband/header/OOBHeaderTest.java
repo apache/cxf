@@ -57,7 +57,7 @@ import org.junit.Test;
 
 
 public class OOBHeaderTest extends AbstractBusClientServerTestBase {    
-
+    public static final String PORT = Server.PORT;
     public static final String CONFIG_FILE = "org/apache/cxf/systest/outofband/header/cxf.xml";
     
     public static final String TEST_HDR_NS = "http://cxf.apache.org/outofband/Header";
@@ -177,7 +177,8 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         assertNotNull("Service is null", service);
 
         PutLastTradedPricePortType putLastTradedPrice = service.getPort(portName,
-            PutLastTradedPricePortType.class);        
+            PutLastTradedPricePortType.class);
+        updateAddressPort(putLastTradedPrice, PORT);
                 
         TradePriceData priceData = new TradePriceData();
         priceData.setTickerPrice(1.0f);
@@ -206,13 +207,13 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         String address = "";
         switch (i) {
         case 0:
-            address = "http://localhost:9107/SOAPDocLitBareService/SoapPort";
+            address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPort";
             break;
         case 1:
-            address = "http://localhost:9107/SOAPDocLitBareService/SoapPortNoHeader";
+            address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortNoHeader";
             break;
         default:
-            address = "http://localhost:9107/SOAPDocLitBareService/SoapPortHeader";                
+            address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader";                
         }
         ((BindingProvider)putLastTradedPrice).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);

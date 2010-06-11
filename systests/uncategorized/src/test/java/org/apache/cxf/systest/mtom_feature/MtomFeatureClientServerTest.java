@@ -35,7 +35,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = Server.PORT;
     private final QName serviceName = new QName("http://apache.org/cxf/systest/mtom_feature",
                                                 "HelloService");
     private Hello port = getPort();
@@ -124,6 +124,12 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         HelloService service = new HelloService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
         //return service.getHelloPort();        
-        return service.getHelloPort(new MTOMFeature());
+        Hello hello = service.getHelloPort(new MTOMFeature());
+        try {
+            updateAddressPort(hello, PORT);
+        } catch (Exception e) {
+            //ignore
+        }
+        return hello;
     }
 }

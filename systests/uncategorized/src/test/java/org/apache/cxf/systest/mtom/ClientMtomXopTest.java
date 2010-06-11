@@ -56,7 +56,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = Server.PORT;
     public static final QName MTOM_PORT = new QName("http://cxf.apache.org/mime", "TestMtomPort");
     public static final QName MTOM_SERVICE = new QName("http://cxf.apache.org/mime", "TestMtomService");
 
@@ -182,7 +182,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         assertNotNull(r);
     }
 
-    private static <T> T createPort(QName serviceName, QName portName, Class<T> serviceEndpointInterface,
+    private <T> T createPort(QName serviceName, QName portName, Class<T> serviceEndpointInterface,
                                     boolean enableMTOM, boolean installInterceptors) throws Exception {
         Bus bus = BusFactory.getDefaultBus();
         ReflectionServiceFactoryBean serviceFactory = new JaxWsServiceFactoryBean();
@@ -209,6 +209,7 @@ public class ClientMtomXopTest extends AbstractBusClientServerTestBase {
         Object obj = Proxy
             .newProxyInstance(serviceEndpointInterface.getClassLoader(),
                               new Class[] {serviceEndpointInterface, BindingProvider.class}, ih);
+        updateAddressPort(obj, PORT);
         return serviceEndpointInterface.cast(obj);
     }
 }

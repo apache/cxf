@@ -27,10 +27,11 @@ import org.apache.cxf.mtom_xop.TestMtomImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run() {
         Object implementor = new TestMtomImpl();
-        String address = "http://localhost:9036/mime-test";
+        String address = "http://localhost:" + PORT + "/mime-test";
         try {
             EndpointImpl jaxep = (EndpointImpl) javax.xml.ws.Endpoint.publish(address, implementor);
             Endpoint ep = jaxep.getServer().getEndpoint();

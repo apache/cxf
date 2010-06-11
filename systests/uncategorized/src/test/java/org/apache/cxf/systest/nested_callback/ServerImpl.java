@@ -24,6 +24,7 @@ import java.net.URL;
 
 import javax.annotation.Resource;
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Service;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
@@ -64,7 +65,7 @@ public class ServerImpl implements ServerPortType  {
             QName interfaceName = EndpointReferenceUtils.getInterfaceName(callback, bus);
             String wsdlLocation = EndpointReferenceUtils.getWSDLLocation(callback);
             QName serviceName = EndpointReferenceUtils.getServiceName(callback, bus);
-
+            String address = EndpointReferenceUtils.getAddress(callback);
             
             String portString = EndpointReferenceUtils.getPortName(callback);
             
@@ -87,6 +88,8 @@ public class ServerImpl implements ServerPortType  {
             URL wsdlURL = new URL(wsdlLocation);            
             Service service = Service.create(wsdlURL, serviceName);
             CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
+            ((BindingProvider)port).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
 
             port.serverSayHi("Sean");
 

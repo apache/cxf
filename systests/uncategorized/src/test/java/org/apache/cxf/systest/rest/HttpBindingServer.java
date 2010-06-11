@@ -25,10 +25,10 @@ import javax.xml.ws.http.HTTPBinding;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class HttpBindingServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(HttpBindingServer.class);
     protected void run() {
         Endpoint e = Endpoint.create(HTTPBinding.HTTP_BINDING, new RestSourcePayloadProviderHttpBinding());
-        String address = "http://localhost:9024/XMLService/RestProviderPort/Customer";
+        String address = "http://localhost:" + PORT + "/XMLService/RestProviderPort/Customer";
         e.publish(address);
     }        
 

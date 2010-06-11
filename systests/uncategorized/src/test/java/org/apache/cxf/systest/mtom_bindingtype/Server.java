@@ -24,10 +24,11 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run()  {    
         Object implementor = new HelloImpl();
-        String address = "http://localhost:9091/jaxws-mtom/hello";
+        String address = "http://localhost:" + PORT + "/jaxws-mtom/hello";
         Endpoint.publish(address, implementor);
     }
 

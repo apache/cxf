@@ -44,6 +44,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
@@ -55,8 +56,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MtomPolicyTest extends AbstractCXFTest {
-    
-    String address = "http://localhost:9036/EchoService";
+    public static final String PORT = TestUtil.getPortNumber(MtomPolicyTest.class);
+    String address = "http://localhost:" + PORT + "/EchoService";
     
     @BeforeClass
     public static void setKeepAliveProperty() {
