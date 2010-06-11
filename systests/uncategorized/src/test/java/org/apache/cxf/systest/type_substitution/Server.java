@@ -24,10 +24,11 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run()  {    
         Object implementor = new CarDealerImpl();
-        String address = "http://localhost:9070/jaxws-type_substitution/cardealer";
+        String address = "http://localhost:" + PORT + "/jaxws-type_substitution/cardealer";
         Endpoint.publish(address, implementor);
     }
 

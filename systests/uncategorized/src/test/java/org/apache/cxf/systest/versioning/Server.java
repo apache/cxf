@@ -28,9 +28,10 @@ import org.apache.hello_world_mixedstyle.GreeterImplMixedStyle;
 
 
 public class Server extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(Server.class);
+    
     protected void run() {
-        String address = "http://localhost:9027/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
         Object implementor1 = new GreeterImplMixedStyle(" version1");
         EndpointImpl ep1 = (EndpointImpl) Endpoint.publish(address, implementor1);

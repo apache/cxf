@@ -20,11 +20,10 @@
 
 package org.apache.cxf.systest.callback;
 
-import java.net.URL;
-
 import javax.annotation.Resource;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
 import org.apache.callback.CallbackPortType;
@@ -62,9 +61,8 @@ public class ServerImpl implements ServerPortType  {
             EndpointReferenceType callback = VersionTransformer.convertToInternal(w3cRef);
         
             QName interfaceName = EndpointReferenceUtils.getInterfaceName(callback, bus);
-            String wsdlLocation = EndpointReferenceUtils.getWSDLLocation(callback);
             QName serviceName = EndpointReferenceUtils.getServiceName(callback, bus);
-
+            String address = EndpointReferenceUtils.getAddress(callback);
             
             String portString = EndpointReferenceUtils.getPortName(callback);
             
@@ -83,9 +81,8 @@ public class ServerImpl implements ServerPortType  {
                 ex.printStackTrace();
             }
             
-            URL wsdlURL = new URL(wsdlLocation);            
-            Service service = Service.create(wsdlURL, serviceName);
-            
+            Service service = Service.create(null, serviceName);
+            service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
             CallbackPortType port =  (CallbackPortType)service.getPort(portName, sei);
 
             port.serverSayHi("Sean");

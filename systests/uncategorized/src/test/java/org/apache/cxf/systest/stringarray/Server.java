@@ -23,9 +23,11 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(Server.class);
+    
     protected void run() {
         Object implementor = new StringArrayTestImpl();
-        String address = "http://localhost:9992/SOAPServiceRPCLit/SoapPort";
+        String address = "http://localhost:" + PORT + "/SOAPServiceRPCLit/SoapPort";
         try {            
             Endpoint.publish(address, implementor);
         } catch (Exception e) {

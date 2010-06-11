@@ -28,6 +28,8 @@ import javax.xml.ws.Holder;
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 import org.apache.type_test.types2.StructWithAnyArrayLax;
 import org.apache.type_test.types2.StructWithAnyStrict;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -37,6 +39,12 @@ public class SOAPRpcLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final QName SERVICE_NAME = new QName("http://apache.org/type_test/rpc", "SOAPService");
 
     protected static final QName PORT_NAME = new QName("http://apache.org/type_test/rpc", "SOAPPort");
+    static final String PORT = SOAPRpcLitServerImpl.PORT;
+    
+    @Before
+    public void updatePort() throws Exception {
+        updateAddressPort(rpcClient, PORT);
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {

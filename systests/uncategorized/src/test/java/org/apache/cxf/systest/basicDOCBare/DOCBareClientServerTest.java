@@ -38,7 +38,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {    
-
+    public static final String PORT = Server.PORT;
+    
     private final QName serviceName = new QName("http://apache.org/hello_world_doc_lit_bare",
                                                 "SOAPService");
     private final QName portName = new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort");
@@ -60,6 +61,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
 
         PutLastTradedPricePortType putLastTradedPrice = service.getPort(portName,
                                                                         PutLastTradedPricePortType.class);
+        updateAddressPort(putLastTradedPrice, PORT);
         String response = putLastTradedPrice.bareNoParam();
         assertEquals("testResponse", response);
         
@@ -109,6 +111,7 @@ public class DOCBareClientServerTest extends AbstractBusClientServerTestBase {
 
         PutLastTradedPricePortType port = service.getPort(portName,
                                                           PutLastTradedPricePortType.class);
+        updateAddressPort(port, PORT);
         String result = port.nillableParameter(null);
         assertNull(result);
     } 

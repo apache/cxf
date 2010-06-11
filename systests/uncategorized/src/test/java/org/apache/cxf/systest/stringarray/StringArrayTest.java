@@ -33,6 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class StringArrayTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -63,6 +64,7 @@ public class StringArrayTest extends AbstractBusClientServerTestBase {
         getBus().getOutInterceptors().add(logOut);
         SOAPServiceRPCLit service = new SOAPServiceRPCLit();
         StringListTest port = service.getSoapPortRPCLit();
+        updateAddressPort(port, PORT);
         String[] strs = new String[]{"org", "apache", "cxf"};
         String[] res =  port.stringListTest(strs);
         assertArrayEquals(strs, res);      

@@ -31,6 +31,8 @@ import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
 import org.apache.type_test.types1.FixedArray;
 import org.apache.type_test.types2.StructWithAnyArrayLax;
 import org.apache.type_test.types2.StructWithAnyStrict;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -38,8 +40,14 @@ public class SOAPDocLitClientTypeTest extends AbstractTypeTestClient5 {
     protected static final String WSDL_PATH = "/wsdl/type_test/type_test_doclit_soap.wsdl";
     protected static final QName SERVICE_NAME = new QName("http://apache.org/type_test/doc", "SOAPService");
     protected static final QName PORT_NAME = new QName("http://apache.org/type_test/doc", "SOAPPort");
+    static final String PORT = SOAPDocLitServerImpl.PORT;
 
 
+    @Before
+    public void updatePort() throws Exception {
+        updateAddressPort(docClient, PORT);
+    }
+    
     @BeforeClass
     public static void startServers() throws Exception {
         boolean ok = launchServer(SOAPDocLitServerImpl.class);

@@ -21,13 +21,19 @@ package org.apache.cxf.systest.type_test.xml;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.systest.type_test.AbstractTypeTestClient5;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 
 public class XMLClientTypeTest extends AbstractTypeTestClient5 {
     static final String WSDL_PATH = "/wsdl/type_test/type_test_xml.wsdl";
     static final QName SERVICE_NAME = new QName("http://apache.org/type_test/xml", "XMLService");
     static final QName PORT_NAME = new QName("http://apache.org/type_test/xml", "XMLPort");
-
+    static final String PORT = XMLServerImpl.PORT;
+    @Before
+    public void updatePort() throws Exception {
+        updateAddressPort(xmlClient, PORT);
+    }
 
     @BeforeClass
     public static void startServers() throws Exception {

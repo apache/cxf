@@ -33,7 +33,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerVersioningTest extends AbstractClientServerTestBase {
-
+    private static final String PORT = Server.PORT;
     private final QName portName = new QName("http://apache.org/hello_world_mixedstyle", "SoapPort");
 
     @BeforeClass
@@ -49,6 +49,7 @@ public class ClientServerVersioningTest extends AbstractClientServerTestBase {
 
         try {
             Greeter greeter = service.getPort(portName, Greeter.class);
+            updateAddressPort(greeter, PORT);
 
             GreetMe1 request = new GreetMe1();
             request.setRequestType("Bonjour");

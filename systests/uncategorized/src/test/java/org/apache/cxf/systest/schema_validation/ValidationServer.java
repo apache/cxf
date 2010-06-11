@@ -26,6 +26,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ValidationServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(ValidationServer.class);
 
     private String oldConfig;
 
@@ -39,7 +40,7 @@ public class ValidationServer extends AbstractBusTestServerBase {
 
     protected void run() {
         Object implementor = new SchemaValidationImpl();
-        String address = "http://localhost:9900/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
     }
 

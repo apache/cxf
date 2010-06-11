@@ -32,7 +32,7 @@ import org.apache.type_test.doc.TypeTestPortType;
 import org.apache.type_test.types1.FixedArray;
 
 public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
-    
+    public static final String PORT = allocatePort(SOAPDocLitServerImpl.class);
 
     public void run()  {
         SpringBusFactory sf = new SpringBusFactory();
@@ -40,7 +40,7 @@ public class SOAPDocLitServerImpl extends AbstractBusTestServerBase {
         BusFactory.setDefaultBus(
             sf.createBus("org/apache/cxf/systest/type_test/databinding-schema-validation.xml"));
         Object implementor = new SOAPTypeTestImpl();
-        String address = "http://localhost:9007/SOAPService/SOAPPort/";
+        String address = "http://localhost:" + PORT + "/SOAPService/SOAPPort/";
         Endpoint.publish(address, implementor);              
     }
 

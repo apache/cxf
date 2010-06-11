@@ -26,10 +26,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.type_test.rpc.TypeTestPortType;
 
 public class SOAPRpcLitServerImpl extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(SOAPRpcLitServerImpl.class);
 
     public void run()  {
         Object implementor = new SOAPTypeTestImpl();
-        String address = "http://localhost:9006/SOAPService/SOAPPort/";
+        String address = "http://localhost:" + PORT + "/SOAPService/SOAPPort/";
         Endpoint.publish(address, implementor);
     }
 

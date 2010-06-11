@@ -29,6 +29,7 @@ import javax.xml.ws.Endpoint;
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.hello_world_soap_http.Greeter;
 import org.apache.hello_world_soap_http.GreeterImpl;
 import org.apache.hello_world_soap_http.SOAPService;
@@ -40,6 +41,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class BusShutdownTest extends Assert {
+    public static final String PORT = TestUtil.getPortNumber(BusShutdownTest.class);
+
+    
     @BeforeClass
     public static void setKeepAliveProperty() {
         TestUtilities.setKeepAliveSystemProperty(false);
@@ -59,7 +63,7 @@ public class BusShutdownTest extends Assert {
         URL wsdlUrl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull("wsdl resource was not found", wsdlUrl); 
         // Since this test always fails in linux box, try to use other port
-        String serverAddr = "http://localhost:40000/greeter/port";
+        String serverAddr = "http://localhost:" + PORT + "/greeter/port";
         makeTwoWayCallOnNewBus(wsdlUrl, serverAddr);
         
         
