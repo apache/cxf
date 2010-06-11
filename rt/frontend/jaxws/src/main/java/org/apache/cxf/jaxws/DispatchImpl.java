@@ -55,6 +55,7 @@ import javax.xml.ws.soap.SOAPFaultException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.common.i18n.Message;
@@ -289,35 +290,32 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                     wsaEnabled = true; 
                 }
             }
-            if (wsaEnabled) {
-                QName dispatchedOpName = null;
-
+            Map<String, QName> payloadOPMap = 
+                createPayloadEleOpNameMap(client.getEndpoint().getBinding().getBindingInfo());
+            if (wsaEnabled && !payloadOPMap.isEmpty()) {
+                String payloadElementName = null;              
                 if (obj instanceof javax.xml.transform.Source) {
                     try {
                         XMLStreamReader reader = StaxUtils
                             .createXMLStreamReader((javax.xml.transform.Source)obj);
                         Document document = StaxUtils.read(reader);
-                        dispatchedOpName = getDispatchedOpName(document.getDocumentElement());
-                        if (dispatchedOpName != null) {
-                            createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
-                        }
-                    } catch (Exception e) {
-                        createdSource = null;
-                        opName = null;
+                        createdSource = new StaxSource(StaxUtils.createXMLStreamReader(document));
+                        payloadElementName = getPayloadElementName(document.getDocumentElement());
+                    } catch (Exception e) {                        
                         // ignore, we are tring to get the operation name
                     }
                 }
                 if (obj instanceof SOAPMessage) {
-                    dispatchedOpName = getDispatchedOpName((SOAPMessage)obj);
+                    payloadElementName = getPayloadElementName((SOAPMessage)obj);
 
                 }
 
                 if (this.context != null) {
-                    dispatchedOpName = getDispatchedOpName(obj);
+                    payloadElementName = getPayloadElementName(obj);
                 }
 
-                if (dispatchedOpName != null) {
-
+                if (payloadElementName != null) {
+                    QName dispatchedOpName = payloadOPMap.get(payloadElementName);
                     BindingOperationInfo bop = client.getEndpoint().getBinding().getBindingInfo()
                         .getOperation(opName);
                     if (bop != null) {
@@ -375,12 +373,7 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
         return client;
     }
     
-    @SuppressWarnings("unchecked")
-    private QName getDispatchedOpName(Element ele) {
-        String payLoadName = null;
-        Map<String, QName> map = (Map<String, QName>)client.getEndpoint().getEndpointInfo().getBinding()
-            .getProperty("payloadElementOpNameMap");
-        
+    private String getPayloadElementName(Element ele) {
         XMLStreamReader xmlreader = StaxUtils.createXMLStreamReader(ele);
         DepthXMLStreamReader reader = new DepthXMLStreamReader(xmlreader);
         try {
@@ -388,46 +381,35 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
 
                 StaxUtils.skipToStartOfElement(reader);
 
-                payLoadName = reader.getName().toString();
+                return reader.getName().toString();
             }
             if (this.mode == Service.Mode.MESSAGE) {
                 StaxUtils.skipToStartOfElement(reader);
                 StaxUtils.toNextTag(reader,
                                     new QName("http://schemas.xmlsoap.org/soap/envelope/", "Body"));
                 reader.nextTag();
-                payLoadName = reader.getName().toString();
+                return reader.getName().toString();
             }
         } catch (XMLStreamException e) {
             // ignore
         }
-        if (map != null && payLoadName != null) {
-            return map.get(payLoadName);
-        }
         return null;
         
     }
     
     
-    @SuppressWarnings("unchecked")
-    private QName getDispatchedOpName(SOAPMessage soapMessage) {
-        String payLoadName = null;
-        Map<String, QName> map = (Map<String, QName>)client.getEndpoint().getEndpointInfo().getBinding()
-            .getProperty("payloadElementOpNameMap");
+    private String getPayloadElementName(SOAPMessage soapMessage) {
         try {            
             SOAPElement element  = (SOAPElement)soapMessage.getSOAPBody().getChildElements().next();
-            payLoadName = new QName(element.getNamespaceURI(), element.getLocalName()).toString(); 
+            return new QName(element.getNamespaceURI(), element.getLocalName()).toString();
         } catch (Exception e) {
             //ignore
         }
-        
-        if (map != null && payLoadName != null) {
-            return map.get(payLoadName);
-        }
         return null;
         
     }
     
-    private QName getDispatchedOpName(Object object) {
+    private String getPayloadElementName(Object object) {
         JAXBDataBinding dataBinding = new JAXBDataBinding();
         dataBinding.setContext(context);
         DataWriter<XMLStreamWriter> dbwriter = dataBinding.createWriter(XMLStreamWriter.class);
@@ -444,12 +426,36 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
 
                 StaxUtils.skipToStartOfElement(reader);
 
-                return reader.getName();
+                return reader.getName().toString();
 
             }
         } catch (XMLStreamException e) {
             // ignore
         }
         return null;
-    }   
+    }
+    
+    private Map<String, QName> createPayloadEleOpNameMap(BindingInfo bindingInfo) {
+        Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
+        for (BindingOperationInfo bop : bindingInfo.getOperations()) {
+            SoapOperationInfo soi = (SoapOperationInfo)bop.getExtensor(SoapOperationInfo.class);
+            if (soi != null) {
+                if ("document".equals(soi.getStyle())) {
+                    // if doc
+                    if (bop.getOperationInfo().getInput() != null
+                        && !bop.getOperationInfo().getInput().getMessageParts().isEmpty()) {
+                        QName qn = bop.getOperationInfo().getInput().getMessagePartByIndex(0)
+                            .getElementQName();
+                        payloadElementMap.put(qn.toString(), bop.getOperationInfo().getName());
+                    }
+                } else if ("rpc".equals(soi.getStyle())) {
+                    // if rpc
+                    payloadElementMap.put(bop.getOperationInfo().getName().toString(), bop.getOperationInfo()
+                        .getName());
+                }
+            }
+        }
+        return payloadElementMap;
+    }
+    
 }
