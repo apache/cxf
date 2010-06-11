@@ -48,8 +48,7 @@ public class CustomOutFaultInterceptor extends AbstractPhaseInterceptor<Message>
         if (ex == null) {
             throw new RuntimeException("Exception is expected");
         }
-        Fault fault = (Fault)ex;
-        if (fault == null) {
+        if (!(ex instanceof Fault)) {
             throw new RuntimeException("Fault is expected");
         }
         // deal with the actual exception : fault.getCause()
