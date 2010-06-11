@@ -358,11 +358,8 @@ public class WSDL2JavaMojo extends AbstractMojo {
         try {
             classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
 
-            bus = BusFactory.newInstance().createBus();
-            BusFactory.setThreadDefaultBus(bus);
-
             for (WsdlOption o : effectiveWsdlOptions) {
-                callWsdl2Java(o);
+                bus = callWsdl2Java(o, bus);
 
                 File dirs[] = o.getDeleteDirs();
                 if (dirs != null) {
@@ -388,7 +385,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
         System.gc();
     }
 
-    private void callWsdl2Java(WsdlOption wsdlOption) throws MojoExecutionException {
+    private Bus callWsdl2Java(WsdlOption wsdlOption, Bus bus) throws MojoExecutionException {
         File outputDirFile = wsdlOption.getOutputDir();
         outputDirFile.mkdirs();
         URI basedir = project.getBasedir().toURI();
@@ -396,9 +393,14 @@ public class WSDL2JavaMojo extends AbstractMojo {
         File doneFile = getDoneFile(basedir, wsdlURI);
 
         if (!shouldRun(wsdlOption, doneFile, wsdlURI)) {
-            return;
+            return bus;
         }
-        
+
+        if (bus == null) {
+            bus = BusFactory.newInstance().createBus();
+            BusFactory.setThreadDefaultBus(bus);
+        }
+
         doneFile.delete();
         List<String> list = wsdlOption.generateCommandLine(outputDirFile, basedir, wsdlURI, getLog()
             .isDebugEnabled());
@@ -416,6 +418,7 @@ public class WSDL2JavaMojo extends AbstractMojo {
             getLog().warn("Could not create marker file " + doneFile.getAbsolutePath());
             getLog().debug(e);
         }
+        return bus;
     }
 
     private File getDoneFile(URI basedir, URI wsdlURI) {
