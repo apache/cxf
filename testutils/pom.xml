@@ -253,7 +253,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-common-xsd</artifactId>
-                <version>${version}</version>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -279,12 +279,12 @@
                     <dependency>
                         <groupId>org.apache.cxf</groupId>
                         <artifactId>cxf-xjc-dv</artifactId>
-                        <version>${version}</version>
+                        <version>${project.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>org.apache.cxf</groupId>
                         <artifactId>cxf-common-utilities</artifactId>
-                        <version>${version}</version>
+                        <version>${project.version}</version>
                     </dependency>
                 </dependencies>
             </plugin>
