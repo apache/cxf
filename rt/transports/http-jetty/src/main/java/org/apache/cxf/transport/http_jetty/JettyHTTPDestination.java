@@ -162,7 +162,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         try {
             url = new URL(endpointInfo.getAddress());
         } catch (Exception e) {
-            throw new Fault(new Message("START_UP_SERVER_FAILED_MSG", LOG, e.getMessage()), e);
+            throw new Fault(e);
         }
         engine.addServant(url, 
                           new JettyHTTPHandler(this, contextMatchOnExact()));
