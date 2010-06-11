@@ -39,6 +39,7 @@ import org.apache.cxf.frontend.ClientProxyFactoryBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.DataHandlerBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
 import org.apache.cxf.test.TestUtilities;
+import org.apache.cxf.testutil.common.TestUtil;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -51,7 +52,8 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
  */
 @ContextConfiguration(locations = { "classpath:mtomTestBeans.xml" })
 public class MtomTest extends AbstractJUnit4SpringContextTests {
-    
+    static final String PORT = TestUtil.getPortNumber(MtomTest.class);
+
     private org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl impl;
     private org.apache.cxf.systest.aegis.mtom.fortest.MtomTest client;
     private TestUtilities testUtilities;
@@ -65,7 +67,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         aegisBinding.setMtomEnabled(enableClientMTOM);
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setDataBinding(aegisBinding);
-        proxyFac.setAddress("http://localhost:9002/mtom");
+        proxyFac.setAddress("http://localhost:" + PORT + "/mtom");
         proxyFac.setServiceClass(org.apache.cxf.systest.aegis.mtom.fortest.MtomTest.class);
         Map<String, Object> props = new HashMap<String, Object>();
         if (enableClientMTOM) {
@@ -144,7 +146,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         String url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
         Assert.assertEquals(SOAPConstants.XSD, url);
         
-        s = testUtilities.getServerForAddress("http://localhost:9002/mtomXmime");
+        s = testUtilities.getServerForAddress("http://localhost:" + PORT + "/mtomXmime");
         wsdl = testUtilities.getWSDLDocument(s); 
         Assert.assertNotNull(wsdl);
         typeAttrList = 

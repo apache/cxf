@@ -43,6 +43,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AegisClientServerTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(AegisServer.class);
     static final Logger LOG = LogUtils.getLogger(AegisClientServerTest.class);
     
     @BeforeClass
@@ -56,7 +57,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         ClientProxyFactoryBean proxyFactory = new ClientProxyFactoryBean();
         proxyFactory.setDataBinding(aegisBinding);
         proxyFactory.setServiceClass(AuthService.class);
-        proxyFactory.setAddress("http://localhost:9002/service");
+        proxyFactory.setAddress("http://localhost:" + PORT + "/service");
         AuthService service = (AuthService) proxyFactory.create();
         assertTrue(service.authenticate("Joe", "Joe", "123"));
         assertFalse(service.authenticate("Joe1", "Joe", "fang"));      
@@ -86,7 +87,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
         proxyFactory.setDataBinding(aegisBinding);
         proxyFactory.setServiceClass(AuthService.class);
-        proxyFactory.setAddress("http://localhost:9002/jaxwsAndAegis");
+        proxyFactory.setAddress("http://localhost:" + PORT + "/jaxwsAndAegis");
         AuthService service = (AuthService) proxyFactory.create();
         assertTrue(service.authenticate("Joe", "Joe", "123"));
         assertFalse(service.authenticate("Joe1", "Joe", "fang"));      
@@ -118,7 +119,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testWSDL() throws Exception {
-        URL url = new URL("http://localhost:9002/jaxwsAndAegis?wsdl");
+        URL url = new URL("http://localhost:" + PORT + "/jaxwsAndAegis?wsdl");
         Document dom = XMLUtils.parse(url.openStream());
         TestUtilities util = new TestUtilities(this.getClass());
         util.addDefaultNamespaces();
@@ -131,7 +132,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
                            + "xsd:sequence/xsd:element[@nillable='true']",
                            dom);
         
-        url = new URL("http://localhost:9002/serviceWithCustomNS?wsdl");
+        url = new URL("http://localhost:" + PORT + "/serviceWithCustomNS?wsdl");
         dom = XMLUtils.parse(url.openStream());
         util.assertValid("//wsdl:definitions[@targetNamespace='http://foo.bar.com']",
                          dom);
@@ -143,7 +144,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
         JaxWsProxyFactoryBean proxyFactory = new JaxWsProxyFactoryBean();
         proxyFactory.setDataBinding(aegisBinding);
         proxyFactory.setServiceClass(SportsService.class);
-        proxyFactory.setWsdlLocation("http://localhost:9002/jaxwsAndAegisSports?wsdl");
+        proxyFactory.setWsdlLocation("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl");
         SportsService service = (SportsService) proxyFactory.create();
 
         Collection<Team> teams = service.getTeams();
@@ -158,7 +159,7 @@ public class AegisClientServerTest extends AbstractBusClientServerTestBase {
     @Test
     public void testDynamicClient() throws Exception {
         DynamicClientFactory dcf = DynamicClientFactory.newInstance();
-        Client client = dcf.createClient("http://localhost:9002/jaxwsAndAegisSports?wsdl");
+        Client client = dcf.createClient("http://localhost:" + PORT + "/jaxwsAndAegisSports?wsdl");
 
         Object r = client.invoke("getAttributeBean")[0];
         Method getAddrPlainString = r.getClass().getMethod("getAttrPlainString");

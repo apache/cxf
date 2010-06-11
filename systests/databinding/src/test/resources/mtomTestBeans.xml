@@ -36,6 +36,8 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
+
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 	
     <cxf:bus>
       <cxf:features>
@@ -46,7 +48,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<bean id="mtomImpl"
 		class="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl" />
 
-	<simple:server id="mtom-server" address="http://localhost:9002/mtom"
+	<simple:server id="mtom-server" address="http://localhost:${testutil.ports.MtomTest}/mtom"
 		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
 		<simple:dataBinding>
 			<bean
@@ -69,7 +71,7 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 		</simple:serviceFactory>
 	</simple:server>
 	
-	<simple:server id="mtom-xmime-server" address="http://localhost:9002/mtomXmime"
+	<simple:server id="mtom-xmime-server" address="http://localhost:${testutil.ports.MtomTest}/mtomXmime"
 		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
 		<simple:dataBinding>
 			<bean
