@@ -284,6 +284,7 @@
                             org.apache.commons.lang*;resolution:=optional,
                             org.apache.commons.codec*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
+                            org.apache.mina*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xmlbeans*;resolution:=optional,
                             org.apache.xml.security*;resolution:=optional,
