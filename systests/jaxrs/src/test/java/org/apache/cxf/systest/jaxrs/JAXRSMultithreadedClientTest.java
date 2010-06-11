@@ -41,6 +41,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -50,49 +51,49 @@ public class JAXRSMultithreadedClientTest extends AbstractBusClientServerTestBas
     
     @Test
     public void testStatefulWebClientWithCopy() throws Exception {
-        runWebClients(WebClient.create("http://localhost:9080/bookstore"), 10, false, true);
+        runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore"), 10, false, true);
     }
     
     @Test
     public void testStatefulWebClientThreadLocal() throws Exception {
-        runWebClients(WebClient.create("http://localhost:9080/bookstore", true), 10, true, true);
+        runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore", true), 10, true, true);
     }
     
     @Test
     public void testStatefulWebClientThreadLocalWithCopy() throws Exception {
-        runWebClients(WebClient.create("http://localhost:9080/bookstore", true), 10, false, true);
+        runWebClients(WebClient.create("http://localhost:" + PORT + "/bookstore", true), 10, false, true);
     }
     
     @Test
     public void testSimpleWebClient() throws Exception {
-        WebClient client = WebClient.create("http://localhost:9080/bookstore/booksecho");
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/booksecho");
         client.type("text/plain").accept("text/plain").header("CustomHeader", "CustomValue");
         runWebClients(client, 10, true, false);
     }
     
     @Test
     public void testSimpleProxy() throws Exception {
-        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class);
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         runProxies(proxy, 10, true, false);
     }
     
     @Test
     public void testThreadSafeProxy() throws Exception {
-        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class,
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
         runProxies(proxy, 10, true, true);
     }
     
     @Test
     public void testThreadSafeProxyWithCopy() throws Exception {
-        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class,
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
         runProxies(proxy, 10, false, true);
     }
     
     @Test
     public void testThreadSafeSubProxy() throws Exception {
-        BookStore proxy = JAXRSClientFactory.create("http://localhost:9080", BookStore.class,
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class,
                                                     Collections.emptyList(), true);
         
         runProxies(proxy.echoThroughBookStoreSub(), 10, true, true);

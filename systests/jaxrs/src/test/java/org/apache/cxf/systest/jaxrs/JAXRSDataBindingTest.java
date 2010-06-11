@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookDataBindingServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -39,7 +40,8 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookJAXB() throws Exception {
-        WebClient client = WebClient.create("http://localhost:9080/databinding/jaxb/bookstore/books/123");
+        WebClient client = WebClient.create("http://localhost:" 
+                                            + PORT + "/databinding/jaxb/bookstore/books/123");
         Book book = client.accept("application/xml").get(Book.class);
         assertEquals(123L, book.getId());
         assertEquals("CXF in Action", book.getName());
@@ -47,7 +49,8 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBookAegis() throws Exception {
-        WebClient client = WebClient.create("http://localhost:9080/databinding/aegis/bookstore/books/123",
+        WebClient client = WebClient.create("http://localhost:"
+                                            + PORT + "/databinding/aegis/bookstore/books/123",
                                             Collections.singletonList(new AegisElementProvider()));
         Book book = client.accept("application/xml").get(Book.class);
         assertEquals(123L, book.getId());

@@ -24,14 +24,14 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class MultipartServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(MultipartServer.class);
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(MultipartStore.class);
         //default lifecycle is per-request, change it to singleton
         sf.setResourceProvider(MultipartStore.class,
                                new SingletonResourceProvider(new MultipartStore()));
-        sf.setAddress("http://localhost:9085/");
+        sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.create();        
     }

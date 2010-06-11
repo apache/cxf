@@ -42,13 +42,14 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
 
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
 
         protected void run() {
             JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
-            sf.setAddress("http://localhost:9080/");
+            sf.setAddress("http://localhost:" + PORT + "/");
             
             UserResource ur = new UserResource();
             ur.setName(BookStoreNoAnnotations.class.getName());
@@ -108,20 +109,20 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
     
     @Test
     public void testGetBook123() throws Exception {
-        getAndCompare("http://localhost:9080/bookstoreNoAnnotations/books/123",
+        getAndCompare("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123",
                       "application/xml", 200);
     }
     
     @Test
     public void testGetBookInterface123() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore2/books/123",
+        getAndCompare("http://localhost:" + PORT + "/bookstore2/books/123",
                       "application/xml", 200);
     }
     
     @Test
     public void testGetChapter() throws Exception {
         
-        getAndCompareChapter("http://localhost:9080/bookstoreNoAnnotations/books/123/chapter",
+        getAndCompareChapter("http://localhost:" + PORT + "/bookstoreNoAnnotations/books/123/chapter",
                       "application/xml", 200);
     }
     

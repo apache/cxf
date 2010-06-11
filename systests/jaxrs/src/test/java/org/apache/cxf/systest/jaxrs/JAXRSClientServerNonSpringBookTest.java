@@ -32,6 +32,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = BookNonSpringServer.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -42,7 +43,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123Singleton() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/singleton/bookstore/books/123",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/singleton/bookstore/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
@@ -50,7 +51,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123UserModel() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/usermodel/bookstore/books/123",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel/bookstore/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
@@ -59,14 +60,14 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     @Test
     public void testGetChapterUserModel() throws Exception {
         
-        getAndCompareAsStrings("http://localhost:9080/usermodel/bookstore/books/123/chapter",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel/bookstore/books/123/chapter",
                                "resources/expected_get_chapter1_utf.txt",
                                "application/xml", 200);
     }
     
     @Test
     public void testGetBook123UserModelInterface() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/usermodel2/bookstore2/books/123",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel2/bookstore2/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
@@ -74,7 +75,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123ApplicationSingleton() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/application/bookstore/books/123",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/application/bookstore/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         
@@ -82,7 +83,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     
     @Test
     public void testGetBook123ApplicationPerRequest() throws Exception {
-        getAndCompareAsStrings("http://localhost:9080/application/bookstore2/bookheaders",
+        getAndCompareAsStrings("http://localhost:" + PORT + "/application/bookstore2/bookheaders",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
         

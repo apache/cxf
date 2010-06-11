@@ -33,7 +33,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
-
+    public static final String PORT = SpringServer.PORT;
     @BeforeClass
     public static void beforeClass() throws Exception {
         // must be 'in-process' to communicate with inner class in single JVM
@@ -44,7 +44,7 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
     @Ignore
     public static class SpringServer extends AbstractSpringServer {
         public SpringServer() {
-            super("/jaxrs_uriinfo", "/app", 9080);
+            super("/jaxrs_uriinfo", "/app");
         }
     }
 
@@ -60,24 +60,24 @@ public class JAXRSUriInfoTest extends AbstractClientServerTestBase {
      */
     @Test
     public void testBasePathAndPathAndPathParam() throws Exception {
-        checkUriInfo("http://localhost:9080/app/v1", "\"\"", "/");
-        checkUriInfo("http://localhost:9080/app/v1/", "\"\"", "/");
-        checkUriInfo("http://localhost:9080/app/v1/test", "\"test\"", "test");
-        checkUriInfo("http://localhost:9080/app/v1/", "\"\"", "/");
-        checkUriInfo("http://localhost:9080/app/v1", "\"\"", "/");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/", "\"\"", "/");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/test", "\"test\"", "test");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/", "\"\"", "/");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1", "\"\"", "/");
           
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar/test", "\"bar/test\"", "bar/test");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
-        checkUriInfo("http://localhost:9080/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/bar/test", "\"bar/test\"", "bar/test");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
+        checkUriInfo("http://localhost:" + PORT + "/app/v1/bar", "\"bar\"", "bar");
     }
     
     private void checkUriInfo(String address, String path, String pathParam) {
         WebClient wc = WebClient.create(address);
         wc.accept("text/plain");
         String data = wc.get(String.class);
-        assertEquals("http://localhost:9080/app/v1/," + path + "," + pathParam, data);
+        assertEquals("http://localhost:" + PORT + "/app/v1/," + path + "," + pathParam, data);
     }
     
     @Ignore

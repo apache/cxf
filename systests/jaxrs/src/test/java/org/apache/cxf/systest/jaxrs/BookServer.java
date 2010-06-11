@@ -30,6 +30,7 @@ import org.apache.cxf.jaxrs.provider.BinaryDataProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(BookServer.class);
 
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
@@ -54,7 +55,7 @@ public class BookServer extends AbstractBusTestServerBase {
         sf.setOutFaultInterceptors(outFaultInts);
         sf.setResourceProvider(BookStore.class,
                                new SingletonResourceProvider(new BookStore(), true));
-        sf.setAddress("http://localhost:9080/");
+        sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.create();        
     }

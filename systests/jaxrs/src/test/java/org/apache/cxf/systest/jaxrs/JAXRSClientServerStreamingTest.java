@@ -46,6 +46,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 
 public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
 
     @Ignore
     public static class Server extends AbstractBusTestServerBase {        
@@ -66,7 +67,7 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
             providers.add(p1);
             providers.add(p2);
             sf.setProviders(providers);
-            sf.setAddress("http://localhost:9080/");
+            sf.setAddress("http://localhost:" + PORT + "/");
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("org.apache.cxf.serviceloader-context", "true");
             sf.setProperties(properties);
@@ -95,13 +96,13 @@ public class JAXRSClientServerStreamingTest extends AbstractBusClientServerTestB
     
     @Test
     public void testGetBook123() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore/books/123",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
                       "application/xml", 200);
     }
     
     @Test
     public void testGetBookUsingStaxWriter() throws Exception {
-        getAndCompare("http://localhost:9080/bookstore/books/123",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/books/123",
                       "text/xml", 200);
     }
     

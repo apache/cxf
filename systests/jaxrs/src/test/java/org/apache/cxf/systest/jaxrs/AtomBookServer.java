@@ -30,7 +30,7 @@ import org.mortbay.jetty.nio.SelectChannelConnector;
 import org.mortbay.jetty.webapp.WebAppContext;
     
 public class AtomBookServer extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(AtomBookServer.class);
     private org.mortbay.jetty.Server server;
     
     protected void run() {
@@ -39,7 +39,7 @@ public class AtomBookServer extends AbstractBusTestServerBase {
         server = new org.mortbay.jetty.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(9080);
+        connector.setPort(Integer.parseInt(PORT));
         server.setConnectors(new Connector[] {connector});
 
         WebAppContext webappcontext = new WebAppContext();

@@ -31,6 +31,7 @@ import org.mortbay.jetty.webapp.WebAppContext;
 
 
 public class BookServerResourceCreatedSpringProviders extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(BookServerResourceCreatedSpringProviders.class);
 
     private org.mortbay.jetty.Server server;
     
@@ -40,7 +41,7 @@ public class BookServerResourceCreatedSpringProviders extends AbstractBusTestSer
         server = new org.mortbay.jetty.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
-        connector.setPort(9080);
+        connector.setPort(Integer.parseInt(PORT));
         server.setConnectors(new Connector[] {connector});
 
         WebAppContext webappcontext = new WebAppContext();

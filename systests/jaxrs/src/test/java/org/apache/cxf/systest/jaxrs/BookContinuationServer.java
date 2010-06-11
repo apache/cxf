@@ -24,13 +24,14 @@ import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
     
 public class BookContinuationServer extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(BookContinuationServer.class);
 
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         sf.setResourceClasses(BookContinuationStore.class);
         sf.setResourceProvider(BookContinuationStore.class,
                                new SingletonResourceProvider(new BookContinuationStore()));
-        sf.setAddress("http://localhost:9080/");
+        sf.setAddress("http://localhost:" + PORT + "/");
 
         sf.create();        
     }

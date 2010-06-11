@@ -35,7 +35,8 @@ import org.junit.Test;
 
 
 public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
-    
+    public static final String PORT = BookContinuationServer.PORT;
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -49,19 +50,19 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(5);
         
-        executor.execute(new BookWorker("http://localhost:9080/bookstore/books/1", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/1", 
                                         "1", 
                                         "CXF in Action1", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:9080/bookstore/books/2", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/2", 
                                         "2", 
                                         "CXF in Action2", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:9080/bookstore/books/3", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/3", 
                                         "3", 
                                         "CXF in Action3", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:9080/bookstore/books/4", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/4", 
                                         "4", 
                                         "CXF in Action4", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:9080/bookstore/books/5", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/5", 
                                         "5", 
                                         "CXF in Action5", startSignal, doneSignal));
         
