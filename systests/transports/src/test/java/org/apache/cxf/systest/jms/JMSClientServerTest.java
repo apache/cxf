@@ -111,7 +111,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                    launchServer(EmbeddedJMSBrokerLauncher.class, props, null));
 
         assertTrue("server did not launch correctly", 
-                   launchServer(Server.class, true));
+                   launchServer(Server.class));
         
     }
     

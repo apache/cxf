@@ -56,6 +56,7 @@ public class Server extends AbstractBusTestServerBase {
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "/wsdl/jms_test.wsdl");
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
