@@ -28,19 +28,20 @@
 http://cxf.apache.org/transports/jms http://cxf.apache.org/schemas/configuration/jms.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
     <jms:conduit name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.jms-conduit">
       <jms:clientConfig clientReceiveTimeout="500000" messageTimeToLive="500000"/>
       <jms:address jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text">
                    <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
                </jms:address>
       <jms:jmsConfig-ref>jmsConf1</jms:jmsConfig-ref>
     </jms:conduit>
     
    <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="tcp://localhost:61500"/>
+  	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
   
   <bean id="singleConnectionFactory"
     class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
@@ -56,7 +57,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
       <jms:address jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text">
                    <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
                </jms:address>
       <jms:jmsConfig-ref>jmsConf2</jms:jmsConfig-ref>  
   </jms:destination>

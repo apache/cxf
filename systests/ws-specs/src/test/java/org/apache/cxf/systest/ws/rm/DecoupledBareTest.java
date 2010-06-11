@@ -47,7 +47,9 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class DecoupledBareTest extends AbstractBusClientServerTestBase {
-
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DECOUPLE_PORT = allocatePort("decoupled.port");
+    
     private static final Logger LOG = LogUtils.getLogger(DecoupledBareTest.class);
 
     public static class Server extends AbstractBusTestServerBase {
@@ -58,7 +60,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
             BusFactory.setDefaultBus(bus);
             
             Object implementor = new DocLitBareGreeterImpl();
-            String address = "http://localhost:7600/SoapContext/SoapPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
             Endpoint ep = Endpoint.create(implementor);
             Map<String, Object> properties = new HashMap<String, Object>();
             properties.put("schema-validation-enabled", Boolean.TRUE);
@@ -96,6 +98,7 @@ public class DecoupledBareTest extends AbstractBusClientServerTestBase {
         assertNotNull(service);
 
         DocLitBare greeter = service.getSoapPort();
+        updateAddressPort(greeter, PORT);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);

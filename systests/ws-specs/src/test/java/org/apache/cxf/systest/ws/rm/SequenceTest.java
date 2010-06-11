@@ -90,6 +90,7 @@ import org.junit.Test;
  * exchange of WS-RM protocol messages.
  */
 public class SequenceTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = Server.PORT;
 
     private static final Logger LOG = LogUtils.getLogger(SequenceTest.class);
     private static final QName GREETMEONEWAY_NAME 
@@ -103,9 +104,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     private static final String GREETME_RESPONSE_ACTION
         = "http://cxf.apache.org/greeter_control/Greeter/greetMeResponse";
 
-    private static int decoupledEndpointPort = 10000;
     private static String decoupledEndpoint;
-
+    private static int decoupledCount = 1;
     private Bus controlBus;
     private Control control;
     private Bus greeterBus;
@@ -1309,6 +1309,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
 
         ControlService cs = new ControlService();
         control = cs.getControlPort();
+        try {
+            updateAddressPort(control, PORT);
+        } catch (Exception ex) {
+            //ignore
+        }
         
         assertTrue("Failed to start greeter", control.startGreeter(cfgResource));        
     }
@@ -1338,6 +1343,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         dispatch = gs.createDispatch(GreeterService.GreeterPort,
                                      DOMSource.class, 
                                      Service.Mode.MESSAGE);
+        try {
+            updateAddressPort(dispatch, PORT);
+        } catch (Exception e) {
+            //ignore
+        }
         dispatch.getRequestContext().put(
                                      BindingProvider.SOAPACTION_USE_PROPERTY, 
                                      false);
@@ -1355,6 +1365,11 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
         }
    
         greeter = gs.getGreeterPort();
+        try {
+            updateAddressPort(greeter, PORT);
+        } catch (Exception e) {
+            //ignore
+        }
         LOG.fine("Created greeter client.");
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);
@@ -1367,9 +1382,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
     private void initDecoupledEndpoint(Client c) {
         // programatically configure decoupled endpoint that is guaranteed to
         // be unique across all test cases
-        
-        decoupledEndpointPort--;
-        decoupledEndpoint = "http://localhost:" + decoupledEndpointPort + "/decoupled_endpoint";
+        decoupledEndpoint = "http://localhost:" 
+            + allocatePort("decoupled-" + decoupledCount++) + "/decoupled_endpoint";
 
         HTTPConduit hc = (HTTPConduit)(c.getConduit());
         HTTPClientPolicy cp = hc.getClient();

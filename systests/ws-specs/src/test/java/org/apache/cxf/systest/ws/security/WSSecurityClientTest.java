@@ -59,6 +59,8 @@ import org.junit.Test;
  *
  */
 public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DEC_PORT = allocatePort(WSSecurityClientTest.class);
 
     private static final java.net.URL WSDL_LOC;
     static {
@@ -102,10 +104,11 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testUsernameToken() {
+    public void testUsernameToken() throws Exception {
         final javax.xml.ws.Service svc 
             = javax.xml.ws.Service.create(WSDL_LOC, GREETER_SERVICE_QNAME);
         final Greeter greeter = svc.getPort(USERNAME_TOKEN_PORT_QNAME, Greeter.class);
+        updateAddressPort(greeter, PORT);
         
         Client client = ClientProxy.getClient(greeter);
         Map<String, Object> props = new HashMap<String, Object>();
@@ -137,7 +140,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
     }
 
     @Test
-    public void testTimestampSignEncrypt() {
+    public void testTimestampSignEncrypt() throws Exception {
         BusFactory.setDefaultBus(
             new SpringBusFactory().createBus(
                 "org/apache/cxf/systest/ws/security/client.xml"
@@ -151,6 +154,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
             TIMESTAMP_SIGN_ENCRYPT_PORT_QNAME,
             Greeter.class
         );
+        updateAddressPort(greeter, PORT);
 
         // Add a No-Op JAX-WS SoapHandler to the dispatch chain to
         // verify that the SoapHandlerInterceptor can peacefully co-exist
@@ -268,7 +272,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         service.addPort(
             USERNAME_TOKEN_PORT_QNAME,
             decoupled ? SOAPBinding.SOAP11HTTP_BINDING : HTTPBinding.HTTP_BINDING, 
-            "http://localhost:9000/GreeterService/UsernameTokenPort"
+            "http://localhost:" + PORT + "/GreeterService/UsernameTokenPort"
         );
         final Dispatch<Source> dispatcher = service.createDispatch(
             USERNAME_TOKEN_PORT_QNAME,
@@ -284,7 +288,7 @@ public class WSSecurityClientTest extends AbstractBusClientServerTestBase {
         );
         if (decoupled) {
             HTTPConduit cond = (HTTPConduit)((DispatchImpl)dispatcher).getClient().getConduit();
-            cond.getClient().setDecoupledEndpoint("http://localhost:9001/decoupled");
+            cond.getClient().setDecoupledEndpoint("http://localhost:" + DEC_PORT + "/decoupled");
         }
         return dispatcher;
     }

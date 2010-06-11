@@ -46,6 +46,8 @@ import org.junit.Test;
  * WS-RM in response to Policies defined for the endpoint via an inline policy in addr-inline-policy.xml.
  */
 public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
+    public static final String DECOUPLED = allocatePort("decoupled");
 
     private static final Logger LOG = LogUtils.getLogger(AddressingInlinePolicyTest.class);
 
@@ -56,7 +58,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
             Bus bus = bf.createBus("org/apache/cxf/systest/ws/policy/addr-inline-policy.xml");
             
             GreeterImpl implementor = new GreeterImpl();
-            String address = "http://localhost:9020/SoapContext/GreeterPort";
+            String address = "http://localhost:" + PORT + "/SoapContext/GreeterPort";
             Endpoint.publish(address, implementor);
             LOG.info("Published greeter endpoint.");            
             testInterceptors(bus);
@@ -92,6 +94,7 @@ public class AddressingInlinePolicyTest extends AbstractBusClientServerTestBase 
         
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
+        updateAddressPort(greeter, PORT);
         LOG.fine("Created greeter client.");
 
         ConnectionHelper.setKeepAliveConnection(greeter, true);

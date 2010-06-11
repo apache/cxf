@@ -50,6 +50,7 @@ import org.junit.Test;
  * the use of multiple compatible or incompatible assertions.
  */
 public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
+    public static final String PORT = allocatePort(Server.class);
 
     private static final Logger LOG = LogUtils.getLogger(HTTPServerPolicyTest.class);
 
@@ -61,7 +62,7 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
             
             GreeterImpl implementor = new GreeterImpl();
             implementor.setThrowAlways(true);
-            Endpoint.publish("http://localhost:9020/SoapContext/GreeterPort", implementor);
+            Endpoint.publish("http://localhost:" + PORT + "/SoapContext/GreeterPort", implementor);
 
             LOG.info("Published greeter endpoint."); 
             
@@ -102,6 +103,8 @@ public class HTTPServerPolicyTest extends AbstractBusClientServerTestBase {
         
         BasicGreeterService gs = new BasicGreeterService();
         final Greeter greeter = gs.getGreeterPort();
+        
+        updateAddressPort(greeter, PORT);
         LoggingInInterceptor in = new LoggingInInterceptor();
         LoggingOutInterceptor out = new LoggingOutInterceptor();
         

@@ -41,6 +41,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class MultiTransportClientServerTest extends AbstractBusClientServerTestBase {
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+    static final String PORT = allocatePort(MyServer.class);
     static final Logger LOG = LogUtils.getLogger(MultiTransportClientServerTest.class);
     private final QName serviceName = new QName(
                                       "http://apache.org/hello_world_doc_lit",
@@ -50,8 +52,9 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
 
         protected void run() {
             Object implementor = new HTTPGreeterImpl();
-            String address = "http://localhost:9001/SOAPDocLitService/SoapPort";
+            String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
             Endpoint.publish(address, implementor);
+            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), "testutils/hello_world_doc_lit.wsdl");
             implementor = new JMSGreeterImpl();
             Endpoint.publish(null, implementor);
         }
@@ -94,6 +97,7 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
         QName portName2 = new QName("http://apache.org/hello_world_doc_lit", "JMSPort");
         URL wsdl = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
 
         MultiTransportService service = new MultiTransportService(wsdl, serviceName);
         assertNotNull(service);
@@ -102,6 +106,7 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
         String response2 = new String("Bonjour");
         try {
             Greeter greeter = service.getPort(portName1, Greeter.class);
+            updateAddressPort(greeter, PORT);
             for (int idx = 0; idx < 5; idx++) {
                 String greeting = greeter.greetMe("Milestone-" + idx);
                 assertNotNull("no response received from service", greeting);

@@ -47,6 +47,7 @@ import org.junit.Test;
 
 
 public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServerTestBase {
+    static final String FACTORY_ADDRESS = NumberFactoryImpl.FACTORY_ADDRESS;
     
     public static class Server extends AbstractBusTestServerBase {        
 
@@ -80,6 +81,7 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
     
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory nfact = service.getNumberFactoryPort();
+        updateAddressPort(nfact, NumberFactoryImpl.PORT);
         
         W3CEndpointReference w3cEpr = nfact.create("2");        
         assertNotNull("reference", w3cEpr);
@@ -121,7 +123,8 @@ public class ManualHttpMulitplexClientServerTest extends AbstractBusClientServer
         
         NumberFactoryService service = new NumberFactoryService();
         NumberFactory factory = service.getNumberFactoryPort();
-         
+        updateAddressPort(factory, NumberFactoryImpl.PORT);
+
         
         W3CEndpointReference w3cEpr = factory.create("20");
         EndpointReferenceType numberTwoRef = VersionTransformer.convertToInternal(w3cEpr); 

@@ -24,10 +24,11 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 
 public class Server extends AbstractBusTestServerBase {
-
+    static final String PORT = allocatePort(Server.class);
+    
     protected void run() {
         Object implementor = new AddNumberImpl();
-        String address = "http://localhost:9093/AddNumberImplPort";
+        String address = "http://localhost:" + PORT + "/AddNumberImplPort";
         
         EndpointImpl ep = new EndpointImpl(implementor);
 

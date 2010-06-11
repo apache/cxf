@@ -28,9 +28,10 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.ws.security.SecurityConstants;
 
 public class Server extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(Server.class);
 
     public Server() throws Exception {
-        this("http://localhost:9001");
+        this("http://localhost:" + PORT);
     }
     
     protected Server(String baseUrl) throws Exception {
@@ -70,7 +71,7 @@ public class Server extends AbstractBusTestServerBase {
         setBus(busLocal);
 
         try {
-            new Server("http://localhost:9001");
+            new Server("http://localhost:" + PORT);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -78,7 +79,7 @@ public class Server extends AbstractBusTestServerBase {
     
     public static void main(String args[]) throws Exception {
         new SpringBusFactory().createBus("org/apache/cxf/systest/ws/wssec11/server/server.xml");
-        new Server("http://localhost:9001");
+        new Server("http://localhost:" + PORT);
         System.out.println("Server ready...");
 
         Thread.sleep(60 * 60 * 10000);

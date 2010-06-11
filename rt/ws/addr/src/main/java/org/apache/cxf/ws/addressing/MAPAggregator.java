@@ -709,9 +709,21 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 if (isOutbound) {
                     conduit = ContextUtils.getConduit(conduit, message);
                 }
+                String s = (String)message.get(Message.ENDPOINT_ADDRESS);
                 EndpointReferenceType reference = conduit != null
                                                   ? conduit.getTarget()
                                                   : ContextUtils.getNoneEndpointReference();
+                if (conduit != null && !StringUtils.isEmpty(s) 
+                    && !reference.getAddress().getValue().equals(s)) {
+                    EndpointReferenceType ref = new EndpointReferenceType();
+                    AttributedURIType tp = new AttributedURIType();
+                    tp.setValue(s);
+                    ref.setAddress(tp);
+                    ref.setMetadata(reference.getMetadata());
+                    ref.setReferenceParameters(reference.getReferenceParameters());
+                    ref.getOtherAttributes().putAll(reference.getOtherAttributes());
+                    reference = ref;
+                }
                 maps.setTo(reference);
             }
 

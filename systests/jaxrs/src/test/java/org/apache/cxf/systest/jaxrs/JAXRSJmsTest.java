@@ -48,8 +48,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
-
     protected static boolean serversStarted;
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     
     @BeforeClass
     public static void startServers() throws Exception {
@@ -169,7 +169,7 @@ public class JAXRSJmsTest extends AbstractBusClientServerTestBase {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
                           "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        props.setProperty(Context.PROVIDER_URL, "tcp://localhost:61500");
+        props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + JMS_PORT);
         return new InitialContext(props);
         
     }

@@ -20,7 +20,12 @@
 package org.apache.cxf.systest.ws.addressing;
 
 import java.lang.reflect.UndeclaredThrowableException;
+
+import javax.jws.WebService;
+
 import org.apache.hello_world_soap_http.BadRecordLitFault;
+
+import org.junit.BeforeClass;
 import org.junit.Test;
 
 
@@ -28,6 +33,7 @@ import org.junit.Test;
  * Tests the addition of WS-Addressing Message Addressing Properties.
  */
 public class MAPTest extends MAPTestBase {
+    static final String ADDRESS = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
     private static final String CONFIG;
     static {
@@ -40,7 +46,29 @@ public class MAPTest extends MAPTestBase {
     public String getConfigFileName() {
         return CONFIG;
     }
+    public String getAddress() {
+        return ADDRESS;
+    }
     
+
+    @BeforeClass
+    public static void startServers() throws Exception {
+        // special case handling for WS-Addressing system test to avoid
+        // UUID related issue when server is run as separate process
+        // via maven on Win2k
+        boolean inProcess = "Windows 2000".equals(System.getProperty("os.name"));
+        assertTrue("server did not launch correctly", 
+                   launchServer(Server.class, null,
+                                new String[] {ADDRESS, GreeterImpl.class.getName()},  inProcess));
+    }
+    @WebService(serviceName = "SOAPServiceAddressing", 
+                portName = "SoapPort", 
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter", 
+                targetNamespace = "http://apache.org/hello_world_soap_http",
+                wsdlLocation = "testutils/hello_world.wsdl")
+    public static class GreeterImpl extends org.apache.cxf.systest.ws.addressing.AbstractGreeterImpl {
+        
+    }
     
     @Test
     public void testUsingKeepAliveConnection() throws Exception {

@@ -19,15 +19,76 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.File;
+import java.lang.reflect.Field;
+import java.util.List;
+import java.util.Map;
+
+import javax.wsdl.Definition;
+import javax.wsdl.Port;
+import javax.wsdl.Service;
+import javax.wsdl.extensions.soap.SOAPAddress;
 
 import org.apache.activemq.broker.BrokerService;
 import org.apache.activemq.store.memory.MemoryPersistenceAdapter;
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
+import org.apache.cxf.wsdl.WSDLManager;
 
 public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
+    public static final String PORT = allocatePort(EmbeddedJMSBrokerLauncher.class);
     
     BrokerService broker;
-    final String brokerUrl1 = "tcp://localhost:61500";            
+    final String brokerUrl1 = "tcp://localhost:" + PORT;            
             
+    
+    public static void updateWsdlExtensors(Bus bus, String wsdlLocation) {
+        try {
+            Definition def = BusFactory.getDefaultBus().getExtension(WSDLManager.class)
+                .getDefinition(wsdlLocation);
+            Map map = def.getAllServices();
+            for (Object o : map.values()) {
+                Service service = (Service)o;
+                Map ports = service.getPorts();
+                for (Object p : ports.values()) {
+                    Port port = (Port)p;
+                    List<?> l = port.getExtensibilityElements();
+                    for (Object e : l) {
+                        if (e instanceof SOAPAddress) {
+                            String add = ((SOAPAddress)e).getLocationURI();
+                            int idx = add.indexOf("jndiURL=");
+                            if (idx != -1) {
+                                int idx2 = add.indexOf("&", idx);
+                                add = add.substring(0, idx)
+                                    + "jndiURL=tcp://localhost:" + PORT
+                                    + (idx2 == -1 ? "" : add.substring(idx2));
+                                ((SOAPAddress)e).setLocationURI(add);
+                            }
+                        } else {
+                            try {
+                                Field f = e.getClass().getDeclaredField("jmsNamingProperty");
+                                f.setAccessible(true);
+                                List<?> props = (List)f.get(e);
+                                for (Object prop : props) {
+                                    f = prop.getClass().getDeclaredField("name");
+                                    f.setAccessible(true);
+                                    if ("java.naming.provider.url".equals(f.get(prop))) {
+                                        f = prop.getClass().getDeclaredField("value");
+                                        f.setAccessible(true);
+                                        f.set(prop, "tcp://localhost:" + PORT);
+                                    }
+                                }
+                            } catch (Exception ex) {
+                                //ignore
+                            }
+                        }
+                    }                    
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    
     public void tearDown() throws Exception {
         if (broker != null) {
             broker.stop();

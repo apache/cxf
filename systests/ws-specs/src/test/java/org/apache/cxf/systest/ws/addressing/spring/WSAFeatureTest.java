@@ -28,6 +28,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.WSAddressingFeature;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
@@ -36,12 +37,13 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Test;
 
 public class WSAFeatureTest extends AbstractCXFTest {
+    static final String PORT = TestUtil.getPortNumber(WSAFeatureTest.class);
     @Test
     public void testServerFactory() {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
         sf.getFeatures().add(new WSAddressingFeature());
         sf.setServiceBean(new GreeterImpl());
-        sf.setAddress("http://localhost:9000/test");
+        sf.setAddress("http://localhost:" + PORT + "/test");
         sf.setStart(false);
         sf.setBus(getBus());
         
@@ -55,7 +57,7 @@ public class WSAFeatureTest extends AbstractCXFTest {
     @Test
     public void testClientProxyFactory() {
         JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean(); 
-        cf.setAddress("http://localhost:9000/test");
+        cf.setAddress("http://localhost:" + PORT + "/test");
         cf.getFeatures().add(new WSAddressingFeature());
         cf.setServiceClass(Greeter.class);
         Greeter greeter = (Greeter) cf.create();

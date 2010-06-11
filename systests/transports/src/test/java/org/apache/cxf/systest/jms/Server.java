@@ -22,11 +22,14 @@ import javax.xml.ws.Binding;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
 
+import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 
 public class Server extends AbstractBusTestServerBase {
-
+    public static final String PORT = allocatePort(Server.class);
 
     protected void run()  {
         Object implementor = new GreeterImplTwoWayJMS();
@@ -49,8 +52,12 @@ public class Server extends AbstractBusTestServerBase {
         Object i9 = new HelloWorldMessageIDAsCorrelationIDAsyncServiceImpl();
         Object mtom = new JMSMTOMImpl();
         
+        Bus bus = BusFactory.getDefaultBus();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
         Endpoint.publish(null, impleDoc);
-        String address = "http://localhost:9000/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         Endpoint.publish("http://testaddr.not.required/", impl2);
         Endpoint.publish("http://testaddr.not.required.topic/", impl3);
@@ -71,8 +78,8 @@ public class Server extends AbstractBusTestServerBase {
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("http://cxf.apache.org/transports/jms", mtom);
         Binding binding = ep.getBinding();        
         ((SOAPBinding)binding).setMTOMEnabled(true);  
+        
     }
-
 
 
     public static void main(String[] args) {

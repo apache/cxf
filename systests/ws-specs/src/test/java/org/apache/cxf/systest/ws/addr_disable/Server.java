@@ -24,10 +24,11 @@ import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(Server.class);
 
     protected void run() {
         Object implementor = new AddNumberImpl();
-        String address = "http://localhost:9095/jaxws/add";
+        String address = "http://localhost:" + PORT + "/jaxws/add";
         
         EndpointImpl ep = new EndpointImpl(BusFactory.getThreadDefaultBus(), 
                                            implementor, 

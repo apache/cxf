@@ -96,7 +96,7 @@ public class ServerLauncher {
                         break;
                     }
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    //ex.printStackTrace();
                 }
             }
             if (!inProcess) {

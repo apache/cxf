@@ -38,8 +38,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class JMSTransactionClientServerTest extends AbstractBusClientServerTestBase {
-    
     protected static boolean serversStarted;
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+
 
     @Before
     public void startServers() throws Exception {
@@ -78,7 +79,8 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
         assertNotNull(service);
 
@@ -93,7 +95,7 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
 
         JMSConfiguration jmsConfig = new JMSConfiguration();
         ConnectionFactory connectionFactory
-            = new org.apache.activemq.ActiveMQConnectionFactory("tcp://localhost:61500");
+            = new org.apache.activemq.ActiveMQConnectionFactory("tcp://localhost:" + JMS_PORT);
         jmsConfig.setConnectionFactory(connectionFactory);
         jmsConfig.setTargetDestination("greeter.queue.noaop");
         jmsConfig.setPubSubDomain(false);

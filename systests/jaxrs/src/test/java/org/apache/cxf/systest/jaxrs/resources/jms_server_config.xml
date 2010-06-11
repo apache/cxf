@@ -33,9 +33,11 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml" />
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />  
   <import resource="classpath:META-INF/cxf/cxf-extension-jms.xml" />
+
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
   <bean id="jmsConnectionFactory" class="org.apache.activemq.ActiveMQConnectionFactory"
-  	p:brokerURL="tcp://localhost:61500"/>
+  	p:brokerURL="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
   
   <bean id="singleConnectionFactory"
     class="org.springframework.jms.connection.SingleConnectionFactory" destroy-method="destroy">
@@ -53,7 +55,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <jms:address jndiConnectionFactoryName="ConnectionFactory" 
                    jndiDestinationName="dynamicQueues/test.jmstransport.text">
                    <jms:JMSNamingProperty name="java.naming.factory.initial" value="org.apache.activemq.jndi.ActiveMQInitialContextFactory"/>
-                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:61500"/>
+                   <jms:JMSNamingProperty name="java.naming.provider.url" value="tcp://localhost:${testutil.ports.EmbeddedJMSBrokerLauncher}"/>
                </jms:address>
       <jms:jmsConfig-ref>jmsConfig</jms:jmsConfig-ref>  
   </jms:destination>

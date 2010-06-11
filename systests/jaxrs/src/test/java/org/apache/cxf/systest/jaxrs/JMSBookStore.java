@@ -47,6 +47,7 @@ import javax.xml.bind.Marshaller;
 
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.ProtocolHeaders;
+import org.apache.cxf.testutil.common.EmbeddedJMSBrokerLauncher;
 import org.apache.cxf.transport.jms.JMSUtils;
 
 @Path("/bookstore")
@@ -135,7 +136,7 @@ public class JMSBookStore {
         Properties props = new Properties();
         props.setProperty(Context.INITIAL_CONTEXT_FACTORY,
                           "org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        props.setProperty(Context.PROVIDER_URL, "tcp://localhost:61500");
+        props.setProperty(Context.PROVIDER_URL, "tcp://localhost:" + EmbeddedJMSBrokerLauncher.PORT);
         return new InitialContext(props);
         
     }

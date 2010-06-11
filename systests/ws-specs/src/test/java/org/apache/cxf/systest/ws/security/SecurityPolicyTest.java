@@ -59,15 +59,20 @@ import org.junit.Test;
 
 
 public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
-    public static final String POLICY_ADDRESS = "http://localhost:9010/SecPolTest";
-    public static final String POLICY_HTTPS_ADDRESS = "https://localhost:9009/SecPolTest";
-    public static final String POLICY_ENCSIGN_ADDRESS = "http://localhost:9010/SecPolTestEncryptThenSign";
-    public static final String POLICY_SIGNENC_ADDRESS = "http://localhost:9010/SecPolTestSignThenEncrypt";
+    public static final String PORT = allocatePort(SecurityPolicyTest.class);
+    public static final String SSL_PORT = allocatePort(SecurityPolicyTest.class, 1);
+
+    public static final String POLICY_ADDRESS = "http://localhost:" + PORT + "/SecPolTest";
+    public static final String POLICY_HTTPS_ADDRESS = "https://localhost:" + SSL_PORT + "/SecPolTest";
+    public static final String POLICY_ENCSIGN_ADDRESS = "http://localhost:" 
+            + PORT + "/SecPolTestEncryptThenSign";
+    public static final String POLICY_SIGNENC_ADDRESS = "http://localhost:" 
+            + PORT + "/SecPolTestSignThenEncrypt";
     public static final String POLICY_SIGNENC_PROVIDER_ADDRESS 
-        = "http://localhost:9010/SecPolTestSignThenEncryptProvider";
-    public static final String POLICY_SIGN_ADDRESS = "http://localhost:9010/SecPolTestSign";
-    public static final String POLICY_XPATH_ADDRESS = "http://localhost:9010/SecPolTestXPath";
-    public static final String POLICY_SIGNONLY_ADDRESS = "http://localhost:9010/SecPolTestSignedOnly";
+        = "http://localhost:" + PORT + "/SecPolTestSignThenEncryptProvider";
+    public static final String POLICY_SIGN_ADDRESS = "http://localhost:" + PORT + "/SecPolTestSign";
+    public static final String POLICY_XPATH_ADDRESS = "http://localhost:" + PORT + "/SecPolTestXPath";
+    public static final String POLICY_SIGNONLY_ADDRESS = "http://localhost:" + PORT + "/SecPolTestSignedOnly";
 
     
     public static class ServerPasswordCallback implements CallbackHandler {
@@ -162,6 +167,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortXPath();
+        updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -172,6 +178,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         
         pt = service.getDoubleItPortEncryptThenSign();
+        updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -181,6 +188,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         pt.doubleIt(BigInteger.valueOf(5));
         
         pt = service.getDoubleItPortSign();
+        updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -191,6 +199,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
 
         
         pt = service.getDoubleItPortSignThenEncrypt();
+        updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -205,6 +214,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         assertEquals(10, x);
         
         pt = service.getDoubleItPortHttps();
+        updateAddressPort(pt, SSL_PORT);
         try {
             pt.doubleIt(BigInteger.valueOf(25));
         } catch (Exception ex) {
@@ -220,6 +230,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         
         try {
             pt = service.getDoubleItPortHttp();
+            updateAddressPort(pt, PORT);
             pt.doubleIt(BigInteger.valueOf(25));
             fail("https policy should have triggered");
         } catch (Exception ex) {
@@ -239,6 +250,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortSignedOnly();
+        updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
                                                       new KeystorePasswordCallback());
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
@@ -276,6 +288,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                      getClass().getResource("alice.properties"));
         disp.getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                      getClass().getResource("bob.properties"));
+        updateAddressPort(disp, PORT);
 
         String req = "<ns2:DoubleIt xmlns:ns2=\"http://cxf.apache.org/policytest/DoubleIt\">"
             + "<numberToDouble>25</numberToDouble></ns2:DoubleIt>";

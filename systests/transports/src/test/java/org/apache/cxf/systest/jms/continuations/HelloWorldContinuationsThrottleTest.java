@@ -41,7 +41,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServerTestBase {
-    
+    static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
+
     private static boolean serversStarted;
     private static final String CONFIG_FILE =
         "org/apache/cxf/systest/jms/continuations/jms_test_config.xml";
@@ -75,7 +76,7 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
         URL wsdlURL = getClass().getResource("/org/apache/cxf/systest/jms/continuations/test2.wsdl");
-        
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlURL.toString());
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();

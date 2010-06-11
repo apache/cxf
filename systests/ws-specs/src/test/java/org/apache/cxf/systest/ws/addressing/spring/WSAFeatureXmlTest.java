@@ -32,6 +32,7 @@ import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.hello_world_soap_http.Greeter;
@@ -39,7 +40,8 @@ import org.apache.hello_world_soap_http.GreeterImpl;
 import org.junit.Test;
 
 public class WSAFeatureXmlTest extends AbstractCXFTest {
-    
+    static final String PORT = TestUtil.getPortNumber(WSAFeatureXmlTest.class);
+
     @Override
     protected Bus createBus() throws BusException {
         return new SpringBusFactory().createBus("/org/apache/cxf/systest/ws/addressing/spring/spring.xml");
@@ -51,7 +53,7 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
      
         assert bus != null;
         sf.setServiceBean(new GreeterImpl());
-        sf.setAddress("http://localhost:9000/test");
+        sf.setAddress("http://localhost:" + PORT + "/test");
         sf.setStart(false);
         
         Configurer c = getBus().getExtension(Configurer.class);
@@ -67,7 +69,7 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
     public void testClientProxyFactory() {
       
         JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean(); 
-        cf.setAddress("http://localhost:9000/test");        
+        cf.setAddress("http://localhost:" + PORT + "/test");        
         cf.setServiceClass(Greeter.class);
         cf.setBus(getBus());
         Configurer c = getBus().getExtension(Configurer.class);

@@ -31,7 +31,9 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.systest.ws.wssec11.server.Server;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+
 
 import wssec.wssec11.IPingService;
 import wssec.wssec11.PingService11;
@@ -41,6 +43,7 @@ import wssec.wssec11.PingService11;
  *
  */
 public class WSSecurity11Common extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(Server.class);
 
        
     private static final String INPUT = "foo";
@@ -79,7 +82,7 @@ public class WSSecurity11Common extends AbstractBusClientServerTestBase {
     
     private static URL getWsdlLocation(String portPrefix) {
         try {
-            return new URL("http://localhost:9001/" + portPrefix + "PingService?wsdl");
+            return new URL("http://localhost:" + PORT + "/" + portPrefix + "PingService?wsdl");
         } catch (MalformedURLException mue) {
             return null;
         }

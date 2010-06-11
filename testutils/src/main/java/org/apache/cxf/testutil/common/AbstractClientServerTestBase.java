@@ -20,6 +20,9 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
@@ -114,11 +117,31 @@ public abstract class AbstractClientServerTestBase extends Assert {
             ((BindingProvider)o).getRequestContext()
                 .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
                      address);
-        } else if (o instanceof Client) {
-            Client c = (Client)o;
+        }
+        Client c = null;
+        if (o instanceof Client) {
+            c = (Client)o;
+        }
+        if (c == null) {
+            try {
+                InvocationHandler i = Proxy.getInvocationHandler(o);
+                c = (Client)i.getClass().getMethod("getClient").invoke(i);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+        if (c == null) {
+            try {
+                Method m = o.getClass().getDeclaredMethod("getClient");
+                m.setAccessible(true);
+                c = (Client)m.invoke(o);
+            } catch (Throwable t) {
+                //ignore
+            }
+        }
+        if (c != null) {
             c.getEndpoint().getEndpointInfo().setAddress(address);
-        } 
-        //maybe simple frontend proxy?
+        }
     }
     protected void updateAddressPort(Object o, String port) 
         throws NumberFormatException, MalformedURLException {
@@ -142,6 +165,9 @@ public abstract class AbstractClientServerTestBase extends Assert {
         //maybe simple frontend proxy?
     }
     
+    protected static String allocatePort(String s) {
+        return TestUtil.getPortNumber(s);
+    }
     protected static String allocatePort(Class<?> cls) {
         return TestUtil.getPortNumber(cls);
     }
