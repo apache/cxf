@@ -66,7 +66,7 @@ public class WSDL11Validator extends AbstractDefinitionValidator {
     }
 
     public WSDL11Validator(final Definition definition, final ToolContext pe) {
-        this(definition, pe, BusFactory.getDefaultBus());
+        this(definition, pe, BusFactory.getThreadDefaultBus());
     }
 
     public WSDL11Validator(final Definition definition, final ToolContext pe, final Bus b) {

@@ -354,8 +354,12 @@ public class WSDL2JavaMojo extends AbstractMojo {
         ClassLoaderSwitcher classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
         boolean result = true;
 
+        Bus bus = null;
         try {
             classLoaderSwitcher.switchClassLoader(project, useCompileClasspath, classesDir);
+
+            bus = BusFactory.newInstance().createBus();
+            BusFactory.setThreadDefaultBus(bus);
 
             for (WsdlOption o : effectiveWsdlOptions) {
                 callWsdl2Java(o);
@@ -369,12 +373,10 @@ public class WSDL2JavaMojo extends AbstractMojo {
             }
         } finally {
             // cleanup as much as we can.
-            Bus bus = BusFactory.getDefaultBus(false);
             if (bus != null) {
                 bus.shutdown(true);
             }
             classLoaderSwitcher.restoreClassLoader();
-            org.apache.cxf.tools.wsdlto.core.PluginLoader.unload();
         }
         if (project != null && sourceRoot != null && sourceRoot.exists()) {
             project.addCompileSourceRoot(sourceRoot.getAbsolutePath());

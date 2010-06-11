@@ -45,7 +45,7 @@ public class WSDLToJava {
     private String[] args;
     private PrintStream out = System.out;
 
-    private PluginLoader pluginLoader = PluginLoader.getInstance();
+    private PluginLoader pluginLoader = PluginLoader.newInstance();
 
     public WSDLToJava() {
         args = new String[0];

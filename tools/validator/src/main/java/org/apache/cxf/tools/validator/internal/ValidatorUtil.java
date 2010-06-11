@@ -60,7 +60,7 @@ public final class ValidatorUtil {
 
     public static SchemaCollection getSchema(final Definition def) {
         ServiceInfo serviceInfo = new ServiceInfo();
-        new SchemaUtil(BusFactory.getDefaultBus(), 
+        new SchemaUtil(BusFactory.getThreadDefaultBus(), 
                        new HashMap<String, Element>()).getSchemas(def, 
                                                                   serviceInfo);
         return serviceInfo.getXmlSchemaCollection();
