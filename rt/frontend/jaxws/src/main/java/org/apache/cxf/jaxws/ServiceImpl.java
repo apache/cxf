@@ -51,12 +51,14 @@ import javax.xml.ws.WebServiceException;
 import javax.xml.ws.WebServiceFeature;
 import javax.xml.ws.handler.Handler;
 import javax.xml.ws.handler.HandlerResolver;
+import javax.xml.ws.soap.AddressingFeature;
 import javax.xml.ws.soap.SOAPBinding;
 import javax.xml.ws.spi.ServiceDelegate;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
+import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
@@ -86,6 +88,7 @@ import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.service.model.ServiceModelUtil;
@@ -621,6 +624,19 @@ public class ServiceImpl extends ServiceDelegate {
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
+        
+        //CXF-2836:create wsdlOperation name and payloadElement Map
+        boolean wsaFeature = false;
+        for (WebServiceFeature feature : features) {
+            if (feature instanceof AddressingFeature 
+                && ((AddressingFeature)feature).isEnabled()) {
+                wsaFeature = true;
+            }
+        }
+        if (wsaFeature) {
+            createPayloadEleOpNameMap(client.getEndpoint().getEndpointInfo().getBinding());
+        }
+        
         Dispatch<T> disp = new DispatchImpl<T>(client, mode, type);
         configureObject(disp);
         return disp;
@@ -670,6 +686,17 @@ public class ServiceImpl extends ServiceDelegate {
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
+        //CXF-2836:create wsdlOperation name and payloadElement Map
+        boolean wsaFeature = false;
+        for (WebServiceFeature feature : features) {
+            if (feature instanceof AddressingFeature 
+                && ((AddressingFeature)feature).isEnabled()) {
+                wsaFeature = true;
+            }
+        }
+        if (wsaFeature) {
+            createPayloadEleOpNameMap(client.getEndpoint().getEndpointInfo().getBinding());
+        }        
         Dispatch<Object> disp = new DispatchImpl<Object>(client, mode, 
                                                          context, Object.class);
         configureObject(disp);
@@ -701,4 +728,30 @@ public class ServiceImpl extends ServiceDelegate {
         client.getInFaultInterceptors().addAll(clientFact.getInFaultInterceptors());
         client.getOutFaultInterceptors().addAll(clientFact.getOutFaultInterceptors());
     }
+
+    // Create payload element and operationName map
+    private void createPayloadEleOpNameMap(BindingInfo bindingInfo) {
+        Map<String, QName> payloadElementMap = new java.util.HashMap<String, QName>();
+        for (BindingOperationInfo bop : bindingInfo.getOperations()) {
+            SoapOperationInfo soi = (SoapOperationInfo)bop.getExtensor(SoapOperationInfo.class);
+            if (soi != null) {
+                if ("document".equals(soi.getStyle())) {
+                    // if doc
+                    if (bop.getOperationInfo().getInput() != null
+                        && !bop.getOperationInfo().getInput().getMessageParts().isEmpty()) {
+                        QName qn = bop.getOperationInfo().getInput().getMessagePartByIndex(0)
+                            .getElementQName();
+                        payloadElementMap.put(qn.toString(), bop.getOperationInfo().getName());
+                    }
+                } else if ("rpc".equals(soi.getStyle())) {
+                    // if rpc
+                    payloadElementMap.put(bop.getOperationInfo().getName().toString(), bop.getOperationInfo()
+                        .getName());
+                }
+            }
+        }
+        bindingInfo.setProperty("payloadElementOpNameMap", payloadElementMap);
+    }
 }
+
+
