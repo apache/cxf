@@ -25,10 +25,12 @@ import org.apache.cxf.greeter_control.GreeterImplBase;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class ServerGreeterBase extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(ServerGreeterBase.class);
 
     protected void run() {
         Object implementor = new GreeterImplBase();
-        String address = "http://localhost:9020/SoapContext/GreeterPort";
+        String address = "http://localhost:"
+            + PORT + "/SoapContext/GreeterPort";
         Endpoint.publish(address, implementor);
     }
 

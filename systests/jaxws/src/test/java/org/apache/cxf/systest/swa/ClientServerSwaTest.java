@@ -47,11 +47,14 @@ import org.apache.cxf.swa.types.DataStruct;
 import org.apache.cxf.swa.types.OutputResponseAll;
 import org.apache.cxf.swa.types.VoidRequest;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
-
+    static String serverPort = TestUtil.getPortNumber(Server.class);
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
@@ -62,8 +65,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         org.apache.cxf.swa_nomime.SwAService service = new org.apache.cxf.swa_nomime.SwAService();
         
         org.apache.cxf.swa_nomime.SwAServiceInterface port = service.getSwAServiceHttpPort();
-//        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-//                                                        "http://localhost:9037/swa");
+        setAddress(port, "http://localhost:" + serverPort + "/swa-nomime");
         
         Holder<String> textHolder = new Holder<String>("Hi");
         Holder<byte[]> data = new Holder<byte[]>("foobar".getBytes());
@@ -105,9 +107,8 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
         
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-//        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-//                                                        "http://localhost:9037/swa");
-        
+        setAddress(port, "http://localhost:" + serverPort + "/swa");
+
         Holder<String> textHolder = new Holder<String>();
         Holder<DataHandler> data = new Holder<DataHandler>();
         
@@ -133,8 +134,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
         
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-//        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-//                                                        "http://localhost:9037/swa");
+        setAddress(port, "http://localhost:" + serverPort + "/swa");
         
         Holder<String> textHolder = new Holder<String>();
         Holder<String> headerHolder = new Holder<String>();
@@ -164,8 +164,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
         
         SwAServiceInterface port = service.getSwAServiceHttpPort();
-//        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
-//                                                        "http://localhost:9037/swa");
+        setAddress(port, "http://localhost:" + serverPort + "/swa");
         
         Holder<DataStruct> structHolder = new Holder<DataStruct>();
         
@@ -197,6 +196,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
         SwAService service = new SwAService();
         
         SwAServiceInterface port = service.getSwAServiceHttpPort();
+        setAddress(port, "http://localhost:" + serverPort + "/swa");
         
         URL url1 = this.getClass().getResource("resources/attach.text");
         URL url2 = this.getClass().getResource("resources/attach.html");
@@ -262,6 +262,7 @@ public class ClientServerSwaTest extends AbstractBusClientServerTestBase {
             .createDispatch(SwAService.SwAServiceHttpPort,
                             SOAPMessage.class,
                             Service.Mode.MESSAGE);
+        setAddress(disp, "http://localhost:" + serverPort + "/swa");
         
         
         SOAPMessage msg = MessageFactory.newInstance().createMessage();

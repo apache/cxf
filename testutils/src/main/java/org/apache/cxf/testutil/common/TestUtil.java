@@ -20,14 +20,18 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.File;
+import java.io.IOException;
 import java.lang.reflect.Method;
+import java.net.ServerSocket;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Properties;
 
 
 public final class TestUtil {
-
+    static Properties ports = new Properties();
+    
     private TestUtil() {
         //Complete
     }
@@ -73,5 +77,35 @@ public final class TestUtil {
             }
         }
         return null;
-    }    
+    }
+    public static Properties getAllPorts() {
+        return ports;
+    }
+    public static String getPortNumber(Class<?> cls) {
+        return getPortNumber(cls.getSimpleName());
+    }
+    public static String getPortNumber(Class<?> cls, int count) {
+        return getPortNumber(cls.getSimpleName() + "." + count);
+    }
+    public static String getPortNumber(String name) {
+        String p = ports.getProperty("testutil.ports." + name);
+        if (p == null) {
+            p = System.getProperty("testutil.ports." + name);
+            if (p != null) {
+                ports.setProperty("testutil.ports." + name, p);
+            }
+        }
+        if (p == null) {
+            try {
+                ServerSocket sock = new ServerSocket(0);
+                p = Integer.toString(sock.getLocalPort());
+                ports.put("testutil.ports." + name, p);
+                System.setProperty("testutil.ports." + name, p);
+                sock.close();
+            } catch (IOException ex) {
+                //
+            }
+        }
+        return p;
+    }
 }

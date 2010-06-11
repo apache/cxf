@@ -23,12 +23,16 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.greeter_control.GreeterImplBaseNoWsdl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class ServerGreeterBaseNoWsdl extends AbstractBusTestServerBase {
 
     protected void run() {
+        
         Object implementor = new GreeterImplBaseNoWsdl();
-        String address = "http://localhost:9020/SoapContext/GreeterPort";
+        String address = "http://localhost:" 
+            + TestUtil.getPortNumber(ServerGreeterBaseNoWsdl.class) 
+            + "/SoapContext/GreeterPort";
         Endpoint.publish(address, implementor);
     }
 

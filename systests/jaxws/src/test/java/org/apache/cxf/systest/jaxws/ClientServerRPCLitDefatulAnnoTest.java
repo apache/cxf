@@ -28,12 +28,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerRPCLitDefatulAnnoTest extends AbstractClientServerTestBase {
+    static final String PORT = allocatePort(Server.class);
 
     public static class Server extends AbstractBusTestServerBase {
 
         protected void run() {
             Object implementor = new HelloImpl();
-            String address = "http://localhost:9091/hello";
+            String address = "http://localhost:" + PORT + "/hello";
             Endpoint.publish(address, implementor);
         }
 
@@ -62,6 +63,7 @@ public class ClientServerRPCLitDefatulAnnoTest extends AbstractClientServerTestB
                                                 serviceName);
         assertNotNull(service);
         Hello hello = service.getHelloPort();
+        updateAddressPort(hello, PORT);
         assertEquals("getSayHi", hello.sayHi("SayHi"));
 
     }

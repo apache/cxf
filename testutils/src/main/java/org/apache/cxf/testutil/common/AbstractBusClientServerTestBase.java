@@ -28,7 +28,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.junit.After;
@@ -108,7 +107,6 @@ public abstract class AbstractBusClientServerTestBase extends AbstractClientServ
     protected void setBus(Bus b) {
         bus = b;
     }
-    
     
     protected HttpURLConnection getHttpConnection(String target) throws Exception {
         URL url = new URL(target);        

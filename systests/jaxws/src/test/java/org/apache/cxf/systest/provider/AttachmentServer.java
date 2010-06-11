@@ -22,13 +22,15 @@ package org.apache.cxf.systest.provider;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class AttachmentServer extends AbstractBusTestServerBase {
-
+    public static final String ADDRESS 
+        = "http://localhost:" + TestUtil.getPortNumber(AttachmentServer.class) 
+            + "/XMLServiceAttachment";
     protected void run() {
         Object implementor = new AttachmentStreamSourceXMLProvider();
-        String address = "http://localhost:9033/XMLServiceAttachment";
-        Endpoint.publish(address, implementor);
+        Endpoint.publish(ADDRESS, implementor);
     }
 
     public static void main(String[] args) {

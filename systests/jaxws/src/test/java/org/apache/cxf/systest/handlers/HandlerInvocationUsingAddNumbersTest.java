@@ -39,6 +39,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbers;
 import org.apache.handlers.AddNumbersService;
 import org.apache.handlers.types.AddNumbersResponse;
@@ -51,7 +52,11 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
     static QName serviceName = new QName("http://apache.org/handlers", "AddNumbersService");
     static QName portName = new QName("http://apache.org/handlers", "AddNumbersPort");
-   
+
+    static String addNumbersAddress
+        = "http://localhost:" + TestUtil.getPortNumber(HandlerServer.class, 1)
+            + "/handlers/AddNumbersService/AddNumbersPort";
+
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(HandlerServer.class));
@@ -63,7 +68,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
         AddNumbersService service = new AddNumbersService(wsdl, serviceName);
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
-        
+        setAddress(port, addNumbersAddress);
         SmallNumberHandler sh = new SmallNumberHandler();
         addHandlersProgrammatically((BindingProvider)port, sh);
 
@@ -79,6 +84,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
+        setAddress(port, addNumbersAddress);
 
         int result = port.addNumbers(10, 20);
         assertEquals(200, result);
@@ -96,7 +102,8 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
         JAXBContext jc = JAXBContext.newInstance("org.apache.handlers.types");
         Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
- 
+        setAddress(disp, addNumbersAddress);
+
         SmallNumberHandler sh = new SmallNumberHandler();
         TestSOAPHandler soapHandler = new TestSOAPHandler<SOAPMessageContext>(false) {
             public boolean handleMessage(SOAPMessageContext ctx) {
@@ -136,6 +143,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
+        setAddress(port, addNumbersAddress);
 
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);
@@ -156,6 +164,7 @@ public class HandlerInvocationUsingAddNumbersTest extends AbstractBusClientServe
 
         AddNumbersServiceWithAnnotation service = new AddNumbersServiceWithAnnotation(wsdl, serviceName);
         AddNumbers port = (AddNumbers)service.getPort(portName, AddNumbers.class);
+        setAddress(port, addNumbersAddress);
 
         List<Handler> handlerChain = ((BindingProvider)port).getBinding().getHandlerChain();
         SmallNumberHandler h = (SmallNumberHandler)handlerChain.get(0);

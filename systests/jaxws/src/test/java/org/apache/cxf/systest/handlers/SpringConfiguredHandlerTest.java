@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.handlers;
 
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.apache.cxf.testutil.common.TestUtil;
 import org.apache.handlers.AddNumbers;
 import org.junit.Test;
 
@@ -27,7 +28,8 @@ import org.junit.Test;
  * 
  */
 public class SpringConfiguredHandlerTest extends AbstractCXFSpringTest {
-
+    static String port = TestUtil.getPortNumber("springport");
+    
     @Override
     protected String[] getConfigLocations() {
         return new String[] {"classpath:/org/apache/cxf/systest/handlers/beans.xml" };

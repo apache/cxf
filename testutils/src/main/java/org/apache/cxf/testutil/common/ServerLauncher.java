@@ -340,6 +340,9 @@ public class ServerLauncher {
                 cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
             }
         }
+        for (Map.Entry<Object, Object> entry : TestUtil.getAllPorts().entrySet()) {
+            cmd.add("-D" + entry.getKey() + "=" + entry.getValue());
+        }
         if (Boolean.getBoolean("java.awt.headless")) {
             cmd.add("-Djava.awt.headless=true");
         }

@@ -25,17 +25,20 @@ import java.util.Map;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class XMLServer extends AbstractBusTestServerBase {
-
+    public static final String ADDRESS 
+        = "http://localhost:" + TestUtil.getPortNumber(XMLServer.class) 
+            + "/XMLService/XMLProviderPort";
+    
     protected void run() {
         Object implementor = new HWDOMSourcePayloadXMLBindingProvider();
-        String address = "http://localhost:9022/XMLService/XMLProviderPort";
         Endpoint ep = Endpoint.create(implementor);
         Map<String, Object> map = new HashMap<String, Object>();
         map.put("schema-validation-enabled", Boolean.TRUE);
         ep.setProperties(map);
-        ep.publish(address);
+        ep.publish(ADDRESS);
     }
 
     public static void main(String[] args) {

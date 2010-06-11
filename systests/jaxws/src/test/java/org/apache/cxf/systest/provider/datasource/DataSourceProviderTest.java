@@ -42,11 +42,14 @@ import javax.xml.transform.stream.StreamSource;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
+    static String serverPort = TestUtil.getPortNumber(Server.class);
 
     static final Logger LOG = LogUtils.getLogger(DataSourceProviderTest.class);
     private static final String BOUNDARY = "----=_Part_4_701508.1145579811786";
@@ -61,7 +64,7 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
     
     @Before
     public void createConnection() throws Exception {
-        url = new URL("http://localhost:9000/test/foo");
+        url = new URL("http://localhost:" + serverPort + "/test/foo");
         conn = (HttpURLConnection) url.openConnection();
         conn.setDoOutput(true);
     }
@@ -69,7 +72,7 @@ public class DataSourceProviderTest extends AbstractBusClientServerTestBase {
 
     @Test 
     public void invokeOnServer() throws Exception { 
-        url = new URL("http://localhost:9000/test/foo");
+        url = new URL("http://localhost:" + serverPort + "/test/foo");
         conn = (HttpURLConnection) url.openConnection();
         printSource(new StreamSource(conn.getInputStream())); 
     }

@@ -75,6 +75,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(ServerMisc.class);
 
 
     @BeforeClass
@@ -137,7 +138,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         QName portName = new QName("http://cxf.apache.org/anonymous_complex_type/",
             "anonymous_complex_typeSOAP");
         AnonymousComplexType act = actService.getPort(portName, AnonymousComplexType.class);
-
+        updateAddressPort(act, PORT);
         try {
             Names reply = act.splitName("Tom Li");
             assertNotNull("no response received from service", reply);
@@ -156,6 +157,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         QName portName = new QName("http://cxf.apache.org/anonymous_complex_type/",
             "anonymous_complex_typeSOAP");
         AnonymousComplexType act = actService.getPort(portName, AnonymousComplexType.class);
+        updateAddressPort(act, PORT);
 
         try {
             SplitName name = new SplitName();
@@ -177,6 +179,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         JaxbElementTest_Service service = new JaxbElementTest_Service();
         assertNotNull(service);
         JaxbElementTest port = service.getPort(JaxbElementTest.class);
+        updateAddressPort(port, PORT);
 
         try {
 
@@ -197,6 +200,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     public void testOrderedParamHolder() throws Exception {
         OrderedParamHolder_Service service = new OrderedParamHolder_Service();
         OrderedParamHolder port = service.getOrderedParamHolderSOAP();
+        updateAddressPort(port, PORT);
         
         try {
             Holder<ComplexStruct> part3 = new Holder<ComplexStruct>();
@@ -643,6 +647,7 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     public void testInheritedTypesInOtherPackage() throws Exception {
         InheritService serv = new InheritService();
         Inherit port = serv.getInheritPort();
+        updateAddressPort(port, PORT);
         ObjectInfo obj = port.getObject(0);
         assertNotNull(obj);
         assertNotNull(obj.getBaseObject());

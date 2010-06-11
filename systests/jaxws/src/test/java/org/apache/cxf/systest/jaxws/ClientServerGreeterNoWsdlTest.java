@@ -41,6 +41,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(ServerGreeterNoWsdl.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -56,6 +57,7 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
 
         try {
             Greeter greeter = service.getGreeterPort();
+            updateAddressPort(greeter, PORT);
             
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);
@@ -71,7 +73,8 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
     @Test
     public void testGetGreetMe() throws Exception {
         HttpURLConnection httpConnection = 
-            getHttpConnection("http://localhost:9020/SoapContext/GreeterPort/greetMe/requestType/cxf");    
+            getHttpConnection("http://localhost:"
+                              + PORT + "/SoapContext/GreeterPort/greetMe/requestType/cxf");    
         httpConnection.connect();        
         
         assertEquals(200, httpConnection.getResponseCode());

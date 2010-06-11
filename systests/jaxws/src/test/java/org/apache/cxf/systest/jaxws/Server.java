@@ -31,6 +31,9 @@ import org.apache.hello_world_soap_http.DocLitBareGreeterImpl;
 import org.apache.hello_world_soap_http.GreeterImpl;
 
 public class Server extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(Server.class);
+    static final String BARE_PORT = allocatePort(Server.class, 1);
+    static final String BOGUS_REAL_PORT = allocatePort(Server.class, 2);
 
     protected void run() {
         URL url = getClass().getResource("fault-stack-trace.xml");
@@ -40,23 +43,23 @@ public class Server extends AbstractBusTestServerBase {
         Object implementor;
         String address;
         implementor = new GreeterImplMultiPort();
-        address = "http://localhost:9020/MultiPort/GreeterPort";
+        address = "http://localhost:" + PORT + "/MultiPort/GreeterPort";
         Endpoint.publish(address, implementor);
 
         implementor = new DocLitBareGreeterMultiPort();
-        address = "http://localhost:9021/MultiPort/DocBarePort";
+        address = "http://localhost:" + PORT + "/MultiPort/DocBarePort";
         Endpoint.publish(address, implementor);
         
         implementor = new GreeterImpl();
-        address = "http://localhost:9000/SoapContext/SoapPort";
+        address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
         implementor = new RefGreeterImpl();
-        address = "http://localhost:9000/SoapContext/SoapPort2";
+        address = "http://localhost:" + PORT + "/SoapContext/SoapPort2";
         Endpoint.publish(address, implementor);
         
         //publish port with soap12 binding
-        address = "http://localhost:9009/SoapContext/SoapPort";
+        address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
 
         
         EndpointImpl e = (EndpointImpl) Endpoint.create(javax.xml.ws.soap.SOAPBinding.SOAP12HTTP_BINDING, 
@@ -64,12 +67,12 @@ public class Server extends AbstractBusTestServerBase {
         e.publish(address);
         
         implementor = new DocLitBareGreeterImpl();
-        address = "http://localhost:7600/SoapContext/SoapPort";
+        address = "http://localhost:" + BARE_PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
         
         implementor = new GreeterImplBogus();
-        address = "http://localhost:9015/SoapContext/SoapPort";
+        address = "http://localhost:" + BOGUS_REAL_PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
     }
     

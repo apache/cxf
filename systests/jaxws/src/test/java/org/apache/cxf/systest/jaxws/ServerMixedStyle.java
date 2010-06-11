@@ -31,13 +31,14 @@ import org.apache.hello_world_mixedstyle.GreeterImplMixedStyle;
 
 
 public class ServerMixedStyle extends AbstractBusTestServerBase {
+    static final String PORT = allocatePort(ServerMixedStyle.class);
 
     protected void run() {
         Object implementor = new GreeterImplMixedStyle();
-        String address = "http://localhost:9027/SoapContext/SoapPort";
+        String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);
         
-        Endpoint.publish("http://localhost:9027/cxf885", new MixedTestImpl());
+        Endpoint.publish("http://localhost:" + PORT + "/cxf885", new MixedTestImpl());
     }
 
     public static void main(String[] args) {

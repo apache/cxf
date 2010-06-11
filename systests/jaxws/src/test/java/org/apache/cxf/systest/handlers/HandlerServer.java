@@ -21,16 +21,22 @@ package org.apache.cxf.systest.handlers;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class HandlerServer extends AbstractBusTestServerBase {
 
     protected void run() {
+        String addNumbersPort = TestUtil.getPortNumber(HandlerServer.class, 1);
+        String greeterPort = TestUtil.getPortNumber(HandlerServer.class, 2);
+        
         Object implementor = new AddNumbersImpl();
-        String address = "http://localhost:9025/handlers/AddNumbersService/AddNumbersPort";
+        String address = "http://localhost:"
+            + addNumbersPort + "/handlers/AddNumbersService/AddNumbersPort";
         Endpoint.publish(address, implementor);
         
         Object implementor1 = new org.apache.hello_world_xml_http.wrapped.GreeterImpl();
-        String address1 = "http://localhost:9007/XMLService/XMLDispatchPort";
+        String address1 = "http://localhost:"
+            + greeterPort + "/XMLService/XMLDispatchPort";
         Endpoint.publish(address1, implementor1);
     }
 

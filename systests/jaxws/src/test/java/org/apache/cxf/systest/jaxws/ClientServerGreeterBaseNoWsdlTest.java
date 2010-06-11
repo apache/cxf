@@ -29,6 +29,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class ClientServerGreeterBaseNoWsdlTest extends AbstractBusClientServerTestBase {
+    static final String PORT = allocatePort(ServerGreeterBaseNoWsdl.class);
 
     @BeforeClass
     public static void startServers() throws Exception {
@@ -44,7 +45,7 @@ public class ClientServerGreeterBaseNoWsdlTest extends AbstractBusClientServerTe
 
         try {
             Greeter greeter = service.getGreeterPort();
-            
+            updateAddressPort(greeter, PORT);
             String greeting = greeter.greetMe("Bonjour");
             assertNotNull("no response received from service", greeting);
             assertEquals("Hello Bonjour", greeting);

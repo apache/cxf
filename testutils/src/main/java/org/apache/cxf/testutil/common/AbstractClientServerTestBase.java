@@ -20,9 +20,15 @@
 package org.apache.cxf.testutil.common;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import javax.xml.ws.BindingProvider;
+
+import org.apache.cxf.endpoint.Client;
 
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -100,4 +106,48 @@ public abstract class AbstractClientServerTestBase extends Assert {
         
         return ok;
     }
+    
+    
+    // extra methods to help support the dynamic port allocations
+    protected void setAddress(Object o, String address) {
+        if (o instanceof BindingProvider) {
+            ((BindingProvider)o).getRequestContext()
+                .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                     address);
+        } else if (o instanceof Client) {
+            Client c = (Client)o;
+            c.getEndpoint().getEndpointInfo().setAddress(address);
+        } 
+        //maybe simple frontend proxy?
+    }
+    protected void updateAddressPort(Object o, String port) 
+        throws NumberFormatException, MalformedURLException {
+        updateAddressPort(o, Integer.parseInt(port));
+    }
+    protected void updateAddressPort(Object o, int port) throws MalformedURLException {
+        String address = null;
+        if (o instanceof BindingProvider) {
+            address = ((BindingProvider)o).getRequestContext()
+                .get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY).toString();
+        } else if (o instanceof Client) {
+            Client c = (Client)o;
+            address = c.getEndpoint().getEndpointInfo().getAddress();
+        }
+        if (address != null) {
+            URL url = new URL(address);
+            url = new URL(url.getProtocol(), url.getHost(),
+                          port, url.getFile());
+            setAddress(o, url.toString());
+        }
+        //maybe simple frontend proxy?
+    }
+    
+    protected static String allocatePort(Class<?> cls) {
+        return TestUtil.getPortNumber(cls);
+    }
+    protected static String allocatePort(Class<?> cls, int count) {
+        return TestUtil.getPortNumber(cls, count);
+    }
+    
+    
 }

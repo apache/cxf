@@ -36,7 +36,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServerTestBase {
-
+    private static final String ADDRESS = AttachmentServer.ADDRESS;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
@@ -47,7 +48,7 @@ public class AttachmentProviderXMLClientServerTest extends AbstractBusClientServ
     public void testRequestWithAttachment() throws Exception {
         
         HttpURLConnection connection =  
-            (HttpURLConnection)new URL("http://localhost:9033/XMLServiceAttachment").openConnection();
+            (HttpURLConnection)new URL(ADDRESS).openConnection();
         connection.setRequestMethod("POST");
         
         String ct = "multipart/related; type=\"text/xml\"; " + "start=\"rootPart\"; "

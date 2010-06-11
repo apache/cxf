@@ -23,12 +23,15 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 public class Server extends AbstractBusTestServerBase {
 
     protected void run() {
+        String port = TestUtil.getPortNumber(Server.class);
+        
         Object implementor = new SwAServiceImpl();
-        String address = "http://localhost:9036/swa";
+        String address = "http://localhost:" + port + "/swa";
         EndpointImpl ep;
         try {
             ep = (EndpointImpl) Endpoint.create(new SwANoMimeServiceImpl());

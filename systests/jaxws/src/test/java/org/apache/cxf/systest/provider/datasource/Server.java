@@ -20,13 +20,15 @@
 package org.apache.cxf.systest.provider.datasource;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
+import org.apache.cxf.testutil.common.TestUtil;
 
 
 public class Server extends AbstractBusTestServerBase {
     
-    protected void run() {            
+    protected void run() { 
+        String port = TestUtil.getPortNumber(Server.class);
         TestProvider servant = new TestProvider();
-        servant.publish("http://localhost:9000/test/foo");
+        servant.publish("http://localhost:" + port + "/test/foo");
     }
     
     public static void main(String[] args) throws Exception { 
