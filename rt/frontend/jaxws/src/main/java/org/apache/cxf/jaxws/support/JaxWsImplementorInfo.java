@@ -301,9 +301,26 @@ public class JaxWsImplementorInfo {
                 }
             }
         }
-        wsProviderAnnotation = implementorClass.getAnnotation(WebServiceProvider.class);
+        
+        wsProviderAnnotation = getWebServiceProviderAnnotation(implementorClass);
     }
 
+    private static WebServiceProvider getWebServiceProviderAnnotation(Class<?> cls) {
+        if (cls == null) {
+            return null;
+        }
+        WebServiceProvider ann = cls.getAnnotation(WebServiceProvider.class);
+        if (null != ann) {
+            return ann;
+        }
+        for (Class<?> inf : cls.getInterfaces()) {
+            if (null != inf.getAnnotation(WebServiceProvider.class)) {
+                return inf.getAnnotation(WebServiceProvider.class);
+            }
+        }
+        return getWebServiceProviderAnnotation(cls.getSuperclass());
+    }
+    
     public boolean isWebServiceProvider() {
         return Provider.class.isAssignableFrom(implementorClass);
     }
@@ -321,22 +338,28 @@ public class JaxWsImplementorInfo {
     }
 
     public Class<?> getProviderParameterType() {
-        // The Provider Implementor inherits out of Provider<T>
-        Class<?> c = implementorClass;
+        return doGetProviderParameterType(implementorClass);
+    }
+
+    private static Class<?> doGetProviderParameterType(Class<?> c) {
         while (c != null) {
             Type intfTypes[] = c.getGenericInterfaces();
             for (Type t : intfTypes) {
                 Class<?> clazz = JAXBEncoderDecoder.getClassFromType(t);
-                if (Provider.class == clazz) {
-                    Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
-                    return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
+                if (Provider.class.isAssignableFrom(clazz)) {
+                    if (Provider.class == clazz) {
+                        Type paramTypes[] = ((ParameterizedType)t).getActualTypeArguments();
+                        return JAXBEncoderDecoder.getClassFromType(paramTypes[0]);
+                    } else {
+                        return doGetProviderParameterType(clazz);
+                    }
                 }
             }
             c = c.getSuperclass();
         }
         return null;
     }
-
+    
     public String getBindingType() {
         BindingType bType = implementorClass.getAnnotation(BindingType.class);
         if (bType != null) {
