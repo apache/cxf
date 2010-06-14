@@ -288,7 +288,10 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
         return clazz.getResource(name);
     }
     
-    private HandlerChainAnnotation findHandlerChainAnnotation(Class<?> clz, boolean searchSEI) {        
+    private HandlerChainAnnotation findHandlerChainAnnotation(Class<?> clz, boolean searchSEI) {
+        if (clz == null) {
+            return null;
+        }
         if (LOG.isLoggable(Level.FINE)) {
             LOG.fine("Checking for HandlerChain annotation on " + clz.getName());
         }
@@ -324,6 +327,9 @@ public class AnnotationHandlerChainBuilder extends HandlerChainBuilder {
                         hcAnn = new HandlerChainAnnotation(ann, iface);
                         break;
                     }
+                }
+                if (hcAnn == null) {
+                    hcAnn = findHandlerChainAnnotation(clz.getSuperclass(), false);
                 }
             }
         } else {

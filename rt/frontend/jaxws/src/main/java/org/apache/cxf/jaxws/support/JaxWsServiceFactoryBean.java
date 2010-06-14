@@ -41,6 +41,7 @@ import javax.xml.ws.Action;
 import javax.xml.ws.AsyncHandler;
 import javax.xml.ws.BindingType;
 import javax.xml.ws.FaultAction;
+import javax.xml.ws.Provider;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebFault;
 import javax.xml.ws.WebServiceFeature;
@@ -269,10 +270,12 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     protected void initializeWSDLOperationsForProvider() {
-        Type[] genericInterfaces = getServiceClass().getGenericInterfaces();
-        ParameterizedType pt = (ParameterizedType)genericInterfaces[0];
-        Class c = (Class)pt.getActualTypeArguments()[0];
-
+        Class c = getProviderParameterType(getServiceClass());
+        if (c == null) {
+            throw new ServiceConstructionException(getServiceClass().getName() + "is not a valid Provider",
+                                                   LOG);
+        }
+        
         if (getEndpointInfo() == null
             && isFromWsdl()) {
             //most likely, they specified a WSDL, but for some reason
@@ -367,6 +370,24 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         
     }
 
+    protected Class<?> getProviderParameterType(Class<?> cls) {
+        if (cls == null) {
+            return null;
+        }
+        Type[] genericInterfaces = cls.getGenericInterfaces();
+        for (Type type : genericInterfaces) {
+            if (type instanceof ParameterizedType) { 
+                Class<?> rawCls = (Class<?>)((ParameterizedType)type).getRawType();
+                if (Provider.class == rawCls) {
+                    return (Class<?>)((ParameterizedType)type).getActualTypeArguments()[0];
+                }
+            } else if (type instanceof Class && Provider.class.isAssignableFrom((Class)type)) {
+                return getProviderParameterType((Class)type);
+            }
+        }
+        return getProviderParameterType(cls.getSuperclass());
+    }
+    
     void initializeWrapping(OperationInfo o, Method selected) {
         Class responseWrapper = getResponseWrapper(selected);
         if (responseWrapper != null) {

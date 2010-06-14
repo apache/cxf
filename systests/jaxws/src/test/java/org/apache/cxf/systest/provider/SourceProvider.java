@@ -16,15 +16,11 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.systest.provider;
 
-public class HWSourcePayloadProvider extends AbstractSourcePayloadProvider
-    implements Comparable<HWSourcePayloadProvider> {
- 
-    @Override
-    public int compareTo(HWSourcePayloadProvider p) {
-        return p == this ? 0 : -1;
-    }
-    
+import javax.xml.transform.Source;
+import javax.xml.ws.Provider;
+
+public interface SourceProvider extends Provider<Source> {
+
 }
