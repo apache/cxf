@@ -272,8 +272,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     protected void initializeWSDLOperationsForProvider() {
         Class c = getProviderParameterType(getServiceClass());
         if (c == null) {
-            throw new ServiceConstructionException(getServiceClass().getName() + "is not a valid Provider",
-                                                   LOG);
+            throw new ServiceConstructionException(new Message("INVALID_PROVIDER_EXC", LOG));
         }
         
         if (getEndpointInfo() == null
