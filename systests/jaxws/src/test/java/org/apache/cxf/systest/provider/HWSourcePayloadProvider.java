@@ -22,7 +22,6 @@ package org.apache.cxf.systest.provider;
 public class HWSourcePayloadProvider extends AbstractSourcePayloadProvider
     implements Comparable<HWSourcePayloadProvider> {
  
-    @Override
     public int compareTo(HWSourcePayloadProvider p) {
         return p == this ? 0 : -1;
     }
