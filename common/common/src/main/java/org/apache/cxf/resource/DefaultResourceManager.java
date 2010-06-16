@@ -35,6 +35,7 @@ public class DefaultResourceManager implements ResourceManager {
 
     protected final List<ResourceResolver> registeredResolvers 
         = new CopyOnWriteArrayList<ResourceResolver>();
+    protected boolean firstCalled;
 
     public DefaultResourceManager() { 
         initializeDefaultResolvers(); 
@@ -47,8 +48,13 @@ public class DefaultResourceManager implements ResourceManager {
     public DefaultResourceManager(List<? extends ResourceResolver> resolvers) {
         addResourceResolvers(resolvers);
     }
+    
+    protected void onFirstResolve() {
+        //nothing
+        firstCalled = true;
+    }
  
-    public final <T> T resolveResource(String name, Class<T> type) { 
+    public final <T> T resolveResource(String name, Class<T> type) {
         return findResource(name, type, false, registeredResolvers);
     } 
 
@@ -86,6 +92,9 @@ public class DefaultResourceManager implements ResourceManager {
     
     private <T> T findResource(String name, Class<T> type, boolean asStream, 
                                List<ResourceResolver> resolvers) {
+        if (!firstCalled) {
+            onFirstResolve();
+        }
         if (resolvers == null) {
             resolvers = registeredResolvers;
         }

@@ -21,10 +21,10 @@ package org.apache.cxf.bus.spring;
 
 
 
-import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.resource.ResourceManager;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.config.DestructionAwareBeanPostProcessor;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -63,17 +63,24 @@ public class Jsr250BeanPostProcessor
     }
     private ResourceManager getResourceManager(Object bean) {
         if (resourceManager == null) {
+            boolean temp = isProcessing;
+            isProcessing = false;
             if (bean instanceof ResourceManager) {
                 resourceManager = (ResourceManager)bean;
                 resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
             } else {
-                Bus b = (Bus)context.getBean("cxf");
-                ResourceManager m = b.getExtension(ResourceManager.class);
+                ResourceManager m = null;
+                try {
+                    m = (ResourceManager)context.getBean(ResourceManager.class.getName());
+                } catch (NoSuchBeanDefinitionException t) {
+                    //ignore - no resource manager
+                }
                 if (resourceManager == null && m != null) {
                     resourceManager = m;
                     resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
                 }
             }
+            isProcessing = temp;
         }
         return resourceManager;
     }
