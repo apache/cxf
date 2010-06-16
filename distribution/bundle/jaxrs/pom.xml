@@ -112,10 +112,10 @@
                         <Implementation-Title>Apache CXF</Implementation-Title>
                         <Implementation-Vendor>The Apache Software Foundation</Implementation-Vendor>
                         <Implementation-Vendor-Id>org.apache</Implementation-Vendor-Id>
-                        <Implementation-Version>${project.version}</Implementation-Version>
+                        <Implementation-Version>${cxf.osgi.version.clean}</Implementation-Version>
                         <Specification-Title>Apache CXF</Specification-Title>
                         <Specification-Vendor>The Apache Software Foundation</Specification-Vendor>
-                        <Specification-Version>${project.version}</Specification-Version>
+                        <Specification-Version>${cxf.osgi.version.clean}</Specification-Version>
                         <DynamicImport-Package>
                             com.ctc.wstx.*,
                             org.apache.commons.logging.*,
@@ -148,6 +148,7 @@
                             org.junit*;resolution:=optional,
                             org.mortbay*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
+                            org.slf4j*;resolution:=optional,
                             org.springframework*;resolution:=optional;version="[2.5,4)",
                             javax.activation;version="[0.0,2)",
                             javax.annotation;version="[0.0,2)",
@@ -160,7 +161,7 @@
                             *
                         </Import-Package>
                         <Export-Package>
-                            org.apache.cxf.*;version=${project.version};-split-package:=merge-first,
+                            org.apache.cxf.*;version=${cxf.osgi.version.clean};-split-package:=merge-first,
                             '=META-INF.cxf.osgi',
                             '=META-INF.cxf'
                         </Export-Package>
