@@ -44,6 +44,6 @@ public class BigDecimalType extends AegisType {
 
     @Override
     public void writeObject(final Object object, final MessageWriter writer, final Context context) {
-        writer.writeValue(object.toString());
+    	writer.writeValue(((BigDecimal) object).toPlainString());
     }
 }
