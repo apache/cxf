@@ -16,34 +16,22 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.aegis.type.basic;
+
+package org.apache.cxf.aegis.type;
 
 import java.math.BigDecimal;
 
-import org.apache.cxf.aegis.Context;
-import org.apache.cxf.aegis.type.Type;
-import org.apache.cxf.aegis.xml.MessageReader;
-import org.apache.cxf.aegis.xml.MessageWriter;
+import org.junit.Test;
 
-/**
- * <code>Type</code> for a <code>BigDecimal</code>
- * 
- * @author <a href="mailto:peter.royal@pobox.com">peter royal</a>
- */
-public class BigDecimalType extends Type {
-    public BigDecimalType() {
-        super();
-    }
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
-    @Override
-    public Object readObject(final MessageReader reader, final Context context) {
-        final String value = reader.getValue();
+public class BigDecimalStringTest {
 
-        return null == value ? null : new BigDecimal(value.trim());
-    }
-
-    @Override
-    public void writeObject(final Object object, final MessageWriter writer, final Context context) {
-    	writer.writeValue(((BigDecimal) object).toPlainString());
+    @Test
+    public void runMyTest() {
+        BigDecimal scientificNotation = new BigDecimal("0.000000001");
+        assertTrue(scientificNotation.toString().contains("E"));
+        assertFalse(scientificNotation.toPlainString().contains("E"));
     }
 }
