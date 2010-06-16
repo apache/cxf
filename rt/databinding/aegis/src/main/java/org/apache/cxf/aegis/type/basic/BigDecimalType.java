@@ -44,6 +44,6 @@ public class BigDecimalType extends Type {
 
     @Override
     public void writeObject(final Object object, final MessageWriter writer, final Context context) {
-    	writer.writeValue(((BigDecimal) object).toPlainString());
+        writer.writeValue(((BigDecimal)object).toPlainString());
     }
 }
