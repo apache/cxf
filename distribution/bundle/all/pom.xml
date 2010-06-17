@@ -270,6 +270,7 @@
                         <Import-Package>
                             !org.apache.cxf.*,
                             !META-INF.cxf,
+                            !META-INF.cxf.osgi,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
@@ -283,6 +284,7 @@
                             org.apache.abdera*;resolution:=optional,
                             org.apache.commons.lang*;resolution:=optional,
                             org.apache.commons.codec*;resolution:=optional,
+                            org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xmlbeans*;resolution:=optional,
@@ -302,7 +304,7 @@
                             javax.jms;resolution:=optional;version="[0.0,2)",
                             javax.jws*;version="[0.0,3)",
                             javax.mail*;version="[0.0,2)",
-                            javax.servlet.*;version="[0.0,3)",
+                            javax.servlet.*;version="[0.0,3)";resolution:=optional,
                             javax.xml.stream*;version="[0.0,2)",
                             javax.xml.ws*;version="[0.0,3)",
                             *
