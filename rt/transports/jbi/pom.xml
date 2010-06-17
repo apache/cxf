@@ -125,6 +125,9 @@
                         <DynamicImport-Package>
                         </DynamicImport-Package>
                         <Import-Package>
+                            javax.activation;version="[0.0,2)",
+                            javax.annotation;version="[0.0,2)",
+                            javax.jws*;version="[0.0,3)",
                             *
                         </Import-Package>
                         <Export-Package>
@@ -132,6 +135,7 @@
                             META-INF.cxf.transport.jbi
                         </Export-Package>
                         <_failok>true</_failok>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
             </plugin>

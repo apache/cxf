@@ -132,12 +132,16 @@
                         <Specification-Version>${project.version}</Specification-Version>
                         <DynamicImport-Package>
                         </DynamicImport-Package>
-                        <Import-Package>*</Import-Package>
+                        <Import-Package>
+                           javax.xml.stream*;version="[0.0,2)",
+                           *
+                        </Import-Package>
                         <Export-Package>
                             org.apache.cxf.*;version=${project.version};-split-package:=merge-first,
                             META-INF.cxf.binding.jbi
                         </Export-Package>
                         <_failok>true</_failok>
+                        <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
             </plugin>
