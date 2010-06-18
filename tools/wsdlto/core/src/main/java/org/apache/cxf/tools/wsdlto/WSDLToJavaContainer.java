@@ -296,7 +296,6 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
         }
         String serviceName = (String)context.get(ToolConstants.CFG_SERVICENAME);
-        QName qname = null;
         for (Definition definition : defs) {
             if (serviceName != null) {
                 for (Iterator<QName> ite = definition.getServices().keySet().iterator(); ite.hasNext();) {
@@ -308,12 +307,8 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
             }
         }
 
-        if (qname == null) {
-            Message msg = new Message("SERVICE_NOT_FOUND", LOG, new Object[] {serviceName});
-            throw new ToolException(msg);
-        }
-
-        return qname;
+        Message msg = new Message("SERVICE_NOT_FOUND", LOG, new Object[] {serviceName});
+        throw new ToolException(msg);
     }
 
     public void loadDefaultNSPackageMapping(ToolContext env) {
