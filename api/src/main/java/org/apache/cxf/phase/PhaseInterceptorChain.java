@@ -31,6 +31,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -613,7 +614,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
             } else {
                 chain.append(", ");
             }
-            chain.append(i.interceptor.getClass().getSimpleName());
+            String nm = i.interceptor.getClass().getSimpleName();
+            if (StringUtils.isEmpty(nm)) {
+                nm = i.interceptor.getId();
+            }
+            chain.append(nm);
             i = i.next;
         }
         chain.append("]\n");
