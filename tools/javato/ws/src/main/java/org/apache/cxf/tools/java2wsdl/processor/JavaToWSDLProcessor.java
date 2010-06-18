@@ -31,7 +31,6 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -49,12 +48,7 @@ import org.apache.cxf.tools.java2wsdl.generator.wsdl11.FaultBeanGenerator;
 import org.apache.cxf.tools.java2wsdl.generator.wsdl11.WrapperBeanGenerator;
 import org.apache.cxf.tools.java2wsdl.processor.internal.ServiceBuilderFactory;
 import org.apache.cxf.tools.util.AnnotationUtil;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
+
 
 public class JavaToWSDLProcessor implements Processor {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaToWSDLProcessor.class);
@@ -62,7 +56,6 @@ public class JavaToWSDLProcessor implements Processor {
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private ToolContext context;
     private final List<AbstractGenerator> generators = new ArrayList<AbstractGenerator>();
-    private ApplicationContext applicationContext;
     
     private void customize(ServiceInfo service) {
         if (context.containsKey(ToolConstants.CFG_TNS)) {
@@ -91,26 +84,6 @@ public class JavaToWSDLProcessor implements Processor {
         
     }
     
-    /**
-     * This is factored out to permit use in a unit test.
-     * @param bus
-     * @return
-     */
-    public static ApplicationContext getApplicationContext(Bus bus, List<String> additionalFilePathnames) {
-        BusApplicationContext busApplicationContext = bus.getExtension(BusApplicationContext.class);
-        GenericApplicationContext appContext = new GenericApplicationContext(busApplicationContext);
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-        reader.loadBeanDefinitions(new ClassPathResource("META-INF/cxf/java2wsbeans.xml"));
-        for (String pathname : additionalFilePathnames) {
-            try {
-                reader.loadBeanDefinitions(new FileSystemResource(pathname));
-            } catch (BeanDefinitionStoreException bdse) {
-                throw new ToolException("Unable to open bean definition file " + pathname, bdse.getCause());
-            }
-        }
-            
-        return appContext;
-    }
     
     public void process() throws ToolException {
         String oldClassPath = System.getProperty(JAVA_CLASS_PATH);
@@ -199,8 +172,8 @@ public class JavaToWSDLProcessor implements Processor {
                 }
             }
         }
-        applicationContext = getApplicationContext(getBus(), beanDefinitions);
-        ServiceBuilderFactory builderFactory = ServiceBuilderFactory.getInstance();
+        
+        ServiceBuilderFactory builderFactory = ServiceBuilderFactory.getInstance(beanDefinitions);
         Class<?> clz = getServiceClass();
         context.put(Class.class, clz);
         if (clz.isInterface()) {
@@ -218,7 +191,7 @@ public class JavaToWSDLProcessor implements Processor {
         builderFactory.setServiceClass(clz);
         builderFactory.setDatabindingName(getDataBindingName());
         // The service class determines the frontend, so no need to pass it in twice.
-        ServiceBuilder builder = builderFactory.newBuilder(applicationContext);
+        ServiceBuilder builder = builderFactory.newBuilder();
 
         builder.validate();
 
