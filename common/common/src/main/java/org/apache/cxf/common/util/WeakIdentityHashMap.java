@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.common.util;
 
+import java.lang.ref.Reference;
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
 import java.util.Collection;
@@ -138,11 +139,10 @@ public class WeakIdentityHashMap<K, V> implements Map<K, V> {
     }
 
     private synchronized void reap() {
-        Object zombie = queue.poll();
+        Reference<? extends K> zombie = queue.poll();
 
         while (zombie != null) {
-            IdentityWeakReference victim = (IdentityWeakReference)zombie;
-            backingStore.remove(victim);
+            backingStore.remove(zombie);
             zombie = queue.poll();
         }
     }

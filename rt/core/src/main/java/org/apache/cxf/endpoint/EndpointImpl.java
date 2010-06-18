@@ -127,13 +127,13 @@ public class EndpointImpl extends AbstractAttributedInterceptorProvider implemen
             BindingFactory bf = null;
             try {
                 bf = bus.getExtension(BindingFactoryManager.class).getBindingFactory(namespace);
+                if (null == bf) {
+                    Message msg = new Message("NO_BINDING_FACTORY", BUNDLE, namespace);
+                    throw new EndpointException(msg);
+                }
                 binding = bf.createBinding(bi);
             } catch (BusException ex) {
                 throw new EndpointException(ex);
-            }
-            if (null == bf) {
-                Message msg = new Message("NO_BINDING_FACTORY", BUNDLE, namespace);
-                throw new EndpointException(msg);
             }
         }    
     }
