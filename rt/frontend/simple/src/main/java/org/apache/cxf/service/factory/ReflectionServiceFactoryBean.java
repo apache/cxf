@@ -19,7 +19,6 @@
 
 package org.apache.cxf.service.factory;
 
-import java.io.IOException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
 import java.lang.reflect.Field;
@@ -53,11 +52,9 @@ import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
-import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
-import org.w3c.dom.Document;
 
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
@@ -70,7 +67,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.common.xmlschema.XmlSchemaValidationManager;
-import org.apache.cxf.databinding.AbstractDataBinding;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.mime.MimeAttribute;
 import org.apache.cxf.databinding.source.mime.MimeSerializer;
@@ -83,14 +79,12 @@ import org.apache.cxf.frontend.FaultInfoException;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.frontend.SimpleMethodDispatcher;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MethodComparator;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.FaultOutInterceptor;
 import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.resource.URIResolver;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
 import org.apache.cxf.service.ServiceModelSchemaValidator;
@@ -119,10 +113,11 @@ import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
-
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
+
+
 
 /**
  * Introspects a class and builds a {@link Service} from it. If a WSDL URL is
@@ -180,7 +175,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     private Map<Method, Boolean> isRpcCache = new HashMap<Method, Boolean>();
     private String styleCache;
     private Boolean defWrappedCache;
-    private List<String> schemaLocations;
     
     public ReflectionServiceFactoryBean() {
         getServiceConfigurations().add(0, new DefaultServiceConfiguration());
@@ -227,39 +221,6 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 db.setExtraClass(extraClass);
             }
             retVal = db;
-        }
-        if (retVal instanceof AbstractDataBinding && schemaLocations != null) {
-            ResourceManager rr = getBus().getExtension(ResourceManager.class);
-
-            List<DOMSource> schemas = new ArrayList<DOMSource>();
-            for (String l : schemaLocations) {
-                URL url = rr.resolveResource(l, URL.class);
-
-                if (url == null) {
-                    URIResolver res;
-                    try {
-                        res = new URIResolver(l);
-                    } catch (IOException e) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l), e);
-                    }
-
-                    if (!res.isResolved()) {
-                        throw new ServiceConstructionException(new Message("INVALID_SCHEMA_URL", LOG, l));
-                    }
-                    url = res.getURL();
-                }
-
-                Document d;
-                try {
-                    d = DOMUtils.readXml(url.openStream());
-                } catch (Exception e) {
-                    throw new ServiceConstructionException(
-                        new Message("ERROR_READING_SCHEMA", LOG, l), e);
-                }
-                schemas.add(new DOMSource(d, url.toString()));
-            }
-
-            ((AbstractDataBinding)retVal).setSchemas(schemas);
         }
         return retVal;
     }
