@@ -238,7 +238,9 @@ public final class CustomizationParser {
     }
 
     protected void copyAllJaxbDeclarations(final Node schemaNode, final Element jaxwsBindingNode) {
-        appendJaxbVersion((Element)schemaNode);
+        if (isSchemaElement((Element)schemaNode)) {
+            appendJaxbVersion((Element)schemaNode);
+        }
 
         Node[] embededNodes = getAnnotationNodes(schemaNode);
         Node annotationNode = embededNodes[0];
@@ -247,15 +249,18 @@ public final class CustomizationParser {
         for (Node childNode = jaxwsBindingNode.getFirstChild();
             childNode != null;
             childNode = childNode.getNextSibling()) {
-            
-            copyJaxbAttributes(childNode, (Element)schemaNode);
-            
-            if (!isJaxbBindings(childNode)) {
+
+            if (isSchemaElement((Element)schemaNode)) {
+                copyJaxbAttributes(childNode, (Element)schemaNode);
+            }
+
+            //TODO: check for valid extension namespaces
+            if (!(childNode instanceof Element)) { //!isJaxbBindings(childNode)) {
                 continue;
             }
             
             Element childEl = (Element)childNode;
-            if (isJaxbBindingsElement(childEl)) {
+            if (isJaxbBindings(childNode) && isJaxbBindingsElement(childEl)) {
                 
                 NodeList nlist = nodeSelector.queryNodes(schemaNode, childEl.getAttribute("node"));
                 for (int i = 0; i < nlist.getLength(); i++) {
@@ -307,7 +312,7 @@ public final class CustomizationParser {
                         String pfxs = attr.getValue();
                         while (pfxs.length() > 0) {
                             String pfx = pfxs;
-                            int idx = pfx.indexOf(',');
+                            int idx = pfx.indexOf(' ');
                             if (idx != -1) {
                                 pfxs = pfxs.substring(idx + 1);
                                 pfx = pfx.substring(0, idx);
@@ -596,6 +601,11 @@ public final class CustomizationParser {
 
     public Node getWSDLNode() {
         return this.wsdlNode;
+    }
+
+    private boolean isSchemaElement(Node schema) {
+        return ToolConstants.SCHEMA_URI.equals(schema.getNamespaceURI())
+               && "schema".equals(schema.getLocalName());
     }
 
     private boolean isJAXWSBindings(Node bindings) {
