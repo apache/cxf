@@ -68,9 +68,15 @@ public class RetransmissionInterceptor extends AbstractPhaseInterceptor {
         if (null == os) {
             return;
         }
-        
-        WriteOnCloseOutputStream stream = RMUtils.createCachedStream(message, os);
-        stream.registerCallback(new RetransmissionCallback(message, getManager()));
+        if (isFault) { 
+            // remove the exception set by the PhaseInterceptorChain so that the 
+            // error does not reach the client when retransmission is scheduled 
+            message.setContent(Exception.class, null);
+            message.getExchange().put(Exception.class, null); 
+        } else { 
+            WriteOnCloseOutputStream stream = RMUtils.createCachedStream(message, os);
+            stream.registerCallback(new RetransmissionCallback(message, getManager()));
+        }
     }
 }
     
