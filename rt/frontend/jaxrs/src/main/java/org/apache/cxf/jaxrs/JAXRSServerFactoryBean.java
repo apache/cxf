@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.invoker.Invoker;
 
@@ -82,6 +83,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     
     public Server create() {
         try {
+            serviceFactory.setBus(getBus());
             checkResources(true);
             if (serviceFactory.getService() == null) {
                 serviceFactory.setServiceName(getServiceName());
@@ -109,6 +111,11 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.put("org.apache.cxf.jaxrs.comparator", rc);
             }
             checkPrivateEndpoint(ep);
+            
+            getServiceFactory().sendEvent(FactoryBeanListener.Event.SERVER_CREATED,
+                                          server, 
+                                          null,
+                                          null);
             if (start) {
                 server.start();
             }

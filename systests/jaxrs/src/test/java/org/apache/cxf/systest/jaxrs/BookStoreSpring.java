@@ -38,8 +38,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.apache.cxf.annotations.Logging;
+
 @Path("/")
 @Produces("application/json")
+@Logging
 public class BookStoreSpring {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();

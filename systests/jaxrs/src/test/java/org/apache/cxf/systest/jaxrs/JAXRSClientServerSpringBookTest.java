@@ -152,6 +152,7 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Content-Type", "*/*");
         connect.addRequestProperty("Accept", type);
+        connect.addRequestProperty("Accept-Encoding", "gzip;q=1.0, identity; q=0.5, *;q=0");
         if (mHeader != null) {
             connect.addRequestProperty("X-HTTP-Method-Override", mHeader);
         }

@@ -87,6 +87,9 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         case SERVER_CREATED: {
             Class<?> cls = (Class<?>)args[2];
+            if (cls == null) {
+                return;
+            }
             Server server = (Server)args[0];
             Bus bus = factory.getBus();
             addGZipSupport(server.getEndpoint(), bus, cls.getAnnotation(GZIP.class));

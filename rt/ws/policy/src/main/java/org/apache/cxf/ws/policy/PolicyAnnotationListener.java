@@ -72,13 +72,17 @@ public class PolicyAnnotationListener implements FactoryBeanListener {
         case ENDPOINT_SELECTED: {
             Class<?> cls = (Class<?>)args[2];
             Endpoint ep = (Endpoint)args[1];
-            addPolicies(factory, ep, cls);
+            if (ep.getEndpointInfo().getInterface() != null) {
+                addPolicies(factory, ep, cls);
+            }
             break;
         }
         case SERVER_CREATED: {
             Class<?> cls = (Class<?>)args[2];
             Server server = (Server)args[0];
-            addPolicies(factory, server, cls);
+            if (server.getEndpoint().getEndpointInfo().getInterface() != null) {
+                addPolicies(factory, server, cls);
+            }
             break;
         }
         case INTERFACE_OPERATION_BOUND: {

@@ -39,6 +39,7 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.AbstractServiceFactoryBean;
+import org.apache.cxf.service.factory.FactoryBeanListener.Event;
 import org.apache.cxf.service.invoker.Invoker;
 
 
@@ -69,6 +70,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
     @Override
     public Service create() {
+        sendEvent(Event.START_CREATE);
+
         initializeServiceModel();
 
         initializeDefaultInterceptors();
@@ -86,7 +89,9 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
             getService().setDataBinding(getDataBinding());
         }
 
-        return getService();
+        Service serv = getService();
+        sendEvent(Event.END_CREATE, serv);
+        return serv;
     }
 
     public Executor getExecutor() {
@@ -216,6 +221,8 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     }
     
     private ClassResourceInfo getCreatedFromModel(Class<?> realClass) {
+        sendEvent(Event.CREATE_FROM_CLASS, realClass);
+
         for (ClassResourceInfo cri : classResourceInfos) {
             if (cri.isCreatedFromModel() 
                 && cri.isRoot() && cri.getServiceClass().isAssignableFrom(realClass)) {
@@ -230,6 +237,7 @@ public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
         JAXRSServiceImpl service = new JAXRSServiceImpl(classResourceInfos, serviceName);
 
         setService(service);
+        sendEvent(Event.SERVICE_SET, service);
 
         if (properties != null) {
             service.putAll(properties);

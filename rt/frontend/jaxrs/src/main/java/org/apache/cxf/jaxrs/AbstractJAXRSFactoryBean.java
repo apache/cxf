@@ -30,7 +30,6 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
-
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
@@ -50,7 +49,9 @@ import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.model.BindingInfo;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
@@ -121,6 +122,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
 
         BindingInfo bindingInfo = createBindingInfo();
         ei.setBinding(bindingInfo);
+        serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINTINFO_CREATED, ei);
 
         return ei;
     }
@@ -141,8 +143,14 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         try {
             BindingFactory bindingFactory = mgr.getBindingFactory(binding);
             setBindingFactory(bindingFactory);
-            return bindingFactory.createBindingInfo(serviceFactory.getService(),
-                                                    binding, bindingConfig);
+            BindingInfo bi = bindingFactory.createBindingInfo(serviceFactory.getService(),
+                                                              binding, bindingConfig);
+            for (BindingOperationInfo boi : bi.getOperations()) {
+                serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_OPERATION_CREATED, boi, boi);
+            }
+
+            serviceFactory.sendEvent(FactoryBeanListener.Event.BINDING_CREATED, bi);
+            return bi;
         } catch (BusException ex) {
             ex.printStackTrace();
             //do nothing
@@ -188,8 +196,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         List<ClassResourceInfo> list = serviceFactory.getRealClassResourceInfo();
         for (ClassResourceInfo cri : list) {
             initializeAnnotationInterceptors(ep, cri.getServiceClass());
+            serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINT_SELECTED, ei, ep,
+                                     cri.getServiceClass());
         }
-            
         return ep;
     }
     

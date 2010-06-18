@@ -64,6 +64,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
+import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -71,6 +72,7 @@ import org.apache.cxf.jaxrs.ext.search.SearchContext;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Path("/bookstore")
+@GZIP(threshold = 1)
 public class BookStore {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();

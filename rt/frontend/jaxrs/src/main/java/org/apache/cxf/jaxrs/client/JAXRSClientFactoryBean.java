@@ -147,6 +147,7 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
     }
     
     public Client createWithValues(Object... varValues) {
+        serviceFactory.setBus(getBus());
         checkResources(false);
         ClassResourceInfo cri = null;
         try {
