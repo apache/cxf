@@ -22,6 +22,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
+import org.w3c.dom.Node;
 
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -36,7 +37,8 @@ public class DocumentWriterInterceptor extends AbstractPhaseInterceptor<Message>
     }
 
     public void handleMessage(Message message) throws Fault {
-        Document doc = message.getContent(Document.class);
+        Node n = message.getContent(Node.class);
+        Document doc = (Document)n;
         XMLStreamWriter writer = message.getContent(XMLStreamWriter.class);
         
         try {

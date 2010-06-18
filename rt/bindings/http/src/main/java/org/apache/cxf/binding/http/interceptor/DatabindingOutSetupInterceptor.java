@@ -33,6 +33,7 @@ import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.interceptor.MessageSenderInterceptor;
 import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.interceptor.WrappedOutInterceptor;
 import org.apache.cxf.message.Message;
@@ -65,7 +66,6 @@ public class DatabindingOutSetupInterceptor extends AbstractPhaseInterceptor<Mes
                 nsMap.addNamespace(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
                 writer.setNamespaceContext(nsMap);
             } catch (XMLStreamException e) {
-                e.printStackTrace();
                 // ignore
             }
             message.setContent(XMLStreamWriter.class, writer);
@@ -74,10 +74,9 @@ public class DatabindingOutSetupInterceptor extends AbstractPhaseInterceptor<Mes
             wrappedOut.addAfter(getId());
             chain.add(wrappedOut);
 
-            XMLMessageOutInterceptor xmlOut = new XMLMessageOutInterceptor(Phase.PRE_LOGICAL);
+            final XMLMessageOutInterceptor xmlOut = new XMLMessageOutInterceptor(Phase.PRE_LOGICAL);
             xmlOut.addAfter(wrappedOut.getId());
             chain.add(xmlOut);
-            
 
             Endpoint ep = message.getExchange().get(Endpoint.class);
             URIMapper mapper = (URIMapper) ep.getService().get(URIMapper.class.getName());
@@ -88,9 +87,18 @@ public class DatabindingOutSetupInterceptor extends AbstractPhaseInterceptor<Mes
             boolean putOrPost = verb.equals(HttpConstants.POST) || verb.equals(HttpConstants.PUT);
             
             if (putOrPost) { 
-                chain.doIntercept(message);
                 chain.add(new URIParameterOutInterceptor());
                 chain.add(new DocumentWriterInterceptor());
+                chain.add(new AbstractPhaseInterceptor<Message>("remove-writer", 
+                        Phase.PREPARE_SEND) {
+                    {
+                        addAfter(xmlOut.getId());
+                        addBefore(MessageSenderInterceptor.class.getName());
+                    }
+                    public void handleMessage(Message message) throws Fault {
+                        message.removeContent(XMLStreamWriter.class);
+                    }
+                });
                 chain.add(STAX_OUT);
             } else {
                 chain.add(new URIParameterOutInterceptor());

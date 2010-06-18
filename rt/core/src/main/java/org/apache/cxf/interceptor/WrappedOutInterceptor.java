@@ -38,13 +38,14 @@ import org.apache.cxf.staxutils.StaxUtils;
 public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(WrappedOutInterceptor.class);
 
-    private WrappedOutEndingInterceptor ending = new WrappedOutEndingInterceptor();
+    private final WrappedOutEndingInterceptor ending;
     
     public WrappedOutInterceptor() {
         this(Phase.MARSHAL);
     }
     public WrappedOutInterceptor(String phase) {
         super(phase);
+        ending = new WrappedOutEndingInterceptor(phase + "-ending");
         addBefore(BareOutInterceptor.class.getName());
     }
 
@@ -90,8 +91,8 @@ public class WrappedOutInterceptor extends AbstractOutDatabindingInterceptor {
     }
     
     public class WrappedOutEndingInterceptor extends AbstractOutDatabindingInterceptor {
-        public WrappedOutEndingInterceptor() {
-            super(Phase.MARSHAL_ENDING);
+        public WrappedOutEndingInterceptor(String phase) {
+            super(phase);
         }
 
         public void handleMessage(Message message) throws Fault {
