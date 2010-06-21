@@ -54,7 +54,7 @@ import org.apache.cxf.wsdl.WSDLManager;
 
 public class ProviderImpl extends javax.xml.ws.spi.Provider {
     public static final String JAXWS_PROVIDER = ProviderImpl.class.getName();
-    private static final Logger LOG = LogUtils.getL7dLogger(ProviderImpl.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(ProviderImpl.class);
     private static JAXBContext jaxbContext;
     
     @Override
@@ -77,6 +77,13 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                                serviceName, serviceClass, features);
         
     }
+    
+    protected EndpointImpl createEndpointImpl(Bus bus,
+                                              String bindingId,
+                                              Object implementor,
+                                              WebServiceFeature ... features) {
+        return new EndpointImpl(bus, implementor, bindingId, features);
+    }
 
     @Override
     public Endpoint createEndpoint(String bindingId, Object implementor) {
@@ -84,7 +91,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         Endpoint ep = null;
         if (EndpointUtils.isValidImplementor(implementor)) {
             Bus bus = BusFactory.getThreadDefaultBus();
-            ep = new EndpointImpl(bus, implementor, bindingId);
+            ep = createEndpointImpl(bus, bindingId, implementor);
             return ep;
         } else {
             throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
@@ -97,7 +104,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         EndpointImpl ep = null;
         if (EndpointUtils.isValidImplementor(implementor)) {
             Bus bus = BusFactory.getThreadDefaultBus();
-            ep = new EndpointImpl(bus, implementor, bindingId, features);
+            ep = createEndpointImpl(bus, bindingId, implementor, features);
             return ep;
         } else {
             throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());
@@ -290,11 +297,4 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
         }
         return jaxbContext;
     }
-    /*
-    //new in 2.2, but introduces a new class not found in 2.1
-    public Endpoint createEndpoint(String bindingId, Class<?> implementorClass,
-                                   Invoker invoker, WebServiceFeature ... features) {
-        //TODO - JAXWS 2.2
-    }
-    */
 }

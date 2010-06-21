@@ -767,11 +767,5 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                 .getName()).toString());
         }
     }
-    
-    /*
-    //new in 2.2, but introduces a new class not found in 2.1
-    public void setEndpointContext(EndpointContext ctxt) {
-        //TODO - JAXWS 2.2
-    }
-    */
+
 }

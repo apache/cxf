@@ -32,6 +32,9 @@
         <relativePath>../../../parent/pom.xml</relativePath>
     </parent>
 
+    <properties>
+        <spi-dir>spi-2.1</spi-dir>
+    </properties>
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
@@ -156,6 +159,21 @@
                             </sources>
                         </configuration>
                     </execution>
+                    <execution>
+                         <id>add-spi</id>
+                         <phase>generate-resources</phase>
+                         <goals>
+                             <goal>add-resource</goal>
+                         </goals>
+                         <configuration>
+                             <resources>
+                                 <resource>
+                                     <directory>${basedir}/src/main/${spi-dir}</directory>
+                                 </resource>
+                             </resources>
+                         </configuration>
+                     </execution>
+
                 </executions>
             </plugin>
         </plugins>
@@ -163,6 +181,77 @@
 
 
     <profiles>
+        <profile>
+            <id>jaxws22</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                    <version>1.0</version>
+                </dependency>
+            </dependencies>
+            <properties>
+                <spi-dir>spi-2.2</spi-dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-jaxws22-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${basedir}/src/main/jaxws22</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                             <execution>
+                                 <id>create-endorsed-dir</id>
+                                 <phase>validate</phase>
+                                 <goals>
+                                     <goal>copy</goal>
+                                 </goals>
+                                 <configuration>
+                                     <artifactItems>
+                                         <artifactItem>
+                                             <groupId>org.apache.geronimo.specs</groupId>
+                                             <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                             <version>1.0</version>
+                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                         </artifactItem>
+                                     </artifactItems>
+                                 </configuration>
+                             </execution>
+                         </executions>
+                    </plugin>
+                </plugins>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-compiler-plugin</artifactId>
+                            <configuration>
+                                <compilerArguments>
+                                    <endorseddirs>${basedir}/target/endorsed</endorseddirs>
+                                </compilerArguments>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
         <profile>
             <id>ibmjdk</id>
             <activation>

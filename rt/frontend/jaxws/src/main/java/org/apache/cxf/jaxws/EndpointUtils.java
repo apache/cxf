@@ -67,8 +67,11 @@ public final class EndpointUtils {
     }
     
     public static boolean isValidImplementor(Object implementor) {
-        if (Provider.class.isAssignableFrom(implementor.getClass())
-            && hasWebServiceProviderAnnotation(implementor.getClass())) {
+        return isValidImplementor(implementor.getClass());
+    }
+    public static boolean isValidImplementor(Class<?> implementorClass) {
+        if (Provider.class.isAssignableFrom(implementorClass)
+            && hasWebServiceProviderAnnotation(implementorClass)) {
             return true;
         }
 
@@ -76,7 +79,7 @@ public final class EndpointUtils {
         // annotation
         // (that implements an SEI) OR a Provider
 
-        if (hasWebServiceAnnotation(implementor.getClass())) {
+        if (hasWebServiceAnnotation(implementorClass)) {
             return true;
         }
 

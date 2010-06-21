@@ -74,7 +74,9 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
         setBindingConfig(defConfig);
         doInit = true;
     }
-    
+    public JaxWsServiceFactoryBean getJaxWsServiceFactory() {
+        return (JaxWsServiceFactoryBean)getServiceFactory();
+    }
     public void setHandlers(List<Handler> h) {
         handlers.clear();
         handlers.addAll(h);
