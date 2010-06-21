@@ -40,7 +40,7 @@
     </cxf:bus>
     
     
-    <jaxws:client name="{http://WSSec/wssec10}UserName_IPingService" createdFromAPI="true">
+    <jaxws:client name="{http://WSSec/wssec10}UserName_IPingService_hashed" createdFromAPI="true">
         <jaxws:properties>
             <entry key="ws-security.username" value="Frank"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.client.UTPasswordCallback"/>

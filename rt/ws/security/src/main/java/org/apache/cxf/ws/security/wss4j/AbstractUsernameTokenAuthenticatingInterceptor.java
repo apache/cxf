@@ -89,7 +89,9 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         supportDigestPasswords = support;
     }
     
-    
+    public boolean getSupportDigestPasswords() {
+        return supportDigestPasswords;
+    }
     
     @Override
     protected SecurityContext createSecurityContext(final Principal p) {
@@ -165,7 +167,11 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     protected CallbackHandler getCallback(RequestData reqData, int doAction) 
         throws WSSecurityException {
         
-        if ((doAction & WSConstants.UT) != 0 && !supportDigestPasswords) {    
+        // Given that a custom UT processor is used for dealing with digests 
+        // no callback handler is required when the request UT contains a digest;
+        // however a custom callback may still be needed for decrypting the encrypted UT
+        
+        if ((doAction & WSConstants.UT) != 0) {
             CallbackHandler pwdCallback = null;
             try {
                 pwdCallback = super.getCallback(reqData, doAction);
@@ -184,7 +190,6 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
             return super.getSecurityEngine();
         }
         Map<QName, Object> profiles = new HashMap<QName, Object>(3);
-        profiles.put(new QName(WSConstants.USERNAMETOKEN_NS, WSConstants.USERNAME_TOKEN_LN), this);
         profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), this);
         profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), this);
         return createSecurityEngine(profiles);
@@ -202,7 +207,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     }
     
     
-    private class DelegatingCallbackHandler implements CallbackHandler {
+    protected class DelegatingCallbackHandler implements CallbackHandler {
 
         private CallbackHandler pwdHandler;
         

@@ -26,6 +26,7 @@ import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.wss4j.UsernameTokenInterceptor;
+import org.apache.ws.security.message.token.UsernameToken;
 
 public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
     
@@ -43,7 +44,11 @@ public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
         
         // add roles this user is in
         String roleName = "Alice".equals(name) ? "developers" : "pms";
-        
+        String expectedPassword = "Alice".equals(name) ? "ecilA" 
+            : UsernameToken.doPasswordDigest(nonce, created, "knarF");
+        if (!password.equals(expectedPassword)) {
+            throw new SecurityException("Wrong Password");
+        }
         subject.getPrincipals().add(new SimpleGroup(roleName, name));
         subject.setReadOnly();
         return subject;

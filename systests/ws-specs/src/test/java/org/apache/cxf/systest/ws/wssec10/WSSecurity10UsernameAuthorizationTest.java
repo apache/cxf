@@ -61,7 +61,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     public void testClientServerAuthorized() {
 
         IPingService port = getPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
+            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml", false);
         
         final String output = port.echo(INPUT);
         assertEquals(INPUT, output);
@@ -71,7 +71,7 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     public void testClientServerUnauthorized() {
 
         IPingService port = getPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml");
+            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml", true);
         
         try {
             port.echo(INPUT);
@@ -81,26 +81,27 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         }
     }
     
-    private static IPingService getPort(String configName) {
+    private static IPingService getPort(String configName, boolean hashed) {
         Bus bus = new SpringBusFactory().createBus(configName);
         
         BusFactory.setDefaultBus(bus);
         BusFactory.setThreadDefaultBus(bus);
-        PingService svc = new PingService(getWsdlLocation());
+        PingService svc = new PingService(getWsdlLocation(hashed));
         final IPingService port = 
             svc.getPort(
                 new QName(
                     "http://WSSec/wssec10",
-                    "UserName_IPingService"
+                    hashed ? "UserName_IPingService_hashed" : "UserName_IPingService"
                 ),
                 IPingService.class
             );
         return port;
     }
     
-    private static URL getWsdlLocation() {
+    private static URL getWsdlLocation(boolean hashed) {
         try {
-            return new URL("http://localhost:" + PORT + "/" + "UserName" + "?wsdl");
+            return new URL("http://localhost:" + PORT + "/" 
+                           + (hashed ? "HashedUserName" : "UserName") + "?wsdl");
         } catch (MalformedURLException mue) {
             return null;
         }
