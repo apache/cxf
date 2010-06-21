@@ -66,7 +66,7 @@ public class UserNameTokenAuthorizationTest extends AbstractSecurityTest {
         wsIn.setProperty(WSHandlerConstants.SIG_PROP_FILE, "META-INF/cxf/insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.DEC_PROP_FILE, "META-INF/cxf/insecurity.properties");
         wsIn.setProperty(WSHandlerConstants.PW_CALLBACK_CLASS, TestPwdCallback.class.getName());
-
+        
         service.getInInterceptors().add(wsIn);
          
         SimpleAuthorizingInterceptor sai = new SimpleAuthorizingInterceptor();
