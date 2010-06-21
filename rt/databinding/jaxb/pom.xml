@@ -33,29 +33,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>unpack-schemas</id>
-                        <phase>process-test-sources</phase>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <configuration>
-                            <outputDirectory>${project.build.directory}/generated/src/test/resources</outputDirectory>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.apache.cxf</groupId>
-                                    <artifactId>cxf-common-schemas</artifactId>
-                                    <version>${project.version}</version>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-xjc-plugin</artifactId>
                 <version>${cxf.xjc-utils.version}</version>
