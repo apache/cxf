@@ -37,7 +37,6 @@ import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.bus.spring.BusApplicationContext;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -56,41 +55,12 @@ import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.java2wsdl.processor.internal.ServiceBuilderFactory;
 import org.apache.cxf.tools.util.AnnotationUtil;
-import org.springframework.beans.factory.BeanDefinitionStoreException;
-import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.FileSystemResource;
 
 public class JavaToJSProcessor implements Processor {
     private static final Logger LOG = LogUtils.getL7dLogger(JavaToJSProcessor.class);
     private static final String JAVA_CLASS_PATH = "java.class.path";
     private static final Charset UTF8 = Charset.forName("utf-8");
     private ToolContext context;
-    private ApplicationContext applicationContext;
-
-    /**
-     * This is factored out to permit use in a unit test.
-     * 
-     * @param bus
-     * @return
-     */
-    public static ApplicationContext getApplicationContext(Bus bus, List<String> additionalFilePathnames) {
-        BusApplicationContext busApplicationContext = bus.getExtension(BusApplicationContext.class);
-        GenericApplicationContext appContext = new GenericApplicationContext(busApplicationContext);
-        XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-        reader.loadBeanDefinitions(new ClassPathResource("META-INF/cxf/java2wsbeans.xml"));
-        for (String pathname : additionalFilePathnames) {
-            try {
-                reader.loadBeanDefinitions(new FileSystemResource(pathname));
-            } catch (BeanDefinitionStoreException bdse) {
-                throw new ToolException("Unable to open bean definition file " + pathname, bdse.getCause());
-            }
-        }
-
-        return appContext;
-    }
 
     public void process() throws ToolException {
         String oldClassPath = System.getProperty(JAVA_CLASS_PATH);
@@ -117,10 +87,10 @@ public class JavaToJSProcessor implements Processor {
             if (null != context.get(ToolConstants.CFG_JAVASCRIPT_UTILS)) {
                 JavascriptQueryHandler.writeUtilsToResponseStream(JavaToJSProcessor.class, fileOutputStream);
             }
-            
+
             OutputStreamWriter outputStreamWriter = new OutputStreamWriter(fileOutputStream, UTF8);
             BufferedWriter writer = new BufferedWriter(outputStreamWriter);
-                
+
             for (SchemaInfo schema : schemata) {
                 SchemaJavascriptBuilder jsBuilder = new SchemaJavascriptBuilder(serviceInfo
                     .getXmlSchemaCollection(), prefixManager, nameManager);
@@ -128,10 +98,8 @@ public class JavaToJSProcessor implements Processor {
                 writer.append(allThatJavascript);
             }
 
-            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, 
-                                                                                   null,
-                                                                                   prefixManager,
-                                                                                   nameManager);
+            ServiceJavascriptBuilder serviceBuilder = new ServiceJavascriptBuilder(serviceInfo, null,
+                                                                                 prefixManager, nameManager);
             serviceBuilder.walk();
             String serviceJavascript = serviceBuilder.getCode();
             writer.append(serviceJavascript);
@@ -157,14 +125,13 @@ public class JavaToJSProcessor implements Processor {
                 // is there a better way to avoid the warning?
                 beanDefinitions.addAll((List<String>)beanFilesParameter);
             } else {
-                String list[] = (String[]) beanFilesParameter;
+                String list[] = (String[])beanFilesParameter;
                 for (String b : list) {
                     beanDefinitions.add(b);
                 }
             }
         }
-        applicationContext = getApplicationContext(getBus(), beanDefinitions);
-        ServiceBuilderFactory builderFactory = ServiceBuilderFactory.getInstance();
+        ServiceBuilderFactory builderFactory = ServiceBuilderFactory.getInstance(beanDefinitions);
         Class<?> clz = getServiceClass();
         context.put(Class.class, clz);
         if (clz.isInterface()) {
@@ -183,7 +150,7 @@ public class JavaToJSProcessor implements Processor {
         builderFactory.setDatabindingName(getDataBindingName());
         // The service class determines the frontend, so no need to pass it in
         // twice.
-        ServiceBuilder builder = builderFactory.newBuilder(applicationContext);
+        ServiceBuilder builder = builderFactory.newBuilder();
 
         builder.validate();
 
@@ -223,13 +190,12 @@ public class JavaToJSProcessor implements Processor {
     protected File getOutputDir(File wsdlLocation) {
         String dir = (String)context.get(ToolConstants.CFG_OUTPUTDIR);
         if (dir == null) {
-            if (wsdlLocation == null 
-                || wsdlLocation.getParentFile() == null
+            if (wsdlLocation == null || wsdlLocation.getParentFile() == null
                 || !wsdlLocation.getParentFile().exists()) {
                 dir = "./";
             } else {
                 dir = wsdlLocation.getParent();
-            } 
+            }
         }
         return new File(dir);
     }

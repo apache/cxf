@@ -21,43 +21,21 @@ package org.apache.cxf.tools.java2wsdl.processor.internal;
 
 import java.util.ArrayList;
 
-import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxws.JaxwsServiceBuilder;
 import org.apache.cxf.service.ServiceBuilder;
 import org.apache.cxf.simple.SimpleServiceBuilder;
 import org.apache.cxf.tools.fortest.classnoanno.docbare.Stock;
 import org.apache.cxf.tools.fortest.simple.Hello;
-import org.apache.cxf.tools.java2wsdl.processor.FrontendFactory;
-import org.apache.cxf.tools.java2wsdl.processor.JavaToWSDLProcessor;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.ApplicationContext;
 
 public class ServiceBuilderFactoryTest extends Assert {
-    ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance();
-    private ApplicationContext applicationContext;
-    
-    @Before
-    public void setUp() {
-        applicationContext = JavaToWSDLProcessor.getApplicationContext(BusFactory.getDefaultBus(), 
-                                                                       new ArrayList<String>());
-    }
-    
-    @Test
-    public void testGetBuilderBeanName() {
-        assertNotNull(factory);
-        assertEquals("JaxwsServiceBuilderBean",
-                     factory.getBuilderBeanName(FrontendFactory.Style.Jaxws));
-
-        assertEquals("SimpleServiceBuilderBean",
-                     factory.getBuilderBeanName(FrontendFactory.Style.Simple));
-    }
+    ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance(new ArrayList<String>());
 
     @Test
     public void testGetJaxwsBuilder() {
         factory.setServiceClass(Stock.class);
-        ServiceBuilder builder = factory.newBuilder(applicationContext);
+        ServiceBuilder builder = factory.newBuilder();
         assertNotNull(builder);
         assertTrue(builder instanceof JaxwsServiceBuilder);
     }
@@ -65,7 +43,7 @@ public class ServiceBuilderFactoryTest extends Assert {
     @Test
     public void testGetSimpleBuilder() {
         factory.setServiceClass(Hello.class);
-        ServiceBuilder builder = factory.newBuilder(applicationContext);
+        ServiceBuilder builder = factory.newBuilder();
         assertNotNull(builder);
         assertTrue(builder instanceof SimpleServiceBuilder);
     }
