@@ -37,6 +37,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.spring.ConfigurerImpl;
+import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.management.InstrumentationManager;
 import org.easymock.classextension.EasyMock;
@@ -181,8 +182,8 @@ public class JettyHTTPServerEngineTest extends Assert {
         assertEquals("The jetty http handler did not take effect", response, "string1string2");
         engine.addServant(new URL(urlStr2), handler2);
         
-        Set<ObjectName>  s = ManagementFactory.getPlatformMBeanServer().
-            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null));
         assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
         
         engine.removeServant(new URL(urlStr));
@@ -211,14 +212,14 @@ public class JettyHTTPServerEngineTest extends Assert {
         
         engine.addServant(new URL(urlStr), handler1);
         
-        Set<ObjectName>  s = ManagementFactory.getPlatformMBeanServer().
-            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        Set<ObjectName>  s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null));
         assertEquals("Could not find 1 Jetty Server: " + s, 1, s.size());
         
         engine2.addServant(new URL(urlStr2), handler2);
         
-        s = ManagementFactory.getPlatformMBeanServer().
-            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null));
         assertEquals("Could not find 2 Jetty Server: " + s, 2, s.size());
         
         engine.removeServant(new URL(urlStr));
@@ -227,14 +228,14 @@ public class JettyHTTPServerEngineTest extends Assert {
         
         engine.shutdown();
         
-        s = ManagementFactory.getPlatformMBeanServer().
-            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null));
         assertEquals("Could not find 2 Jetty Server: " + s, 1, s.size());
         
         engine2.shutdown();
         
-        s = ManagementFactory.getPlatformMBeanServer().
-            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null);
+        s = CastUtils.cast(ManagementFactory.getPlatformMBeanServer().
+            queryNames(new ObjectName("org.mortbay.jetty:type=server,*"), null));
         assertEquals("Could not find 0 Jetty Server: " + s, 0, s.size());
         
         factory.destroyForPort(9234);

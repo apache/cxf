@@ -73,6 +73,7 @@ public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
         assertTrue("server did not launch correctly", launchServer(EmbeddedJMSBrokerLauncher.class,
                                                                    props, null));
         assertTrue("server did not launch correctly", launchServer(Server.class, false));
+        createStaticBus();
     }
     
     private void oneWayTest(TestCaseType testcase, JMSSimplePortType port) throws Exception {
@@ -81,6 +82,7 @@ public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
 
         Map<String, Object> requestContext = bp.getRequestContext();
         JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+
         requestContext.put(JMSConstants.JMS_CLIENT_REQUEST_HEADERS, requestHeader);
         Exception e = null;
         try {

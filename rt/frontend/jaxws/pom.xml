@@ -272,6 +272,9 @@
             <activation>
                 <jdk>1.5</jdk>
             </activation>
+            <properties>
+                <spi-dir>spi-2.2</spi-dir>
+            </properties>
             <dependencies>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
@@ -291,7 +294,7 @@
                 </dependency>
                 <dependency>
                      <groupId>org.apache.geronimo.specs</groupId>
-                     <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                  </dependency>
                  <dependency>
                      <groupId>org.apache.geronimo.specs</groupId>
@@ -302,6 +305,28 @@
                      <artifactId>${saaj.impl.artifactId}</artifactId>
                  </dependency>
             </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-jaxws22-source</id>
+                                <phase>generate-sources</phase>
+                                <goals>
+                                    <goal>add-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${basedir}/src/main/jaxws22</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 

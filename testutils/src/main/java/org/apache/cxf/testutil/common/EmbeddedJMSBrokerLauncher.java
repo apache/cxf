@@ -43,7 +43,10 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     
     public static void updateWsdlExtensors(Bus bus, String wsdlLocation) {
         try {
-            Definition def = BusFactory.getDefaultBus().getExtension(WSDLManager.class)
+            if (bus == null) {
+                bus = BusFactory.getThreadDefaultBus();
+            }
+            Definition def = bus.getExtension(WSDLManager.class)
                 .getDefinition(wsdlLocation);
             Map map = def.getAllServices();
             for (Object o : map.values()) {

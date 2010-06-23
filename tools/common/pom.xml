@@ -103,7 +103,7 @@
                 </dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                     <scope>test</scope>
                 </dependency>
             </dependencies>

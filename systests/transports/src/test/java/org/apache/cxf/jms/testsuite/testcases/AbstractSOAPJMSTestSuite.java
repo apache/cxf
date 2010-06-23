@@ -29,6 +29,7 @@ import javax.jms.Session;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.jms.testsuite.util.JMSTestUtil;
 import org.apache.cxf.testsuite.testcase.MessagePropertiesType;
 import org.apache.cxf.testsuite.testcase.TestCaseType;
@@ -60,6 +61,8 @@ public abstract class AbstractSOAPJMSTestSuite extends AbstractBusClientServerTe
         QName qPortName = new QName(namespace, portName);
         URL wsdl = getClass().getResource("/wsdl/jms_spec_testsuite.wsdl");
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        BusFactory.setThreadDefaultBus(getBus());
+        BusFactory.setDefaultBus(getBus());
         Class<? extends Service> svcls = serviceClass.asSubclass(Service.class);
 
         Constructor<? extends Service> serviceConstructor = svcls.getConstructor(URL.class,
@@ -157,8 +160,12 @@ public abstract class AbstractSOAPJMSTestSuite extends AbstractBusClientServerTe
         // todo messagetype
         // todo messageid
         if (messageProperties.isSetDeliveryMode()) {
-            assertEquals(header.getJMSDeliveryMode(), messageProperties.getDeliveryMode()
-                .intValue());
+            int dm = 0;
+            if (header.isSetJMSDeliveryMode()) {
+                dm = header.getJMSDeliveryMode();
+            }
+            assertEquals(dm, 
+                         messageProperties.getDeliveryMode().intValue());
         }
         if (messageProperties.isSetPriority()) {
             assertEquals(header.getJMSPriority(), messageProperties.getPriority().intValue());

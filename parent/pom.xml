@@ -911,7 +911,7 @@
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
-                <artifactId>geronimo-jaxws_2.1_spec</artifactId>
+                <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                 <version>1.0</version>
             </dependency>
             <dependency>
@@ -1189,6 +1189,18 @@
     </reporting>
 
     <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <jdk>1.5</jdk>
+            </activation>
+            <properties>
+                <jaxb.version>2.2.1</jaxb.version>
+                <jaxb.impl.version>2.2.1.1</jaxb.impl.version>
+                <jaxb.xjc.version>2.2.1.1</jaxb.xjc.version>
+                <jdk.version>1.5</jdk.version>
+            </properties>
+        </profile>
         <profile>
             <id>validateServices</id>
             <properties>

@@ -153,7 +153,8 @@ public class Tag {
             return false;
         }
         for (QName attr : getAttributes().keySet()) {
-            if (getIgnoreAttr().contains(attr.getLocalPart())) {
+            if (getIgnoreAttr().contains(attr.getLocalPart())
+                || getIgnoreAttr().contains(getName().getLocalPart() + "@" + attr.getLocalPart())) {
                 continue;
             }
             if (!tag.getAttributes().containsKey(attr)) {
