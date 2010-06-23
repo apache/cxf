@@ -59,7 +59,6 @@ import org.w3c.dom.Element;
 
 import com.ibm.wsdl.extensions.schema.SchemaImpl;
 import org.apache.cxf.Bus;
-import org.apache.cxf.NSManager;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.XMLUtils;
@@ -77,6 +76,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.ws.addressing.NSManager;
 import org.apache.cxf.wsdl.WSDLManager;
 
 /**

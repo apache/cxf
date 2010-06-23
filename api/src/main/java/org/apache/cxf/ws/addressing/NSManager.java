@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf;
+package org.apache.cxf.ws.addressing;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.ws.addressing.JAXWSAConstants;
 
 /***
  * Only public/static/final fields can be resolved
