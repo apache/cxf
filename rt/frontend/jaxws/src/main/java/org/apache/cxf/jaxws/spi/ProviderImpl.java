@@ -19,6 +19,7 @@
 
 package org.apache.cxf.jaxws.spi;
 
+import java.lang.reflect.Method;
 import java.net.URL;
 import java.util.List;
 import java.util.Map;
@@ -42,6 +43,7 @@ import org.w3c.dom.Element;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.WSDLConstants;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
@@ -56,6 +58,29 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     public static final String JAXWS_PROVIDER = ProviderImpl.class.getName();
     protected static final Logger LOG = LogUtils.getL7dLogger(ProviderImpl.class);
     private static JAXBContext jaxbContext;
+    private static final boolean JAXWS_22;
+    static {
+        boolean b = false;
+        try {
+            //JAX-WS 2.2 would have the HttpContext class in the classloader
+            Class<?> cls = ClassLoaderUtils.loadClass("javax.xml.ws.spi.http.HttpContext", 
+                                                      ProviderImpl.class);
+            //In addition to that, the Endpoint class we pick up on the classloader
+            //should have a publish method that uses it.  Otherwise, we MAY be
+            //be getting the HttpContext from the 2.2 jaxws-api jar, but the Endpoint
+            //class from the 2.1 JRE
+            Method m = Endpoint.class.getMethod("publish", cls);
+            b = m != null;
+        } catch (Throwable ex) {
+            b = false;
+        }
+        JAXWS_22 = b;
+    }
+    
+    
+    public static boolean isJaxWs22() {
+        return JAXWS_22;
+    }
     
     @Override
     public ServiceDelegate createServiceDelegate(URL url, QName qname, Class cls) {

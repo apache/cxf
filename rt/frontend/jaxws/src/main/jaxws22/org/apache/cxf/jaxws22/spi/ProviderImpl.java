@@ -28,7 +28,6 @@ import javax.xml.ws.spi.Invoker;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
@@ -42,14 +41,11 @@ public class ProviderImpl extends org.apache.cxf.jaxws.spi.ProviderImpl {
                                               String bindingId,
                                               Object implementor,
                                               WebServiceFeature ... features) {
-        try {
-            ClassLoaderUtils.loadClass("javax.xml.ws.spi.http.HttpContext", ProviderImpl.class);
-        } catch (Throwable ex) {
-            //couldn't find the 2.2 stuff, assume 2.1 behavior
-            return super.createEndpointImpl(bus, bindingId, implementor, features);
+        if (isJaxWs22()) {
+            return new EndpointImpl(bus, implementor, bindingId, features);
         }
-        
-        return new EndpointImpl(bus, implementor, bindingId, features);
+        //couldn't find the 2.2 stuff, assume 2.1 behavior
+        return super.createEndpointImpl(bus, bindingId, implementor, features);
     }
 
     //new in 2.2, but introduces a new class not found in 2.1
@@ -61,15 +57,17 @@ public class ProviderImpl extends org.apache.cxf.jaxws.spi.ProviderImpl {
             if (features != null) {
                 factory.getJaxWsServiceFactory().setWsFeatures(Arrays.asList(features));
             }
-            factory.setInvoker(new JAXWS22Invoker(invoker));
-            try {
-                invoker.inject(new WebServiceContextImpl());
-            } catch (Exception e) {
-                throw new WebServiceException(new Message("ENDPOINT_CREATION_FAILED_MSG", LOG).toString(), e);
+            if (invoker != null) {
+                factory.setInvoker(new JAXWS22Invoker(invoker));
+                try {
+                    invoker.inject(new WebServiceContextImpl());
+                } catch (Exception e) {
+                    throw new WebServiceException(new Message("ENDPOINT_CREATION_FAILED_MSG",
+                                                              LOG).toString(), e);
+                }
             }
             EndpointImpl ep = new EndpointImpl(bus, null, factory);
             ep.setImplementorClass(implementorClass);
-            
             return ep;
         } else {
             throw new WebServiceException(new Message("INVALID_IMPLEMENTOR_EXC", LOG).toString());

@@ -37,6 +37,7 @@ import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
 import org.apache.cxf.configuration.spring.BusWiringType;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.FatalBeanException;
 import org.springframework.beans.factory.BeanDefinitionStoreException;
@@ -48,12 +49,27 @@ import org.springframework.context.ApplicationContextAware;
 
 
 public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
-
+    private static final Class<?> EP_CLASS;
+    static {
+        Class<?> cls = SpringEndpointImpl.class;
+        try {
+            if (ProviderImpl.isJaxWs22()) {
+                cls = ClassLoaderUtils
+                    .loadClass("org.apache.cxf.jaxws22.spring.JAXWS22SpringEndpointImpl", 
+                           EndpointDefinitionParser.class);
+            }
+        } catch (Throwable t) {
+            cls = SpringEndpointImpl.class;
+        }
+        EP_CLASS = cls;
+    }
+    
+    
     private static final String IMPLEMENTOR = "implementor";
 
     public EndpointDefinitionParser() {
         super();
-        setBeanClass(SpringEndpointImpl.class);
+        setBeanClass(EP_CLASS);
     }
 
     @Override

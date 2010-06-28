@@ -26,30 +26,23 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
-public class EndpointDefinitionParser extends org.apache.cxf.jaxws.spring.EndpointDefinitionParser {
-    public EndpointDefinitionParser() {
-        setBeanClass(JAXWS22SpringEndpointImpl.class);
-    }
-    
-    @NoJSR250Annotations
-    public static class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointImpl
-        implements ApplicationContextAware {
-    
-        public JAXWS22SpringEndpointImpl(Object implementor) {
-            super((Bus)null, implementor);
-        }
-        public JAXWS22SpringEndpointImpl(Bus bus, Object implementor) {
-            super(bus, implementor);
-        }
-        
-        
-        public void setApplicationContext(ApplicationContext ctx) throws BeansException {
-            if (getBus() == null) {
-                Bus bus = BusFactory.getThreadDefaultBus();
-                BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
-                setBus(bus);
-            }
-        }
-    }
+@NoJSR250Annotations
+public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointImpl
+    implements ApplicationContextAware {
 
+    public JAXWS22SpringEndpointImpl(Object implementor) {
+        super((Bus)null, implementor);
+    }
+    public JAXWS22SpringEndpointImpl(Bus bus, Object implementor) {
+        super(bus, implementor);
+    }
+    
+    
+    public void setApplicationContext(ApplicationContext ctx) throws BeansException {
+        if (getBus() == null) {
+            Bus bus = BusFactory.getThreadDefaultBus();
+            BusWiringBeanFactoryPostProcessor.updateBusReferencesInContext(bus, ctx);
+            setBus(bus);
+        }
+    }
 }
