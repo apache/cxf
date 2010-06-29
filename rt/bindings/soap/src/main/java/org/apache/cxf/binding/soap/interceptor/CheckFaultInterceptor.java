@@ -62,7 +62,7 @@ public class CheckFaultInterceptor extends AbstractSoapInterceptor {
             throw new SoapFault(new Message("XML_STREAM_EXC", LOG), e, 
                                 message.getVersion().getSender());
         }
-        if (message.getVersion().getFault().equals(xmlReader.getName())) {
+        if (message.getVersion().getFault().equals(xmlReader.getName()) && isRequestor(message)) {
             Endpoint ep = message.getExchange().get(Endpoint.class);
             message.getInterceptorChain().abort();
             if (ep.getInFaultObserver() != null) {

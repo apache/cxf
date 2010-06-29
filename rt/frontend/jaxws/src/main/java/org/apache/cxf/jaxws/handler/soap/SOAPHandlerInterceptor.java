@@ -277,7 +277,7 @@ public class SOAPHandlerInterceptor extends
                     }
                 }
             }
-            if (msg.getSOAPPart().getEnvelope().getBody() != null 
+            if (isRequestor(message) && msg.getSOAPPart().getEnvelope().getBody() != null 
                 && msg.getSOAPPart().getEnvelope().getBody().hasFault()) {
                 return null;
             }            
