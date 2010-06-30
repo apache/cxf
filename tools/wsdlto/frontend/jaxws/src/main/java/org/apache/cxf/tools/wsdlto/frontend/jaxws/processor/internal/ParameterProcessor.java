@@ -441,11 +441,9 @@ public class ParameterProcessor extends AbstractProcessor {
                     jreturn.setTargetNamespace("");
                 }
                 method.setReturn(jreturn);
-                return;
             }
-
+            return;
         }
-
         for (QName outElement : outputWrapElement) {
             if ("return".equals(outElement.getLocalPart())) {
                 if (method.getReturn() != null) {
@@ -500,7 +498,7 @@ public class ParameterProcessor extends AbstractProcessor {
                         }
                     }
                 }
-
+    
                 addParameter(method, jp);
             }
         }
