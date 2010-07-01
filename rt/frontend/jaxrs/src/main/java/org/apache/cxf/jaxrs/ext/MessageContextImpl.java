@@ -68,6 +68,9 @@ public class MessageContextImpl implements MessageContext {
             || (MultipartBody.INBOUND_MESSAGE_ATTACHMENTS + ".embedded").equals(keyValue)) {
             return createAttachments(key.toString());
         }
+        if (keyValue.equals("WRITE-" + Message.ATTACHMENTS)) {
+            return m.getExchange().getOutMessage().get(Message.ATTACHMENTS);
+        }
         Object value = m.get(key);
         if (value == null && isRequestor()) {
             Message inMessage = m.getExchange().getInMessage();
@@ -150,6 +153,10 @@ public class MessageContextImpl implements MessageContext {
             convertToAttachments(value);
         }
         m.put(key.toString(), value);
+        if (!isRequestor()) {
+            m.getExchange().put(key.toString(), value);
+        }
+            
     }
 
     private void convertToAttachments(Object value) {
@@ -161,7 +168,7 @@ public class MessageContextImpl implements MessageContext {
             Attachment handler = (Attachment)handlers.get(i);
             AttachmentImpl att = new AttachmentImpl(handler.getContentId(), handler.getDataHandler());
             for (String key : handler.getHeaders().keySet()) {
-                att.setHeader(key, att.getHeader(key));
+                att.setHeader(key, handler.getHeader(key));
             }
             att.setXOP(false);
             atts.add(att);

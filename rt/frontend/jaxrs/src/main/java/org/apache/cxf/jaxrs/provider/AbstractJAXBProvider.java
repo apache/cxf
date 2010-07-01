@@ -382,14 +382,9 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             || JAXBElement.class.isAssignableFrom(type)
             || objectFactoryForClass(type)
             || (type != genericType && objectFactoryForType(genericType))
-            || adapterAvailable(type, anns)
+            || getAdapter(type, anns) != null
             || type.getResource("jaxb.index") != null;
     
-    }
-    
-    protected boolean adapterAvailable(Class<?> type, Annotation[] anns) {
-        return AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class) != null
-               || type.getAnnotation(XmlJavaTypeAdapter.class) != null;
     }
     
     protected boolean objectFactoryForClass(Class<?> type) {
@@ -464,7 +459,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
     
     @SuppressWarnings("unchecked")
-    protected Object checkAdapter(Object obj, Annotation[] anns, boolean marshal) {
+    protected Object checkAdapter(Object obj, Class<?> cls, Annotation[] anns, boolean marshal) {
         XmlJavaTypeAdapter typeAdapter = getAdapter(obj.getClass(), anns); 
         if (typeAdapter != null) {
             try {
@@ -482,10 +477,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         return obj;
     }
     
-    protected XmlJavaTypeAdapter getAdapter(Class<?> type, Annotation[] anns) {
+    protected XmlJavaTypeAdapter getAdapter(Class<?> objectClass, Annotation[] anns) {
         XmlJavaTypeAdapter typeAdapter = AnnotationUtils.getAnnotation(anns, XmlJavaTypeAdapter.class);
         if (typeAdapter == null) {
-            typeAdapter = type.getAnnotation(XmlJavaTypeAdapter.class);
+            typeAdapter = objectClass.getAnnotation(XmlJavaTypeAdapter.class);
+            if (typeAdapter == null) {
+                // lets just try the 1st interface for now
+                Class<?>[] interfaces = objectClass.getInterfaces();
+                typeAdapter = interfaces.length > 0 
+                    ? interfaces[0].getAnnotation(XmlJavaTypeAdapter.class) : null;
+            }
         }
         return typeAdapter;
     }

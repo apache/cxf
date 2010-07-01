@@ -30,6 +30,8 @@ import java.util.Map;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.imageio.ImageIO;
+import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -70,8 +72,8 @@ public class MultipartStore {
     @POST
     @Path("/xop")
     @Consumes("multipart/related")
-    @Produces("text/plain")
-    public String addBookXop(XopType type) throws Exception {
+    @Produces("multipart/related;type=text/xml")
+    public XopType addBookXop(XopType type) throws Exception {
         if (!"xopName".equals(type.getName())) {
             throw new RuntimeException("Wrong name property");
         }
@@ -84,7 +86,25 @@ public class MultipartStore {
         if (!Boolean.getBoolean("java.awt.headless") && type.getImage() == null) {
             throw new RuntimeException("Wrong image property");
         }
-        return type.getName() + bookXsd + new String(type.getAttachinfo2());
+        context.put(org.apache.cxf.message.Message.MTOM_ENABLED, 
+                    (Object)"true");
+        
+        XopType xop = new XopType();
+        xop.setName("xopName");
+        InputStream is = 
+            getClass().getResourceAsStream("/org/apache/cxf/systest/jaxrs/resources/book.xsd");
+        byte[] data = IOUtils.readBytesFromStream(is);
+        xop.setAttachinfo(new DataHandler(new ByteArrayDataSource(data, "application/octet-stream")));
+        
+        xop.setAttachinfo2(bookXsd.getBytes());
+     
+        if (Boolean.getBoolean("java.awt.headless")) {
+            System.out.println("Running headless. Ignoring an Image property.");
+        } else {
+            xop.setImage(ImageIO.read(getClass().getResource(
+                "/org/apache/cxf/systest/jaxrs/resources/java.jpg")));
+        }
+        return xop;
     }
     
     

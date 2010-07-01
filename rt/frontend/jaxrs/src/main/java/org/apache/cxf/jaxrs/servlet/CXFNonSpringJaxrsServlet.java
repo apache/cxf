@@ -70,7 +70,7 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
         String applicationClass = servletConfig.getInitParameter(JAXRS_APPLICATION_PARAM);
         if (applicationClass != null) {
-            createServerFromApplication(applicationClass);
+            createServerFromApplication(applicationClass, servletConfig);
             return;
         }
         
@@ -255,7 +255,8 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         
     }
     
-    protected void createServerFromApplication(String cName) throws ServletException {
+    protected void createServerFromApplication(String cName, ServletConfig servletConfig) 
+        throws ServletException {
         Class<?> appClass = loadClass(cName, "Application");
         Application app = null;
         try {
@@ -303,6 +304,10 @@ public class CXFNonSpringJaxrsServlet extends CXFNonSpringServlet {
         for (Map.Entry<Class, ResourceProvider> entry : map.entrySet()) {
             bean.setResourceProvider(entry.getKey(), entry.getValue());
         }
+        setSchemasLocations(bean, servletConfig);
+        setInterceptors(bean, servletConfig, OUT_INTERCEPTORS_PARAM);
+        setInterceptors(bean, servletConfig, IN_INTERCEPTORS_PARAM);
+        
         bean.create();
     }
     

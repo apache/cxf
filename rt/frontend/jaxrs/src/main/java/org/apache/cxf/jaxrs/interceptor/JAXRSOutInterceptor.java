@@ -374,12 +374,13 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         
         Object contentType = 
             response.getMetadata().getFirst(HttpHeaders.CONTENT_TYPE);
+        if (contentType != null) {
+            return Collections.singletonList(MediaType.valueOf(contentType.toString()));
+        }
         Exchange exchange = message.getExchange();
         List<MediaType> produceTypes = null;
         OperationResourceInfo operation = exchange.get(OperationResourceInfo.class);
-        if (contentType != null) {
-            return Collections.singletonList(MediaType.valueOf(contentType.toString()));
-        } else if (operation != null) {
+        if (operation != null) {
             produceTypes = operation.getProduceTypes();
         } else {
             produceTypes = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
@@ -389,7 +390,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (acceptContentTypes == null) {
             acceptContentTypes = Collections.singletonList(MediaType.WILDCARD_TYPE);
         }        
-        return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes);
+        return JAXRSUtils.intersectMimeTypes(acceptContentTypes, produceTypes, true);
         
     }
     

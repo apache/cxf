@@ -383,7 +383,7 @@ public class JAXRSUtilsTest extends Assert {
         List<MediaType> providerMimeTypes = 
             JAXRSUtils.parseMediaTypes("application/mytype, application/xml, application/json");
 
-        candidateList = JAXRSUtils.intersectMimeTypes(acceptedMimeTypes, providerMimeTypes);
+        candidateList = JAXRSUtils.intersectMimeTypes(acceptedMimeTypes, providerMimeTypes, false);
 
         assertEquals(3, candidateList.size());
         for (MediaType type : candidateList) {
@@ -779,11 +779,15 @@ public class JAXRSUtilsTest extends Assert {
         Method m = Customer.class.getMethod("testFormBean", argType);
         MessageImpl messageImpl = new MessageImpl();
         messageImpl.put(Message.REQUEST_URI, "/bar");
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         String body = "a=aValue&b=123";
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
 
         MessageImpl complexMessageImpl = new MessageImpl();
         complexMessageImpl.put(Message.REQUEST_URI, "/bar");
+        complexMessageImpl.put(Message.PROTOCOL_HEADERS, headers);
         body = "c=1&a=A&b=123&c=2&c=3&"
                                 + "d.c=4&d.a=B&d.b=456&d.c=5&d.c=6&"
                                 + "e.c=41&e.a=B1&e.b=457&e.c=51&e.c=61&"
@@ -961,6 +965,9 @@ public class JAXRSUtilsTest extends Assert {
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=1&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
+        MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
+        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
                                                            null, messageImpl);

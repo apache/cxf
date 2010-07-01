@@ -19,7 +19,6 @@
 
 package org.apache.cxf.jaxrs.impl;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -81,15 +80,14 @@ public class MediaTypeHeaderProviderTest extends Assert {
     
     @Test
     public void testTypeWithParameters() {
-        MediaType m = MediaType.valueOf("text/html;q=1234;b=4321");
+        MediaType mt = MediaType.valueOf("text/html;q=1234;b=4321");
         
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("q", "1234");
-        params.put("b", "4321");
-        
-        MediaType expected = new MediaType("text", "html", params);
-        
-        assertEquals("Media type was not parsed correctly", expected, m);
+        assertEquals("text", mt.getType());
+        assertEquals("html", mt.getSubtype());
+        Map<String, String> params2 = mt.getParameters();
+        assertEquals(2, params2.size());
+        assertEquals("1234", params2.get("q"));
+        assertEquals("4321", params2.get("b"));
     }
     
     @Test
@@ -99,6 +97,23 @@ public class MediaTypeHeaderProviderTest extends Assert {
         
         assertEquals("simple media type is not serialized", "text/plain",
                      provider.toString(new MediaType("text", "plain")));
+    }
+    
+    @Test
+    public void testHeaderFileName() {
+
+        String fileName = "version_2006&#65288;3&#65289;.pdf";
+        String header = "application/octet-stream; name=\"%s\"";
+        String value = String.format(header, fileName);
+        
+        MediaTypeHeaderProvider provider = new MediaTypeHeaderProvider();
+        MediaType mt = provider.fromString(value);
+        assertEquals("application", mt.getType());
+        assertEquals("octet-stream", mt.getSubtype());
+        Map<String, String> params = mt.getParameters();
+        assertEquals(1, params.size());
+        assertEquals("\"version_2006&#65288;3&#65289;.pdf\"", params.get("name"));
+        
     }
     
     @Test

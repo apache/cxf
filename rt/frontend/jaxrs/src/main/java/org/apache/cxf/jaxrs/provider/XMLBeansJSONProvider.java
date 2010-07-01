@@ -90,7 +90,7 @@ public class XMLBeansJSONProvider extends XMLBeansElementProvider {
             Map<String, String> nstojns = new HashMap<String, String>();
             XMLOutputFactory factory = new MappedXMLOutputFactory(nstojns);
             XMLStreamWriter xsw = factory.createXMLStreamWriter(os);
-
+            xsw.writeStartDocument();
             if (obj instanceof XmlObject) {
 
                 XmlObject xObj = (XmlObject)obj;

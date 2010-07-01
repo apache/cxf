@@ -424,6 +424,12 @@ public class BookStore {
         return new BookInfo(doGetBook("123"));
     }
     
+    @GET
+    @Path("/books/interface/adapter")
+    public BookInfoInterface getBookAdapter2() throws Exception {
+        return new BookInfo2(doGetBook("123"));
+    }
+    
     @PathParam("bookId")
     public void setBookId(String id) {
         currentBookId = id;
@@ -721,6 +727,13 @@ public class BookStore {
         cds.put(cd1.getId(), cd1);
     }
     
+    @XmlJavaTypeAdapter(BookInfoAdapter.class)
+    private static interface BookInfoInterface {
+        String getName();
+        
+        long getId();
+    }
+    
     static class BookInfo {
         private String name;
         private long id;
@@ -750,6 +763,16 @@ public class BookStore {
             b.setId(id);
             b.setName(name);
             return b;
+        }
+    }
+    
+    static class BookInfo2 extends BookInfo implements BookInfoInterface {
+        public BookInfo2() {
+            
+        }
+        
+        public BookInfo2(Book b) {
+            super(b);
         }
     }
     

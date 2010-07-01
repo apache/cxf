@@ -31,6 +31,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.Response;
 import javax.xml.bind.annotation.XmlTransient;
 
 import org.apache.cxf.aegis.type.java5.IgnoreProperty;
@@ -100,6 +101,13 @@ public class BookStore {
     @Path("chapter")
     public Chapter getChaper() {
         return new Chapter(1);
+    }
+    
+    @GET
+    @Path("chapter2")
+    @WadlElement(response = Chapter.class)
+    public Response getChaper2() {
+        return Response.ok().entity(new Chapter(1)).build();
     }
     
     @Path("form")

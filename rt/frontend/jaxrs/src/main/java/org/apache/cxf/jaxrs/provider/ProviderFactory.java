@@ -448,7 +448,7 @@ public final class ProviderFactory {
         List<MediaType> supportedMediaTypes = JAXRSUtils.getProviderConsumeTypes(ep);
         
         List<MediaType> availableMimeTypes = 
-            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType), supportedMediaTypes);
+            JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType), supportedMediaTypes, false);
 
         if (availableMimeTypes.size() == 0) {
             return false;
@@ -501,7 +501,7 @@ public final class ProviderFactory {
         
         List<MediaType> availableMimeTypes = 
             JAXRSUtils.intersectMimeTypes(Collections.singletonList(mediaType),
-                                          supportedMediaTypes);
+                                          supportedMediaTypes, false);
 
         if (availableMimeTypes.size() == 0) {
             return false;

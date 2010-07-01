@@ -172,7 +172,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             if (response instanceof JAXBElement && !JAXBElement.class.isAssignableFrom(type)) {
                 response = ((JAXBElement)response).getValue();    
             }
-            response = checkAdapter(response, anns, false);
+            response = checkAdapter(response, type, anns, false);
             return response;
             
         } catch (JAXBException e) {
@@ -254,7 +254,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
         throws IOException {
         try {
             
-            Object actualObject = checkAdapter(obj, anns, true);
+            Object actualObject = checkAdapter(obj, cls, anns, true);
             Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
             if (cls == genericType) {
                 genericType = actualClass;
