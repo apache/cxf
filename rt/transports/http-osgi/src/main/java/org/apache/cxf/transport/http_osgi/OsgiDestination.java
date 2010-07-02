@@ -49,12 +49,13 @@ public class OsgiDestination extends AbstractHTTPDestination {
      * @throws IOException
      */
     public OsgiDestination(Bus b,
+                           OsgiTransportFactory osgiTransportFactory, 
                            EndpointInfo ei,
                            OsgiDestinationRegistryIntf fact,
                            String p)
         throws IOException {
         // would add the default port to the address
-        super(b, null, ei, false);
+        super(b, osgiTransportFactory, ei, false);
         factory = fact;
         path = p;
     }

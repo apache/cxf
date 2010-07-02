@@ -42,7 +42,7 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         OsgiDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
             String path = OsgiDestinationRegistry.getTrimmedPath(endpointInfo.getAddress());
-            d = new OsgiDestination(getBus(), endpointInfo, registry, path);
+            d = new OsgiDestination(getBus(), this, endpointInfo, registry, path);
             registry.addDestination(path, d);
         }
         return d;

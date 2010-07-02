@@ -44,6 +44,7 @@ public class OsgiDestinationTest extends Assert {
     private Bus bus;
     private OsgiDestinationRegistryIntf registry;
     private MessageObserver observer;
+    private OsgiTransportFactory osgiTransportFactory;
     private EndpointInfo endpoint;
 
     @Before
@@ -52,6 +53,7 @@ public class OsgiDestinationTest extends Assert {
         bus = control.createMock(Bus.class);
         registry = control.createMock(OsgiDestinationRegistryIntf.class);
         observer = control.createMock(MessageObserver.class);
+        osgiTransportFactory = control.createMock(OsgiTransportFactory.class);
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }
@@ -66,7 +68,7 @@ public class OsgiDestinationTest extends Assert {
     @Test
     public void testCtor() throws Exception {
         OsgiDestination destination = 
-            new OsgiDestination(bus, endpoint, registry, "snafu");
+            new OsgiDestination(bus, osgiTransportFactory, endpoint, registry, "snafu");
 
         assertNull(destination.getMessageObserver());
         assertNotNull(destination.getAddress());
@@ -82,7 +84,7 @@ public class OsgiDestinationTest extends Assert {
         control.replay();
 
         OsgiDestination destination = 
-            new OsgiDestination(bus, endpoint, registry, "snafu");
+            new OsgiDestination(bus, osgiTransportFactory, endpoint, registry, "snafu");
         destination.setMessageObserver(observer);
 
         destination.doMessage(message);
@@ -97,7 +99,7 @@ public class OsgiDestinationTest extends Assert {
         control.replay();
 
         OsgiDestination destination = 
-            new OsgiDestination(bus, endpoint, registry, "snafu");
+            new OsgiDestination(bus, osgiTransportFactory, endpoint, registry, "snafu");
 
         destination.shutdown();
          
