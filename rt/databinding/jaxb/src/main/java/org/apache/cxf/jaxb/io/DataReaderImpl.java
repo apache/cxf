@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxb.io;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,6 +29,7 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.PropertyException;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.bind.ValidationEventHandler;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.common.i18n.Message;
@@ -108,22 +110,42 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
             honorJaxbAnnotation = (Boolean)part.getProperty("honor.jaxb.annotations");
         }
         Annotation[] anns = null;
+       
         if (honorJaxbAnnotation) {
             anns = getJAXBAnnotation(part);
             if (anns.length > 0) {
-                //RpcLit will use the JAXB Bridge to unmarshall part message when it is 
-                //annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
-                //TODO:Cache the JAXBRIContext
+                // RpcLit will use the JAXB Bridge to unmarshall part message when it is
+                // annotated with @XmlList,@XmlAttachmentRef,@XmlJavaTypeAdapter
+                // TODO:Cache the JAXBRIContext
                 QName qname = new QName(null, part.getConcreteName().getLocalPart());
-    
-                return JAXBEncoderDecoder.unmarshalWithBridge(qname,
-                                                              part.getTypeClass(),
+
+                return JAXBEncoderDecoder.unmarshalWithBridge(qname, 
+                                                              part.getTypeClass(), 
                                                               anns, 
-                                                              databinding.getContextClasses(),
+                                                              databinding.getContextClasses(), 
+                                                              reader, 
+                                                              getAttachmentUnmarshaller());
+            }
+        }
+        //The jaxb class contains XMLGregorianCalendar field also needs JAXB Bridge
+        if (part != null && part.getTypeClass() != null) {
+            boolean useJAXBBridge = false;
+            for (Field field : part.getTypeClass().getDeclaredFields()) {
+                if (field.getType().equals(XMLGregorianCalendar.class)) {
+                    useJAXBBridge = true;
+                    break;
+                }
+            }
+            if (useJAXBBridge) {
+                return JAXBEncoderDecoder.unmarshalWithBridge(part.getConcreteName(), 
+                                                              part.getTypeClass(),
+                                                              part.getTypeClass().getAnnotations(),
+                                                              databinding.getContextClasses(), 
                                                               reader,
                                                               getAttachmentUnmarshaller());
             }
         }
+        
         
         return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), reader, part, 
                                              unwrapJAXBElement);
