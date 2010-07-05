@@ -119,7 +119,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param params  The params that matches the parts of the input message of the operation.  If the 
      * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
      * params are in the wrapped form, use invokeWrapped
-     * @return The return values that matche the parts of the output message of the operation
+     * 
      */
     void invoke(ClientCallback callback,
                     String operationName,
@@ -132,7 +132,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param params  The params that matches the parts of the input message of the operation.  If the 
      * BindingOperationInfo supports unwrapping, it assumes the params are in the "unwrapped" form.  If 
      * params are in the wrapped form, use invokeWrapped
-     * @return The return values that matche the parts of the output message of the operation
+     * 
      */
     void invoke(ClientCallback callback,
                     QName operationName,
@@ -145,7 +145,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param operationName The name of the operation to be invoked. The service namespace will be used
      * when looking up the BindingOperationInfo.
      * @param params  The params that matches the parts of the input message of the operation
-     * @return The return values that matche the parts of the output message of the operation
+     *
      */
     void invokeWrapped(ClientCallback callback,
                            String operationName,
@@ -156,7 +156,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param callback The callback that is called when the response is ready
      * @param operationName The name of the operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
-     * @return The return values that matche the parts of the output message of the operation
+     * 
      */
     void invokeWrapped(ClientCallback callback,
                            QName operationName,
@@ -167,11 +167,50 @@ public interface Client extends InterceptorProvider, MessageObserver {
      * @param callback The callback that is called when the response is ready
      * @param oi  The operation to be invoked
      * @param params  The params that matches the parts of the input message of the operation
-     * @return The return values that matche the parts of the output message of the operation
+     *
      */
     void invoke(ClientCallback callback,
                 BindingOperationInfo oi,
-                Object... params) throws Exception;    
+                Object... params) throws Exception;
+    
+    /**
+     * Invokes an operation asynchronously
+     * @param callback The callback that is called when the response is ready
+     * @param oi  The operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @param context contextual information for the invocation
+     */
+    void invoke(ClientCallback callback,
+                BindingOperationInfo oi,
+                Object[] params,
+                Map<String, Object> context) throws Exception;  
+    
+    /**
+     * Invokes an operation asynchronously
+     * @param callback The callback that is called when the response is ready
+     * @param oi  The operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @param exchange The Exchange to be used for the invocation
+     *
+     */
+    void invoke(ClientCallback callback,
+                BindingOperationInfo oi,
+                Object[] params,
+                Exchange exchange) throws Exception;  
+    
+    /**
+     * Invokes an operation asynchronously
+     * @param callback The callback that is called when the response is ready
+     * @param oi  The operation to be invoked
+     * @param params  The params that matches the parts of the input message of the operation
+     * @param context  Optional (can be null) contextual information for the invocation
+     * @param exchange Optional (can be null) The Exchange to be used for the invocation  
+     */
+    void invoke(ClientCallback callback,
+                BindingOperationInfo oi,
+                Object[] params,
+                Map<String, Object> context,
+                Exchange exchange) throws Exception;  
     
     
     /**

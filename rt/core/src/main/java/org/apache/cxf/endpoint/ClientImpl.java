@@ -378,18 +378,47 @@ public class ClientImpl
     public void invoke(ClientCallback callback,
                        BindingOperationInfo oi,
                        Object... params) throws Exception {
+        invoke(callback, oi, params, null, null);
+    }
+    
+    public void invoke(ClientCallback callback,
+                       BindingOperationInfo oi,
+                       Object[] params,
+                       Map<String, Object> context) throws Exception {
+        invoke(callback, oi, params, context, null);
+    }
+    
+    public void invoke(ClientCallback callback,
+                       BindingOperationInfo oi,
+                       Object[] params,
+                       Exchange exchange) throws Exception {
+        invoke(callback, oi, params, null, exchange);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public void invoke(ClientCallback callback,
+                       BindingOperationInfo oi,
+                       Object[] params,
+                       Map<String, Object> context,
+                       Exchange exchange) throws Exception {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
-            Exchange exchange = new ExchangeImpl();
+            if (exchange == null) {
+                exchange = new ExchangeImpl();
+            }
             exchange.setSynchronous(false);
             Endpoint endpoint = getEndpoint();
-            Map<String, Object> context = new HashMap<String, Object>();
-            Map<String, Object> resp = getResponseContext();
-            resp.clear();
-            Map<String, Object> reqContext = new HashMap<String, Object>(getRequestContext());
-            context.put(RESPONSE_CONTEXT, resp);
-            context.put(REQUEST_CONTEXT, reqContext);
+            if (context == null) {
+                context = new HashMap<String, Object>();
+                Map<String, Object> resp = getResponseContext();
+                resp.clear();
+                Map<String, Object> reqContext = new HashMap<String, Object>(getRequestContext());
+                context.put(RESPONSE_CONTEXT, resp);
+                context.put(REQUEST_CONTEXT, reqContext);
+            }
+                        
+            Map<String, Object> reqContext = (Map<String, Object>)context.get(REQUEST_CONTEXT);
 
             Message message = endpoint.getBinding().createMessage();
             message.put(Message.INVOCATION_CONTEXT, context);
