@@ -304,7 +304,7 @@
                             javax.jms;resolution:=optional;version="[0.0,2)",
                             javax.jws*;version="[0.0,3)",
                             javax.mail*;version="[0.0,2)",
-                            javax.servlet.*;version="[0.0,3)";resolution:=optional,
+                            javax.servlet.*;version="[0.0,4)";resolution:=optional,
                             javax.xml.stream*;version="[0.0,2)",
                             javax.xml.ws*;version="[0.0,3)",
                             *
