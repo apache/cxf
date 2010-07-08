@@ -24,7 +24,7 @@ import org.apache.cxf.tools.common.ToolException;
 
 public class JAXBBindErrorListener implements ErrorListener {
     private boolean isVerbose;
-    private String prefix = "Thrown by JAXB : ";
+    private String prefix = "Thrown by JAXB: ";
 
     public JAXBBindErrorListener(boolean verbose) {
         isVerbose = verbose;
