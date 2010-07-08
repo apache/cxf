@@ -160,4 +160,29 @@ public class JaxWsServerFactoryBeanTest extends AbstractJaxWsTest {
                         doc,
                         XPathConstants.NODE);
     }
+    
+    @Test
+    public void testPostConstructCalled() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setServiceClass(Hello.class);
+        Hello bean = new Hello();
+        factory.setServiceBean(bean);
+        String address = "http://localhost:9001/jaxwstest";
+        factory.setAddress(address);
+        factory.create();
+        assertTrue("PostConstruct is not called", bean.isPostConstructCalled());
+    }
+    
+    @Test
+    public void testPostConstructBlocked() throws Exception {
+        JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
+        factory.setServiceClass(Hello.class);
+        Hello bean = new Hello();
+        factory.setServiceBean(bean);
+        String address = "http://localhost:9001/jaxwstest";
+        factory.setAddress(address);
+        factory.setBlockPostConstruct(true);
+        factory.create();
+        assertFalse("PostConstruct is called", bean.isPostConstructCalled());
+    }
 }
