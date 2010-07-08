@@ -61,6 +61,8 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 public class JaxWsServerFactoryBean extends ServerFactoryBean {
     protected boolean doInit;
     protected List<Handler> handlers = new ArrayList<Handler>();
+
+    private boolean blockPostConstruct;
     
     public JaxWsServerFactoryBean() {
         this(new JaxWsServiceFactoryBean());
@@ -229,11 +231,27 @@ public class JaxWsServerFactoryBean extends ServerFactoryBean {
             ResourceInjector injector = new ResourceInjector(resourceManager);
             if (Proxy.isProxyClass(instance.getClass()) && getServiceClass() != null) {
                 injector.inject(instance, getServiceClass());
-                injector.construct(instance, getServiceClass());
+                if (!blockPostConstruct) {
+                    injector.construct(instance, getServiceClass());
+                }
             } else {
                 injector.inject(instance);
-                injector.construct(instance);
+                if (!blockPostConstruct) {
+                    injector.construct(instance);
+                }
             }
         }
-    }  
+    }
+
+    /**
+     * 
+     * @param blockPostConstruct @PostConstruct method will not be called 
+     *  if this property is set to true - this may be necessary in cases
+     *  when the @PostConstruct method needs to be called at a later stage,
+     *  for example, when a higher level container does its own injection.  
+     */
+    public void setBlockPostConstruct(boolean blockPostConstruct) {
+        this.blockPostConstruct = blockPostConstruct;
+    }
+      
 }

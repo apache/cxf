@@ -21,12 +21,26 @@ package org.apache.cxf.jaxws.service;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.jws.WebMethod;
 import javax.jws.WebService;
 
 @WebService
 public class Hello {
 
+    private boolean postConstructCalled;
+    
+    @PostConstruct
+    @WebMethod(exclude = true)
+    public void init() {
+        postConstructCalled = true;
+    }
+    
+    @WebMethod(exclude = true)
+    public boolean isPostConstructCalled() {
+        return postConstructCalled;
+    }
+    
     @WebMethod
     public String sayHi(String text) {
         return text;

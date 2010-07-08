@@ -264,6 +264,14 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
         return endpointName.toString() + ".jaxws-endpoint";
     }
 
+    protected JaxWsServerFactoryBean getServerFactory() {
+        return serverFactory;
+    }
+    
+    protected void setServerFactory(JaxWsServerFactoryBean bean) {
+        this.serverFactory = bean;
+    }
+    
     protected void checkProperties() {
         if (properties != null) {
             if (properties.containsKey("javax.xml.ws.wsdl.description")) {
