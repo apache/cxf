@@ -84,7 +84,7 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
     private static void addParameter(Map<String, String> parameters, String token) {
         int equalSign = token.indexOf('=');
         if (equalSign == -1) {
-            throw new IllegalArgumentException("Wrong media type  parameter, seperator is missing");
+            throw new IllegalArgumentException("Wrong media type parameter, separator is missing");
         }
         parameters.put(token.substring(0, equalSign).trim().toLowerCase(), 
                        token.substring(equalSign + 1).trim());
