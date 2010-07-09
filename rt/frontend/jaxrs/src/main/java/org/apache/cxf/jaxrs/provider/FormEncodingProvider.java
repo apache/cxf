@@ -128,7 +128,7 @@ public class FormEncodingProvider implements
             FormUtils.populateMapFromMultipart(params, body, decode);
         } else {
             FormUtils.populateMapFromString(params, 
-                                            FormUtils.readBody(is), 
+                                            FormUtils.readBody(is, mt), 
                                             decode,
                                             mc != null ? mc.getHttpServletRequest() : null);
         }
@@ -179,14 +179,17 @@ public class FormEncodingProvider implements
         } else {
             MultivaluedMap<String, String> map = (MultivaluedMap<String, String>)obj;
             boolean encoded = AnnotationUtils.getAnnotation(anns, Encoded.class) != null;
+            
+            String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+            
             for (Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator(); it.hasNext();) {
                 Map.Entry<String, List<String>> entry = it.next();
                 for (Iterator<String> entryIterator = entry.getValue().iterator(); entryIterator.hasNext();) {
                     String value = entryIterator.next();
-                    os.write(entry.getKey().getBytes("UTF-8"));
+                    os.write(entry.getKey().getBytes(encoding));
                     os.write('=');
                     String data = encoded ? value : HttpUtils.urlEncode(value);
-                    os.write(data.getBytes("UTF-8"));
+                    os.write(data.getBytes(encoding));
                     if (entryIterator.hasNext() || it.hasNext()) {
                         os.write('&');
                     }

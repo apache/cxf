@@ -24,12 +24,17 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
 public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
+    private static final Pattern COMPLEX_PARAMETERS = 
+        Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-]+))");
+    
     public MediaType fromString(String mType) {
         
         if (mType == null) {
@@ -53,21 +58,22 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
         
         Map<String, String> parameters = Collections.emptyMap();
         if (paramsStart != -1) {
-            // Using Pattern.compile might be marginally faster ?
-            // though it's rare when more than one parameter is provided
+
             parameters = new LinkedHashMap<String, String>();
-            StringTokenizer st = 
-                new StringTokenizer(mType.substring(paramsStart + 1), ";");
-            while (st.hasMoreTokens()) {
-                String token = st.nextToken();
-                int equalSign = token.indexOf('=');
-                if (equalSign == -1) {
-                    throw new IllegalArgumentException("Wrong media type  parameter, seperator is missing");
-                }
-                parameters.put(token.substring(0, equalSign).trim().toLowerCase(), 
-                               token.substring(equalSign + 1).trim());
-            }
             
+            String paramString = mType.substring(paramsStart + 1);
+            if (paramString.contains("\"")) {
+                Matcher m = COMPLEX_PARAMETERS.matcher(paramString);
+                while (m.find()) {
+                    String val = m.group().trim();
+                    addParameter(parameters, val);
+                }
+            } else {
+                StringTokenizer st = new StringTokenizer(paramString, ";");
+                while (st.hasMoreTokens()) {
+                    addParameter(parameters, st.nextToken());
+                }
+            }
         }
         
         return new MediaType(type.trim().toLowerCase(), 
@@ -75,6 +81,15 @@ public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
                              parameters);
     }
 
+    private static void addParameter(Map<String, String> parameters, String token) {
+        int equalSign = token.indexOf('=');
+        if (equalSign == -1) {
+            throw new IllegalArgumentException("Wrong media type  parameter, seperator is missing");
+        }
+        parameters.put(token.substring(0, equalSign).trim().toLowerCase(), 
+                       token.substring(equalSign + 1).trim());
+    }
+    
     public String toString(MediaType type) {
         StringBuilder sb = new StringBuilder();
         sb.append(type.getType()).append('/').append(type.getSubtype());

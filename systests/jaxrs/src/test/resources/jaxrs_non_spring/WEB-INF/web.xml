@@ -49,6 +49,14 @@
 		      <param-name>javax.ws.rs.Application</param-name>
 		      <param-value>org.apache.cxf.systest.jaxrs.BookApplication</param-value>    
 		</init-param>
+		<init-param>
+		      <param-name>jaxrs.outInterceptors</param-name>
+		      <param-value>org.apache.cxf.interceptor.LoggingOutInterceptor</param-value>    
+		</init-param>
+		<init-param>
+		      <param-name>jaxrs.inInterceptors</param-name>
+		      <param-value>org.apache.cxf.interceptor.LoggingInInterceptor</param-value>    
+		</init-param>
 		<load-on-startup>1</load-on-startup>
 	</servlet>
 

@@ -65,7 +65,14 @@ public class Book {
     @Produces("application/xml;charset=ISO-8859-1")
     public Chapter getChapter(@PathParam("chapterid")int chapterid) {
         return chapters.get(new Long(chapterid));
-    } 
+    }
+    
+    @GET
+    @Path("chapters/acceptencoding/{chapterid}/")    
+    @Produces("application/xml")
+    public Chapter getChapterAcceptEncoding(@PathParam("chapterid")int chapterid) {
+        return chapters.get(new Long(chapterid));
+    }
 
     @GET
     @Path("chapters/badencoding/{chapterid}/")    

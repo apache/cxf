@@ -168,7 +168,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                 response = ((CollectionWrapper)response).getCollectionOrArray(theType, type); 
             }
             
-            response = checkAdapter(response, anns, false);
+            response = checkAdapter(response, type, anns, false);
             return response;
             
         } catch (JAXBException e) {
@@ -229,7 +229,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException {
         try {
-            Object actualObject = checkAdapter(obj, anns, true);
+            Object actualObject = checkAdapter(obj, cls, anns, true);
             Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
             String encoding = HttpUtils.getSetEncoding(m, headers, null);
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
@@ -319,7 +319,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
     
     protected void addAttachmentMarshaller(Marshaller ms) {
-        Collection<Attachment> attachments = getAttachments();
+        Collection<Attachment> attachments = getAttachments(true);
         if (attachments != null) {
             Object value = getContext().getContextualProperty(Message.MTOM_THRESHOLD);
             Integer threshold = value != null ? Integer.valueOf(value.toString()) : 0;
@@ -329,17 +329,19 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     }
     
     protected void addAttachmentUnmarshaller(Unmarshaller um) {
-        Collection<Attachment> attachments = getAttachments();
+        Collection<Attachment> attachments = getAttachments(false);
         if (attachments != null) {
             um.setAttachmentUnmarshaller(new JAXBAttachmentUnmarshaller(
                 attachments));
         }
     }
     
-    private Collection<Attachment> getAttachments() {
+    private Collection<Attachment> getAttachments(boolean write) {
         MessageContext mc = getContext();
         if (mc != null) {
-            return CastUtils.cast((Collection<?>)mc.get(Message.ATTACHMENTS));
+            // TODO: there has to be a better fix
+            String propertyName = write ? "WRITE-" + Message.ATTACHMENTS : Message.ATTACHMENTS;
+            return CastUtils.cast((Collection<?>)mc.get(propertyName));
         } else {
             return null;
         }

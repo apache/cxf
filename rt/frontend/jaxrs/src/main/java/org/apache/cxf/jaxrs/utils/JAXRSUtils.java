@@ -679,7 +679,7 @@ public final class JAXRSUtils {
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
                 String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
                 if (body == null) {
-                    body = FormUtils.readBody(m.getContent(InputStream.class));
+                    body = FormUtils.readBody(m.getContent(InputStream.class), mt);
                     m.put("org.apache.cxf.jaxrs.provider.form.body", body);
                 }
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
@@ -1035,7 +1035,8 @@ public final class JAXRSUtils {
      * @return return a list of intersected mime types
      */   
     public static List<MediaType> intersectMimeTypes(List<MediaType> requiredMediaTypes, 
-                                                     List<MediaType> userMediaTypes) {
+                                                     List<MediaType> userMediaTypes,
+                                                     boolean addRequiredParamsIfPossible) {
         Set<MediaType> supportedMimeTypeList = new LinkedHashSet<MediaType>();
 
         for (MediaType requiredType : requiredMediaTypes) {
@@ -1068,8 +1069,17 @@ public final class JAXRSUtils {
                     String type = requiredType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) 
                                       ? userType.getType() : requiredType.getType();
                     String subtype = requiredType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD) 
-                                      ? userType.getSubtype() : requiredType.getSubtype();                  
-                    supportedMimeTypeList.add(new MediaType(type, subtype, userType.getParameters()));
+                                      ? userType.getSubtype() : requiredType.getSubtype();
+                    Map<String, String> parameters = userType.getParameters();
+                    if (addRequiredParamsIfPossible) {
+                        parameters = new LinkedHashMap<String, String>(parameters);
+                        for (Map.Entry<String, String> entry : requiredType.getParameters().entrySet()) {
+                            if (!parameters.containsKey(entry.getKey())) {
+                                parameters.put(entry.getKey(), entry.getValue());
+                            }
+                        }
+                    }
+                    supportedMimeTypeList.add(new MediaType(type, subtype, parameters));
                 }
             }
         }
@@ -1081,13 +1091,14 @@ public final class JAXRSUtils {
     public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA, 
                                                      MediaType mimeTypeB) {
         return intersectMimeTypes(mimeTypesA, 
-                                  Collections.singletonList(mimeTypeB));
+                                  Collections.singletonList(mimeTypeB), false);
     }
     
     public static List<MediaType> intersectMimeTypes(String mimeTypesA, 
                                                      String mimeTypesB) {
         return intersectMimeTypes(parseMediaTypes(mimeTypesA),
-                                  parseMediaTypes(mimeTypesB));
+                                  parseMediaTypes(mimeTypesB),
+                                  false);
     }
     
     public static List<MediaType> sortMediaTypes(String mediaTypes) {

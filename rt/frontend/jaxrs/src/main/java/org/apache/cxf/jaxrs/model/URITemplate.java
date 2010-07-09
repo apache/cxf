@@ -439,97 +439,100 @@ public final class URITemplate {
             }
         }
     }
-}
+    
+    /**
+     * Splits string into parts inside and outside curly braces. Nested curly braces are ignored and treated
+     * as part inside top-level curly braces. Example: string "foo{bar{baz}}blah" is split into three tokens,
+     * "foo","{bar{baz}}" and "blah". When closed bracket is missing, whole unclosed part is returned as one
+     * token, e.g.: "foo{bar" is split into "foo" and "{bar". When opening bracket is missing, closing
+     * bracket is ignored and taken as part of current token e.g.: "foo{bar}baz}blah" is split into "foo",
+     * "{bar}" and "baz}blah".
+     * <p>
+     * This is helper class for {@link URITemplate} that enables recurring literals appearing next to regular
+     * expressions e.g. "/foo/{zipcode:[0-9]{5}}/". Nested expressions with closed sections, like open-closed
+     * brackets causes expression to be out of regular grammar (is context-free grammar) which are not
+     * supported by Java regexp version.
+     * 
+     * @author amichalec
+     * @version $Rev$
+     */
+    static class CurlyBraceTokenizer {
 
-/**
- * Splits string into parts inside and outside curly braces. Nested curly braces are ignored and treated as
- * part inside top-level curly braces. Example: string "foo{bar{baz}}blah" is split into three tokens, "foo",
- * "{bar{baz}}" and "blah". When closed bracket is missing, whole unclosed part is returned as one token,
- * e.g.: "foo{bar" is split into "foo" and "{bar". When opening bracket is missing, closing bracked is ignored
- * and taken as part of current token e.g.: "foo{bar}baz}blah" is split into "foo", "{bar}" and "baz}blah".
- * <p>
- * This is helper class for {@link URITemplate} that enables recurring literals appearing next to regular
- * expressions e.g. "/foo/{zipcode:[0-9]{5}}/". Nested expressions with closed sections, like open-closed
- * brackets causes expression to be out of regular grammar (is context-free grammar) which are not supported
- * by Java regexp version.
- * 
- * @author amichalec
- * @version $Rev$
- */
-final class CurlyBraceTokenizer {
+        private List<String> tokens = new ArrayList<String>();
+        private int tokenIdx;
 
-    private List<String> tokens = new ArrayList<String>();
-    private int tokenIdx;
-
-    public CurlyBraceTokenizer(String string) {
-        boolean outside = true;
-        int level = 0;
-        int lastIdx = 0;
-        int idx;
-        for (idx = 0; idx < string.length(); idx++) {
-            if (string.charAt(idx) == '{') {
-                if (outside) {
-                    if (lastIdx < idx) {
-                        tokens.add(string.substring(lastIdx, idx));
+        public CurlyBraceTokenizer(String string) {
+            boolean outside = true;
+            int level = 0;
+            int lastIdx = 0;
+            int idx;
+            for (idx = 0; idx < string.length(); idx++) {
+                if (string.charAt(idx) == '{') {
+                    if (outside) {
+                        if (lastIdx < idx) {
+                            tokens.add(string.substring(lastIdx, idx));
+                        }
+                        lastIdx = idx;
+                        outside = false;
+                    } else {
+                        level++;
                     }
-                    lastIdx = idx;
-                    outside = false;
-                } else {
-                    level++;
-                }
-            } else if (string.charAt(idx) == '}' && !outside) {
-                if (level > 0) {
-                    level--;
-                } else {
-                    if (lastIdx < idx) {
-                        tokens.add(string.substring(lastIdx, idx + 1));
+                } else if (string.charAt(idx) == '}' && !outside) {
+                    if (level > 0) {
+                        level--;
+                    } else {
+                        if (lastIdx < idx) {
+                            tokens.add(string.substring(lastIdx, idx + 1));
+                        }
+                        lastIdx = idx + 1;
+                        outside = true;
                     }
-                    lastIdx = idx + 1;
-                    outside = true;
                 }
             }
+            if (lastIdx < idx) {
+                tokens.add(string.substring(lastIdx, idx));
+            }
         }
-        if (lastIdx < idx) {
-            tokens.add(string.substring(lastIdx, idx));
+
+        /**
+         * Token is enclosed by curly braces.
+         * 
+         * @param token
+         *            text to verify
+         * @return true if enclosed, false otherwise.
+         */
+        public static boolean insideBraces(String token) {
+            return token.charAt(0) == '{' && token.charAt(token.length() - 1) == '}';
         }
-    }
 
-    /**
-     * Token is enclosed by curly braces.
-     * 
-     * @param token
-     *            text to verify
-     * @return true if enclosed, false otherwise.
-     */
-    public static boolean insideBraces(String token) {
-        return token.charAt(0) == '{' && token.charAt(token.length() - 1) == '}';
-    }
-
-    /**
-     * Strips token from enclosed curly braces. If token is not enclosed method
-     * has no side effect.
-     * 
-     * @param token
-     *            text to verify
-     * @return text stripped from curly brace begin-end pair.
-     */
-    public static String stripBraces(String token) {
-        if (insideBraces(token)) {
-            return token.substring(1, token.length() - 1);
-        } else {
-            return token;
+        /**
+         * Strips token from enclosed curly braces. If token is not enclosed method
+         * has no side effect.
+         * 
+         * @param token
+         *            text to verify
+         * @return text stripped from curly brace begin-end pair.
+         */
+        public static String stripBraces(String token) {
+            if (insideBraces(token)) {
+                return token.substring(1, token.length() - 1);
+            } else {
+                return token;
+            }
         }
-    }
 
-    public boolean hasNext() {
-        return tokens.size() > tokenIdx;
-    }
+        public boolean hasNext() {
+            return tokens.size() > tokenIdx;
+        }
 
-    public String next() {
-        if (hasNext()) {
-            return tokens.get(tokenIdx++);
-        } else {
-            throw new IllegalStateException("no more elements");
+        public String next() {
+            if (hasNext()) {
+                return tokens.get(tokenIdx++);
+            } else {
+                throw new IllegalStateException("no more elements");
+            }
         }
     }
 }
+
+

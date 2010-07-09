@@ -329,14 +329,15 @@ public class WadlGeneratorTest extends Assert {
         
         List<Element> resourceEls = DOMUtils.getChildrenWithName(resource, 
                                          WadlGenerator.WADL_NS, "resource");
-        assertEquals(7, resourceEls.size());        
+        assertEquals(8, resourceEls.size());        
         assertEquals("/book2", resourceEls.get(0).getAttribute("path"));
         assertEquals("/books/{bookid}", resourceEls.get(1).getAttribute("path"));
         assertEquals("/chapter", resourceEls.get(2).getAttribute("path"));
-        assertEquals("/books/{bookid}", resourceEls.get(3).getAttribute("path"));
-        assertEquals("/booksubresource", resourceEls.get(4).getAttribute("path"));
-        assertEquals("/form", resourceEls.get(5).getAttribute("path"));
-        assertEquals("/itself", resourceEls.get(6).getAttribute("path"));
+        assertEquals("/chapter2", resourceEls.get(3).getAttribute("path"));
+        assertEquals("/books/{bookid}", resourceEls.get(4).getAttribute("path"));
+        assertEquals("/booksubresource", resourceEls.get(5).getAttribute("path"));
+        assertEquals("/form", resourceEls.get(6).getAttribute("path"));
+        assertEquals("/itself", resourceEls.get(7).getAttribute("path"));
         
         // verify root resource starting with "/"
         // must have a single template parameter
@@ -419,17 +420,19 @@ public class WadlGeneratorTest extends Assert {
         
         // verify resource starting with /chapter
         verifyGetResourceMethod(resourceEls.get(2), chapterEl);
+     // verify resource starting with /chapter2
+        verifyGetResourceMethod(resourceEls.get(3), chapterEl);
         
         // verify resource starting from /booksubresource
         // should have 2 parameters
-        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(4), 
+        paramsEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
                          WadlGenerator.WADL_NS, "param");
         assertEquals(2, paramsEls.size());
         checkParameter(paramsEls.get(0), "id", "template", "xs:int");
         checkParameter(paramsEls.get(1), "mid", "matrix", "xs:int");
         
         // should have 4 child resources
-        List<Element> subResourceEls = DOMUtils.getChildrenWithName(resourceEls.get(4), 
+        List<Element> subResourceEls = DOMUtils.getChildrenWithName(resourceEls.get(5), 
                                          WadlGenerator.WADL_NS, "resource");
         assertEquals(4, subResourceEls.size());        
         assertEquals("/book", subResourceEls.get(0).getAttribute("path"));

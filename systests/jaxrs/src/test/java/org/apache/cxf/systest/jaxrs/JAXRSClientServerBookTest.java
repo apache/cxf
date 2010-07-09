@@ -57,7 +57,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class));
+                   launchServer(BookServer.class, true));
     }
     
     
@@ -598,6 +598,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookAdapterInterface() throws Exception {
+        getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/interface/adapter",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
     public void testGetBook123FromSub() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/interface/subresource",
                                "resources/expected_get_book123.txt",
@@ -631,6 +638,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                + PORT + "/bookstore/booksubresource/123/chapters/badencoding/1",
                                "resources/expected_get_chapter1_utf.txt",
                                "application/xml", "application/xml;charset=UTF-8", 200);
+    }
+    
+    @Test
+    public void testGetChapterAcceptEncoding() throws Exception {
+        
+        getAndCompareAsStrings("http://localhost:" 
+                               + PORT + "/bookstore/booksubresource/123/chapters/acceptencoding/1",
+                               "resources/expected_get_chapter1.txt",
+                               "application/xml;charset=ISO-8859-1", "application/xml;charset=ISO-8859-1", 
+                               200);
     }
     
     @Test

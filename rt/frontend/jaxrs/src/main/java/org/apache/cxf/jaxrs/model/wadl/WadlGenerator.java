@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -495,6 +496,8 @@ public class WadlGenerator implements RequestHandler {
                 }
                 sb.append("<representation");
                 sb.append(" mediaType=\"").append(mt.toString()).append("\"");
+                
+                type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
                 if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
                     generateQName(sb, qnameResolver, clsMap, type,
                                   getBodyAnnotations(ori, inbound));
@@ -509,6 +512,11 @@ public class WadlGenerator implements RequestHandler {
             }
             sb.append("</representation>");
         }
+    }
+    
+    protected Class<?> getActualJaxbType(Class<?> type, Method resourceMethod, boolean inbound) {
+        WadlElement element = resourceMethod.getAnnotation(WadlElement.class);
+        return element == null ? type : inbound ? element.request() : element.response();
     }
     
     protected List<OperationResourceInfo> sortOperationsByPath(Set<OperationResourceInfo> ops) {

@@ -816,7 +816,13 @@ public final class InjectionUtils {
         for (Method m : bean.getClass().getMethods()) {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
                 && m.getName().length() > 3) {
-                String propertyName = m.getName().substring(3).toLowerCase();
+                String propertyName = m.getName().substring(3);
+                if (propertyName.length() == 1) {
+                    propertyName = propertyName.toLowerCase();
+                } else {
+                    propertyName = propertyName.substring(0, 1).toLowerCase()
+                                   + propertyName.substring(1);
+                }
                 if (baseName.contains(propertyName) || "class".equals(propertyName)) {
                     continue;
                 }

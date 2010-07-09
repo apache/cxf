@@ -258,7 +258,7 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         conduit.getClient().setReceiveTimeout(1000000);
         conduit.getClient().setConnectionTimeout(1000000);
         
-        client.type("multipart/related").accept("text/plain");
+        client.type("multipart/related").accept("multipart/related");
         XopType xop = new XopType();
         xop.setName("xopName");
         InputStream is = 
@@ -276,10 +276,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
             xop.setImage(getImage("/org/apache/cxf/systest/jaxrs/resources/java.jpg"));
         }
         
-        String response = client.post(xop, String.class);
+        XopType xop2 = client.post(xop, XopType.class);
         
-        
-        assertEquals("xopName" + bookXsd + bookXsd, response);
+        String bookXsdOriginal = IOUtils.readStringFromStream(getClass().getResourceAsStream(
+                "/org/apache/cxf/systest/jaxrs/resources/book.xsd"));
+        String bookXsd2 = IOUtils.readStringFromStream(xop2.getAttachinfo().getInputStream());        
+        assertEquals(bookXsdOriginal, bookXsd2);
     }
     
     private Image getImage(String name) throws Exception {

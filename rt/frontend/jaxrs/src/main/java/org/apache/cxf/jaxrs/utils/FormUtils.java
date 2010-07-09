@@ -29,6 +29,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.common.util.StringUtils;
@@ -59,14 +60,19 @@ public final class FormUtils {
         }
     }
     
-    public static String readBody(InputStream is) {
+    public static String readBody(InputStream is, MediaType mt) {
         try {
             ByteArrayOutputStream bos = new ByteArrayOutputStream();
             IOUtils.copy(is, bos, 1024);
-            return new String(bos.toByteArray(), "UTF-8");
+            return new String(bos.toByteArray(), getCharset(mt));
         } catch (Exception ex) {
             throw new WebApplicationException(ex);
         }
+    }
+    
+    private static String getCharset(MediaType mt) {
+        String charset = mt.getParameters().get("charset");
+        return charset == null ? "UTF-8" : charset;
     }
     
     public static void populateMapFromString(MultivaluedMap<String, String> params, 
