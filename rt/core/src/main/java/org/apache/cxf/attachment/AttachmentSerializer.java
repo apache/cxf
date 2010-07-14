@@ -129,7 +129,7 @@ public class AttachmentSerializer {
         StringBuilder mimeBodyCt = new StringBuilder();
         String bodyType = getHeaderValue("Content-Type", null);
         if (bodyType == null) {
-            mimeBodyCt.append("application/xop+xml; charset=")
+            mimeBodyCt.append((xop ? "application/xop+xml" : "text/xml") + "; charset=")
                 .append(encoding)
                 .append("; type=\"")
                 .append(bodyCt)
