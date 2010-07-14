@@ -43,7 +43,16 @@ import org.junit.Test;
 public class AttachmentSerializerTest extends Assert {
     
     @Test
-    public void testMessageWrite() throws Exception {
+    public void testMessageWriteXopOn() throws Exception {
+        doTestMessageWrite(true);
+    }
+    
+    @Test
+    public void testMessageWriteXopOff() throws Exception {
+        doTestMessageWrite(false);
+    }
+    
+    private void doTestMessageWrite(boolean xop) throws Exception {
         MessageImpl msg = new MessageImpl();
         
         Collection<Attachment> atts = new ArrayList<Attachment>();
@@ -64,6 +73,10 @@ public class AttachmentSerializerTest extends Assert {
         msg.setContent(OutputStream.class, out);
         
         AttachmentSerializer serializer = new AttachmentSerializer(msg);
+        if (!xop) {
+            // default is "on"
+            serializer.setXop(xop);
+        }
         
         serializer.writeProlog();
 
@@ -84,8 +97,14 @@ public class AttachmentSerializerTest extends Assert {
         MimeMultipart multipart = (MimeMultipart) inMsg.getContent();
         
         MimeBodyPart part = (MimeBodyPart) multipart.getBodyPart(0);
-        assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\";", 
-                     part.getHeader("Content-Type")[0]);
+        if (xop) {
+            assertEquals("application/xop+xml; charset=UTF-8; type=\"application/soap+xml\";", 
+                         part.getHeader("Content-Type")[0]);
+        } else {
+            assertEquals("text/xml; charset=UTF-8; type=\"application/soap+xml\";", 
+                         part.getHeader("Content-Type")[0]);
+        }
+        
         assertEquals("binary", part.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<root.message@cxf.apache.org>", part.getHeader("Content-ID")[0]);
         
@@ -101,7 +120,7 @@ public class AttachmentSerializerTest extends Assert {
         assertEquals("application/octet-stream", part2.getHeader("Content-Type")[0]);
         assertEquals("binary", part2.getHeader("Content-Transfer-Encoding")[0]);
         assertEquals("<test.xml>", part2.getHeader("Content-ID")[0]);
-        
+
     }
     
     @Test
