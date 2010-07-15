@@ -23,7 +23,7 @@ package org.apache.cxf.attachment;
 import java.io.IOException;
 import java.io.InputStream;
 
-final class DelegatingInputStream extends InputStream {
+public class DelegatingInputStream extends InputStream {
     private InputStream is;
     private AttachmentDeserializer deserializer;
     private boolean isClosed;
