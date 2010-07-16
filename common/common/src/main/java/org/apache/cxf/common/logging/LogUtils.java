@@ -95,8 +95,12 @@ public final class LogUtils {
                 }
             }
             if (!StringUtils.isEmpty(cname)) {
-                loggerClass = Class.forName(cname.trim(), true,
-                                            Thread.currentThread().getContextClassLoader());
+                try {
+                    loggerClass = Class.forName(cname.trim(), true,
+                                                Thread.currentThread().getContextClassLoader());
+                } catch (Throwable ex) {
+                    loggerClass = Class.forName(cname.trim());
+                }
                 getLogger(LogUtils.class).fine("Using " + loggerClass.getName() + " for logging.");
             }
         } catch (Throwable ex) {
