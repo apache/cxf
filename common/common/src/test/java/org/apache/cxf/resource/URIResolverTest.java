@@ -135,5 +135,19 @@ public class URIResolverTest extends Assert {
         
     }
 
-
+    @Test
+    public void testBasePathWithSpace() throws Exception {
+        URIResolver wsdlResolver = new URIResolver();
+        // resolve the wsdl
+        wsdlResolver.resolve(null, "wsdl/folder with spaces/foo.wsdl", this.getClass());
+        assertTrue(wsdlResolver.isResolved());
+    }
+    
+    @Test
+    public void testBasePathWithEncodedSpace() throws Exception {
+        URIResolver wsdlResolver = new URIResolver();
+        // resolve the wsdl
+        wsdlResolver.resolve(null, "wsdl/folder%20with%20spaces/foo.wsdl", this.getClass());
+        assertTrue(wsdlResolver.isResolved());
+    }
 }
