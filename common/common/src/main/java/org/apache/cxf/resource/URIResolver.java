@@ -125,6 +125,10 @@ public class URIResolver {
     private void tryFileSystem(String baseUriStr, String uriStr) throws IOException, MalformedURLException {
         try {
             URI relative;
+
+            // It is possible that spaces have been encoded.  We should decode them first.
+            uriStr = uriStr.replaceAll("%20", " ");
+
             File uriFile = new File(uriStr);
             uriFile = new File(uriFile.getAbsolutePath());
 
