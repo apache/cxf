@@ -20,8 +20,13 @@
 package org.apache.cxf.tools.validator.internal;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
@@ -35,8 +40,6 @@ public class Stax2DOM {
 
     public Stax2DOM() {
     }
-
-
 
     public Document getDocument(String wsdl) throws ToolException {
         try {
@@ -53,22 +56,49 @@ public class Stax2DOM {
     }
 
     public Document getDocument(URL url) throws ToolException {
+        InputStream input = null;
         try {
-            StreamSource src = new StreamSource(url.openStream(), url.toExternalForm());
+            input = url.openStream();
+            StreamSource src = new StreamSource(input, url.toExternalForm());
             return StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
         } catch (Exception e) {
             throw new ToolException(e);
+        } finally {
+            if (input != null) {
+                try {
+                    input.close();
+                } catch (IOException e) {
+                    // throw or change do nothing.
+                    throw new ToolException(e);
+                }
+            }
         }
     }
 
     public Document getDocument(File wsdl) throws ToolException {
+        XMLStreamReader reader = null;
         try {
-            StreamSource src = new StreamSource(wsdl);
-            return StaxUtils.read(StaxUtils.createXMLStreamReader(src), true);
+            StreamSource source = new StreamSource(wsdl);
+            reader = StaxUtils.createXMLStreamReader(source);
+            return StaxUtils.read(reader, true);
         } catch (Exception e) {
             throw new ToolException(e);
+        } finally {
+            try {
+                try {
+                    //on woodstox, calling closeCompletely will allow any 
+                    //cached things like dtds and such to be completely
+                    //closed and cleaned up.
+                    reader.getClass().getMethod("closeCompletely").invoke(reader);
+                } catch (Throwable t) {
+                    //ignore
+                }
+                reader.close();
+            } catch (XMLStreamException e) {
+                // throw or change do nothing.
+                throw new ToolException(e);
+            }
         }
     }
-
 
 }
