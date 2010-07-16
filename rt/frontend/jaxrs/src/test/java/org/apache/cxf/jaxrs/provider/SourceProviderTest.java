@@ -68,10 +68,10 @@ public class SourceProviderTest extends Assert {
         StreamSource s = new StreamSource(new ByteArrayInputStream("<test/>".getBytes()));
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         p.writeTo(s, null, null, null, null, null, os);
-        assertTrue(os.toString().contains("<test/>"));
+        assertTrue(os.toString(), os.toString().contains("<test/>") || os.toString().contains("<test />"));
         os = new ByteArrayOutputStream();
         p.writeTo(createDomSource(), null, null, null, null, null, os);
-        assertTrue(os.toString().contains("<test/>"));
+        assertTrue(os.toString(), os.toString().contains("<test/>") || os.toString().contains("<test />"));
     }
     
     @SuppressWarnings("unchecked")
