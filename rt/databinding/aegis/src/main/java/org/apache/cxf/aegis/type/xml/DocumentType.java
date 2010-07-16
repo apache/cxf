@@ -18,9 +18,6 @@
  */
 package org.apache.cxf.aegis.type.xml;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -43,21 +40,7 @@ import org.apache.cxf.staxutils.StaxUtils;
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class DocumentType extends Type {
-    private DocumentBuilder builder;
-
     public DocumentType() {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        try {
-            builder = factory.newDocumentBuilder();
-        } catch (ParserConfigurationException e) {
-            throw new DatabindingException("Couldn't load document builder.", e);
-        }
-        setWriteOuter(false);
-    }
-
-    public DocumentType(DocumentBuilder builder) {
-        this.builder = builder;
         setWriteOuter(false);
     }
 
@@ -67,7 +50,7 @@ public class DocumentType extends Type {
             XMLStreamReader reader = ((ElementReader)mreader).getXMLStreamReader();
             // we need to eat the surrounding element.
             reader.nextTag();
-            Object tree = StaxUtils.read(builder, new FragmentStreamReader(reader), true);
+            Object tree = StaxUtils.read(null, new FragmentStreamReader(reader), true);
             reader.nextTag(); // eat the end tag.
             return tree;
         } catch (XMLStreamException e) {

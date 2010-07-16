@@ -19,20 +19,17 @@
 
 package org.apache.cxf.bus.extension;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
-import org.xml.sax.SAXException;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class ExtensionFragmentParser {
 
@@ -45,15 +42,8 @@ public class ExtensionFragmentParser {
     List<Extension> getExtensions(InputStream is) {
         Document document = null;
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            DocumentBuilder parser = factory.newDocumentBuilder();
-            document = parser.parse(is);
-        } catch (ParserConfigurationException ex) {
-            throw new ExtensionException(ex);
-        } catch (SAXException ex) {
-            throw new ExtensionException(ex);
-        } catch (IOException ex) {
+            document = StaxUtils.read(is);
+        } catch (XMLStreamException ex) {
             throw new ExtensionException(ex);
         }
         

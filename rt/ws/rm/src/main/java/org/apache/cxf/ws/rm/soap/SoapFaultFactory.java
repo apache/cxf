@@ -24,7 +24,6 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,6 +36,7 @@ import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.ws.rm.BindingFaultFactory;
 import org.apache.cxf.ws.rm.Identifier;
@@ -98,9 +98,7 @@ public class SoapFaultFactory implements BindingFaultFactory {
     }
     
     void setDetail(SoapFault fault, Object detail) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        Document doc = factory.newDocumentBuilder().newDocument();
+        Document doc = DOMUtils.createDocument();
         Element elem = null;
         
         JAXBContext ctx = JAXBContext.newInstance(

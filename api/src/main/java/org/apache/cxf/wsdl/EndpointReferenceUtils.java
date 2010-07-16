@@ -46,12 +46,9 @@ import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMResult;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamSource;
@@ -265,25 +262,6 @@ public final class EndpointReferenceUtils {
     private EndpointReferenceUtils() {
         // Utility class - never constructed
     }
-    
-    private static Transformer getTransformer() throws EndpointUtilsException {
-        //To Support IBM JDK 
-        //If use the default transformFactory ,org.apache.xalan.processor.TransformerFactoryImpl \
-        //when transform stuff will lost attributes 
-        if (System.getProperty("java.vendor").indexOf("IBM") > -1) {
-            System.setProperty("javax.xml.transform.TransformerFactory", 
-                               "org.apache.xalan.xsltc.trax.TransformerFactoryImpl");
-        }
-        
-        try {
-            return TransformerFactory.newInstance().newTransformer();
-        } catch (TransformerConfigurationException tce) {
-            throw new EndpointUtilsException(new Message("COULD_NOT_CREATE_TRANSFORMER", LOG),
-                                                         tce);
-        }
-        
-    }
-    
     
     /**
      * Sets the service and port name of the provided endpoint reference. 
@@ -586,8 +564,7 @@ public final class EndpointReferenceUtils {
                     if (doTransform) {
                         DOMResult domResult = new DOMResult();
                         domResult.setSystemId(source.getSystemId());
-                        
-                        getTransformer().transform(source, domResult);
+                        node = StaxUtils.read(source);
     
                         node = domResult.getNode();
                     }
@@ -609,7 +586,7 @@ public final class EndpointReferenceUtils {
                         anyList.add(node);
                     }
                 }
-            } catch (TransformerException te) {
+            } catch (XMLStreamException te) {
                 throw new EndpointUtilsException(new Message("COULD_NOT_POPULATE_EPR", LOG),
                                                  te);
             }

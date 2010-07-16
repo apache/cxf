@@ -23,8 +23,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.w3c.dom.Document;
@@ -35,6 +33,7 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -101,26 +100,20 @@ public class Soap11FaultOutInterceptor extends AbstractSoapInterceptor {
                         sb.append(ste.getClassName() + "!" + ste.getMethodName() + "!" + ste.getFileName()  
                                 + "!" + ste.getLineNumber() + "\n");
                     }
-                    try {
-                        Element detail = fault.getDetail(); 
-                        if (detail == null) {
-                            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                            factory.setNamespaceAware(true);
-                            Document doc = factory.newDocumentBuilder().newDocument();
-                            Element stackTrace = doc.createElementNS(Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
-                            stackTrace.setTextContent(sb.toString());
-                            detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
-                            fault.setDetail(detail);
-                            detail.appendChild(stackTrace);
-                        } else {
-                            Element stackTrace = detail.getOwnerDocument().createElementNS(
-                                    Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
-                            stackTrace.setTextContent(sb.toString());
-                            detail.appendChild(stackTrace);
-                        }                    
-                    } catch (ParserConfigurationException pe) {
-                        // move on...
-                    }
+                    Element detail = fault.getDetail(); 
+                    if (detail == null) {
+                        Document doc = XMLUtils.newDocument();
+                        Element stackTrace = doc.createElementNS(Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
+                        stackTrace.setTextContent(sb.toString());
+                        detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
+                        fault.setDetail(detail);
+                        detail.appendChild(stackTrace);
+                    } else {
+                        Element stackTrace = detail.getOwnerDocument().createElementNS(
+                                Soap11.SOAP_NAMESPACE, Fault.STACKTRACE);
+                        stackTrace.setTextContent(sb.toString());
+                        detail.appendChild(stackTrace);
+                    }                    
                 }
     
                 if (fault.hasDetails()) {

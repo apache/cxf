@@ -800,7 +800,10 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             assertEquals(200, result);
             String resp = put.getResponseBodyAsString();
             InputStream expected = getClass().getResourceAsStream("resources/update_book.txt");
-            assertTrue(resp.indexOf(getStringFromInputStream(expected)) >= 0);
+            String s = getStringFromInputStream(expected);
+            //System.out.println(resp);
+            //System.out.println(s);            
+            assertTrue(resp.indexOf(s) >= 0);
         } finally {
             // Release current connection to the connection pool once you are
             // done
