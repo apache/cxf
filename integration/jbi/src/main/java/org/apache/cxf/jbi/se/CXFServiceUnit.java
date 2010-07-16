@@ -33,12 +33,12 @@ import javax.jbi.messaging.MessagingException;
 import javax.jbi.servicedesc.ServiceEndpoint;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+
+import org.xml.sax.InputSource;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
@@ -48,6 +48,7 @@ import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jbi.ServiceConsumer;
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.jbi.JBITransportFactory;
 
@@ -228,12 +229,10 @@ public class CXFServiceUnit {
                 Class<?> clz = classes.iterator().next();
                 ws = clz.getAnnotation(WebService.class);
             }
-            if (ws != null) { 
-                DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-                factory.setNamespaceAware(true);
-                DocumentBuilder builder = factory.newDocumentBuilder();
-                doc = builder.parse(ws.wsdlLocation());
-                
+            if (ws != null) {
+                InputSource in = new InputSource(ws.wsdlLocation());
+                StaxUtils.createXMLStreamReader(in);
+                doc = StaxUtils.read(in);
             } else { 
                 LOG.severe(new Message("SU.COULDNOT.GET.ANNOTATION", LOG).toString());
             }

@@ -360,6 +360,18 @@ public final class StaxUtils {
         }
         return false;
     }
+    public static void copy(Source source, OutputStream os) throws XMLStreamException {
+        XMLStreamWriter writer = createXMLStreamWriter(os);
+        try {
+            copy(source, writer);
+        } finally {
+            try {
+                writer.flush();
+            } catch (XMLStreamException ex) {
+                //ignore
+            }
+        }
+    }
     public static void copy(Source source, XMLStreamWriter writer) throws XMLStreamException {
         if (source instanceof SAXSource) {
             SAXSource ss = (SAXSource)source;
@@ -783,6 +795,42 @@ public final class StaxUtils {
         }        
     }
 
+    public static Document read(Source s) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s);
+        try {
+            return read(reader);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+    public static Document read(InputStream s) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s);
+        try {
+            return read(reader);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
+    public static Document read(InputSource s) throws XMLStreamException {
+        XMLStreamReader reader = createXMLStreamReader(s);
+        try {
+            return read(reader);
+        } finally {
+            try {
+                reader.close();
+            } catch (Exception ex) {
+                //ignore
+            }
+        }
+    }
     public static Document read(XMLStreamReader reader) throws XMLStreamException {
         return read(reader, false);
     }
@@ -801,7 +849,8 @@ public final class StaxUtils {
     
     public static Document read(DocumentBuilder builder, XMLStreamReader reader, boolean repairing) 
         throws XMLStreamException {
-        Document doc = builder.newDocument();
+        
+        Document doc = builder == null ? DOMUtils.createDocument() : builder.newDocument();
         if (reader.getLocation().getSystemId() != null) {
             try {
                 doc.setDocumentURI(new String(reader.getLocation().getSystemId()));
@@ -886,7 +935,10 @@ public final class StaxUtils {
         if (e.getParentNode() instanceof Element) {
             return isDeclared((Element)e.getParentNode(), namespaceURI, prefix);
         }
-
+        if (StringUtils.isEmpty(prefix) && StringUtils.isEmpty(namespaceURI)) {
+            //A document that probably doesn't have any namespace qualifies elements
+            return true;
+        }
         return false;
     }
     public static void readDocElements(Node parent, XMLStreamReader reader, boolean repairing) 

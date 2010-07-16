@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -34,6 +33,7 @@ import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 
 /**
@@ -67,9 +67,7 @@ public class SoapFaultFactory  {
         QName subCode = jmsFault.getSubCode();
         fault.setSubCode(subCode);
         try {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            Document doc = factory.newDocumentBuilder().newDocument();
+            Document doc = XMLUtils.newDocument();
             Element detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
             Element detailChild = doc.createElementNS(subCode.getNamespaceURI(), subCode.getLocalPart());
             detailChild.setTextContent(fault.getReason());
@@ -91,24 +89,20 @@ public class SoapFaultFactory  {
         if (null == detail) {
             return fault;
         }
-
-        try {
-            setDetail(fault, detail);
-        } catch (Exception ex) {
-            LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex); 
-            ex.printStackTrace();
-        }
+        setDetail(fault, detail);
         return fault;
     }
     
-    void setDetail(SoapFault fault, Object detail) throws Exception {
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        Document doc = factory.newDocumentBuilder().newDocument();
-        Element elem = null;
-        
-        elem =  (Element)doc.getFirstChild();
-        fault.setDetail(elem);
+    void setDetail(SoapFault fault, Object detail) {
+        Element el = null;
+        if (detail instanceof Element) {
+            el = (Element)detail;
+        } else if (detail instanceof Document) {
+            el = ((Document)detail).getDocumentElement();
+        }
+        if (el != null) {
+            fault.setDetail(el);
+        }
     }
     
     public String toString(Fault f) {

@@ -32,8 +32,6 @@ import javax.jbi.messaging.ExchangeStatus;
 import javax.jbi.messaging.Fault;
 import javax.jbi.messaging.MessageExchange;
 import javax.jbi.messaging.NormalizedMessage;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.dom.DOMSource;
 
 import org.w3c.dom.Document;
@@ -42,6 +40,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class JBIDestinationOutputStream extends CachedOutputStream {
 
@@ -85,11 +84,10 @@ public class JBIDestinationOutputStream extends CachedOutputStream {
                 InputStream bais = getInputStream();
                 LOG.finest(new org.apache.cxf.common.i18n.Message(
                     "BUILDING.DOCUMENT", LOG).toString());
-                DocumentBuilderFactory docBuilderFactory = DocumentBuilderFactory.newInstance();
-                docBuilderFactory.setNamespaceAware(true);
-                DocumentBuilder builder = docBuilderFactory.newDocumentBuilder();
-                Document doc = builder.parse(bais);
-            
+                Document doc = StaxUtils.read(bais);
+                bais.close();
+                
+                
                 MessageExchange xchng = inMessage.get(MessageExchange.class);
                 LOG.fine(new org.apache.cxf.common.i18n.Message(
                     "CREATE.NORMALIZED.MESSAGE", LOG).toString());

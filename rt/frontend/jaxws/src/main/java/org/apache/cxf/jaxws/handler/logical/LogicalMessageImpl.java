@@ -35,9 +35,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.LogicalMessage;
 import javax.xml.ws.Service;
@@ -49,7 +47,6 @@ import org.w3c.dom.Node;
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -148,8 +145,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             if (obj instanceof StreamSource) {
                 try {
                     CachedOutputStream cos = new CachedOutputStream();
-                    Transformer transformer = XMLUtils.newTransformer();
-                    transformer.transform(obj, new StreamResult(cos));
+                    StaxUtils.copy(obj, cos);
 
                     obj = new StreamSource(cos.getInputStream());
                     message.setContent(Source.class, new StreamSource(cos.getInputStream()));
@@ -164,9 +160,7 @@ public class LogicalMessageImpl implements LogicalMessage {
             } else {
                 try {
                     CachedOutputStream cos = new CachedOutputStream();
-                    Transformer transformer = XMLUtils.newTransformer();
-
-                    transformer.transform(obj, new StreamResult(cos));
+                    StaxUtils.copy(obj, cos);
                     InputStream in = cos.getInputStream();
                     SOAPMessage msg = initSOAPMessage(in);
                     source = new DOMSource(((SOAPMessage)msg).getSOAPBody().getFirstChild());

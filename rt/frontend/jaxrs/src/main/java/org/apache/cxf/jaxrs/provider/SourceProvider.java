@@ -33,19 +33,17 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.MessageBodyWriter;
 import javax.ws.rs.ext.Provider;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
@@ -69,20 +67,21 @@ public class SourceProvider implements
         if (DOMSource.class.isAssignableFrom(source) || Document.class.isAssignableFrom(source)) {
             
             boolean docRequired = Document.class.isAssignableFrom(source);
-            
-            Document doc = null;
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder builder;
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
             try {
-                builder = factory.newDocumentBuilder();
-                doc = builder.parse(is);
+                Document doc = StaxUtils.read(reader);
+                return docRequired ? doc : new DOMSource(doc);
             } catch (Exception e) {
                 IOException ioex = new IOException("Problem creating a Source object");
                 ioex.setStackTrace(e.getStackTrace());
                 throw ioex;
+            } finally {
+                try {
+                    reader.close();
+                } catch (XMLStreamException e) {
+                    //ignore
+                }
             }
-    
-            return docRequired ? doc : new DOMSource(doc);
         } else if (StreamSource.class.isAssignableFrom(source)
                    || Source.class.isAssignableFrom(source)) {
             return new StreamSource(is);
@@ -96,14 +95,26 @@ public class SourceProvider implements
     public void writeTo(Source source, Class<?> clazz, Type genericType, Annotation[] annotations,  
         MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
-        StreamResult result = new StreamResult(os);
-        TransformerFactory tf = TransformerFactory.newInstance();
+        
+        String encoding = "utf-8"; //FIXME
+        
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, encoding);
         try {
-            Transformer t = tf.newTransformer();
-            t.transform(source, result);
-        } catch (TransformerException te) {
-            te.printStackTrace();
-            throw new WebApplicationException(te);
+            StaxUtils.copy(reader, writer);
+        } catch (XMLStreamException e) {
+            throw new WebApplicationException(e);
+        } finally {
+            try {
+                reader.close();
+            } catch (XMLStreamException e) {
+                //ignore
+            }
+            try {
+                writer.flush();
+            } catch (XMLStreamException e) {
+                //ignore
+            }
         }
     }
     
