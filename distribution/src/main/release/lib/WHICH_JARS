@@ -23,7 +23,8 @@ The following jars are required for all CXF usage:
 - jaxb-impl.jar (this is a [6] for normal runtime, but is required for 
                  tooling and the dynamic clients)
 - XmlSchema.jar
-- wstx-asl.jar  [6] or another StAX implementation
+- woodstox-core-asl.jar  [6] or another StAX implementation
+- stax2-api-3.0.1.jar [6] for woodstox above
 - wsdl4j.jar
 
 The following jars are required for XML catalog support:
@@ -33,6 +34,7 @@ For Java2WSDL and WSDL2Java:
 - The above jars
 - jaxb-xjc.jar
 - velocity.jar
+- oro.jar
 - commons-collections.jar
 - commons-lang.jar
 
@@ -82,6 +84,7 @@ For JAX-RS support:
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
 - spring-jms.jar
+- spring-tx.jar
 
 For CORBA support:
 - antlr.jar

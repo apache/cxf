@@ -310,5 +310,17 @@
             </plugin>
         </plugins>
     </build>
-
+    <profiles>
+        <profile>
+            <id>jdk15</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <jaxb.version>${jaxb22.version}</jaxb.version>
+                <jaxb.impl.version>${jaxb22.impl.version}</jaxb.impl.version>
+                <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
+            </properties>
+        </profile>
+    </profiles>
 </project>
