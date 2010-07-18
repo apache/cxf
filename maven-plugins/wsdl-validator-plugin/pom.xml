@@ -3,7 +3,7 @@
     <groupId>org.apache.cxf</groupId>
     <artifactId>cxf-wsdl-validator-plugin</artifactId>
     <packaging>maven-plugin</packaging>
-    <version>2.3.0-servlet3jetty7-SNAPSHOT</version>
+    <version>2.3.0-SNAPSHOT</version>
     <name>Apache CXF WSDL Validator Maven2 Plugin</name>
     <url>http://cxf.apache.org</url>
 
@@ -11,7 +11,7 @@
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
-        <version>2.3.0-servlet3jetty7-SNAPSHOT</version>
+        <version>2.3.0-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
