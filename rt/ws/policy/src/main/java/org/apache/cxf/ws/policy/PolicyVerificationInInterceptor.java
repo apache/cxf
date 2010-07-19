@@ -21,7 +21,10 @@ package org.apache.cxf.ws.policy;
 
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.Bus;
+import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.message.Exchange;
@@ -92,8 +95,19 @@ public class PolicyVerificationInInterceptor extends AbstractPolicyInterceptor {
                 effectivePolicy = pe.getEffectiveServerRequestPolicy(ei, boi);
             }
         }
-                
-        aim.checkEffectivePolicy(effectivePolicy.getPolicy());
+        try {
+            aim.checkEffectivePolicy(effectivePolicy.getPolicy());
+        } catch (PolicyException ex) {
+            //To check if there is ws addressing policy violation and throw WSA specific 
+            //exception to pass jaxws2.2 tests
+            if (ex.getMessage().indexOf("Addressing") > -1) {
+                throw new SoapFault("A required header representing a Message Addressing Property " 
+                                    + "is not present",
+                                    new QName("http://www.w3.org/2005/08/addressing", 
+                                              "MessageAddressingHeaderRequired"));
+            }
+            throw ex;
+        }
         LOG.fine("Verified policies for inbound message.");
     }
 
