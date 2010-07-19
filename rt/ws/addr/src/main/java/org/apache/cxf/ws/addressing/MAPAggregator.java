@@ -40,6 +40,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
+import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
@@ -300,7 +301,49 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         } 
         return false;
     }
-    
+
+   
+    private WSAddressingFeature getWSAddressingFeature(Message message) {
+        if (message.getExchange() != null && message.getExchange().getEndpoint() != null) {
+            Endpoint endpoint = message.getExchange().getEndpoint();
+            if (endpoint.getActiveFeatures() != null) {
+                for (AbstractFeature feature : endpoint.getActiveFeatures()) {
+                    if (feature instanceof WSAddressingFeature) {
+                        return (WSAddressingFeature)feature;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * If the isRequestor(message) == true and isAddressRequired() == false
+     * Assert all the wsa related assertion to true
+     * 
+     * @param message the current message
+     */
+    private void assertAddressing(Message message) {
+        AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+        if (null == aim) {
+            return;
+        }
+        QName[] types = new QName[] {
+            MetadataConstants.ADDRESSING_ASSERTION_QNAME, MetadataConstants.USING_ADDRESSING_2004_QNAME,
+            MetadataConstants.USING_ADDRESSING_2005_QNAME, MetadataConstants.USING_ADDRESSING_2006_QNAME
+        };
+
+        for (QName type : types) {
+            assertAssertion(aim, type);
+            if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME)) {
+                assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME);
+                assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME);
+            } else if (type.equals(MetadataConstants.ADDRESSING_ASSERTION_QNAME_0705)) {
+                assertAssertion(aim, MetadataConstants.ANON_RESPONSES_ASSERTION_QNAME_0705);
+                assertAssertion(aim, MetadataConstants.NON_ANON_RESPONSES_ASSERTION_QNAME_0705);
+            }
+        }
+    }
+
     /**
      * Asserts all Addressing assertions for the current message, regardless their nested 
      * Policies.
@@ -467,6 +510,13 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 ContextUtils.retrieveMAPs(message, false, ContextUtils.isOutbound(message));
             if (null != theMaps) {            
                 assertAddressing(message, theMaps.getReplyTo(), theMaps.getFaultTo());
+            }
+            // If the wsa policy is enabled , but the client sets the
+            // WSAddressingFeature.isAddressingRequired to false , we need to assert all WSA assertion to true
+            if (!ContextUtils.isOutbound(message) && ContextUtils.isRequestor(message)
+                && getWSAddressingFeature(message) != null
+                && !getWSAddressingFeature(message).isAddressingRequired()) {
+                assertAddressing(message);
             }
         }
         return continueProcessing;
