@@ -162,8 +162,14 @@ public class UriBuilderImpl extends UriBuilder {
         // is promising unfortunatley it causes the loss of encoded reserved values such as +,
         // which might cause problems if consumers do rely on URLEncoder which would turn '+' into
         // ' ' or would break the contract in when query parameters are expected to have %2B 
-        
+        if (values == null) {
+            throw new IllegalArgumentException("Template parameter values are set to null");
+        }
         for (int i = 0; i < values.length; i++) {
+            if (values[i] == null) {
+                throw new IllegalArgumentException("Template parameter value is set to null");
+            }
+            
             values[i] = HttpUtils.encodePartiallyEncoded(values[i].toString(), false);
         }
         return doBuild(true, values);
