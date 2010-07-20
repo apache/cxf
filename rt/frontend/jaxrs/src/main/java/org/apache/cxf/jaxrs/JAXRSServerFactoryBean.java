@@ -109,6 +109,9 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
                 ep.put("org.apache.cxf.jaxrs.comparator", rc);
             }
             checkPrivateEndpoint(ep);
+            
+            applyFeatures();
+            
             if (start) {
                 server.start();
             }
@@ -122,7 +125,6 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
             throw new ServiceConstructionException(e);
         }
 
-        applyFeatures();
         return server;
     }
 
