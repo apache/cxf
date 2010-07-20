@@ -126,6 +126,18 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", "http://bar/", newUri.toString());
     }
     
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullPathWithBuildEncoded() throws Exception {
+        URI uri = new URI("http://bar");
+        new UriBuilderImpl(uri).path("{bar}").buildFromEncoded((Object[])null);
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testNullPathWithBuildEncoded2() throws Exception {
+        URI uri = new URI("http://bar");
+        new UriBuilderImpl(uri).path("{bar}").buildFromEncoded(new Object[] {null});
+    }
+    
     @Test
     public void testPathTrailingSlash2() throws Exception {
         URI uri = new URI("http://bar");
