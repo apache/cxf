@@ -67,5 +67,25 @@ public class WSAddressingFeature extends AbstractFeature {
         mapAggregator.setAddressingRequired(required);
     }
     
-    
+    /**
+     * Returns the cache used to enforce duplicate message IDs when
+     * {@link #isAllowDuplicates()} returns {@code false}.
+     *
+     * @return the cache used to enforce duplicate message IDs
+     */
+    public MessageIdCache getMessageIdCache() {
+        return mapAggregator.getMessageIdCache();
+    }
+
+    /**
+     * Sets the cache used to enforce duplicate message IDs when
+     * {@link #isAllowDuplicates()} returns {@code false}.
+     *
+     * @param messageIdCache the cache to use
+     *
+     * @throws NullPointerException if {@code messageIdCache} is {@code null}
+     */
+    public void setMessageIdCache(MessageIdCache messageIdCache) {
+        mapAggregator.setMessageIdCache(messageIdCache);
+    }
 }

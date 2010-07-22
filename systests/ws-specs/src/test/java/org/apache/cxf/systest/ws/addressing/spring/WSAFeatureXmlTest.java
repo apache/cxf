@@ -33,6 +33,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.testutil.common.TestUtil;
+import org.apache.cxf.ws.addressing.DefaultMessageIdCache;
 import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.soap.MAPCodec;
 import org.apache.hello_world_soap_http.Greeter;
@@ -82,15 +83,22 @@ public class WSAFeatureXmlTest extends AbstractCXFTest {
     private void checkAddressInterceptors(List<Interceptor> interceptors) {
         boolean hasAg = false;
         boolean hasCodec = false;
+        Object cache = null;
         
         for (Interceptor i : interceptors) {
             if (i instanceof MAPAggregator) {
                 hasAg = true;
+                cache = ((MAPAggregator) i).getMessageIdCache();
             } else if (i instanceof MAPCodec) {
                 hasCodec = true;
             }
         }
+        
+        assertTrue(cache instanceof TestCache);
         assertTrue(hasAg);
         assertTrue(hasCodec);
+    }
+    
+    public static class TestCache extends DefaultMessageIdCache {
     }
 }

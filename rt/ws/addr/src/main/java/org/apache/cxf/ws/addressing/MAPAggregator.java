@@ -25,7 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -81,11 +80,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     
 
     /**
-     * REVISIT: map usage implies that the *same* interceptor instance 
-     * is used in all chains.
+     * The cache to use for enforcing uniqueness.  Defaults to {@link DefaultMessageIdCache}.
      */
-    protected final Map<String, String> messageIDs = 
-        new ConcurrentHashMap<String, String>();
+    private MessageIdCache messageIdCache = new DefaultMessageIdCache();
     
     private boolean usingAddressingAdvisory = true;
     private boolean addressingRequired;
@@ -156,7 +153,31 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         addressingRequired = required;
     }
     
-    
+    /**
+     * Returns the cache used to enforce duplicate message IDs when
+     * {@link #allowDuplicates()} returns {@code false}.
+     *
+     * @return the cache used to enforce duplicate message IDs
+     */
+    public MessageIdCache getMessageIdCache() {
+        return messageIdCache;
+    }
+
+    /**
+     * Sets the cache used to enforce duplicate message IDs when
+     * {@link #allowDuplicates()} returns {@code false}.
+     *
+     * @param messageIdCache the cache to use
+     *
+     * @throws NullPointerException if {@code messageIdCache} is {@code null}
+     */
+    public void setMessageIdCache(MessageIdCache messageIdCache) {
+        if (messageIdCache == null) {
+            throw new NullPointerException("messageIdCache cannot be null.");
+        }
+        this.messageIdCache = messageIdCache;
+    }
+
     /**
      * Invoked for normal processing of inbound and outbound messages.
      *
@@ -954,8 +975,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             if (!allowDuplicates) {
                 AttributedURIType messageID = maps.getMessageID();
                 if (messageID != null
-                    && messageIDs.put(messageID.getValue(), 
-                                      messageID.getValue()) != null) {
+                    && !messageIdCache.checkUniquenessAndCacheId(messageID.getValue())) {
                     LOG.log(Level.WARNING,
                             "DUPLICATE_MESSAGE_ID_MSG",
                             messageID.getValue());

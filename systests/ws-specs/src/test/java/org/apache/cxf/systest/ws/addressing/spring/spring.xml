@@ -30,14 +30,16 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   
   <jaxws:server id="server" abstract="true">
     <jaxws:features>
-      <wsa:addressing allowDuplicates="false"/>
+      <wsa:addressing allowDuplicates="false" messageIdCache="#cache"/>
     </jaxws:features>
   </jaxws:server>
   
   <jaxws:client id="client" abstract="true">
     <jaxws:features>
-      <wsa:addressing allowDuplicates="false"/>
+      <wsa:addressing allowDuplicates="false" messageIdCache="#cache"/>
     </jaxws:features>
   </jaxws:client>  
   
+  <bean id="cache"
+        class="org.apache.cxf.systest.ws.addressing.spring.WSAFeatureXmlTest$TestCache"/>
 </beans>
