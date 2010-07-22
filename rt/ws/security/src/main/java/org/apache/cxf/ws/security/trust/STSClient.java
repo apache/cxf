@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.trust;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.net.URL;
 import java.security.PublicKey;
 import java.security.cert.X509Certificate;
@@ -139,6 +140,8 @@ public class STSClient implements Configurable, InterceptorProvider {
 
     boolean isSecureConv;
     int ttl = 300;
+    
+    Object actAs;
 
     Map<String, Object> ctx = new HashMap<String, Object>();
     
@@ -268,6 +271,11 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setEndpointQName(QName qn) {
         endpointName = qn;
     }
+    
+    public void setActAs(Object actAs) {
+        this.actAs = actAs;
+    }
+    
     public void setKeySize(int i) {
         keySize = i;
     }
@@ -451,6 +459,9 @@ public class STSClient implements Configurable, InterceptorProvider {
             StaxUtils.copy(el, writer);
             writer.writeEndElement();
         }
+        
+        addActAs(writer);
+        
         writer.writeEndElement();
 
         Object obj[] = client.invoke(boi, new DOMSource(writer.getDocument().getDocumentElement()));
@@ -696,6 +707,35 @@ public class STSClient implements Configurable, InterceptorProvider {
             writer.writeEndElement();
             writer.writeEndElement();
             writer.writeEndElement();
+        }
+    }
+    
+    private void addActAs(W3CDOMStreamWriter writer) throws Exception {
+        if (this.actAs != null) {
+            final boolean isString = this.actAs instanceof String;
+            final boolean isElement = this.actAs instanceof Element; 
+            if (isString || isElement) {
+                final Element actAsEl;
+                
+                if (isString) {
+                    final Document acAsDoc =
+                        DOMUtils.readXml(new StringReader((String) this.actAs));
+                    actAsEl = acAsDoc.getDocumentElement();
+                } else {
+                    actAsEl = (Element) this.actAs;
+                }
+                
+                writer.writeStartElement(STSUtils.WST_NS_08_02, "ActAs");
+                
+                // Unlikely to ever be otherwise, but still prudent to check.
+                if (actAsEl.getOwnerDocument() != writer.getDocument()) {
+                    writer.getDocument().adoptNode(actAsEl);
+                }
+                
+                writer.getCurrentNode().appendChild(actAsEl);
+                
+                writer.writeEndElement();
+            }
         }
     }
 
