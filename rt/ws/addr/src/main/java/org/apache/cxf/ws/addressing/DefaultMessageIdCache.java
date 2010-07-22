@@ -16,17 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.addressing.spring;
+package org.apache.cxf.ws.addressing;
 
-import org.w3c.dom.Element;
+import java.util.Set;
 
-import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
+import org.apache.mina.util.ConcurrentHashSet;
 
-public class AddressingBeanDefinitionParser extends AbstractBeanDefinitionParser {
-
-    @Override
-    protected Class getBeanClass(Element arg0) {
-        return WSAddressingFeature.class;
+/**
+ * An implementation that uses a simple set to store received message IDs.
+ * Note that this implementation does not make any attempt to flush older
+ * message IDs or to persist the message IDs outside of this instance. 
+ */
+public class DefaultMessageIdCache implements MessageIdCache {
+    
+    /**
+     * The set of message IDs.
+     */
+    private final Set<String> messageIdSet = new ConcurrentHashSet<String>();  
+    
+    public boolean checkUniquenessAndCacheId(String messageId) {
+        return this.messageIdSet.add(messageId);
+    }
+    
+    protected Set<String> getMessageIdSet() {
+        return this.messageIdSet;
     }
 }

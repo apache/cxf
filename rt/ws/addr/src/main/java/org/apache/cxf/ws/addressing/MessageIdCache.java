@@ -16,17 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.addressing.spring;
+package org.apache.cxf.ws.addressing;
 
-import org.w3c.dom.Element;
-
-import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.apache.cxf.ws.addressing.WSAddressingFeature;
-
-public class AddressingBeanDefinitionParser extends AbstractBeanDefinitionParser {
-
-    @Override
-    protected Class getBeanClass(Element arg0) {
-        return WSAddressingFeature.class;
-    }
+/**
+ * Interface abstracting various ID caches for enforcement of ID uniqueness.
+ */
+public interface MessageIdCache {
+    
+    /**
+     * Check {@code messageId} for uniqueness against previously
+     * encountered values and cache the ID.  Note that the retention
+     * policy for previously encountered values is implementation specific.
+     * 
+     * @param messageId the message ID to check for uniqueness and cache for
+     *                  future comparison
+     *
+     * @return true if and only if {@code messageId} is not already in the
+     *         cache
+     */
+    boolean checkUniquenessAndCacheId(String messageId);
 }

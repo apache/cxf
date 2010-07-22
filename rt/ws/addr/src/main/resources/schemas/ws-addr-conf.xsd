@@ -30,6 +30,7 @@
            <xs:attribute name="allowDuplicates" type="xs:boolean"/>
            <xs:attribute name="usingAddressingAdvisory" type="xs:boolean"/>
            <xs:attribute name="addressingRequired" type="xs:boolean"/>
+           <xs:attribute name="messageIdCache" type="xs:string"/>
         </xs:complexType>
     </xs:element>
     

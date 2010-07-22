@@ -253,7 +253,7 @@ public class MAPAggregatorTest extends Assert {
 
     @Test(expected = SoapFault.class)
     public void testResponderInboundInvalidMAPs() throws Exception {
-        aggregator.messageIDs.put("urn:uuid:12345", "urn:uuid:12345");
+        aggregator.getMessageIdCache().checkUniquenessAndCacheId("urn:uuid:12345");
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, false);
@@ -263,7 +263,7 @@ public class MAPAggregatorTest extends Assert {
 
     @Test(expected = SoapFault.class)
     public void testResponderInboundInvalidMAPsFault() throws Exception {
-        aggregator.messageIDs.put("urn:uuid:12345", "urn:uuid:12345");
+        aggregator.getMessageIdCache().checkUniquenessAndCacheId("urn:uuid:12345");
         Message message = setUpMessage(false, false, false, false, false, false, true);
         aggregator.setAllowDuplicates(false);
         aggregator.mediate(message, true);
@@ -574,7 +574,8 @@ public class MAPAggregatorTest extends Assert {
                 setUpRebase(message, exchange);
             }
         }
-        if (outbound || aggregator.messageIDs.size() > 0) {
+        if (outbound || ((DefaultMessageIdCache) aggregator.getMessageIdCache())
+            .getMessageIdSet().size() > 0) {
             if (!zeroLengthAction) {
                 Method method = SEI.class.getMethod("op", new Class[0]);
                 setUpMethod(message, exchange, method);
