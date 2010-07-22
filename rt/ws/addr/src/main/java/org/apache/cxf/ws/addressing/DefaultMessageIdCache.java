@@ -18,9 +18,9 @@
  */
 package org.apache.cxf.ws.addressing;
 
+import java.util.Map;
 import java.util.Set;
-
-import org.apache.mina.util.ConcurrentHashSet;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * An implementation that uses a simple set to store received message IDs.
@@ -32,13 +32,14 @@ public class DefaultMessageIdCache implements MessageIdCache {
     /**
      * The set of message IDs.
      */
-    private final Set<String> messageIdSet = new ConcurrentHashSet<String>();  
+    private final Map<String, Boolean> messageIdSet = 
+        new ConcurrentHashMap<String, Boolean>();  
     
     public boolean checkUniquenessAndCacheId(String messageId) {
-        return this.messageIdSet.add(messageId);
+        return this.messageIdSet.put(messageId, Boolean.TRUE) == null;
     }
     
     protected Set<String> getMessageIdSet() {
-        return this.messageIdSet;
+        return this.messageIdSet.keySet();
     }
 }
