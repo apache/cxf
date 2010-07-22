@@ -80,6 +80,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
             client.setEndpointName(ep.getEndpointInfo().getName().toString() + ".sts-client");
             client.setBeanName(ep.getEndpointInfo().getName().toString() + ".sts-client");
         }
+        
+        // Transpose ActAs info from original request to the STS client.
+        client.setActAs(message.getContextualProperty(SecurityConstants.STS_TOKEN_ACT_AS));
+        
         return client;
     }
     static class IssuedTokenOutInterceptor extends AbstractPhaseInterceptor<Message> {
