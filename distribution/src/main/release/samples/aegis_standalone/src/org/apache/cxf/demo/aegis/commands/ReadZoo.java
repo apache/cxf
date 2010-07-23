@@ -20,6 +20,7 @@
 package org.apache.cxf.demo.aegis.commands;
 
 import java.io.FileInputStream;
+import java.lang.reflect.Type;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -48,7 +49,7 @@ public final class ReadZoo {
         AegisContext context;
 
         context = new AegisContext();
-        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        Set<Type> rootClasses = new HashSet<Type>();
         rootClasses.add(Zoo.class);
         context.setRootClasses(rootClasses);
         context.initialize();

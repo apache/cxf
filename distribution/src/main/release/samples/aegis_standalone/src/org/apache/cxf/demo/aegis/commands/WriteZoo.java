@@ -32,7 +32,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.aegis.AegisContext;
 import org.apache.cxf.aegis.AegisWriter;
-import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.demo.aegis.types.Animal;
 import org.apache.cxf.demo.aegis.types.Zoo;
 
@@ -54,7 +54,7 @@ public final class WriteZoo {
 
         context = new AegisContext();
         context.setWriteXsiTypes(true);
-        Set<Class<?>> rootClasses = new HashSet<Class<?>>();
+        Set<java.lang.reflect.Type> rootClasses = new HashSet<java.lang.reflect.Type>();
         rootClasses.add(Zoo.class);
         context.setRootClasses(rootClasses);
         context.initialize();
@@ -64,7 +64,7 @@ public final class WriteZoo {
         IndentingXMLStreamWriter indentWriter = new IndentingXMLStreamWriter(xmlWriter);
 
         Zoo zoo = populateZoo();
-        Type aegisType = context.getTypeMapping().getType(zoo.getClass());
+        AegisType aegisType = context.getTypeMapping().getType(zoo.getClass());
         writer.write(zoo, new QName("urn:aegis:demo", "zoo"), false, indentWriter, aegisType);
         xmlWriter.close();
         output.close();
