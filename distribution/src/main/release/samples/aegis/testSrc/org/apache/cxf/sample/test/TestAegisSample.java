@@ -17,29 +17,26 @@
  * under the License.
  */
 
-package demo.hw.server;
+package org.apache.cxf.sample.test;
 
-import org.apache.cxf.aegis.databinding.AegisDatabinding;
-import org.apache.cxf.frontend.ServerFactoryBean;
+import demo.hw.client.Client;
+import demo.hw.server.Server;
 
-public class Server {
+import org.junit.BeforeClass;
+import org.junit.Test;
 
-    public Server() throws Exception {
-        HelloWorldImpl helloworldImpl = new HelloWorldImpl();
-        ServerFactoryBean svrFactory = new ServerFactoryBean();
-        svrFactory.setServiceClass(HelloWorld.class);
-        svrFactory.setAddress("http://localhost:9000/Hello");
-        svrFactory.setServiceBean(helloworldImpl);
-        svrFactory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        svrFactory.create();
-    }
-
-    public static void main(String args[]) throws Exception {
+/**
+ * 
+ */
+public class TestAegisSample {
+    @BeforeClass
+    public static void startServer() throws Exception {
         new Server();
-        System.out.println("Server ready...");
-
-        Thread.sleep(5 * 60 * 1000);
-        System.out.println("Server exiting");
-        System.exit(0);
     }
+    
+    @Test
+    public void testClient() throws Exception {
+        Client.main(null);
+    }
+
 }

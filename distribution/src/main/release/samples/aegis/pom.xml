@@ -32,6 +32,7 @@
             </resource>
         </resources>
         <sourceDirectory>src</sourceDirectory>
+	<testSourceDirectory>testSrc</testSourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -39,6 +40,13 @@
                     <source>1.5</source>
                     <target>1.5</target>
                 </configuration>
+            </plugin>
+            <plugin>
+                <artifactId>maven-surefire-plugin</artifactId>
+				<version>2.5</version>
+				<configuration>
+					<forkMode>always</forkMode>
+				</configuration>
             </plugin>
         </plugins>
     </build>
@@ -135,11 +143,17 @@
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-        <!-- Jetty is needed if you're using the CXFServlet -->
+        <!-- The server example in here launches the embedded jetty. Not needed
+	     if you deploy a WAR. -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
             <version>${cxf.version}</version>
         </dependency>
+	<dependency>
+	  <groupId>junit</groupId>
+	  <artifactId>junit</artifactId>
+	  <version>4.8.1</version>
+	</dependency>
     </dependencies>
 </project>
