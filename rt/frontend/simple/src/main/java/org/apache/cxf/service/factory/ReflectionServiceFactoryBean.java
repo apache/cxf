@@ -48,6 +48,7 @@ import java.util.logging.Logger;
 
 import javax.wsdl.Operation;
 import javax.xml.bind.annotation.XmlAttachmentRef;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -1371,6 +1372,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 }
                 if (anno instanceof XmlJavaTypeAdapter) {
                     map.put(XmlJavaTypeAdapter.class, true);
+                }
+                if (anno instanceof XmlElementWrapper) {
+                    map.put(XmlElementWrapper.class, true);
                 }
             }
         }

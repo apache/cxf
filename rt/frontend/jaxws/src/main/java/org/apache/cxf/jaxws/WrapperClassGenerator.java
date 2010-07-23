@@ -33,6 +33,7 @@ import java.util.logging.Logger;
 
 import javax.xml.bind.annotation.XmlAttachmentRef;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlMimeType;
 import javax.xml.bind.annotation.XmlNsForm;
@@ -102,7 +103,8 @@ public final class WrapperClassGenerator extends ASMHelper {
                 if (anno.annotationType() == XmlList.class 
                     || anno.annotationType() == XmlAttachmentRef.class
                     || anno.annotationType() == XmlJavaTypeAdapter.class
-                    || anno.annotationType() == XmlMimeType.class) {
+                    || anno.annotationType() == XmlMimeType.class
+                    || anno.annotationType() == XmlElementWrapper.class) {
                     list.add(anno);
                 }
             }
@@ -395,7 +397,14 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0.visit("defaultValue", el.defaultValue());
                 av0.visit("type", el.type());
                 av0.visitEnd(); 
-                
+            } else if (ann instanceof XmlElementWrapper) {
+                XmlElementWrapper el = (XmlElementWrapper)ann;
+                av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElementWrapper;", true);
+                av0.visit("name", el.name());
+                av0.visit("nillable", el.nillable());
+                av0.visit("requried", el.required());
+                av0.visit("namespace", el.namespace());
+                av0.visitEnd(); 
             }
         }
         return addedEl;
