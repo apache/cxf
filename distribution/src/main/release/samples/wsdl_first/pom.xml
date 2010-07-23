@@ -25,6 +25,7 @@
     <name>WSDL first demo using Document/Literal Style</name>
     <properties>
         <cxf.version>[2,)</cxf.version>
+	<cxf.release.base>../..</cxf.release.base>
     </properties>
     <build>
         <resources>
@@ -40,7 +41,7 @@
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
                     <configuration>
-                        <webXml>../../etc/web.xml</webXml>
+                        <webXml>${cxf.release.base}/etc/web.xml</webXml>
                         <webResources>
                             <resource>
                                 <directory>wsdl</directory>

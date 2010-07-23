@@ -42,6 +42,7 @@
 		    <mavenOpts>-Xmx2g -XX:MaxPermSize=256m</mavenOpts>
 		    <properties>
 		      <cxf.version>${project.version}</cxf.version>
+		      <cxf.release.base>${basedir}/../distribution/src/main/release</cxf.release.base>
 		    </properties>
                 </configuration>
                 <executions>
