@@ -34,7 +34,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.logging.Level;
@@ -422,7 +421,7 @@ public class DynamicClientFactory {
             num++;
         }
         
-        if (simpleBindingEnabled && isJaxb21(compiler)) {
+        if (simpleBindingEnabled) {
             String id = "/org/apache/cxf/endpoint/dynamic/simple-binding.xjb";
             LOG.info("Loading the JAXB 2.1 simple binding for client.");
             InputSource source = new InputSource(getClass().getResourceAsStream(id));
@@ -431,32 +430,6 @@ public class DynamicClientFactory {
         }
     }
     
-    private boolean isJaxb21(SchemaCompiler sc) {
-        String id = sc.getOptions().getBuildID();
-        StringTokenizer st = new StringTokenizer(id, ".");
-        String minor = null;
-        
-        // major version
-        if (st.hasMoreTokens()) {
-            st.nextToken();
-        }
-        
-        if (st.hasMoreTokens()) {
-            minor = st.nextToken();
-        }
-        
-        try {
-            int i = Integer.valueOf(minor);
-            if (i >= 1) {
-                return true;
-            }
-        } catch (NumberFormatException e) {
-            // do nothing;
-        }
-        
-        return false;
-    }
-
     public boolean isSimpleBindingEnabled() {
         return simpleBindingEnabled;
     }
