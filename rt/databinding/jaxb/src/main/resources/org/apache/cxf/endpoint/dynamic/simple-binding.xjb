@@ -23,7 +23,7 @@
 -->
 <jaxb:bindings
   xmlns:jaxb="http://java.sun.com/xml/ns/jaxb" jaxb:version="2.0"
-  xmlns:xjc= "http://java.sun.com/xml/ns/jaxb/xjc" jaxb:extensionBindingPrefixes="xjc">
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc" jaxb:extensionBindingPrefixes="xjc">
   
   <jaxb:globalBindings generateElementProperty="false">
     <xjc:simple />

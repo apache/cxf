@@ -42,7 +42,9 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.namespace.QName;
+import javax.xml.stream.XMLStreamException;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.xml.sax.EntityResolver;
@@ -73,6 +75,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.staxutils.StaxUtils;
 /**
  * This class reads a WSDL and creates a dynamic client from it.
  * 
@@ -420,13 +423,15 @@ public class DynamicClientFactory {
             compiler.parseSchema(key, el);
             num++;
         }
-        
         if (simpleBindingEnabled) {
             String id = "/org/apache/cxf/endpoint/dynamic/simple-binding.xjb";
-            LOG.info("Loading the JAXB 2.1 simple binding for client.");
-            InputSource source = new InputSource(getClass().getResourceAsStream(id));
-            source.setSystemId(id);
-            compiler.parseSchema(source);
+            LOG.fine("Loading the JAXB 2.1 simple binding for client.");
+            try {
+                Document doc = StaxUtils.read(getClass().getResourceAsStream(id));
+                compiler.parseSchema(id, doc.getDocumentElement());
+            } catch (XMLStreamException e) {
+                LOG.log(Level.WARNING, "Could not parse simple-binding.xsd", e);
+            }
         }
     }
     
