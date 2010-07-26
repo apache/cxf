@@ -360,8 +360,21 @@ public final class JAXRSUtils {
             return ori;
         }
         
-        int status = pathMatched == 0 ? 404 : methodMatched == 0 ? 405 
-                     : consumeMatched == 0 ? 415 : produceMatched == 0 ? 406 : 404;
+        int status;
+        
+        if (pathMatched == 0) {
+            status = 404;
+        } else if (methodMatched == 0) {
+            status = 405;
+        } else if (consumeMatched == 0) {
+            status = 415;
+        } else if (produceMatched == 0) {
+            status = 406;
+        } else {
+            // this branch should not even be executed 
+            status = 404;
+        }
+        
         String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 

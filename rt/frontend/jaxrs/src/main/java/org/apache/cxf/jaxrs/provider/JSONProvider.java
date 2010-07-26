@@ -263,6 +263,7 @@ public class JSONProvider extends AbstractJAXBProvider  {
             
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
                 actualClass = InjectionUtils.getActualType(genericType);
+                actualClass = getActualType(actualClass, genericType, anns);
                 marshalCollection(cls, actualObject, actualClass, genericType, encoding, os, m);
             } else {
                 marshal(actualObject, actualClass, genericType, encoding, os);

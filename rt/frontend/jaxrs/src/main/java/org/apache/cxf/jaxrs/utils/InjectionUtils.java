@@ -860,7 +860,7 @@ public final class InjectionUtils {
             if (m.getName().startsWith("get") && m.getParameterTypes().length == 0 
                 && m.getName().length() > 3) {
                 String propertyName = m.getName().substring(3).toLowerCase();
-                if ("class".equals(propertyName) 
+                if (m.getReturnType() == Class.class
                     || checkIgnorable && canPropertyBeIgnored(m, propertyName)) {
                     continue;
                 }
