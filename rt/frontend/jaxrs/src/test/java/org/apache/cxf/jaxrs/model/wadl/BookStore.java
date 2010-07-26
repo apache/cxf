@@ -145,6 +145,10 @@ public class BookStore {
             return bean;
         }
         
+        public TestEnum getE() {
+            return TestEnum.A;
+        }
+        
     }
     
     public static class QueryBean2 {
@@ -178,5 +182,9 @@ public class BookStore {
         public int getB() {
             return b;
         }
+    }
+    
+    public static enum TestEnum {
+        A;        
     }
 }
