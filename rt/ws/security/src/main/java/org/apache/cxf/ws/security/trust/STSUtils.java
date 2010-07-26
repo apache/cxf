@@ -48,9 +48,12 @@ import org.apache.neethi.Policy;
  * 
  */
 public final class STSUtils {
+    /**
+     * WS-T 1.0 Namespace.
+     */
     public static final String WST_NS_05_02 = "http://schemas.xmlsoap.org/ws/2005/02/trust";
     /**
-     * WS-T 1.3 Namespace
+     * WS-T 1.3 Namespace.
      */
     public static final String WST_NS_05_12 = "http://docs.oasis-open.org/ws-sx/ws-trust/200512";
     /**
