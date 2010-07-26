@@ -20,12 +20,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first</artifactId>
-    <version>1.0</version>
     <packaging>war</packaging>
     <name>WSDL first demo using Document/Literal Style</name>
+    <parent>
+        <groupId>org.apache.cxf.samples</groupId>
+        <artifactId>cxf-samples</artifactId>
+        <version>2.3.0-SNAPSHOT</version>
+    </parent>
     <properties>
-        <cxf.version>[2,)</cxf.version>
-	<cxf.release.base>../..</cxf.release.base>
+        <cxf.version>${project.version}</cxf.version>
+        <cxf.release.base>${basedir}/../..</cxf.release.base>
     </properties>
     <build>
         <resources>
@@ -73,7 +77,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>LATEST</version>
+                <version>${project.version}</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -146,35 +150,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>snapshots</id>
-            <repositories>
-                <repository>
-                    <id>apache-snapshots</id>
-                    <name>Apache SNAPSHOT Repository</name>
-                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>apache-snapshots</id>
-                    <name>Apache Maven Plugin Snapshots</name>
-                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
     </profiles>
 
     <dependencies>
@@ -198,6 +173,7 @@
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.7</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

@@ -466,5 +466,12 @@
                 <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
             </properties>
         </profile>
+        <profile>
+            <!-- build the samples as well to make sure they really do build -->
+            <id>everything</id>
+            <modules>
+                <module>src/main/release/samples</module>
+            </modules>
+        </profile>
     </profiles>
 </project>

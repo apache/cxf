@@ -18,12 +18,12 @@
  */
 package demo.spring.servlet;
 
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 public class Server {
 
@@ -37,7 +37,7 @@ public class Server {
          * as a convenience so you do not need to configure your servlet
          * container to see CXF in action!
          */
-        org.mortbay.jetty.Server server = new org.mortbay.jetty.Server();
+        org.eclipse.jetty.server.Server server = new org.eclipse.jetty.server.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
         connector.setPort(9002);

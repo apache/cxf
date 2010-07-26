@@ -1,0 +1,129 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf.samples</groupId>
+    <artifactId>cxf-samples</artifactId>
+    <packaging>pom</packaging>
+    <version>2.3.0-SNAPSHOT</version>
+    <name>Apache CXF Runtime</name>
+    <url>http://cxf.apache.org</url>
+
+    <parent>
+        <groupId>org.apache.cxf</groupId>
+        <artifactId>cxf-parent</artifactId>
+        <version>2.3.0-SNAPSHOT</version>
+    </parent>
+
+    <properties>
+        <!-- don't deploy the samples, kind of pointless -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+
+        <!-- for now -->
+        <pmd.skip>true</pmd.skip>
+        <checkstyle.skip>true</checkstyle.skip>
+    </properties>
+
+    <modules>
+        <module>in_jvm_transport</module>
+        <module>js_browser_client_simple</module>
+        <module>js_browser_client_java_first</module>
+        <module>java_first_jaxws_factory_bean</module>
+        <module>jax_rs/content_negotiation</module>
+        <module>jax_rs/basic_https</module>
+        <module>jax_rs/basic</module>
+        <module>callback</module>
+        <module>wsdl_first_pure_xml</module>
+        <module>jaxws_dispatch_provider</module>
+        <module>wsdl_first_xmlbeans</module>
+        <module>wsdl_first_soap12</module>
+        <module>wsdl_first_dynamic_client</module>
+        <module>jms_queue</module>
+        <module>restful_dispatch</module>
+        <module>wsdl_first</module>
+        <module>aegis_standalone</module>
+        <module>java_first_jaxws</module>
+        <module>ws_rm</module>
+        <module>configuration_interceptor</module>
+        <module>java_first_spring_support</module>
+        <module>ws_security/ut</module>
+        <module>ws_security/ut_sign</module>
+        <module>ws_security/sign_enc</module>
+        <module>ws_security/ut_policy</module>
+        <module>mtom</module>
+        <module>jaxws_async</module>
+        <module>java_first_pojo</module>
+        <module>ws_policy</module>
+        <module>js_client</module>
+        <module>wsdl_first_https</module>
+        <module>ws_addressing</module>
+        <module>soap_header</module>
+        <module>jms-spec-demo</module>
+        <module>wsdl_first_xml_wrapped</module>
+        <module>restful_http_binding</module>
+        <module>aegis</module>
+        <module>jax_server_aegis_client</module>
+        <module>jaxws_handlers</module>
+        <module>wsdl_first_rpclit</module>
+        <module>jms_pubsub</module>
+
+        <!--
+        these are a bit fragile as they need to go off to external sites to get stuff like
+        wsdl's and certs and such
+        -->
+        <!--module>ws_security/interopfest/wssc</module>
+        <module>ws_security/interopfest/wstrust10</module>
+        <module>ws_security/interopfest/wssec10</module>
+        <module>ws_security/interopfest/wssec11</module>
+        <module>ws_security/interopfest/wstrust13</module-->
+    </modules>
+
+
+    <profiles>
+        <profile>
+             <id>snapshots</id>
+             <repositories>
+                 <repository>
+                     <id>apache-snapshots</id>
+                     <name>Apache SNAPSHOT Repository</name>
+                     <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                     <snapshots>
+                         <enabled>true</enabled>
+                     </snapshots>
+                     <releases>
+                         <enabled>false</enabled>
+                     </releases>
+                 </repository>
+             </repositories>
+             <pluginRepositories>
+                 <pluginRepository>
+                     <id>apache-snapshots</id>
+                     <name>Apache Maven Plugin Snapshots</name>
+                     <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                     <releases>
+                         <enabled>false</enabled>
+                     </releases>
+                     <snapshots>
+                         <enabled>true</enabled>
+                     </snapshots>
+                 </pluginRepository>
+             </pluginRepositories>
+         </profile>
+    </profiles>
+</project>

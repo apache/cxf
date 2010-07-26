@@ -21,11 +21,14 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>jax_rs_basic_https</artifactId>
     <name>JAX-RS Basic Demo With HTTPS communications</name>
-    <version>1.0</version>
+    <parent>
+        <groupId>org.apache.cxf.samples</groupId>
+        <artifactId>cxf-samples</artifactId>
+        <version>2.3.0-SNAPSHOT</version>
+    </parent>
     <properties>
-        <cxf.version>[2,)</cxf.version>
+        <cxf.version>${project.version}</cxf.version>
         <httpclient.version>3.1</httpclient.version>
-        <jsr311.version>1.0</jsr311.version>
     </properties>
 
     <build>
@@ -137,35 +140,6 @@
                 </plugins>
             </build>
         </profile>
-        <profile>
-            <id>snapshots</id>
-            <repositories>
-                <repository>
-                    <id>apache-snapshots</id>
-                    <name>Apache SNAPSHOT Repository</name>
-                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                </repository>
-            </repositories>
-            <pluginRepositories>
-                <pluginRepository>
-                    <id>apache-snapshots</id>
-                    <name>Apache Maven Plugin Snapshots</name>
-                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
-                    <releases>
-                        <enabled>false</enabled>
-                    </releases>
-                    <snapshots>
-                        <enabled>true</enabled>
-                    </snapshots>
-                </pluginRepository>
-            </pluginRepositories>
-        </profile>
     </profiles>
     <dependencies>
         <dependency>
@@ -192,7 +166,6 @@
         <dependency>
             <groupId>javax.ws.rs</groupId>
             <artifactId>jsr311-api</artifactId>
-            <version>${jsr311.version}</version>
         </dependency>
     </dependencies>
 </project>
