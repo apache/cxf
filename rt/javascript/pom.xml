@@ -88,8 +88,8 @@
            <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty</artifactId>
+            <groupId>org.eclipse.jetty</groupId>
+            <artifactId>jetty-server</artifactId>
             <version>${jetty.version}</version>
            <scope>test</scope>
         </dependency>       

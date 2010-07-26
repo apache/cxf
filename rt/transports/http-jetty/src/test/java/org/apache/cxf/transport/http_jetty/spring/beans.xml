@@ -68,12 +68,12 @@
 	   <hj:engine port="9001">
 	       <hj:threadingParameters minThreads="99" maxThreads="777"/>	      
 	     <hj:connector>
-           <beans:bean class="org.mortbay.jetty.bio.SocketConnector">
+           <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
               <beans:property name = "port" value="9001" />
            </beans:bean>
          </hj:connector>
          <hj:handlers>
-           <beans:bean class="org.mortbay.jetty.handler.DefaultHandler"/>         
+           <beans:bean class="org.eclipse.jetty.server.handler.DefaultHandler"/>         
          </hj:handlers>
          <hj:sessionSupport>true</hj:sessionSupport>
 	  </hj:engine> 

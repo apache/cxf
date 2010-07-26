@@ -93,7 +93,7 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch controlDoneSignal = new CountDownLatch(5);
         CountDownLatch helloDoneSignal = new CountDownLatch(5);
-        
+
         executor.execute(new ControlWorker(helloPort, "Fred", startSignal, controlDoneSignal));
         executor.execute(new HelloWorker(helloPort, "Fred", "", startSignal, helloDoneSignal));
         
@@ -111,8 +111,8 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         
         startSignal.countDown();
         
-        controlDoneSignal.await(10, TimeUnit.SECONDS);
-        helloDoneSignal.await(10, TimeUnit.SECONDS);
+        controlDoneSignal.await(100, TimeUnit.SECONDS);
+        helloDoneSignal.await(100, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have been resumed", 0, controlDoneSignal.getCount());
         assertEquals("Not all invocations have completed", 0, helloDoneSignal.getCount());

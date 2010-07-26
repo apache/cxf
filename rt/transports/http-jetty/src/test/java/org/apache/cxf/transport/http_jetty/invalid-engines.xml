@@ -40,7 +40,7 @@
 	         <sec:clientAuthentication want="true" required="true"/>
 	    </httpj:tlsServerParameters>
 	    <httpj:connector>
-	       <beans:bean class="org.mortbay.jetty.bio.SocketConnector">
+	       <beans:bean class="org.eclipse.jetty.server.bio.SocketConnector">
               <beans:property name = "port" value="1234" />
            </beans:bean>
 	    </httpj:connector> 

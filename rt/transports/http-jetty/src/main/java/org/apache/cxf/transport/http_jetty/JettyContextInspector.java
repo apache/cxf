@@ -19,7 +19,7 @@
 package org.apache.cxf.transport.http_jetty;
 
 import org.apache.cxf.endpoint.ContextInspector;
-import org.mortbay.jetty.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandler;
 
 public class JettyContextInspector implements ContextInspector {
     

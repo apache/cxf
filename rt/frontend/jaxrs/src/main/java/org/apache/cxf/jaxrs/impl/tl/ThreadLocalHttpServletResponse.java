@@ -21,6 +21,7 @@ package org.apache.cxf.jaxrs.impl.tl;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collection;
 import java.util.Locale;
 
 import javax.servlet.ServletOutputStream;
@@ -172,6 +173,26 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
     public void setLocale(Locale loc) {
         get().setLocale(loc);
         
+    }
+
+    @Override
+    public String getHeader(String name) {
+        return get().getHeader(name);
+    }
+
+    @Override
+    public Collection<String> getHeaderNames() {
+        return get().getHeaderNames();
+    }
+
+    @Override
+    public Collection<String> getHeaders(String headerName) {
+        return get().getHeaders(headerName);
+    }
+
+    @Override
+    public int getStatus() {
+        return get().getStatus();
     }
 
     

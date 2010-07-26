@@ -206,7 +206,6 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         private String path;
         private String servletPath;
         
-        @SuppressWarnings("unchecked")
         public HttpServletRequestFilter(HttpServletRequest request, String path, String servletPath) {
             super(request);
             this.path = path;
@@ -247,7 +246,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         }
         
         @Override
-        public Map getParameterMap() {
+        public Map<String, String[]> getParameterMap() {
             return params;
         }
         

@@ -538,7 +538,7 @@ public class BookStore {
     @Produces("application/xml")
     @Consumes("text/xml")
     public Book addBookCustomFailure(Book book, @Context HttpServletResponse response) {
-        response.setStatus(333);
+        response.setStatus(233);
         response.addHeader("CustomHeader", "CustomValue");
         book.setId(888);
         return book;

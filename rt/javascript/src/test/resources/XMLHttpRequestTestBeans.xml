@@ -41,17 +41,17 @@
 	<httpj:engine-factory bus="cxf">
 		<httpj:engine port="8808">
 			<httpj:handlers>
-				<bean class="org.mortbay.jetty.handler.ContextHandler">
+				<bean class="org.eclipse.jetty.server.handler.ContextHandler">
 					<property name="contextPath" value="/" />
 					<property name="handler">
-						<bean class="org.mortbay.jetty.handler.ResourceHandler">
+						<bean class="org.eclipse.jetty.server.handler.ResourceHandler">
 							<property name="baseResource">
-								<bean class="org.mortbay.resource.FileResource">
+								<bean class="org.eclipse.jetty.util.resource.FileResource">
 									<constructor-arg value="${staticResourceURL}" />
 								</bean>
 							</property>
 							<property name="mimeTypes">
-								<bean class="org.mortbay.jetty.MimeTypes">
+								<bean class="org.eclipse.jetty.http.MimeTypes">
 									<property name="mimeMap">
 									    <map>
 									    	<entry key="html"><value>text/html; charset="utf-8"</value></entry>
@@ -62,7 +62,7 @@
 						</bean>
 					</property>
 				</bean>
-				<bean class="org.mortbay.jetty.handler.DefaultHandler" />
+				<bean class="org.eclipse.jetty.server.handler.DefaultHandler" />
 			</httpj:handlers>
 		</httpj:engine>
 	</httpj:engine-factory>

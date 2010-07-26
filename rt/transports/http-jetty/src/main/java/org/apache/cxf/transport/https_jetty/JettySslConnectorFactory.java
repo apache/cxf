@@ -21,7 +21,7 @@ package org.apache.cxf.transport.https_jetty;
 
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.transport.http_jetty.JettyConnectorFactory;
-import org.mortbay.jetty.AbstractConnector;
+import org.eclipse.jetty.server.AbstractConnector;
 
 /**
  * This class wraps the JettyConnectorFactory and will create 

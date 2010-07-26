@@ -21,7 +21,7 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.net.URL;
 
-import org.mortbay.jetty.Handler;
+import org.eclipse.jetty.server.Handler;
 
 public interface ServerEngine {
     /**

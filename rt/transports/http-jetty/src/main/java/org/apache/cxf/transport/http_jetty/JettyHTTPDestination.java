@@ -34,7 +34,6 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
-import org.apache.cxf.continuations.ContinuationInfo;
 import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.interceptor.Fault;
@@ -46,15 +45,12 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
-import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationWrapper;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
-import org.mortbay.jetty.HttpConnection;
-import org.mortbay.jetty.Request;
-import org.mortbay.util.ajax.Continuation;
-import org.mortbay.util.ajax.ContinuationSupport;
+import org.eclipse.jetty.server.HttpConnection;
+import org.eclipse.jetty.server.Request;
 
 public class JettyHTTPDestination extends AbstractHTTPDestination {
     
@@ -219,6 +215,14 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         Request baseRequest = (req instanceof Request) 
             ? (Request)req : HttpConnection.getCurrentConnection().getRequest();
             
+        if (!"HEAD".equals(req.getMethod())) {
+            //bug in Jetty with persistent connections that if a HEAD is
+            //sent, a _head flag is never reset
+            HttpConnection c = baseRequest.getConnection();
+            if (c != null) {
+                c.getGenerator().setHead(false);
+            }
+        }
         if (getServer().isSetRedirectURL()) {
             resp.sendRedirect(getServer().getRedirectURL());
             resp.flushBuffer();
@@ -294,11 +298,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         if (inMessage == null) {
             
             inMessage = new MessageImpl();
-            if (engine.getContinuationsEnabled()) {
-                inMessage.put(ContinuationProvider.class.getName(), 
-                          new JettyContinuationProvider(req, inMessage));
-            }
-            
             setupMessage(inMessage, context, req, resp);
             
             ((MessageImpl)inMessage).setDestination(this);
@@ -312,17 +311,11 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             incomingObserver.onMessage(inMessage);
             resp.flushBuffer();
             baseRequest.setHandled(true);
-            JettyContinuationProvider p = (JettyContinuationProvider)inMessage
-                .get(ContinuationProvider.class.getName());
-            if (p != null) {
-                //make sure the continuation is stripped down 
-                JettyContinuationWrapper c = p.getContinuation(false);
-                if (c != null) {
-                    c.done();
-                }
-            }
         } catch (SuspendedInvocationException ex) {
-            throw ex.getRuntimeException();
+            if (ex.getRuntimeException() != null) {
+                throw ex.getRuntimeException();
+            }
+            //else nothing to do
         } catch (Fault ex) {
             Throwable cause = ex.getCause();
             if (cause instanceof RuntimeException) {
@@ -339,38 +332,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         }
     }
 
-    protected Message retrieveFromContinuation(HttpServletRequest req) {
-        Message m = null;
-        
-        if (!engine.getContinuationsEnabled()) {
-            return null;
-        }
-        
-        Continuation cont = ContinuationSupport.getContinuation(req, null);
-        synchronized (cont) {
-            Object o = cont.getObject();
-            if (o instanceof ContinuationInfo) {
-                ContinuationInfo ci = (ContinuationInfo)o;
-                m = ci.getMessage();
-                
-                // now that we got the message we don't need ContinuationInfo
-                // as we don't know how continuation was suspended, by jetty wrapper
-                // or directly in which (latter) case we need to ensure that an original user object
-                // if any, need to be restored
-                cont.setObject(ci.getUserObject());
-            }
-            if (m == null && (cont.isPending() || cont.isResumed())) {
-                String message = "No message for existing continuation, status : "
-                    + (cont.isPending() ? "Pending" : "Resumed");
-                if (!(o instanceof ContinuationInfo)) {
-                    message += ", ContinuationInfo object is unavailable";
-                }
-                LOG.warning(message);
-            }
-        }
-        return m;
-    }
-    
     @Override
     public void shutdown() {
         transportFactory.removeDestination(endpointInfo);
@@ -384,5 +345,17 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
    
     private String getStem(String baseURI) {    
         return baseURI.substring(0, baseURI.lastIndexOf("/"));
+    }
+    
+    protected Message retrieveFromContinuation(HttpServletRequest req) {
+        return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+    }
+    protected void setupContinuation(Message inMessage,
+                      final HttpServletRequest req, 
+                      final HttpServletResponse resp) {
+        if (engine.getContinuationsEnabled()) {
+            inMessage.put(ContinuationProvider.class.getName(), 
+                      new JettyContinuationProvider(req, resp, inMessage));
+        }
     }
 }

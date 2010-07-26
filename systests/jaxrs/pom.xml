@@ -68,19 +68,22 @@
           <groupId>org.apache.ant</groupId>
           <artifactId>ant</artifactId>
         </dependency>
+         <dependency>
+       		<groupId>org.eclipse.jetty</groupId>
+       		<artifactId>jetty-server</artifactId>
+        </dependency>
+          <dependency>
+       		<groupId>org.eclipse.jetty</groupId>
+       		<artifactId>jetty-webapp</artifactId>
+        </dependency>
         <dependency>  
-           <groupId>jetty</groupId>  
-           <artifactId>jsp-api</artifactId> 
-           <version>2.1-6.0.2</version>
+           <groupId>org.eclipse.jetty</groupId>  
+           <artifactId>jetty-jsp-2.1</artifactId>
+           <version>${jetty.version}</version>
        </dependency>
-        <dependency>  
-           <groupId>jetty</groupId>  
-           <artifactId>jsp</artifactId> 
-           <version>2.1-6.0.2</version>
-       </dependency> 
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <groupId>${servlet-api.group}</groupId>
+            <artifactId>${servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -151,6 +154,10 @@
             <groupId>org.apache.activemq</groupId>
             <artifactId>activemq-core</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.jetty</groupId>
+        	<artifactId>jetty-server</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

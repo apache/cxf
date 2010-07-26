@@ -21,10 +21,12 @@ package org.apache.cxf.transport.http_jetty;
 import java.io.IOException;
 
 import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.mortbay.jetty.handler.AbstractHandler;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.handler.AbstractHandler;
 
 public class JettyHTTPHandler extends AbstractHandler {
     private String urlName;
@@ -59,17 +61,19 @@ public class JettyHTTPHandler extends AbstractHandler {
         return target.startsWith(pathString);
     }
 
-    public void handle(String target, HttpServletRequest req,
-                       HttpServletResponse resp, int dispatch) throws IOException {
+    @Override
+    public void handle(String target, Request baseRequest, HttpServletRequest request,
+                       HttpServletResponse response) throws IOException, ServletException {
         if (contextMatchExact) {
             if (target.equals(urlName)) {
-                jettyHTTPDestination.doService(servletContext, req, resp);
+                jettyHTTPDestination.doService(servletContext, request, response);
             }
         } else {
             if (target.equals(urlName) || checkContextPath(target)) {
-                jettyHTTPDestination.doService(servletContext, req, resp);
+                jettyHTTPDestination.doService(servletContext, request, response);
             }
         }
+        
     }
 
 

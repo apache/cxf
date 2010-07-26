@@ -43,7 +43,6 @@ import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
-import org.apache.cxf.continuations.ContinuationInfo;
 import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.endpoint.EndpointResolverRegistry;
 import org.apache.cxf.helpers.CastUtils;
@@ -59,6 +58,7 @@ import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -69,13 +69,12 @@ import org.apache.cxf.ws.addressing.JAXWSAConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.easymock.classextension.EasyMock;
+import org.eclipse.jetty.http.HttpFields;
+import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mortbay.jetty.HttpFields;
-import org.mortbay.jetty.Request;
-import org.mortbay.jetty.Response;
-import org.mortbay.util.ajax.Continuation;
 
 public class JettyHTTPDestinationTest extends Assert {
     protected static final String AUTH_HEADER = "Authorization";
@@ -202,56 +201,11 @@ public class JettyHTTPDestinationTest extends Assert {
         }
     }
     
-    @Test
-    public void testRetrieveFromContinuation() throws Exception {
-        
-        Continuation continuation = EasyMock.createMock(Continuation.class);
-        
-        Message m = new MessageImpl();
-        ContinuationInfo ci = new ContinuationInfo(m);
-        Object userObject = new Object();
-        ci.setUserObject(userObject);
-        continuation.getObject();
-        EasyMock.expectLastCall().andReturn(ci);
-        continuation.setObject(ci.getUserObject());
-        EasyMock.expectLastCall();
-        EasyMock.replay(continuation);
-        
-        HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
-        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
-        EasyMock.expectLastCall().andReturn(continuation);
-        EasyMock.replay(httpRequest);
-        
-        ServiceInfo serviceInfo = new ServiceInfo();
-        serviceInfo.setName(new QName("bla", "Service"));
-        EndpointInfo ei = new EndpointInfo(serviceInfo, "");
-        ei.setName(new QName("bla", "Port"));
-        
-        transportFactory = new JettyHTTPTransportFactory();
-        transportFactory.setBus(new CXFBusImpl());
-        
-        TestJettyDestination testDestination = 
-            new TestJettyDestination(transportFactory.getBus(), 
-                                     transportFactory, ei);
-        testDestination.finalizeConfig();
-        Message mi = testDestination.retrieveFromContinuation(httpRequest);
-        assertSame("Message is lost", m, mi);
-        EasyMock.verify(continuation);
-        EasyMock.reset(httpRequest);
-        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
-        EasyMock.expectLastCall().andReturn(null);
-        mi = testDestination.retrieveFromContinuation(httpRequest);
-        assertNotSame("New message expected", m, mi);
-    }
     
     @Test
     public void testContinuationsIgnored() throws Exception {
         
-        Continuation continuation = EasyMock.createMock(Continuation.class);
         HttpServletRequest httpRequest = EasyMock.createMock(HttpServletRequest.class);
-        httpRequest.getAttribute("org.mortbay.jetty.ajax.Continuation");
-        EasyMock.expectLastCall().andReturn(continuation);
-        EasyMock.replay(httpRequest);
         
         ServiceInfo serviceInfo = new ServiceInfo();
         serviceInfo.setName(new QName("bla", "Service"));
@@ -720,8 +674,9 @@ public class JettyHTTPDestinationTest extends Assert {
         request = EasyMock.createMock(Request.class);
         response = EasyMock.createMock(Response.class);
         request.getMethod();
-        EasyMock.expectLastCall().andReturn(method);
-        
+        EasyMock.expectLastCall().andReturn(method).atLeastOnce();
+        request.getConnection();
+        EasyMock.expectLastCall().andReturn(null).anyTimes();
         
         if (setRedirectURL) {
             policy.setRedirectURL(NOWHERE + "foo/bar");
@@ -739,7 +694,10 @@ public class JettyHTTPDestinationTest extends Assert {
             if ("GET".equals(method) && "?wsdl".equals(query)) {
                 verifyGetWSDLQuery();                
             } else { // test for the post
-                EasyMock.expect(request.getMethod()).andReturn(method);            
+                EasyMock.expect(request.getAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE))
+                    .andReturn(null);
+                
+                //EasyMock.expect(request.getMethod()).andReturn(method);            
                 EasyMock.expect(request.getInputStream()).andReturn(is);
                 EasyMock.expect(request.getContextPath()).andReturn("/bar");
                 EasyMock.expect(request.getPathInfo()).andReturn("/foo");
@@ -748,7 +706,7 @@ public class JettyHTTPDestinationTest extends Assert {
                 EasyMock.expect(request.getQueryString()).andReturn(query);    
                 EasyMock.expect(request.getHeader("Accept")).andReturn("*/*");  
                 EasyMock.expect(request.getContentType()).andReturn("text/xml charset=utf8").times(2);
-                EasyMock.expect(request.getAttribute("org.mortbay.jetty.ajax.Continuation")).andReturn(null);
+                EasyMock.expect(request.getAttribute("org.eclipse.jetty.ajax.Continuation")).andReturn(null);
                 
                 HttpFields httpFields = new HttpFields();
                 httpFields.add("content-type", "text/xml");

@@ -25,10 +25,10 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.servlet.Context;
-import org.mortbay.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
 
 public class NoSpringServletServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(NoSpringServletServer.class);
@@ -45,7 +45,8 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             ContextHandlerCollection contexts = new ContextHandlerCollection();
             httpServer.setHandler(contexts);
 
-            Context root = new Context(contexts, "/", Context.SESSIONS);
+            ServletContextHandler root = new ServletContextHandler(contexts, "/",
+                                                                   ServletContextHandler.SESSIONS);
 
             CXFNonSpringServlet cxf = new CXFNonSpringServlet();
             ServletHolder servlet = new ServletHolder(cxf);

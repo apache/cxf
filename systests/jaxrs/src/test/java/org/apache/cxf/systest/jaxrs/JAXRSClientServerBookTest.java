@@ -57,7 +57,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class, true));
+                   launchServer(BookServer.class, false));
     }
     
     
@@ -741,7 +741,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(888L, book.getId());
         Response r = client.getResponse();
         assertEquals("CustomValue", r.getMetadata().getFirst("CustomHeader"));
-        assertEquals(333, r.getStatus());
+        assertEquals(233, r.getStatus());
         assertEquals("application/xml", r.getMetadata().getFirst("Content-Type"));
     }
     

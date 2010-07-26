@@ -21,11 +21,13 @@ package org.apache.cxf.transport.http_jetty;
 
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
+import org.eclipse.jetty.server.handler.ContextHandler;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mortbay.jetty.handler.ContextHandler;
 
 public class JettyContextInspectorTest extends Assert {
     private static final String CONTEXT_PATH = "/foo/bar";

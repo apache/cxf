@@ -57,8 +57,7 @@ For XML Configuration support:
 
 For standalone HTTP support:
 - geronimo-servlet.jar
-- jetty.jar
-- jetty-util.jar
+- jetty-*.jar
 - sl4j.jar & sl4j-jdk14.jar (optional - but improves logging)
  
 For Aegis support:

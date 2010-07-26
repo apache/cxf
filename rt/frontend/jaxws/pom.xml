@@ -134,11 +134,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <groupId>${servlet-api.group}</groupId>
+            <artifactId>${servlet-api.artifact}</artifactId>
             <scope>provided</scope>
         </dependency>        
-
     </dependencies>
 
     <build>

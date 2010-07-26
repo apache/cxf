@@ -79,7 +79,7 @@ public class ClientServerGreeterNoWsdlTest extends AbstractBusClientServerTestBa
         
         assertEquals(200, httpConnection.getResponseCode());
     
-        assertEquals("text/xml; charset=utf-8", httpConnection.getContentType());
+        assertEquals("text/xml;charset=utf-8", httpConnection.getContentType().toLowerCase());
         assertEquals("OK", httpConnection.getResponseMessage());
         
         InputStream in = httpConnection.getInputStream();

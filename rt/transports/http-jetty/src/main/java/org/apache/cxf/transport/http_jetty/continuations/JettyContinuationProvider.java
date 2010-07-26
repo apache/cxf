@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.http_jetty.continuations;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
@@ -28,11 +29,15 @@ import org.apache.cxf.message.Message;
 public class JettyContinuationProvider implements ContinuationProvider {
 
     private HttpServletRequest request;
+    private HttpServletResponse response;
     private Message inMessage; 
     private JettyContinuationWrapper wrapper;
     
-    public JettyContinuationProvider(HttpServletRequest req, Message m) {
+    public JettyContinuationProvider(HttpServletRequest req,
+                                     HttpServletResponse resp, 
+                                     Message m) {
         request = req;
+        response = resp;
         this.inMessage = m;
     }
     public Continuation getContinuation() {
@@ -43,7 +48,7 @@ public class JettyContinuationProvider implements ContinuationProvider {
             return null;
         }
         if (wrapper == null && create) {
-            wrapper = new JettyContinuationWrapper(request, inMessage);
+            wrapper = new JettyContinuationWrapper(request, response, inMessage);
         }
         return wrapper;
     }

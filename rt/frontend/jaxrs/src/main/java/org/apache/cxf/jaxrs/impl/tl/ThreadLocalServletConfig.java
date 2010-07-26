@@ -32,7 +32,7 @@ public class ThreadLocalServletConfig extends AbstractThreadLocalProxy<ServletCo
         return get().getInitParameter(name);
     }
 
-    public Enumeration getInitParameterNames() {
+    public Enumeration<String> getInitParameterNames() {
         return get().getInitParameterNames();
     }
 

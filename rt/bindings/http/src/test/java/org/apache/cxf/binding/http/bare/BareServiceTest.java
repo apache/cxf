@@ -187,7 +187,7 @@ public class BareServiceTest extends AbstractRestTest {
         HttpURLConnection c = (HttpURLConnection)url.openConnection();
         c.setRequestMethod("GET");
 
-        assertEquals("text/xml; charset=utf-8", c.getContentType());
+        assertEquals("text/xml;charset=utf-8", c.getContentType().toLowerCase());
 
         Document doc = DOMUtils.readXml(c.getErrorStream());
         Message msg = new Message("SIMPLE_TYPE", IriDecoderHelper.BUNDLE);
@@ -216,7 +216,7 @@ public class BareServiceTest extends AbstractRestTest {
         HttpURLConnection c = (HttpURLConnection)url.openConnection();
         c.setRequestMethod("GET");
 
-        assertEquals("text/xml; charset=utf-8", c.getContentType());
+        assertEquals("text/xml;charset=utf-8", c.getContentType().toLowerCase());
 
         Document doc = DOMUtils.readXml(c.getInputStream());
         addNamespace("b", "http://bare.http.binding.cxf.apache.org/");

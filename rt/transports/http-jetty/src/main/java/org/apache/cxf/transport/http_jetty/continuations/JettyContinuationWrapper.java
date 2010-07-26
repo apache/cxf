@@ -20,96 +20,75 @@
 package org.apache.cxf.transport.http_jetty.continuations;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.continuations.Continuation;
-import org.apache.cxf.continuations.ContinuationInfo;
-import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
-import org.mortbay.jetty.RetryRequest;
-import org.mortbay.util.ajax.ContinuationSupport;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.eclipse.jetty.continuation.ContinuationListener;
+import org.eclipse.jetty.server.AsyncContext;
+import org.eclipse.jetty.server.Request;
 
-public class JettyContinuationWrapper implements Continuation {
-
-    private org.mortbay.util.ajax.Continuation continuation;
+public class JettyContinuationWrapper implements Continuation, ContinuationListener {
+    boolean isNew;
+    boolean isResumed;
+    boolean isPending = true;
+    Object obj;
+    
     private Message message;
+    private AsyncContext context;
+    private final Request req;
     
-    
-    public JettyContinuationWrapper(HttpServletRequest request, Message m) {
-        continuation = ContinuationSupport.getContinuation(request, null); 
+    public JettyContinuationWrapper(HttpServletRequest request, 
+                                    HttpServletResponse resp, 
+                                    Message m) {
+        req = (Request)request;
         message = m;
+        isNew = !req.isAsyncStarted();
+        if (isNew) {
+            req.setAttribute(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE,
+                             message.getExchange().getInMessage());
+            context = req.startAsync(req, resp);
+            context.addContinuationListener(this);
+        } else {
+            context = req.getAsyncContext();
+        }
     }
 
     public Object getObject() {
-        Object o = continuation.getObject();
-        if (o instanceof ContinuationInfo) {
-            return ((ContinuationInfo)o).getUserObject();
-        }
-        return o;
+        return obj;
     }
-
-    public boolean isNew() {
-        return continuation.isNew() || (!continuation.isPending() && !continuation.isResumed());
-    }
-
-    public boolean isPending() {
-        return continuation.isPending();
-    }
-
-    public boolean isResumed() {
-        return continuation.isResumed();
-    }
-
-    public void reset() {
-        continuation.reset();
+    public void setObject(Object userObject) {
+        obj = userObject;
     }
 
     public void resume() {
-        continuation.resume();
+        isResumed = true;
+        context.dispatch();
     }
 
-    public void setObject(Object userObject) {
-        
-        ContinuationInfo ci = null;
-        Message m = message;
-        if (m != null && m.getExchange() != null && m.getExchange().getInMessage() != null) {
-            m = m.getExchange().getInMessage();
-        }
-        Object obj = continuation.getObject();
-        if (obj instanceof ContinuationInfo) {
-            ci = (ContinuationInfo)obj;
-        } else {
-            ci = new ContinuationInfo(m);
-            ci.setUserObject(obj);
-        }
-        if (message != userObject) {
-            ci.setUserObject(userObject);
-        }
-        continuation.setObject(ci);
+    public boolean isNew() {
+        return isNew;
     }
+
+    public boolean isPending() {
+        return isPending;
+    }
+
+    public boolean isResumed() {
+        return isResumed;
+    }
+
+    public void reset() {
+    }
+
 
     public boolean suspend(long timeout) {
-        
-        Object obj = continuation.getObject();
-        if (obj == null) {
-            continuation.setObject(new ContinuationInfo(message));
-        }
-        try {
-            return continuation.suspend(timeout);
-        } catch (RetryRequest ex) {
-            throw new SuspendedInvocationException(ex);
-        }
+        context.setTimeout(timeout);
+        isNew = false;
+        throw new org.apache.cxf.continuations.SuspendedInvocationException();
     }
     
-    public void done() {
-        ContinuationInfo ci = null;
-        Object obj = continuation.getObject();
-        if (obj instanceof ContinuationInfo) {
-            ci = (ContinuationInfo)obj;
-            continuation.setObject(ci.getUserObject());
-        }
-        continuation.reset();
-    }
-
     protected Message getMessage() {
         Message m = message;
         if (m != null && m.getExchange().getInMessage() != null) {
@@ -118,9 +97,14 @@ public class JettyContinuationWrapper implements Continuation {
         return m;
     }
     
-    public org.mortbay.util.ajax.Continuation getContinuation() {
-        return continuation;
+
+    public void onComplete(org.eclipse.jetty.continuation.Continuation continuation) {
+        getMessage().remove(AbstractHTTPDestination.CXF_CONTINUATION_MESSAGE);
+        isPending = false;
     }
-    
+
+    public void onTimeout(org.eclipse.jetty.continuation.Continuation continuation) {
+        context.dispatch();
+    }
     
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.transport.http_jetty;
 
-import org.mortbay.jetty.AbstractConnector;
+import org.eclipse.jetty.server.AbstractConnector;
 
 
 /**

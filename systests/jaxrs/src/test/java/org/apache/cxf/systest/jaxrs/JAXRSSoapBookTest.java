@@ -74,7 +74,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class));
+                   launchServer(BookServerRestSoap.class, true));
     }
     
     @Test

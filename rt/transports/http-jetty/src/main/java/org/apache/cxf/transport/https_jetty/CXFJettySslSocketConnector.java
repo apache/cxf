@@ -37,7 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.transport.https.SSLUtils;
-import org.mortbay.jetty.security.SslSocketConnector;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
 
 /**
  * This class extends the Jetty SslSocketConnector, which allows

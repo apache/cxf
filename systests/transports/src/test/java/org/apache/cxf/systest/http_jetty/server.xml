@@ -26,7 +26,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
   
     <http-jetty:engine-factory bus="cxf">
         <http-jetty:engine port="0">
-	    <http-jetty:threadingParameters minThreads="1" maxThreads="3"/>   
+	       <http-jetty:threadingParameters minThreads="1" maxThreads="3"/>   
         </http-jetty:engine>
     </http-jetty:engine-factory>
 

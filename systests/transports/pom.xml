@@ -107,8 +107,8 @@
     </profiles>
     <dependencies>
         <dependency>
-            <groupId>org.apache.geronimo.specs</groupId>
-            <artifactId>geronimo-servlet_2.5_spec</artifactId>
+            <groupId>${servlet-api.group}</groupId>
+            <artifactId>${servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
@@ -165,6 +165,14 @@
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.jetty</groupId>
+        	<artifactId>jetty-servlet</artifactId>
+        </dependency>
+        <dependency>
+        	<groupId>org.eclipse.jetty</groupId>
+        	<artifactId>jetty-webapp</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>

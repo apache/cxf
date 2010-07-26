@@ -23,15 +23,24 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.Principal;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
 
+import javax.servlet.AsyncContext;
+import javax.servlet.DispatcherType;
 import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
 import javax.servlet.ServletInputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
 
 public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<HttpServletRequest> 
     implements HttpServletRequest {
@@ -56,11 +65,11 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         return get().getHeader(name);
     }
 
-    public Enumeration getHeaderNames() {
+    public Enumeration<String> getHeaderNames() {
         return get().getHeaderNames();
     }
 
-    public Enumeration getHeaders(String name) {
+    public Enumeration<String> getHeaders(String name) {
         return get().getHeaders(name);
     }
 
@@ -141,7 +150,7 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         return get().getAttribute(name);
     }
 
-    public Enumeration getAttributeNames() {
+    public Enumeration<String> getAttributeNames() {
         return get().getAttributeNames();
     }
 
@@ -177,7 +186,7 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         return get().getLocale();
     }
 
-    public Enumeration getLocales() {
+    public Enumeration<Locale> getLocales() {
         return get().getLocales();
     }
 
@@ -185,11 +194,11 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
         return get().getParameter(name);
     }
 
-    public Map getParameterMap() {
+    public Map<String, String[]> getParameterMap() {
         return get().getParameterMap();
     }
 
-    public Enumeration getParameterNames() {
+    public Enumeration<String> getParameterNames() {
         return get().getParameterNames();
     }
 
@@ -257,4 +266,63 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
 
     }
 
+    @Override
+    public AsyncContext getAsyncContext() {
+        return get().getAsyncContext();
+    }
+
+    @Override
+    public DispatcherType getDispatcherType() {
+        return get().getDispatcherType();
+    }
+
+    @Override
+    public ServletContext getServletContext() {
+        return get().getServletContext();
+    }
+
+    @Override
+    public boolean isAsyncStarted() {
+        return get().isAsyncStarted();
+    }
+
+    @Override
+    public boolean isAsyncSupported() {
+        return get().isAsyncSupported();
+    }
+
+    @Override
+    public AsyncContext startAsync() {
+        return get().startAsync();
+    }
+
+    @Override
+    public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
+        return get().startAsync(request, response);
+    }
+
+    @Override
+    public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
+        return get().authenticate(response);
+    }
+
+    @Override
+    public Part getPart(String name) throws IOException, ServletException {
+        return get().getPart(name);
+    }
+
+    @Override
+    public Collection<Part> getParts() throws IOException, ServletException {
+        return get().getParts();
+    }
+
+    @Override
+    public void login(String username, String password) throws ServletException {
+        get().login(username, password);
+    }
+
+    @Override
+    public void logout() throws ServletException {
+        get().logout();
+    }
 }

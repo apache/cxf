@@ -41,8 +41,8 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.jca.cxf.WorkManagerThreadPool;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngine;
 import org.apache.cxf.transport.http_jetty.JettyHTTPServerEngineFactory;
-import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
 
 
 public class EJBEndpoint {

@@ -37,7 +37,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.management.InstrumentationManager;
-import org.mortbay.component.Container;
+import org.eclipse.jetty.util.component.Container;
 
 
 /**
@@ -290,7 +290,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
             MBeanServer mbs =  bus.getExtension(InstrumentationManager.class).getMBeanServer();
             if (mbs != null) {
                 try {
-                    Class<?> cls = ClassLoaderUtils.loadClass("org.mortbay.management.MBeanContainer", 
+                    Class<?> cls = ClassLoaderUtils.loadClass("org.eclipse.jetty.jmx.MBeanContainer", 
                                                           getClass());
                     
                     mBeanContainer = (Container.Listener) cls.
@@ -300,7 +300,7 @@ public class JettyHTTPServerEngineFactory implements BusLifeCycleListener {
                 } catch (Throwable ex) {
                     //ignore - just won't instrument jetty.  Probably don't have the
                     //jetty-management jar available
-                    LOG.info("Could not load or start org.mortbay.management.MBeanContainer.  "
+                    LOG.info("Could not load or start org.eclipse.management.MBeanContainer.  "
                              + "Jetty JMX support will not be enabled: " + ex.getMessage());
                 }
             }

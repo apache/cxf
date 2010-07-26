@@ -40,6 +40,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
+import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
@@ -52,6 +53,7 @@ import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.continuations.ContinuationProvider;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
@@ -80,8 +82,9 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 /**
  * Common base for HTTP Destination implementations.
  */
-public abstract class AbstractHTTPDestination extends AbstractMultiplexDestination implements Configurable,
-    Assertor {
+public abstract class AbstractHTTPDestination 
+    extends AbstractMultiplexDestination 
+    implements Configurable, Assertor {
     
     public static final String HTTP_REQUEST = "HTTP.REQUEST";
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
@@ -91,7 +94,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
-    
+    public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
@@ -104,6 +107,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     protected boolean fixedParameterOrder;
     protected boolean multiplexWithAddress;
     protected CertConstraints certConstraints;
+    protected boolean isServlet3;
     
     /**
      * Constructor
@@ -120,6 +124,13 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         throws IOException {
         super(b, getTargetReference(getAddressValue(ei, dp), b), ei);  
         bus = b;
+        
+        try {
+            ServletRequest.class.getMethod("isAsyncSupported");
+            isServlet3 = true;
+        } catch (Throwable t) {
+            //servlet 2.5 or earlier, no async support
+        }
         
         initConfig();
     }
@@ -271,7 +282,10 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                                 final ServletContext context, 
                                 final HttpServletRequest req, 
                                 final HttpServletResponse resp) throws IOException {
-
+        setupContinuation(inMessage,
+                          req, 
+                          resp);
+        
         DelegatingInputStream in = new DelegatingInputStream(req.getInputStream());
         inMessage.setContent(DelegatingInputStream.class, in);
         inMessage.setContent(InputStream.class, in);
@@ -337,7 +351,26 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                 Arrays.asList(new Interceptor[] {CertConstraintsInterceptor.INSTANCE}));
 
     }
-    
+    protected Message retrieveFromContinuation(HttpServletRequest req) {
+        if (!isServlet3) {
+            return null;
+        }
+        return retrieveFromServlet3Async(req);
+    }
+    protected Message retrieveFromServlet3Async(HttpServletRequest req) {
+        if (req.isAsyncStarted()) {
+            return (Message)req.getAttribute(CXF_CONTINUATION_MESSAGE);
+        }
+        return null;
+    }
+    protected void setupContinuation(Message inMessage,
+                      final HttpServletRequest req, 
+                      final HttpServletResponse resp) {
+        if (isServlet3) {
+            inMessage.put(ContinuationProvider.class.getName(), 
+                          new Servlet3ContinuationProvider(req, resp, inMessage));
+        }
+    }
     protected String getBasePath(String contextPath) throws IOException {
         if (StringUtils.isEmpty(endpointInfo.getAddress())) {
             return "";
@@ -470,6 +503,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     }
     
     protected OutputStream flushHeaders(Message outMessage) throws IOException {
+        return flushHeaders(outMessage, true);
+    }
+    protected OutputStream flushHeaders(Message outMessage, boolean getStream) throws IOException {
         if (isResponseRedirected(outMessage)) {
             return null;
         }
@@ -506,6 +542,8 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
             if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setContentLength(0);
                 response.flushBuffer();
+                response.getOutputStream().close();
+            } else if (!getStream) {
                 response.getOutputStream().close();
             } else {
                 responseStream = response.getOutputStream();                
@@ -614,7 +652,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
          */
         public void close() throws IOException {
             if (wrappedStream == null) {
-                OutputStream responseStream = flushHeaders(outMessage);
+                OutputStream responseStream = flushHeaders(outMessage, false);
                 if (null != responseStream) {
                     wrappedStream = responseStream;
                 }

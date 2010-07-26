@@ -21,8 +21,11 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.eclipse.jetty.server.Request;
 
 public class JettyHTTPTestHandler extends JettyHTTPHandler {
     private boolean contextMatchExact;
@@ -34,8 +37,11 @@ public class JettyHTTPTestHandler extends JettyHTTPHandler {
         response = s;
     }
 
-    public void handle(String target, HttpServletRequest req,
-                       HttpServletResponse resp, int dispatch) throws IOException {
+    @Override
+    public void handle(String target, 
+                       Request baseRequest,
+                       HttpServletRequest request,
+                       HttpServletResponse resp) throws IOException, ServletException {
 
         if (contextMatchExact) {
             // just return the response for testing

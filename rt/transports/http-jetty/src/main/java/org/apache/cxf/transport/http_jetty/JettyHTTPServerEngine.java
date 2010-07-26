@@ -21,7 +21,6 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
 import java.net.URL;
-
 import java.security.GeneralSecurityException;
 import java.util.List;
 import java.util.logging.Level;
@@ -38,21 +37,23 @@ import org.apache.cxf.configuration.jsse.TLSServerParameters;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.transport.HttpUriMapper;
 import org.apache.cxf.transport.https_jetty.JettySslConnectorFactory;
-import org.mortbay.component.Container;
-import org.mortbay.jetty.AbstractConnector;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ContextHandler;
-import org.mortbay.jetty.handler.ContextHandlerCollection;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerList;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.security.SslSocketConnector;
-import org.mortbay.jetty.servlet.HashSessionIdManager;
-import org.mortbay.jetty.servlet.HashSessionManager;
-import org.mortbay.jetty.servlet.SessionHandler;
-import org.mortbay.thread.QueuedThreadPool;
+import org.eclipse.jetty.server.AbstractConnector;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ContextHandler;
+import org.eclipse.jetty.server.handler.ContextHandlerCollection;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.server.session.HashSessionIdManager;
+import org.eclipse.jetty.server.session.HashSessionManager;
+import org.eclipse.jetty.server.session.SessionHandler;
+import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.util.component.Container;
+import org.eclipse.jetty.util.thread.OldQueuedThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 
 
 /**
@@ -292,7 +293,6 @@ public class JettyHTTPServerEngine
      * @param url the URL associated with the servant
      * @param handler notified on incoming HTTP requests
      */
-    @SuppressWarnings("deprecation")
     public synchronized void addServant(URL url, JettyHTTPHandler handler) {
         if (server == null) {
             DefaultHandler defaultHandler = null;
@@ -314,50 +314,70 @@ public class JettyHTTPServerEngine
                     LOG.finer("connector.port: " + connector.getPort());
                 }
             } 
-            server.addConnector(connector);            
+
+            server.addConnector(connector);
+            /*
+             * The server may have no handler, it might have a collection handler,
+             * it might have a one-shot. We need to add one or more of ours.
+             *
+             */
+            int numberOfHandlers = 1;
+            if (handlers != null) {
+                numberOfHandlers += handlers.size();
+            }
+            Handler existingHandler = server.getHandler();
+
+            HandlerCollection handlerCollection = null;
+            boolean existingHandlerCollection = existingHandler instanceof HandlerCollection;
+            if (existingHandlerCollection) {
+                handlerCollection = (HandlerCollection) existingHandler;
+            }
+
+            if (!existingHandlerCollection 
+                &&
+                (existingHandler != null || numberOfHandlers > 1)) {
+                handlerCollection = new HandlerCollection();
+                if (existingHandler != null) {
+                    handlerCollection.addHandler(existingHandler);
+                }
+                server.setHandler(handlerCollection);
+            }
+            
+            /*
+             * At this point, the server's handler is a collection. It was either
+             * one to start, or it is now one containing only the single handler
+             * that was there to begin with.
+             */
+
             if (handlers != null && handlers.size() > 0) {
-                HandlerList handlerList = new HandlerList();
                 for (Handler h : handlers) {
-                    // filting the jetty default handler 
-                    // which should not be added at this point
+                    // Filtering out the jetty default handler 
+                    // which should not be added at this point.
                     if (h instanceof DefaultHandler) {
                         defaultHandler = (DefaultHandler) h;
                     } else {
-                        handlerList.addHandler(h);
+                        handlerCollection.addHandler(h);
                     }
                 }
-                server.addHandler(handlerList);
             }
             contexts = new ContextHandlerCollection();
-            server.addHandler(contexts);
-            if (defaultHandler != null) {
-                server.addHandler(defaultHandler);
+            /*
+             * handlerCollection may be null here if is only one handler to deal with.
+             * Which in turn implies that there can't be a 'defaultHander' to deal with.
+             */
+            if (handlerCollection != null) {
+                handlerCollection.addHandler(contexts);
+                if (defaultHandler != null) {
+                    handlerCollection.addHandler(defaultHandler);
+                }
+            } else {
+                server.setHandler(contexts);
             }
+
             try {                
                 setReuseAddress(connector);
+                setupThreadPool();
                 server.start();
-               
-                AbstractConnector aconn = (AbstractConnector) connector;
-                if (isSetThreadingParameters()) {
-                    if (aconn.getThreadPool() instanceof org.mortbay.thread.BoundedThreadPool) {
-                        org.mortbay.thread.BoundedThreadPool pool 
-                            = (org.mortbay.thread.BoundedThreadPool)aconn.getThreadPool();
-                        if (getThreadingParameters().isSetMinThreads()) {
-                            pool.setMinThreads(getThreadingParameters().getMinThreads());
-                        }
-                        if (getThreadingParameters().isSetMaxThreads()) {
-                            pool.setMaxThreads(getThreadingParameters().getMaxThreads());
-                        }
-                    } else if (aconn.getThreadPool() instanceof QueuedThreadPool) {
-                        QueuedThreadPool pool = (QueuedThreadPool)aconn.getThreadPool();
-                        if (getThreadingParameters().isSetMinThreads()) {
-                            pool.setMinThreads(getThreadingParameters().getMinThreads());
-                        }
-                        if (getThreadingParameters().isSetMaxThreads()) {
-                            pool.setMaxThreads(getThreadingParameters().getMaxThreads());
-                        }
-                    }
-                }
             } catch (Exception e) {
                 LOG.log(Level.SEVERE, "START_UP_SERVER_FAILED_MSG", new Object[] {e.getMessage(), port});
                 //problem starting server
@@ -375,15 +395,20 @@ public class JettyHTTPServerEngine
         String contextName = HttpUriMapper.getContextName(url.getPath());            
         ContextHandler context = new ContextHandler();
         context.setContextPath(contextName);
-        
-        // bind the jetty http handler with the context handler        
-        context.setHandler(handler);
-        if (isSessionSupport) {            
+        // bind the jetty http handler with the context handler
+        if (isSessionSupport) {         
+            // If we have sessions, we need two handlers.
             HashSessionManager sessionManager = new HashSessionManager();
             SessionHandler sessionHandler = new SessionHandler(sessionManager);
             HashSessionIdManager idManager = new HashSessionIdManager();
-            sessionManager.setIdManager(idManager);            
-            context.addHandler(sessionHandler);           
+            sessionManager.setIdManager(idManager);
+            HandlerCollection hc = new HandlerCollection();
+            hc.addHandler(handler);
+            hc.addHandler(sessionHandler);
+            context.setHandler(hc);
+        } else {
+            // otherwise, just the one.
+            context.setHandler(handler);
         }
         contexts.addHandler(context);
         
@@ -403,6 +428,34 @@ public class JettyHTTPServerEngine
         
             
         ++servantCount;
+    }
+    
+    protected void setupThreadPool() {
+        AbstractConnector aconn = (AbstractConnector) connector;
+        if (isSetThreadingParameters()) {
+            ThreadPool pool = aconn.getThreadPool();
+            if (pool == null) {
+                pool = new QueuedThreadPool();
+                aconn.setThreadPool(pool);
+            }
+            if (pool instanceof OldQueuedThreadPool) {
+                OldQueuedThreadPool pl = (OldQueuedThreadPool)pool;
+                if (getThreadingParameters().isSetMinThreads()) {
+                    pl.setMinThreads(getThreadingParameters().getMinThreads());
+                }
+                if (getThreadingParameters().isSetMaxThreads()) {
+                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
+                }
+            } else if (pool instanceof QueuedThreadPool) {
+                QueuedThreadPool pl = (QueuedThreadPool)pool;
+                if (getThreadingParameters().isSetMinThreads()) {
+                    pl.setMinThreads(getThreadingParameters().getMinThreads());
+                }
+                if (getThreadingParameters().isSetMaxThreads()) {
+                    pl.setMaxThreads(getThreadingParameters().getMaxThreads());
+                }
+            }
+        }
     }
     
     private void setReuseAddress(Connector conn) throws IOException {

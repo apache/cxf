@@ -24,7 +24,7 @@ import javax.resource.spi.work.WorkEvent;
 import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 
-import org.mortbay.thread.ThreadPool;
+import org.eclipse.jetty.util.thread.ThreadPool;
 
 /**
  * The adapter for using Application Server's thread pool. 

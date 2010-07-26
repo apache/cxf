@@ -22,23 +22,23 @@ package org.apache.cxf.systest.jaxrs;
 import java.net.URISyntaxException;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-import org.mortbay.jetty.Connector;
-import org.mortbay.jetty.Handler;
-import org.mortbay.jetty.handler.DefaultHandler;
-import org.mortbay.jetty.handler.HandlerCollection;
-import org.mortbay.jetty.nio.SelectChannelConnector;
-import org.mortbay.jetty.webapp.WebAppContext;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.Handler;
+import org.eclipse.jetty.server.handler.DefaultHandler;
+import org.eclipse.jetty.server.handler.HandlerCollection;
+import org.eclipse.jetty.server.nio.SelectChannelConnector;
+import org.eclipse.jetty.webapp.WebAppContext;
 
 
 public class BookDataBindingServer extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(BookDataBindingServer.class);
 
-    private org.mortbay.jetty.Server server;
+    private org.eclipse.jetty.server.Server server;
     
     protected void run() {
         System.out.println("Starting Server");
 
-        server = new org.mortbay.jetty.Server();
+        server = new org.eclipse.jetty.server.Server();
 
         SelectChannelConnector connector = new SelectChannelConnector();
         connector.setPort(Integer.parseInt(PORT));

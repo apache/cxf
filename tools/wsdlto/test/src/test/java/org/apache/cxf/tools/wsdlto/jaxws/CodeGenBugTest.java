@@ -43,10 +43,11 @@ import org.apache.cxf.tools.wsdlto.WSDLToJava;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.validator.UniqueBodyValidator;
 import org.apache.cxf.wsdl11.WSDLRuntimeException;
 
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.handler.ResourceHandler;
+
 import org.junit.Test;
 
-import org.mortbay.jetty.Server;
-import org.mortbay.jetty.handler.ResourceHandler;
 
 
 public class CodeGenBugTest extends AbstractCodeGenTest {
@@ -464,7 +465,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
 
         ResourceHandler reshandler = new ResourceHandler();
         reshandler.setResourceBase(getLocation("/wsdl2java_wsdl/"));
-        server.addHandler(reshandler);
+        // this is the only handler we're supposed to need, so we don't need to 'add' it.
+        server.setHandler(reshandler);
         server.start();
         env.put(ToolConstants.CFG_WSDLURL, "http://localhost:8585/hello_world.wsdl");
         env.put(ToolConstants.CFG_BINDING, "http://localhost:8585/remote-hello_world_binding.xsd");
