@@ -175,22 +175,18 @@ public class ThreadLocalHttpServletResponse extends AbstractThreadLocalProxy<Htt
         
     }
 
-    @Override
     public String getHeader(String name) {
         return get().getHeader(name);
     }
 
-    @Override
     public Collection<String> getHeaderNames() {
         return get().getHeaderNames();
     }
 
-    @Override
     public Collection<String> getHeaders(String headerName) {
         return get().getHeaders(headerName);
     }
 
-    @Override
     public int getStatus() {
         return get().getStatus();
     }

@@ -266,62 +266,50 @@ public class ThreadLocalHttpServletRequest extends AbstractThreadLocalProxy<Http
 
     }
 
-    @Override
     public AsyncContext getAsyncContext() {
         return get().getAsyncContext();
     }
 
-    @Override
     public DispatcherType getDispatcherType() {
         return get().getDispatcherType();
     }
 
-    @Override
     public ServletContext getServletContext() {
         return get().getServletContext();
     }
 
-    @Override
     public boolean isAsyncStarted() {
         return get().isAsyncStarted();
     }
 
-    @Override
     public boolean isAsyncSupported() {
         return get().isAsyncSupported();
     }
 
-    @Override
     public AsyncContext startAsync() {
         return get().startAsync();
     }
 
-    @Override
     public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
         return get().startAsync(request, response);
     }
 
-    @Override
     public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
         return get().authenticate(response);
     }
 
-    @Override
     public Part getPart(String name) throws IOException, ServletException {
         return get().getPart(name);
     }
 
-    @Override
     public Collection<Part> getParts() throws IOException, ServletException {
         return get().getParts();
     }
 
-    @Override
     public void login(String username, String password) throws ServletException {
         get().login(username, password);
     }
 
-    @Override
     public void logout() throws ServletException {
         get().logout();
     }

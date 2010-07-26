@@ -147,141 +147,115 @@ public class ThreadLocalServletContext extends AbstractThreadLocalProxy<ServletC
         
     }
 
-    @Override
     public boolean setInitParameter(String name, String value) {
         return get().setInitParameter(name, value);
     }
 
-    @Override
     public Dynamic addServlet(String servletName, String className) throws IllegalArgumentException,
         IllegalStateException {
         return get().addServlet(servletName, className);
     }
 
-    @Override
     public Dynamic addServlet(String servletName, Servlet servlet) throws IllegalArgumentException,
         IllegalStateException {
         return get().addServlet(servletName, servlet);
     }
 
-    @Override
     public Dynamic addServlet(String servletName, Class<? extends Servlet> clazz)
         throws IllegalArgumentException, IllegalStateException {
         return get().addServlet(servletName, clazz);
     }
 
-    @Override
     public <T extends Servlet> T createServlet(Class<T> clazz) throws ServletException {
         return get().createServlet(clazz);
     }
 
-    @Override
     public ServletRegistration getServletRegistration(String servletName) {
         return get().getServletRegistration(servletName);
     }
 
-    @Override
     public Map<String, ? extends ServletRegistration> getServletRegistrations() {
         return get().getServletRegistrations();
     }
 
-    @Override
     public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, String className)
         throws IllegalArgumentException, IllegalStateException {
         return get().addFilter(filterName, className);
     }
 
-    @Override
     public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName, Filter filter)
         throws IllegalArgumentException, IllegalStateException {
         return get().addFilter(filterName, filter);
     }
 
-    @Override
     public javax.servlet.FilterRegistration.Dynamic addFilter(String filterName,
                                                               Class<? extends Filter> filterClass)
         throws IllegalArgumentException, IllegalStateException {
         return get().addFilter(filterName, filterClass);
     }
 
-    @Override
     public <T extends Filter> T createFilter(Class<T> clazz) throws ServletException {
         return get().createFilter(clazz);
     }
 
-    @Override
     public FilterRegistration getFilterRegistration(String filterName) {
         return get().getFilterRegistration(filterName);
     }
 
-    @Override
     public Map<String, ? extends FilterRegistration> getFilterRegistrations() {
         return get().getFilterRegistrations();
     }
 
-    @Override
     public void addListener(Class<? extends EventListener> listenerClass) {
         get().addListener(listenerClass);
     }
 
-    @Override
     public void addListener(String className) {
         get().addListener(className);
         
     }
 
-    @Override
     public <T extends EventListener> void addListener(T t) {
         get().addListener(t);
     }
 
-    @Override
     public <T extends EventListener> T createListener(Class<T> clazz) throws ServletException {
         return get().createListener(clazz);
     }
 
-    @Override
     public void declareRoles(String... roleNames) {
         get().declareRoles(roleNames);
     }
 
-    @Override
     public SessionCookieConfig getSessionCookieConfig() {
         return get().getSessionCookieConfig();
     }
 
-    @Override
     public void setSessionTrackingModes(Set<SessionTrackingMode> sessionTrackingModes) {
         get().setSessionTrackingModes(sessionTrackingModes);
         
     }
 
-    @Override
     public Set<SessionTrackingMode> getDefaultSessionTrackingModes() {
         return get().getDefaultSessionTrackingModes();
     }
 
-    @Override
     public int getEffectiveMajorVersion() throws UnsupportedOperationException {
         return get().getEffectiveMajorVersion();
     }
 
-    @Override
     public int getEffectiveMinorVersion() throws UnsupportedOperationException {
         return get().getEffectiveMinorVersion();
     }
 
-    @Override
     public Set<SessionTrackingMode> getEffectiveSessionTrackingModes() {
         return get().getEffectiveSessionTrackingModes();
     }
 
-    @Override
     public ClassLoader getClassLoader() {
         return get().getClassLoader();
     }
 
-    @Override
     public JspConfigDescriptor getJspConfigDescriptor() {
         return get().getJspConfigDescriptor();
     }
