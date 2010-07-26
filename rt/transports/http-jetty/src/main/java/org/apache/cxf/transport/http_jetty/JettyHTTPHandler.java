@@ -61,7 +61,6 @@ public class JettyHTTPHandler extends AbstractHandler {
         return target.startsWith(pathString);
     }
 
-    @Override
     public void handle(String target, Request baseRequest, HttpServletRequest request,
                        HttpServletResponse response) throws IOException, ServletException {
         if (contextMatchExact) {
