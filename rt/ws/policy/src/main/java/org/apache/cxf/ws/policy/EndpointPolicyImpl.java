@@ -88,8 +88,16 @@ public class EndpointPolicyImpl implements EndpointPolicy {
     
     public EndpointPolicy updatePolicy(Policy p) {
         EndpointPolicyImpl epi = createEndpointPolicy();
-        Policy np = (Policy)p.normalize(true);
-        epi.setPolicy(getPolicy().merge(np));
+        
+        if (!PolicyUtils.isEmptyPolicy(p)) {
+            Policy normalizedPolicy = (Policy)p.normalize(true);
+            epi.setPolicy(getPolicy().merge(normalizedPolicy));
+        } else {
+            Policy clonedPolicy = new Policy();
+            clonedPolicy.addPolicyComponents(getPolicy().getPolicyComponents());
+            epi.setPolicy(clonedPolicy);
+        }
+        
         epi.checkExactlyOnes();
         epi.finalizeConfig();
         return epi;
