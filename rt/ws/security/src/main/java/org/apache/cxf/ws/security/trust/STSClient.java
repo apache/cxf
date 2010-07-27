@@ -376,8 +376,14 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeStartElement("wst", "RequestSecurityToken", namespace);
         writer.writeNamespace("wst", namespace);
         boolean wroteKeySize = false;
+        
         String keyType = null;
+        
         if (template != null) {
+            if (this.useSecondaryParameters()) {
+                writer.writeStartElement("wst", "SecondaryParameters", namespace);
+            }
+            
             Element tl = DOMUtils.getFirstElement(template);
             while (tl != null) {
                 StaxUtils.copy(tl, writer);
@@ -389,11 +395,13 @@ public class STSClient implements Configurable, InterceptorProvider {
                 }
                 tl = DOMUtils.getNextElement(tl);
             }
+            
+            if (this.useSecondaryParameters()) {
+                writer.writeEndElement();
+            }
         }
 
-        writer.writeStartElement("wst", "RequestType", namespace);
-        writer.writeCharacters(namespace + requestType);
-        writer.writeEndElement();
+        addRequestType(requestType, writer);
         addAppliesTo(writer, appliesTo);
         keyType = writeKeyType(writer, keyType);
 
@@ -471,6 +479,12 @@ public class STSClient implements Configurable, InterceptorProvider {
             token.setX509Certificate(cert, crypto);
         }
         return token;
+    }
+
+    private void addRequestType(String requestType, W3CDOMStreamWriter writer) throws XMLStreamException {
+        writer.writeStartElement("wst", "RequestType", namespace);
+        writer.writeCharacters(namespace + requestType);
+        writer.writeEndElement();
     }
     
     private Element getDocumentElement(DOMSource ds) {
@@ -641,6 +655,10 @@ public class STSClient implements Configurable, InterceptorProvider {
         } catch (Exception ex) {
             LOG.log(Level.WARNING, "Problem cancelling token", ex);
         }
+    }
+    
+    private boolean useSecondaryParameters() {
+        return !STSUtils.WST_NS_05_02.equals(namespace);
     }
 
     private String writeKeyType(W3CDOMStreamWriter writer, String keyType) throws XMLStreamException {
