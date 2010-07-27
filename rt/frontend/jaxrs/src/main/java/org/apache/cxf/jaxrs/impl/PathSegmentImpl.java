@@ -55,5 +55,9 @@ public class PathSegmentImpl implements PathSegment {
     public String getOriginalPath() {
         return path;
     }
+    
+    public String toString() {
+        return path;
+    }
 
 }

@@ -48,6 +48,7 @@ public class UriBuilderImpl extends UriBuilder {
     private int port;
     private String host;
     private List<PathSegment> paths = new ArrayList<PathSegment>();
+    private boolean leadingSlash;
     private String fragment;
     private String schemeSpecificPart; 
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
@@ -126,7 +127,13 @@ public class UriBuilderImpl extends UriBuilder {
             }
             return new URI(b.toString());
         } else if (!isSchemeOpaque()) {
-            return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
+            if ((scheme != null || host != null || userInfo != null)
+                && !thePath.isEmpty() && !thePath.startsWith("/")) {
+                thePath = "/" + thePath;
+            }
+            
+            return new URI(scheme, userInfo, host, port, 
+                           thePath, theQuery, fragment);
         } else {
             return new URI(scheme, schemeSpecificPart, fragment);
         }
@@ -149,6 +156,9 @@ public class UriBuilderImpl extends UriBuilder {
         int idx = ind;
         for (String var : uniqueVars) {
             Object oval = values[idx++];
+            if (oval == null) {
+                throw new IllegalArgumentException("No object for " + var);
+            }
             varValueMap.put(var, oval.toString());
         }
         return templ.substitute(varValueMap);
@@ -249,6 +259,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder host(String theHost) throws IllegalArgumentException {
+        if ("".equals(theHost)) {
+            throw new IllegalArgumentException("Host cannot be empty");
+        }
         this.host = theHost;
         return this;
     }
@@ -314,7 +327,9 @@ public class UriBuilderImpl extends UriBuilder {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
-        
+        if (paths.isEmpty()) {
+            leadingSlash = path.startsWith("/");
+        }
         List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);
@@ -330,6 +345,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
+        if (thePort < 0) {
+            throw new IllegalArgumentException("Port cannot be negative");
+        }
         this.port = thePort;
         return this;
     }
@@ -392,6 +410,7 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private void setPathAndMatrix(String path) {
+        leadingSlash = path.startsWith("/");
         paths = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty()) {
             matrix = paths.get(paths.size() - 1).getMatrixParameters();
@@ -408,7 +427,9 @@ public class UriBuilderImpl extends UriBuilder {
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
                 p = fromEncoded ? new URITemplate(p).encodeLiteralCharacters() : p;
-                if (!p.startsWith("/")) {
+                if (sb.length() == 0 && leadingSlash) {
+                    sb.append('/');
+                } else if (!p.startsWith("/") && sb.length() > 0) {
                     sb.append('/');
                 }
                 sb.append(p);
@@ -504,6 +525,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder segment(String... segments) throws IllegalArgumentException {
+        if (segments == null) {
+            throw new IllegalArgumentException("Segments should not be null");
+        }
         for (String segment : segments) {
             path(segment);
         }
