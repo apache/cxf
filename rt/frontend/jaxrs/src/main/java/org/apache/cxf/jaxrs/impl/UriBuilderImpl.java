@@ -128,7 +128,7 @@ public class UriBuilderImpl extends UriBuilder {
             return new URI(b.toString());
         } else if (!isSchemeOpaque()) {
             if ((scheme != null || host != null || userInfo != null)
-                && !thePath.isEmpty() && !thePath.startsWith("/")) {
+                && thePath.length() != 0 && !thePath.startsWith("/")) {
                 thePath = "/" + thePath;
             }
             
