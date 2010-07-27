@@ -28,6 +28,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.ws.policy.builder.primitive.NestedPrimitiveAssertion;
 import org.apache.neethi.Assertion;
 import org.apache.neethi.Constants;
+import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyComponent;
 import org.apache.neethi.PolicyOperator;
 
@@ -40,6 +41,45 @@ public final class PolicyUtils {
     
     private PolicyUtils() {
     }  
+    
+    /**
+     * Checks if a given policy contains no policy components 
+     * or if it has only empty ExactlyOne or All components 
+     * containing no assertions 
+     * 
+     * @param p the policy
+     * @return true if the policy is empty
+     */
+    public static boolean isEmptyPolicy(Policy p) {
+        
+        return isEmptyPolicyOperator(p);
+    }
+    
+    /**
+     * Checks if a given policy operator has no policy components 
+     * or if it has only empty ExactlyOne or All components 
+     * containing no assertions 
+     * 
+     * @param p the policy operator
+     * @return true if this policy operator is empty
+     */
+    public static boolean isEmptyPolicyOperator(PolicyOperator p) {
+        
+        if (p.isEmpty()) {
+            return true;
+        }
+        
+        List components = p.getPolicyComponents();
+        
+        for (Object component : components) {
+            if (!(component instanceof PolicyOperator)
+                || !isEmptyPolicyOperator((PolicyOperator)component)) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
     
     /**
      * Determine if a collection of assertions contains a given assertion, using

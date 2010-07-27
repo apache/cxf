@@ -36,8 +36,10 @@ import org.apache.neethi.All;
 import org.apache.neethi.Constants;
 import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
+import org.apache.neethi.PolicyOperator;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -212,6 +214,61 @@ public class EndpointPolicyImplTest extends Assert {
         QName n2 = assertions2.get(0).getName();
         assertTrue("Policy was not merged",
                    n1.equals(aqn1) && n2.equals(aqn2) || n1.equals(aqn2) && n2.equals(aqn1));
+    }
+
+    @Test
+    public void testUpdatePolicyWithEmptyPolicy() {
+        
+        doTestUpdateWithEmptyPolicy(new Policy());
+    }
+    
+    @Test
+    public void testUpdatePolicyWithEmptyAll() {
+        
+        Policy emptyPolicy = new Policy();
+        emptyPolicy.addPolicyComponent(new All());
+        emptyPolicy.addPolicyComponent(new All());
+        doTestUpdateWithEmptyPolicy(emptyPolicy);
+    }
+    
+    @Test
+    public void testUpdatePolicyWithEmptyExactlyOneAndAll() {
+        
+        Policy emptyPolicy = new Policy();
+        PolicyOperator exactlyOne = new ExactlyOne();
+        exactlyOne.addPolicyComponent(new All());
+        exactlyOne.addPolicyComponent(new All());
+        emptyPolicy.addPolicyComponent(exactlyOne);
+        emptyPolicy.addPolicyComponent(new All());
+        emptyPolicy.addPolicyComponent(new All());
+        doTestUpdateWithEmptyPolicy(emptyPolicy);
+    }    
+    
+    private void doTestUpdateWithEmptyPolicy(Policy emptyPolicy) {
+        Policy p1 = new Policy();
+        QName aqn1 = new QName("http://x.y.z", "a");
+        p1.addAssertion(mockAssertion(aqn1, 5, true));
+        
+        EndpointPolicyImpl epi = new TestEndpointPolicy();
+        control.replay();
+        
+        epi.setPolicy((Policy)p1.normalize(true));
+                
+        Policy ep = epi.updatePolicy(emptyPolicy).getPolicy();
+        
+        List<ExactlyOne> pops = 
+            CastUtils.cast(ep.getPolicyComponents(), ExactlyOne.class);
+        assertEquals("New policy must have 1 top level policy operator", 1, pops.size());
+        List<All> alts = 
+            CastUtils.cast(pops.get(0).getPolicyComponents(), All.class);
+        assertEquals("1 alternatives should be available", 1, alts.size());
+        
+        List<PolicyAssertion> assertions1 = 
+            CastUtils.cast(alts.get(0).getAssertions(), PolicyAssertion.class);
+        assertEquals("1 assertion should be available", 1, assertions1.size());
+        
+        QName n1 = assertions1.get(0).getName();
+        assertTrue("Policy was not merged", n1.equals(aqn1));
     }
     
     private PolicyAssertion mockAssertion(QName name, int howMany, boolean normalize) {
