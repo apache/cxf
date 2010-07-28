@@ -21,17 +21,23 @@ package org.apache.cxf.jaxrs.impl;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.jaxrs.utils.HttpUtils;
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 /**
@@ -52,8 +58,34 @@ public class RequestImpl implements Request {
     
 
     public Variant selectVariant(List<Variant> vars) throws IllegalArgumentException {
-        // TODO Auto-generated method stub
-        return null;
+        if (vars == null || vars.isEmpty()) {
+            throw new IllegalArgumentException("List of Variants is either null or empty");
+        }
+        MediaType inMediaType = headers.getMediaType();
+        Locale inLang = headers.getLanguage();
+        String inEnc = headers.getRequestHeaders().getFirst(HttpHeaders.CONTENT_ENCODING);
+        
+        List<Variant> matchingVars = new LinkedList<Variant>();
+        for (Variant var : vars) {
+            MediaType mt = var.getMediaType();
+            Locale lang = var.getLanguage();
+            String enc = var.getEncoding();
+            
+            boolean mtMatched = mt == null || inMediaType == null
+                || JAXRSUtils.intersectMimeTypes(Collections.singletonList(inMediaType), mt).size() != 0;
+            
+            boolean encMatched = inEnc == null || enc == null || inEnc.equalsIgnoreCase(enc);
+            
+            boolean langMatched = inLang == null || lang == null || inLang.equals(lang);
+            
+            if (mtMatched && encMatched && langMatched) {
+                matchingVars.add(var);
+            }
+        }
+        if (matchingVars.size() > 1) {
+            Collections.sort(matchingVars, new VariantComparator());       
+        }
+        return matchingVars.isEmpty() ? null : matchingVars.get(0);
     }
 
 
@@ -187,4 +219,50 @@ public class RequestImpl implements Request {
 
 
 
+    private static class VariantComparator implements Comparator<Variant> {
+
+        @Override
+        public int compare(Variant v1, Variant v2) {
+            int result = compareMediaTypes(v1.getMediaType(), v2.getMediaType());
+            
+            if (result != 0) {
+                return result;
+            }
+            
+            result = compareLanguages(v1.getLanguage(), v2.getLanguage());
+            
+            if (result == 0) {
+                result = compareEncodings(v1.getEncoding(), v2.getEncoding());
+            }
+            
+            return result;
+        }
+        
+        private static int compareMediaTypes(MediaType mt1, MediaType mt2) {
+            if (mt1 != null && mt2 == null) {
+                return -1;
+            } else if (mt1 == null && mt2 != null) {
+                return 1;
+            } 
+            return JAXRSUtils.compareMediaTypes(mt1, mt2);
+        }
+        
+        private static int compareLanguages(Locale l1, Locale l2) {
+            if (l1 != null && l2 == null) {
+                return -1;
+            } else if (l1 == null && l2 != null) {
+                return 1;
+            }
+            return 0;
+        }
+        
+        private static int compareEncodings(String enc1, String enc2) {
+            if (enc1 != null && enc2 == null) {
+                return -1;
+            } else if (enc1 == null && enc2 != null) {
+                return 1;
+            }
+            return 0;
+        }
+    }
 }
