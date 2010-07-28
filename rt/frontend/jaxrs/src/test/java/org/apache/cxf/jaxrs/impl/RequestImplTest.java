@@ -20,14 +20,18 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.Variant;
 
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -54,6 +58,98 @@ public class RequestImplTest extends Assert {
     public void tearUp() {
         m = null;
         metadata.clear();
+    }
+    
+    @Test
+    public void testSingleMatchingVariant() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "UTF-8");
+        assertSameVariant(null, new Locale("en"), "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
+        
+    }
+    
+    @Test
+    public void testSingleMatchingVariantWithContentTypeOnly() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "UTF-8");
+        assertSameVariant(null, new Locale("en"), "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, null, "UTF-8");
+        assertSameVariant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
+        
+    }
+    
+    @Test
+    public void testSingleNonMatchingVariant() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        
+        List<Variant> list = new ArrayList<Variant>();
+        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
+        assertNull(new RequestImpl(m).selectVariant(list));
+        
+    }
+    
+    @Test
+    public void testMultipleNonMatchingVariants() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        
+        List<Variant> list = new ArrayList<Variant>();
+        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
+        list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("es"), "utf-8"));
+        list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "abc"));
+        assertNull(new RequestImpl(m).selectVariant(list));
+        
+    }
+    
+    @Test
+    public void testMultipleVariantsSingleMatch() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        
+        List<Variant> list = new ArrayList<Variant>();
+        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
+        list.add(new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("es"), "utf-8"));
+        
+        Variant var3 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "utf-8");
+        list.add(var3);
+        assertSame(var3, new RequestImpl(m).selectVariant(list));
+        
+    }
+    
+    @Test
+    public void testMultipleVariantsBestMatch() {
+        metadata.putSingle(HttpHeaders.CONTENT_TYPE, "application/xml");
+        metadata.putSingle(HttpHeaders.CONTENT_LANGUAGE, "en");
+        metadata.putSingle(HttpHeaders.CONTENT_ENCODING, "utf-8");
+        
+        List<Variant> list = new ArrayList<Variant>();
+        list.add(new Variant(MediaType.APPLICATION_JSON_TYPE, new Locale("en"), "utf-8"));
+        Variant var2 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), "utf-8");
+        list.add(var2);
+        Variant var3 = new Variant(MediaType.APPLICATION_XML_TYPE, new Locale("en"), null);
+        list.add(var3);
+        assertSame(var2, new RequestImpl(m).selectVariant(list));
+        list.clear();
+        list.add(var3);
+        assertSame(var3, new RequestImpl(m).selectVariant(list));
+        
+    }
+    
+    private void assertSameVariant(MediaType mt, Locale lang, String enc) {
+        Variant var = new Variant(mt, lang, enc);
+        List<Variant> list = new ArrayList<Variant>();
+        list.add(var);
+        assertSame(var, new RequestImpl(m).selectVariant(list));    
     }
     
     @Test
