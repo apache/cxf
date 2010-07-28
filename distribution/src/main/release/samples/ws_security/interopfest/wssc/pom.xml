@@ -58,7 +58,6 @@
         <plugins>
             <plugin>
                 <artifactId>maven-antrun-plugin</artifactId>
-                <version>1.3</version>
                 <executions>
                     <execution>
                         <id>download-certs-wsdl</id>
@@ -77,13 +76,6 @@
                         </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.apache.ant</groupId>
-                        <artifactId>ant-trax</artifactId>
-                        <version>1.7.1</version>
-                    </dependency>
-                </dependencies>
             </plugin>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>

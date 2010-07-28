@@ -85,17 +85,23 @@
     </modules>
     <dependencyManagement>
         <dependencies>
+            <!-- 
+            Pull in the cxf-parents as import scope to re-use the dependenecyManagement 
+            sections of those poms.   Those sections define the versions of various third
+            party deps that CXF used to build with and test with and we would like
+            to make sure the same versions are used for the samples
+            -->
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-parent</artifactId>
-                <version>2.3.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
             <dependency>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf</artifactId>
-                <version>2.3.0-SNAPSHOT</version>
+                <version>${project.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -118,6 +124,13 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-antrun-plugin</artifactId>
                     <version>1.4</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant-trax</artifactId>
+                            <version>1.8.0</version>
+                        </dependency>
+                    </dependencies>
                 </plugin>
             </plugins>
         </pluginManagement>
@@ -153,4 +166,23 @@
             </pluginRepositories>
         </profile>
     </profiles>
+
+    <!--
+     we turn off the deploy in the properties above, but deploy plugin will
+     still barf without this section in the pom
+     -->
+    <distributionManagement>
+         <repository>
+             <id>apache.releases.https</id>
+             <name>Apache Release Distribution Repository</name>
+             <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+         </repository>
+         <snapshotRepository>
+             <id>apache.snapshots.https</id>
+             <name>Apache Development Snapshot Repository</name>
+             <url>https://repository.apache.org/content/repositories/snapshots</url>
+             <uniqueVersion>false</uniqueVersion>
+         </snapshotRepository>
+     </distributionManagement>
+
 </project>

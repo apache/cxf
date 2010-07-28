@@ -19,11 +19,12 @@
 
 package org.apache.cxf.sample.test;
 
+import org.junit.BeforeClass;
+import org.junit.Test;
+
 import demo.hw.client.Client;
 import demo.hw.server.Server;
 
-import org.junit.BeforeClass;
-import org.junit.Test;
 
 /**
  * 

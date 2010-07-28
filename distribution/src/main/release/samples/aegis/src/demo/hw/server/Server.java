@@ -22,9 +22,11 @@ package demo.hw.server;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.frontend.ServerFactoryBean;
 
-public class Server {
+public final class Server {
+    private Server() {
+    }
 
-    public Server() throws Exception {
+    public static void startServer() throws Exception {
         HelloWorldImpl helloworldImpl = new HelloWorldImpl();
         ServerFactoryBean svrFactory = new ServerFactoryBean();
         svrFactory.setServiceClass(HelloWorld.class);
@@ -35,7 +37,7 @@ public class Server {
     }
 
     public static void main(String args[]) throws Exception {
-        new Server();
+        startServer();
         System.out.println("Server ready...");
 
         Thread.sleep(5 * 60 * 1000);
