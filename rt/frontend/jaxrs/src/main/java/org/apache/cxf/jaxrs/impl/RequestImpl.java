@@ -221,7 +221,6 @@ public class RequestImpl implements Request {
 
     private static class VariantComparator implements Comparator<Variant> {
 
-        @Override
         public int compare(Variant v1, Variant v2) {
             int result = compareMediaTypes(v1.getMediaType(), v2.getMediaType());
             
