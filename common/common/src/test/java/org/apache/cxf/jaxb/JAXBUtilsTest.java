@@ -37,18 +37,42 @@ public class JAXBUtilsTest extends Assert {
     public void testPackageNames() {
         assertEquals("org.apache.cxf.configuration.types",
                      JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types"));
+
+        // tests of JAXB 2.2 Appendix D.5.1, Rule #1: schemes to be removed are just http and urn
+        assertEquals("auto.org.apache.cxf.configuration.types",
+                JAXBUtils.namespaceURIToPackage("auto://cxf.apache.org/configuration/types"));
+        assertEquals("mouse.org.apache.cxf.configuration.types",
+                JAXBUtils.namespaceURIToPackage("mouse://cxf.apache.org/configuration/types"));
+        assertEquals("h.org.apache.cxf.configuration.types",
+                JAXBUtils.namespaceURIToPackage("h://cxf.apache.org/configuration/types"));
+
+        // tests of JAXB 2.2 Appendix D.5.1, Rule #2: file type is one of .?? or .??? or .html
+        assertEquals("org.apache.cxf.configuration.types_h",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.h"));
         assertEquals("org.apache.cxf.configuration.types",
-                     JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.xsd"));
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.hi"));
+        assertEquals("org.apache.cxf.configuration.types",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.xsd"));
+        assertEquals("org.apache.cxf.configuration.types",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.html"));
+        assertEquals("org.apache.cxf.configuration.types_auto",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.auto"));
+        assertEquals("org.apache.cxf.configuration.types_mouse",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/configuration/types.mouse"));
+        
+        // other tests
+        assertEquals("https.com.mytech.rosette_analysis",
+                JAXBUtils.namespaceURIToPackage("https://mytech.com/rosette.analysis"));
+        assertEquals("org.apache.cxf.config._4types_",
+                JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/config/4types."));
         assertEquals("org.apache.cxf.config_types",
                      JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/config-types"));
         assertEquals("org.apache.cxf._default.types",
                      JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/default/types"));
-        assertEquals("org.apache.cxf.config._4types",
-                     JAXBUtils.namespaceURIToPackage("http://cxf.apache.org/config/4types."));
-        assertEquals("com.iona.configuration.types",
-                     JAXBUtils.namespaceURIToPackage("http://www.iona.com/configuration/types"));
+        assertEquals("com.progress.configuration.types",
+                     JAXBUtils.namespaceURIToPackage("http://www.progress.com/configuration/types"));
         assertEquals("org.apache.cxf.config.types",
-                     JAXBUtils.namespaceURIToPackage("urn://cxf-apache-org/config/types"));
+                JAXBUtils.namespaceURIToPackage("urn:cxf-apache-org:config:types"));
         assertEquals("types", JAXBUtils.namespaceURIToPackage("types"));
     } 
     

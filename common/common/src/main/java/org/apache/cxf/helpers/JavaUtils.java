@@ -30,7 +30,7 @@ public final class JavaUtils {
 
     /**
      * These are java keywords as specified at the following URL.
-     * http://java.sun.com/docs/books/jls/second_edition/html/lexical.doc.html#229308
+     * http://java.sun.com/docs/books/jls/third_edition/html/lexical.html#3.9
      * Note that false, true, and null are not strictly keywords; they are
      * literal values, but for the purposes of this array, they can be treated
      * as literals.
