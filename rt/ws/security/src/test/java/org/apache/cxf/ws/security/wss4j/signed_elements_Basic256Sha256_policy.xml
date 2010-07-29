@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsp:Policy 
+    xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy" 
+    xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702"
+    xmlns:ser="http://www.sdj.pl">
+  <wsp:ExactlyOne>
+    <wsp:All>
+      <sp:AsymmetricBinding>
+        <wsp:Policy>
+          <sp:InitiatorToken>
+            <wsp:Policy>
+              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                <wsp:Policy>
+                  <sp:RequireIssuerSerialReference />
+                  <sp:WssX509V3Token10 />
+                </wsp:Policy>
+              </sp:X509Token>
+            </wsp:Policy>
+          </sp:InitiatorToken>
+          <sp:RecipientToken>
+            <wsp:Policy>
+              <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+                <wsp:Policy>
+                  <sp:RequireIssuerSerialReference />
+                  <sp:WssX509V3Token10 />
+                </wsp:Policy>
+              </sp:X509Token>
+            </wsp:Policy>
+          </sp:RecipientToken>
+          <sp:AlgorithmSuite>
+            <wsp:Policy>
+              <sp:Basic256Sha256 />
+            </wsp:Policy>
+          </sp:AlgorithmSuite>
+          <sp:Layout>
+            <wsp:Policy>
+              <sp:Strict />
+            </wsp:Policy>
+          </sp:Layout>
+        </wsp:Policy>
+      </sp:AsymmetricBinding>
+      <sp:SignedElements>
+        <sp:XPath>//ser:Header</sp:XPath>
+      </sp:SignedElements>  
+    </wsp:All>
+  </wsp:ExactlyOne>
+</wsp:Policy>
