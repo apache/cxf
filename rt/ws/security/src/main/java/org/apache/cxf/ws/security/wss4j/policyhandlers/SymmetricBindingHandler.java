@@ -641,7 +641,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             } else {
                 sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
                                       + WSConstants.SAML_ASSERTION_ID);
-                sig.setKeyIdentifierType(type);
+                sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
             }
             
             String sigTokId;
