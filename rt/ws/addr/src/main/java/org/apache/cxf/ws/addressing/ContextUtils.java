@@ -412,6 +412,14 @@ public final class ContextUtils {
                         // has been sent (i.e. to a oneway, or a partial response
                         // to a decoupled twoway)
                         
+                        //In tomcat container, the httpServletRequest will be recycled/cleared in the 
+                        //servlet thread. The values in request can not be retrieved in the new created
+                        //thread after that . Replace it with httpServletRequest snaphost.
+                        if (inMessage.get("HTTP.REQUEST") != null
+                            && inMessage.get("HTTP.REQUEST.SNAPSHOT") != null) {
+                            inMessage.put("HTTP.REQUEST", inMessage.get("HTTP.REQUEST.SNAPSHOT"));
+
+                        }                   
                         // pause dispatch on current thread ...
                         inMessage.getInterceptorChain().pause();
 
