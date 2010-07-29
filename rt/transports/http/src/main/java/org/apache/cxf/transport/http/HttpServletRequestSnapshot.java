@@ -37,7 +37,6 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     private Cookie[] cookies;
     private String localAddr;
     private Locale local;
-    @SuppressWarnings("unchecked")
     private Enumeration locals;
     private String localName;
     private int localPort = -1;
@@ -63,7 +62,6 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         new java.util.concurrent.ConcurrentHashMap<String, Enumeration<String>>();
     private String requestedSessionId;
 
-    @SuppressWarnings("unchecked")
     public HttpServletRequestSnapshot(HttpServletRequest request) {
         super(request);
         authType = request.getAuthType();
@@ -98,7 +96,9 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         serverName = request.getServerName();
         serverPort = request.getServerPort();
         servletPath = request.getServletPath();
-        session = request.getSession();
+        if (request.isRequestedSessionIdValid()) {
+            session = request.getSession();
+        }
         principal = request.getUserPrincipal();
     }
 

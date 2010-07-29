@@ -275,13 +275,23 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
         setupMessage(inMessage, null, context, req, resp);
     }
     
-    protected void setupMessage(Message inMessage,
+    protected void setupMessage(final Message inMessage,
                                 final ServletConfig config,
                                 final ServletContext context, 
                                 final HttpServletRequest req, 
                                 final HttpServletResponse resp) throws IOException {
 
-        DelegatingInputStream in = new DelegatingInputStream(req.getInputStream());
+        DelegatingInputStream in = new DelegatingInputStream(req.getInputStream()) {
+            public void cacheInput() {
+                if (!cached) {
+                    //we need to cache the values of the HttpServletRequest
+                    //so they can be queried later for things like paths and schemes 
+                    //and such like that 
+                    inMessage.put(HTTP_REQUEST, new HttpServletRequestSnapshot(req));
+                }
+                super.cacheInput();
+            }
+        };
         inMessage.setContent(DelegatingInputStream.class, in);
         inMessage.setContent(InputStream.class, in);
         inMessage.put(HTTP_REQUEST, req);
