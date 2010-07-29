@@ -168,12 +168,13 @@ public final class JAXBUtils {
     }
     
     /** 
-     * Checks if the specified word is a Java keyword (as of 1.5).
+     * Checks if the specified word is a Java keyword (as defined in JavaUtils).
      * 
      * @param word the word to check.
      * @return true if the word is a keyword.
+     * @see org.apache.cxf.helpers.JavaUtils
      */
-    public static boolean isJavaKeyword(String word) {
+    protected static boolean isJavaKeyword(String word) {
         return JavaUtils.isJavaKeyword(word);
     }
 
@@ -194,7 +195,7 @@ public final class JAXBUtils {
     
     /**
      * Generates a Java package name from a URI according to the
-     * algorithm outlined in JAXB 2.0.
+     * algorithm outlined in Appendix D of JAXB (2.0+).
      * 
      * @param namespaceURI the namespace URI.
      * @return the package name.
@@ -203,13 +204,15 @@ public final class JAXBUtils {
        
         StringBuilder packageName = new StringBuilder();
         String authority = uri.getAuthority();
-        if (authority == null && "urn".equals(uri.getScheme())) {
+        String scheme = uri.getScheme();
+        if (authority == null && "urn".equals(scheme)) {
             authority = uri.getSchemeSpecificPart();
         }
         
         if (null != authority && !"".equals(authority)) {
-            if ("urn".equals(uri.getScheme())) {
+            if ("urn".equals(scheme)) {
                 packageName.append(authority);
+                /* JAXB 2.2 D.5.1, Rule #5 */
                 for (int i = 0; i < packageName.length(); i++) {
                     if (packageName.charAt(i) == '-') {
                         packageName.setCharAt(i, '.');
@@ -247,17 +250,29 @@ public final class JAXBUtils {
                     }
                     packageName.insert(0, normalizePackageNamePart(token));
                 }
-               
             }
+            
+            if (!("http".equalsIgnoreCase(scheme) || "urn".equalsIgnoreCase(scheme))) {
+                packageName.insert(0, ".");
+                packageName.insert(0, normalizePackageNamePart(scheme));
+            }
+            
         }
 
         String path = uri.getPath();
         if (path == null) {
             path = "";
         }
+        /* JAXB 2.2 D.5.1 Rule 2 - remove trailing .??, .???, or .html only. */
         int index = path.lastIndexOf('.');
         if (index < 0) {
             index = path.length();
+        } else {
+            String ending = path.substring(index + 1);
+            if (ending.length() < 2 || (ending.length() > 3 
+                && !"html".equalsIgnoreCase(ending))) {
+                index = path.length();
+            }
         }
         StringTokenizer st = new StringTokenizer(path.substring(0, index), "/");
         while (st.hasMoreTokens()) {
@@ -297,7 +312,7 @@ public final class JAXBUtils {
     
     /**
      * Converts an XML name to a Java identifier according to the mapping
-     * algorithm outlines in the JAXB specification
+     * algorithm outlined in the JAXB specification
      * 
      * @param name the XML name
      * @return the Java identifier
