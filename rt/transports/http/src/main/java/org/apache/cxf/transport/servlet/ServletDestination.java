@@ -34,7 +34,6 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.HTTPSession;
-import org.apache.cxf.transport.http.HttpServletRequestSnapshot;
 
 
 public class ServletDestination extends AbstractHTTPDestination {
@@ -88,10 +87,7 @@ public class ServletDestination extends AbstractHTTPDestination {
                      context,
                      req,
                      resp);
-        //the HttpServletRequest will be recycled in another thread when the operation 
-        //is oneway and WSA enabled. This SNAPSHOT request will be used in tihs case.
-        
-        inMessage.put("HTTP.REQUEST.SNAPSHOT", new HttpServletRequestSnapshot(req));
+
         ExchangeImpl exchange = new ExchangeImpl();
         exchange.setInMessage(inMessage);
         exchange.setSession(new HTTPSession(req));
