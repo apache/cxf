@@ -166,24 +166,75 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setLocation(String location) {
         this.location = location;
     }
-
-    public void setPolicy(Policy policy) {
-        this.policy = policy;
-        if (algorithmSuite == null) {
-            Iterator i = policy.getAlternatives();
-            while (i.hasNext() && algorithmSuite == null) {
-                List<PolicyComponent> p = CastUtils.cast((List)i.next());
-                for (PolicyComponent p2 : p) {
-                    if (p2 instanceof Binding) {
-                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
-                    }
-                }
-            }
+    
+    /**
+     * Sets the WS-P policy that is applied to communications between this client and the remote server
+     * if no value is supplied for {@link #setWsdlLocation(String)}.
+     * <p/>
+     * Accepts {@link Policy} or {@link Element} as input.
+     *
+     * @param newPolicy the policy object
+     *
+     * @throws IllegalArgumentException if {@code newPolicy} is not one of the supported types.
+     */
+    public void setPolicy(Object newPolicy) {
+        if (newPolicy instanceof Policy) {
+            this.setPolicyInternal((Policy) newPolicy);
+        } else if (newPolicy instanceof Element) {
+            this.setPolicyInternal((Element) newPolicy);    
+        } else {
+            throw new IllegalArgumentException("Unsupported policy object.  Type must be "
+                       + "org.apache.neethi.Policy or org.w3c.dom.Element.");
         }
     }
+    
+    /**
+     * Sets the WS-P policy that is applied to communications between this client and the remote server
+     * if no value is supplied for {@link #setWsdlLocation(String)}.
+     *
+     * @param newPolicy the policy object
+     *
+     * @deprecated This method exists to allow the use of inversion of control containers such as
+     *             the Spring Framework to configure an instance of this class while the overloaded
+     *             and deprecated methods are still present.  This method will be removed in
+     *             future versions along with the previously existing deprecated methods.
+     *
+     * @see #setPolicy(Object)
+     * @see #setPolicy(Element)
+     * @see #setPolicy(Policy)
+     */
+    @Deprecated
+    public void setPolicyObject(Object newPolicy) {
+        this.setPolicy(newPolicy);
+    }
 
-    public void setPolicy(Element policy) {
-        setPolicy(bus.getExtension(PolicyBuilder.class).getPolicy(policy));
+    /**
+     * Sets the WS-P policy that is applied to communications between this client and the remote server
+     * if no value is supplied for {@link #setWsdlLocation(String)}.
+     *
+     * @param newPolicy the policy object
+     *
+     * @deprecated This method and its overloaded counterpart {@link #setPolicy(Element)} will be removed in
+     *             future versions to facilitate configuration through inversion of control containers such as
+     *             the Spring Framework.  Use {@link setPolicy(Object)} instead.
+     */
+    @Deprecated
+    public void setPolicy(Policy newPolicy) {
+        this.setPolicyInternal(newPolicy);
+    }
+
+    /**
+     * Sets the WS-P policy that is applied to communications between this client and the remote server
+     * if no value is supplied for {@link #setWsdlLocation(String)}.
+     * 
+     * @param newPolicy the policy DOM structure
+     *
+     * @deprecated This method and its overloaded counterpart {@link #setPolicy(Policy)} will be removed in
+     *             future versions to facilitate configuration through inversion of control containers such as
+     *             the Spring Framework.    Use {@link setPolicy(Object)} instead.
+     */
+    public void setPolicy(Element newPolicy) {
+        this.setPolicyInternal(newPolicy);
     }
 
     public void setSoap12() {
@@ -283,6 +334,24 @@ public class STSClient implements Configurable, InterceptorProvider {
         return keySize;
     }
 
+    protected void setPolicyInternal(Policy newPolicy) {
+        this.policy = newPolicy;
+        if (algorithmSuite == null) {
+            Iterator i = policy.getAlternatives();
+            while (i.hasNext() && algorithmSuite == null) {
+                List<PolicyComponent> p = CastUtils.cast((List)i.next());
+                for (PolicyComponent p2 : p) {
+                    if (p2 instanceof Binding) {
+                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    }
+                }
+            }
+        }
+    }
+    
+    protected void setPolicyInternal(Element newPolicy) {
+        this.setPolicyInternal(bus.getExtension(PolicyBuilder.class).getPolicy(newPolicy));
+    }
 
     private void createClient() throws BusException, EndpointException {
         if (client != null) {
@@ -330,7 +399,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 Conduit conduit = client.getConduit();
                 EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(client.getEndpoint()
                     .getEndpointInfo(), boi, conduit);
-                setPolicy(effectivePolicy.getPolicy());
+                setPolicyInternal(effectivePolicy.getPolicy());
                 return boi;
             }
         }
