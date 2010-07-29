@@ -172,23 +172,25 @@ public class STSClient implements Configurable, InterceptorProvider {
         this.location = location;
     }
 
-    public void setPolicy(Policy policy) {
-        this.policy = policy;
-        if (algorithmSuite == null) {
-            Iterator i = policy.getAlternatives();
-            while (i.hasNext() && algorithmSuite == null) {
-                List<PolicyComponent> p = CastUtils.cast((List)i.next());
-                for (PolicyComponent p2 : p) {
-                    if (p2 instanceof Binding) {
-                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
-                    }
-                }
-            }
+    /**
+     * Sets the WS-P policy that is applied to communications between this client and the remote server
+     * if no value is supplied for {@link #setWsdlLocation(String)}.
+     * <p/>
+     * Accepts {@link Policy} or {@link Element} as input.
+     *
+     * @param newPolicy the policy object
+     *
+     * @throws IllegalArgumentException if {@code newPolicy} is not one of the supported types.
+     */
+    public void setPolicy(Object newPolicy) {
+        if (newPolicy instanceof Policy) {
+            this.setPolicyInternal((Policy) newPolicy);
+        } else if (newPolicy instanceof Element) {
+            this.setPolicyInternal((Element) newPolicy);    
+        } else {
+            throw new IllegalArgumentException("Unsupported policy object.  Type must be "
+                       + "org.apache.neethi.Policy or org.w3c.dom.Element.");
         }
-    }
-
-    public void setPolicy(Element policy) {
-        setPolicy(bus.getExtension(PolicyBuilder.class).getPolicy(policy));
     }
 
     public void setSoap12() {
@@ -287,6 +289,25 @@ public class STSClient implements Configurable, InterceptorProvider {
     public int getKeySize() {
         return keySize;
     }
+    
+    protected void setPolicyInternal(Policy newPolicy) {
+        this.policy = newPolicy;
+        if (algorithmSuite == null) {
+            Iterator i = policy.getAlternatives();
+            while (i.hasNext() && algorithmSuite == null) {
+                List<PolicyComponent> p = CastUtils.cast((List)i.next());
+                for (PolicyComponent p2 : p) {
+                    if (p2 instanceof Binding) {
+                        algorithmSuite = ((Binding)p2).getAlgorithmSuite();
+                    }
+                }
+            }
+        }
+    }
+    
+    protected void setPolicyInternal(Element newPolicy) {
+        this.setPolicyInternal(bus.getExtension(PolicyBuilder.class).getPolicy(newPolicy));
+    }
 
 
     private void createClient() throws BusException, EndpointException {
@@ -335,7 +356,7 @@ public class STSClient implements Configurable, InterceptorProvider {
                 Conduit conduit = client.getConduit();
                 EffectivePolicy effectivePolicy = pe.getEffectiveClientRequestPolicy(client.getEndpoint()
                     .getEndpointInfo(), boi, conduit);
-                setPolicy(effectivePolicy.getPolicy());
+                setPolicyInternal(effectivePolicy.getPolicy());
                 return boi;
             }
         }
