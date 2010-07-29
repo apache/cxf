@@ -26,12 +26,19 @@ import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.soap.Node;
 import javax.xml.soap.SOAPException;
 import javax.xml.soap.SOAPMessage;
+import javax.xml.xpath.XPath;
+import javax.xml.xpath.XPathConstants;
+import javax.xml.xpath.XPathExpression;
+import javax.xml.xpath.XPathFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.Binding;
@@ -50,6 +57,7 @@ import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
+import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
@@ -92,6 +100,15 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_ELEMENTS),
                 null,
                 Arrays.asList(CoverageType.SIGNED));
+    }
+
+    // TODO this test does not follow the traditional pattern as no server-side enforcement
+    // of algorithm suites yet exists.  This support is blocked on WSS4J patches.  In the interim
+    // the outbound side is tested ONLY.
+    @Test
+    public void testAsymmetricBindingAlgorithmSuitePolicy() throws Exception {
+        runOutInterceptorAndValidateAsymmetricBinding("signed_elements_policy.xml");
+        runOutInterceptorAndValidateAsymmetricBinding("signed_elements_Basic256Sha256_policy.xml");
     }
 
     @Test
@@ -744,6 +761,23 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         return msg.getContent(SOAPMessage.class).getSOAPPart();
     }
     
+    // TODO: This method can be removed when testAsymmetricBindingPolicyWithSignedElements
+    // is cleaned up by adding server side enforcement of signature related algorithms.
+    private void runOutInterceptorAndValidateAsymmetricBinding(String policyDoc) throws Exception {
+        final Document originalDoc = this.readDocument("wsse-request-clean.xml");
+        
+        final Element outPolicyElement = 
+                this.readDocument(policyDoc).getDocumentElement();
+       
+        final Policy outPolicy = this.policyBuilder.getPolicy(outPolicyElement);
+        final AssertionInfoMap aim = new AssertionInfoMap(outPolicy);
+        
+        final Document signedDoc = this.runOutInterceptorAndValidate(
+                originalDoc, outPolicy, Arrays.asList(SP12Constants.ASYMMETRIC_BINDING), null);
+        
+        this.verifySignatureAlgorithms(signedDoc, aim);
+    }
+    
     private PolicyBasedWSS4JOutInterceptorInternal getOutInterceptor() {
         return (new PolicyBasedWSS4JOutInterceptor()).createEndingInterceptor();
     }
@@ -840,6 +874,51 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         assertNotNull(protectedElements);
     }
     
+    // TODO: This method can be removed when runOutInterceptorAndValidateAsymmetricBinding
+    // is cleaned up by adding server side enforcement of signature related algorithms.
+    private void verifySignatureAlgorithms(Document signedDoc, AssertionInfoMap aim) throws Exception { 
+        final AssertionInfo assertInfo = aim.get(SP12Constants.ASYMMETRIC_BINDING).iterator().next();
+        assertNotNull(assertInfo);
+        
+        final AsymmetricBinding binding = (AsymmetricBinding) assertInfo.getAssertion();
+        final String expectedSignatureMethod = binding.getAlgorithmSuite().getAsymmetricSignature();
+        final String expectedDigestAlgorithm = binding.getAlgorithmSuite().getDigest();
+        final String expectedCanonAlgorithm  = binding.getAlgorithmSuite().getInclusiveC14n();
+            
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        final NamespaceContext nsContext = this.getNamespaceContext();
+        xpath.setNamespaceContext(nsContext);
+        
+        // Signature Algorithm
+        final XPathExpression sigAlgoExpr = 
+            xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo" 
+                              + "/ds:SignatureMethod/@Algorithm");
+        
+        final String sigMethod =  (String) sigAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
+        assertEquals(expectedSignatureMethod, sigMethod);
+        
+        // Digest Method Algorithm
+        final XPathExpression digestAlgoExpr = xpath.compile(
+            "/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference/ds:DigestMethod");
+        
+        final NodeList digestMethodNodes = 
+            (NodeList) digestAlgoExpr.evaluate(signedDoc, XPathConstants.NODESET);
+        
+        for (int i = 0; i < digestMethodNodes.getLength(); i++) {
+            Node node = (Node)digestMethodNodes.item(i);
+            String digestAlgorithm = node.getAttributes().getNamedItem("Algorithm").getNodeValue();
+            assertEquals(expectedDigestAlgorithm, digestAlgorithm);
+        }
+        
+        // Canonicalization Algorithm
+        final XPathExpression canonAlgoExpr =
+            xpath.compile("/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo" 
+                              + "/ds:CanonicalizationMethod/@Algorithm");
+        final String canonMethod =  (String) canonAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
+        assertEquals(expectedCanonAlgorithm, canonMethod);
+    }
+
     private static final class MockEndpoint extends 
         AbstractAttributedInterceptorProvider implements Endpoint {
 
