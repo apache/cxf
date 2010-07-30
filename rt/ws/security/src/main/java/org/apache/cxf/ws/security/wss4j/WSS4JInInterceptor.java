@@ -217,27 +217,39 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 t2 = System.currentTimeMillis();
             }
 
-            if (wsResult == null) { // no security header found
-                if (doAction == WSConstants.NO_SECURITY) {
-                    return;
-                } else if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
-                    LOG.warning("Request does not contain required Security header, " 
+            if (wsResult != null) { // security header found
+                if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
+                    checkSignatureConfirmation(reqData, wsResult);
+                }
+
+                checkSignatures(msg, reqData, wsResult);
+                checkTimestamps(msg, reqData, wsResult);
+                checkActions(msg, reqData, wsResult, actions);
+                doResults(msg, actor, doc, wsResult);
+            } else { // no security header found
+                // Create an empty result vector to pass into the required validation
+                // methods.
+                wsResult = new Vector<Object>();
+                
+                if (doc.getSOAPPart().getEnvelope().getBody().hasFault()) {
+                    LOG.warning("Request does not contain Security header, " 
                                 + "but it's a fault.");
-                    return;
+                    // We allow lax action matching here for backwards compatibility
+                    // with manually configured WSS4JInInterceptors that previously
+                    // allowed faults to pass through even if their actions aren't
+                    // a strict match against those configured.  In the WS-SP case,
+                    // we will want to still call doResults as it handles asserting
+                    // certain assertions that do not require a WS-S header such as
+                    // a sp:TransportBinding assertion.  In the case of WS-SP,
+                    // the unasserted assertions will provide confirmation that
+                    // security was not sufficient.
+                    // checkActions(msg, reqData, wsResult, actions);
+                    doResults(msg, actor, doc, wsResult);
                 } else {
-                    LOG.warning("Request does not contain required Security header");
-                    throw new WSSecurityException(WSSecurityException.INVALID_SECURITY);
+                    checkActions(msg, reqData, wsResult, actions);
+                    doResults(msg, actor, doc, wsResult);
                 }
             }
-            if (reqData.getWssConfig().isEnableSignatureConfirmation()) {
-                checkSignatureConfirmation(reqData, wsResult);
-            }
-
-            checkSignatures(msg, reqData, wsResult);
-            checkTimestamps(msg, reqData, wsResult);
-            checkActions(msg, reqData, wsResult, actions);
-            
-            doResults(msg, actor, doc, wsResult);
 
             if (doTimeLog) {
                 t3 = System.currentTimeMillis();

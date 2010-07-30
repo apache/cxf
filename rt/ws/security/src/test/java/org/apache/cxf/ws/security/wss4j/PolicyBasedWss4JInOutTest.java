@@ -19,6 +19,7 @@
 package org.apache.cxf.ws.security.wss4j;
 
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -100,6 +101,27 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 Arrays.asList(SP12Constants.SIGNED_ELEMENTS),
                 null,
                 Arrays.asList(CoverageType.SIGNED));
+    }
+    
+    @Test
+    public void testTransportBinding() throws Exception {
+        this.runInInterceptorAndValidate(
+                "wsse-request-clean.xml",
+                "transport_binding_policy.xml",
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
+                              SP12Constants.TRANSPORT_TOKEN),
+                null,
+                new ArrayList<CoverageType>());
+        
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "transport_binding_policy.xml",
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING),
+                null,
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
+                              SP12Constants.TRANSPORT_TOKEN),
+                null,
+                new ArrayList<CoverageType>());
     }
 
     // TODO this test does not follow the traditional pattern as no server-side enforcement
@@ -620,6 +642,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         t.setOutputProperty(OutputKeys.INDENT, "no");
         t.transform(new DOMSource(inDoc), new StreamResult(System.out));
         */
+        
         
         this.runInInterceptorAndValidate(inDoc,
                 inPolicy, inAssertions.getAssertedAssertions(),
