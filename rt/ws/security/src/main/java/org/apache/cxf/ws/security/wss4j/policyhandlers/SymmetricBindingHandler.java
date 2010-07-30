@@ -430,7 +430,6 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                             if (id.startsWith("#")) {
                                 id = id.substring(1);
                             }
-
                             dkEncr.setExternalKey(encrTok.getSecret(), id);
                         } else {
                             dkEncr.setExternalKey(encrTok.getSecret(), encrTok.getId());
@@ -498,9 +497,14 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                             encr.setUseKeyIdentifier(true);
                             encr.setKeyIdentifierType(WSConstants.EMBED_SECURITY_TOKEN_REF);
                         }
+                    } else {
+                        if (encrToken instanceof IssuedToken) {
+                            encr.setUseKeyIdentifier(true);
+                            encr.setCustomReferenceValue(SecurityTokenReference.SAML_ID_URI);
+                            encr.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
+                        }
                     }
 
-                    
                     encr.prepare(saaj.getSOAPPart(),
                                  crypto);
                    
