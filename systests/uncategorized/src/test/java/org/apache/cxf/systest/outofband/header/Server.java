@@ -24,12 +24,14 @@ package org.apache.cxf.systest.outofband.header;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 //import org.apache.cxf.BusFactory;
 //import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 
 public class Server extends AbstractBusTestServerBase {
@@ -76,6 +78,14 @@ public class Server extends AbstractBusTestServerBase {
         ep.setProperties(props);
         ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader");
 
+        ep = Endpoint.create(new OOBHdrPropertyServiceImpl());
+        props = new HashMap<String, Object>(2);
+        props.put(Endpoint.WSDL_SERVICE, new QName("http://apache.org/hello_world_doc_lit_bare", 
+                                                   "SOAPService"));
+        props.put(Endpoint.WSDL_PORT, new QName("http://apache.org/hello_world_doc_lit_bare", "SoapPort"));
+        ep.setProperties(props);
+        ep.publish("http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeaderProperty");
+
     }
 
 
@@ -89,5 +99,17 @@ public class Server extends AbstractBusTestServerBase {
         } finally {
             System.out.println("done!");
         }
+    }
+    
+    
+    @WebService(serviceName = "SOAPService", 
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_doc_lit_bare.PutLastTradedPricePortType",
+                targetNamespace = "http://apache.org/hello_world_doc_lit_bare",
+                wsdlLocation = "testutils/doc_lit_bare.wsdl")
+    @EndpointProperty(key = "endpoint-processes-headers",
+                      value = "{http://cxf.apache.org/outofband/Header}outofbandHeader")
+    public class OOBHdrPropertyServiceImpl extends OOBHdrServiceImpl {
+        
     }
 }

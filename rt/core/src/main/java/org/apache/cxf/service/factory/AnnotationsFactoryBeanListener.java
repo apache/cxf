@@ -25,6 +25,8 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.DataBinding;
+import org.apache.cxf.annotations.EndpointProperties;
+import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.Logging;
@@ -83,6 +85,11 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             addFastInfosetSupport(ep, cls.getAnnotation(FastInfoset.class));
             addGZipSupport(ep, bus, cls.getAnnotation(GZIP.class));
             addLoggingSupport(ep, bus, cls.getAnnotation(Logging.class));
+            addEndpointProperties(ep, bus, cls.getAnnotation(EndpointProperty.class));
+            EndpointProperties props = cls.getAnnotation(EndpointProperties.class);
+            if (props != null) {
+                addEndpointProperties(ep, bus, props.value());
+            }
             break; 
         }
         case SERVER_CREATED: {
@@ -111,6 +118,11 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                                  WSDLDocumentation.Placement.SERVICE,
                                  docs.toArray(new WSDLDocumentation[docs.size()]));
             }
+            addEndpointProperties(server.getEndpoint(), bus, cls.getAnnotation(EndpointProperty.class));
+            EndpointProperties props = cls.getAnnotation(EndpointProperties.class);
+            if (props != null) {
+                addEndpointProperties(server.getEndpoint(), bus, props.value());
+            }
             addBindingOperationDocs(server);
             break;
         }
@@ -130,6 +142,21 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         default:
             //do nothing
         }
+    }
+
+    private void addEndpointProperties(Endpoint ep, Bus bus, EndpointProperty ... annotations) {
+        for (EndpointProperty prop : annotations) {
+            if (prop == null) {
+                continue;
+            }
+            String s[] = prop.value();
+            if (s.length == 1) {
+                ep.getEndpointInfo().setProperty(prop.key(), s[0]);
+            } else {
+                ep.getEndpointInfo().setProperty(prop.key(), s[1]);                
+            }
+        }
+        
     }
 
     private void setDataBinding(AbstractServiceFactoryBean factory,

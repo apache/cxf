@@ -187,18 +187,22 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         assertFalse(check(0, putLastTradedPrice, false, true, priceData));
         assertFalse(check(1, putLastTradedPrice, false, true, priceData));
         assertTrue(check(2, putLastTradedPrice, false, true, priceData));        
+        assertTrue(check(3, putLastTradedPrice, false, true, priceData));        
 
         assertFalse(check(0, putLastTradedPrice, true, true, priceData));
         assertFalse(check(1, putLastTradedPrice, true, true, priceData));
         assertFalse(check(2, putLastTradedPrice, true, true, priceData));        
+        assertFalse(check(3, putLastTradedPrice, true, true, priceData));        
 
         assertTrue(check(0, putLastTradedPrice, false, false, priceData));
         assertTrue(check(1, putLastTradedPrice, false, false, priceData));
         assertTrue(check(2, putLastTradedPrice, false, false, priceData));        
+        assertTrue(check(4, putLastTradedPrice, false, false, priceData));        
 
         assertTrue(check(0, putLastTradedPrice, true, false, priceData));
         assertTrue(check(1, putLastTradedPrice, true, false, priceData));
         assertTrue(check(2, putLastTradedPrice, true, false, priceData));        
+        assertTrue(check(4, putLastTradedPrice, true, false, priceData));        
     }
     
     private boolean check(int i, PutLastTradedPricePortType putLastTradedPrice, 
@@ -212,8 +216,12 @@ public class OOBHeaderTest extends AbstractBusClientServerTestBase {
         case 1:
             address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortNoHeader";
             break;
+        case 2:
+            address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader";      
+            break;
         default:
-            address = "http://localhost:" + PORT + "/SOAPDocLitBareService/SoapPortHeader";                
+            address = "http://localhost:" + PORT 
+                + "/SOAPDocLitBareService/SoapPortHeaderProperty";                
         }
         ((BindingProvider)putLastTradedPrice).getRequestContext()
             .put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, address);
