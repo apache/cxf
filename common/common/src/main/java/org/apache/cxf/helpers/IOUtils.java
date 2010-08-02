@@ -38,16 +38,49 @@ public final class IOUtils {
     }
     
     /**
+     * Use this function instead of new String(byte[], String) to avoid surprises from 
+     * non-standard default encodings.
+     * @param bytes
+     * @param charsetName
+     * @return
+     */
+    public static String newStringFromBytes(byte[] bytes, String charsetName) {
+        try {
+            return new String(bytes, charsetName);
+        } catch (UnsupportedEncodingException e) {
+            throw 
+                new RuntimeException("Impossible failure: Charset.forName(\""
+                                     + charsetName + "\") returns invalid name.");
+
+        }
+    }
+    
+    
+    /**
      * Use this function instead of new String(byte[]) to avoid surprises from non-standard default encodings.
      * @param bytes
      * @return
      */
     public static String newStringFromBytes(byte[] bytes) {
+        return newStringFromBytes(bytes, UTF8_CHARSET.name());        
+    }
+    
+    /**
+     * Use this function instead of new String(byte[], int, int, String) 
+     * to avoid surprises from non-standard default encodings.
+     * @param bytes
+     * @param charsetName
+     * @param start
+     * @param length
+     * @return
+     */
+    public static String newStringFromBytes(byte[] bytes, String charsetName, int start, int length) {
         try {
-            return new String(bytes, UTF8_CHARSET.name());
+            return new String(bytes, start, length, charsetName);
         } catch (UnsupportedEncodingException e) {
             throw 
-                new RuntimeException("Impossible failure: Charset.forName(\"utf-8\") returns invalid name.");
+                new RuntimeException("Impossible failure: Charset.forName(\""
+                                     + charsetName + "\") returns invalid name.");
 
         }
     }
@@ -61,13 +94,7 @@ public final class IOUtils {
      * @return
      */
     public static String newStringFromBytes(byte[] bytes, int start, int length) {
-        try {
-            return new String(bytes, start, length, UTF8_CHARSET.name());
-        } catch (UnsupportedEncodingException e) {
-            throw 
-                new RuntimeException("Impossible failure: Charset.forName(\"utf-8\") returns invalid name.");
-
-        }
+        return newStringFromBytes(bytes, UTF8_CHARSET.name(), start, length);
     }
 
     public static int copy(final InputStream input, final OutputStream output)

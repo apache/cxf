@@ -24,6 +24,7 @@ import java.io.PrintWriter;
 import java.util.logging.Level;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
@@ -116,7 +117,11 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 if (bos.size() > limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
                 }
-                bos.writeCacheTo(buffer.getPayload(), limit);
+                if (StringUtils.isEmpty(encoding)) {
+                    bos.writeCacheTo(buffer.getPayload(), limit);
+                } else {
+                    bos.writeCacheTo(buffer.getPayload(), encoding, limit);
+                }
                     
                 bos.close();
             } catch (IOException e) {
