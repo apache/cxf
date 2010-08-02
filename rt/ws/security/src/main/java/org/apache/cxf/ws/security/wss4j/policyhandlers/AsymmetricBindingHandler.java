@@ -95,7 +95,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
     private void doSignBeforeEncrypt() {
         try {
-            Vector<WSEncryptionPart> sigs = getSignedParts();
+            Vector<WSEncryptionPart> sigs = new Vector<WSEncryptionPart>();
             if (isRequestor()) {
                 //Add timestamp
                 if (timestampEl != null) {
@@ -195,6 +195,9 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 try {
                     doSignature(sigParts);
                 } catch (WSSecurityException e) {
+                    //REVISIT - exception
+                    e.printStackTrace();
+                } catch (SOAPException e) {
                     //REVISIT - exception
                     e.printStackTrace();
                 }
@@ -334,7 +337,8 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
         }
     }
-    private void doSignature(Vector<WSEncryptionPart> sigParts) throws WSSecurityException {
+    
+    private void doSignature(Vector<WSEncryptionPart> sigParts) throws WSSecurityException, SOAPException {
         Token sigToken = null;
         TokenWrapper wrapper = null;
         if (isRequestor()) {
@@ -385,18 +389,16 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             }
         } else {
             WSSecSignature sig = getSignatureBuider(wrapper, sigToken, false);
+                      
+            // This action must occur before sig.prependBSTElementToHeader
+            if (abinding.isTokenProtection()
+                    && sig.getBSTTokenId() != null) {
+                sigParts.add(new WSEncryptionPart(sig.getBSTTokenId()));
+            }
+
             sig.prependBSTElementToHeader(secHeader);
             insertBeforeBottomUp(sig.getSignatureElement());
-            
-            if (abinding.isTokenProtection()) {                
-                // Special flag telling WSS4J to sign the initiator token.
-                // Use this instead of the BST ID so that we don't
-                // have to deal with maintaining such logic here.
-                sigParts.add(new WSEncryptionPart("Token", null, 
-                        "Element", WSConstants.PART_TYPE_ELEMENT));
-            }
-                    
-            sig.prependBSTElementToHeader(secHeader);
+            sigParts.addAll(this.getSignedParts());
             
             AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
             sig.setSignatureAlgorithm(algorithmSuite.getAsymmetricSignature());
@@ -406,7 +408,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
             signatures.add(sig.getSignatureValue());
-
                         
             mainSigId = addWsuIdToElement(sig.getSignatureElement());
         }

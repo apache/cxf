@@ -18,11 +18,13 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
-
+import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Vector;
 import java.util.concurrent.Executor;
 
@@ -58,12 +60,17 @@ import org.apache.cxf.ws.policy.PolicyException;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
+import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
+import org.apache.cxf.ws.security.tokenstore.SecurityToken;
+import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.wss4j.CryptoCoverageUtil.CoverageType;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor.PolicyBasedWSS4JOutInterceptorInternal;
 import org.apache.neethi.Policy;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityEngineResult;
+import org.apache.ws.security.components.crypto.Crypto;
+import org.apache.ws.security.components.crypto.CryptoFactory;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 import org.apache.ws.security.util.WSSecurityUtil;
@@ -101,6 +108,29 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 null,
                 Arrays.asList(CoverageType.SIGNED));
     }
+    
+    @Test
+    public void testTransportBinding() throws Exception {
+        this.runInInterceptorAndValidate(
+                "wsse-request-clean.xml",
+                "transport_binding_policy.xml",
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
+                              SP12Constants.TRANSPORT_TOKEN),
+                null,
+                new ArrayList<CoverageType>());
+        
+        // Note that outbound does not asset TRANSPORT_TOKEN as another handler
+        // would assert that.
+        this.runAndValidate(
+                "wsse-request-clean.xml",
+                "transport_binding_policy.xml",
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING),
+                null,
+                Arrays.asList(SP12Constants.TRANSPORT_BINDING,
+                              SP12Constants.TRANSPORT_TOKEN),
+                null,
+                new ArrayList<CoverageType>());
+    }
 
     // TODO this test does not follow the traditional pattern as no server-side enforcement
     // of algorithm suites yet exists.  This support is blocked on WSS4J patches.  In the interim
@@ -109,6 +139,15 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     public void testAsymmetricBindingAlgorithmSuitePolicy() throws Exception {
         runOutInterceptorAndValidateAsymmetricBinding("signed_elements_policy.xml");
         runOutInterceptorAndValidateAsymmetricBinding("signed_elements_Basic256Sha256_policy.xml");
+    }
+    
+    // TODO this test does not follow the traditional pattern as no server-side enforcement
+    // of algorithm suites yet exists.  This support is blocked on WSS4J patches.  In the interim
+    // the outbound side is tested ONLY.
+    @Test
+    public void testSignedElementsWithIssuedSAMLToken() throws Exception {
+        this.runOutInterceptorAndValidateSamlTokenAttached(
+                "signed_elements_with_sst_issued_token_policy.xml");
     }
 
     @Test
@@ -621,6 +660,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         t.transform(new DOMSource(inDoc), new StreamResult(System.out));
         */
         
+        
         this.runInInterceptorAndValidate(inDoc,
                 inPolicy, inAssertions.getAssertedAssertions(),
                 inAssertions.getNotAssertedAssertions(), types);
@@ -726,7 +766,17 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         AssertionInfoMap aim = new AssertionInfoMap(policy);
         
         final SoapMessage msg = 
-            this.getOutSoapMessageForDom(document, aim); 
+            this.getOutSoapMessageForDom(document, aim);
+        
+        return this.runOutInterceptorAndValidate(msg, policy, aim,
+                assertedOutAssertions, notAssertedOutAssertions);       
+    }    
+        
+    
+    private Document runOutInterceptorAndValidate(SoapMessage msg, Policy policy,
+            AssertionInfoMap aim,
+            List<QName> assertedOutAssertions, 
+            List<QName> notAssertedOutAssertions) throws Exception {
         
         this.getOutInterceptor().handleMessage(msg);
         
@@ -761,7 +811,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         return msg.getContent(SOAPMessage.class).getSOAPPart();
     }
     
-    // TODO: This method can be removed when testAsymmetricBindingPolicyWithSignedElements
+    // TODO: This method can be removed when testAsymmetricBindingAlgorithmSuitePolicy
     // is cleaned up by adding server side enforcement of signature related algorithms.
     private void runOutInterceptorAndValidateAsymmetricBinding(String policyDoc) throws Exception {
         final Document originalDoc = this.readDocument("wsse-request-clean.xml");
@@ -776,6 +826,50 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
                 originalDoc, outPolicy, Arrays.asList(SP12Constants.ASYMMETRIC_BINDING), null);
         
         this.verifySignatureAlgorithms(signedDoc, aim);
+    }
+      
+    // TODO: This method can be removed or reduced when testSignedElementsWithIssuedSAMLToken is
+    // cleaned up.
+    private void runOutInterceptorAndValidateSamlTokenAttached(String policyDoc) throws Exception {
+        // create the request message
+        final Document document = this.readDocument("wsse-request-clean.xml");
+        final Element outPolicyElement = 
+            this.readDocument(policyDoc).getDocumentElement();
+        final Policy policy = this.policyBuilder.getPolicy(outPolicyElement);
+        
+        AssertionInfoMap aim = new AssertionInfoMap(policy);        
+        SoapMessage msg = this.getOutSoapMessageForDom(document, aim);
+        
+        // add an "issued" assertion into the message exchange
+        Element issuedAssertion = 
+            this.readDocument("example-sts-issued-saml-assertion.xml").getDocumentElement();
+        
+        String assertionId = issuedAssertion.getAttributeNode("AssertionID").getNodeValue();
+        
+        SecurityToken issuedToken = 
+            new SecurityToken(assertionId, issuedAssertion, null);
+        
+        Properties cryptoProps = new Properties();
+        URL url = ClassLoader.getSystemResource("META-INF/cxf/outsecurity.properties");
+        cryptoProps.load(url.openStream());
+        Crypto crypto = CryptoFactory.getInstance(cryptoProps);
+        String alias = cryptoProps.getProperty("org.apache.ws.security.crypto.merlin.keystore.alias");
+        issuedToken.setX509Certificate(crypto.getCertificates(alias)[0], crypto);
+        
+        msg.getExchange().get(Endpoint.class).put(SecurityConstants.TOKEN_ID, 
+                issuedToken.getId());
+        msg.getExchange().put(SecurityConstants.TOKEN_ID, issuedToken.getId());
+        
+        TokenStore tokenStore = new MemoryTokenStore();
+        msg.getExchange().get(Endpoint.class).getEndpointInfo()
+            .setProperty(TokenStore.class.getName(), tokenStore);
+        tokenStore.add(issuedToken);
+        
+        // fire the interceptor and verify results
+        final Document signedDoc = this.runOutInterceptorAndValidate(
+                msg, policy, aim, null, null);
+        
+        verifySignatureCoversAssertion(signedDoc, assertionId);
     }
     
     private PolicyBasedWSS4JOutInterceptorInternal getOutInterceptor() {
@@ -876,6 +970,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     
     // TODO: This method can be removed when runOutInterceptorAndValidateAsymmetricBinding
     // is cleaned up by adding server side enforcement of signature related algorithms.
+    // See https://issues.apache.org/jira/browse/WSS-222
     private void verifySignatureAlgorithms(Document signedDoc, AssertionInfoMap aim) throws Exception { 
         final AssertionInfo assertInfo = aim.get(SP12Constants.ASYMMETRIC_BINDING).iterator().next();
         assertNotNull(assertInfo);
@@ -918,7 +1013,55 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
         final String canonMethod =  (String) canonAlgoExpr.evaluate(signedDoc, XPathConstants.STRING);
         assertEquals(expectedCanonAlgorithm, canonMethod);
     }
-
+    
+    // TODO: This method can be removed when runOutInterceptorAndValidateSamlTokenAttached
+    // is cleaned up.
+    private void verifySignatureCoversAssertion(Document signedDoc, String assertionId) throws Exception {
+        XPathFactory factory = XPathFactory.newInstance();
+        XPath xpath = factory.newXPath();
+        final NamespaceContext nsContext = this.getNamespaceContext();
+        xpath.setNamespaceContext(nsContext);
+        
+        // Find the SecurityTokenReference for the assertion
+        final XPathExpression strExpr = xpath.compile(
+            "/s:Envelope/s:Header/wsse:Security/wsse:SecurityTokenReference/wsse:KeyIdentifier");
+        
+        final NodeList strKeyIdNodes = 
+            (NodeList) strExpr.evaluate(signedDoc, XPathConstants.NODESET);
+        
+        String strId = null;
+        for (int i = 0; i < strKeyIdNodes.getLength(); i++) {
+            Node keyIdNode = (Node) strKeyIdNodes.item(i);
+            String strKey = keyIdNode.getTextContent();
+            if (strKey.equals(assertionId)) {
+                Node strNode = (Node) keyIdNode.getParentNode();
+                strId = strNode.getAttributes().
+                    getNamedItemNS(nsContext.getNamespaceURI("wsu"), "Id").getNodeValue();
+                break;
+            }
+        }
+        assertNotNull("SecurityTokenReference for " + assertionId + " not found in security header.", strId);
+        
+        // Verify STR is included in the signature references
+        final XPathExpression sigRefExpr = xpath.compile(
+            "/s:Envelope/s:Header/wsse:Security/ds:Signature/ds:SignedInfo/ds:Reference");
+        
+        final NodeList sigReferenceNodes = 
+            (NodeList) sigRefExpr.evaluate(signedDoc, XPathConstants.NODESET);
+        
+        boolean foundStrReference = false;
+        for (int i = 0; i < sigReferenceNodes.getLength(); i++) {
+            Node sigRefNode = (Node) sigReferenceNodes.item(i);
+            String sigRefURI = sigRefNode.getAttributes().getNamedItem("URI").getNodeValue();
+            if (sigRefURI.equals("#" + strId)) {
+                foundStrReference = true;
+                break;
+            }
+        }
+        
+        assertTrue("SecurityTokenReference for " + assertionId + " is not signed.", foundStrReference);
+    }
+    
     private static final class MockEndpoint extends 
         AbstractAttributedInterceptorProvider implements Endpoint {
 

@@ -119,7 +119,11 @@ import org.apache.ws.security.message.WSSecSignatureConfirmation;
 import org.apache.ws.security.message.WSSecTimestamp;
 import org.apache.ws.security.message.WSSecUsernameToken;
 import org.apache.ws.security.message.token.SecurityTokenReference;
+import org.apache.ws.security.transform.STRTransform;
 import org.apache.ws.security.util.WSSecurityUtil;
+import org.apache.xml.security.signature.XMLSignatureException;
+import org.apache.xml.security.transforms.TransformationException;
+import org.apache.xml.security.transforms.Transforms;
 
 /**
  * 
@@ -462,11 +466,11 @@ public abstract class AbstractBindingBuilder {
                     this.encryptedTokensIdList.add(secToken.getId());
                 }
         
-                if (secToken.getX509Certificate() == null) {
+                if (secToken.getX509Certificate() == null) {   
                     //Add the extracted token
                     ret.put(token, new WSSecurityTokenHolder(secToken));
                 } else {
-                    WSSecSignature sig = new WSSecSignature();                    
+                    WSSecSignatureHelper sig = new WSSecSignatureHelper();                    
                     sig.setX509Certificate(secToken.getX509Certificate());
                     sig.setCustomTokenId(secToken.getId());
                     sig.setKeyIdentifierType(WSConstants.CUSTOM_KEY_IDENTIFIER);
@@ -500,8 +504,10 @@ public abstract class AbstractBindingBuilder {
                         throw new Fault(e);
                     }
                     
+                    addSupportingElement(cloneElement(sig.getSecRef().getElement()));
+                    
                     if (suppTokens.isEncryptedToken()) {
-                        encryptedTokensIdList.add(sig.getBSTTokenId());
+                        encryptedTokensIdList.add(secToken.getId());
                     }
                     ret.put(token, sig);                
                 }
@@ -554,10 +560,22 @@ public abstract class AbstractBindingBuilder {
             Object tempTok =  entry.getValue();
             WSEncryptionPart part = null;
             
-            if (tempTok instanceof WSSecSignature) {
-                WSSecSignature tempSig = (WSSecSignature) tempTok;
-                if (tempSig.getBSTTokenId() != null) {
-                    part = new WSEncryptionPart(tempSig.getBSTTokenId());
+            if (tempTok instanceof WSSecSignatureHelper) {
+                WSSecSignatureHelper tempSig = (WSSecSignatureHelper) tempTok;
+                if ((WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID).
+                    equals(tempSig.getSecRef().getKeyIdentifierValueType())) {
+                               
+                    // NOTE: This usage of WSEncryptionPart is a workaroud that is
+                    // coupled with WSSecSignatureHelper. This approach is used so that
+                    // we can force WSS4J to sign the assertion through a STR that
+                    // WSS4J did not create during message signature creation.
+                    part = new WSEncryptionPart(tempSig.getStrUri(), "ExternalSTRTransform", "Element",
+                          WSConstants.PART_TYPE_ELEMENT);
+            
+                } else {
+                    if (tempSig.getBSTTokenId() != null) {
+                        part = new WSEncryptionPart(tempSig.getBSTTokenId());
+                    }
                 }
             } else if (tempTok instanceof WSSecUsernameToken) {
                 WSSecUsernameToken unt = (WSSecUsernameToken)tempTok;
@@ -1282,8 +1300,8 @@ public abstract class AbstractBindingBuilder {
             }
         }
     }
-    protected WSSecSignature getSignatureBuider(TokenWrapper wrapper, Token token, boolean endorse) {
-        WSSecSignature sig = new WSSecSignature();
+    protected WSSecSignatureHelper getSignatureBuider(TokenWrapper wrapper, Token token, boolean endorse) {
+        WSSecSignatureHelper sig = new WSSecSignatureHelper();
         checkForX509PkiPath(sig, token);        
         setKeyIdentifierType(sig, wrapper, token);
         
@@ -1717,4 +1735,48 @@ public abstract class AbstractBindingBuilder {
         
         signedParts.addAll(signedEncryptedParts);
     }
+    
+    private static final class WSSecSignatureHelper extends WSSecSignature {
+        public SecurityTokenReference getSecRef() {
+            return this.secRef;
+        }
+
+        public String getStrUri() {
+            return this.strUri;
+        }
+
+        @Override
+        public void addReferencesToSign(Vector references,
+                WSSecHeader secHeader) throws WSSecurityException {
+            final Vector<Object> unalteredReferences = new Vector<Object>();
+
+            try {
+                for (int part = 0; part < references.size(); part++) {
+                    final WSEncryptionPart encPart = (WSEncryptionPart) references.get(part);
+
+                    final String elemName = encPart.getName();
+                    final Transforms transforms = new Transforms(document);
+
+                    if (elemName != null && "ExternalSTRTransform".equals(encPart.getNamespace())) {
+                        final Element ctx = this.createSTRParameter(document);
+                        transforms.addTransform(STRTransform.implementedTransformURI, ctx);
+                        this.sig.addDocument("#" + elemName, transforms, this.getDigestAlgo());
+                    } else {
+                        unalteredReferences.add(encPart);
+                    }
+                }
+            } catch (TransformationException e1) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e1
+                );
+            } catch (XMLSignatureException e1) {
+                throw new WSSecurityException(
+                    WSSecurityException.FAILED_SIGNATURE, "noXMLSig", null, e1
+                );
+            }
+
+            super.addReferencesToSign(unalteredReferences, secHeader);
+        }
+    }
+    
 }
