@@ -279,7 +279,12 @@ public class CachedOutputStream extends OutputStream {
             IOUtils.copyAndCloseInput(fin, out);
         }
     }
+    
     public void writeCacheTo(StringBuilder out, int limit) throws IOException {
+        writeCacheTo(out, "UTF-8", limit);
+    }
+    
+    public void writeCacheTo(StringBuilder out, String charsetName, int limit) throws IOException {
         flush();
         if (totalLength < limit
             || limit == -1) {
@@ -291,7 +296,7 @@ public class CachedOutputStream extends OutputStream {
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 byte bytes[] = ((ByteArrayOutputStream)currentStream).toByteArray();
-                out.append(IOUtils.newStringFromBytes(bytes, 0, limit));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, limit));
             } else {
                 throw new IOException("Unknown format of currentStream");
             }
@@ -304,7 +309,7 @@ public class CachedOutputStream extends OutputStream {
                 if ((count + x) > limit) {
                     x = limit - count;
                 }
-                out.append(IOUtils.newStringFromBytes(bytes, 0, x));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, x));
                 count += x;
 
                 if (count >= limit) {
@@ -316,12 +321,17 @@ public class CachedOutputStream extends OutputStream {
             fin.close();
         }
     }
+    
     public void writeCacheTo(StringBuilder out) throws IOException {
+        writeCacheTo(out, "UTF-8");
+    }
+    
+    public void writeCacheTo(StringBuilder out, String charsetName) throws IOException {
         flush();
         if (inmem) {
             if (currentStream instanceof ByteArrayOutputStream) {
                 byte[] bytes = ((ByteArrayOutputStream)currentStream).toByteArray();
-                out.append(IOUtils.newStringFromBytes(bytes));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName));
             } else {
                 throw new IOException("Unknown format of currentStream");
             }
@@ -331,7 +341,7 @@ public class CachedOutputStream extends OutputStream {
             byte bytes[] = new byte[1024];
             int x = fin.read(bytes);
             while (x != -1) {
-                out.append(IOUtils.newStringFromBytes(bytes, 0, x));
+                out.append(IOUtils.newStringFromBytes(bytes, charsetName, 0, x));
                 x = fin.read(bytes);
             }
             fin.close();
