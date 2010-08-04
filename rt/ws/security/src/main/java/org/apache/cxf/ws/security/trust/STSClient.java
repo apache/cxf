@@ -111,6 +111,7 @@ import org.apache.ws.security.processor.EncryptedKeyProcessor;
 import org.apache.ws.security.util.Base64;
 import org.apache.ws.security.util.WSSecurityUtil;
 import org.apache.ws.security.util.XmlSchemaDateFormat;
+import org.apache.xml.security.keys.content.X509Data;
 import org.apache.xml.security.keys.content.keyvalues.DSAKeyValue;
 import org.apache.xml.security.keys.content.keyvalues.RSAKeyValue;
 
@@ -138,6 +139,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     String namespace = STSUtils.WST_NS_05_12;
     String addressingNamespace;
 
+    boolean useCertificateForConfirmationKeyInfo;
     boolean isSecureConv;
     int ttl = 300;
     
@@ -334,6 +336,22 @@ public class STSClient implements Configurable, InterceptorProvider {
         return keySize;
     }
 
+    /**
+     * Indicate whether to use the signer's public X509 certificate for the subject confirmation key info 
+     * when creating a RequestsSecurityToken message. If the property is set to 'false', only the public key 
+     * value will be provided in the request. If the property is set to 'true' the complete certificate will 
+     * be sent in the request.
+     * 
+     * Note: this setting is only applicable for assertions that use an asymmetric proof key
+     */
+    public void setUseCertificateForConfirmationKeyInfo(boolean useCertificate) {
+        this.useCertificateForConfirmationKeyInfo = useCertificate;
+    }
+    
+    public boolean isUseCertificateForConfirmationKeyInfo() {
+        return useCertificateForConfirmationKeyInfo;
+    }
+    
     protected void setPolicyInternal(Policy newPolicy) {
         this.policy = newPolicy;
         if (algorithmSuite == null) {
@@ -482,51 +500,13 @@ public class STSClient implements Configurable, InterceptorProvider {
             keySize = 256;
         }
         if (keyType.endsWith("SymmetricKey")) {
-            if (!wroteKeySize && (!isSecureConv || keySize != 256)) {
-                writer.writeStartElement("wst", "KeySize", namespace);
-                writer.writeCharacters(Integer.toString(keySize));
-                writer.writeEndElement();
-            }
-
-            if (requiresEntropy) {
-                writer.writeStartElement("wst", "Entropy", namespace);
-                writer.writeStartElement("wst", "BinarySecret", namespace);
-                writer.writeAttribute("Type", namespace + "/Nonce");
-                if (algorithmSuite == null) {
-                    requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
-                } else {
-                    requestorEntropy = WSSecurityUtil
-                        .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
-                } 
-                writer.writeCharacters(Base64.encode(requestorEntropy));
-
-                writer.writeEndElement();
-                writer.writeEndElement();
-                writer.writeStartElement("wst", "ComputedKeyAlgorithm", namespace);
-                writer.writeCharacters(namespace + "/CK/PSHA1");
-                writer.writeEndElement();
-            }
+            requestorEntropy = writeElementsForRSTSymmetricKey(writer, wroteKeySize);
         } else if (keyType.endsWith("PublicKey")) {
-            writer.writeStartElement("wst", "UseKey", namespace);
-            writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
-            writer.writeNamespace("dsig", "http://www.w3.org/2000/09/xmldsig#");
-            writer.writeStartElement("dsig", "KeyValue", "http://www.w3.org/2000/09/xmldsig#");
             crypto = createCrypto(false);
             cert = getCert(crypto);
-            PublicKey key = cert.getPublicKey();
-            String pubKeyAlgo = key.getAlgorithm();
-            if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
-                DSAKeyValue dsaKeyValue = new DSAKeyValue(writer.getDocument(), key);
-                writer.getCurrentNode().appendChild(dsaKeyValue.getElement());
-            } else if ("RSA".equalsIgnoreCase(pubKeyAlgo)) {
-                RSAKeyValue rsaKeyValue = new RSAKeyValue(writer.getDocument(), key);
-                writer.getCurrentNode().appendChild(rsaKeyValue.getElement());
-            }
-
-            writer.writeEndElement();
-            writer.writeEndElement();
-            writer.writeEndElement();
+            writeElementsForRSTPublicKey(writer, cert);
         }
+        
         if (target != null) {
             writer.writeStartElement("wst", "RenewTarget", namespace);
             Element el = target.getUnattachedReference();
@@ -548,6 +528,66 @@ public class STSClient implements Configurable, InterceptorProvider {
             token.setX509Certificate(cert, crypto);
         }
         return token;
+    }
+    
+    private byte[] writeElementsForRSTSymmetricKey(W3CDOMStreamWriter writer,
+            boolean wroteKeySize) throws Exception {
+        byte[] requestorEntropy = null;
+
+        if (!wroteKeySize && (!isSecureConv || keySize != 256)) {
+            writer.writeStartElement("wst", "KeySize", namespace);
+            writer.writeCharacters(Integer.toString(keySize));
+            writer.writeEndElement();
+        }
+
+        if (requiresEntropy) {
+            writer.writeStartElement("wst", "Entropy", namespace);
+            writer.writeStartElement("wst", "BinarySecret", namespace);
+            writer.writeAttribute("Type", namespace + "/Nonce");
+            if (algorithmSuite == null) {
+                requestorEntropy = WSSecurityUtil.generateNonce(keySize / 8);
+            } else {
+                requestorEntropy = WSSecurityUtil
+                    .generateNonce(algorithmSuite.getMaximumSymmetricKeyLength() / 8);
+            }
+            writer.writeCharacters(Base64.encode(requestorEntropy));
+
+            writer.writeEndElement();
+            writer.writeEndElement();
+            writer.writeStartElement("wst", "ComputedKeyAlgorithm", namespace);
+            writer.writeCharacters(namespace + "/CK/PSHA1");
+            writer.writeEndElement();
+        }
+        return requestorEntropy;
+    }
+
+
+    private void writeElementsForRSTPublicKey(W3CDOMStreamWriter writer,
+            X509Certificate cert) throws Exception {
+        writer.writeStartElement("wst", "UseKey", namespace);
+        writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
+        writer.writeNamespace("dsig", "http://www.w3.org/2000/09/xmldsig#");
+
+        if (useCertificateForConfirmationKeyInfo) {
+            X509Data certElem = new X509Data(writer.getDocument());
+            certElem.addCertificate(cert);
+            writer.getCurrentNode().appendChild(certElem.getElement());
+        } else {
+            writer.writeStartElement("dsig", "KeyValue", "http://www.w3.org/2000/09/xmldsig#");
+            PublicKey key = cert.getPublicKey();
+            String pubKeyAlgo = key.getAlgorithm();
+            if ("DSA".equalsIgnoreCase(pubKeyAlgo)) {
+                DSAKeyValue dsaKeyValue = new DSAKeyValue(writer.getDocument(), key);
+                writer.getCurrentNode().appendChild(dsaKeyValue.getElement());
+            } else if ("RSA".equalsIgnoreCase(pubKeyAlgo)) {
+                RSAKeyValue rsaKeyValue = new RSAKeyValue(writer.getDocument(), key);
+                writer.getCurrentNode().appendChild(rsaKeyValue.getElement());
+            }
+            writer.writeEndElement();
+        }
+
+        writer.writeEndElement();
+        writer.writeEndElement();
     }
 
     private void addRequestType(String requestType, W3CDOMStreamWriter writer) throws XMLStreamException {
@@ -1077,7 +1117,7 @@ public class STSClient implements Configurable, InterceptorProvider {
     public void setOutFaultInterceptors(List<Interceptor> interceptors) {
         getOutFaultInterceptors().addAll(interceptors);
     }
-    
+        
     public void setFeatures(List<AbstractFeature> f) {
         features = f;
     }
