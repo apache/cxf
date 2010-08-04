@@ -24,6 +24,7 @@ import javax.jms.XAConnectionFactory;
 
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.configuration.ConfigurationException;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
@@ -35,7 +36,7 @@ import org.springframework.jndi.JndiTemplate;
 import org.springframework.transaction.PlatformTransactionManager;
 
 @NoJSR250Annotations
-public class JMSConfiguration {
+public class JMSConfiguration implements InitializingBean {
     /**
      * The use of -1 is to make easier to determine 
      * if the setCacheLevel has been called.
@@ -250,6 +251,12 @@ public class JMSConfiguration {
         this.durableSubscriptionName = durableSubscriptionName;
     }
 
+    public void afterPropertiesSet() throws Exception {
+        if (connectionFactory == null) {
+            throw new RuntimeException("Required property connectionfactory was not set");
+        }
+    }
+
     @Required
     public void setConnectionFactory(ConnectionFactory connectionFactory) {
         this.connectionFactory = connectionFactory;
@@ -425,9 +432,6 @@ public class JMSConfiguration {
         if (wrappedConnectionFactory == null) {
             if (connectionFactory == null) {
                 connectionFactory = JMSFactory.getConnectionFactoryFromJndi(this);
-            }
-            if (connectionFactory == null) {
-                throw new RuntimeException("connectionFactory has not been initialized");
             }
             if (wrapInSingleConnectionFactory && !(connectionFactory instanceof SingleConnectionFactory)) {
                 SingleConnectionFactory scf;
