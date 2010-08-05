@@ -465,7 +465,7 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         return new RMEndpoint(this, endpoint);
     }  
     
-    public void initialise(Bus b) {
+    public void init(Bus b) {
         setBus(b);
         initialise();
         registerListeners();
