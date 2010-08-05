@@ -464,7 +464,13 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
     RMEndpoint createReliableEndpoint(Endpoint endpoint) {
         return new RMEndpoint(this, endpoint);
     }  
-   
+    
+    public void initialise(Bus b) {
+        setBus(b);
+        initialise();
+        registerListeners();
+    }
+    
     @PostConstruct
     void initialise() {
         if (null == rmAssertion) {
