@@ -25,7 +25,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -160,11 +159,7 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
                 }
             }
             try {
-                if (StringUtils.isEmpty(encoding)) {
-                    cos.writeCacheTo(buffer.getPayload(), limit);
-                } else {                    
-                    cos.writeCacheTo(buffer.getPayload(), encoding, limit);
-                }
+                writePayload(buffer.getPayload(), cos, encoding); 
             } catch (Exception ex) {
                 //ignore
             }
