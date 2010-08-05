@@ -21,10 +21,18 @@ package org.apache.cxf.interceptor;
 
 import java.io.OutputStream;
 import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.stream.StreamResult;
+import javax.xml.transform.stream.StreamSource;
+
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -42,6 +50,7 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
 
     private int limit = 100 * 1024;
     private PrintWriter writer;
+    private boolean prettyLogging;
     
     public LoggingOutInterceptor(String phase) {
         super(phase);
@@ -60,13 +69,21 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
         this.writer = w;
     }
     
+    public void setPrettyLogging(boolean flag) {
+        prettyLogging = flag;
+    }
+    
+    public boolean isPrettyLogging() {
+        return prettyLogging;
+    }
+    
     public void setLimit(int lim) {
         limit = lim;
     }
     
     public int getLimit() {
         return limit;
-    }    
+    }
 
     public void handleMessage(Message message) throws Fault {
         final OutputStream os = message.getContent(OutputStream.class);
@@ -96,7 +113,42 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
      */
     protected String transform(String originalLogString) {
         return originalLogString;
-    } 
+    }
+    
+    protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding)
+        throws Exception {
+        if (isPrettyLogging()) {
+
+            TransformerFactory tfactory = TransformerFactory.newInstance();
+            try {
+                tfactory.setAttribute("indent-number", "2");
+            } catch (Exception ex) {
+                // ignore
+            }
+            Transformer serializer;
+            serializer = tfactory.newTransformer();
+            // Setup indenting to "pretty print"
+            serializer.setOutputProperty(OutputKeys.INDENT, "yes");
+            serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
+
+            StringWriter swriter = new StringWriter();
+            serializer.transform(new StreamSource(cos.getInputStream()), new StreamResult(swriter));
+            String result = swriter.toString();
+            if (result.length() < limit || limit == -1) {
+                builder.append(swriter.toString());
+            } else {
+                builder.append(swriter.toString().substring(0, limit));
+            }
+
+        } else {
+            if (StringUtils.isEmpty(encoding)) {
+                cos.writeCacheTo(builder, limit);
+            } else {
+                cos.writeCacheTo(builder, encoding, limit);
+            }
+
+        }
+    }
 
     class LoggingCallback implements CachedOutputStreamCallback {
         
