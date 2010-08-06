@@ -27,12 +27,12 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -115,18 +115,11 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
         return originalLogString;
     }
     
-    protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding)
+    protected void writePayload(StringBuilder builder, CachedOutputStream cos,
+                                String encoding, String contentType)
         throws Exception {
-        if (isPrettyLogging()) {
-
-            TransformerFactory tfactory = TransformerFactory.newInstance();
-            try {
-                tfactory.setAttribute("indent-number", "2");
-            } catch (Exception ex) {
-                // ignore
-            }
-            Transformer serializer;
-            serializer = tfactory.newTransformer();
+        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0)) {
+            Transformer serializer = XMLUtils.newTransformer(2);
             // Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -211,7 +204,7 @@ public class LoggingOutInterceptor extends AbstractPhaseInterceptor {
                 }
             }
             try {
-                writePayload(buffer.getPayload(), cos, encoding); 
+                writePayload(buffer.getPayload(), cos, encoding, ct); 
             } catch (Exception ex) {
                 //ignore
             }

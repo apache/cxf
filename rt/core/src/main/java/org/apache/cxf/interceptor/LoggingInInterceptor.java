@@ -26,13 +26,13 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
@@ -111,18 +111,11 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
         return originalLogString;
     }
     
-    protected void writePayload(StringBuilder builder, CachedOutputStream cos, String encoding)
+    protected void writePayload(StringBuilder builder, CachedOutputStream cos,
+                                String encoding, String contentType)
         throws Exception {
-        if (isPrettyLogging()) {
-
-            TransformerFactory tfactory = TransformerFactory.newInstance();
-            try {
-                tfactory.setAttribute("indent-number", "2");
-            } catch (Exception ex) {
-                // ignore
-            }
-            Transformer serializer;
-            serializer = tfactory.newTransformer();
+        if (isPrettyLogging() && (contentType != null && contentType.indexOf("xml") >= 0)) {
+            Transformer serializer = XMLUtils.newTransformer(2);
             // Setup indenting to "pretty print"
             serializer.setOutputProperty(OutputKeys.INDENT, "yes");
             serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");
@@ -201,7 +194,7 @@ public class LoggingInInterceptor extends AbstractPhaseInterceptor<Message> {
                 if (bos.size() > limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
                 }
-                writePayload(buffer.getPayload(), bos, encoding); 
+                writePayload(buffer.getPayload(), bos, encoding, ct); 
                     
                 bos.close();
             } catch (Exception e) {
