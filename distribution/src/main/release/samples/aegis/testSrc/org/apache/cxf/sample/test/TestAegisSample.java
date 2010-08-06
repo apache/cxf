@@ -32,7 +32,7 @@ import demo.hw.server.Server;
 public class TestAegisSample {
     @BeforeClass
     public static void startServer() throws Exception {
-        new Server();
+        Server.startServer();
     }
     
     @Test
