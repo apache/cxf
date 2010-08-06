@@ -133,7 +133,7 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
                 }
             }
             try {
-                writePayload(buffer.getPayload(), cos, encoding); 
+                writePayload(buffer.getPayload(), cos, encoding, ct); 
             } catch (Exception ex) {
                 //ignore
             }

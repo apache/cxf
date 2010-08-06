@@ -28,11 +28,11 @@ import java.util.logging.Logger;
 
 import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.io.CacheAndWriteOutputStream;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
@@ -80,14 +80,7 @@ public class PrettyLoggingOutInterceptor extends AbstractPhaseInterceptor {
         public void onClose(CachedOutputStream cos) {
             
             try {
-                TransformerFactory tfactory = TransformerFactory.newInstance();
-                try { 
-                    tfactory.setAttribute("indent-number", "2");
-                } catch (Exception ex) {
-                    //ignore
-                }
-                Transformer serializer;
-                serializer = tfactory.newTransformer();
+                Transformer serializer = XMLUtils.newTransformer(2);
                 //Setup indenting to "pretty print"
                 serializer.setOutputProperty(OutputKeys.INDENT, "yes");
                 serializer.setOutputProperty("{http://xml.apache.org/xslt}indent-amount", "2");

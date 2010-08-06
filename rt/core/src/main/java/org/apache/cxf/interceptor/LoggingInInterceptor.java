@@ -115,7 +115,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
                 if (bos.size() > limit) {
                     buffer.getMessage().append("(message truncated to " + limit + " bytes)\n");
                 }
-                writePayload(buffer.getPayload(), bos, encoding); 
+                writePayload(buffer.getPayload(), bos, encoding, ct); 
                     
                 bos.close();
             } catch (Exception e) {
