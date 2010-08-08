@@ -45,7 +45,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     private String scheme;
     private String userInfo;
-    private int port;
+    private int port = -1;
     private String host;
     private List<PathSegment> paths = new ArrayList<PathSegment>();
     private boolean leadingSlash;
@@ -89,7 +89,6 @@ public class UriBuilderImpl extends UriBuilder {
                     theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
                 }
             }
-            
             return buildURI(fromEncoded, thePath, theQuery);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
@@ -327,6 +326,13 @@ public class UriBuilderImpl extends UriBuilder {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
+        // this is the cheapest way to figure out if a given path is a full-fledged 
+        // URI with the http(s) scheme but a more formal approach may be needed 
+        if (path.startsWith("http")) {
+            uri(URI.create(path));
+            return this;
+        }
+        
         if (paths.isEmpty()) {
             leadingSlash = path.startsWith("/");
         }
@@ -345,7 +351,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
-        if (thePort < 0) {
+        if (thePort < 0 && thePort != -1) {
             throw new IllegalArgumentException("Port cannot be negative");
         }
         this.port = thePort;
@@ -506,7 +512,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", true);
+        query = JAXRSUtils.getStructuredParams(queryValue, "&", false);
         return this;
     }
 

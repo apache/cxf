@@ -255,7 +255,8 @@ public final class URITemplate {
                     }
                     sb.append(value);
                 } else {
-                    sb.append(var);
+                    throw new IllegalArgumentException("Template variable " + var.getName() 
+                        + " has no matching value"); 
                 }
             } else {
                 sb.append(chunk);

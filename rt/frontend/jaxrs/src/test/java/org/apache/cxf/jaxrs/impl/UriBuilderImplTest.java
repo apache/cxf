@@ -808,6 +808,7 @@ public class UriBuilderImplTest extends Assert {
             //expected
         }
     }
+    
     @Test
     public void testNullQueryParam() {
         try {
@@ -819,7 +820,6 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
-    @Ignore
     public void testReplaceQuery4() {
         String expected = "http://localhost:8080";
 
@@ -827,25 +827,8 @@ public class UriBuilderImplTest extends Assert {
             .queryParam("name", "x=", "y?", "x y", "&").replaceQuery(null).build();
         assertEquals(expected, uri.toString());        
     }
-    @Test
-    @Ignore
-    public void testReplaceQuery5() {
-        String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
-
-        URI uri = UriBuilder.fromPath("http://localhost:8080")
-            .queryParam("name", "x=", "y?", "x y", "&")
-            .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
-        assertEquals(expected, uri.toString());        
-    }
-    @Test
-    @Ignore
-    public void testQueryParam() {
-        String expected = "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
-
-        URI uri =  UriBuilder.fromPath("http://localhost:8080")
-            .queryParam("name", "x=", "y?", "x y", "&").build();
-        assertEquals(expected, uri.toString());        
-    }
+    
+    
     @Test
     public void testInvalidPort() {
         try {
@@ -855,6 +838,13 @@ public class UriBuilderImplTest extends Assert {
             //expected
         }
     }
+    
+    @Test
+    public void testResetPort() {
+        URI uri = UriBuilder.fromUri("http://localhost:8080/some/path").port(-1).build();
+        assertEquals("http://localhost/some/path", uri.toString());
+    }
+    
     @Test
     public void testInvalidHost() {
         try {
@@ -864,24 +854,18 @@ public class UriBuilderImplTest extends Assert {
             //expected
         }
     }
+    
+    
     @Test
-    @Ignore
-    public void testFromEncoded() {
-        String expected = "http://localhost:8080/a/%25/=/%25G0/%25/=";
-
+    public void testFromEncodedDuplicateVar2() {
+        String expected = "http://localhost:8080/xy/%20/%25/xy";
         URI uri = UriBuilder.fromPath("http://localhost:8080")
-            .path("/{v}/{w}/{x}/{y}/{z}/{x}")
-            .buildFromEncoded("a", "%25", "=", "%G0", "%", "23"); 
-        assertEquals(expected, uri.toString());        
-
-        expected = "http://localhost:8080/xy/%20/%25/xy";
-        uri = UriBuilder.fromPath("http://localhost:8080")
             .path("/{x}/{y}/{z}/{x}")
             .buildFromEncoded("xy", " ", "%");
         assertEquals(expected, uri.toString());        
     }
+
     @Test
-    @Ignore
     public void testNullMapValue() {
         try {
             Map<String, String> maps = new HashMap<String, String>();
@@ -900,8 +884,8 @@ public class UriBuilderImplTest extends Assert {
             //expected
         }
     }
+
     @Test
-    @Ignore
     public void testMissingMapValue() {
         try {
             Map<String, String> maps = new HashMap<String, String>();
@@ -919,5 +903,37 @@ public class UriBuilderImplTest extends Assert {
         } catch (IllegalArgumentException ex) {
             //expected
         }
+    }
+    
+    @Test
+    @Ignore("This may need to be challenged, '23' overrides '=' for the 2nd occurence of x")
+    public void testFromEncodedDuplicateVar() {
+        String expected = "http://localhost:8080/a/%25/=/%25G0/%25/=";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .path("/{v}/{w}/{x}/{y}/{z}/{x}")
+            .buildFromEncoded("a", "%25", "=", "%G0", "%", "23"); 
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    @Ignore("name2=%20 is double encoded after the replacement -> name2=%2520")
+    public void testReplaceQuery5() {
+        String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&")
+            .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    @Ignore("query parameters are not encoded due to build() being called")
+    public void testQueryParam() {
+        String expected = "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
+
+        URI uri =  UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").build();
+        assertEquals(expected, uri.toString());        
     }
 }
