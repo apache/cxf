@@ -37,11 +37,9 @@ import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.connection.UserCredentialsConnectionFactoryAdapter;
 import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.JmsTemplate102;
 import org.springframework.jms.core.SessionCallback;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.listener.DefaultMessageListenerContainer;
-import org.springframework.jms.listener.DefaultMessageListenerContainer102;
 import org.springframework.jms.support.destination.DestinationResolver;
 
 /**
@@ -103,7 +101,10 @@ public final class JMSFactory {
         if (jmsConfig.getJmsTemplate() != null) {
             return jmsConfig.getJmsTemplate();
         }
-        JmsTemplate jmsTemplate = jmsConfig.isUseJms11() ? new JmsTemplate() : new JmsTemplate102();
+        @SuppressWarnings("deprecation")
+        JmsTemplate jmsTemplate = jmsConfig.isUseJms11() 
+            ? new JmsTemplate() 
+            : new org.springframework.jms.core.JmsTemplate102();
         jmsTemplate.setConnectionFactory(jmsConfig.getOrCreateWrappedConnectionFactory());
         jmsTemplate.setPubSubDomain(jmsConfig.isPubSubDomain());
         if (jmsConfig.getReceiveTimeout() != null) {
@@ -135,6 +136,7 @@ public final class JMSFactory {
      * @param destinationName null for temp dest or a destination name
      * @return
      */
+    @SuppressWarnings("deprecation")
     public static AbstractMessageListenerContainer createJmsListener(EndpointInfo ei,
                                                                     JMSConfiguration jmsConfig,
                                                                     MessageListener listenerHandler,
@@ -167,7 +169,7 @@ public final class JMSFactory {
                 jmsListener = new DefaultMessageListenerContainer();
             }
         } else {
-            jmsListener = new DefaultMessageListenerContainer102();
+            jmsListener = new org.springframework.jms.listener.DefaultMessageListenerContainer102();
         }
         
         return createJmsListener(jmsListener,
@@ -191,8 +193,10 @@ public final class JMSFactory {
                                                                     Destination destination, 
                                                                     String messageSelectorPrefix,
                                                                     boolean userCID) {
+        @SuppressWarnings("deprecation")
         DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
-            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+            ? new DefaultMessageListenerContainer() 
+            : new org.springframework.jms.listener.DefaultMessageListenerContainer102();
         
         return createJmsListener(jmsListener,
                                  jmsConfig,
@@ -207,8 +211,10 @@ public final class JMSFactory {
                                                                     String destination, 
                                                                     String messageSelectorPrefix,
                                                                     boolean userCID) {
+        @SuppressWarnings("deprecation")
         DefaultMessageListenerContainer jmsListener = jmsConfig.isUseJms11()
-            ? new DefaultMessageListenerContainer() : new DefaultMessageListenerContainer102();
+            ? new DefaultMessageListenerContainer() 
+            : new org.springframework.jms.listener.DefaultMessageListenerContainer102();
         
         return createJmsListener(jmsListener,
                                  jmsConfig,
@@ -324,6 +330,7 @@ public final class JMSFactory {
      * @param pubSubDomain true=pubSub, false=Queues
      * @return resolved destination
      */
+    @SuppressWarnings("unchecked")
     public static Destination resolveOrCreateDestination(final JmsTemplate jmsTemplate,
                                                           final String replyToDestinationName,
                                                           final boolean pubSubDomain) {

@@ -168,6 +168,7 @@ public class JMSConduitTest extends AbstractJMSTester {
                 return JMSUtils.createAndSetPayload(testBytes, session, JMSConstants.BYTE_MESSAGE_TYPE);
             }
         };
+        @SuppressWarnings("unchecked")
         javax.jms.Message message = (javax.jms.Message)jmsTemplate.execute(sc);
         
         // The ibm jdk finalizes conduit (during most runs of this test) and

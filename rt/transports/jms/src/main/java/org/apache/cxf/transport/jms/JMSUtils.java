@@ -53,7 +53,6 @@ import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
 import org.springframework.jms.support.JmsUtils;
 import org.springframework.jms.support.converter.MessageConversionException;
-import org.springframework.jms.support.converter.SimpleMessageConverter102;
 
 public final class JMSUtils {
 
@@ -118,6 +117,7 @@ public final class JMSUtils {
      * @return the message payload as byte[]
      * @throws UnsupportedEncodingException
      */
+    @SuppressWarnings("deprecation")
     public static void retrieveAndSetPayload(org.apache.cxf.message.Message inMessage,
                                              Message message, String encoding)
         throws UnsupportedEncodingException {
@@ -125,7 +125,8 @@ public final class JMSUtils {
         Object converted;
         byte[] result;
         try {
-            converted = new SimpleMessageConverter102().fromMessage(message);
+            converted = new org.springframework.jms.support.converter.SimpleMessageConverter102()
+                .fromMessage(message);
         } catch (MessageConversionException e) {
             throw new RuntimeException("Conversion failed", e);
         } catch (JMSException e) {

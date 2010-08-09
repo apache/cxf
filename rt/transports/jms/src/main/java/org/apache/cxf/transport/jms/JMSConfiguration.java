@@ -28,7 +28,6 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.jms.connection.SingleConnectionFactory;
-import org.springframework.jms.connection.SingleConnectionFactory102;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.listener.AbstractMessageListenerContainer;
 import org.springframework.jms.support.destination.DestinationResolver;
@@ -442,7 +441,11 @@ public class JMSConfiguration implements InitializingBean {
                         scf = new SingleConnectionFactory(connectionFactory);
                     }
                 } else {
-                    scf = new SingleConnectionFactory102(connectionFactory, pubSubDomain);
+                    @SuppressWarnings("deprecation")
+                    SingleConnectionFactory scf2 
+                        = new org.springframework.jms.connection.SingleConnectionFactory102(connectionFactory,
+                                                                                            pubSubDomain);
+                    scf = scf2;
                 }
                 if (getDurableSubscriptionClientId() != null) {
                     scf.setClientId(getDurableSubscriptionClientId());

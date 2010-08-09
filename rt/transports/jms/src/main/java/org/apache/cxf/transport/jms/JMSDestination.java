@@ -130,6 +130,7 @@ public class JMSDestination extends AbstractMultiplexDestination
         this.deactivate();
     }
 
+    @SuppressWarnings("unchecked")
     private Destination resolveDestinationName(final JmsTemplate jmsTemplate, final String name) {
         SessionCallback sc = new SessionCallback() {
             public Object doInJms(Session session) throws JMSException {

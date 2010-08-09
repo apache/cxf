@@ -1249,6 +1249,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
 
         Thread t = new Thread() {
             public void run() {
+                @SuppressWarnings("unchecked")
                 Destination destination = (Destination)jmsTemplate.execute(new SessionCallback() {
                     public Object doInJms(Session session) throws JMSException {
                         DestinationResolver resolv = jmsTemplate.getDestinationResolver();
@@ -1264,7 +1265,8 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                     }
                 };
                     
-                destination = (Destination)jmsTemplate.execute(new SessionCallback() {
+                @SuppressWarnings("unchecked")
+                Destination destination2 = (Destination)jmsTemplate.execute(new SessionCallback() {
                     public Object doInJms(Session session) throws JMSException {
                         DestinationResolver resolv = jmsTemplate.getDestinationResolver();
                         return resolv.resolveDestinationName(session,
@@ -1272,7 +1274,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                                              false);
                     }
                 });
-                jmsTemplate.send(destination, messageCreator);
+                jmsTemplate.send(destination2, messageCreator);
             }
         };
 
