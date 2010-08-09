@@ -32,6 +32,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -72,7 +73,7 @@ public class StaxOutInterceptor extends AbstractPhaseInterceptor<Message> {
                     writer = factory.createXMLStreamWriter(os, encoding);
                 }
             }
-            if (Boolean.TRUE.equals(message.getContextualProperty(FORCE_START_DOCUMENT))) {
+            if (MessageUtils.getContextualBoolean(message, FORCE_START_DOCUMENT, false)) {
                 writer.writeStartDocument(encoding, "1.0");
                 message.removeContent(OutputStream.class);
                 message.put(OUTPUT_STREAM_HOLDER, os);
