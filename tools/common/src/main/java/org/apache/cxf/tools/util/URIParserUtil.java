@@ -248,18 +248,15 @@ public final class URIParserUtil {
     }
     public static String normalize(final String uri) {
         URL url = null;
+        String result = null;
         try {
             url = new URL(uri);
-            return escapeChars(url.toString().replace("\\", "/"));
+            result = escapeChars(url.toURI().normalize().toString().replace("\\", "/"));
         } catch (MalformedURLException e1) {
             try {
-                if (uri.startsWith("classpath:")) {
-                    
+                if (uri.startsWith("classpath:")) {                  
                     url = ClassLoaderUtils.getResource(uri.substring(10), URIParserUtil.class);
-                    if (url != null) {
-                        return url.toExternalForm();
-                    }
-                    return uri;
+                    return url != null ? url.toExternalForm() : uri;
                 }
                 File file = new File(uri);
                 if (file.exists()) {
@@ -276,7 +273,12 @@ public final class URIParserUtil {
             } catch (Exception e2) {
                 return escapeChars(uri.replace("\\", "/"));
             }
+        } catch (URISyntaxException e) {
+            if (url != null) {
+                result = escapeChars(url.toString().replace("\\", "/"));
+            }
         }
+        return result;
     }
 
     public static String getAbsoluteURI(final String arg) {

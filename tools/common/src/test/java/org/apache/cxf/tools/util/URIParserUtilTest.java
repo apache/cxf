@@ -56,6 +56,9 @@ public class URIParserUtilTest extends Assert {
 
         uri = "/c:\\hello.wsdl";
         assertEquals("file:/c:/hello.wsdl", URIParserUtil.normalize(uri));
+        
+        uri = "file:/home/john/test/all/../../alltest";
+        assertEquals("file:/home/john/alltest", URIParserUtil.normalize(uri));
     }
 
     @Test
