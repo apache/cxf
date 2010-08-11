@@ -35,6 +35,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
+import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolException;
@@ -420,7 +421,8 @@ public class ParameterProcessor extends AbstractProcessor {
                     }
                     JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                              JavaType.Style.INOUT, outputPart);
-                    if (!qualified) {
+                    
+                    if (!qualified && !isRefElement(outputPart, outElement)) {
                         jp.setTargetNamespace("");
                     }
                     if (!jpIn.getClassName().equals(jp.getClassName())) {
@@ -471,7 +473,8 @@ public class ParameterProcessor extends AbstractProcessor {
                         }
                         JavaParameter jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                                  JavaType.Style.INOUT, outputPart);
-                        if (!qualified) {
+                        
+                        if (!qualified && !isRefElement(outputPart, outElement)) {
                             jp.setTargetNamespace("");
                         }
                         if (!jpIn.getClassName().equals(jp.getClassName())) {
@@ -486,7 +489,7 @@ public class ParameterProcessor extends AbstractProcessor {
             if (!sameWrapperChild) {
                 JavaParameter  jp = getParameterFromQName(outputPart.getElementQName(), outElement,
                                                           JavaType.Style.OUT, outputPart);
-                if (!qualified) {
+                if (!qualified && !isRefElement(outputPart, outElement)) {
                     jp.setTargetNamespace("");
                 }
                 
@@ -800,5 +803,14 @@ public class ParameterProcessor extends AbstractProcessor {
             
         }
         return true;
+    }
+
+    private boolean isRefElement(MessagePartInfo outputPart, QName outElement) {
+        OperationInfo wrappedOp = outputPart.getMessageInfo().getOperation().getUnwrappedOperation();
+        MessagePartInfo mpart = wrappedOp.getOutput().getMessagePart(outElement);
+        if (mpart == null) {
+            return false;
+        }
+        return mpart.getProperty("isRefElement") != null;
     }
 }

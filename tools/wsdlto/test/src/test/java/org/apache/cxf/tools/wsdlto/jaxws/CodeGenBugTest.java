@@ -27,6 +27,7 @@ import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.WebFault;
@@ -50,6 +51,19 @@ import org.mortbay.jetty.handler.ResourceHandler;
 
 
 public class CodeGenBugTest extends AbstractCodeGenTest {
+ 
+    @Test
+    public void testCXF2935() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, 
+                getLocation("/wsdl2java_wsdl/cxf2935/webservice.wsdl"));
+        env.put(ToolConstants.CFG_ALLOW_ELEMENT_REFS, "true");
+        processor.setContext(env);
+        processor.execute();
+        Class<?> clz = classLoader.loadClass("org.apache.cxf.WebParamWebService");
+        WebParam webParam = AnnotationUtil.getWebParam(clz.getMethods()[0], "Name");       
+        assertEquals("helloString/Name", webParam.targetNamespace());
+          
+    }   
     
     
     @Test
