@@ -450,22 +450,24 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             //Find the SC token
             boolean found = false;
             List results = (List)message.get(WSHandlerConstants.RECV_RESULTS);
-            for (int i = 0; i < results.size(); i++) {
-                WSHandlerResult rResult =
-                        (WSHandlerResult) results.get(i);
-
-                Vector wsSecEngineResults = rResult.getResults();
-
-                for (int j = 0; j < wsSecEngineResults.size(); j++) {
-                    WSSecurityEngineResult wser =
-                            (WSSecurityEngineResult) wsSecEngineResults.get(j);
-                    Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                    if (actInt.intValue() == WSConstants.SCT) {
-                        SecurityContextToken tok
-                            = (SecurityContextToken)wser
-                                .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
-                        message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
-                        found = true;
+            if (results != null) {
+                for (int i = 0; i < results.size(); i++) {
+                    WSHandlerResult rResult =
+                            (WSHandlerResult) results.get(i);
+    
+                    Vector wsSecEngineResults = rResult.getResults();
+    
+                    for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                        WSSecurityEngineResult wser =
+                                (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                        Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                        if (actInt.intValue() == WSConstants.SCT) {
+                            SecurityContextToken tok
+                                = (SecurityContextToken)wser
+                                    .get(WSSecurityEngineResult.TAG_SECURITY_CONTEXT_TOKEN);
+                            message.getExchange().put(SecurityConstants.TOKEN_ID, tok.getIdentifier());
+                            found = true;
+                        }
                     }
                 }
             }
