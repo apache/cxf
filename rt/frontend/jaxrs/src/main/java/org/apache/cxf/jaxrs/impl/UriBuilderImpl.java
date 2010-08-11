@@ -550,12 +550,14 @@ public class UriBuilderImpl extends UriBuilder {
      */
     private List<String> toStringList(Object... values) throws IllegalArgumentException {
         List<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; i++) {
-            Object value = values[i];
-            if (value == null) {
-                throw new IllegalArgumentException("Null value on " + i + " position");
+        if (values != null) {
+            for (int i = 0; i < values.length; i++) {
+                Object value = values[i];
+                if (value == null) {
+                    throw new IllegalArgumentException("Null value on " + i + " position");
+                }
+                list.add(value.toString());
             }
-            list.add(value.toString());
         }
         if (list.isEmpty()) {
             list.add("");
