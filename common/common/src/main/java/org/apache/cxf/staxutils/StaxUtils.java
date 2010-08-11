@@ -784,7 +784,9 @@ public final class StaxUtils {
         }
         case Node.DOCUMENT_TYPE_NODE:
             try {
-                writer.writeDTD(((DocumentType)n).getTextContent());
+                if (((DocumentType)n).getTextContent() != null) {
+                    writer.writeDTD(((DocumentType)n).getTextContent());
+                }
             } catch (UnsupportedOperationException ex) {
                 //can we ignore?  DOM writers really don't allow this
                 //as there isn't a way to write a DTD in dom
