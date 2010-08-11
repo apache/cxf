@@ -45,9 +45,10 @@ public class UriBuilderImpl extends UriBuilder {
 
     private String scheme;
     private String userInfo;
-    private int port;
+    private int port = -1;
     private String host;
     private List<PathSegment> paths = new ArrayList<PathSegment>();
+    private boolean leadingSlash;
     private String fragment;
     private String schemeSpecificPart; 
     private MultivaluedMap<String, String> query = new MetadataMap<String, String>();
@@ -88,7 +89,6 @@ public class UriBuilderImpl extends UriBuilder {
                     theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
                 }
             }
-            
             return buildURI(fromEncoded, thePath, theQuery);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
@@ -126,7 +126,13 @@ public class UriBuilderImpl extends UriBuilder {
             }
             return new URI(b.toString());
         } else if (!isSchemeOpaque()) {
-            return new URI(scheme, userInfo, host, port, thePath, theQuery, fragment);
+            if ((scheme != null || host != null || userInfo != null)
+                && thePath.length() != 0 && !thePath.startsWith("/")) {
+                thePath = "/" + thePath;
+            }
+            
+            return new URI(scheme, userInfo, host, port, 
+                           thePath, theQuery, fragment);
         } else {
             return new URI(scheme, schemeSpecificPart, fragment);
         }
@@ -149,6 +155,9 @@ public class UriBuilderImpl extends UriBuilder {
         int idx = ind;
         for (String var : uniqueVars) {
             Object oval = values[idx++];
+            if (oval == null) {
+                throw new IllegalArgumentException("No object for " + var);
+            }
             varValueMap.put(var, oval.toString());
         }
         return templ.substitute(varValueMap);
@@ -249,6 +258,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder host(String theHost) throws IllegalArgumentException {
+        if ("".equals(theHost)) {
+            throw new IllegalArgumentException("Host cannot be empty");
+        }
         this.host = theHost;
         return this;
     }
@@ -314,7 +326,16 @@ public class UriBuilderImpl extends UriBuilder {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
+        // this is the cheapest way to figure out if a given path is a full-fledged 
+        // URI with the http(s) scheme but a more formal approach may be needed 
+        if (path.startsWith("http")) {
+            uri(URI.create(path));
+            return this;
+        }
         
+        if (paths.isEmpty()) {
+            leadingSlash = path.startsWith("/");
+        }
         List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);
@@ -330,6 +351,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
+        if (thePort < 0 && thePort != -1) {
+            throw new IllegalArgumentException("Port cannot be negative");
+        }
         this.port = thePort;
         return this;
     }
@@ -392,6 +416,13 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private void setPathAndMatrix(String path) {
+        if (path.startsWith("http://")
+            || path.startsWith("https://")) {
+            setUriParts(URI.create(path));
+            return;
+        }
+        
+        leadingSlash = path.startsWith("/");
         paths = JAXRSUtils.getPathSegments(path, false, false);
         if (!paths.isEmpty()) {
             matrix = paths.get(paths.size() - 1).getMatrixParameters();
@@ -408,7 +439,9 @@ public class UriBuilderImpl extends UriBuilder {
             String p = ps.getPath();
             if (p.length() != 0 || !iter.hasNext()) {
                 p = fromEncoded ? new URITemplate(p).encodeLiteralCharacters() : p;
-                if (!p.startsWith("/")) {
+                if (sb.length() == 0 && leadingSlash) {
+                    sb.append('/');
+                } else if (!p.startsWith("/") && sb.length() > 0) {
                     sb.append('/');
                 }
                 sb.append(p);
@@ -485,7 +518,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", true);
+        query = JAXRSUtils.getStructuredParams(queryValue, "&", false);
         return this;
     }
 
@@ -504,6 +537,9 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder segment(String... segments) throws IllegalArgumentException {
+        if (segments == null) {
+            throw new IllegalArgumentException("Segments should not be null");
+        }
         for (String segment : segments) {
             path(segment);
         }
@@ -520,12 +556,14 @@ public class UriBuilderImpl extends UriBuilder {
      */
     private List<String> toStringList(Object... values) throws IllegalArgumentException {
         List<String> list = new ArrayList<String>();
-        for (int i = 0; i < values.length; i++) {
-            Object value = values[i];
-            if (value == null) {
-                throw new IllegalArgumentException("Null value on " + i + " position");
+        if (values != null) {
+            for (int i = 0; i < values.length; i++) {
+                Object value = values[i];
+                if (value == null) {
+                    throw new IllegalArgumentException("Null value on " + i + " position");
+                }
+                list.add(value.toString());
             }
-            list.add(value.toString());
         }
         if (list.isEmpty()) {
             list.add("");

@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
@@ -729,5 +730,210 @@ public class UriBuilderImplTest extends Assert {
         MultivaluedMap<String, String> queries2 = 
             JAXRSUtils.getStructuredParams(uri2.getRawQuery(), "&", false);
         assertEquals("Unexpected queries", queries1, queries2);
+    }
+    
+    
+    @Test
+    public void testTck1() {
+        String value = "test1#test2";
+        String expected = "test1%23test2";
+        String path = "{arg1}";
+        URI uri = UriBuilder.fromPath(path).build(value);
+        assertEquals(expected, uri.toString());        
+    }
+    @Test
+    public void testNullValue() {
+        String value = null;
+        String path = "{arg1}";
+        try {
+            UriBuilder.fromPath(path).build(value);
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+    @Test
+    public void testFragment() {
+        String expected = "test#abc";
+        String path = "test";
+        URI uri = UriBuilder.fromPath(path).fragment("abc").build();
+        assertEquals(expected, uri.toString());        
+    }
+    @Test
+    @Ignore
+    public void testFragmentTemplate() {
+        String expected = "abc#xyz";
+        URI uri = UriBuilder
+            .fromPath("{arg1}")
+            .fragment("{arg2}")
+            .build("abc", "xyx");
+        assertEquals(expected, uri.toString());        
+    }
+    @Test
+    @Ignore
+    public void testSegments() {
+        String path1 = "ab";
+        String[] path2 = {"a1", "x/y", "3b "};
+        String expected = "ab/a1/x%2Fy/3b%20";
+
+        URI uri = UriBuilder.fromPath(path1).segment(path2).build();
+        assertEquals(expected, uri.toString());        
+    }
+    @Test
+    @Ignore
+    public void testSegments2() {
+        String path1 = "";
+        String[] path2 = {"a1", "/", "3b "};
+        String expected = "a1/%2F/3b%20";
+
+        URI uri = UriBuilder.fromPath(path1).segment(path2).build();
+        assertEquals(expected, uri.toString());        
+    }
+    @Test
+    @Ignore
+    public void testReplaceQuery3() {
+        String expected = "http://localhost:8080?name1=xyz";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery("name1=xyz").build();
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    public void testNullSegment() {
+        try {
+            UriBuilder.fromPath("/").segment((String)null).build();
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+    
+    @Test
+    public void testNullQueryParam() {
+        try {
+            UriBuilder.fromPath("http://localhost:8080").queryParam("hello", (String)null);
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+
+    @Test
+    public void testReplaceQuery4() {
+        String expected = "http://localhost:8080";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery(null).build();
+        assertEquals(expected, uri.toString());        
+    }
+    
+    
+    @Test
+    public void testInvalidPort() {
+        try {
+            UriBuilder.fromUri("http://localhost:8080/some/path?name=foo").port(-10).build();
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+    
+    @Test
+    public void testResetPort() {
+        URI uri = UriBuilder.fromUri("http://localhost:8080/some/path").port(-1).build();
+        assertEquals("http://localhost/some/path", uri.toString());
+    }
+    
+    @Test
+    public void testInvalidHost() {
+        try {
+            UriBuilder.fromUri("http://localhost:8080/some/path?name=foo").host("").build();
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+    
+    
+    @Test
+    public void testFromEncodedDuplicateVar2() {
+        String expected = "http://localhost:8080/xy/%20/%25/xy";
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .path("/{x}/{y}/{z}/{x}")
+            .buildFromEncoded("xy", " ", "%");
+        assertEquals(expected, uri.toString());        
+    }
+
+    @Test
+    public void testNullMapValue() {
+        try {
+            Map<String, String> maps = new HashMap<String, String>();
+            maps.put("x", null);
+            maps.put("y", "/path-absolute/test1");
+            maps.put("z", "fred@example.com");
+            maps.put("w", "path-rootless/test2");
+            maps.put("u", "extra");
+
+            URI uri = UriBuilder.fromPath("")
+                .path("{w}/{x}/{y}/{z}/{x}")
+                .buildFromMap(maps);
+            
+            fail("Should be IllegalArgumentException.  Not return " + uri.toString());
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+
+    @Test
+    public void testMissingMapValue() {
+        try {
+            Map<String, String> maps = new HashMap<String, String>();
+            maps.put("x", null);
+            maps.put("y", "/path-absolute/test1");
+            maps.put("z", "fred@example.com");
+            maps.put("w", "path-rootless/test2");
+            maps.put("u", "extra");
+
+            URI uri = UriBuilder.fromPath("")
+                .path("{w}/{v}/{x}/{y}/{z}/{x}")
+                .buildFromMap(maps);
+            
+            fail("Should be IllegalArgumentException.  Not return " + uri.toString());
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
+    }
+    
+    @Test
+    @Ignore("This may need to be challenged, '23' overrides '=' for the 2nd occurence of x")
+    public void testFromEncodedDuplicateVar() {
+        String expected = "http://localhost:8080/a/%25/=/%25G0/%25/=";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .path("/{v}/{w}/{x}/{y}/{z}/{x}")
+            .buildFromEncoded("a", "%25", "=", "%G0", "%", "23"); 
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    @Ignore("name2=%20 is double encoded after the replacement -> name2=%2520")
+    public void testReplaceQuery5() {
+        String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&")
+            .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
+    @Ignore("query parameters are not encoded due to build() being called")
+    public void testQueryParam() {
+        String expected = "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
+
+        URI uri =  UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").build();
+        assertEquals(expected, uri.toString());        
     }
 }

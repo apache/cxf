@@ -60,7 +60,9 @@ public final class HttpUtils {
     private static final String LOCAL_HOST = "localhost";
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
-        
+    // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
+    private static final String PATH_RESERVED_DELIMETERS = "=";
+    
     private HttpUtils() {
     }
     
@@ -84,7 +86,9 @@ public final class HttpUtils {
     }
     
     public static String pathEncode(String value) {
-        
+        if (isReservedPathSequence(value)) {
+            return value;
+        }
         String result = urlEncode(value);
         // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
         // We need to retain '+' and encode ' ' as %20
@@ -96,6 +100,11 @@ public final class HttpUtils {
         }
 
         return result;
+    }
+    
+    private static boolean isReservedPathSequence(String sequence) {
+        // realistically, we'd probably need to check every character
+        return PATH_RESERVED_DELIMETERS.equals(sequence);
     }
     
     /**

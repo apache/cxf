@@ -367,12 +367,12 @@ public class URITemplateTest extends Assert {
         assertEquals("Wrong substitution", "/foo/bar/bar/bar", ut.substitute(map));
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testSubstituteMapIncomplete() throws Exception {
         URITemplate ut = new URITemplate("/foo/{a}/{b}/{a:\\d}");
         Map<String, String> map = new HashMap<String, String>();
         map.put("b", "bar");
-        assertEquals("Wrong substitution", "/foo/{a}/bar/{a:\\d}", ut.substitute(map));
+        ut.substitute(map);
     }
 
     @Test
