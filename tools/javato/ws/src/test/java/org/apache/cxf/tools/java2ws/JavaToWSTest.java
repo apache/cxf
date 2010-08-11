@@ -27,7 +27,6 @@ import org.apache.cxf.common.util.Compiler;
 import org.apache.cxf.helpers.FileUtils;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.common.ToolTestBase;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,6 +78,21 @@ public class JavaToWSTest extends ToolTestBase {
         JavaToWS.main(args);
         checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
+    }
+    
+    @Test
+    public void testCXF2934() throws Exception {
+        String[] args = new String[] {
+            "-wsdl", "-wrapperbean",
+            "-s", output.getPath(), 
+            "-o", output.getPath() + "/tmp.wsdl", 
+            "org.apache.cxf.tools.fortest.cxf2934.WebParamService"
+        };
+        JavaToWS.main(args);
+        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloResponse.java");
+        String str = FileUtils.getStringFromFile(wrapper);
+        assertTrue("namespace value in annoataion @XmlElement is not correct"
+                   , str.indexOf("helloString/Name") > -1);
     }
 
     private void checkStdErr() {

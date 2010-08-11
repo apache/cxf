@@ -21,9 +21,13 @@ package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.jws.WebParam;
+import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.util.CollectionUtils;
 import org.apache.cxf.common.util.StringUtils;
@@ -92,15 +96,23 @@ public final class ResponseWrapper extends Wrapper {
             int idx = hasReturnType ? mpi.getIndex() - 1 : mpi.getIndex();
             if (idx >= 0) {
                 String name = mpi.getName().getLocalPart();
-
                 Type t = paramClasses[idx];
                 String type = getTypeString(t);
-
                 JavaField jf = new JavaField(name, type, "");
                 List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method, idx - 1);
                 jf.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
-                fields.add(new JavaField(name, type, ""));
-
+                if (t instanceof ParameterizedType) {
+                    ParameterizedType pt = (ParameterizedType)t;
+                    Class c = (Class)pt.getRawType();
+                    if (Holder.class.isAssignableFrom(c)) {
+                        Annotation[][] paramAnnotations = method.getParameterAnnotations();
+                        WebParam wParam = getWebParamAnnotation(paramAnnotations[idx]);
+                        if (wParam != null && !StringUtils.isEmpty(wParam.targetNamespace())) {
+                            jf.setTargetNamespace(wParam.targetNamespace());
+                        }
+                    }                   
+                }
+                fields.add(jf);
             }
         }
 
@@ -128,5 +140,4 @@ public final class ResponseWrapper extends Wrapper {
         jClass.setNamespace(resNs);
         return jClass;
     }
-
 }

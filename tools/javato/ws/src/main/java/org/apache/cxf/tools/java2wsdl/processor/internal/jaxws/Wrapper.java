@@ -19,6 +19,7 @@
 
 package org.apache.cxf.tools.java2wsdl.processor.internal.jaxws;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.ParameterizedType;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.jws.WebParam;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Holder;
 
@@ -111,7 +113,7 @@ public class Wrapper {
 
         if (StringUtils.isEmpty(c1.getName())) {
             c1.setName(c2.getName());
-        }
+        }       
         return c1;
     }
     
@@ -225,6 +227,15 @@ public class Wrapper {
         }
         type = type.replace('$', '.');
         return type;
+    }
+    
+    protected WebParam getWebParamAnnotation(final Annotation[] annotations) {
+        for (Annotation annotation : annotations) {
+            if (annotation instanceof WebParam) {
+                return (WebParam)annotation;
+            }
+        }
+        return null;
     }
 
 }

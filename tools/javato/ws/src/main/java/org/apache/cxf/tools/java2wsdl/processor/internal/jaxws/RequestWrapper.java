@@ -93,15 +93,6 @@ public class RequestWrapper extends Wrapper {
         return fields;
     }
 
-    private WebParam getWebParamAnnotation(final Annotation[] annotations) {
-        for (Annotation annotation : annotations) {
-            if (annotation instanceof WebParam) {
-                return (WebParam) annotation;
-            }
-        }
-        return null;
-    }
-
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
