@@ -762,6 +762,7 @@ public class WSDLServiceBuilder {
                     mpi.setElementQName(el.getRefName());
                     mpi.setElement(true);
                     mpi.setXmlSchema(el);
+                    mpi.setProperty("isRefElement", true);
                     // element reference is not permitted for wrapper element
                     if (!allowRefs) {
                         ret = false;

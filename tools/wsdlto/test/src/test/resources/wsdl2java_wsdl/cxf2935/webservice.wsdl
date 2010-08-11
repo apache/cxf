@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="webParamWebServiceService"
+	targetNamespace="http://cxf.apache.org" xmlns:ns1="helloString/Name"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf.apache.org"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+	<wsdl:types>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:ns1="helloString/Name"
+			xmlns:tns="http://cxf.apache.org" attributeFormDefault="unqualified"
+			elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org">
+			<xs:import namespace="helloString/Name" />
+			<xs:element name="helloString" type="tns:helloString"/>
+			<xs:element name="helloStringResponse" type="tns:helloStringResponse"/>
+			<xs:complexType name="helloString">
+				<xs:sequence>
+					<xs:element minOccurs="0" ref="ns1:Name" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="name">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="firstName" type="xs:string" />
+					<xs:element minOccurs="0" name="lastName" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="helloStringResponse">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="return" type="xs:string" />
+					<xs:element minOccurs="0" ref="ns1:Name" />
+					<xs:element minOccurs="0" name="Employee" type="tns:employee" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="employee">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="address" type="tns:address" />
+					<xs:element minOccurs="0" name="dept" type="tns:department" />
+					<xs:element minOccurs="0" name="name" type="tns:name" />
+					<xs:element minOccurs="0" name="salary" type="tns:salary" />
+					<xs:element minOccurs="0" name="title" type="xs:string" />
+					<xs:element name="type" type="xs:int" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="address">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="city" type="xs:string" />
+					<xs:element minOccurs="0" name="country" type="xs:string" />
+					<xs:element minOccurs="0" name="email" type="xs:string" />
+					<xs:element minOccurs="0" name="phone" type="xs:string" />
+					<xs:element minOccurs="0" name="state" type="xs:string" />
+					<xs:element minOccurs="0" name="street" type="xs:string" />
+					<xs:element minOccurs="0" name="zipcode" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="department">
+				<xs:sequence>
+					<xs:element minOccurs="0" name="location" type="xs:string" />
+					<xs:element minOccurs="0" name="name" type="xs:string" />
+				</xs:sequence>
+			</xs:complexType>
+			<xs:complexType name="salary">
+				<xs:sequence>
+					<xs:element name="bonusPercentage" type="xs:int" />
+					<xs:element minOccurs="0" name="currency" type="xs:string" />
+					<xs:element name="salary" type="xs:int" />
+				</xs:sequence>
+			</xs:complexType>
+		</xs:schema>
+		<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+			xmlns:ns1="http://cxf.apache.org" targetNamespace="helloString/Name"
+			version="1.0">
+			<xs:import namespace="http://cxf.apache.org" />
+			<xs:element name="Name" type="ns1:name" />
+		</xs:schema>
+	</wsdl:types>
+	<wsdl:message name="helloString">
+		<wsdl:part name="parameters" element="tns:helloString">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:message name="helloStringResponse">
+		<wsdl:part name="parameters" element="tns:helloStringResponse">
+		</wsdl:part>
+	</wsdl:message>
+	<wsdl:portType name="webParamWebService">
+		<wsdl:operation name="helloString">
+			<wsdl:input name="helloString" message="tns:helloString">
+			</wsdl:input>
+			<wsdl:output name="helloStringResponse" message="tns:helloStringResponse">
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="webParamWebServiceServiceSoapBinding"
+		type="tns:webParamWebService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="helloString">
+			<soap:operation soapAction="urn:HelloString" style="document" />
+			<wsdl:input name="helloString">
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output name="helloStringResponse">
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="webParamWebServiceService">
+		<wsdl:port name="webParamWebServicePort" binding="tns:webParamWebServiceServiceSoapBinding">
+			<soap:address location="http://localhost:9090/webParamWebServicePort" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
