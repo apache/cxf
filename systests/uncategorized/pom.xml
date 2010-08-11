@@ -409,6 +409,10 @@
                     <groupId>org.codehaus.woodstox</groupId>
                     <artifactId>wstx-asl</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>woodstox</groupId>
+                    <artifactId>wstx-asl</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
