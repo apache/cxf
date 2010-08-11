@@ -199,18 +199,20 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                 if (!isRequestor(message)) {
                     boolean found = false;
                     Vector results = (Vector)message.get(WSHandlerConstants.RECV_RESULTS);
-                    for (int i = 0; i < results.size(); i++) {
-                        WSHandlerResult rResult =
-                                (WSHandlerResult) results.get(i);
-
-                        Vector wsSecEngineResults = rResult.getResults();
-
-                        for (int j = 0; j < wsSecEngineResults.size(); j++) {
-                            //WSSecurityEngineResult wser =
-                            //        (WSSecurityEngineResult) wsSecEngineResults.get(j);
-                            //Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                            //how to find if it's due to an IssuedToken?
-                            found = true;
+                    if (results != null) {
+                        for (int i = 0; i < results.size(); i++) {
+                            WSHandlerResult rResult =
+                                    (WSHandlerResult) results.get(i);
+    
+                            Vector wsSecEngineResults = rResult.getResults();
+    
+                            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                                //WSSecurityEngineResult wser =
+                                //        (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                                //Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                                //how to find if it's due to an IssuedToken?
+                                found = true;
+                            }
                         }
                     }
                     for (AssertionInfo inf : ais) {
