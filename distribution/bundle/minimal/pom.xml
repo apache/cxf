@@ -220,6 +220,7 @@
                             '=schemas.wsdl'
                         </Export-Package>
                         <_failok>true</_failok>
+                        <_nouses>true</_nouses>
                         <_versionpolicy>[$(version;==;$(@)),$(version;+;$(@)))</_versionpolicy>
                     </instructions>
                 </configuration>
