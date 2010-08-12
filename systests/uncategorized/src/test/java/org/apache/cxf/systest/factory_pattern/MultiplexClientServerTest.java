@@ -23,7 +23,6 @@ package org.apache.cxf.systest.factory_pattern;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.wsdl.Definition;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
@@ -119,10 +118,8 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         
         // verify it is JMS, 999 for JMS will throw a fault
         W3CEndpointReference ref = factory.create("999");
-        Definition def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(),
-                                                                       NumberService.WSDL_LOCATION
-                                                                           .toString());
-        assertNotNull(def);
+        String s = NumberService.WSDL_LOCATION.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(), s);
         NumberService numService = new NumberService();
 
         assertNotNull("reference", ref);

@@ -26,7 +26,6 @@ import javax.jms.Destination;
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
-import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 
@@ -61,8 +60,8 @@ public abstract class AbstractSOAPJMSTestSuite extends AbstractBusClientServerTe
         QName qServiceName = new QName(namespace, serviceName);
         QName qPortName = new QName(namespace, portName);
         URL wsdl = getClass().getResource("/wsdl/jms_spec_testsuite.wsdl");
-        Definition def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
-        assertNotNull(def);
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
         BusFactory.setThreadDefaultBus(getBus());
         BusFactory.setDefaultBus(getBus());
         Class<? extends Service> svcls = serviceClass.asSubclass(Service.class);

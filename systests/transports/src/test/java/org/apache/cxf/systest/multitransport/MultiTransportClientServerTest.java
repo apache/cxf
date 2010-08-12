@@ -55,8 +55,8 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
             Object implementor = new HTTPGreeterImpl();
             String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
             Endpoint.publish(address, implementor);
-            def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(),
-                                                                "testutils/hello_world_doc_lit.wsdl");
+            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(),
+                                                          "testutils/hello_world_doc_lit.wsdl");
             implementor = new JMSGreeterImpl();
             Endpoint.publish(null, implementor);
         }
@@ -99,8 +99,8 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
         QName portName2 = new QName("http://apache.org/hello_world_doc_lit", "JMSPort");
         URL wsdl = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-        Definition def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
-        assertNotNull(def);
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
 
         MultiTransportService service = new MultiTransportService(wsdl, serviceName);
         assertNotNull(service);

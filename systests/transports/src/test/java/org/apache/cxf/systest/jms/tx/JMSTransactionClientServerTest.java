@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.jms.ConnectionFactory;
-import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
@@ -80,8 +79,8 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-        Definition def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
-        assertNotNull(def);
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
         assertNotNull(service);
 
