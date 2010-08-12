@@ -30,6 +30,8 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.BindingFactory;
@@ -86,6 +88,27 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
     }
     
+    public Bus getBus() {
+        Bus b = super.getBus();
+        checkBindingFactory(bus);
+        return b;
+    }
+
+    private void checkBindingFactory(Bus bus) {
+        BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
+        try {
+            bfm.getBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID);
+        } catch (BusException b) {
+            //not registered, let's register one
+            bfm.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, 
+                                       new JAXRSBindingFactory(bus));
+        }
+    }
+
+    public void setBus(Bus bus) {
+        super.setBus(bus);
+        checkBindingFactory(bus);
+    }
     
     /*
      * EndpointInfo contains information form WSDL's physical part such as
