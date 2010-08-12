@@ -23,15 +23,7 @@
        xmlns:foo="http://cxf.apache.org/configuration/foo"
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
-    
-    <bean class="org.apache.cxf.jaxrs.JAXRSBindingFactory" 
-	  id="org.apache.cxf.jaxrs.JAXRSBindingFactory" 
-	  lazy-init="true">
-        <property name="activationNamespaces">
-            <set>
-                <value>http://apache.org/cxf/binding/jaxrs</value>
-            </set>
-        </property>
-	<property name="bus" ref="cxf"/>
-    </bean>
+
+    <!-- Nothing needed now.  Leave file for 2.2.x for compatibility -->
+
 </beans>
