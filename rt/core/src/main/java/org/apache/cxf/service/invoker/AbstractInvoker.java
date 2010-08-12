@@ -54,7 +54,7 @@ public abstract class AbstractInvoker implements Invoker {
             BindingOperationInfo bop = exchange.get(BindingOperationInfo.class);
             MethodDispatcher md = (MethodDispatcher) 
                 exchange.get(Service.class).get(MethodDispatcher.class.getName());
-            Method m = md.getMethod(bop);
+            Method m = bop == null ? null : md.getMethod(bop);
             if (m == null && bop == null) {
                 LOG.severe(new Message("MISSING_BINDING_OPERATION", LOG).toString());
                 throw new Fault(new Message("EXCEPTION_INVOKING_OBJECT", LOG, 
