@@ -36,6 +36,10 @@
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
         <checkstyle.extension>-corba</checkstyle.extension>
+
+        <jaxb.version>${jaxb22.version}</jaxb.version>
+        <jaxb.impl.version>${jaxb22.impl.version}</jaxb.impl.version>
+        <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
     </properties>
 
     <modules>
@@ -455,17 +459,6 @@
     </build>
 
     <profiles>
-        <profile>
-            <id>jdk15</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <jaxb.version>${jaxb22.version}</jaxb.version>
-                <jaxb.impl.version>${jaxb22.impl.version}</jaxb.impl.version>
-                <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
-            </properties>
-        </profile>
         <profile>
             <!-- build the samples as well to make sure they really do build -->
             <id>everything</id>
