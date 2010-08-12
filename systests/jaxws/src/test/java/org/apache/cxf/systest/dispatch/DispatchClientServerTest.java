@@ -168,7 +168,45 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         }
         
     }
+    @Test
+    public void test404() throws Exception {
+        //CXF-2384
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
 
+        //pick one of the other service/ports that would have an address
+        //without a service running
+        QName otherServiceName = new QName("http://apache.org/hello_world_soap_http",
+                "SOAPProviderService");
+        QName otherPortName = new QName("http://apache.org/hello_world_soap_http", "SoapProviderPort");
+        
+        
+        SOAPService service = new SOAPService(wsdl, otherServiceName);
+        assertNotNull(service);
+
+        Dispatch<SOAPMessage> disp = service
+            .createDispatch(otherPortName, SOAPMessage.class, Service.Mode.MESSAGE);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                     "http://localhost:" 
+                                     + greeterPort
+                                     + "/SomePlaceWithNoServiceRunning/SoapDispatchPort");
+        
+        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
+        assertNotNull(soapReqMsg);
+        
+        try {
+            disp.invoke(soapReqMsg);
+            fail("Should have faulted");
+        } catch (SOAPFaultException ex) {
+            fail("should not be a SOAPFaultException");
+        } catch (WebServiceException ex) {
+            //expected
+            assertTrue(ex.getCause().getClass().getName(),
+                       ex.getCause() instanceof java.io.IOException);
+        }
+        
+    }
     @Test
     public void testSOAPMessage() throws Exception {
 
