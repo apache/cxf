@@ -20,6 +20,7 @@
 package org.apache.cxf.service.factory;
 
 import java.lang.reflect.Array;
+import java.lang.reflect.Field;
 import java.lang.reflect.GenericArrayType;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -241,10 +242,16 @@ public class DefaultServiceConfiguration extends AbstractServiceConfiguration {
     
     @Override
     public Boolean isHolder(Class<?> cls, Type type) {
-        if (cls.getSimpleName().equals("Holder")
-            && cls.getDeclaredFields().length == 1
-            && "value".equals(cls.getDeclaredFields()[0].getName())
-            && Modifier.isPublic(cls.getDeclaredFields()[0].getModifiers())) {
+        if (cls.getSimpleName().equals("Holder")) {
+            for (Field f : cls.getDeclaredFields()) {
+                if (Modifier.isStatic(f.getModifiers())) { 
+                    continue;
+                }
+                if (Modifier.isPublic(f.getModifiers())
+                    && "value".equals(f.getName())) {
+                    return Boolean.TRUE;
+                }
+            }
             return Boolean.TRUE;
         }
         return Boolean.FALSE;
