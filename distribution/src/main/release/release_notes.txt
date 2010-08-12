@@ -1,8 +1,8 @@
-Apache CXF 2.2.9 Release Notes
+Apache CXF 2.2.10 Release Notes
 
 1. Overview
  
-Apache CXF 2.2.9 delivers the third major version of 
+Apache CXF 2.2.10 delivers the third major version of 
 the Celtix project (http://celtix.objectweb.org) and the XFire project
 (http://xfire.codehaus.org) merge.  This release is a major update from 
 the 2.1.x series.   The major new additions include:
@@ -13,7 +13,7 @@ the 2.1.x series.   The major new additions include:
  * Initial support for JAX-RS 1.0 including a client API for accessing 
    REST services   
 
-2.2.9 fixes over 21 JIRA issues reported by users and the community.
+2.2.10 fixes over 55 JIRA issues reported by users and the community.
 
 
 2. Installation Prerequisites 
@@ -76,34 +76,68 @@ for caveats when upgrading from CXF 2.1.x to 2.2.x.
 
 6. Specific issues, features, and improvements fixed in this version
 
-Release Notes - CXF - Version 2.2.9
+Release Notes - CXF - Version 2.2.10
 
 ** Bug
-    * [CXF-2492] - NPE in DatatypeConverter after updating to 2.2.4
-    * [CXF-2788] - Bus.shutdown() did not close all the created Jms connection
-    * [CXF-2803] - ConcurrentModificationException in JAXB-WS frontend
-    * [CXF-2806] - PrettyPrintXMLStreamWriter - method writeStartElement(localname) calls method writeStartElement(prefix, localName, namespaceURI) with wrong paramters
-    * [CXF-2815] - Handler.getHeaders() should always be called
-    * [CXF-2816] - CachedOutputStream leaves behind temp files if resetOut() is called
-    * [CXF-2817] - The NON_UNIQUE_BODY message misspells signature signaure
-    * [CXF-2818] - The INITIAL_APP_CONTEXT_CREATION_FAILED_MSG message misspells create as crate 
-    * [CXF-2819] - <protocol-bindings>##SOAP12_Binding</protocol-bindings> in handler chain is not correctly matched  
-    * [CXF-2821] - NPE during WSDL validation
-    * [CXF-2822] - The interceptor is not added to the ClientImpl when create the dispatch to invoke service
-    * [CXF-2827] - JAXWS2.2: wsam:action attribute is not generated in <wsdl:input> and <wsdl:ouput> element when the SEI method is not annotated with @Action
-    * [CXF-2828] - JSR 250 @Resource annotation on field does not work for proxied service implementations
-    * [CXF-2829] - W3CDOMStreamReader is not compatible with wstx XMLEventReader
-    * [CXF-2830] - NullPointerException in EndpointReferenceUtils.SchemaLSResourceResolver resolveResource when systemId is null
-    * [CXF-2832] - WSA needs to validate incoming action
-    * [CXF-2834] - JAXWS2.2:MAPCodec.restoreExchange() does not honor the addressingDisabled property
-    * [CXF-2835] - ConcurrentModificationException in ClientImpl caused by toString-method on requestContext
+    * [CXF-2704] - CXF JAX-RS  "Content-Disposition" is lost for second multipart 
+    * [CXF-2823] - REST Client sending all lowercase post parameters
+    * [CXF-2841] - WS-RM returns an exception to the client even when its retry mechanim successfully delivers the message after some transmission error
+    * [CXF-2842] -  wsa:action header is missing when the  wsam:Action="" in wsdl input
+    * [CXF-2843] - The default wsa:action value computation for response message is not correct. 
+    * [CXF-2844] - Typo on JAX-WS Configuration page: publishedEndpointURL should be publishedEndpointUrl
+    * [CXF-2846] - JAXWS Provider endpoints do not work if either super classes implementing or interfaces extending Provider are used
+    * [CXF-2847] - BigDecimalType incorrectly prints scientific notation
+    * [CXF-2851] - Schemas passed by ServiceFactoryBean.setSchemaLocation() are not accessible in DataBinding model
+    * [CXF-2852] - JavaToWS requires Spring
+    * [CXF-2853] - XFire Migration Guide shows XMLBeans indicates not ported
+    * [CXF-2856] - In some cases, use of http binding on the client results in "IllegalStateException (Already connected)"
+    * [CXF-2857] - MTOM: JAX-RS response missing XOP attachment
+    * [CXF-2861] - http-osgi transport doesn't set conduitInitiator correctly
+    * [CXF-2865] - DispatchClientServerTest fails on Windows
+    * [CXF-2867] - Skip wsa policy verification  when client proxy is created with AddressingFeature(required=false) 
+    * [CXF-2868] - JAXB unmarshal error when the field  of  partTypeClass  is javax.xml.datatype.XMLGregorianCalendar
+    * [CXF-2869] - have JAXBElementProvider look for @XmlJavaTypeAdapter on the interfaces
+    * [CXF-2885] - Wrong import package version for javax.servlet
+    * [CXF-2887] - JAXRS NullPointerException given null argument
+    * [CXF-2891] - Invalid WSDL when using <jax-ws:schemaLocation> (XSD) with ASM in the classpath
+    * [CXF-2892] - AttachmentSerializer outputs "xop+xml" as body content type even XOP is not enabled
+    * [CXF-2893] - CXF should use class' classloader for initialization of its loggers
+    * [CXF-2896] - URIResolver should decode spaces before trying to resolve URI from filesystem
+    * [CXF-2900] - WSDLValidator through Stax2DOM leaves input streams open which causes input files to be locked.
+    * [CXF-2902] - Doc-lit, bare, multi part ("type" and not any) message gets rejected by DocLiteralInInterceptor
+    * [CXF-2906] - WS-Addressing replay/message ID uniqueness enforcement does not handle clustering or restarts
+    * [CXF-2908] - Using a Java enum type in a JAX-RS matrix parameter results in a StackOverflowError when generating the WADL
+    * [CXF-2909] - WS-T / WS-SP sp:RequestSecurityTokenTemplate not using  wst:SecondaryParameters
+    * [CXF-2910] - Unable to use XmlSchema element as message part in WSDL
+    * [CXF-2914] - Digest algorithm defined in WS-SecurityPolicy is not honored in WS-Security signature from client
+    * [CXF-2915] - Client with WS-SecurityPolicy requiring an IssuedToken fails to include an issued SAML token in the WS-Security signature of the message
+    * [CXF-2918] - URIParserUtil.getAbsoluteURL() does not return a nomalized url string
+    * [CXF-2919] - NullPointerException at org.apache.cxf.staxutils.StaxUtils.writeNode(Node, XMLStreamWriter, boolean) when DOCTYPE is in a XML Schema
+    * [CXF-2921] - PolicyBasedWSS4JInInterceptor not asserting TransportBinding assertion when no message layer security is added
+    * [CXF-2936] - NullPointerException in ServerImpl combining JAX-RS and Simple Frontend
 
 ** Improvement
-    * [CXF-2808] - WSDL2JAVA: generated serialVersionUID on @WebFault exceptions
-    * [CXF-2809] - Upgrade to Jaxen 1.1.1
-    * [CXF-2826] - Should check for angular bracket "<>" when generating "start" tag for Content-Type for HTTP header 
+    * [CXF-2664] - STSClient overloaded setPolicy causes issues with Spring based STS client configuration
+    * [CXF-2824] - Error handling improvements for invalid Soap message content
+    * [CXF-2833] - Source jars for osgi jars should work in Eclipse PDE mode
+    * [CXF-2837] - Add null pointer check in SoapOutInterceptor
+    * [CXF-2855] - WSDL2Java JAX-WS XJC customizations
+    * [CXF-2860] - Handle the soap fault inbound message in server side
+    * [CXF-2862] - Provide an annotation to allow customisation of the elements declared in the request & response representation in the auto-generated wadl
+    * [CXF-2863] - When 'useHttpsURLConnectionDefaultSslSocketFactory'  is true, the 'trustManagers' configuration is not truly ignored
+    * [CXF-2884] - Client async invoke API should accept context and exchange parameters
+    * [CXF-2886] - Add a blockPostConstruct property to JaxWsServerFactoryBean  
+    * [CXF-2905] - Support sending WS-A 1.4 ActAs in requests from STS client.
+    * [CXF-2907] - Allow DynamicClientFactory to use any JAXB version 2.1 or greater
+    * [CXF-2923] - Logging{In|Out}Intererceptor should check the encoding before writing the log
+    * [CXF-2928] - Add a configuration option that allows STSClient to use the requester's X509Certificate as the SubjectConfirmation KeyInfo data within RequestSecurityToken messages
+    * [CXF-2929] - Allow programmatic initialisation of RMManager
+    * [CXF-2931] - Add configurable pretty printing to the CXF logging in/out interceptors
 
 
-
+** Task
+    * [CXF-2836] - JAXWS2.2: Generate proper wsa:action header for dispatch instance when AddressinfFeature is enabled
+    * [CXF-2840] - JAXWS2.2: Process the EPR in WSDL
+    * [CXF-2850] - Throw correct SOAPFaultException when the wsa addressing header is missing 
 
 
