@@ -76,8 +76,8 @@ public class JMSContinuationsClientServerTest extends AbstractBusClientServerTes
         QName portName = getPortName(new QName("http://cxf.apache.org/hello_world_jms", "HelloWorldPort"));
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         assertNotNull(wsdl);
-        
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
 
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
         assertNotNull(service);

@@ -76,7 +76,8 @@ public class HelloWorldContinuationsThrottleTest extends AbstractBusClientServer
         QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
         
         URL wsdlURL = getClass().getResource("/org/apache/cxf/systest/jms/continuations/test2.wsdl");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlURL.toString());
+        String wsdlString = wsdlURL.toString().intern();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();

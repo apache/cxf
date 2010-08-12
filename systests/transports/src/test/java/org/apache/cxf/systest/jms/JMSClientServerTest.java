@@ -98,6 +98,9 @@ import org.springframework.jndi.JndiTemplate;
 public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     static final String JMS_PORT = EmbeddedJMSBrokerLauncher.PORT;
     static final String PORT = Server.PORT;
+    
+    private String wsdlString;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         Map<String, String> props = new HashMap<String, String>();                
@@ -117,7 +120,10 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
     
     public URL getWSDLURL(String s) throws Exception {
         URL u = getClass().getResource(s);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), u.toString());
+        wsdlString = u.toString().intern();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
+        System.gc();
+        System.gc();
         return u;
     }
     public QName getServiceName(QName q) {
@@ -357,8 +363,9 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
         ClassPathXmlApplicationContext ctx = 
             new ClassPathXmlApplicationContext(
                 new String[] {"/org/apache/cxf/systest/jms/JMSClients.xml"});
+        String wsdlString2 = "classpath:wsdl/jms_test.wsdl";
         EmbeddedJMSBrokerLauncher.updateWsdlExtensors((Bus)ctx.getBean("cxf"),
-                                                      "classpath:wsdl/jms_test.wsdl");   
+                                                          wsdlString2);
         HelloWorldPortType greeter = (HelloWorldPortType)ctx.getBean("jmsRPCClient");
         assertNotNull(greeter);
         
@@ -439,8 +446,11 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
                                                "HelloWorldQueueDecoupledOneWaysPort"));
         URL wsdl = getWSDLURL("/wsdl/jms_test.wsdl");
         assertNotNull(wsdl);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), "testutils/jms_test.wsdl");
+        String wsdlString2 = wsdl.toString();
+        String wsdlString3 = "testutils/jms_test.wsdl";
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString2);
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString3);
+        
 
         HelloWorldQueueDecoupledOneWaysService service = 
             new HelloWorldQueueDecoupledOneWaysService(wsdl, serviceName);

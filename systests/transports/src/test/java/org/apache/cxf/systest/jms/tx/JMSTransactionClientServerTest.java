@@ -79,8 +79,8 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
         QName portName = getPortName(new QName("http://apache.org/hello_world_doc_lit", "SoapPort2"));
         URL wsdl = getWSDLURL("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
-        
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
         SOAPService2 service = new SOAPService2(wsdl, serviceName);
         assertNotNull(service);
 

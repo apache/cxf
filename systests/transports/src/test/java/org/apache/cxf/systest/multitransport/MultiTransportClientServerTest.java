@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Endpoint;
 
@@ -49,12 +50,13 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
                                                 "MultiTransportService");
 
     public static class MyServer extends AbstractBusTestServerBase {
-
+        Definition def;
         protected void run() {
             Object implementor = new HTTPGreeterImpl();
             String address = "http://localhost:" + PORT + "/SOAPDocLitService/SoapPort";
             Endpoint.publish(address, implementor);
-            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), "testutils/hello_world_doc_lit.wsdl");
+            EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(),
+                                                          "testutils/hello_world_doc_lit.wsdl");
             implementor = new JMSGreeterImpl();
             Endpoint.publish(null, implementor);
         }
@@ -97,7 +99,8 @@ public class MultiTransportClientServerTest extends AbstractBusClientServerTestB
         QName portName2 = new QName("http://apache.org/hello_world_doc_lit", "JMSPort");
         URL wsdl = getClass().getResource("/wsdl/hello_world_doc_lit.wsdl");
         assertNotNull(wsdl);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        String wsdlString = wsdl.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdlString);
 
         MultiTransportService service = new MultiTransportService(wsdl, serviceName);
         assertNotNull(service);

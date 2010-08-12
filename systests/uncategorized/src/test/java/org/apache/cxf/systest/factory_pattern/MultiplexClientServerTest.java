@@ -118,8 +118,8 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         
         // verify it is JMS, 999 for JMS will throw a fault
         W3CEndpointReference ref = factory.create("999");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(),
-                                                      NumberService.WSDL_LOCATION.toString());        
+        String s = NumberService.WSDL_LOCATION.toString();
+        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(BusFactory.getDefaultBus(), s);
         NumberService numService = new NumberService();
 
         assertNotNull("reference", ref);
