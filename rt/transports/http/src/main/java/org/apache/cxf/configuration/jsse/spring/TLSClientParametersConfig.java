@@ -59,7 +59,9 @@ public final class TLSClientParametersConfig {
         throws GeneralSecurityException,
                IOException {
 
-        TLSClientParameters ret = new TLSClientParameters();
+        TLSClientParameters ret = new TLSClientParameters(); 
+        boolean usingDefaults = params.isUseHttpsURLConnectionDefaultSslSocketFactory();
+        
         if (params.isDisableCNCheck()) {
             ret.setDisableCNCheck(true);
         }
@@ -81,16 +83,16 @@ public final class TLSClientParametersConfig {
         if (params.isSetJsseProvider()) {
             ret.setJsseProvider(params.getJsseProvider());
         }
-        if (params.isSetSecureRandomParameters()) {
+        if (params.isSetSecureRandomParameters() && !usingDefaults) {
             ret.setSecureRandom(
                 TLSParameterJaxBUtils.getSecureRandom(
                         params.getSecureRandomParameters()));
         }
-        if (params.isSetKeyManagers()) {
+        if (params.isSetKeyManagers() && !usingDefaults) {
             ret.setKeyManagers(
                 TLSParameterJaxBUtils.getKeyManagers(params.getKeyManagers()));
         }
-        if (params.isSetTrustManagers()) {
+        if (params.isSetTrustManagers() && !usingDefaults) {
             ret.setTrustManagers(
                 TLSParameterJaxBUtils.getTrustManagers(
                         params.getTrustManagers()));
