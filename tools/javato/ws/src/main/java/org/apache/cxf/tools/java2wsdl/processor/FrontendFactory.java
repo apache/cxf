@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebMethod;
-import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.xml.ws.WebServiceProvider;
@@ -77,8 +77,12 @@ public final class FrontendFactory {
             if (WrapperUtil.isWrapperClassExists(method)) {
                 return true;
             }
-            WebParam param = AnnotationUtil.getPrivMethodAnnotation(method, WebParam.class);
-            if (param != null) {
+            WebMethod m = AnnotationUtil.getPrivMethodAnnotation(method, WebMethod.class);
+            if (m != null) {
+                return true;
+            }
+            WebResult res = AnnotationUtil.getPrivMethodAnnotation(method, WebResult.class);
+            if (res != null) {
                 return true;
             }
         }

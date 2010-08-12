@@ -91,8 +91,8 @@ public class JavaToWSTest extends ToolTestBase {
         JavaToWS.main(args);
         File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
-        assertTrue("namespace value in annoataion @XmlElement is not correct"
-                   , str.indexOf("helloString/Name") > -1);
+        assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
+                   str.indexOf("helloString/Name") > -1);
     }
 
     private void checkStdErr() {
