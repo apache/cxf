@@ -57,11 +57,11 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.common.util.XMLSchemaQNames;
+import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.helpers.CastUtils;
-import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxws.JAXWSMethodDispatcher;
 import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
@@ -620,7 +620,9 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
     
     private Set<Class<?>> generatedWrapperBeanClass() {
-        if (getDataBinding() instanceof JAXBDataBinding) {
+        DataBinding b = getDataBinding();
+        if (b.getClass().getName().endsWith("JAXBDataBinding") 
+            && schemaLocations == null) {
             ServiceInfo serviceInfo = getService().getServiceInfos().get(0);
             WrapperClassGenerator wrapperGen = new WrapperClassGenerator(this,
                                                                          serviceInfo.getInterface(),
