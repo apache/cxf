@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jms;
 
+import javax.wsdl.Definition;
 import javax.xml.ws.Binding;
 import javax.xml.ws.Endpoint;
 import javax.xml.ws.soap.SOAPBinding;
@@ -32,7 +33,10 @@ import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 public class Server extends AbstractBusTestServerBase {
     public static final String PORT = allocatePort(Server.class);
-
+    Definition def1;
+    Definition def2;
+    Definition def3;
+    
     protected void run()  {
         Object implementor = new GreeterImplTwoWayJMS();
         Object impl2 =  new GreeterImplQueueOneWay();
@@ -53,9 +57,10 @@ public class Server extends AbstractBusTestServerBase {
         Object mtom = new JMSMTOMImpl();
         
         Bus bus = BusFactory.getDefaultBus();
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
+        def1 = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/hello_world_doc_lit.wsdl");
+        def2 = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test.wsdl");
+        def3 = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, "testutils/jms_test_mtom.wsdl");
+        
         Endpoint.publish(null, impleDoc);
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";
         Endpoint.publish(address, implementor);

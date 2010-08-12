@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jms.continuations;
 
+import javax.wsdl.Definition;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
@@ -32,11 +33,13 @@ public class Server3 extends AbstractBusTestServerBase {
     private static final String CONFIG_FILE =
         "org/apache/cxf/systest/jms/continuations/jms_test_config.xml";
    
+    Definition def;
+    
     protected void run()  {
         SpringBusFactory bf = new SpringBusFactory();
         Bus bus = bf.createBus(CONFIG_FILE);
         BusFactory.setDefaultBus(bus);
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, 
+        def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(bus, 
                                                       "org/apache/cxf/systest/jms/continuations/test2.wsdl");
         Object implementor = new HelloWorldWithContinuationsJMS2();        
         String address = "http://localhost:" + PORT + "/SoapContext/SoapPort";

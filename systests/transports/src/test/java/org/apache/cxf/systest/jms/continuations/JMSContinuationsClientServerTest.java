@@ -22,6 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.hello_world_jms.HelloWorldPortType;
@@ -77,7 +78,8 @@ public class JMSContinuationsClientServerTest extends AbstractBusClientServerTes
         URL wsdl = getWSDLURL("/org/apache/cxf/systest/jms/continuations/jms_test.wsdl");
         assertNotNull(wsdl);
         
-        EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        Definition def = EmbeddedJMSBrokerLauncher.updateWsdlExtensors(getBus(), wsdl.toString());
+        assertNotNull(def);
 
         HelloWorldService service = new HelloWorldService(wsdl, serviceName);
         assertNotNull(service);

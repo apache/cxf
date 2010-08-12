@@ -41,7 +41,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
     final String brokerUrl1 = "tcp://localhost:" + PORT;            
             
     
-    public static void updateWsdlExtensors(Bus bus, String wsdlLocation) {
+    public static Definition updateWsdlExtensors(Bus bus, String wsdlLocation) {
         try {
             if (bus == null) {
                 bus = BusFactory.getThreadDefaultBus();
@@ -87,9 +87,11 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
                     }                    
                 }
             }
+            return def;
         } catch (Exception e) {
             e.printStackTrace();
         }
+        return null;
     }
     
     public void tearDown() throws Exception {
