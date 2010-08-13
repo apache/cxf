@@ -37,7 +37,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
-import java.util.WeakHashMap;
 import java.util.logging.Logger;
 
 import javax.ws.rs.WebApplicationException;
@@ -85,16 +84,17 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     implements MessageBodyReader<Object>, MessageBodyWriter<Object> {
     
     protected static final ResourceBundle BUNDLE = BundleUtils.getBundle(AbstractJAXBProvider.class);
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractJAXBProvider.class);
-   
     private static final String JAXB_DEFAULT_NAMESPACE = "##default";
     private static final String JAXB_DEFAULT_NAME = "##default";
     
-    private static Map<String, JAXBContext> packageContexts = new WeakHashMap<String, JAXBContext>();
-    private static Map<Class<?>, JAXBContext> classContexts = new WeakHashMap<Class<?>, JAXBContext>();
+    private static Map<String, JAXBContext> packageContexts = new HashMap<String, JAXBContext>();
+    private static Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
+
    
-    private static Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
-    private static JAXBContext collectionContext; 
+    protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
+    protected JAXBContext collectionContext; 
     
     protected Map<String, String> jaxbElementClassMap;
     protected boolean unmarshalAsJaxbElement;

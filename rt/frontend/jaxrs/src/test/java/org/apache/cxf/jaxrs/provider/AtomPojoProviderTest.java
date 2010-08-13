@@ -107,7 +107,7 @@ public class AtomPojoProviderTest extends Assert {
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
         MediaType mt = MediaType.valueOf("application/atom+xml;type=entry");
         provider.writeTo(new Book("a"), Book.class, Book.class, new Annotation[]{}, mt, null, bos);
-        System.out.println(bos.toString());
+        //System.out.println(bos.toString());
         ByteArrayInputStream bis = new ByteArrayInputStream(bos.toByteArray());
         Book book = (Book)provider.readFrom((Class)Book.class, Book.class, 
                                             new Annotation[]{}, mt, null, bis);

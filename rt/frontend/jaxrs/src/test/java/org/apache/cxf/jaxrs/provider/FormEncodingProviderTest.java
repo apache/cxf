@@ -215,17 +215,13 @@ public class FormEncodingProviderTest extends Assert {
         byte[] iso88591bytes = helloStringUTF16.getBytes("ISO-8859-1");
         String helloStringISO88591 = new String(iso88591bytes, "ISO-8859-1");
         
-        System.out.println(helloStringISO88591);
-        
         MultivaluedMap<String, String> mvMap = 
             (MultivaluedMap<String, String>)ferp.readFrom((Class)MultivaluedMap.class, null,
                 new Annotation[]{}, 
                 MediaType.valueOf(MediaType.APPLICATION_FORM_URLENCODED + ";charset=ISO-8859-1"), null, 
                 new ByteArrayInputStream(iso88591bytes));
         String value = mvMap.getFirst("name");
-
-        System.out.println(value);
-
+        assertEquals(helloStringISO88591, "name=" + value);
     }
 
     @Test
