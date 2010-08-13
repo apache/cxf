@@ -782,10 +782,6 @@ public class CodeGeneratorProvider implements RequestHandler {
             throw new IllegalStateException("Unable to write generated Java files for schemas: "
                                             + e.getMessage(), e);
         }
-        List<File> srcFiles = FileUtils.getFilesRecurse(src, ".+\\.java$");
-        for (File f : srcFiles) {
-            System.out.println(f.getAbsolutePath());
-        }
     }
 
     private List<Element> getSchemaElements(Element appElement) {

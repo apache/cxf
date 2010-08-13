@@ -79,6 +79,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
     
+    public JAXBElementProvider() {
+        
+    }
+    
     @Override
     public boolean isReadable(Class<?> type, Type genericType, Annotation[] anns, MediaType mt) {
         

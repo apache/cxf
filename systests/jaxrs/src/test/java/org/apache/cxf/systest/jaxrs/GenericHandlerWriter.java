@@ -32,6 +32,11 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 
 public class GenericHandlerWriter implements MessageBodyWriter<GenericHandler<Book>> {
+    JAXBElementProvider jaxb = new JAXBElementProvider();
+    
+    public GenericHandlerWriter() {
+        
+    }
 
     public long getSize(GenericHandler<Book> t, Class<?> type, Type genericType, Annotation[] annotations, 
                         MediaType mediaType) {        
@@ -46,7 +51,6 @@ public class GenericHandlerWriter implements MessageBodyWriter<GenericHandler<Bo
     public void writeTo(GenericHandler<Book> o, Class<?> c, Type t, Annotation[] anns, MediaType m,
                         MultivaluedMap<String, Object> headers, OutputStream os) 
         throws IOException, WebApplicationException {
-        JAXBElementProvider jaxb = new JAXBElementProvider();
         jaxb.writeTo(o.getEntity(), o.getEntity().getClass(), InjectionUtils.getActualType(t), 
                      anns, m, headers, os);
     }

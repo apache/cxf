@@ -514,7 +514,7 @@ public class AtomPojoProvider extends AbstractConfigurableProvider
         }
         try {
             Unmarshaller um = 
-                new JAXBElementProvider().getJAXBContext(cls, cls).createUnmarshaller();
+                jaxbProvider.getJAXBContext(cls, cls).createUnmarshaller();
             return um.unmarshal(new StringReader(entry.getContent()));
         } catch (Exception ex) {
             reportError("Object of type " + cls.getName() + " can not be deserialized from Entry", ex);
