@@ -79,6 +79,24 @@ public class JavaToWSTest extends ToolTestBase {
         checkStdErr();
         assertTrue("Failed to generate WSDL file", wsdlFile.exists());
     }
+
+    @Test
+    public void testCXF2941() throws Exception {
+        String[] args = new String[] {
+            "-wsdl", "-wrapperbean", 
+            "-s", output.getPath(), 
+            "-o", output.getPath() + "/cxf2941.wsdl", 
+            "org.apache.cxf.tools.fortest.cxf2941.WebResultService"
+        };
+        JavaToWS.main(args);
+        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloResponse.java");
+        String str = FileUtils.getStringFromFile(wrapper);
+        assertTrue("namespace value in annoataion @XmlElement is not correct"
+                   , str.indexOf("hello/name") > -1);
+        assertTrue("name value in annoataion @XmlElement is not correct"
+                   , str.indexOf("\"name\"") > -1);
+    }
+    
     
     @Test
     public void testCXF2934() throws Exception {

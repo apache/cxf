@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.xml.ws.Holder;
 
 import org.apache.cxf.common.util.CollectionUtils;
@@ -75,9 +76,17 @@ public final class ResponseWrapper extends Wrapper {
             return fields;
         }
         MessagePartInfo part = message.getMessageParts().get(0);
-
+        
         field.setName(part.getName().getLocalPart());
-
+        field.setTargetNamespace(part.getName().getNamespaceURI());
+               
+        if (method.getAnnotation(WebResult.class) == null 
+            && method.getAnnotation(javax.xml.ws.ResponseWrapper.class) == null
+            || method.getAnnotation(WebResult.class) != null 
+            && method.getAnnotation(WebResult.class).targetNamespace().equals("")) {
+            field.setTargetNamespace("");   
+        }
+        
         boolean hasReturnType = false;
 
         if (!returnType.isAssignableFrom(void.class)) {
@@ -86,8 +95,6 @@ public final class ResponseWrapper extends Wrapper {
             List<Annotation> jaxbAnns = WrapperUtil.getJaxbAnnotations(method);
             field.setType(type);
             field.setJaxbAnnotations(jaxbAnns.toArray(new Annotation[jaxbAnns.size()]));
-            field.setTargetNamespace("");
-
         }
         fields.add(field);
 
