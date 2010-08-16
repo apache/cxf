@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<wsdl:definitions name="WebResultServiceService" targetNamespace="http://cxf2944.fortest.tools.cxf.apache.org/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://cxf2944.fortest.tools.cxf.apache.org/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:types>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:ns1="hello/name" xmlns:tns="http://cxf2944.fortest.tools.cxf.apache.org/" elementFormDefault="unqualified" targetNamespace="http://cxf2944.fortest.tools.cxf.apache.org/" version="1.0">
+<xs:import namespace="hello/name"/>
+<xs:element name="helloString" type="tns:helloString"/>
+<xs:element name="helloStringResponse" type="tns:helloStringResponse"/>
+<xs:complexType name="helloString">
+    <xs:sequence>
+      <xs:element name="arg0" type="xs:int"/>
+    </xs:sequence>
+  </xs:complexType>
+<xs:complexType name="helloStringResponse">
+    <xs:sequence>
+      <xs:element minOccurs="0" ref="ns1:name"/>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="hello/name" version="1.0">
+<xs:element name="name" type="xs:string"/>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="helloString">
+    <wsdl:part name="parameters" element="tns:helloString">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="helloStringResponse">
+    <wsdl:part name="parameters" element="tns:helloStringResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="WebResultService">
+    <wsdl:operation name="helloString">
+      <wsdl:input name="helloString" message="tns:helloString">
+    </wsdl:input>
+      <wsdl:output name="helloStringResponse" message="tns:helloStringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="WebResultServiceServiceSoapBinding" type="tns:WebResultService">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="helloString">
+      <soap:operation soapAction="urn:HelloString" style="document"/>
+      <wsdl:input name="helloString">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="helloStringResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="WebResultServiceService">
+    <wsdl:port name="WebResultServicePort" binding="tns:WebResultServiceServiceSoapBinding">
+      <soap:address location="http://localhost:9090/WebResultServicePort"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

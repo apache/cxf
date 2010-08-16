@@ -439,7 +439,7 @@ public class ParameterProcessor extends AbstractProcessor {
             }
             if (!sameWrapperChild) {
                 JavaReturn jreturn = getReturnFromQName(outElement, outputPart);
-                if (!qualified) {
+                if (!qualified && !this.isRefElement(outputPart, outElement)) {
                     jreturn.setTargetNamespace("");
                 }
                 method.setReturn(jreturn);
