@@ -433,11 +433,7 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
             String tns = null;
             String local = null;
             if (webResult != null) {
-                //if it's a "wrapped" thing, the WebResult namespace is irrelevant
-                //as the generated element has to be in the namespace of the wrapper type
-                if (webResult.header() || !op.isUnwrapped()) {
-                    tns = webResult.targetNamespace();
-                }
+                tns = webResult.targetNamespace();
                 local = webResult.name();
             }
             if (tns == null || tns.length() == 0) {
