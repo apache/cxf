@@ -63,6 +63,7 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     @Override
     protected void doParse(Element element, ParserContext ctx, BeanDefinitionBuilder bean) {
         boolean isAbstract = false;
+        boolean publish = true;
         NamedNodeMap atts = element.getAttributes();
         String bus = element.getAttribute("bus");
         if (StringUtils.isEmpty(bus)) {
@@ -93,6 +94,8 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             } else if ("abstract".equals(name)) {
                 bean.setAbstract(true);
                 isAbstract = true;
+            } else if ("publish".equals(name)) {
+                publish = "true".equals(val);
             }
         }
         
@@ -119,7 +122,9 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
             elem = DOMUtils.getNextElement(elem);
         }
         if (!isAbstract) {
-            bean.setInitMethodName("publish");
+            if (publish) {
+                bean.setInitMethodName("publish");
+            }
             bean.setDestroyMethodName("stop");
         }
         // We don't want to delay the registration of our Server

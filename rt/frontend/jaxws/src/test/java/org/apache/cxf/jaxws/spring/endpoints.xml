@@ -141,4 +141,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     implementor="#greeter"
     address="http://localhost:8080/publishedEndpointUrl"
     publishedEndpointUrl="http://cxf.apache.org/Greeter"/>
+
+  <jaxws:endpoint id="unpublishedEndpoint"
+    implementor="#greeter"
+    address="http://localhost:8080/unpublished"
+    publish="false"/>
 </beans>
