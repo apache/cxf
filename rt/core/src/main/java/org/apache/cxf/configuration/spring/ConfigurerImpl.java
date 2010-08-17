@@ -162,18 +162,22 @@ public class ConfigurerImpl extends BeanConfigurerSupport
     
     private void configureWithWildCard(String bn, Object beanInstance) {
         if (!wildCardBeanDefinitions.isEmpty()) {
-            String className = beanInstance.getClass().getName();
-            List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
-            if (matchers != null) {
-                for (MatcherHolder m : matchers) {
-                    synchronized (m.matcher) {
-                        m.matcher.reset(bn);
-                        if (m.matcher.matches()) {
-                            configureBean(m.wildCardId, beanInstance, false);
-                            return;
+            Class<?> clazz = beanInstance.getClass();            
+            while (!Object.class.equals(clazz)) {
+                String className = clazz.getName();
+                List<MatcherHolder> matchers = wildCardBeanDefinitions.get(className);
+                if (matchers != null) {
+                    for (MatcherHolder m : matchers) {
+                        synchronized (m.matcher) {
+                            m.matcher.reset(bn);
+                            if (m.matcher.matches()) {
+                                configureBean(m.wildCardId, beanInstance, false);
+                                return;
+                            }
                         }
                     }
                 }
+                clazz = clazz.getSuperclass();
             }
         }
     }
