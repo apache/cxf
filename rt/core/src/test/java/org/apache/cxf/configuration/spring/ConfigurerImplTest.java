@@ -198,6 +198,24 @@ public class ConfigurerImplTest extends Assert {
     }
     
     @Test
+    public void testConfigureSimpleMatchingStarBeanIdWithChildInstance() {
+        SimpleBean sb = new ChildBean("simple2");
+        BusApplicationContext ac = 
+            new BusApplicationContext("/org/apache/cxf/configuration/spring/test-beans.xml",
+                                      false);
+
+        ConfigurerImpl configurer = new ConfigurerImpl();
+        configurer.setApplicationContext(ac);
+        configurer.configureBean(sb);
+        assertTrue("Unexpected value for attribute booleanAttr", 
+                   !sb.getBooleanAttr());
+        assertEquals("Unexpected value for attribute integerAttr", 
+                     BigInteger.TEN, sb.getIntegerAttr());
+        assertEquals("Unexpected value for attribute stringAttr", 
+                     "StarHallo", sb.getStringAttr());
+    }
+    
+    @Test
     public void testGetBeanName() {
         ConfigurerImpl configurer = new ConfigurerImpl();
         Object beanInstance = new Configurable() {
@@ -236,7 +254,7 @@ public class ConfigurerImplTest extends Assert {
         assertTrue("The conetxts' contains a wrong application context", contexts.contains(context2));
     }
     
-    final class SimpleBean implements Configurable {
+    class SimpleBean implements Configurable {
         
         private String beanName;
         
@@ -397,5 +415,13 @@ public class ConfigurerImplTest extends Assert {
         public void setBeanName(String beanName) {
             this.beanName = beanName;
         }    
+    }
+    
+    class ChildBean extends SimpleBean {
+
+        public ChildBean(String bn) {
+            super(bn);
+        }
+        
     }
 }
