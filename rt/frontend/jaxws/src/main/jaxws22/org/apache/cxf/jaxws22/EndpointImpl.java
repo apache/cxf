@@ -23,7 +23,9 @@ import javax.xml.ws.EndpointContext;
 import javax.xml.ws.WebServiceFeature;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.transport.http_jaxws_spi.JAXWSHttpSpiTransportFactory;
 
 /**
  * 
@@ -104,7 +106,11 @@ public class EndpointImpl extends org.apache.cxf.jaxws.EndpointImpl {
     
     //new in 2.2, but introduces a new class not found in 2.1
     public void publish(javax.xml.ws.spi.http.HttpContext context) {
-        super.publish(context);
+        ServerFactoryBean serverFactory = getServerFactory();
+        if (serverFactory.getDestinationFactory() == null) {
+            serverFactory.setDestinationFactory(new JAXWSHttpSpiTransportFactory(getBus(), context));
+        }
+        super.publish(context.getPath());
     }
     
 }

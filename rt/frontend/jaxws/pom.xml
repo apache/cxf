@@ -184,9 +184,13 @@
             <id>jaxws22</id>
             <dependencies>
                 <dependency>
+                    <groupId>org.apache.cxf</groupId>
+                    <artifactId>cxf-rt-transports-http-jaxws-spi</artifactId>
+                    <version>${project.version}</version>
+                </dependency>
+                <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                    <version>1.0</version>
                 </dependency>
             </dependencies>
             <properties>
@@ -227,7 +231,6 @@
                                          <artifactItem>
                                              <groupId>org.apache.geronimo.specs</groupId>
                                              <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                                             <version>1.0</version>
                                              <outputDirectory>${basedir}/target/endorsed</outputDirectory>
                                          </artifactItem>
                                      </artifactItems>
