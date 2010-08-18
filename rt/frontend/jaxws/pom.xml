@@ -63,6 +63,10 @@
             <artifactId>asm</artifactId>
         </dependency>
         <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-api</artifactId>
             <version>${project.version}</version>
@@ -86,6 +90,11 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-simple</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -184,11 +193,6 @@
             <id>jaxws22</id>
             <dependencies>
                 <dependency>
-                    <groupId>org.apache.cxf</groupId>
-                    <artifactId>cxf-rt-transports-http-jaxws-spi</artifactId>
-                    <version>${project.version}</version>
-                </dependency>
-                <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                 </dependency>
@@ -211,6 +215,18 @@
                                 <configuration>
                                     <sources>
                                         <source>${basedir}/src/main/jaxws22</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-jaxws22-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${basedir}/src/test/jaxws22</source>
                                     </sources>
                                 </configuration>
                             </execution>
@@ -322,6 +338,18 @@
                                 <configuration>
                                     <sources>
                                         <source>${basedir}/src/main/jaxws22</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                            <execution>
+                                <id>add-jaxws22-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${basedir}/src/test/jaxws22</source>
                                     </sources>
                                 </configuration>
                             </execution>

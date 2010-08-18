@@ -58,13 +58,4 @@
         <module>javascript</module>
     </modules>
 
-    <profiles>
-      <profile>
-        <id>jaxws22</id>
-        <modules>
-          <module>transports/http-jaxws-spi</module>
-        </modules>
-      </profile>
-    </profiles>
-
 </project>
