@@ -34,4 +34,13 @@
     <modules>
       <module>webapp</module>
     </modules>
+
+    <profiles>
+      <profile>
+        <id>jaxws22</id>
+        <modules>
+          <module>grizzly</module>
+        </modules>
+      </profile>
+    </profiles>
 </project>
