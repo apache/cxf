@@ -19,7 +19,7 @@
 	targetNamespace="http://cxf.apache.org/jms_greeter" xmlns="http://schemas.xmlsoap.org/wsdl/"
 	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://cxf.apache.org/jms_greeter"
 	xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
-	xmlns:x1="http://cxf.apache.org/jms_greeter/types" xmlns:soapjms="http://www.w3.org/2008/07/soap/bindings/JMS/">
+	xmlns:x1="http://cxf.apache.org/jms_greeter/types" xmlns:soapjms="http://www.w3.org/2010/soapjms/">
 	<wsdl:types>
 		<schema targetNamespace="http://cxf.apache.org/jms_greeter/types"
 			xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
@@ -93,7 +93,7 @@
 
 	<wsdl:binding name="JMSGreeterPortBinding" type="tns:JMSGreeterPortType">
 		<soap:binding style="document"
-			transport="http://www.w3.org/2008/07/soap/bindings/JMS/" />
+			transport="http://www.w3.org/2010/soapjms/" />
 		<soapjms:jndiConnectionFactoryName>ConnectionFactory</soapjms:jndiConnectionFactoryName>
 		<soapjms:jndiInitialContextFactory>
 			org.apache.activemq.jndi.ActiveMQInitialContextFactory

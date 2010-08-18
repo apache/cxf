@@ -19,9 +19,6 @@
 
 package org.apache.cxf.binding.soap.jms.interceptor;
 
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.xml.namespace.QName;
 
 import org.w3c.dom.Document;
@@ -32,16 +29,12 @@ import org.apache.cxf.binding.soap.Soap11;
 import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.binding.soap.SoapVersion;
-import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.interceptor.Fault;
 
 /**
  * 
  */
 public class SoapFaultFactory  {
-
-    private static final Logger LOG = LogUtils.getL7dLogger(SoapFaultFactory.class); 
     
     private SoapVersion version;
     
@@ -63,20 +56,7 @@ public class SoapFaultFactory  {
     
     Fault createSoap11Fault(JMSFault jmsFault) {
         SoapFault fault = new SoapFault(jmsFault.getReason(),
-            jmsFault.isSender() ? version.getSender() : version.getReceiver());
-        QName subCode = jmsFault.getSubCode();
-        fault.setSubCode(subCode);
-        try {
-            Document doc = XMLUtils.newDocument();
-            Element detail = doc.createElementNS(Soap11.SOAP_NAMESPACE, "detail");
-            Element detailChild = doc.createElementNS(subCode.getNamespaceURI(), subCode.getLocalPart());
-            detailChild.setTextContent(fault.getReason());
-            detail.appendChild(detailChild);
-            fault.setDetail(detail);
-        } catch (Exception ex) {
-            LogUtils.log(LOG, Level.SEVERE, "MARSHAL_FAULT_DETAIL_EXC", ex); 
-            ex.printStackTrace();
-        }
+            jmsFault.getSubCode());
         return fault;
     }
     

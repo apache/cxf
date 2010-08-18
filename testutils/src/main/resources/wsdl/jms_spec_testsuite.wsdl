@@ -29,7 +29,7 @@
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
     xmlns:x1="http://cxf.apache.org/jms_simple/types"
-    xmlns:soapjms="http://www.w3.org/2008/07/soap/bindings/JMS/">
+    xmlns:soapjms="http://www.w3.org/2010/soapjms/">
     <wsdl:types>
         <schema targetNamespace="http://cxf.apache.org/jms_simple/types"
             xmlns="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
@@ -61,7 +61,7 @@
     </wsdl:portType>
 
     <wsdl:binding name="JMSSimplePortBinding" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
 
         <wsdl:operation name="echo">
             <soap:operation soapAction="echo" style="document"/>
@@ -82,7 +82,7 @@
     </wsdl:binding>
 
     <wsdl:binding name="JMSSimpleSOAP12PortBinding" type="tns:JMSSimplePortType">
-        <soap12:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap12:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
 
         <wsdl:operation name="echo">
             <soap12:operation soapAction="echo" style="document"/>
@@ -103,7 +103,7 @@
     </wsdl:binding>
 
     <wsdl:binding name="JMSSimplePortBinding0006" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         
         <soapjms:deliveryMode>NON_PERSISTENT</soapjms:deliveryMode>
         <soapjms:timeToLive>7200000</soapjms:timeToLive>
@@ -129,7 +129,7 @@
     </wsdl:binding>
     
     <wsdl:binding name="JMSSimplePortBinding0009" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         
         <soapjms:deliveryMode>PERSISTENT</soapjms:deliveryMode>
         <soapjms:timeToLive>7200000</soapjms:timeToLive>
@@ -155,7 +155,7 @@
     </wsdl:binding>
     
     <wsdl:binding name="JMSSimplePortBinding0010" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         
         <soapjms:deliveryMode>NON_PERSISTENT</soapjms:deliveryMode>
         <soapjms:timeToLive>7200000</soapjms:timeToLive>
@@ -181,7 +181,7 @@
     </wsdl:binding>
     
     <wsdl:binding name="JMSSimplePortBinding0013" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         
         <soapjms:timeToLive>7200000</soapjms:timeToLive>
         
@@ -204,7 +204,7 @@
     </wsdl:binding>
 
     <wsdl:binding name="JMSSimplePortBinding0014" type="tns:JMSSimplePortType">
-        <soap:binding style="document" transport="http://www.w3.org/2008/07/soap/bindings/JMS/"/>
+        <soap:binding style="document" transport="http://www.w3.org/2010/soapjms/"/>
         
         <soapjms:timeToLive>7200000</soapjms:timeToLive>
         <soapjms:priority>4</soapjms:priority>

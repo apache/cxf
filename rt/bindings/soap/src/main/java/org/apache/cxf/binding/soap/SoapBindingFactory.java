@@ -146,8 +146,8 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         info.setName(config.getBindingName(si));
         info.setStyle(config.getStyle());
         if ("http://cxf.apache.org/transports/jms".equals(config.getTransportURI())) {
-            info.setTransportURI("http://www.w3.org/2008/07/soap/bindings/JMS/");
-            config.setTransportURI("http://www.w3.org/2008/07/soap/bindings/JMS/");
+            info.setTransportURI("http://www.w3.org/2010/soapjms/");
+            config.setTransportURI("http://www.w3.org/2010/soapjms/");
         } else {
             info.setTransportURI(config.getTransportURI());
         }
@@ -380,7 +380,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             }
             
             //jms
-            if (sbi.getTransportURI().equals("http://www.w3.org/2008/07/soap/bindings/JMS/")) {
+            if (sbi.getTransportURI().equals("http://www.w3.org/2010/soapjms/")) {
                 sb.getInInterceptors().add(new SoapJMSInInterceptor());
             }
         } else {

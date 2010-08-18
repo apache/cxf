@@ -45,7 +45,7 @@
 			<priority>4</priority>
 			<expiration>0</expiration>
 			<replyTo></replyTo>
-			<correlationID></correlationID>
+			<correlationID>Correlator0002</correlationID>
 			<destination>queue://testqueue0001</destination>
 			<redelivered>false</redelivered>
 			<bindingVersion>1.0</bindingVersion>
@@ -62,7 +62,7 @@
 			<priority>4</priority>
 			<expiration>0</expiration>
 			<replyTo></replyTo>
-			<correlationID></correlationID>
+			<correlationID>Correlator0002</correlationID>
 			<destination></destination>
 			<redelivered>false</redelivered>
 			<bindingVersion>1.0</bindingVersion>
@@ -103,7 +103,7 @@
 			<priority>4</priority>
 			<expiration>0</expiration>
 			<replyTo></replyTo>
-			<correlationID></correlationID>
+			<correlationID>Correlator0002</correlationID>
 			<destination>queue://testqueue0101</destination>
 			<redelivered>false</redelivered>
 			<bindingVersion>1.0</bindingVersion>
@@ -120,7 +120,7 @@
 			<priority>4</priority>
 			<expiration>0</expiration>
 			<replyTo></replyTo>
-			<correlationID></correlationID>
+			<correlationID>Correlator0002</correlationID>
 			<destination></destination>
 			<redelivered>false</redelivered>
 			<bindingVersion>1.0</bindingVersion>

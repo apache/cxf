@@ -39,7 +39,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 		        <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
 		        <value>http://schemas.xmlsoap.org/soap/http/</value>
                 <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-            	<value>http://www.w3.org/2008/07/soap/bindings/JMS/</value>
+            	<value>http://www.w3.org/2010/soapjms/</value>
                 <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
             	<value>http://schemas.xmlsoap.org/soap/http</value>
             </list>

@@ -155,7 +155,10 @@ public class SOAPJMSTestSuiteTest extends AbstractSOAPJMSTestSuite {
         final JMSSimplePortType simplePort = getPort("JMSSimpleService0001", "SimplePort",
                                                      JMSSimpleService0001.class,
                                                      JMSSimplePortType.class);
-        twoWayTest(testcase, simplePort);
+        JMSMessageHeadersType requestHeader = new JMSMessageHeadersType();
+        requestHeader.setJMSCorrelationID("Correlator0002");
+
+        twoWayTestWithRequestHeader(testcase, simplePort, requestHeader);
     }
 
     @Test

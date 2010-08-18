@@ -205,6 +205,9 @@ public final class JMSTestUtil {
         if (messageProperties.isSetExpiration()) {
             jmsMessage.setJMSPriority(messageProperties.getExpiration());
         }
+        if (messageProperties.isSetCorrelationID()) {
+            jmsMessage.setJMSCorrelationID(messageProperties.getCorrelationID());
+        }
         
         if (messageProperties.isSetTargetService()
             && !"".equals(messageProperties.getTargetService().trim())) {
