@@ -19,25 +19,19 @@
 package org.apache.cxf.transport.https_jetty;
 
 
-import java.io.IOException;
-import java.net.ServerSocket;
 import java.security.SecureRandom;
-import java.util.Arrays;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLServerSocket;
-import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.TrustManager;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.configuration.security.ClientAuthentication;
 import org.apache.cxf.configuration.security.FiltersType;
 import org.apache.cxf.transport.https.SSLUtils;
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
+import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 
 /**
  * This class extends the Jetty SslSocketConnector, which allows
@@ -45,7 +39,7 @@ import org.eclipse.jetty.server.ssl.SslSocketConnector;
  * and TrustManagers. Also, Jetty version 6.1.3 has a bug where
  * the Trust store needs a password.
  */
-public class CXFJettySslSocketConnector extends SslSocketConnector {
+public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFJettySslSocketConnector.class);    
     
     protected KeyManager[]   keyManagers;
@@ -104,27 +98,17 @@ public class CXFJettySslSocketConnector extends SslSocketConnector {
             }
         }
     }
-    
-    /**
-     * We create our own socket factory.
-     */
-    @Override
-    protected SSLServerSocketFactory createFactory()
-        throws Exception {
-    
+    protected SSLContext createSSLContext() throws Exception  {
         String proto = getProtocol() == null
-               ? "TLS"
-               : getProtocol();
-        
+            ? "TLS"
+                : getProtocol();
+ 
         SSLContext context = getProvider() == null
-               ? SSLContext.getInstance(proto)
-               : SSLContext.getInstance(proto, getProvider());
-
+            ? SSLContext.getInstance(proto)
+                : SSLContext.getInstance(proto, getProvider());
+            
         context.init(keyManagers, trustManagers, secureRandom);
 
-        SSLServerSocketFactory con = context.getServerSocketFactory();
-
-        
         String[] cs = 
             SSLUtils.getCiphersuites(
                     cipherSuites,
@@ -133,15 +117,7 @@ public class CXFJettySslSocketConnector extends SslSocketConnector {
                     LOG, true);
         
         setExcludeCipherSuites(cs);
-        return con;
+        
+        return context;
     }
-    protected ServerSocket newServerSocket(String host, int port, int backlog) throws IOException {
-        ServerSocket sock = super.newServerSocket(host, port, backlog);
-        if (sock instanceof SSLServerSocket && LOG.isLoggable(Level.INFO)) {
-            SSLServerSocket sslSock = (SSLServerSocket)sock;
-            LOG.log(Level.INFO, "CIPHERSUITES_SET", Arrays.asList(sslSock.getEnabledCipherSuites()));
-        }
-        return sock;
-    }
-
 }

@@ -38,9 +38,12 @@ import org.junit.Test;
 
 public class ClientServerWrappedContinuationTest extends AbstractClientServerTestBase {
     public static final String PORT = allocatePort(Server.class);
+    public static final String HTTPS_PORT = allocatePort(Server.class, 1);
     
     private static final String CLIENT_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/cxf.xml";
+    private static final String CLIENT_HTTPS_CONFIG_FILE =
+        "org/apache/cxf/systest/http_jetty/continuations/cxf_https.xml";
     private static final String SERVER_CONFIG_FILE =
         "org/apache/cxf/systest/http_jetty/continuations/jaxws-server.xml";
     
@@ -53,6 +56,8 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
             
             Object implementor = new HelloImplWithWrapppedContinuation();
             String address = "http://localhost:" + PORT + "/hellocontinuation";
+            Endpoint.publish(address, implementor);
+            address = "https://localhost:" + HTTPS_PORT + "/securecontinuation";
             Endpoint.publish(address, implementor);
         }
 
@@ -87,7 +92,26 @@ public class ClientServerWrappedContinuationTest extends AbstractClientServerTes
         HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
         assertNotNull(service);
         final HelloContinuation helloPort = service.getHelloContinuationPort();
+        doTest(helloPort);
+    }
         
+    @Test
+    public void testHttpsWrappedContinuations() throws Exception {
+        SpringBusFactory bf = new SpringBusFactory();
+        Bus bus = bf.createBus(CLIENT_HTTPS_CONFIG_FILE);
+        BusFactory.setDefaultBus(bus);
+        
+        QName serviceName = new QName("http://cxf.apache.org/systest/jaxws", "HelloContinuationService");
+        
+        URL wsdlURL = new URL("https://localhost:" + HTTPS_PORT + "/securecontinuation?wsdl");
+        
+        HelloContinuationService service = new HelloContinuationService(wsdlURL, serviceName);
+        assertNotNull(service);
+        final HelloContinuation helloPort = service.getHelloContinuationPort();
+        doTest(helloPort);
+    }
+
+    private void doTest(final HelloContinuation helloPort) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(10, 10, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(6));
         CountDownLatch startSignal = new CountDownLatch(1);

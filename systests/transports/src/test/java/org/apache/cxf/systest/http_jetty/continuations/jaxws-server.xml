@@ -28,6 +28,7 @@ under the License.
         http://cxf.apache.org/transports/http-jetty/configuration   http://cxf.apache.org/schemas/configuration/http-jetty.xsd
         http://cxf.apache.org/configuration/security                http://cxf.apache.org/schemas/configuration/security.xsd
         ">
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
     <!-- -->
     <!-- This Spring config file is designed to represent a minimal -->
@@ -44,8 +45,8 @@ under the License.
     <!-- -->
     <!-- TLS Port configuration parameters for port 9091 -->
     <!-- -->
-    <httpj:engine-factory id="port-9091-tls-config">
-        <httpj:engine port="9091">
+    <httpj:engine-factory>
+        <httpj:engine port="${testutil.ports.Server.1}">
             <httpj:tlsServerParameters>
                <sec:keyManagers keyPassword="password">
 	           <sec:keyStore type="JKS" password="password" 
@@ -59,21 +60,6 @@ under the License.
         </httpj:engine>
     </httpj:engine-factory>
 
-    <!-- -->
-    <!-- HTTP/S configuration for clients -->
-    <!-- -->
-    <http:conduit name="{http://cxf.apache.org/systest/jaxws}HelloContinuationPort.http-conduit">
-        <http:client ConnectionTimeout="3000000" ReceiveTimeout="3000000"/>
-        <http:tlsClientParameters disableCNCheck="true">
-            <sec:keyManagers keyPassword="password">
-	           <sec:keyStore type="JKS" password="password" 
-	                file="src/test/java/org/apache/cxf/systest/http/resources/Morpit.jks"/>
-	           </sec:keyManagers>
-	        <sec:trustManagers>
-	           <sec:keyStore type="JKS" password="password"
-	               file="src/test/java/org/apache/cxf/systest/http/resources/Truststore.jks"/>
-	        </sec:trustManagers>
-        </http:tlsClientParameters>
-    </http:conduit>
+
 
 </beans>

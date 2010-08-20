@@ -153,7 +153,7 @@ public final class SSLUtils {
             kmf.init(ks, keyStorePassword.toCharArray());
             keystoreManagers = kmf.getKeyManagers();
             LogUtils.log(log,
-                         Level.INFO,
+                         Level.FINE,
                          "LOADED_KEYSTORE",
                          keyStoreLocation);
         } catch (Exception e) {
@@ -202,7 +202,7 @@ public final class SSLUtils {
         TrustManagerFactory tmf  = 
             TrustManagerFactory.getInstance(trustStoreMgrFactoryAlgorithm);
         tmf.init(trustedCertStore);
-        LogUtils.log(log, Level.INFO, "LOADED_TRUST_STORE", trustStoreLocation);
+        LogUtils.log(log, Level.FINE, "LOADED_TRUST_STORE", trustStoreLocation);
         trustStoreManagers = tmf.getTrustManagers();
 
         return trustStoreManagers;
@@ -255,7 +255,7 @@ public final class SSLUtils {
                 logMsg = "KEY_STORE_NOT_SET";
             }
         }
-        LogUtils.log(log, Level.INFO, logMsg, keyStoreLocation);
+        LogUtils.log(log, Level.FINE, logMsg, keyStoreLocation);
         return keyStoreLocation;
     }
     
@@ -267,7 +267,7 @@ public final class SSLUtils {
             keyStoreType = DEFAULT_KEYSTORE_TYPE;
             logMsg = "KEY_STORE_TYPE_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg, keyStoreType);
+        LogUtils.log(log, Level.FINE, logMsg, keyStoreType);
         return keyStoreType;
     }  
     
@@ -283,7 +283,7 @@ public final class SSLUtils {
                      ? "KEY_STORE_PASSWORD_SYSTEM_PROPERTY_SET"
                      : "KEY_STORE_PASSWORD_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg);
+        LogUtils.log(log, Level.FINE, logMsg);
         return keyStorePassword;        
     }
     
@@ -298,7 +298,7 @@ public final class SSLUtils {
                      ? "KEY_PASSWORD_SYSTEM_PROPERTY_SET"
                      : "KEY_PASSWORD_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg);
+        LogUtils.log(log, Level.FINE, logMsg);
         return keyPassword;
     }
 
@@ -313,7 +313,7 @@ public final class SSLUtils {
                 KeyManagerFactory.getDefaultAlgorithm();
             logMsg = "KEY_STORE_ALGORITHM_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg, keyStoreMgrFactoryAlgorithm);
+        LogUtils.log(log, Level.FINE, logMsg, keyStoreMgrFactoryAlgorithm);
         return keyStoreMgrFactoryAlgorithm;
     } 
     
@@ -328,7 +328,7 @@ public final class SSLUtils {
                 TrustManagerFactory.getDefaultAlgorithm();
             logMsg = "TRUST_STORE_ALGORITHM_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg, trustStoreMgrFactoryAlgorithm);
+        LogUtils.log(log, Level.FINE, logMsg, trustStoreMgrFactoryAlgorithm);
         return trustStoreMgrFactoryAlgorithm;
     }    
     
@@ -357,9 +357,9 @@ public final class SSLUtils {
         if (!(cipherSuitesList == null || cipherSuitesList.isEmpty())) {
             cipherSuites = getCiphersFromList(cipherSuitesList, log, exclude);
         } else {
-            LogUtils.log(log, Level.INFO, "CIPHERSUITES_NOT_SET");
+            LogUtils.log(log, Level.FINE, "CIPHERSUITES_NOT_SET");
             if (filters == null) {
-                LogUtils.log(log, Level.INFO, "CIPHERSUITE_FILTERS_NOT_SET");                
+                LogUtils.log(log, Level.FINE, "CIPHERSUITE_FILTERS_NOT_SET");                
             }
             List<String> filteredCipherSuites = new ArrayList<String>();
             List<String> excludedCipherSuites = new ArrayList<String>();
@@ -439,7 +439,7 @@ public final class SSLUtils {
                                                boolean exclude) {
         int numCipherSuites = cipherSuitesList.size();
         String[] cipherSuites = cipherSuitesList.toArray(new String[numCipherSuites]);
-        if (log.isLoggable(exclude ? Level.FINE : Level.INFO)) {
+        if (log.isLoggable(Level.FINE)) {
             StringBuilder ciphsStr = new StringBuilder();
             for (String s : cipherSuites) {
                 if (ciphsStr.length() != 0) {
@@ -447,7 +447,7 @@ public final class SSLUtils {
                 }
                 ciphsStr.append(s);
             }
-            LogUtils.log(log, exclude ? Level.FINE : Level.INFO, 
+            LogUtils.log(log, Level.FINE, 
                 exclude ? "CIPHERSUITES_EXCLUDED" : "CIPHERSUITES_SET", ciphsStr.toString());            
         }
         return cipherSuites;
@@ -467,7 +467,7 @@ public final class SSLUtils {
                 logMsg = "TRUST_STORE_NOT_SET";
             }
         }
-        LogUtils.log(log, Level.INFO, logMsg, trustStoreLocation);
+        LogUtils.log(log, Level.FINE, logMsg, trustStoreLocation);
         return trustStoreLocation;
     }
     
@@ -480,7 +480,7 @@ public final class SSLUtils {
             trustStoreType = DEFAULT_TRUST_STORE_TYPE;
             logMsg = "TRUST_STORE_TYPE_NOT_SET";
         }
-        LogUtils.log(log, Level.INFO, logMsg, trustStoreType);
+        LogUtils.log(log, Level.FINE, logMsg, trustStoreType);
         return trustStoreType;
     }
     
@@ -488,11 +488,11 @@ public final class SSLUtils {
                                                  Logger log) {
         if (secureSocketProtocol != null) {
             LogUtils.log(log,
-                         Level.INFO,
+                         Level.FINE,
                          "SECURE_SOCKET_PROTOCOL_SET",
                          secureSocketProtocol);
         } else {
-            LogUtils.log(log, Level.INFO, "SECURE_SOCKET_PROTOCOL_NOT_SET");
+            LogUtils.log(log, Level.FINE, "SECURE_SOCKET_PROTOCOL_NOT_SET");
             secureSocketProtocol = DEFAULT_SECURE_SOCKET_PROTOCOL;
         }
         return secureSocketProtocol;
@@ -508,7 +508,7 @@ public final class SSLUtils {
             requireClientAuthentication =
                 isRequireClientAuthentication.booleanValue();
             LogUtils.log(log,
-                         Level.INFO,
+                         Level.FINE,
                          "REQUIRE_CLIENT_AUTHENTICATION_SET", 
                          requireClientAuthentication);
         } else {
@@ -529,7 +529,7 @@ public final class SSLUtils {
             wantClientAuthentication =
                 isWantClientAuthentication.booleanValue();
             LogUtils.log(log,
-                         Level.INFO,
+                         Level.FINE,
                          "WANT_CLIENT_AUTHENTICATION_SET", 
                          wantClientAuthentication);
         } else {
