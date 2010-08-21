@@ -504,8 +504,6 @@ public abstract class AbstractBindingBuilder {
                         throw new Fault(e);
                     }
                     
-                    addSupportingElement(cloneElement(sig.getSecRef().getElement()));
-                    
                     if (suppTokens.isEncryptedToken()) {
                         encryptedTokensIdList.add(secToken.getId());
                     }
@@ -564,6 +562,8 @@ public abstract class AbstractBindingBuilder {
                 WSSecSignatureHelper tempSig = (WSSecSignatureHelper) tempTok;
                 if ((WSConstants.WSS_SAML_NS + WSConstants.SAML_ASSERTION_ID).
                     equals(tempSig.getSecRef().getKeyIdentifierValueType())) {
+                    
+                    addSupportingElement(cloneElement(tempSig.getSecRef().getElement()));
                                
                     // NOTE: This usage of WSEncryptionPart is a workaroud that is
                     // coupled with WSSecSignatureHelper. This approach is used so that
