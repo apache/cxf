@@ -50,8 +50,6 @@ import javax.servlet.http.Part;
 import javax.xml.ws.spi.http.HttpContext;
 import javax.xml.ws.spi.http.HttpExchange;
 
-import org.apache.commons.lang.NotImplementedException;
-
 /**
  * This class provides a HttpServletRequest instance using information
  * coming from the HttpExchange and HttpContext instances provided
@@ -73,7 +71,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public AsyncContext getAsyncContext() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public Object getAttribute(String name) {
@@ -97,7 +95,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public DispatcherType getDispatcherType() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public ServletInputStream getInputStream() throws IOException {
@@ -123,7 +121,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public Enumeration<Locale> getLocales() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getLocalName() {
@@ -143,19 +141,19 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public String getParameter(String name) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public Map<String, String[]> getParameterMap() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public Enumeration<String> getParameterNames() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String[] getParameterValues(String name) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getProtocol() {
@@ -174,7 +172,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
 
     @Deprecated
     public String getRealPath(String path) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getRemoteAddr() {
@@ -205,7 +203,7 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public RequestDispatcher getRequestDispatcher(String path) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getScheme() {
@@ -225,15 +223,15 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public boolean isAsyncStarted() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean isAsyncSupported() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean isSecure() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void removeAttribute(String name) {
@@ -249,15 +247,15 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public AsyncContext startAsync() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public AsyncContext startAsync(ServletRequest request, ServletResponse response) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean authenticate(HttpServletResponse response) throws IOException, ServletException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getAuthType() {
@@ -300,11 +298,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public Part getPart(String name) throws IOException, ServletException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public Collection<Part> getParts() throws IOException, ServletException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getPathInfo() {
@@ -363,16 +361,16 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public boolean isRequestedSessionIdFromCookie() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Deprecated
     public boolean isRequestedSessionIdFromUrl() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean isRequestedSessionIdFromURL() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public boolean isRequestedSessionIdValid() {
@@ -384,11 +382,11 @@ class HttpServletRequestAdapter implements HttpServletRequest {
     }
 
     public void login(String username, String password) throws ServletException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void logout() throws ServletException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
     
     private class ServletInputStreamAdapter extends ServletInputStream {

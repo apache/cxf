@@ -34,8 +34,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.ws.spi.http.HttpExchange;
 
-import org.apache.commons.lang.NotImplementedException;
-
 /**
  * This class provides a HttpServletResponse instance using information
  * coming from the HttpExchange instance provided
@@ -63,7 +61,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public int getBufferSize() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getCharacterEncoding() {
@@ -102,15 +100,15 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void reset() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void resetBuffer() {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void setBufferSize(int size) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void setCharacterEncoding(String charset) {
@@ -118,7 +116,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void setContentLength(int len) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void setContentType(String type) {
@@ -132,7 +130,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void addCookie(Cookie cookie) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void addDateHeader(String name, long date) {
@@ -152,21 +150,21 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public String encodeURL(String url) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String encodeRedirectURL(String url) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Deprecated
     public String encodeUrl(String url) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     @Deprecated
     public String encodeRedirectUrl(String url) {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public String getHeader(String name) {
@@ -196,7 +194,7 @@ class HttpServletResponseAdapter implements HttpServletResponse {
     }
 
     public void sendRedirect(String location) throws IOException {
-        throw new NotImplementedException();
+        throw new UnsupportedOperationException();
     }
 
     public void setDateHeader(String name, long date) {
