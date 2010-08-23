@@ -30,6 +30,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.apache.cxf.common.injection.ResourceInjector;
 import org.apache.cxf.configuration.Configurer;
@@ -105,15 +106,19 @@ public class ExtensionManagerImpl implements ExtensionManager {
             activateViaNS(deferred.keySet().iterator().next());
         }
     }
-    public <T> void activateAllByType(Class<T> type) {
+    public synchronized <T> void activateAllByType(Class<T> type) {
         for (Map.Entry<String, Collection<Extension>> e : deferred.entrySet()) {
-            Iterator<Extension> it = e.getValue().iterator();
-            while (it.hasNext()) {
-                Extension ex = it.next();
-                if (type.isAssignableFrom(ex.getClassObject(loader))) {
-                    loadAndRegister(ex);
-                    it.remove();
+            if (!e.getValue().isEmpty()) {
+                List<Extension> removes = new ArrayList<Extension>(e.getValue().size());
+                Iterator<Extension> it = e.getValue().iterator();
+                while (it.hasNext()) {
+                    Extension ex = it.next();
+                    if (type.isAssignableFrom(ex.getClassObject(loader))) {
+                        loadAndRegister(ex);
+                        removes.add(ex);
+                    }
                 }
+                e.getValue().removeAll(removes);
             }
         }
     }
@@ -202,7 +207,7 @@ public class ExtensionManagerImpl implements ExtensionManager {
         for (String ns : e.getNamespaces()) {
             Collection<Object> intf2Obj = namespaced.get(ns);
             if (intf2Obj == null) {
-                intf2Obj = new ArrayList<Object>();
+                intf2Obj = new CopyOnWriteArrayList<Object>();
                 if (!namespaced.containsKey(ns)) {
                     namespaced.put(ns, intf2Obj);
                 }
