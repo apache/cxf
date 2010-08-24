@@ -82,7 +82,11 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     @Test
     public void testFeedsWithLogRecordsOneEntry() throws Exception {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/root");
-        wc.path("/log").get();
+        try  {
+            wc.path("/log").get();
+        } catch (Exception ex) {
+            //ignore
+        }
         Thread.sleep(3000);
         List<Feed> elements = Resource.getElements();
         assertEquals(8, elements.size());
@@ -191,8 +195,14 @@ public class JAXRSLoggingAtomPushSpringTest extends AbstractClientServerTestBase
     @Ignore
     @Path("/root")
     public static class Resource {
-        private static final Logger LOG1 = LogUtils.getL7dLogger(Resource.class);
-        private static final Logger LOG2 = LogUtils.getL7dLogger(Resource.class, null, "namedLogger");
+        private static final Logger LOG1;
+        private static final Logger LOG2;
+        
+        static {
+            System.gc();
+            LOG1 = LogUtils.getL7dLogger(Resource.class);
+            LOG2 = LogUtils.getL7dLogger(Resource.class, null, "namedLogger");
+        }
         
         private static List<Feed> feeds = new ArrayList<Feed>();
         

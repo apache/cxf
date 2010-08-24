@@ -83,7 +83,7 @@ public class JAXRSClientServerUserResourceTest extends AbstractBusClientServerTe
             
             String modelRef = "classpath:/org/apache/cxf/systest/jaxrs/resources/resources2.xml";
             sf.setModelRefWithServiceClass(modelRef, BookStoreNoAnnotationsInterface.class);
-            sf.setServiceBeans(new BookStoreNoAnnotationsImpl());
+            sf.setServiceBean(new BookStoreNoAnnotationsImpl());
             sf.create();
 
         }

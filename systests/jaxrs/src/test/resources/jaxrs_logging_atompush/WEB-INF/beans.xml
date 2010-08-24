@@ -40,7 +40,20 @@ http://www.springframework.org/schema/util/spring-util-2.0.xsd">
 
 	<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
 
-
+	<jaxrs:server id="atomserver" address="/">
+		<jaxrs:serviceBeans>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource2"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource3"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource4"/>
+			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource5"/>
+		</jaxrs:serviceBeans>
+		<jaxrs:providers>
+			<ref bean="feed" />
+			<ref bean="entry" />
+		</jaxrs:providers>
+	</jaxrs:server>
+	
 	<bean class="org.apache.cxf.management.web.logging.atom.AtomPushBean"
 		init-method="init">
 		<property name="multiplicity" value="one"/>
@@ -133,19 +146,7 @@ factory-method="create">
 	    <property name="formattedOutput" value="true"/>
 	</bean>
 
-	<jaxrs:server id="atomserver" address="/">
-		<jaxrs:serviceBeans>
-			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource"/>
-			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource2"/>
-			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource3"/>
-			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource4"/>
-			<bean class="org.apache.cxf.systest.jaxrs.JAXRSLoggingAtomPushSpringTest$Resource5"/>
-		</jaxrs:serviceBeans>
-		<jaxrs:providers>
-			<ref bean="feed" />
-			<ref bean="entry" />
-		</jaxrs:providers>
-	</jaxrs:server>
+
 
 	<!--  
 	Other config samples:

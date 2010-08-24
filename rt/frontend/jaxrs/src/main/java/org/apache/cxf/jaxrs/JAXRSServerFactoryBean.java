@@ -177,8 +177,11 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * 
      * @return
      */
-    public void setServiceBeans(Object... beans) {
+    public void setServiceBeanObjects(Object... beans) {
         setServiceBeans(Arrays.asList(beans));
+    }
+    public void setServiceBean(Object bean) {
+        setServiceBeans(Arrays.asList(bean));
     }
     
     public void setServiceBeans(List<Object> beans) {

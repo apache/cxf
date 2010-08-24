@@ -28,7 +28,7 @@ public class BookServerResourceCreatedOutside extends AbstractBusTestServerBase 
     protected void run() {
         JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
         BookStore bs = new BookStore();
-        sf.setServiceBeans(bs);
+        sf.setServiceBean(bs);
         sf.setAddress("http://localhost:" + PORT + "/");
         sf.create();
         
