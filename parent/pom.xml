@@ -65,7 +65,7 @@
         <servlet-api.group>org.apache.geronimo.specs</servlet-api.group>
         <servlet-api.artifact>geronimo-servlet_3.0_spec</servlet-api.artifact>
         <servlet-api.version>1.0</servlet-api.version>
-        <spring.version>3.0.3.RELEASE</spring.version>
+        <spring.version>3.0.4.RELEASE</spring.version>
         <spring.mock>spring-test</spring.mock>
         <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
         <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
