@@ -28,10 +28,10 @@ import org.apache.cxf.bus.spring.SpringBusFactory;
 import org.apache.cxf.test.AbstractCXFTest;
 import org.apache.cxf.xmlbeans.wsdltest.GreeterMine;
 import org.apache.cxf.xmlbeans.wsdltest.SOAPMineService;
+import org.apache.cxf.xmlbeans.wsdltest.SayHi2MessageDocument;
 import org.apache.cxf.xmlbeans.wsdltest.StringListType;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class XmlBeansTest extends AbstractCXFTest {
@@ -58,7 +58,6 @@ public class XmlBeansTest extends AbstractCXFTest {
     
     
     @Test
-    @Ignore
     public void testBusCreationFails() throws Exception {
         bf = new SpringBusFactory();
         bus = bf.createBus(CONFIG1);
@@ -66,22 +65,22 @@ public class XmlBeansTest extends AbstractCXFTest {
     }
 
     @Test
-    @Ignore
     public void testBasicFails() throws Exception {
 
         bf = new SpringBusFactory();
         bus = bf.createBus(CONFIG2);
         BusFactory.setDefaultBus(bus);
-        URL wsdlURL = XmlBeansTest.class.getResource("xmlbeanstest.wsdl");
+        URL wsdlURL = XmlBeansTest.class.getResource("/wsdl/xmlbeanstest.wsdl");
         SOAPMineService ss =
             new SOAPMineService(wsdlURL,
-                                new QName("http://cxf.apache.org/xmlbeans", "SOAPMineService"));
+                                new QName("http://cxf.apache.org/xmlbeans/wsdltest", "SOAPMineService"));
         GreeterMine port = ss.getSoapPort();
-
-        StringListType stringListType = StringListType.Factory.newInstance();
+        
+        SayHi2MessageDocument document = SayHi2MessageDocument.Factory.newInstance();
+        StringListType stringListType = document.addNewSayHi2Message();
         stringListType.setMyname("sean");
         stringListType.setMyaddress("home");
-        port.sayHi2(stringListType);
+        port.sayHi2(document);
     }
     
 

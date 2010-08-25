@@ -23,10 +23,10 @@ import javax.jws.WebService;
 import javax.xml.ws.BindingType;
 
 import org.apache.cxf.xmlbeans.wsdltest.GreeterMine;
-import org.apache.cxf.xmlbeans.wsdltest.StringListType;
+import org.apache.cxf.xmlbeans.wsdltest.SayHi2MessageDocument;
 
 @WebService(endpointInterface = "org.apache.cxf.xmlbeans.wsdltest.GreeterMine",
-            targetNamespace = "http://org.apache.cxf/xmlbeans",
+            targetNamespace = "http://cxf.apache.org/xmlbeans/wsdltest",
             portName = "SoapPort",
             serviceName = "SOAPMineService",
             name = "GreeterMine")
@@ -39,8 +39,10 @@ public class GreeterMineImpl implements GreeterMine {
         return "Bonjour";
     }
 */
-    public void sayHi2(StringListType stringList) {
+    public void sayHi2(SayHi2MessageDocument in) {
         System.out.println("****** Executing the operation sayHi2 *****");
+        in.dump();
+        
     }
 
 

@@ -40,9 +40,11 @@ public class GreeterImpl implements Greeter {
      */
     public String greetMe(String me) throws GreetMeFault {
         if ("fault".equals(me)) {
-            org.apache.xmlbeans.XmlString st = org.apache.xmlbeans.XmlString.Factory.newInstance();
-            st.setStringValue("Some fault detail");
-            throw new GreetMeFault("Fault String", st);
+            org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeFaultDetailDocument detail
+                = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeFaultDetailDocument.Factory
+                .newInstance();
+            detail.setGreetMeFaultDetail("Some fault detail");
+            throw new GreetMeFault("Fault String", detail);
         }
         LOG.info("Executing operation greetMe");        
         return "Hello " + me;
