@@ -53,8 +53,8 @@ public class PutLastTradePriceImpl implements PutLastTradedPricePortType {
     
 
     public void putLastTradedPrice(org.apache.cxf.xmlbeans.docLitBare.types.InDocument body) {
-        System.out.println("Get the last trade price " 
-                           + body.getIn().getTickerPrice() + ", " + body.getIn().getTickerSymbol());
+        /*System.out.println("Get the last trade price " 
+                           + body.getIn().getTickerPrice() + ", " + body.getIn().getTickerSymbol());*/
     
     }
     

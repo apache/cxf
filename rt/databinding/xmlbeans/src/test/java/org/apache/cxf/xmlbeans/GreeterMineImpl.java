@@ -40,9 +40,7 @@ public class GreeterMineImpl implements GreeterMine {
     }
 */
     public void sayHi2(SayHi2MessageDocument in) {
-        System.out.println("****** Executing the operation sayHi2 *****");
-        in.dump();
-        
+        /*System.out.println("****** Executing the operation sayHi2 *****");*/
     }
 
 
