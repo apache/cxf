@@ -53,8 +53,7 @@ import org.apache.cxf.wsdl.http.AddressType;
 
 public class OsgiServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
-    
-    private volatile String lastBase = "";
+      
     private OsgiServlet servlet;
     public OsgiServletController(OsgiServlet servlet) {
         super(servlet.getServletConfig());
@@ -67,23 +66,18 @@ public class OsgiServletController extends AbstractServletController {
         }
         String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
 
-        if (base.equals(lastBase)) {
-            return;
-        }
-        
+               
         Set<String> paths = servlet.getTransport().getDestinationsPaths();
         for (String path : paths) {
             OsgiDestination d2 = servlet.getTransport().getDestinationForPath(path);
             String ad = d2.getEndpointInfo().getAddress();
-            if (ad.equals(path)
-                || ad.equals(lastBase + path)) {
+            if (ad.equals(path)) {
                 d2.getEndpointInfo().setAddress(base + path);
                 if (d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
                     d2.getEndpointInfo().getExtensor(AddressType.class).setLocation(base + path);
                 }
             }
         }
-        lastBase = base;
     }
 
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
