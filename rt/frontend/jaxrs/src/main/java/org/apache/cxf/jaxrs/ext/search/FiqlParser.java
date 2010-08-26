@@ -132,7 +132,7 @@ public class FiqlParser<T> {
                 operators.add(s2);
                 lastIdx = idx + 1;
             }
-            boolean isEnd = (idx == expr.length() - 1);
+            boolean isEnd = idx == expr.length() - 1;
             if (isEnd) {
                 String s1 = expr.substring(lastIdx, idx + 1);
                 subexpressions.add(s1);
