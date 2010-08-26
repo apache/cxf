@@ -94,6 +94,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     XmlErrorWatcher errorListener = new XmlErrorWatcher(errors);
     PathResourceLoader cpResourceLoader = new PathResourceLoader(CodeGenUtil.systemClasspath());
     StscState state;
+   
     
     public void initialize(ToolContext context) throws ToolException {
         context.put(ToolConstants.RUNTIME_DATABINDING_CLASS,
@@ -101,6 +102,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         
         String wsdl = (String)context.get(ToolConstants.CFG_WSDLURL);
         String catalog = (String)context.get(ToolConstants.CFG_CATALOG);
+              
         Object o = context.get(ToolConstants.CFG_BINDING);
         String bindingFiles[]; 
         if (o instanceof String) {
@@ -135,7 +137,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     public String getType(QName qn, boolean element) {
         String ret;
         if (element) {
-            ret = typeSystem.findElement(qn).getType().getFullJavaName();
+            ret = typeSystem.findDocumentType(qn).getFullJavaName();                  
             if (ret.contains("$")) {
                 ret = ret.substring(0, ret.indexOf('$'));
             }

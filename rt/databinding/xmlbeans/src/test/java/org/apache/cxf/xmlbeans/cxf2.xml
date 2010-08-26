@@ -22,14 +22,12 @@
           class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean"
           scope="singleton">
       <property name="dataBinding" ref="xmlBeansBean" />
+      <property name="wrapped" value="false"/>
     </bean>
 
     <jaxws:endpoint id="greeterMineEndpoint"
                     address="http://localhost:9000/SoapContext/SoapPort"
-                    wsdlLocation="src/test/java/org/apache/cxf/xmlbeans/xmlbeanstest.wsdl"
-                    implementor="org.apache.cxf.xmlbeans.GreeterMineImpl"
-                    serviceName="ns:SOAPMineService"
-                    xmlns:ns="http://cxf.apache.org/xmlbeans">
+                    implementor="org.apache.cxf.xmlbeans.GreeterMineImpl">
         <jaxws:serviceFactory>
             <ref bean="testServiceFactory"/>
         </jaxws:serviceFactory>

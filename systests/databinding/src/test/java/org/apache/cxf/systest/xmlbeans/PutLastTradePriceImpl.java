@@ -20,12 +20,9 @@
 package org.apache.cxf.systest.xmlbeans;
 
 import javax.jws.WebService;
-import javax.xml.ws.Holder;
 
-import org.apache.cxf.xmlbeans.docLitBare.types.TradePriceData;
+import org.apache.cxf.xmlbeans.docLitBare.types.StringRespTypeDocument;
 import org.apache.cxf.xmlbeans.doc_lit_bare.PutLastTradedPricePortType;
-import org.apache.xmlbeans.XmlDecimal;
-import org.apache.xmlbeans.XmlString;
 
 /**
  * 
@@ -35,25 +32,31 @@ import org.apache.xmlbeans.XmlString;
             endpointInterface = "org.apache.cxf.xmlbeans.doc_lit_bare.PutLastTradedPricePortType"
 )
 public class PutLastTradePriceImpl implements PutLastTradedPricePortType {
-
-    /** {@inheritDoc}*/
-    public XmlString bareNoParam() {
-        return null;
+    
+    public StringRespTypeDocument bareNoParam() {
+        StringRespTypeDocument st = StringRespTypeDocument.Factory.newInstance();
+        st.setStringRespType("Get the request!");
+        return st;
     }
 
-    /** {@inheritDoc}*/
-    public XmlString nillableParameter(XmlDecimal theRequest) {
-        return null;
+    public org.apache.cxf.xmlbeans.docLitBare.types.OutStringDocument nillableParameter(
+         org.apache.cxf.xmlbeans.docLitBare.types.InDecimalDocument theRequest) {        
+        org.apache.cxf.xmlbeans.docLitBare.types.OutStringDocument st 
+            = org.apache.cxf.xmlbeans.docLitBare.types.OutStringDocument.Factory.newInstance();
+        st.setOutString("Get the request " + theRequest.getInDecimal().toString());
+        return st;
     }
 
-    /** {@inheritDoc}*/
-    public void putLastTradedPrice(TradePriceData body) {
-
+    public void sayHi(javax.xml.ws.Holder<org.apache.cxf.xmlbeans.docLitBare.types.InoutDocument> body) {
+        body.value.getInout().setTickerSymbol("BAK");
     }
+    
 
-    /** {@inheritDoc}*/
-    public void sayHi(Holder<TradePriceData> body) {
-
+    public void putLastTradedPrice(org.apache.cxf.xmlbeans.docLitBare.types.InDocument body) {
+        System.out.println("Get the last trade price " 
+                           + body.getIn().getTickerPrice() + ", " + body.getIn().getTickerSymbol());
+    
     }
+    
 
 }
