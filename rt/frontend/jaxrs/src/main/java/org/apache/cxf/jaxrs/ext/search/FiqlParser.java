@@ -101,27 +101,48 @@ public class FiqlParser<T> {
      * @throws FiqlParseException when expression does not follow FIQL grammar
      */
     public SearchCondition<T> parse(String fiqlExpression) throws FiqlParseException {
-        ASTNode<T> ast = parseAndsOrsParens(fiqlExpression);
+        ASTNode<T> ast = parseAndsOrsBrackets(fiqlExpression);
         // System.out.println(ast);
         return ast.build();
     }
 
-    private ASTNode<T> parseAndsOrsParens(String expr) throws FiqlParseException {
-        String s1 = "([\\p{ASCII}&&[^;,()]]+|\\([\\p{ASCII}]+\\))([;,])?";
-        Pattern p = Pattern.compile(s1);
-        Matcher m = p.matcher(expr);
+    private ASTNode<T> parseAndsOrsBrackets(String expr) throws FiqlParseException {
         List<String> subexpressions = new ArrayList<String>();
         List<String> operators = new ArrayList<String>();
-        int lastEnd = -1;
-        while (m.find()) {
-            subexpressions.add(m.group(1));
-            operators.add(m.group(2));
-            if (lastEnd != -1 && lastEnd != m.start()) {
-                throw new FiqlParseException(String
-                    .format("Unexpected characters \"%s\" starting at position %d", expr.substring(lastEnd, m
-                        .start()), lastEnd));
+        int level = 0;
+        int lastIdx = 0;
+        int idx = 0;
+        for (idx = 0; idx < expr.length(); idx++) {
+            char c = expr.charAt(idx);
+            if (c == '(') {
+                level++;
+            } else if (c == ')') {
+                level--;
+                if (level < 0) {
+                    throw new FiqlParseException(String.format("Unexpected closing bracket at position %d",
+                                                               idx));
+                }
             }
-            lastEnd = m.end();
+            String cs = Character.toString(c);
+            boolean isOperator = AND.equals(cs) || OR.equals(cs);
+            if (level == 0 && isOperator) {
+                String s1 = expr.substring(lastIdx, idx);
+                String s2 = expr.substring(idx, idx + 1);
+                subexpressions.add(s1);
+                operators.add(s2);
+                lastIdx = idx + 1;
+            }
+            boolean isEnd = (idx == expr.length() - 1);
+            if (isEnd) {
+                String s1 = expr.substring(lastIdx, idx + 1);
+                subexpressions.add(s1);
+                operators.add(null);
+                lastIdx = idx + 1;
+            }
+        }
+        if (level != 0) {
+            throw new FiqlParseException(String
+                .format("Unmatched opening and closing brackets in expression: %s", expr));
         }
         if (operators.get(operators.size() - 1) != null) {
             String op = operators.get(operators.size() - 1);
@@ -143,7 +164,7 @@ public class FiqlParser<T> {
                 String subex = subexpressions.get(from);
                 ASTNode<T> node = null;
                 if (subex.startsWith("(")) {
-                    node = parseAndsOrsParens(subex.substring(1, subex.length() - 1));
+                    node = parseAndsOrsBrackets(subex.substring(1, subex.length() - 1));
                 } else {
                     node = parseComparison(subex);
                 }

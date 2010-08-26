@@ -69,17 +69,32 @@ public class FiqlParserTest extends Assert {
     }
 
     @Test
-    public void testRedundantParens() throws FiqlParseException {
+    public void testMultilevelExpression2() throws FiqlParseException {
+        parser.parse("((name==a;level==10),name!=b;name!=c);level=gt=10");
+    }
+
+    @Test
+    public void testRedundantBrackets() throws FiqlParseException {
         parser.parse("name==a;((((level==10))))");
     }
-
-    @Test(expected = FiqlParseException.class)
-    public void testUnmatchedParen() throws FiqlParseException {
-        parser.parse("name==a;(level==10,(name!=b)");
+    
+    @Test
+    public void testAndOfOrs() throws FiqlParseException {
+        parser.parse("(name==a,name==b);(level=gt=0,level=lt=10)");
+    }
+    
+    @Test
+    public void testOrOfAnds() throws FiqlParseException {
+        parser.parse("(name==a;name==b),(level=gt=0;level=lt=10)");
     }
 
     @Test(expected = FiqlParseException.class)
-    public void testUnmatchedParen2() throws FiqlParseException {
+    public void testUnmatchedBracket() throws FiqlParseException {
+        parser.parse("name==a;(name!=b;(level==10,(name!=b))");
+    }
+
+    @Test(expected = FiqlParseException.class)
+    public void testUnmatchedBracket2() throws FiqlParseException {
         parser.parse("name==bbb;))()level==111");
     }
 
