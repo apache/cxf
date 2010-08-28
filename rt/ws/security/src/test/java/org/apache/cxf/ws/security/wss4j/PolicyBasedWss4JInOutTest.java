@@ -904,7 +904,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     }
     
     /**
-     * Gets a SoapMessage, but with the needed SecurityConstants in the context propreties
+     * Gets a SoapMessage, but with the needed SecurityConstants in the context properties
      * so that it can be passed to PolicyBasedWSS4JOutInterceptor.
      *
      * @see #getSoapMessageForDom(Document, AssertionInfoMap)

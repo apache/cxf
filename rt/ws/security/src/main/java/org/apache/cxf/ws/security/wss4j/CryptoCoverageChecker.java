@@ -163,6 +163,8 @@ public class CryptoCoverageChecker extends AbstractSoapInterceptor {
             }
         }
         
+        CryptoCoverageUtil.reconcileEncryptedSignedRefs(signed, encrypted);
+        
         for (XPathExpression xPathExpression : this.xPaths) {
             Collection<WSDataRef> refsToCheck = null;
             

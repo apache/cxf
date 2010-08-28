@@ -154,6 +154,39 @@ public class CryptoCoverageCheckerTest extends AbstractSecurityTest {
                 true);
     }
     
+    @Test
+    public void testEncryptedSignedWithIncompleteCoverage() throws Exception {
+        this.runInterceptorAndValidate(
+                "encrypted_body_content_signed_missing_signed_header.xml",
+                this.getPrefixes(),
+                Arrays.asList(new XPathExpression(
+                        "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT)),
+                false);
+    }
+    
+    @Test
+    public void testEncryptedSignedWithCompleteCoverage() throws Exception {
+        this.runInterceptorAndValidate(
+                "encrypted_body_content_signed.xml",
+                this.getPrefixes(),
+                Arrays.asList(
+                        new XPathExpression(
+                                "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT),
+                        new XPathExpression(
+                                "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
+                true);
+        
+        this.runInterceptorAndValidate(
+               "wss-242.xml",
+               this.getPrefixes(),
+               Arrays.asList(
+                       new XPathExpression(
+                               "//ser:Header", CoverageType.SIGNED, CoverageScope.ELEMENT),
+                       new XPathExpression(
+                               "//ser:Header", CoverageType.ENCRYPTED, CoverageScope.ELEMENT)),
+               true);
+    }
+    
     private Map<String, String> getPrefixes() {
         final Map<String, String> prefixes = new HashMap<String, String>();
         prefixes.put("ser", "http://www.sdj.pl");
