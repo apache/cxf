@@ -42,6 +42,7 @@ import org.w3c.dom.NodeList;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.ws.policy.PolicyConstants;
+import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSDataRef;
 import org.apache.ws.security.WSSecurityException;
 
@@ -65,10 +66,10 @@ public final class CryptoCoverageUtil {
      * are resolved to the decrypted element and added to {@code signedRefs}.
      * The original reference to the encrypted content remains unaltered in the
      * list to allow for matching against a requirement that xenc:EncryptedData
-     * elements be signed.
+     * and xenc:EncryptedKey elements be signed.
      * 
      * @param signedRefs references to the signed content in the message
-     * @param encryptedRefs refernces to the encrypted content in the message
+     * @param encryptedRefs references to the encrypted content in the message
      */
     public static void reconcileEncryptedSignedRefs(final Collection<WSDataRef> signedRefs, 
             final Collection<WSDataRef> encryptedRefs) {
@@ -76,13 +77,11 @@ public final class CryptoCoverageUtil {
         final List<WSDataRef> encryptedSignedRefs = new LinkedList<WSDataRef>();
         
         for (WSDataRef encryptedRef : encryptedRefs) {
-            final String encryptedRefId = encryptedRef.getWsuId();
             final Iterator<WSDataRef> signedRefsIt = signedRefs.iterator();
             while (signedRefsIt.hasNext()) {
                 final WSDataRef signedRef = signedRefsIt.next();
                 
-                if (signedRef.getWsuId().equals(encryptedRefId)
-                        || signedRef.getWsuId().equals("#" + encryptedRefId)) {
+                if (isSignedEncryptionRef(encryptedRef, signedRef)) {
                     
                     final WSDataRef encryptedSignedRef = 
                         new WSDataRef(signedRef.getDataref());
@@ -105,7 +104,7 @@ public final class CryptoCoverageUtil {
         
         signedRefs.addAll(encryptedSignedRefs);
     }
-    
+
     /**
      * Checks that the references provided refer to the
      * signed/encrypted SOAP body element.
@@ -122,7 +121,7 @@ public final class CryptoCoverageUtil {
      * 
      * @throws WSSecurityException
      *             if there is an error evaluating the coverage or the body is not
-     *             covered by the signture/encryption.
+     *             covered by the signature/encryption.
      */
     public static void checkBodyCoverage(
         SOAPMessage message,
@@ -168,7 +167,7 @@ public final class CryptoCoverageUtil {
      * 
      * @throws WSSecurityException
      *             if there is an error evaluating the coverage or a header is not
-     *             covered by the signture/encryption.
+     *             covered by the signature/encryption.
      */
     public static void checkHeaderCoverage(
             SOAPMessage message,
@@ -225,7 +224,7 @@ public final class CryptoCoverageUtil {
      * 
      * @throws WSSecurityException
      *             if there is an error evaluating an XPath or an element is not
-     *             covered by the signture/encryption.
+     *             covered by the signature/encryption.
      */
     public static void checkCoverage(
             SOAPMessage message,
@@ -260,7 +259,7 @@ public final class CryptoCoverageUtil {
      * 
      * @throws WSSecurityException
      *             if there is an error evaluating an XPath or an element is not
-     *             covered by the signture/encryption.
+     *             covered by the signature/encryption.
      */
     public static void checkCoverage(
             SOAPMessage message,
@@ -317,6 +316,53 @@ public final class CryptoCoverageUtil {
                 }
             }
         }
+    }
+    
+    /**
+     * Determines if {@code signedRef} points to the encrypted content represented by
+     * {@code encryptedRef} using the following algorithm.
+     *
+     * <ol>
+     * <li>Check that the signed content is an XML Encryption element.</li>
+     * <li>Check that the reference Ids of the signed content and encrypted content
+     * (not the decrypted version of the encrypted content) match.  Check that the
+     * reference Id of the signed content matches the reference Id of the encrypted
+     * content prepended with a #.
+     * <li>Check for other Id attributes on the signed element that may match the
+     * referenced identifier for the encrypted content.  This is a workaround for
+     * WSS-242.</li>
+     * </ol>
+     *
+     * @param encryptedRef the ref representing the encrpted content
+     * @param signedRef the ref representing the signed content
+     */
+    private static boolean isSignedEncryptionRef(WSDataRef encryptedRef, WSDataRef signedRef) {
+        
+        // Don't even bother if the signed element wasn't an XML Enc element.
+        if (!WSConstants.ENC_NS.equals(signedRef.getProtectedElement()
+                                       .getNamespaceURI())) {
+            return false;
+        }
+        
+        if (signedRef.getWsuId().equals(encryptedRef.getWsuId())
+            || signedRef.getWsuId().equals("#" + encryptedRef.getWsuId())) {
+            return true;
+        }
+        
+        // There should be no other Ids on an EncryptedData or EncryptedKey element;
+        // however, WSS4J will happily add them on the outbound side.  See WSS-242.
+        // The following code looks for the specific behavior that exists in
+        // 1.5.8 and earlier version.
+        
+        String wsuId = signedRef.getProtectedElement().getAttributeNS(
+                WSConstants.WSU_NS, "Id");
+        
+        if (signedRef.getWsuId().equals(wsuId)
+            || signedRef.getWsuId().equals("#" + wsuId)) {
+            return true;
+        }
+        
+        return false;
     }
 
     private static boolean matchElement(Collection<WSDataRef> refs,
