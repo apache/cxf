@@ -214,6 +214,16 @@ public class FiqlParserTest extends Assert {
     }
     
     @Test
+    public void testSQL4() throws FiqlParseException {
+        SearchCondition<Condition> filter = parser.parse("(name==test,level==18);(name==test1,level!=19)");
+        String sql = filter.toSQL("table");
+        assertTrue(("SELECT * FROM table WHERE ((name = 'test') OR (level = '18'))"
+                   + " AND ((name = 'test1') OR (level <> '19'))").equals(sql)
+                   || ("SELECT * FROM table WHERE ((name = 'test1') OR (level <> '19'))"
+                   + " AND ((name = 'test') OR (level = '18'))").equals(sql));
+    }
+    
+    @Test
     public void testParseComplex4() throws FiqlParseException {
         SearchCondition<Condition> filter = parser.parse("name==foo*;name!=*bar,level=gt=10");
         assertTrue(filter.isMet(new Condition("zonk", 20, null)));
