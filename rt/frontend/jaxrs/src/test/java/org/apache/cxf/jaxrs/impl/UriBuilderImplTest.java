@@ -726,9 +726,9 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("Unexpected fragment", uri1.getFragment(), uri2.getFragment());
         
         MultivaluedMap<String, String> queries1 = 
-            JAXRSUtils.getStructuredParams(uri1.getRawQuery(), "&", false);
+            JAXRSUtils.getStructuredParams(uri1.getRawQuery(), "&", false, false);
         MultivaluedMap<String, String> queries2 = 
-            JAXRSUtils.getStructuredParams(uri2.getRawQuery(), "&", false);
+            JAXRSUtils.getStructuredParams(uri2.getRawQuery(), "&", false, false);
         assertEquals("Unexpected queries", queries1, queries2);
     }
     
@@ -906,7 +906,6 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
-    @Ignore("This may need to be challenged, '23' overrides '=' for the 2nd occurence of x")
     public void testFromEncodedDuplicateVar() {
         String expected = "http://localhost:8080/a/%25/=/%25G0/%25/=";
 
@@ -917,7 +916,6 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
-    @Ignore("name2=%20 is double encoded after the replacement -> name2=%2520")
     public void testReplaceQuery5() {
         String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
 
@@ -928,7 +926,7 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
-    @Ignore("query parameters are not encoded due to build() being called")
+    @Ignore
     public void testQueryParam() {
         String expected = "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
 

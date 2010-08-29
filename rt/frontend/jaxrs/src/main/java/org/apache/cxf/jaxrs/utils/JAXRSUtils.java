@@ -364,17 +364,16 @@ public final class JAXRSUtils {
         
         int status;
         
+        // criteria matched the least number of times will determine the error code;
+        // priority : path, method, consumes, produces;
         if (pathMatched == 0) {
             status = 404;
         } else if (methodMatched == 0) {
             status = 405;
-        } else if (consumeMatched == 0) {
+        } else if (consumeMatched <= produceMatched) {
             status = 415;
-        } else if (produceMatched == 0) {
-            status = 406;
         } else {
-            // this branch should not even be executed 
-            status = 404;
+            status = 406;
         }
         
         String name = resource.isRoot() ? "NO_OP_EXC" : "NO_SUBRESOURCE_METHOD_FOUND";
@@ -735,7 +734,7 @@ public final class JAXRSUtils {
     public static MultivaluedMap<String, String> getMatrixParams(String path, boolean decode) {
         int index = path.indexOf(';');
         return index == -1 ? new MetadataMap<String, String>()
-                           : JAXRSUtils.getStructuredParams(path.substring(index + 1), ";", decode);
+                           : JAXRSUtils.getStructuredParams(path.substring(index + 1), ";", decode, false);
     }
     
     private static Object processHeaderParam(Message m, 
@@ -917,11 +916,12 @@ public final class JAXRSUtils {
      */
     public static MultivaluedMap<String, String> getStructuredParams(String query, 
                                                                     String sep, 
-                                                                    boolean decode) {
+                                                                    boolean decode,
+                                                                    boolean decodePlus) {
         MultivaluedMap<String, String> map = 
             new MetadataMap<String, String>(new LinkedHashMap<String, List<String>>());
         
-        getStructuredParams(map, query, sep, decode);
+        getStructuredParams(map, query, sep, decode, decodePlus);
         
         return map;
     }
@@ -929,7 +929,8 @@ public final class JAXRSUtils {
     public static void getStructuredParams(MultivaluedMap<String, String> queries,
                                            String query, 
                                            String sep, 
-                                           boolean decode) {
+                                           boolean decode,
+                                           boolean decodePlus) {
         if (!StringUtils.isEmpty(query)) {            
             List<String> parts = Arrays.asList(query.split(sep));
             for (String part : parts) {
@@ -938,8 +939,8 @@ public final class JAXRSUtils {
                 if (values.length == 1) {
                     value = "";
                 } else if (decode) {
-                    value = "&".equals(sep) ? HttpUtils.urlDecode(values[1]) 
-                                            : HttpUtils.pathDecode(values[1]); 
+                    value = (";".equals(sep) || !decodePlus)
+                        ? HttpUtils.pathDecode(values[1]) : HttpUtils.urlDecode(values[1]); 
                 } else {
                     value = values[1];
                 }

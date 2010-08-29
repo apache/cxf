@@ -48,6 +48,7 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.AttachmentOutInterceptor;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
+import org.apache.cxf.jaxrs.impl.ProvidersImpl;
 import org.apache.cxf.jaxrs.interceptor.AttachmentInputInterceptor;
 import org.apache.cxf.jaxrs.interceptor.AttachmentOutputInterceptor;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
@@ -228,7 +229,8 @@ public class MessageContextImpl implements MessageContext {
         try {
             Attachment first = new Attachment(AttachmentUtil.createAttachment(
                                      inMessage.getContent(InputStream.class), 
-                                     (InternetHeaders)inMessage.get(InternetHeaders.class.getName())));
+                                     (InternetHeaders)inMessage.get(InternetHeaders.class.getName())),
+                                     new ProvidersImpl(inMessage));
             newAttachments.add(first);
         } catch (IOException ex) {
             throw new WebApplicationException(500);
@@ -241,7 +243,7 @@ public class MessageContextImpl implements MessageContext {
         }
         childAttachments.size();
         for (org.apache.cxf.message.Attachment a : childAttachments) {
-            newAttachments.add(new Attachment(a));
+            newAttachments.add(new Attachment(a, new ProvidersImpl(inMessage)));
         }
         MediaType mt = embeddedAttachment 
             ? (MediaType)inMessage.get("org.apache.cxf.multipart.embedded.ctype")

@@ -19,13 +19,17 @@
 package org.apache.cxf.jaxrs.ext.multipart;
 
 import java.io.InputStream;
+import java.lang.annotation.Annotation;
 import java.util.Iterator;
 import java.util.List;
 
 import javax.activation.DataHandler;
 import javax.activation.DataSource;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Providers;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
@@ -35,8 +39,10 @@ public class Attachment {
     private MultivaluedMap<String, String> headers = 
         new MetadataMap<String, String>(false, true);
     private Object object;
+    private Providers providers;
     
-    public Attachment(org.apache.cxf.message.Attachment a) {
+    public Attachment(org.apache.cxf.message.Attachment a,
+                      Providers providers) {
         handler = a.getDataHandler();
         for (Iterator<String> i = a.getHeaderNames(); i.hasNext();) {
             String name = i.next();
@@ -46,6 +52,7 @@ public class Attachment {
             headers.add(name, a.getHeader(name));
         }
         headers.putSingle("Content-ID", a.getId());
+        this.providers = providers;
     }
     
     public Attachment(String id, DataHandler dh, MultivaluedMap<String, String> headers) {
@@ -98,6 +105,22 @@ public class Attachment {
 
     public Object getObject() {
         return object;
+    }
+    
+    public <T> T getObject(Class<T> cls) {
+        if (providers != null) {
+            MessageBodyReader<T> mbr = 
+                providers.getMessageBodyReader(cls, cls, new Annotation[]{}, getContentType());
+            if (mbr != null) {
+                try {
+                    return mbr.readFrom(cls, cls, new Annotation[]{}, getContentType(), 
+                                        headers, getDataHandler().getInputStream());
+                } catch (Exception ex) {
+                    throw new WebApplicationException(ex);
+                }
+            }
+        }
+        return null;
     }
     
     public String getHeader(String name) {
