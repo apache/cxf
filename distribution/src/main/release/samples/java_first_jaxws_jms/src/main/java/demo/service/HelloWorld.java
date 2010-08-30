@@ -16,26 +16,14 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package demo.service;
 
-package test.client;
+import javax.jws.WebMethod;
+import javax.jws.WebParam;
+import javax.jws.WebService;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
-import test.service.HelloWorld;
-
-public final class ClientJMS {
-
-	public static void main(String[] args) throws Exception {
-		//Bus bus = new SpringBusFactory().createBus("jms.xml");
-		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingInInterceptor());
-    	factory.setServiceClass(HelloWorld.class);
-    	factory.setAddress("jms://");
-    	HelloWorld client = (HelloWorld) factory.create();
-		String reply = client.sayHi("HI");
-		System.out.println(reply);
-		System.exit(0);
-	}
+@WebService
+public interface HelloWorld {
+	@WebMethod
+	public abstract String sayHi(@WebParam(name="name") String name);
 }

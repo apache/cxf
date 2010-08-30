@@ -17,21 +17,24 @@
   specific language governing permissions and limitations
   under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>org.apache.cxf.samples</groupId>
-    <artifactId>java_first_jaxws_jms</artifactId>
-    <name>Java First demo using JAX-WS and JMS</name>
-    <parent>
-        <groupId>org.apache.cxf.samples</groupId>
-        <artifactId>cxf-samples</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
-    </parent>
-    <properties>
-        <cxf.version>${project.version}</cxf.version>
-    </properties>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>org.apache.cxf.samples</groupId>
+	<artifactId>java_first_jaxws_jms</artifactId>
+	<name>Java First demo using JAX-WS and JMS</name>
+	<parent>
+	  <groupId>org.apache.cxf.samples</groupId>
+	  <artifactId>cxf-samples</artifactId>
+	  <version>2.3.0-SNAPSHOT</version>
+	</parent>
+
+	<properties>
+	  <cxf.version>${project.version}</cxf.version>
+	</properties>
     <build>
-        <sourceDirectory>src</sourceDirectory>
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -58,7 +61,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.hw.server.Server</mainClass>
+                                    <mainClass>demo.server.ServerJMS</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
@@ -81,7 +84,7 @@
                                     <goal>java</goal>
                                 </goals>
                                 <configuration>
-                                    <mainClass>demo.hw.client.Client</mainClass>
+                                    <mainClass>demo.client.ClientJMS</mainClass>
                                 </configuration>
                             </execution>
                         </executions>
@@ -90,12 +93,14 @@
             </build>
         </profile>
     </profiles>
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.activemq</groupId>
-            <artifactId>activemq-core</artifactId>
-            <version>5.4.0</version>
-        </dependency>
+
+
+	<dependencies>
+		<dependency>
+			<groupId>org.apache.activemq</groupId>
+   			<artifactId>activemq-core</artifactId>
+    		<version>5.4.0</version>
+		</dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
@@ -111,5 +116,5 @@
             <artifactId>cxf-rt-transports-jms</artifactId>
             <version>${cxf.version}</version>
         </dependency>
-    </dependencies>
+	</dependencies>
 </project>

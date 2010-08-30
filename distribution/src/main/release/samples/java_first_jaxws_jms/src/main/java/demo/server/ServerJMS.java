@@ -17,30 +17,29 @@
  * under the License.
  */
 
-package test.server;
+package demo.server;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
-import test.service.HelloWorld;
-import test.service.impl.HelloWorldImpl;
+import demo.service.HelloWorld;
+import demo.service.impl.HelloWorldImpl;
 
-
-public class ServerHTTP {
+public class ServerJMS {
 
     public static void main(String args[]) throws Exception {
-        System.out.println("Starting Server");
-        Object implementor = new HelloWorldImpl();
-        // Create our Server
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+    	Object implementor = new HelloWorldImpl();
+    	JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(HelloWorld.class);
-        svrFactory.setAddress("http://localhost:9000/helloWorld");
+        svrFactory.setAddress("jms://");
         svrFactory.setServiceBean(implementor);
         svrFactory.getInInterceptors().add(new LoggingInInterceptor());
         svrFactory.getOutInterceptors().add(new LoggingInInterceptor());
         svrFactory.create();
-
+        
+        System.out.println("Server ready... Press any key to exit");
         System.in.read();
+        System.out.println("Server exiting");
         System.exit(0);
     }
 }

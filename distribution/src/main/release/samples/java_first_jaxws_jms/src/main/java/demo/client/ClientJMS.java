@@ -17,29 +17,25 @@
  * under the License.
  */
 
-package test.server;
+package demo.client;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
-import test.service.HelloWorld;
-import test.service.impl.HelloWorldImpl;
+import demo.service.HelloWorld;
 
-public class ServerJMS {
+public final class ClientJMS {
 
-    public static void main(String args[]) throws Exception {
-    	Object implementor = new HelloWorldImpl();
-    	JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(HelloWorld.class);
-        svrFactory.setAddress("jms://");
-        svrFactory.setServiceBean(implementor);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingInInterceptor());
-        svrFactory.create();
-        
-        System.out.println("Server ready... Press any key to exit");
-        System.in.read();
-        System.out.println("Server exiting");
-        System.exit(0);
-    }
+	public static void main(String[] args) throws Exception {
+		//Bus bus = new SpringBusFactory().createBus("jms.xml");
+		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.getInInterceptors().add(new LoggingInInterceptor());
+        factory.getOutInterceptors().add(new LoggingInInterceptor());
+    	factory.setServiceClass(HelloWorld.class);
+    	factory.setAddress("jms://");
+    	HelloWorld client = (HelloWorld) factory.create();
+		String reply = client.sayHi("HI");
+		System.out.println(reply);
+		System.exit(0);
+	}
 }

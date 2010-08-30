@@ -17,30 +17,30 @@
  * under the License.
  */
 
-package test.client;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
+package demo.server;
 
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
-import test.service.HelloWorld;
+import demo.service.HelloWorld;
+import demo.service.impl.HelloWorldImpl;
 
-public final class ClientHTTP {
 
-     public static void main(String args[]) throws Exception {
-    	Logger.getLogger("").setLevel(Level.FINE);
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingInInterceptor());
-    	factory.setServiceClass(HelloWorld.class);
-    	factory.setAddress("http://localhost:9000/helloWorld");
-    	HelloWorld client = (HelloWorld) factory.create();
-    	
-    	String reply = client.sayHi("HI");
-        System.out.println("Server said: " + reply);
-        System.exit(0); 
+public class ServerHTTP {
+
+    public static void main(String args[]) throws Exception {
+        System.out.println("Starting Server");
+        Object implementor = new HelloWorldImpl();
+        // Create our Server
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        svrFactory.setServiceClass(HelloWorld.class);
+        svrFactory.setAddress("http://localhost:9000/helloWorld");
+        svrFactory.setServiceBean(implementor);
+        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
+        svrFactory.getOutInterceptors().add(new LoggingInInterceptor());
+        svrFactory.create();
+
+        System.in.read();
+        System.exit(0);
     }
-
 }
