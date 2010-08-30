@@ -17,15 +17,9 @@
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-jms.xml" />
-	
-	<cxf:bus>
-        <cxf:features>
-            <cxf:logging/>
-        </cxf:features>
-    </cxf:bus> 
 
 	<jms:conduit
-		name="{http://service.test/}HelloWorldPort.jms-conduit">
+		name="{http://service.demo/}HelloWorldPort.jms-conduit">
 		<!--
 		<jms:clientConfig clientReceiveTimeout="500"
 			messageTimeToLive="500" />
@@ -42,10 +36,10 @@
 				value="tcp://localhost:61616" />
 		</jms:address>
 	</jms:conduit>
-	
+
 	<jms:destination
-		name="{http://service.test/}HelloWorldPort.jms-destination">
-		<!-- 
+		name="{http://service.demo/}HelloWorldPort.jms-destination">
+		<!--
 		<jms:clientConfig clientReceiveTimeout="500"
 			messageTimeToLive="500" />
 		<jms:runtimePolicy messageType="binary" />
