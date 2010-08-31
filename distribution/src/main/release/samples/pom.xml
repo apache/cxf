@@ -35,6 +35,7 @@
         <module>js_browser_client_simple</module>
         <module>js_browser_client_java_first</module>
         <module>java_first_jaxws_factory_bean</module>
+	<module>java_first_jms</module>
         <module>jax_rs/content_negotiation</module>
         <module>jax_rs/basic_https</module>
         <module>jax_rs/basic</module>
