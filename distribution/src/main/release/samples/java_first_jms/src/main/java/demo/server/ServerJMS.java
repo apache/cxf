@@ -26,30 +26,35 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import demo.service.HelloWorld;
 import demo.service.impl.HelloWorldImpl;
 
-public class ServerJMS {
+
+public final class ServerJMS {
+    private ServerJMS() {
+        //
+    }
 
     public static void main(String args[]) throws Exception {
 
-    	boolean amqBroker = args.length > 0 && "-activemqbroker".equals(args[0]);
-    	if (amqBroker) {
-    	    /*
-    	     * The following make it easier to run this against something other than ActiveMQ.
-    	     * You will have to get a JMS broker onto the right port of localhost.
-    	     */
-    		Class<?> brokerClass = ServerJMS.class.getClassLoader().loadClass("org.apache.activemq.broker.BrokerService");
-    		if (brokerClass == null) {
-    		    System.err.println("ActiveMQ is not in the classpath, cannot launch broker.");
-    		    return;
-    		}
-    		Object broker = brokerClass.newInstance();
-    		Method addConnectorMethod = brokerClass.getMethod("addConnector", String.class);
-    		addConnectorMethod.invoke(broker, "tcp://localhost:61616");
-    		Method startMethod = brokerClass.getMethod("start");
-    		startMethod.invoke(broker);
-    	}
+        boolean amqBroker = args.length > 0 && "-activemqbroker".equals(args[0]);
+        if (amqBroker) {
+            /*
+             * The following make it easier to run this against something other than ActiveMQ. You will have
+             * to get a JMS broker onto the right port of localhost.
+             */
+            Class<?> brokerClass = ServerJMS.class.getClassLoader()
+                .loadClass("org.apache.activemq.broker.BrokerService");
+            if (brokerClass == null) {
+                System.err.println("ActiveMQ is not in the classpath, cannot launch broker.");
+                return;
+            }
+            Object broker = brokerClass.newInstance();
+            Method addConnectorMethod = brokerClass.getMethod("addConnector", String.class);
+            addConnectorMethod.invoke(broker, "tcp://localhost:61616");
+            Method startMethod = brokerClass.getMethod("start");
+            startMethod.invoke(broker);
+        }
 
-    	Object implementor = new HelloWorldImpl();
-    	JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        Object implementor = new HelloWorldImpl();
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(HelloWorld.class);
         svrFactory.setAddress("jms://");
         svrFactory.setServiceBean(implementor);

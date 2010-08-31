@@ -19,14 +19,16 @@
 
 package demo.server;
 
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
-
 import demo.service.HelloWorld;
 import demo.service.impl.HelloWorldImpl;
 
 
-public class ServerHTTP {
+
+public final class ServerHTTP {
+    private ServerHTTP() {
+        //
+    }
 
     public static void main(String args[]) throws Exception {
         System.out.println("Starting Server");
@@ -36,8 +38,6 @@ public class ServerHTTP {
         svrFactory.setServiceClass(HelloWorld.class);
         svrFactory.setAddress("http://localhost:9000/helloWorld");
         svrFactory.setServiceBean(implementor);
-        svrFactory.getInInterceptors().add(new LoggingInInterceptor());
-        svrFactory.getOutInterceptors().add(new LoggingInInterceptor());
         svrFactory.create();
 
         System.in.read();

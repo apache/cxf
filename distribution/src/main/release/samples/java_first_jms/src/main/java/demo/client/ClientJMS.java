@@ -20,18 +20,20 @@
 package demo.client;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
 import demo.service.HelloWorld;
 
 public final class ClientJMS {
+    private ClientJMS() {
+        //
+    }
 
-	public static void main(String[] args) throws Exception {
-		JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-    	factory.setServiceClass(HelloWorld.class);
-    	factory.setAddress("jms://");
-    	HelloWorld client = (HelloWorld) factory.create();
-		String reply = client.sayHi("HI");
-		System.out.println(reply);
-		System.exit(0);
-	}
+    public static void main(String[] args) throws Exception {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(HelloWorld.class);
+        factory.setAddress("jms://");
+        HelloWorld client = (HelloWorld)factory.create();
+        String reply = client.sayHi("HI");
+        System.out.println(reply);
+        System.exit(0);
+    }
 }

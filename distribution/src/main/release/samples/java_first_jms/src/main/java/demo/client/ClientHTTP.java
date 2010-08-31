@@ -21,26 +21,27 @@ package demo.client;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;
-
-import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 
 import demo.service.HelloWorld;
 
-public final class ClientHTTP {
 
-     public static void main(String args[]) throws Exception {
-    	Logger.getLogger("").setLevel(Level.FINE);
+
+public final class ClientHTTP {
+    private ClientHTTP() {
+        //
+    }
+
+    public static void main(String args[]) throws Exception {
+        Logger.getLogger("").setLevel(Level.FINE);
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.getInInterceptors().add(new LoggingInInterceptor());
-        factory.getOutInterceptors().add(new LoggingInInterceptor());
-    	factory.setServiceClass(HelloWorld.class);
-    	factory.setAddress("http://localhost:9000/helloWorld");
-    	HelloWorld client = (HelloWorld) factory.create();
-    	
-    	String reply = client.sayHi("HI");
+        factory.setServiceClass(HelloWorld.class);
+        factory.setAddress("http://localhost:9000/helloWorld");
+        HelloWorld client = (HelloWorld)factory.create();
+
+        String reply = client.sayHi("HI");
         System.out.println("Server said: " + reply);
-        System.exit(0); 
+        System.exit(0);
     }
 
 }
