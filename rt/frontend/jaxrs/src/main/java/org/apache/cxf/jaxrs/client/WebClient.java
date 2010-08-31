@@ -598,6 +598,7 @@ public class WebClient extends AbstractClient {
 
     protected Response doChainedInvocation(String httpMethod, 
         MultivaluedMap<String, String> headers, Object body, Class<?> responseClass, Type genericType) {
+        Throwable primaryError = null;
         
         URI uri = getCurrentURI();
         Message m = createMessage(httpMethod, headers, uri);
@@ -613,12 +614,18 @@ public class WebClient extends AbstractClient {
         
         try {
             m.getInterceptorChain().doIntercept(m);
+            primaryError = m.getExchange().get(Exception.class);
         } catch (Throwable ex) {
-            // we'd like a user to get the whole Response anyway if needed
+            primaryError = ex;
         }
+
         
         // TODO : this needs to be done in an inbound chain instead
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
+        if (connect == null && primaryError != null) {
+            /** do we have a pre-connect error ? */
+            throw new WebApplicationException(primaryError);
+        }
         return handleResponse(connect, m, responseClass, genericType);
     }
     
