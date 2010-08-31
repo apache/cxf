@@ -268,6 +268,24 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/jaxb-body")
+    @Consumes("multipart/related;type=\"text/xml\"")
+    @Produces("text/xml")
+    public Response addBookParts2(MultipartBody body) 
+        throws Exception {
+        Book b1 = body.getAttachmentObject("rootPart", Book.class);
+        Book b2 = body.getAttachmentObject("book2", Book.class);
+        if (b1.equals(b2)) {
+            throw new WebApplicationException();
+        }
+        if (!b1.getName().equals(b2.getName())) {
+            throw new WebApplicationException();
+        }
+        b1.setId(124);
+        return Response.ok(b1).build();
+    }
+    
+    @POST
     @Path("/books/jaxbonly")
     @Consumes("multipart/mixed")
     @Produces("multipart/mixed;type=text/xml")

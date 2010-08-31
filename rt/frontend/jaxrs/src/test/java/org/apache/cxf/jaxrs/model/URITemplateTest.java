@@ -249,7 +249,50 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/abcd", values));
         assertFalse(uriTemplate.match("/books/abc", values));
     }
+    
+    @Test
+    public void testExpressionWithNestedGroup() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/{resource:.+\\.(js|css|gif|png)}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
+        assertTrue(uriTemplate.match("/script.js", values));
+        assertEquals("script.js", values.getFirst("resource"));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+        values.clear();
+        
+        assertTrue(uriTemplate.match("/script.js/bar", values));
+        assertEquals("script.js", values.getFirst("resource"));
+        finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/bar", finalPath);
+        values.clear();
+        
+        assertFalse(uriTemplate.match("/script.pdf", values));
+    }
+
+    @Test
+    public void testExpressionWithNestedGroup2() throws Exception {
+        URITemplate uriTemplate = 
+            new URITemplate("/{resource:.+\\.(js|css|gif|png)}/bar");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/script.js/bar/baz", values));
+        assertEquals("script.js", values.getFirst("resource"));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/baz", finalPath);
+    }
+    
+    @Test
+    public void testLiteralExpression() throws Exception {
+        URITemplate uriTemplate = 
+            new URITemplate("/bar");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/bar/baz", values));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/baz", finalPath);
+    }
+    
     @Test
     public void testMultipleExpression2() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/{bookId:123}/chapter/{id}");

@@ -194,6 +194,12 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testAddBookAsJAXBBody() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/jaxb-body";
+        doAddBook(address, "attachmentData", 200);               
+    }
+    
+    @Test
     public void testAddBookAsListOfAttachments() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/listattachments";
         doAddBook(address, "attachmentData", 200);               

@@ -88,4 +88,12 @@ public class MultipartBody {
         }
         return null;
     }
+    
+    public <T> T getAttachmentObject(String contentId, Class<T> cls) {
+        Attachment att = getAttachment(contentId);
+        if (att != null) {
+            return att.getObject(cls);
+        }
+        return null;
+    }
 }

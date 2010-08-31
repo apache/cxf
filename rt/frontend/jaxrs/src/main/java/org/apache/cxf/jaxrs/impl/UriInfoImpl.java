@@ -111,11 +111,13 @@ public class UriInfoImpl implements UriInfo {
     public MultivaluedMap<String, String> getQueryParameters(boolean decode) {
         
         if (!caseInsensitiveQueries) {
-            return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), "&", decode);
+            return JAXRSUtils.getStructuredParams((String)message.get(Message.QUERY_STRING), 
+                              "&", decode, decode);
         }
         
         MultivaluedMap<String, String> queries = new MetadataMap<String, String>(false, true);
-        JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING), "&", decode);
+        JAXRSUtils.getStructuredParams(queries, (String)message.get(Message.QUERY_STRING), 
+                                      "&", decode, decode);
         return queries;
         
     }

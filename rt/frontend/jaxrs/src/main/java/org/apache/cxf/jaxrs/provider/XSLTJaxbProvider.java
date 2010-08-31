@@ -217,7 +217,7 @@ public class XSLTJaxbProvider extends JAXBElementProvider {
         return outClassesToHandle == null || outClassesToHandle.contains(className); 
     }
     
-    private Templates createTemplates(Templates templates, 
+    protected Templates createTemplates(Templates templates, 
                                       Map<String, Object> configuredParams,
                                       Map<String, String> outProps) {
         if (templates == null) {

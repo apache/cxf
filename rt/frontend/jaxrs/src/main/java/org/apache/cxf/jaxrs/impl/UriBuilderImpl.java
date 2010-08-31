@@ -76,19 +76,21 @@ public class UriBuilderImpl extends UriBuilder {
     }
 
     private URI doBuild(boolean fromEncoded, Object... values) {
-        try {
-            String thePath = buildPath(fromEncoded);
-            URITemplate pathTempl = new URITemplate(thePath);
-            thePath = substituteVarargs(pathTempl, values, 0);
-            
-            String theQuery = buildQuery(fromEncoded);
-            if (theQuery != null) {
-                URITemplate queryTempl = new URITemplate(theQuery);
-                int lengthDiff = values.length - pathTempl.getVariables().size(); 
-                if (lengthDiff > 0) {
-                    theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
-                }
+        
+        String thePath = buildPath(fromEncoded);
+        URITemplate pathTempl = new URITemplate(thePath);
+        thePath = substituteVarargs(pathTempl, values, 0);
+        
+        String theQuery = buildQuery(fromEncoded);
+        if (theQuery != null) {
+            URITemplate queryTempl = new URITemplate(theQuery);
+            int lengthDiff = values.length - pathTempl.getVariables().size(); 
+            if (lengthDiff > 0) {
+                theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
             }
+        }
+        
+        try {
             return buildURI(fromEncoded, thePath, theQuery);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
@@ -406,7 +408,7 @@ public class UriBuilderImpl extends UriBuilder {
             }
             String rawQuery = uri.getRawQuery();
             if (rawQuery != null) {
-                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false);
+                query = JAXRSUtils.getStructuredParams(rawQuery, "&", false, false);
             }
             userInfo = uri.getUserInfo();
         } else {
@@ -488,7 +490,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder replaceMatrix(String matrixValues) throws IllegalArgumentException {
-        this.matrix = JAXRSUtils.getStructuredParams(matrixValues, ";", true);
+        this.matrix = JAXRSUtils.getStructuredParams(matrixValues, ";", true, false);
         return this;
     }
 
@@ -518,7 +520,7 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", false);
+        query = JAXRSUtils.getStructuredParams(queryValue, "&", true, false);
         return this;
     }
 

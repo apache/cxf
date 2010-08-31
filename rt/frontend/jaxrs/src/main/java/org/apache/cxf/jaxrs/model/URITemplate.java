@@ -173,11 +173,11 @@ public final class URITemplate {
             String value = m.group(i++);
             templateVariableToValue.add(name, value);
         }
-
         // The right hand side value, might be used to further resolve
         // sub-resources.
-
-        String finalGroup = m.group(i);
+        int groupCount = m.groupCount();
+        
+        String finalGroup = m.group(groupCount);
         templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup == null ? "/" : finalGroup);
 
         return true;
