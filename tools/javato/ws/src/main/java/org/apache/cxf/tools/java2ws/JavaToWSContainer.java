@@ -85,10 +85,11 @@ public class JavaToWSContainer extends AbstractCXFToolContainer {
         } catch (Exception ex) {
             
             // Try to find an exception with a message on the stack
-            Throwable e = ex.getCause();
+            Throwable e = ex;
             while ((e.getMessage() == null || "".equals(e.getMessage())) && e.getCause() != null) {
                 e = e.getCause();
             }
+        
             err.println("Error: " + e.toString());
             err.println();
             if (isVerboseOn()) {
