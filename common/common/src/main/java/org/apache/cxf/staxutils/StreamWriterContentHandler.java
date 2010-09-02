@@ -163,16 +163,22 @@ public class StreamWriterContentHandler implements ContentHandler {
 
     /**
      * Method getPrefix.
+     * @param namespaceURI 
      *
      * @param qname
      * @return Returns String.
      */
-    private String getPrefix(String ns) {
+    private String getPrefix(String ns, String namespaceURI) {
         int idx = ns.indexOf(':');
         if (idx != -1) {
             return ns.substring(0, idx);
+        } else if (namespaceURI != null && namespaceURI.length() > 0) {
+            //this is the case that have namespaceURI but use DEFAULT_NS_PREFIX
+            return "";
+        } else {
+            //this is the case that namespaceURI is just empty, so NS_PREFIX is null
+            return null;
         }
-        return null;
     }
 
     /**
@@ -189,7 +195,7 @@ public class StreamWriterContentHandler implements ContentHandler {
                              String qName,
                              Attributes atts) throws SAXException {
         try {
-            String prefix = getPrefix(qName);
+            String prefix = getPrefix(qName, namespaceURI);
             
             // it is only the prefix we want to learn from the QName! so we can get rid of the
             // spliting QName
