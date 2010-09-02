@@ -49,6 +49,8 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.EndpointUtils;
 import org.apache.cxf.jaxws.ServiceImpl;
+import org.apache.cxf.message.MessageUtils;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
@@ -62,7 +64,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     static {
         boolean b = false;
         try {
-            //JAX-WS 2.2 would have the HttpContext class in the classloader
+            //JAX-WS 2.2 would have the HttpCoPhaseInterceptorChainntext class in the classloader
             Class<?> cls = ClassLoaderUtils.loadClass("javax.xml.ws.spi.http.HttpContext", 
                                                       ProviderImpl.class);
             //In addition to that, the Endpoint class we pick up on the classloader
@@ -215,12 +217,21 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
             writer.writeNamespace(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.NS_WSAW);
             writer.writeNamespace(JAXWSAConstants.WSAM_PREFIX, JAXWSAConstants.NS_WSAM);
             if (wsdlDocumentLocation != null) {
+                boolean includeLocationOnly = false;
+                org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
+                if (message != null) {
+                    includeLocationOnly = MessageUtils.isTrue(
+                        message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
+                }
+                String attrubuteValue = serviceName != null && !includeLocationOnly 
+                        ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation
+                        : wsdlDocumentLocation;
                 writer.writeNamespace(JAXWSAConstants.WSDLI_PFX,
                                       JAXWSAConstants.NS_WSDLI);
                 writer.writeAttribute(JAXWSAConstants.WSDLI_PFX,
                                       JAXWSAConstants.NS_WSDLI,
                                       JAXWSAConstants.WSDLI_WSDLLOCATION,
-                                      wsdlDocumentLocation);
+                                      attrubuteValue);
             }
             if (interfaceName != null) {
                 writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
