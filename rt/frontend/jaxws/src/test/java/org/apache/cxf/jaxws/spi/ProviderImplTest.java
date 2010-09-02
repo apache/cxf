@@ -44,9 +44,8 @@ public class ProviderImplTest extends org.junit.Assert {
         assertTrue("Embeded wsdl element is not generated", sw.toString().indexOf(expected) > -1);
         assertTrue("wsdlLocation attribute has the wrong value", 
                    sw.toString().contains("wsdli:wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
-        System.out.println(sw.toString());
-
     }
+
     @After
     public void tearDown() {
         BusFactory.setDefaultBus(null);
