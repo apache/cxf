@@ -29,12 +29,12 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
 	  id="org.apache.cxf.transport.servlet.ServletTransportFactory">
         <property name="bus" ref="cxf"/>
         <property name="transportIds">
-            <set>
+            <list>
                 <value>http://cxf.apache.org/transports/http</value>                
                 <value>http://cxf.apache.org/transports/http/configuration</value>                
                 <value>http://schemas.xmlsoap.org/wsdl/http</value>
                 <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-            </set>
+            </list>
         </property>
     </bean>
 </beans>
