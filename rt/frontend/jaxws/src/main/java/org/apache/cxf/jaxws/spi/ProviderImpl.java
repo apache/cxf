@@ -64,7 +64,7 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
     static {
         boolean b = false;
         try {
-            //JAX-WS 2.2 would have the HttpCoPhaseInterceptorChainntext class in the classloader
+            //JAX-WS 2.2 would have the HttpContext class in the classloader
             Class<?> cls = ClassLoaderUtils.loadClass("javax.xml.ws.spi.http.HttpContext", 
                                                       ProviderImpl.class);
             //In addition to that, the Endpoint class we pick up on the classloader
