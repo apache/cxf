@@ -48,6 +48,7 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.MapNamespaceContext;
 import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -566,7 +567,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 RequiredParts rp = (RequiredParts)ai.getAssertion();
                 ai.setAsserted(true);
                 for (Header h : rp.getHeaders()) {
-                    if (header == null || !header.getChildElements(h.getQName()).hasNext()) {
+                    if (header == null || DOMUtils.getFirstChildWithName(header, h.getQName()) == null) {
                         ai.setNotAsserted("No header element of name " + h.getQName() + " found.");
                     }
                 }
