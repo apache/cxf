@@ -174,8 +174,6 @@ public class RPCInInterceptor extends AbstractInDatabindingInterceptor {
                                                                            LOG,
                                                                            qn));
                 }
-                //honor JAXBAnnotation
-                part.setProperty("honor.jaxb.annotations", true);
                 try {
                     parameters.put(part, dr.read(part, xmlReader));
                 } catch (Fault f) {

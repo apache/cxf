@@ -85,8 +85,6 @@ public class RPCOutInterceptor extends AbstractOutDatabindingInterceptor {
                     }
                    //WSI-BP R2737  -RPC/LIG part name space is empty
                    // part.setConcreteName(new QName("", part.getConcreteName().getLocalPart()));
-                    part.setProperty("honor.jaxb.annotations", true);
-                    
                 }
             }
             writeParts(message, message.getExchange(), operation, objs, parts);

@@ -147,9 +147,9 @@ public class DataWriterImpl<T> extends JAXBDataBase implements DataWriter<T> {
     }
     
     public void write(Object obj, MessagePartInfo part, T output) {
-        boolean honorJaxbAnnotation = false;
-        if (part != null && part.getProperty("honor.jaxb.annotations") != null) {
-            honorJaxbAnnotation = (Boolean)part.getProperty("honor.jaxb.annotations");
+        boolean honorJaxbAnnotation = honorJAXBAnnotations(part);
+        if (part != null && !part.isElement() && part.getTypeClass() != null) {
+            honorJaxbAnnotation = true;
         }
         
         if (obj != null

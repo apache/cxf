@@ -122,6 +122,19 @@ public abstract class JAXBDataBase {
         this.mtomThreshold = threshold;
     }
     
+    protected final boolean honorJAXBAnnotations(MessagePartInfo part) {
+        if (part == null) {
+            return false;
+        }
+        if (!part.isElement()) {
+            //RPC-Lit always needs to look for these
+            return true;
+        }
+        //certain cases that use XmlJavaTypeAdapters will require this and the
+        //JAXBSchemaInitializer will set this.
+        Boolean b = (Boolean)part.getProperty("honor.jaxb.annotations");
+        return b == null ? false : b;
+    }
     
     
 }
