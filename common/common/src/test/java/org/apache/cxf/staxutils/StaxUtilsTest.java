@@ -23,6 +23,7 @@ import java.io.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
@@ -268,5 +269,23 @@ public class StaxUtilsTest extends Assert {
         String output = sw.toString();
         assertFalse(output.contains("<?pi in='the sky'?>"));
         assertFalse(output.contains("<?e excl='gads'?>"));
+    }
+    
+    @Test
+    public void testDefaultPrefix() throws Exception {
+        try {
+            String soapMessage = "./resources/AddRequest.xml";     
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream(soapMessage));
+            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
+            StaxSource staxSource = new StaxSource(reader);
+            StaxUtils.copy(staxSource, writer);
+            writer.flush();
+            baos.flush();
+        } catch (XMLStreamException e) {
+            fail("shouldn't catch this exception");
+        }
+           
+        
     }
 }
