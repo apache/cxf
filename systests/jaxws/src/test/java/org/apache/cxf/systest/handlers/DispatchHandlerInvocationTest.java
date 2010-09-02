@@ -108,6 +108,37 @@ public class DispatchHandlerInvocationTest extends AbstractBusClientServerTestBa
         AddNumbersResponse value = (AddNumbersResponse)response.getValue();
         assertEquals(222, value.getReturn());
     }
+    
+    @Test
+    public void testInvokeWithJAXBUnwrapPayloadMode() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/addNumbers.wsdl");
+        assertNotNull(wsdl);
+
+        org.apache.cxf.systest.handlers.AddNumbersServiceUnwrap service = 
+            new org.apache.cxf.systest.handlers.AddNumbersServiceUnwrap(wsdl, serviceName);
+        assertNotNull(service);
+
+        JAXBContext jc = JAXBContext.newInstance(
+            org.apache.cxf.systest.handlers.types.AddNumbers.class,
+            org.apache.cxf.systest.handlers.types.AddNumbersResponse.class);
+
+        Dispatch<Object> disp = service.createDispatch(portName, jc, Service.Mode.PAYLOAD);
+        setAddress(disp, addNumbersAddress);
+        
+        TestHandler handler = new TestHandler();
+        TestSOAPHandler soapHandler = new TestSOAPHandler();
+        addHandlersProgrammatically(disp, handler, soapHandler);
+
+        org.apache.cxf.systest.handlers.types.AddNumbers req = 
+            new org.apache.cxf.systest.handlers.types.AddNumbers();
+        req.setArg0(10);
+        req.setArg1(20);
+        
+        org.apache.cxf.systest.handlers.types.AddNumbersResponse response = 
+            (org.apache.cxf.systest.handlers.types.AddNumbersResponse)disp.invoke(req);
+        assertNotNull(response);
+        assertEquals(222, response.getReturn());
+    }
 
     @Test
     public void testInvokeWithDOMSourcMessageMode() throws Exception {

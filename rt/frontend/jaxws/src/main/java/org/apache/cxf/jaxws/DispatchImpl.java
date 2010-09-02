@@ -29,6 +29,7 @@ import java.util.logging.Logger;
 
 import javax.activation.DataSource;
 import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBElement;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPElement;
 import javax.xml.soap.SOAPException;
@@ -275,6 +276,9 @@ public class DispatchImpl<T> implements Dispatch<T>, BindingProvider {
                 if (msg.countAttachments() > 0) {
                     client.getRequestContext().put(AttachmentOutInterceptor.WRITE_ATTACHMENTS, Boolean.TRUE);
                 }
+            } else if (context != null) {
+                Boolean unwrapProperty = obj instanceof JAXBElement ? Boolean.FALSE : Boolean.TRUE;
+                getRequestContext().put("unwrap.jaxb.element", unwrapProperty);
             }
             QName opName = (QName)getRequestContext().get(MessageContext.WSDL_OPERATION);
                        
