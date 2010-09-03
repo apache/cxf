@@ -81,6 +81,10 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             Class<?> cls = (Class<?>)args[2];
             Endpoint ep = (Endpoint)args[1];
             Bus bus = factory.getBus();
+            // To avoid the NPE
+            if (cls == null) {
+                return;
+            }
             addSchemaValidationSupport(ep, cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(ep, cls.getAnnotation(FastInfoset.class));
             addGZipSupport(ep, bus, cls.getAnnotation(GZIP.class));
