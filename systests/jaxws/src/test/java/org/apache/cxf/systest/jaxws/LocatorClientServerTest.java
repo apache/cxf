@@ -68,7 +68,7 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
     @BeforeClass
     public static void startServers() throws Exception {
-        assertTrue("server did not launch correctly", launchServer(MyServer.class, true));
+        assertTrue("server did not launch correctly", launchServer(MyServer.class));
     }
 
     @Test
@@ -115,7 +115,6 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/1", "Number"));
         String eprString = epr.toString();
-        System.out.println(eprString);
         assertTrue(eprString.contains("Metadata"));
         assertTrue(eprString.contains("wsdli:wsdlLocation=\"http://service/1 wsdlLoc\""));
     }
@@ -131,7 +130,6 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
         
         W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/2", "Number"));
         String eprString = epr.toString();
-        System.out.println(eprString);
         assertTrue(eprString.contains("Metadata"));
         assertTrue(eprString.contains("wsdli:wsdlLocation=\"wsdlLoc\""));
     }
