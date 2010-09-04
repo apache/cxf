@@ -33,16 +33,13 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.RequestWrapper;
 import javax.xml.ws.ResponseWrapper;
 
-//import javax.xml.ws.RequestWrapper;
-//import javax.xml.ws.ResponseWrapper;
-
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.soap.SoapFault;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.phase.PhaseManager;
@@ -58,15 +55,16 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.MessageInfo.Type;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
 
 import static org.apache.cxf.binding.soap.Soap11.SOAP_NAMESPACE;
 import static org.apache.cxf.message.Message.REQUESTOR_ROLE;
@@ -318,6 +316,37 @@ public class MAPAggregatorTest extends Assert {
         aggregator.mediate(message, true);
         control.verify();
         verifyMessage(message, true, false, false /*check*/);
+    }
+    
+    @Test
+    public void testTwoWayRequestWithReplyToNone() throws Exception {
+        Message message = new MessageImpl();  
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        setUpMessageProperty(message,
+                             REQUESTOR_ROLE,
+                             Boolean.FALSE);
+        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        EndpointReferenceType replyTo = new EndpointReferenceType();
+        replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_NONE_ADDRESS));
+        maps.setReplyTo(replyTo);
+        AttributedURIType id = 
+            ContextUtils.getAttributedURI("urn:uuid:12345");
+        maps.setMessageID(id);
+        maps.setAction(ContextUtils.getAttributedURI(""));
+        setUpMessageProperty(message,
+                             SERVER_ADDRESSING_PROPERTIES_INBOUND,
+                             maps);
+        setUpMessageProperty(message,
+                             "org.apache.cxf.ws.addressing.map.fault.name",
+                             "NoneAddress");
+        
+        try {
+            aggregator.mediate(message, false);
+            fail("Two way request with ReplyTo address set to none must fail");
+        } catch (SoapFault ex) {
+            // expected
+        }
     }
 
     
