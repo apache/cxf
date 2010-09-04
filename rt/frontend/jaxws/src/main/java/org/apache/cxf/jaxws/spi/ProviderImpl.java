@@ -212,83 +212,92 @@ public class ProviderImpl extends javax.xml.ws.spi.Provider {
                 writer.writeEndElement();
             }
 
-            writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_METADATA_NAME,
-                                     JAXWSAConstants.NS_WSA);
-            writer.writeNamespace(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.NS_WSAW);
-            writer.writeNamespace(JAXWSAConstants.WSAM_PREFIX, JAXWSAConstants.NS_WSAM);
-            if (wsdlDocumentLocation != null) {
-                boolean includeLocationOnly = false;
-                org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
-                if (message != null) {
-                    includeLocationOnly = MessageUtils.isTrue(
-                        message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
+            if (wsdlDocumentLocation != null
+                || interfaceName != null
+                || serviceName != null
+                || metadata != null) {
+                
+                        
+                writer.writeStartElement(JAXWSAConstants.WSA_PREFIX, JAXWSAConstants.WSA_METADATA_NAME,
+                                         JAXWSAConstants.NS_WSA);
+                writer.writeNamespace(JAXWSAConstants.WSAW_PREFIX, JAXWSAConstants.NS_WSAW);
+                writer.writeNamespace(JAXWSAConstants.WSAM_PREFIX, JAXWSAConstants.NS_WSAM);
+                
+                if (wsdlDocumentLocation != null) {
+                    boolean includeLocationOnly = false;
+                    org.apache.cxf.message.Message message = PhaseInterceptorChain.getCurrentMessage();
+                    if (message != null) {
+                        includeLocationOnly = MessageUtils.isTrue(
+                            message.getContextualProperty("org.apache.cxf.wsa.metadata.wsdlLocationOnly"));
+                    }
+                    String attrubuteValue = serviceName != null && !includeLocationOnly 
+                            ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation
+                            : wsdlDocumentLocation;
+                    writer.writeNamespace(JAXWSAConstants.WSDLI_PFX,
+                                          JAXWSAConstants.NS_WSDLI);
+                    writer.writeAttribute(JAXWSAConstants.WSDLI_PFX,
+                                          JAXWSAConstants.NS_WSDLI,
+                                          JAXWSAConstants.WSDLI_WSDLLOCATION,
+                                          attrubuteValue);
                 }
-                String attrubuteValue = serviceName != null && !includeLocationOnly 
-                        ? serviceName.getNamespaceURI() + " " + wsdlDocumentLocation
-                        : wsdlDocumentLocation;
-                writer.writeNamespace(JAXWSAConstants.WSDLI_PFX,
-                                      JAXWSAConstants.NS_WSDLI);
-                writer.writeAttribute(JAXWSAConstants.WSDLI_PFX,
-                                      JAXWSAConstants.NS_WSDLI,
-                                      JAXWSAConstants.WSDLI_WSDLLOCATION,
-                                      attrubuteValue);
-            }
-            if (interfaceName != null) {
-                writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
-                                         JAXWSAConstants.WSAM_INTERFACE_NAME,
-                                         JAXWSAConstants.NS_WSAM);
-                String portTypePrefix = interfaceName.getPrefix();
-                if (portTypePrefix == null || portTypePrefix.equals("")) {
-                    portTypePrefix = "ns1";
+                if (interfaceName != null) {
+                    writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
+                                             JAXWSAConstants.WSAM_INTERFACE_NAME,
+                                             JAXWSAConstants.NS_WSAM);
+                    String portTypePrefix = interfaceName.getPrefix();
+                    if (portTypePrefix == null || portTypePrefix.equals("")) {
+                        portTypePrefix = "ns1";
+                    }
+                    writer.writeNamespace(portTypePrefix, interfaceName.getNamespaceURI());
+                    writer.writeCharacters(portTypePrefix + ":" + interfaceName.getLocalPart());
+                    writer.writeEndElement();
                 }
-                writer.writeNamespace(portTypePrefix, interfaceName.getNamespaceURI());
-                writer.writeCharacters(portTypePrefix + ":" + interfaceName.getLocalPart());
-                writer.writeEndElement();
-            }
-
-            
-            String serviceNamePrefix = null;
-
-            if (serviceName != null) {
-                serviceNamePrefix = (serviceName.getPrefix() == null || serviceName.getPrefix().length() == 0)
-                    ? "ns2" : serviceName.getPrefix();
-
-                writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
-                                         JAXWSAConstants.WSAM_SERVICENAME_NAME,
-                                         JAXWSAConstants.NS_WSAM);
-
-                if (portName != null) {
-                    writer.writeAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName.getLocalPart());
-                }
-                writer.writeNamespace(serviceNamePrefix, serviceName.getNamespaceURI());
-                writer.writeCharacters(serviceNamePrefix + ":" + serviceName.getLocalPart());
-
-                writer.writeEndElement();
-            }
-
-            if (wsdlDocumentLocation != null) {
-
-                writer.writeStartElement(WSDLConstants.WSDL_PREFIX, WSDLConstants.QNAME_DEFINITIONS
-                    .getLocalPart(), WSDLConstants.NS_WSDL11);
-                writer.writeNamespace(WSDLConstants.WSDL_PREFIX, WSDLConstants.NS_WSDL11);
-                writer.writeStartElement(WSDLConstants.WSDL_PREFIX,
-                                         WSDLConstants.QNAME_IMPORT.getLocalPart(),
-                                         WSDLConstants.QNAME_IMPORT.getNamespaceURI());
+    
+                
+                String serviceNamePrefix = null;
+    
                 if (serviceName != null) {
-                    writer.writeAttribute(WSDLConstants.ATTR_NAMESPACE, serviceName.getNamespaceURI());
+                    serviceNamePrefix = 
+                        (serviceName.getPrefix() == null || serviceName.getPrefix().length() == 0)
+                        ? "ns2" : serviceName.getPrefix();
+    
+                    writer.writeStartElement(JAXWSAConstants.WSAM_PREFIX,
+                                             JAXWSAConstants.WSAM_SERVICENAME_NAME,
+                                             JAXWSAConstants.NS_WSAM);
+    
+                    if (portName != null) {
+                        writer.writeAttribute(JAXWSAConstants.WSAM_ENDPOINT_NAME, portName.getLocalPart());
+                    }
+                    writer.writeNamespace(serviceNamePrefix, serviceName.getNamespaceURI());
+                    writer.writeCharacters(serviceNamePrefix + ":" + serviceName.getLocalPart());
+    
+                    writer.writeEndElement();
                 }
-                writer.writeAttribute(WSDLConstants.ATTR_LOCATION, wsdlDocumentLocation);
-                writer.writeEndElement();
+    
+                if (wsdlDocumentLocation != null) {
+    
+                    writer.writeStartElement(WSDLConstants.WSDL_PREFIX, WSDLConstants.QNAME_DEFINITIONS
+                        .getLocalPart(), WSDLConstants.NS_WSDL11);
+                    writer.writeNamespace(WSDLConstants.WSDL_PREFIX, WSDLConstants.NS_WSDL11);
+                    writer.writeStartElement(WSDLConstants.WSDL_PREFIX,
+                                             WSDLConstants.QNAME_IMPORT.getLocalPart(),
+                                             WSDLConstants.QNAME_IMPORT.getNamespaceURI());
+                    if (serviceName != null) {
+                        writer.writeAttribute(WSDLConstants.ATTR_NAMESPACE, serviceName.getNamespaceURI());
+                    }
+                    writer.writeAttribute(WSDLConstants.ATTR_LOCATION, wsdlDocumentLocation);
+                    writer.writeEndElement();
+                    writer.writeEndElement();
+                }
+    
+                if (metadata != null) {
+                    for (Element e : metadata) {
+                        StaxUtils.writeElement(e, writer, true);
+                    }
+                }
+    
                 writer.writeEndElement();
             }
-
-            if (metadata != null) {
-                for (Element e : metadata) {
-                    StaxUtils.writeElement(e, writer, true);
-                }
-            }
-
-            writer.writeEndElement();
             
             if (elements != null) {
                 for (Element e : elements) {
