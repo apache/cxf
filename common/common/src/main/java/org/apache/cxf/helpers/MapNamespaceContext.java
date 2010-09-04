@@ -21,7 +21,9 @@ package org.apache.cxf.helpers;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
+
 import org.w3c.dom.Node;
 
 public  final class MapNamespaceContext implements NamespaceContext {
@@ -56,7 +58,13 @@ public  final class MapNamespaceContext implements NamespaceContext {
 
     public String getNamespaceURI(String prefix) {
         if (null == prefix) {
-            throw new IllegalArgumentException("Null prefix to getNamespacePrefix");
+            throw new IllegalArgumentException("Null prefix to getNamespaceURI");
+        }
+        if (XMLConstants.XML_NS_PREFIX.equals(prefix)) {
+            return XMLConstants.XML_NS_URI;
+        }
+        if (XMLConstants.XMLNS_ATTRIBUTE.equals(prefix)) {
+            return XMLConstants.XMLNS_ATTRIBUTE_NS_URI;
         }
         // if we have a target node, facts-on-the-ground in its parent tree take precedence.
         if (targetNode != null) {
@@ -70,6 +78,16 @@ public  final class MapNamespaceContext implements NamespaceContext {
     }
 
     public String getPrefix(String namespaceURI) {
+        if (namespaceURI == null) {
+            throw new IllegalArgumentException("Null namespace to getPrefix");
+        }
+        if (XMLConstants.XML_NS_URI.equals(namespaceURI)) {
+            return XMLConstants.XML_NS_PREFIX;
+        }
+        if (XMLConstants.XMLNS_ATTRIBUTE_NS_URI.equals(namespaceURI)) {
+            return XMLConstants.XMLNS_ATTRIBUTE;
+        }
+
         for (Map.Entry<String, String> e : namespaces.entrySet()) {
             if (e.getValue().equals(namespaceURI)) {
                 return e.getKey();
