@@ -64,9 +64,11 @@ public class ChainInitiationObserver implements MessageObserver {
             
             if (m.getInterceptorChain() instanceof PhaseInterceptorChain) {
                 phaseChain = (PhaseInterceptorChain)m.getInterceptorChain();
-                if (phaseChain.getState() == InterceptorChain.State.PAUSED) {
-                    phaseChain.resume();
-                    return;
+                synchronized (phaseChain) {
+                    if (phaseChain.getState() == InterceptorChain.State.PAUSED) {
+                        phaseChain.resume();
+                        return;
+                    }
                 }
             }
             
