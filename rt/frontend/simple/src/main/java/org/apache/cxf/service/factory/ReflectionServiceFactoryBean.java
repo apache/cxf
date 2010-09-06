@@ -702,29 +702,28 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                 //make it.
                 WSDLServiceBuilder.checkForWrapped(o, true);
             }
+            if (o.getUnwrappedOperation() != null) {
+                if (o.hasInput()) {
+                    MessageInfo input = o.getInput();
+                    MessagePartInfo part = input.getMessageParts().get(0);
+                    part.setTypeClass(getRequestWrapper(method));
+                    part.setProperty("REQUEST.WRAPPER.CLASSNAME", getRequestWrapperClassName(method));
+                    part.setIndex(0);
+                }
 
-            if (o.hasInput()) {
-                MessageInfo input = o.getInput();
-                MessagePartInfo part = input.getMessageParts().get(0);
-                part.setTypeClass(getRequestWrapper(method));
-                part.setProperty("REQUEST.WRAPPER.CLASSNAME", getRequestWrapperClassName(method));
-                part.setIndex(0);
+                if (o.hasOutput()) {
+                    MessageInfo input = o.getOutput();
+                    MessagePartInfo part = input.getMessageParts().get(0);
+                    part.setTypeClass(getResponseWrapper(method));
+                    part.setProperty("RESPONSE.WRAPPER.CLASSNAME", getResponseWrapperClassName(method));
+                    part.setIndex(0);
+                }
+                setFaultClassInfo(o, method);
+                o = o.getUnwrappedOperation();
+            } else {
+                LOG.warning(new Message("COULD_NOT_UNWRAP", LOG, o.getName(), method).toString());
+                setFaultClassInfo(o, method);
             }
-
-            if (o.hasOutput()) {
-                MessageInfo input = o.getOutput();
-                MessagePartInfo part = input.getMessageParts().get(0);
-                part.setTypeClass(getResponseWrapper(method));
-                part.setProperty("RESPONSE.WRAPPER.CLASSNAME", getResponseWrapperClassName(method));
-                part.setIndex(0);
-            }
-
-            setFaultClassInfo(o, method);
-            if (o.getUnwrappedOperation() == null) {
-                throw new ServiceConstructionException(new Message("COULD_NOT_UNWRAP", LOG,
-                                                                   o.getName(), method));
-            }
-            o = o.getUnwrappedOperation();
         } else if (o.isUnwrappedCapable()) {
             // remove the unwrapped operation because it will break the
             // the WrapperClassOutInterceptor, and in general makes
@@ -755,14 +754,14 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         if (o.hasOutput()
             && !initializeParameter(o, method, -1, paramType, genericType)) {
             return false;
-        }
+        }        
         if (origOp.hasOutput()) {
             sendEvent(Event.OPERATIONINFO_OUT_MESSAGE_SET, origOp, method, origOp.getOutput());
         }
 
         setFaultClassInfo(o, method);
         return true;
-    }    
+    }   
     private boolean initializeParameter(OperationInfo o, Method method, int i,
                                      Class paramType, Type genericType) {
         boolean isIn = isInParam(method, i);
