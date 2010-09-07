@@ -656,7 +656,6 @@ public class ServiceImpl extends ServiceDelegate {
         AbstractServiceFactoryBean sf = null;
         try {
             JAXBDataBinding db = new JAXBDataBinding(context);
-            db.setUnwrapJAXBElement(false);
             sf = createDispatchService(db);
         } catch (ServiceConstructionException e) {
             throw new WebServiceException(e);

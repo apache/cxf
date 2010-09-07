@@ -68,6 +68,11 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                 veventHandler = databinding.getValidationEventHandler();
             }
             setEventHandler = MessageUtils.getContextualBoolean(m, "set-jaxb-validation-event-handler", true);
+            
+            Object unwrapProperty = m.get(JAXBDataBinding.UNWRAP_JAXB_ELEMENT);
+            if (unwrapProperty != null) {
+                unwrapJAXBElement = Boolean.TRUE.equals(unwrapProperty);
+            }
         }
     }
     private Unmarshaller createUnmarshaller() {
@@ -106,9 +111,10 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
 
     public Object read(MessagePartInfo part, T reader) {
         boolean honorJaxbAnnotation = false;
-        if (part != null && part.getProperty("honor.jaxb.annotations") != null) {
+        if (part != null && part.getProperty("honor.jaxb.annotations") != null) { 
             honorJaxbAnnotation = (Boolean)part.getProperty("honor.jaxb.annotations");
         }
+        
         Annotation[] anns = null;
        
         if (honorJaxbAnnotation) {
