@@ -508,10 +508,16 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                                 message);
                 } 
                 if (!isOneway) {
-                    // ensure the inbound MAPs are available in both the full & fault
-                    // response messages (used to determine relatesTo etc.)
-                    ContextUtils.propogateReceivedMAPs(maps,
+                    // if ReplyTo address is none then 202 response status is expected
+                    // However returning a fault is more appropriate for request-response MEP
+                    if (ContextUtils.isNoneAddress(maps.getReplyTo())) {
+                        continueProcessing = false;
+                    } else {
+                        // ensure the inbound MAPs are available in both the full & fault
+                        // response messages (used to determine relatesTo etc.)
+                        ContextUtils.propogateReceivedMAPs(maps,
                                                        message.getExchange());
+                    }
                 }
             }
             if (continueProcessing) {
