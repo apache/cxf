@@ -19,11 +19,13 @@
 
 package org.apache.cxf.tools.java2wsdl.processor.internal;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.BusApplicationContext;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.frontend.AbstractServiceFactory;
 import org.apache.cxf.service.ServiceBuilder;
@@ -36,8 +38,8 @@ import org.springframework.beans.factory.BeanDefinitionStoreException;
 import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.core.io.UrlResource;
 
 /**
  * This class constructs ServiceBuilder objects using Spring. These objects are used to access the services
@@ -117,7 +119,12 @@ public final class SpringServiceBuilderFactory extends ServiceBuilderFactory {
             .getExtension(BusApplicationContext.class);
         GenericApplicationContext appContext = new GenericApplicationContext(busApplicationContext);
         XmlBeanDefinitionReader reader = new XmlBeanDefinitionReader(appContext);
-        reader.loadBeanDefinitions(new ClassPathResource("META-INF/cxf/java2wsbeans.xml"));
+        List<URL> urls = ClassLoaderUtils.getResources("META-INF/cxf/java2wsbeans.xml", 
+                                                       SpringServiceBuilderFactory.class);
+        for (URL url : urls) {
+            reader.loadBeanDefinitions(new UrlResource(url));
+        }
+        
         for (String pathname : additionalFilePathnames) {
             try {
                 reader.loadBeanDefinitions(new FileSystemResource(pathname));

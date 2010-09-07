@@ -22,8 +22,6 @@
        xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-<bean id='JaxwsServiceBuilderBean' class='org.apache.cxf.jaxws.JaxwsServiceBuilder' scope="prototype" />
-<bean id='SimpleServiceBuilderBean' class='org.apache.cxf.simple.SimpleServiceBuilder' scope="prototype" />
-
+    <bean id='JaxbDatabindingBean' class="org.apache.cxf.jaxb.JAXBDataBinding" scope="prototype"/>
 
 </beans>

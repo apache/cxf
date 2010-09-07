@@ -222,6 +222,9 @@
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
                                     <resource>META-INF/cxf/bus-extensions.xml</resource>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.XmlAppendingTransformer">
+                                    <resource>META-INF/cxf/java2wsbeans.xml</resource>
+                                </transformer>
                                 <transformer implementation="org.apache.cxf.maven.CXFAllTransformer" />
                             </transformers>
                         </configuration>
