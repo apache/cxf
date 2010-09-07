@@ -19,15 +19,24 @@
 
 package org.apache.cxf.jaxws.spi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.namespace.QName;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.wsaddressing.W3CEndpointReference;
 
+import org.w3c.dom.Element;
+
 import org.apache.cxf.BusFactory;
+
 import org.junit.After;
 
 
 public class ProviderImplTest extends org.junit.Assert {
+    
     @org.junit.Test
     public void testCreateW3CEpr() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "ServiceName");
@@ -46,6 +55,72 @@ public class ProviderImplTest extends org.junit.Assert {
                    sw.toString().contains("wsdli:wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
     }
 
+    @org.junit.Test
+    public void testCreateW3CEprNoMetadata() throws Exception {
+        ProviderImpl impl = new ProviderImpl();
+        W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
+                         "http://myaddress", null, null, null, null, null, null, null, null);
+        
+        java.io.StringWriter sw = new java.io.StringWriter();
+        StreamResult result = new StreamResult(sw);
+        w3Epr.writeTo(result);
+        assertTrue("Address is expected", sw.toString().contains("Address"));
+        assertFalse("empty Metadata element should be dropped", sw.toString().contains("Metadata"));
+    }
+    
+    @org.junit.Test
+    public void testCreateW3CEprMetadataInterfaceNameOnly() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org", "IntfName");
+        ProviderImpl impl = new ProviderImpl();
+        W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
+                         "http://myaddress", serviceName, null, null, null, null, null, null, null);
+        
+        java.io.StringWriter sw = new java.io.StringWriter();
+        StreamResult result = new StreamResult(sw);
+        w3Epr.writeTo(result);
+        assertTrue("Address is expected", sw.toString().contains("Address"));
+        assertTrue("Metadata element expected", sw.toString().contains("Metadata"));
+        assertTrue("Interface element expected", sw.toString().contains("Interface"));
+        assertFalse("ServiceName is unexpected", sw.toString().contains("ServiceName"));
+    }
+    
+    @org.junit.Test
+    public void testCreateW3CEprMetadataServiceNameOnly() throws Exception {
+        QName serviceName = new QName("http://cxf.apache.org", "ServiceName");
+        ProviderImpl impl = new ProviderImpl();
+        W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
+                         "http://myaddress", null, serviceName, null, null, null, null, null, null);
+        
+        java.io.StringWriter sw = new java.io.StringWriter();
+        StreamResult result = new StreamResult(sw);
+        w3Epr.writeTo(result);
+        assertTrue("Address is expected", sw.toString().contains("Address"));
+        assertTrue("Metadata element expected", sw.toString().contains("Metadata"));
+        assertFalse("Interface element unexpected", sw.toString().contains("Interface"));
+        assertTrue("ServiceName is expected", sw.toString().contains("ServiceName"));
+    }
+    
+    @org.junit.Test
+    public void testCreateW3CEprMetadataMetadataOnly() throws Exception {
+        ProviderImpl impl = new ProviderImpl();
+        DocumentBuilder builder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+        Element element = builder.newDocument().createElement("customMetadata");
+        List<Element> metadata = new ArrayList<Element>();
+        metadata.add(element);
+        W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
+                         "http://myaddress", null, null, 
+                         metadata, null, null);
+        
+        java.io.StringWriter sw = new java.io.StringWriter();
+        StreamResult result = new StreamResult(sw);
+        w3Epr.writeTo(result);
+        assertTrue("Address is expected", sw.toString().contains("Address"));
+        assertTrue("Metadata element expected", sw.toString().contains("Metadata"));
+        assertTrue("Custom Metadata element expected", sw.toString().contains("customMetadata"));
+        assertFalse("Interface element unexpected", sw.toString().contains("Interface"));
+        assertFalse("ServiceName unexpected", sw.toString().contains("ServiceName"));
+    }
+    
     @After
     public void tearDown() {
         BusFactory.setDefaultBus(null);
