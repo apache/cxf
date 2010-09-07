@@ -24,8 +24,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
-@SuppressWarnings("unchecked")
-public class IncomingMessageCounterInterceptor extends AbstractPhaseInterceptor {
+public class IncomingMessageCounterInterceptor extends AbstractPhaseInterceptor<Message> {
     
     private static int messageCount;
     
