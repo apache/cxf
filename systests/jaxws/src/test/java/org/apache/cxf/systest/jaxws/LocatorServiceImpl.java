@@ -22,7 +22,7 @@
  * This class is not complete
  */
 
-package org.apache.locator_test;
+package org.apache.cxf.systest.jaxws;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +30,9 @@ import java.util.logging.Logger;
 
 import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.locator.EndpointNotExistFault;
 import org.apache.locator.LocatorService;
 import org.apache.locator.types.EndpointIdentity;
@@ -50,7 +53,7 @@ import org.apache.locator.types.QueryEndpointsResponse;
                       wsdlLocation = "testutils/locator.wsdl")
 public class LocatorServiceImpl implements LocatorService {
 
-    static final Logger LOG = Logger.getLogger(LocatorServiceImpl.class.getName());
+    static final Logger LOG = LogUtils.getL7dLogger(LocatorServiceImpl.class);
 
     public void registerPeerManager(
                                     javax.xml.ws.wsaddressing.W3CEndpointReference peerManager,
@@ -80,6 +83,17 @@ public class LocatorServiceImpl implements LocatorService {
         throws EndpointNotExistFault {
         LOG.info("Executing operation lookupEndpoint");
         W3CEndpointReferenceBuilder eprBuilder = new  W3CEndpointReferenceBuilder();
+        eprBuilder.address("http://bar");
+        eprBuilder.serviceName(serviceQname);
+        eprBuilder.wsdlDocumentLocation("wsdlLoc");
+        
+        // just in case, for backward compatibility, the builder may be asked to
+        // create a wsdlLocation attribute with a location only
+        if (serviceQname.getNamespaceURI().endsWith("2")) {
+            Message m = PhaseInterceptorChain.getCurrentMessage();
+            m.put("org.apache.cxf.wsa.metadata.wsdlLocationOnly", "true");
+        }
+        
         return eprBuilder.build();
     }
 

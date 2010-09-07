@@ -34,7 +34,7 @@ import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.locator.LocatorService;
 import org.apache.locator.LocatorService_Service;
 import org.apache.locator.types.QueryEndpoints;
-import org.apache.locator_test.LocatorServiceImpl;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -102,6 +102,34 @@ public class LocatorClientServerTest extends AbstractBusClientServerTestBase {
 
         port.queryEndpoints(new QueryEndpoints());
 
+    }
+    
+    @Test
+    public void testLookupEndpointAndVerifyWsdlLocationAndNamespace() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
+        assertNotNull(wsdl);
+
+        LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
+        LocatorService port = ss.getLocatorServicePort();
+        updateAddressPort(port, PORT);
+        
+        W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/1", "Number"));
+        String eprString = epr.toString();
+        assertTrue(eprString.contains("Metadata wsdli:wsdlLocation=\"http://service/1 wsdlLoc\""));
+    }
+    
+    @Test
+    public void testLookupEndpointAndVerifyWsdlLocationOnly() throws Exception {
+        URL wsdl = getClass().getResource("/wsdl/locator.wsdl");
+        assertNotNull(wsdl);
+
+        LocatorService_Service ss = new LocatorService_Service(wsdl, serviceName);
+        LocatorService port = ss.getLocatorServicePort();
+        updateAddressPort(port, PORT);
+        
+        W3CEndpointReference epr = port.lookupEndpoint(new QName("http://service/2", "Number"));
+        String eprString = epr.toString();
+        assertTrue(eprString.contains("Metadata wsdli:wsdlLocation=\"wsdlLoc\""));
     }
 
     @Test

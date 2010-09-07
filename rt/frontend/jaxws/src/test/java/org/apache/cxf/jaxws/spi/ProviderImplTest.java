@@ -27,7 +27,7 @@ import org.apache.cxf.BusFactory;
 import org.junit.After;
 
 
-public class ProverImplTest extends org.junit.Assert {
+public class ProviderImplTest extends org.junit.Assert {
     @org.junit.Test
     public void testCreateW3CEpr() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "ServiceName");
@@ -42,9 +42,10 @@ public class ProverImplTest extends org.junit.Assert {
         w3Epr.writeTo(result);
         String expected = "<wsdl:definitions"; 
         assertTrue("Embeded wsdl element is not generated", sw.toString().indexOf(expected) > -1);
-        
-
+        assertTrue("wsdlLocation attribute has the wrong value", 
+                   sw.toString().contains("wsdli:wsdlLocation=\"http://cxf.apache.org wsdlLoc\""));
     }
+
     @After
     public void tearDown() {
         BusFactory.setDefaultBus(null);
