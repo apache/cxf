@@ -113,13 +113,8 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
     }
 
     public Object read(MessagePartInfo part, T reader) {
-        boolean honorJaxbAnnotation = false;
-        if (part != null && part.getProperty("honor.jaxb.annotations") != null) { 
-            honorJaxbAnnotation = (Boolean)part.getProperty("honor.jaxb.annotations");
-        }
-        
+        boolean honorJaxbAnnotation = honorJAXBAnnotations(part);
         Annotation[] anns = null;
-       
         if (honorJaxbAnnotation) {
             anns = getJAXBAnnotation(part);
             if (anns.length > 0) {
