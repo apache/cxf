@@ -30,7 +30,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 public class ServiceBuilderFactoryTest extends Assert {
-    ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance(new ArrayList<String>());
+    ServiceBuilderFactory factory = ServiceBuilderFactory.getInstance(new ArrayList<String>(),
+                                                                      "jaxb");
 
     @Test
     public void testGetJaxwsBuilder() {
