@@ -39,10 +39,16 @@ public abstract class ServiceBuilderFactory {
         databindingName = ToolConstants.DEFAULT_DATA_BINDING_NAME;
     }
 
-    public static ServiceBuilderFactory getInstance(List<String> beanDefinitions) {
+    public static ServiceBuilderFactory getInstance(List<String> beanDefinitions,
+                                                    String db) {
         ServiceBuilderFactory factory;
         if (beanDefinitions == null || beanDefinitions.isEmpty()) {
-            factory = new DefaultServiceBuilderFactory();
+            if (ToolConstants.JAXB_DATABINDING.equals(db)
+                || ToolConstants.AEGIS_DATABINDING.equals(db)) {
+                factory = new DefaultServiceBuilderFactory();
+            } else {
+                factory = new SpringServiceBuilderFactory(beanDefinitions);
+            }
         } else {
             factory = new SpringServiceBuilderFactory(beanDefinitions);
         }

@@ -38,12 +38,12 @@
 		
 			<option id="databinding" maxOccurs="1">
 				<annotation>
-				    Specify the data binding (aegis or jaxb). Default is jaxb for jaxws 
+				    Specify the data binding (aegis, jaxb, xmlbeans, etc...). Default is jaxb for jaxws 
 				    frontend, and aegis for simple frontend.
 				</annotation>
 				<switch>databinding</switch>
 				<associatedArgument placement="afterSpace">
-				  <annotation>jaxb or aegis</annotation>
+				  <annotation>databinding name</annotation>
 				</associatedArgument>
 			</option>
 			<option id="frontend" maxOccurs="1">

@@ -131,7 +131,11 @@ public class JavaToJSProcessor implements Processor {
                 }
             }
         }
-        ServiceBuilderFactory builderFactory = ServiceBuilderFactory.getInstance(beanDefinitions);
+
+        
+        ServiceBuilderFactory builderFactory 
+            = ServiceBuilderFactory.getInstance(beanDefinitions,
+                                                getDataBindingName());
         Class<?> clz = getServiceClass();
         context.put(Class.class, clz);
         if (clz.isInterface()) {

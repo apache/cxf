@@ -46,7 +46,7 @@ public final class DefaultServiceBuilderFactory extends ServiceBuilderFactory {
         } else if (ToolConstants.AEGIS_DATABINDING.equals(dbn)) {
             dataBinding = new AegisDatabinding();
         } else {
-            throw new ToolException("Unsupported databinding: " + s);
+            throw new ToolException("Unsupported databinding: " + dbn);
         }
         AbstractServiceFactory builder = null;
         if (Style.Jaxws.equals(s)) {
