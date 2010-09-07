@@ -69,6 +69,19 @@ public class ProviderImplTest extends org.junit.Assert {
     }
     
     @org.junit.Test
+    public void testCreateW3CEprNoMetadataEmptyCustomMetadata() throws Exception {
+        ProviderImpl impl = new ProviderImpl();
+        W3CEndpointReference w3Epr = impl.createW3CEndpointReference(
+           "http://myaddress", null, null, new ArrayList<Element>(), null, null);
+        
+        java.io.StringWriter sw = new java.io.StringWriter();
+        StreamResult result = new StreamResult(sw);
+        w3Epr.writeTo(result);
+        assertTrue("Address is expected", sw.toString().contains("Address"));
+        assertFalse("empty Metadata element should be dropped", sw.toString().contains("Metadata"));
+    }
+    
+    @org.junit.Test
     public void testCreateW3CEprMetadataInterfaceNameOnly() throws Exception {
         QName serviceName = new QName("http://cxf.apache.org", "IntfName");
         ProviderImpl impl = new ProviderImpl();
