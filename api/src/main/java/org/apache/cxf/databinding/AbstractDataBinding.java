@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.Resource;
+import javax.xml.XMLConstants;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.transform.dom.DOMSource;
@@ -69,7 +70,7 @@ public abstract class AbstractDataBinding implements DataBinding {
 
     /**
      * This call is used to set the bus. It should only be called once.
-     * 
+     *
      * @param bus
      */
     @Resource(name = "cxf")
@@ -88,6 +89,23 @@ public abstract class AbstractDataBinding implements DataBinding {
 
     public XmlSchema addSchemaDocument(ServiceInfo serviceInfo, SchemaCollection col, Document d,
                                        String systemId) {
+
+
+        /*
+         * Sanity check. The document has to remotely resemble a schema.
+         */
+        if (!XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(d.getDocumentElement().getNamespaceURI())) {
+            throw new RuntimeException("Invalid schema document passed to "
+                                       + "AbstractDataBinding.addSchemaDocument, "
+                                       + "not in W3C schema namespace");
+        }
+
+        if (!"schema".equals(d.getDocumentElement().getLocalName())) {
+            throw new RuntimeException("Invalid schema document passed to "
+                                       + "AbstractDataBinding.addSchemaDocument, "
+                                       + "document element isn't 'schema'");
+        }
+
         String ns = d.getDocumentElement().getAttribute("targetNamespace");
         boolean copied = false;
 
@@ -129,7 +147,7 @@ public abstract class AbstractDataBinding implements DataBinding {
             }
             n = n.getNextSibling();
         }
-        
+
         if (patchRequired) {
             if (!copied) {
                 d = copy(d);
@@ -168,7 +186,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         boolean hasStuffToRemove = false;
         Element el = DOMUtils.getFirstElement(d.getDocumentElement());
         while (el != null) {
-            if ("import".equals(el.getLocalName()) 
+            if ("import".equals(el.getLocalName())
                 && StringUtils.isEmpty(el.getAttribute("targetNamespace"))) {
                 hasStuffToRemove = true;
                 break;
@@ -216,7 +234,7 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     /**
-     * @return the namespaceMap (URI to prefix). This will be null 
+     * @return the namespaceMap (URI to prefix). This will be null
      * if no particular namespace map has been set.
      */
     public Map<String, String> getNamespaceMap() {
@@ -224,9 +242,9 @@ public abstract class AbstractDataBinding implements DataBinding {
     }
 
     /**
-     * Set a map of from URI to prefix. If possible, the data binding will use these 
+     * Set a map of from URI to prefix. If possible, the data binding will use these
      * prefixes on the wire.
-     * 
+     *
      * @param namespaceMap The namespaceMap to set.
      */
     public void setNamespaceMap(Map<String, String> namespaceMap) {
