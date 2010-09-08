@@ -392,7 +392,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
                 av0.visit("name", el.name());
                 av0.visit("nillable", el.nillable());
-                av0.visit("requried", el.required());
+                av0.visit("required", el.required());
                 av0.visit("namespace", el.namespace());
                 av0.visit("defaultValue", el.defaultValue());
                 av0.visit("type", el.type());
@@ -402,7 +402,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElementWrapper;", true);
                 av0.visit("name", el.name());
                 av0.visit("nillable", el.nillable());
-                av0.visit("requried", el.required());
+                av0.visit("required", el.required());
                 av0.visit("namespace", el.namespace());
                 av0.visitEnd(); 
             }
