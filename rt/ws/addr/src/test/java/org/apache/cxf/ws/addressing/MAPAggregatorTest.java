@@ -348,6 +348,32 @@ public class MAPAggregatorTest extends Assert {
             // expected
         }
     }
+    
+    @Test
+    public void testReplyToWithAnonymousAddressRetained() throws Exception {
+        Message message = new MessageImpl();  
+        Exchange exchange = new ExchangeImpl();
+        message.setExchange(exchange);
+        exchange.setOutMessage(message);
+        setUpMessageProperty(message,
+                             REQUESTOR_ROLE,
+                             Boolean.TRUE);
+        AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
+        EndpointReferenceType replyTo = new EndpointReferenceType();
+        replyTo.setAddress(ContextUtils.getAttributedURI(Names.WSA_ANONYMOUS_ADDRESS));
+        maps.setReplyTo(replyTo);
+        AttributedURIType id = 
+            ContextUtils.getAttributedURI("urn:uuid:12345");
+        maps.setMessageID(id);
+        maps.setAction(ContextUtils.getAttributedURI(""));
+        setUpMessageProperty(message,
+                             CLIENT_ADDRESSING_PROPERTIES,
+                             maps);
+        aggregator.mediate(message, false);
+        AddressingProperties props = 
+            (AddressingProperties)message.get(JAXWSAConstants.CLIENT_ADDRESSING_PROPERTIES_OUTBOUND);
+        assertSame(replyTo, props.getReplyTo());
+    }
 
     
     private Message setUpMessage(boolean requestor, 
