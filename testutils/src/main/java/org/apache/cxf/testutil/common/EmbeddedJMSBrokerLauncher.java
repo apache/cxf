@@ -97,7 +97,8 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             broker.stop();
         }
     }
-            
+    
+    //START SNIPPET: broker
     public void run() {
         try {                
             broker = new BrokerService();
@@ -109,6 +110,7 @@ public class EmbeddedJMSBrokerLauncher extends AbstractBusTestServerBase {
             e.printStackTrace();
         }
     }
+    //END SNIPPET: broker
 
     public static void main(String[] args) {
         try {
