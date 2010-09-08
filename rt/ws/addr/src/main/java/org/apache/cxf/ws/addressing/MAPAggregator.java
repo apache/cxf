@@ -838,7 +838,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             // current invocation
             EndpointReferenceType replyTo = maps.getReplyTo();
             if (ContextUtils.isGenericAddress(replyTo)) {
-                replyTo = getReplyTo(message);
+                replyTo = getReplyTo(message, replyTo);
                 if (replyTo == null
                     || (isOneway
                         && (replyTo.getAddress() == null
@@ -895,11 +895,12 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         }
     }
 
-    private EndpointReferenceType getReplyTo(Message message) {
+    private EndpointReferenceType getReplyTo(Message message, 
+                                             EndpointReferenceType originalReplyTo) {
         Exchange exchange = message.getExchange();
         Endpoint info = exchange.get(Endpoint.class);
         if (info == null) {
-            return null;
+            return originalReplyTo;
         }
         synchronized (info) {
             EndpointInfo ei = info.getEndpointInfo();
@@ -914,7 +915,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 return dest.getAddress();
             }
         }
-        return null;
+        return originalReplyTo;
     }
 
     private Destination createDecoupledDestination(Message message) {
