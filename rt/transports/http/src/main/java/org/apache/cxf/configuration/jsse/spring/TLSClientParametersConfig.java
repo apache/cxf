@@ -100,6 +100,9 @@ public final class TLSClientParametersConfig {
         if (params.isSetCertConstraints()) {
             ret.setCertConstraints(params.getCertConstraints());
         }
+        if (params.isSetSslCacheTimeout()) {
+            ret.setSslCacheTimeout(params.getSslCacheTimeout());
+        }
         return ret;
     }
     
