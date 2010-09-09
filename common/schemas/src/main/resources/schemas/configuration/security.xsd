@@ -479,6 +479,13 @@
                 </xs:documentation>
               </xs:annotation>
            </xs:attribute>
+           <xs:attribute name="sslCacheTimeout" type="xs:int">
+            <xs:annotation>
+                <xs:documentation>
+                    This attribute contains the JDK SSL session cache timeout
+                </xs:documentation>
+            </xs:annotation>
+        </xs:attribute>
     </xs:complexType>
     
     <xs:complexType name="TLSServerParametersType">

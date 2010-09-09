@@ -28,6 +28,7 @@ import javax.net.ssl.SSLSocketFactory;
 public class TLSClientParameters extends TLSParameterBase {
     private boolean disableCNCheck;
     private SSLSocketFactory sslSocketFactory;
+    private int sslCacheTimeout = 86400000;
     private boolean useHttpsURLConnectionDefaultSslSocketFactory;
     private boolean useHttpsURLConnectionDefaultHostnameVerifier;
 
@@ -65,6 +66,21 @@ public class TLSClientParameters extends TLSParameterBase {
     public final SSLSocketFactory getSSLSocketFactory() {
         return sslSocketFactory;
     }
+    
+    /**
+     * Returns the SSL cache timeout if it has been configured or the JDK default value
+     */
+    public int getSslCacheTimeout() {
+        return sslCacheTimeout;
+    }
+
+    /**
+     * This sets the SSL Session Cache timeout value for client sessions handled by CXF
+     */
+    public void setSslCacheTimeout(int sslCacheTimeout) {
+        this.sslCacheTimeout = sslCacheTimeout;
+    }
+
     
     /**
      * Returns whether or not {@link javax.net.ssl.HttpsURLConnection#getDefaultSSLSocketFactory()} should be

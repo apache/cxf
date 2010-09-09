@@ -171,7 +171,7 @@ public final class HttpsURLConnectionFactory
 
             SSLContext ctx = provider == null ? SSLContext.getInstance(protocol) : SSLContext
                 .getInstance(protocol, provider);
-
+            ctx.getClientSessionContext().setSessionTimeout(tlsClientParameters.getSslCacheTimeout());
             ctx.init(tlsClientParameters.getKeyManagers(), tlsClientParameters.getTrustManagers(),
                      tlsClientParameters.getSecureRandom());
 
