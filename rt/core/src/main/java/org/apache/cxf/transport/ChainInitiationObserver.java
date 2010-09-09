@@ -38,7 +38,6 @@ import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseChainCache;
-import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.phase.PhaseManager;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.ServiceImpl;
@@ -60,10 +59,10 @@ public class ChainInitiationObserver implements MessageObserver {
         Bus origBus = BusFactory.getThreadDefaultBus(false);
         BusFactory.setThreadDefaultBus(bus);
         try {
-            PhaseInterceptorChain phaseChain = null;
+            InterceptorChain phaseChain = null;
             
-            if (m.getInterceptorChain() instanceof PhaseInterceptorChain) {
-                phaseChain = (PhaseInterceptorChain)m.getInterceptorChain();
+            if (m.getInterceptorChain() != null) {
+                phaseChain = m.getInterceptorChain();
                 // To make sure the phase chain is run by one thread once
                 synchronized (phaseChain) {
                     if (phaseChain.getState() == InterceptorChain.State.PAUSED 
@@ -117,7 +116,7 @@ public class ChainInitiationObserver implements MessageObserver {
             BusFactory.setThreadDefaultBus(origBus);
         }
     }
-    private void addToChain(PhaseInterceptorChain chain, Message m) {
+    private void addToChain(InterceptorChain chain, Message m) {
         Collection<InterceptorProvider> providers 
             = CastUtils.cast((Collection<?>)m.get(Message.INTERCEPTOR_PROVIDERS));
         if (providers != null) {
