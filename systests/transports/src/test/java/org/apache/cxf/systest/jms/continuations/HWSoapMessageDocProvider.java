@@ -38,7 +38,6 @@ import org.w3c.dom.Node;
 
 import org.apache.cxf.continuations.Continuation;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.helpers.DOMUtils;
 
 
@@ -78,35 +77,25 @@ public class HWSoapMessageDocProvider implements Provider<SOAPMessage> {
             ContinuationProvider contProvider = 
                 (ContinuationProvider) messageContext.get(ContinuationProvider.class.getName());
             final Continuation continuation = contProvider.getContinuation();
-            synchronized (continuation) {
-                if (continuation.isNew()) {
-
-                    new Thread(new Runnable() {
-
-                        public void run() {
-                            try {
-                                synchronized (continuation) {
-                                    continuation.resume();
-                                }
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
+            
+            if (continuation.isNew()) {
+                continuation.suspend(5000);
+                new Thread(new Runnable() {
+                    public void run() {
+                        try {
+                            continuation.resume();
+                        } catch (Exception e) {
+                            e.printStackTrace();
                         }
-
-                    }).start();
-
-                    continuation.suspend(5000);
-                    throw new RuntimeException("The continuation provider doesn't "
-                            + "support asynchronous continuations");
-                    
-                } else if (!continuation.isResumed()) {
-                    throw new RuntimeException("time out");
-                } else {
-                    return resumeMessage(request);
-                }
+                    }
+                }).start();
+                return null;
+            } else if (!continuation.isResumed()) {
+                continuation.reset();
+                throw new RuntimeException("time out");
+            } else {
+                return resumeMessage(request);
             }
-        } catch (SuspendedInvocationException e) {
-            throw e;
         } catch (SOAPFaultException e) {
             throw e;
         } 

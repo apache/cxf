@@ -60,7 +60,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         AsyncContext context;
         boolean isNew;
         boolean isResumed;
-        boolean isPending = true;
+        boolean isPending;
         Object obj;
         
         public Servlet3Continuation() {
@@ -76,9 +76,16 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
         
         public boolean suspend(long timeout) {
+            if (isPending) {
+                return false;
+            }
             context.setTimeout(timeout);
             isNew = false;
-            throw new org.apache.cxf.continuations.SuspendedInvocationException();
+            // Need to get the right message which is handled in the interceptor chain
+            inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
+                
+            isPending = true;
+            return true;
         }
         public void redispatch() {
             context.dispatch();
@@ -89,6 +96,8 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         }
 
         public void reset() {
+            context.complete();
+            obj = null;
         }
 
         public boolean isNew() {
@@ -121,6 +130,7 @@ public class Servlet3ContinuationProvider implements ContinuationProvider {
         public void onStartAsync(AsyncEvent event) throws IOException {
         }
         public void onTimeout(AsyncEvent event) throws IOException {
+            isPending = false;
             redispatch();
         }
         

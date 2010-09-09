@@ -44,11 +44,16 @@ public class JettyContinuationProvider implements ContinuationProvider {
         return getContinuation(true);
     }    
     public JettyContinuationWrapper getContinuation(boolean create) {
-        if (inMessage.getExchange().isOneWay()) {
-            return null;
+        Message m = inMessage;
+        // Get the real message which is used in the interceptor chain
+        if (m != null && m.getExchange() != null && m.getExchange().getInMessage() != null) {
+            m = m.getExchange().getInMessage();
         }
+        if (m.getExchange().isOneWay()) {
+            return null;
+        }        
         if (wrapper == null && create) {
-            wrapper = new JettyContinuationWrapper(request, response, inMessage);
+            wrapper = new JettyContinuationWrapper(request, response, m);
         }
         return wrapper;
     }

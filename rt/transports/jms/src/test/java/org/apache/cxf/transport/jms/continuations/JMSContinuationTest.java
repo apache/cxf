@@ -24,7 +24,10 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
-import org.apache.cxf.continuations.SuspendedInvocationException;
+
+import org.apache.cxf.interceptor.InterceptorChain;
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.MessageObserver;
@@ -48,6 +51,10 @@ public class JMSContinuationTest extends Assert {
     @Before
     public void setUp() {
         m = new MessageImpl();
+        Exchange exchange = new ExchangeImpl();
+        m.setExchange(exchange);
+        m.setInterceptorChain(EasyMock.createMock(InterceptorChain.class));
+        exchange.setInMessage(m);
         continuations = new LinkedList<JMSContinuation>();
         b = BusFactory.getDefaultBus();
         observer = EasyMock.createMock(MessageObserver.class);
@@ -66,12 +73,9 @@ public class JMSContinuationTest extends Assert {
     public void testSuspendResume() {
         TestJMSContinuationWrapper cw = 
             new TestJMSContinuationWrapper(b, m, observer, continuations, null, new JMSConfiguration());
-        try {
-            cw.suspend(5000);
-            fail("SuspendInvocation exception expected");
-        } catch (SuspendedInvocationException ex) {
-            // ignore
-        }
+        
+        cw.suspend(5000);
+          
         assertFalse(cw.isNew());
         assertTrue(cw.isPending());
         assertFalse(cw.isResumed());
@@ -122,12 +126,8 @@ public class JMSContinuationTest extends Assert {
     
     private void suspendResumeCheckStartAndStop(JMSContinuation cw, JMSConfiguration config,
                                             DefaultMessageListenerContainerStub springContainer) {
-        try {
-            cw.suspend(5000);
-            fail("SuspendInvocation exception expected");
-        } catch (SuspendedInvocationException ex) {
-            // ignore
-        }
+        cw.suspend(5000);
+            
         assertEquals(continuations.size(), 1);
         assertSame(continuations.get(0), cw);
         assertTrue(springContainer.isStop());

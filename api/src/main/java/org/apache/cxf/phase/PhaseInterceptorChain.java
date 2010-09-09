@@ -155,7 +155,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
     }
     
     // this method should really be on the InterceptorChain interface
-    public State getState() {
+    public synchronized State getState() {
         return state;
     }
     
@@ -212,9 +212,13 @@ public class PhaseInterceptorChain implements InterceptorChain {
     public synchronized void pause() {
         state = State.PAUSED;
     }
+    
+    public synchronized void suspend() {
+        state = State.SUSPENDED;
+    }
 
     public synchronized void resume() {
-        if (state == State.PAUSED) {
+        if (state == State.PAUSED || state == State.SUSPENDED) {
             state = State.EXECUTING;
             doIntercept(pausedMessage);
         }
@@ -242,6 +246,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
                     }
                     //System.out.println("-----------" + currentInterceptor);
                     currentInterceptor.handleMessage(message);
+                    if (state == State.SUSPENDED) {
+                         // throw the exception to make sure thread exit without interrupt
+                        throw new SuspendedInvocationException();
+                    }
+                    
                 } catch (SuspendedInvocationException ex) {
                     // we need to resume from the same interceptor the exception got originated from
                     if (iterator.hasPrevious()) {

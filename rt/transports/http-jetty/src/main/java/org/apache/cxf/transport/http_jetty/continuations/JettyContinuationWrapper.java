@@ -32,7 +32,7 @@ import org.eclipse.jetty.server.Request;
 public class JettyContinuationWrapper implements Continuation, ContinuationListener {
     boolean isNew;
     boolean isResumed;
-    boolean isPending = true;
+    boolean isPending;
     Object obj;
     
     private Message message;
@@ -80,13 +80,21 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     }
 
     public void reset() {
+        context.complete();
+        obj = null;
     }
 
 
     public boolean suspend(long timeout) {
+        if (isPending) {
+            return false;
+        }
         context.setTimeout(timeout);
         isNew = false;
-        throw new org.apache.cxf.continuations.SuspendedInvocationException();
+        // Need to get the right message which is handled in the interceptor chain
+        message.getExchange().getInMessage().getInterceptorChain().suspend();
+        isPending = true;
+        return true;
     }
     
     protected Message getMessage() {
@@ -104,6 +112,7 @@ public class JettyContinuationWrapper implements Continuation, ContinuationListe
     }
 
     public void onTimeout(org.eclipse.jetty.continuation.Continuation continuation) {
+        isPending = false;
         context.dispatch();
     }
     

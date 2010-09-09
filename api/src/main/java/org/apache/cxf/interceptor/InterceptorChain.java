@@ -37,6 +37,7 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
     
     enum State {
         PAUSED,
+        SUSPENDED,
         EXECUTING,
         COMPLETE,
         ABORTED,
@@ -67,6 +68,8 @@ public interface InterceptorChain extends Iterable<Interceptor<? extends Message
     boolean doInterceptStartingAt(Message message, String startingAtInterceptorID);
 
     void pause();
+    
+    void suspend();
     
     void resume();
     

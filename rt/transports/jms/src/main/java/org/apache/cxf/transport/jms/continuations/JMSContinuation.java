@@ -26,7 +26,6 @@ import java.util.TimerTask;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.continuations.Continuation;
-import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.jms.JMSConfiguration;
@@ -82,6 +81,7 @@ public class JMSContinuation implements Continuation {
         isNew = true;
         isPending = false;
         isResumed = false;
+        userObject = null;
     }
 
     public void resume() {
@@ -94,9 +94,7 @@ public class JMSContinuation implements Continuation {
     }
     
     protected void doResume() {
-        
         updateContinuations(true);
-        
         BusFactory.setThreadDefaultBus(bus);
         try {
             incomingObserver.onMessage(inMessage);
@@ -115,7 +113,8 @@ public class JMSContinuation implements Continuation {
         if (isPending) {
             return false;
         }
-        
+        // Need to get the right message which is handled in the interceptor chain
+        inMessage.getExchange().getInMessage().getInterceptorChain().suspend();
         updateContinuations(false);
                 
         isNew = false;
@@ -125,8 +124,7 @@ public class JMSContinuation implements Continuation {
         if (timeout > 0) {
             createTimerTask(timeout);
         }
-        
-        throw new SuspendedInvocationException();
+        return true;
     }
 
     protected void createTimerTask(long timeout) {

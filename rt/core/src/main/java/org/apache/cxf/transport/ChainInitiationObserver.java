@@ -64,8 +64,10 @@ public class ChainInitiationObserver implements MessageObserver {
             
             if (m.getInterceptorChain() instanceof PhaseInterceptorChain) {
                 phaseChain = (PhaseInterceptorChain)m.getInterceptorChain();
+                // To make sure the phase chain is run by one thread once
                 synchronized (phaseChain) {
-                    if (phaseChain.getState() == InterceptorChain.State.PAUSED) {
+                    if (phaseChain.getState() == InterceptorChain.State.PAUSED 
+                        || phaseChain.getState() == InterceptorChain.State.SUSPENDED) {
                         phaseChain.resume();
                         return;
                     }
@@ -110,6 +112,7 @@ public class ChainInitiationObserver implements MessageObserver {
             addToChain(phaseChain, message);
             
             phaseChain.doIntercept(message);
+            
         } finally {
             BusFactory.setThreadDefaultBus(origBus);
         }

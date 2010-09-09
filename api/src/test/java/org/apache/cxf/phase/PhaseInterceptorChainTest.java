@@ -35,6 +35,7 @@ import org.apache.cxf.message.FaultMode;
 import org.apache.cxf.message.Message;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -73,6 +74,7 @@ public class PhaseInterceptorChainTest extends Assert {
     @Test
     public void testState() throws Exception {
         AbstractPhaseInterceptor p = setUpPhaseInterceptor("phase1", "p1");
+       
         control.replay();
         chain.add(p);
         
@@ -103,6 +105,7 @@ public class PhaseInterceptorChainTest extends Assert {
         
         chain.add(p1);
         chain.add(p2);
+        
         try {
             chain.doIntercept(message);
             fail("Suspended invocation swallowed");
@@ -529,7 +532,7 @@ public class PhaseInterceptorChainTest extends Assert {
         }
         
         public void handleMessage(Message m) {
-            throw new SuspendedInvocationException(new Throwable());
+            m.getInterceptorChain().suspend();
         }
     }
 
