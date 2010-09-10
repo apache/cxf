@@ -32,6 +32,7 @@
     </parent>
 
     <modules>
+        <module>container-integration</module> 
         <module>uncategorized</module> 
         <module>transports</module>
         <module>jaxws</module>
