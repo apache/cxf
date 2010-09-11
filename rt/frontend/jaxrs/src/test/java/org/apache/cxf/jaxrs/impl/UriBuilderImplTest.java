@@ -368,6 +368,92 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
+    public void testBuildFromEncodedMapComplex() throws Exception {
+        Map<String, Object> maps = new HashMap<String, Object>();
+        maps.put("x", "x%20yz");
+        maps.put("y", "/path-absolute/%test1");
+        maps.put("z", "fred@example.com");
+        maps.put("w", "path-rootless/test2");
+
+        String expectedPath =
+                "path-rootless/test2/x%20yz//path-absolute/%25test1/fred@example.com/x%20yz";
+        
+        URI uri = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}")
+                            .buildFromEncodedMap(maps);
+        String rawPath = uri.getRawPath();
+        assertEquals(expectedPath, rawPath);    
+    }
+    
+    @Test
+    public void testBuildFromEncodedMapComplex2() throws Exception {
+        Map<String, Object> maps = new HashMap<String, Object>();
+        maps.put("x", "x%yz");
+        maps.put("y", "/path-absolute/test1");
+        maps.put("z", "fred@example.com");
+        maps.put("w", "path-rootless/test2");
+        maps.put("u", "extra");
+
+        String expectedPath =
+                "path-rootless/test2/x%25yz//path-absolute/test1/fred@example.com/x%25yz";
+        
+        URI uri = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}")
+                            .buildFromEncodedMap(maps);
+        String rawPath = uri.getRawPath();
+        assertEquals(expectedPath, rawPath);    
+    }
+    
+    @Test
+    public void testBuildFromEncodedMapMultipleTimes() throws Exception {
+        Map<String, Object> maps = new HashMap<String, Object>();
+        maps.put("x", "x%yz");
+        maps.put("y", "/path-absolute/test1");
+        maps.put("z", "fred@example.com");
+        maps.put("w", "path-rootless/test2");
+
+        Map<String, Object> maps1 = new HashMap<String, Object>();
+        maps1.put("x", "x%20yz");
+        maps1.put("y", "/path-absolute/test1");
+        maps1.put("z", "fred@example.com");
+        maps1.put("w", "path-rootless/test2");
+
+        Map<String, Object> maps2 = new HashMap<String, Object>();
+        maps2.put("x", "x%yz");
+        maps2.put("y", "/path-absolute/test1");
+        maps2.put("z", "fred@example.com");
+        maps2.put("w", "path-rootless/test2");
+        maps2.put("v", "xyz");
+
+        String expectedPath =
+                "path-rootless/test2/x%25yz//path-absolute/test1/fred@example.com/x%25yz";
+
+        String expectedPath1 =
+                "path-rootless/test2/x%20yz//path-absolute/test1/fred@example.com/x%20yz";
+
+        String expectedPath2 =
+                "path-rootless/test2/x%25yz//path-absolute/test1/fred@example.com/x%25yz";
+        
+        UriBuilder ub = UriBuilder.fromPath("").path("{w}/{x}/{y}/{z}/{x}"); 
+        
+        URI uri = ub.buildFromEncodedMap(maps);
+        assertEquals(expectedPath, uri.getRawPath());
+        
+        uri = ub.buildFromEncodedMap(maps1);
+        assertEquals(expectedPath1, uri.getRawPath());
+        
+        uri = ub.buildFromEncodedMap(maps2);
+        assertEquals(expectedPath2, uri.getRawPath());
+    }
+    
+    @Test(expected = IllegalArgumentException.class)
+    public void testBuildFromEncodedMapWithNullValue() throws Exception {
+        
+        Map<String, Object> maps = new HashMap<String, Object>();
+        maps.put("x", null);
+        maps.put("y", "bar");
+        UriBuilder.fromPath("").path("{x}/{y}").buildFromEncodedMap(maps);
+    }
+    
+    @Test
     public void testAddPath() throws Exception {
         URI uri = new URI("http://foo/bar");
         URI newUri = new UriBuilderImpl().uri(uri).path("baz").build();
@@ -477,6 +563,15 @@ public class UriBuilderImplTest extends Assert {
     }
 
     @Test
+    public void testReplaceQueryWithNull2() {
+        String expected = "http://localhost:8080";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery(null).build();
+        assertEquals(expected, uri.toString());        
+    }
+    
+    @Test
     public void testReplaceQueryEmpty() throws Exception {
         URI uri = new URI("http://foo/bar?p1=v1&p2=v2");
         URI newUri = new UriBuilderImpl(uri).replaceQuery("").build();
@@ -497,6 +592,15 @@ public class UriBuilderImplTest extends Assert {
         assertEquals("URI is not built correctly", new URI("http://foo/bar?p1=nv1"), newUri);
     }
 
+    @Test
+    public void testReplaceQuery3() {
+        String expected = "http://localhost:8080?name1=xyz";
+
+        URI uri = UriBuilder.fromPath("http://localhost:8080")
+            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery("name1=xyz").build();
+        assertEquals(expected, uri.toString());        
+    }
+    
     @Test(expected = IllegalArgumentException.class)
     public void testQueryParamNameNull() throws Exception {
         new UriBuilderImpl().queryParam(null, "baz");
@@ -505,6 +609,17 @@ public class UriBuilderImplTest extends Assert {
     @Test(expected = IllegalArgumentException.class)
     public void testQueryParamNullVal() throws Exception {
         new UriBuilderImpl().queryParam("foo", "bar", null, "baz");
+    }
+    
+    @Test
+    @SuppressWarnings("all")
+    public void testNullQueryParamValues() {
+        try {
+            UriBuilder.fromPath("http://localhost:8080").queryParam("hello", null);
+            fail("Should be IllegalArgumentException");
+        } catch (IllegalArgumentException ex) {
+            //expected
+        }
     }
 
     @Test
@@ -741,8 +856,9 @@ public class UriBuilderImplTest extends Assert {
         URI uri = UriBuilder.fromPath(path).build(value);
         assertEquals(expected, uri.toString());        
     }
+    
     @Test
-    public void testNullValue() {
+    public void testNullPathValue() {
         String value = null;
         String path = "{arg1}";
         try {
@@ -752,6 +868,7 @@ public class UriBuilderImplTest extends Assert {
             //expected
         }
     }
+    
     @Test
     public void testFragment() {
         String expected = "test#abc";
@@ -759,18 +876,18 @@ public class UriBuilderImplTest extends Assert {
         URI uri = UriBuilder.fromPath(path).fragment("abc").build();
         assertEquals(expected, uri.toString());        
     }
+    
     @Test
-    @Ignore
     public void testFragmentTemplate() {
         String expected = "abc#xyz";
         URI uri = UriBuilder
             .fromPath("{arg1}")
             .fragment("{arg2}")
-            .build("abc", "xyx");
+            .build("abc", "xyz");
         assertEquals(expected, uri.toString());        
     }
+    
     @Test
-    @Ignore
     public void testSegments() {
         String path1 = "ab";
         String[] path2 = {"a1", "x/y", "3b "};
@@ -779,8 +896,8 @@ public class UriBuilderImplTest extends Assert {
         URI uri = UriBuilder.fromPath(path1).segment(path2).build();
         assertEquals(expected, uri.toString());        
     }
+    
     @Test
-    @Ignore
     public void testSegments2() {
         String path1 = "";
         String[] path2 = {"a1", "/", "3b "};
@@ -789,15 +906,8 @@ public class UriBuilderImplTest extends Assert {
         URI uri = UriBuilder.fromPath(path1).segment(path2).build();
         assertEquals(expected, uri.toString());        
     }
-    @Test
-    @Ignore
-    public void testReplaceQuery3() {
-        String expected = "http://localhost:8080?name1=xyz";
-
-        URI uri = UriBuilder.fromPath("http://localhost:8080")
-            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery("name1=xyz").build();
-        assertEquals(expected, uri.toString());        
-    }
+    
+    
     
     @Test
     public void testNullSegment() {
@@ -807,25 +917,6 @@ public class UriBuilderImplTest extends Assert {
         } catch (IllegalArgumentException ex) {
             //expected
         }
-    }
-    
-    @Test
-    public void testNullQueryParam() {
-        try {
-            UriBuilder.fromPath("http://localhost:8080").queryParam("hello", (String)null);
-            fail("Should be IllegalArgumentException");
-        } catch (IllegalArgumentException ex) {
-            //expected
-        }
-    }
-
-    @Test
-    public void testReplaceQuery4() {
-        String expected = "http://localhost:8080";
-
-        URI uri = UriBuilder.fromPath("http://localhost:8080")
-            .queryParam("name", "x=", "y?", "x y", "&").replaceQuery(null).build();
-        assertEquals(expected, uri.toString());        
     }
     
     
@@ -914,24 +1005,120 @@ public class UriBuilderImplTest extends Assert {
             .buildFromEncoded("a", "%25", "=", "%G0", "%", "23"); 
         assertEquals(expected, uri.toString());        
     }
+
+    @Test
+    public void testMultipleUriSchemes() throws Exception {
+        URI uri;
+
+        String[] urisOriginal = {
+            "ftp://ftp.is.co.za/rfc/rfc1808.txt",
+            "ftp://ftp.is.co.za/rfc/rfc1808.txt",
+            "mailto:java-net@java.sun.com",
+            "mailto:java-net@java.sun.com",
+            "news:comp.lang.java",
+            "news:comp.lang.java",
+            "urn:isbn:096139210x",
+            "http://www.ietf.org/rfc/rfc2396.txt",
+            "http://www.ietf.org/rfc/rfc2396.txt",
+            "ldap://[2001:db8::7]/c=GB?objectClass?one",
+            "ldap://[2001:db8::7]/c=GB?objectClass?one",
+            "tel:+1-816-555-1212",
+            "tel:+1-816-555-1212",
+            "telnet://192.0.2.16:80/",
+            "telnet://192.0.2.16:80/",
+            "foo://example.com:8042/over/there?name=ferret#nose",
+            "foo://example.com:8042/over/there?name=ferret#nose"
+        };
+
+        URI urisReplace[] = new URI[urisOriginal.length];
+
+        urisReplace[0] = new URI("http", "//ftp.is.co.za/rfc/rfc1808.txt",
+                null);
+        urisReplace[1] = new URI(null, "ftp.is.co.za",
+                "/test/rfc1808.txt", null, null);
+        urisReplace[2] = new URI("mailto", "java-net@java.sun.com", null);
+        urisReplace[3] = new URI(null, "testuser@sun.com", null);
+        urisReplace[4] = new URI("http", "//comp.lang.java", null);
+        urisReplace[5] = new URI(null, "news.lang.java", null);
+        urisReplace[6] = new URI("urn:isbn:096139210x");
+        urisReplace[7] = new URI(null, "//www.ietf.org/rfc/rfc2396.txt",
+                null);
+        urisReplace[8] = new URI(null, "www.ietf.org", "/rfc/rfc2396.txt", null,
+                null);
+        urisReplace[9] =
+                new URI("ldap", "//[2001:db8::7]/c=GB?objectClass?one", null);
+        urisReplace[10] =
+                new URI(null, "//[2001:db8::7]/c=GB?objectClass?one", null);
+        urisReplace[11] = new URI("tel", "+1-816-555-1212", null);
+        urisReplace[12] = new URI(null, "+1-866-555-1212", null);
+        urisReplace[13] = new URI("telnet", "//192.0.2.16:80/", null);
+        urisReplace[14] = new URI(null, "//192.0.2.16:81/", null);
+        urisReplace[15] =
+            new URI("http", "//example.com:8042/over/there?name=ferret",
+                null);
+        urisReplace[16] =
+                new URI(null, "//example.com:8042/over/there?name=ferret",
+                "mouth");
+        
+        String[] urisExpected = {
+            "http://ftp.is.co.za/rfc/rfc1808.txt",
+            "ftp://ftp.is.co.za/test/rfc1808.txt",
+            "mailto:java-net@java.sun.com",
+            "mailto:testuser@sun.com",
+            "http://comp.lang.java",
+            "news:news.lang.java",
+            "urn:isbn:096139210x",
+            "http://www.ietf.org/rfc/rfc2396.txt",
+            "http://www.ietf.org/rfc/rfc2396.txt",
+            "ldap://[2001:db8::7]/c=GB?objectClass?one",
+            "ldap://[2001:db8::7]/c=GB?objectClass?one",
+            "tel:+1-816-555-1212",
+            "tel:+1-866-555-1212",
+            "telnet://192.0.2.16:80/",
+            "telnet://192.0.2.16:81/",
+            "http://example.com:8042/over/there?name=ferret#nose",
+            "foo://example.com:8042/over/there?name=ferret#mouth"
+        };
+
+        for (int i = 0;  i < urisOriginal.length; i++) {
+            uri = UriBuilder.fromUri(new URI(urisOriginal[i])).uri(urisReplace[i]).
+                    build();
+            if (uri.toString().trim().compareToIgnoreCase(urisExpected[i]) != 0) {
+                fail("Problem replacing " + urisOriginal[i] + " with " + urisReplace[i]
+                     + ", index " + i);    
+            }
+        }        
+    }
     
     @Test
-    public void testReplaceQuery5() {
+    @Ignore("QueryParamTest5")
+    public void testEncodingQueryParamFromBuild() throws Exception {
+        String expectedValue =
+                "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
+        URI uri = UriBuilder.fromPath("http://localhost:8080").queryParam("name",
+                    "x=", "y?", "x y", "&").build();
+        assertEquals(expectedValue, uri.toString());    
+    }
+    
+    @Test
+    @Ignore("ReplaceQueryParamTest3")
+    public void testReplaceParamAndEncodeQueryParamFromBuild() throws Exception {
+        String expectedValue =
+                "http://localhost:8080?name=x&name=y&name=y+x&name=x%25y&name=%20";
+        URI uri = UriBuilder.fromPath("http://localhost:8080").queryParam("name",
+                    "x=", "y?", "x y", "&").replaceQueryParam("name", "x", "y",
+                    "y x", "x%y", "%20").build();
+        assertEquals(expectedValue, uri.toString());
+    }
+
+    @Test
+    // ReplaceQuery3
+    public void testReplaceStringAndEncodeQueryParamFromBuild() {
         String expected = "http://localhost:8080?name1=x&name2=%20&name3=x+y&name4=23&name5=x%20y";
 
         URI uri = UriBuilder.fromPath("http://localhost:8080")
             .queryParam("name", "x=", "y?", "x y", "&")
             .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
-        assertEquals(expected, uri.toString());        
-    }
-    
-    @Test
-    @Ignore
-    public void testQueryParam() {
-        String expected = "http://localhost:8080?name=x%3D&name=y?&name=x+y&name=%26";
-
-        URI uri =  UriBuilder.fromPath("http://localhost:8080")
-            .queryParam("name", "x=", "y?", "x y", "&").build();
         assertEquals(expected, uri.toString());        
     }
 }

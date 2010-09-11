@@ -61,7 +61,7 @@ public final class HttpUtils {
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
-    private static final String PATH_RESERVED_DELIMETERS = "=";
+    private static final String PATH_RESERVED_CHARACTERS = "=@";
     
     private HttpUtils() {
     }
@@ -86,10 +86,28 @@ public final class HttpUtils {
     }
     
     public static String pathEncode(String value) {
-        if (isReservedPathSequence(value)) {
-            return value;
+        
+        StringBuilder buffer = new StringBuilder();
+        StringBuilder bufferToEncode = new StringBuilder();
+        
+        for (int i = 0; i < value.length(); i++) {
+            char currentChar = value.charAt(i);
+            if (PATH_RESERVED_CHARACTERS.indexOf(currentChar) != -1) {
+                if (bufferToEncode.length() > 0) {
+                    buffer.append(urlEncode(bufferToEncode.toString()));
+                    bufferToEncode.setLength(0);
+                }    
+                buffer.append(currentChar);
+            } else {
+                bufferToEncode.append(currentChar);
+            }
         }
-        String result = urlEncode(value);
+        
+        if (bufferToEncode.length() > 0) {
+            buffer.append(urlEncode(bufferToEncode.toString()));
+        }
+        
+        String result = buffer.toString();
         // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
         // We need to retain '+' and encode ' ' as %20
         if (result.indexOf('+') != -1) {
@@ -102,11 +120,7 @@ public final class HttpUtils {
         return result;
     }
     
-    private static boolean isReservedPathSequence(String sequence) {
-        // realistically, we'd probably need to check every character
-        return PATH_RESERVED_DELIMETERS.equals(sequence);
-    }
-    
+       
     /**
      * Encodes partially encoded string. Encode all values but those matching pattern 
      * "percent char followed by two hexadecimal digits".
