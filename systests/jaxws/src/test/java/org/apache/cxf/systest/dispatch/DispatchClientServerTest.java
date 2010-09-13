@@ -818,6 +818,8 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
         public void handleResponse(Response<Object> response) {
             try {
+                //response context shouldn't be empty even with fault response message
+                assertTrue(response.getContext().size() != 0);
                 reply = response.get();
             } catch (Exception e) {
                 //e.printStackTrace();

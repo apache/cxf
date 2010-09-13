@@ -551,8 +551,11 @@ public class ClientImpl
                                    Exchange exchange,
                                    BindingOperationInfo oi,
                                    Map<String, Object> resContext) throws Exception {
-     // Check to see if there is a Fault from the outgoing chain
-        Exception ex = message.getContent(Exception.class);
+        Exception ex = null;
+        // Check to see if there is a Fault from the outgoing chain if it's an out Message
+        if (!message.get(Message.INBOUND_MESSAGE).equals(Boolean.TRUE)) {
+            ex = message.getContent(Exception.class);
+        }
         boolean mepCompleteCalled = false;
         if (ex != null) {
             getConduitSelector().complete(exchange);
