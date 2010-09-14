@@ -34,8 +34,6 @@ public interface Client extends InterceptorProvider, MessageObserver {
     String REQUEST_CONTEXT = "RequestContext";
     String RESPONSE_CONTEXT = "ResponseContext";
     String KEEP_CONDUIT_ALIVE = "KeepConduitAlive";
-    String CONNECTION_TIMEOUT = "javax.xml.ws.client.connectionTimeout";
-    String RECEIVE_TIMEOUT = "javax.xml.ws.client.receiveTimeout";
 
     /**
      * Invokes an operation synchronously

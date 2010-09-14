@@ -116,7 +116,13 @@ public interface Message extends StringMap {
      * As above, but Collection<InterceptorProvider> 
      */
     String INTERCEPTOR_PROVIDERS = Message.class.getName() + ".INTERCEPTOR_PROVIDER";
-
+    
+    /*
+     * The properties to allow configure the client timeout
+     */
+    String CONNECTION_TIMEOUT = "javax.xml.ws.client.connectionTimeout";
+    String RECEIVE_TIMEOUT = "javax.xml.ws.client.receiveTimeout";
+    
     String getId();
     void setId(String id);
     
