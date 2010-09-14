@@ -154,7 +154,6 @@ public class PhaseInterceptorChain implements InterceptorChain {
         return CURRENT_MESSAGE.get();
     }
     
-    // this method should really be on the InterceptorChain interface
     public State getState() {
         return state;
     }
