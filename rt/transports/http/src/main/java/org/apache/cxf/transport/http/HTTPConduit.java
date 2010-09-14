@@ -54,7 +54,6 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
-import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
@@ -504,39 +503,35 @@ public class HTTPConduit
         HttpURLConnectionFactory f = getConnectionFactory(currentURL);
         HttpURLConnection connection = f.createConnection(getProxy(csPolicy), currentURL);
         connection.setDoOutput(true);       
-        Map<String, Object> ctx = CastUtils.cast((Map<?, ?>)message.get(Message.INVOCATION_CONTEXT));
-        if (ctx != null) {
-            Map<String, Object> reqCtx = CastUtils.cast((Map<?, ?>)ctx.get(Client.REQUEST_CONTEXT));
-            if (reqCtx != null && reqCtx.get(Client.RECEIVE_TIMEOUT) != null) {
-                Object obj = reqCtx.get(Client.RECEIVE_TIMEOUT);
-                try {
-                    csPolicy.setReceiveTimeout(Long.parseLong(obj.toString()));
-                } catch (NumberFormatException e) {
-                    LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
-                        Client.RECEIVE_TIMEOUT, obj.toString()
-                    });
-                }
-
-            }
-            if (reqCtx != null && reqCtx.get(Client.CONNECTION_TIMEOUT) != null) {
-                Object obj = reqCtx.get(Client.CONNECTION_TIMEOUT);
-                try {
-                    csPolicy.setReceiveTimeout(Long.parseLong(obj.toString()));
-                } catch (NumberFormatException e) {
-                    LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
-                        Client.CONNECTION_TIMEOUT, obj.toString()
-                    });
-                }
-
-            }
-        }
         
         long timeout = csPolicy.getConnectionTimeout();
+        if (message.get(Message.CONNECTION_TIMEOUT) != null) {
+            Object obj = message.get(Message.CONNECTION_TIMEOUT);
+            try {
+                timeout = Long.parseLong(obj.toString());
+            } catch (NumberFormatException e) {
+                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
+                    Message.CONNECTION_TIMEOUT, obj.toString()
+                });
+            }
+        }
         if (timeout > Integer.MAX_VALUE) {
             timeout = Integer.MAX_VALUE;
         }
+
         connection.setConnectTimeout((int)timeout);
+        
         timeout = csPolicy.getReceiveTimeout();
+        if (message.get(Message.RECEIVE_TIMEOUT) != null) {
+            Object obj = message.get(Message.RECEIVE_TIMEOUT);
+            try {
+                timeout = Long.parseLong(obj.toString());
+            } catch (NumberFormatException e) {
+                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
+                    Message.RECEIVE_TIMEOUT, obj.toString()
+                });
+            }
+        }
         if (timeout > Integer.MAX_VALUE) {
             timeout = Integer.MAX_VALUE;
         }
