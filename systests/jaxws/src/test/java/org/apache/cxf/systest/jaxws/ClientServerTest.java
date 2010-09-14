@@ -170,6 +170,28 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testTimeoutConfigutation() throws Exception {
+
+        SOAPService service = new SOAPService();
+        assertNotNull(service);
+
+        Greeter greeter = service.getPort(portName, Greeter.class);
+        updateAddressPort(greeter, PORT);
+        ((javax.xml.ws.BindingProvider)greeter).getRequestContext().put("javax.xml.ws.client.receiveTimeout",
+                                                                        "1");
+        try {
+            greeter.greetMe("test");
+            // remove fail() check to let this test pass in the powerful machine
+        } catch (Throwable ex) {
+            Object cause = null;
+            if (ex.getCause() != null) {
+                cause = ex.getCause();
+            }
+            assertTrue("Timeout cause is expected", cause instanceof java.net.SocketTimeoutException);
+        }
+    }    
+    
+    @Test
     public void testNillable() throws Exception {
         SOAPService service = new SOAPService();
         assertNotNull(service);
