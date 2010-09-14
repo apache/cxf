@@ -82,62 +82,87 @@ public class UriBuilderImpl extends UriBuilder {
         thePath = substituteVarargs(pathTempl, values, 0);
         
         String theQuery = buildQuery(fromEncoded);
+        int queryTemplateVarsSize = 0;
         if (theQuery != null) {
             URITemplate queryTempl = new URITemplate(theQuery);
             int lengthDiff = values.length - pathTempl.getVariables().size(); 
             if (lengthDiff > 0) {
+                queryTemplateVarsSize = queryTempl.getVariables().size(); 
                 theQuery = substituteVarargs(queryTempl, values, values.length - lengthDiff);
             }
         }
         
+        String theFragment = fragment;
+        if (theFragment != null) {
+            URITemplate fragmentTempl = new URITemplate(theFragment);
+            int lengthDiff = values.length - pathTempl.getVariables().size() - queryTemplateVarsSize; 
+            if (lengthDiff > 0) {
+                theFragment = substituteVarargs(fragmentTempl, values, values.length - lengthDiff);
+            }
+        }
+        
         try {
-            return buildURI(fromEncoded, thePath, theQuery);
+            return buildURI(fromEncoded, thePath, theQuery, theFragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
     }
     
-    private URI buildURI(boolean fromEncoded, String thePath, String theQuery) throws URISyntaxException {
-        // TODO : do encodePartiallyEncoded only once here, do not do it inside buildPath()
-        // buildFromEncoded and buildFromEncodedMap - we'll need to be careful such that 
-        // path '/' separators are not encoded so probably we'll need to create PathSegments
-        // again if fromEncoded is set
+    private URI buildURI(boolean fromEncoded, String thePath, String theQuery, String theFragment) 
+        throws URISyntaxException {
         if (fromEncoded) {
-            StringBuilder b = new StringBuilder();
-            b.append(scheme).append(":");
-            if (!isSchemeOpaque()) {
-                b.append("//");
-                if (userInfo != null) {
-                    b.append(userInfo).append('@');
-                }
-                b.append(host);
-                if (port != -1) {
-                    b.append(':').append(port);    
-                }
-                if (thePath != null && thePath.length() > 0) {
-                    b.append(thePath.startsWith("/") ? thePath : '/' + thePath);
-                }
-                if (theQuery != null && theQuery.length() != 0) {
-                    b.append('?').append(theQuery);
-                }
-            } else {
-                b.append(schemeSpecificPart);
-            }
-            if (fragment != null) {
-                b.append('#').append(fragment);
-            }
-            return new URI(b.toString());
+            return buildURIFromEncoded(thePath, theQuery, theFragment);
         } else if (!isSchemeOpaque()) {
             if ((scheme != null || host != null || userInfo != null)
                 && thePath.length() != 0 && !thePath.startsWith("/")) {
                 thePath = "/" + thePath;
             }
-            
-            return new URI(scheme, userInfo, host, port, 
-                           thePath, theQuery, fragment);
+            URI uri = new URI(scheme, userInfo, host, port, 
+                           thePath, theQuery, theFragment);
+            if (thePath.contains("%2F")) {
+                // TODO: the bogus case of segments containing encoded '/'
+                // Not sure if we have a cleaner solution though.
+                String realPath = uri.getRawPath().replace("%252F", "%2F");
+                uri = buildURIFromEncoded(realPath, uri.getRawQuery(), uri.getRawFragment());
+            }
+            return uri;
         } else {
-            return new URI(scheme, schemeSpecificPart, fragment);
+            return new URI(scheme, schemeSpecificPart, theFragment);
         }
+    }
+    
+    private URI buildURIFromEncoded(String thePath, String theQuery, String theFragment) 
+        throws URISyntaxException {
+        StringBuilder b = new StringBuilder();
+        if (scheme != null) {
+            b.append(scheme).append(":");
+        }
+        if (!isSchemeOpaque()) {
+            if (scheme != null) {
+                b.append("//");
+            }
+            if (userInfo != null) {
+                b.append(userInfo).append('@');
+            }
+            if (host != null) {
+                b.append(host);
+            }
+            if (port != -1) {
+                b.append(':').append(port);    
+            }
+            if (thePath != null && thePath.length() > 0) {
+                b.append(thePath.startsWith("/") || b.length() == 0 ? thePath : '/' + thePath);
+            }
+            if (theQuery != null && theQuery.length() != 0) {
+                b.append('?').append(theQuery);
+            }
+        } else {
+            b.append(schemeSpecificPart);
+        }
+        if (theFragment != null) {
+            b.append('#').append(theFragment);
+        }
+        return new URI(b.toString());
     }
     
     private boolean isSchemeOpaque() {
@@ -203,7 +228,9 @@ public class UriBuilderImpl extends UriBuilder {
                 theQuery = substituteMapped(theQuery, map);
             }
             
-            return buildURI(fromEncoded, thePath, theQuery);
+            String theFragment = fragment == null ? null : substituteMapped(fragment, map);
+            
+            return buildURI(fromEncoded, thePath, theQuery, theFragment);
         } catch (URISyntaxException ex) {
             throw new UriBuilderException("URI can not be built", ex);
         }
@@ -225,11 +252,31 @@ public class UriBuilderImpl extends UriBuilder {
     @Override
     public URI buildFromEncodedMap(Map<String, ? extends Object> map) throws IllegalArgumentException,
         UriBuilderException {
-        // see buildFromEncoded() comment
+        
         Map<String, String> decodedMap = new HashMap<String, String>(map.size());
         for (Map.Entry<String, ? extends Object> entry : map.entrySet()) {
-            decodedMap.put(entry.getKey(), 
-                           HttpUtils.encodePartiallyEncoded(entry.getValue().toString(), false));
+            if (entry.getValue() == null) {
+                throw new IllegalArgumentException("Value is null");
+            }
+            String theValue = entry.getValue().toString();
+            if (theValue.contains("/")) {
+                // protecting '/' from being encoded here assumes that a given value may constitute multiple
+                // path segments - very questionable especially given that queries and fragments may also 
+                // contain template vars - technically this can be covered by checking where a given template
+                // var is coming from and act accordingly. Confusing nonetheless.
+                StringBuilder buf = new StringBuilder();
+                String[] values = theValue.split("/");
+                for (int i = 0; i < values.length; i++) {
+                    buf.append(HttpUtils.encodePartiallyEncoded(values[i], false));
+                    if (i + 1 < values.length) {
+                        buf.append("/");
+                    }
+                }
+                decodedMap.put(entry.getKey(), buf.toString());
+            } else {
+                decodedMap.put(entry.getKey(), HttpUtils.encodePartiallyEncoded(theValue, false));
+            }
+            
         }
         return doBuildFromMap(decodedMap, true);
     }
@@ -324,7 +371,10 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder path(String path) throws IllegalArgumentException {
-        
+        return doPath(path, true);
+    }
+
+    private UriBuilder doPath(String path, boolean checkSegments) {
         if (path == null) {
             throw new IllegalArgumentException("path is null");
         }
@@ -338,7 +388,14 @@ public class UriBuilderImpl extends UriBuilder {
         if (paths.isEmpty()) {
             leadingSlash = path.startsWith("/");
         }
-        List<PathSegment> segments = JAXRSUtils.getPathSegments(path, false, false);
+        
+        List<PathSegment> segments;
+        if (checkSegments) { 
+            segments = JAXRSUtils.getPathSegments(path, false, false);
+        } else {
+            segments = new ArrayList<PathSegment>();
+            segments.add(new PathSegmentImpl(path.replaceAll("/", "%2F"), false));
+        }
         if (!paths.isEmpty() && !matrix.isEmpty()) {
             PathSegment ps = paths.remove(paths.size() - 1);
             paths.add(replacePathSegment(ps));
@@ -350,7 +407,7 @@ public class UriBuilderImpl extends UriBuilder {
         }
         return this;
     }
-
+    
     @Override
     public UriBuilder port(int thePort) throws IllegalArgumentException {
         if (thePort < 0 && thePort != -1) {
@@ -398,11 +455,15 @@ public class UriBuilderImpl extends UriBuilder {
         if (uri == null) {
             throw new IllegalArgumentException("uri is null");
         }
-        scheme = uri.getScheme();
-        if (!uri.isOpaque()) {
+        String theScheme = uri.getScheme();
+        if (theScheme != null) {
+            scheme = theScheme;
+        }
+        String rawPath = uri.getRawPath();
+        if (!uri.isOpaque() 
+            && (theScheme != null || rawPath != null && rawPath.startsWith("/"))) {
             port = uri.getPort();
             host = uri.getHost();
-            String rawPath = uri.getRawPath();
             if (rawPath != null) {
                 setPathAndMatrix(uri.getRawPath());
             }
@@ -411,10 +472,14 @@ public class UriBuilderImpl extends UriBuilder {
                 query = JAXRSUtils.getStructuredParams(rawQuery, "&", false, false);
             }
             userInfo = uri.getUserInfo();
+            schemeSpecificPart = null;
         } else {
             schemeSpecificPart = uri.getSchemeSpecificPart();
         }
-        fragment = uri.getFragment();
+        String theFragment = uri.getFragment();
+        if (theFragment != null) {
+            fragment = theFragment;
+        }
     }
 
     private void setPathAndMatrix(String path) {
@@ -462,8 +527,8 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder matrixParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
+        if (name == null || values == null) {
+            throw new IllegalArgumentException("name or values is null");
         }
         List<String> list = matrix.get(name);
         if (list == null) {
@@ -476,8 +541,8 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder queryParam(String name, Object... values) throws IllegalArgumentException {
-        if (name == null) {
-            throw new IllegalArgumentException("name is null");
+        if (name == null || values == null) {
+            throw new IllegalArgumentException("name or values is null");
         }
         List<String> list = query.get(name);
         if (list == null) {
@@ -543,7 +608,7 @@ public class UriBuilderImpl extends UriBuilder {
             throw new IllegalArgumentException("Segments should not be null");
         }
         for (String segment : segments) {
-            path(segment);
+            doPath(segment, false);
         }
         return this;
     }
