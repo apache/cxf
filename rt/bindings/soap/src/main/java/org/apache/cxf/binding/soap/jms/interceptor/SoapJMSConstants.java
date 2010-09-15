@@ -48,8 +48,7 @@ public final class SoapJMSConstants {
     public static final String CONTENTTYPE_FIELD = SOAP_JMS_PREFIX + CONTENTTYPE_PARAMETER_NAME;
     public static final String ISFAULT_FIELD = SOAP_JMS_PREFIX + ISFAULT_PARAMETER_NAME;
 
-    public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2008/07/"
-                                                                     + "soap/bindings/JMS/";
+    public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2010/soapjms/";
     public static final String SOAP_JMS_NAMESPACE = SOAP_JMS_SPECIFICIATION_TRANSPORTID;
     
     // fault codes

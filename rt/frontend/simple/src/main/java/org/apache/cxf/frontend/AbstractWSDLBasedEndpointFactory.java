@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.BusException;
 import org.apache.cxf.binding.BindingFactoryManager;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
@@ -239,6 +240,13 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
     protected EndpointInfo createEndpointInfo() throws BusException {
         // Get the Service from the ServiceFactory if specified
         Service service = serviceFactory.getService();
+        // setup the transport ID for the soap over jms if there is only address information
+        if (transportId == null && getAddress() != null 
+            && getAddress().startsWith("jms:") && !"jms://".equals(getAddress())) {
+            // Set the transportId to be soap over jms transport
+            transportId = SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID;
+        }
+        
         // SOAP nonsense
         BindingInfo bindingInfo = createBindingInfo();
         if (bindingInfo instanceof SoapBindingInfo

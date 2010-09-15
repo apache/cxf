@@ -36,6 +36,7 @@ import javax.wsdl.factory.WSDLFactory;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusException;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.tcp.SoapTcpDestination;
 import org.apache.cxf.binding.soap.tcp.TCPConduit;
@@ -77,7 +78,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         return Collections.singleton("soap.tcp");
     }
     public String mapTransportURI(String s, String address) {
-        if ("http://www.w3.org/2010/soapjms/".equals(s)
+        if (SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID.equals(s)
             || (address != null && address.startsWith("jms"))) {
             s = "http://cxf.apache.org/transports/jms";
         } else if (SOAP_11_HTTP_BINDING.equals(s)
@@ -173,7 +174,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                     info.addExtensor(sa);
                     info.setAddress(sa.getLocationURI());
                     if (isJMSSpecAddress(sa.getLocationURI())) {
-                        info.setTransportId("http://www.w3.org/2010/soapjms/");
+                        info.setTransportId(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
                     }
                 } else {
                     info.addExtensor(extensor);

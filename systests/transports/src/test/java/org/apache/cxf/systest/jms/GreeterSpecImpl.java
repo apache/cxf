@@ -23,8 +23,7 @@ import org.apache.cxf.jms_greeter.JMSGreeterPortType;
 @javax.jws.WebService(portName = "GreeterPort", 
                       serviceName = "JMSGreeterService",
                       targetNamespace = "http://cxf.apache.org/jms_greeter",
-                      endpointInterface = "org.apache.cxf.jms_greeter.JMSGreeterPortType",
-                      wsdlLocation = "testutils/jms_spec_test.wsdl")
+                      endpointInterface = "org.apache.cxf.jms_greeter.JMSGreeterPortType")
 public class GreeterSpecImpl implements JMSGreeterPortType {
 
     public String greetMe(String me) {

@@ -59,6 +59,7 @@ import org.apache.cxf.binding.soap.interceptor.SoapHeaderOutFilterInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.SoapPreProtocolOutInterceptor;
 import org.apache.cxf.binding.soap.interceptor.StartBodyInterceptor;
+import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSConstants;
 import org.apache.cxf.binding.soap.jms.interceptor.SoapJMSInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapBindingInfo;
 import org.apache.cxf.binding.soap.model.SoapBodyInfo;
@@ -145,13 +146,9 @@ public class SoapBindingFactory extends AbstractBindingFactory {
 
         info.setName(config.getBindingName(si));
         info.setStyle(config.getStyle());
-        if ("http://cxf.apache.org/transports/jms".equals(config.getTransportURI())) {
-            info.setTransportURI("http://www.w3.org/2010/soapjms/");
-            config.setTransportURI("http://www.w3.org/2010/soapjms/");
-        } else {
-            info.setTransportURI(config.getTransportURI());
-        }
-
+       
+        info.setTransportURI(config.getTransportURI());
+        
         if (config.isMtomEnabled()) {
             info.setProperty(Message.MTOM_ENABLED, Boolean.TRUE);
         }
@@ -380,7 +377,7 @@ public class SoapBindingFactory extends AbstractBindingFactory {
             }
             
             //jms
-            if (sbi.getTransportURI().equals("http://www.w3.org/2010/soapjms/")) {
+            if (sbi.getTransportURI().equals(SoapJMSConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID)) {
                 sb.getInInterceptors().add(new SoapJMSInInterceptor());
             }
         } else {
