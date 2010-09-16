@@ -58,6 +58,7 @@ public class BusDefinitionParser extends AbstractBeanDefinitionParser {
             bean.addConstructorArgReference(bus);
             element.removeAttribute("bus");
         }
+        bean.setLazyInit(false);
         super.doParse(element, ctx, bean);
     }
     
