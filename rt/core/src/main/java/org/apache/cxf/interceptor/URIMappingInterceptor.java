@@ -20,10 +20,15 @@
 package org.apache.cxf.interceptor;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLDecoder;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -231,9 +236,40 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         }
         return parameters;
     }
+
+    private Date parseDate(String value, Class<?> type) {
+        SimpleDateFormat sdf;
+
+        if (value.length() == 10) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd");
+        } else if (value.length() == 19) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+        } else if (value.length() == 23) {
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
+        } else if (value.length() == 25) {
+            value = value.substring(0, value.length() - 3) 
+                + value.substring(value.length() - 2, value.length());
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ");
+        } else if (value.length() == 29) {
+            value = value.substring(0, value.length() - 3) 
+                + value.substring(value.length() - 2, value.length());
+            sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSZZZZZ");
+        } else {
+            throw new RuntimeException("Unable to create " + type + " out of '" + value + "'");
+        }
+        try {
+            return sdf.parse(value);
+        } catch (ParseException e) {
+            throw new RuntimeException("Unable to create " + type + " out of '" + value + "'");
+        }
+    }
+
     private Object readType(String value, Class<?> type) {
         Object ret = value;
-        if (Integer.class == type) {
+
+        if (value == null) {
+            // let null be null regardless of target type
+        } else if (Integer.class == type) {
             ret = Integer.valueOf(value);
         } else if (Byte.class == type) {
             ret = Byte.valueOf(value);
@@ -248,7 +284,22 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         } else if (Boolean.class == type) { 
             ret = Boolean.valueOf(value);
         } else if (Character.class == type) { 
-            ret = value.charAt(0); 
+            ret = value.charAt(0);
+        } else if (type != null && type.isEnum()) {
+            try {
+                ret = type.getMethod("valueOf", String.class).invoke(null, value);
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException("Unable to create " + type + " out of '" + value + "'");
+            } catch (InvocationTargetException e) {
+                throw new RuntimeException("Unable to create " + type + " out of '" + value + "'");
+            } catch (NoSuchMethodException e) {
+                throw new RuntimeException("Unable to create " + type + " out of '" + value + "'");
+            }
+        } else if (java.util.Date.class == type) {
+            ret = parseDate(value, type);
+        } else if (Calendar.class == type) {
+            ret = Calendar.getInstance();
+            ((Calendar)ret).setTime(parseDate(value, type));
         }
         return ret;
     }
