@@ -429,6 +429,7 @@ public class ServiceProcessor extends AbstractProcessor {
         parameterAnnotation.addElement(new JAnnotationElement("header", true, true));
         parameterAnnotation.addElement(new JAnnotationElement("name", 
                                                                      parameter.getQName().getLocalPart()));
+        parameterAnnotation.addElement(new JAnnotationElement("partName", parameter.getPartName()));
         parameterAnnotation.addElement(new JAnnotationElement("targetNamespace", 
                                                                      parameter.getTargetNamespace()));
     }
