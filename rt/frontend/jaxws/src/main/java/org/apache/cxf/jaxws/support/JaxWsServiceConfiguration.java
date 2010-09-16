@@ -235,7 +235,9 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         String tns = mi.getName().getNamespaceURI();
         String local = null;
         if (param != null) {
-            if (Boolean.TRUE.equals(isRPC(method)) || isDocumentBare(method)) {
+            if (Boolean.TRUE.equals(isRPC(method)) 
+                || isDocumentBare(method)
+                || param.header()) {
                 local = param.partName();
             }
             if (local == null || local.length() == 0) {
