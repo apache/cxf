@@ -90,7 +90,7 @@ public class BusDefinitionParserTest extends Assert {
         String cfgFile = "org/apache/cxf/bus/spring/lazyInitBus.xml";
         Bus bus = new SpringBusFactory().createBus(cfgFile, true);
 
-        List<Interceptor<? extends Message>> in = bus.getInInterceptors();
+        List<Interceptor> in = bus.getInInterceptors();
         boolean found = false;
         for (Interceptor i : in) {
             if (i instanceof LoggingInInterceptor) {
