@@ -165,7 +165,8 @@
                             org.apache.commons.logging.*,
                             org.slf4j.*,
                             org.slf4j.impl.*,
-                            org.mortbay.management
+                            org.eclipse.jetty.jmx,
+                            org.eclipse.jetty.jmx.*
                         </DynamicImport-Package>
                         <Import-Package>
                             !org.apache.cxf.*,
@@ -198,7 +199,7 @@
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
                             org.junit*;resolution:=optional,
-                            org.mortbay*;resolution:=optional,
+                            org.eclipse.jetty*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
                             org.slf4j*;resolution:=optional;version="[1.5,2)",
                             org.springframework*;resolution:=optional;version="[2.5,4)",

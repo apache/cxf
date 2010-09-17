@@ -83,6 +83,22 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-databinding-sdo</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tuscany.sdo</groupId>
+                    <artifactId>tuscany-sdo-tools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tuscany.sdo</groupId>
+                    <artifactId>tuscany-sdo-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-tools-wsdlto-frontend-jaxws</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -265,18 +281,20 @@
                             org.apache.commons.logging.*,
                             org.slf4j.*,
                             org.slf4j.impl.*,
-                            org.mortbay.management
+                            org.eclipse.jetty.jmx,
+                            org.eclipse.jetty.jmx.*
                         </DynamicImport-Package>
                         <Import-Package>
                             !org.apache.cxf.*,
+                            repackage;resolution:=optional,
                             !META-INF.cxf,
                             !META-INF.cxf.osgi,
                             antlr*;resolution:=optional,
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,
+                            commonj.sdo*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
-                            repackage;resolution:=optional,
                             javax.resource*;resolution:=optional,
                             javax.xml.soap,
                             junit.framework*;resolution:=optional,
@@ -287,17 +305,20 @@
                             org.apache.commons.pool*;resolution:=optional,
                             org.apache.log4j*;resolution:=optional,
                             org.apache.mina*;resolution:=optional,
+                            org.apache.tuscany.sdo*;resolution:=optional,
                             org.apache.velocity*;resolution:=optional,
                             org.apache.xmlbeans*;resolution:=optional,
                             org.apache.xml.security*;resolution:=optional,
                             org.apache.ws.security*;resolution:=optional,
                             org.codehaus.jra*;resolution:=optional,
                             org.codehaus.jettison*;resolution:=optional,
+                            org.eclipse.emf*;resolution:=optional,
+                            org.eclipse.jetty*;resolution:=optional,
                             org.jaxen*;resolution:=optional,
                             org.jdom*;resolution:=optional,
                             org.junit*;resolution:=optional,
-                            org.mortbay*;resolution:=optional,
                             org.mozilla.javascript*;resolution:=optional,
+                            org.objectweb.asm*;version="[2.0,4)",
                             org.slf4j*;resolution:=optional;version="[1.5,2)",
                             org.springframework*;resolution:=optional;version="[2.5,4)",
                             javax.activation;version="[0.0,2)",

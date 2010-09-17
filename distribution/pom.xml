@@ -222,6 +222,22 @@
             <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
             <version>${project.version}</version>
         </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-rt-databinding-sdo</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.apache.tuscany.sdo</groupId>
+                    <artifactId>tuscany-sdo-tools</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.apache.tuscany.sdo</groupId>
+                    <artifactId>tuscany-sdo-impl</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>${project.groupId}</groupId>
