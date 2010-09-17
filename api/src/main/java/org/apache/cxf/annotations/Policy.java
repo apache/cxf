@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enables message Logging
+ * Attaches a Policy to a service or method
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
