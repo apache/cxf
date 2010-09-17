@@ -35,7 +35,8 @@ import org.apache.maven.project.MavenProjectHelper;
 /**
  * @goal java2ws
  * @description CXF Java To Webservice Tool
- */
+ * @requiresDependencyResolution test
+*/
 public class Java2WSMojo extends AbstractMojo {
     /**
      * @parameter 
@@ -142,24 +143,21 @@ public class Java2WSMojo extends AbstractMojo {
     private Boolean attachWsdl;
     
     public void execute() throws MojoExecutionException {
-        StringBuilder buf = new StringBuilder();
-        for (Object classpathElement : classpathElements) {
-            buf.append(classpathElement.toString());
-            buf.append(File.pathSeparatorChar);
-        }
-        String newCp = buf.toString();
-        String cp = System.getProperty("java.class.path");
+        ClassLoaderSwitcher classLoaderSwitcher = new ClassLoaderSwitcher(getLog());
+        
+
         try {
-            System.setProperty("java.class.path", newCp);
-            processJavaClass();
+            String cp = classLoaderSwitcher.switchClassLoader(project, false, 
+                                                              classpath, classpathElements);
+            processJavaClass(cp);
         } finally {
-            System.setProperty("java.class.path", cp);
+            classLoaderSwitcher.restoreClassLoader();
         }
 
         System.gc();
     }
 
-    private void processJavaClass() throws MojoExecutionException {
+    private void processJavaClass(String cp) throws MojoExecutionException {
         List<String> args = new ArrayList<String>();
 
         // outputfile arg
@@ -220,7 +218,7 @@ public class Java2WSMojo extends AbstractMojo {
         
         // classpath arg
         args.add("-cp");
-        args.add(classpath);
+        args.add(cp);
 
         // soap12 arg
         if (soap12 != null && soap12.booleanValue()) {

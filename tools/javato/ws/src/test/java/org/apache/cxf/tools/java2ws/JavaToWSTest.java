@@ -86,10 +86,10 @@ public class JavaToWSTest extends ToolTestBase {
             "-wsdl", "-wrapperbean", 
             "-s", output.getPath(), 
             "-o", output.getPath() + "/cxf2941.wsdl", 
-            "org.apache.cxf.tools.fortest.cxf2941.WebResultService"
+            org.apache.cxf.tools.fortest.cxf2941.WebResultService.class.getName()
         };
         JavaToWS.main(args);
-        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloResponse.java");
+        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2941/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct"
                    , str.indexOf("hello/name") > -1);
@@ -107,7 +107,7 @@ public class JavaToWSTest extends ToolTestBase {
             "org.apache.cxf.tools.fortest.cxf2934.WebParamService"
         };
         JavaToWS.main(args);
-        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloResponse.java");
+        File wrapper = outputFile("org/apache/cxf/tools/fortest/cxf2934/jaxws/HelloStringResponse.java");
         String str = FileUtils.getStringFromFile(wrapper);
         assertTrue("namespace value in annoataion @XmlElement is not correct: " + str,
                    str.indexOf("helloString/Name") > -1);
