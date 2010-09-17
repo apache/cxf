@@ -28,7 +28,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 	<bean class="org.springframework.context.annotation.CommonAnnotationBeanPostProcessor"/>
 	<context:annotation-config/>
 	-->
-    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl"/>
+    <bean id="cxf" class="org.apache.cxf.bus.CXFBusImpl" destroy-method="shutdown"/>
     <bean id="org.apache.cxf.bus.spring.BusApplicationListener" class="org.apache.cxf.bus.spring.BusApplicationListener"/>
     <bean id="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor" class="org.apache.cxf.bus.spring.BusWiringBeanFactoryPostProcessor"/>
     <bean id="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor" class="org.apache.cxf.bus.spring.Jsr250BeanPostProcessor"/>    

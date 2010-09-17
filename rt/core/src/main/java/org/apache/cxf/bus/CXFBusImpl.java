@@ -138,6 +138,10 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         }
     }
 
+    public void shutdown() {
+        shutdown(true);
+    }
+
     public void shutdown(boolean wait) {
         BusLifeCycleManager lifeCycleManager = this.getExtension(BusLifeCycleManager.class);
         if (null != lifeCycleManager) {
@@ -150,9 +154,11 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         if (null != lifeCycleManager) {
             lifeCycleManager.postShutdown();
         }
-        if (BusFactory.getDefaultBus(false) == this) { 
+
+        if (BusFactory.getDefaultBus(false) == this) {
             BusFactory.setDefaultBus(null);
         }
+        BusFactory.clearDefaultBusForAnyThread(this);
     }
 
     protected BusState getState() {

@@ -22,6 +22,9 @@ package org.apache.cxf;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,7 +37,7 @@ public abstract class BusFactory {
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
 
     protected static Bus defaultBus;
-    protected static ThreadLocal<Bus> localBus = new ThreadLocal<Bus>();
+    protected static Map<Thread, Bus> threadBusses = new WeakHashMap<Thread, Bus>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
     
@@ -86,7 +89,9 @@ public abstract class BusFactory {
      * @param bus the default bus.
      */
     public static void setThreadDefaultBus(Bus bus) {
-        localBus.set(bus);
+        synchronized (threadBusses) {
+            threadBusses.put(Thread.currentThread(), bus);
+        }
     }
     
     /**
@@ -102,11 +107,40 @@ public abstract class BusFactory {
      * @return the default bus.
      */
     public static Bus getThreadDefaultBus(boolean createIfNeeded) {
-        if (createIfNeeded && localBus.get() == null) {
-            Bus b = getDefaultBus(createIfNeeded);
-            localBus.set(b);
+        Bus threadBus;
+        synchronized (threadBusses) {
+            if (createIfNeeded) {
+                threadBus = threadBusses.get(Thread.currentThread());
+                if (createIfNeeded && threadBus == null) {
+                    threadBus = getDefaultBus(createIfNeeded);
+                    threadBusses.put(Thread.currentThread(), threadBus);
+                }
+            } else {
+                threadBus = threadBusses.get(Thread.currentThread());
+            }
         }
-        return localBus.get();
+        return threadBus;
+    }
+
+    /**
+     * Removes a bus from being a thread default bus for any thread.
+     * <p>
+     * This is tipically done when a bus has ended its lifecycle (i.e.: a call
+     * to {@link Bus#shutdown(boolean)} was invoked) and it wants to remove any
+     * reference to itself for any thread.
+     * 
+     * @param bus
+     *            the bus to remove
+     */
+    public static void clearDefaultBusForAnyThread(final Bus bus) {
+        synchronized (threadBusses) {
+            for (final Iterator<Bus> iterator = threadBusses.values().iterator(); 
+                iterator.hasNext();) {
+                if (bus == null || bus.equals(iterator.next())) {
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     /**
@@ -115,8 +149,10 @@ public abstract class BusFactory {
      * @return true if the bus was not set and is now set
      */
     public static synchronized boolean possiblySetDefaultBus(Bus bus) {
-        if (localBus.get() == null) {
-            localBus.set(bus);
+        synchronized (threadBusses) {
+            if (threadBusses.get(Thread.currentThread()) == null) {
+                threadBusses.put(Thread.currentThread(), bus);
+            }
         }
         
         if (defaultBus == null) {
