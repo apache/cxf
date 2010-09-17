@@ -96,6 +96,11 @@ public class RequestWrapper extends Wrapper {
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.RequestWrapper reqWrapper = method.getAnnotation(javax.xml.ws.RequestWrapper.class);
+        javax.jws.WebMethod webMethod = method.getAnnotation(javax.jws.WebMethod.class);
+        String methName = webMethod == null ? null : webMethod.operationName();
+        if (StringUtils.isEmpty(methName)) {
+            methName = method.getName();
+        }
         String reqClassName = getClassName();
         String reqNs = null;
 
@@ -104,7 +109,7 @@ public class RequestWrapper extends Wrapper {
             reqNs = reqWrapper.targetNamespace().length() > 0 ? reqWrapper.targetNamespace() : null;
         }
         if (reqClassName == null) {
-            reqClassName = getPackageName(method) + ".jaxws." + StringUtils.capitalize(method.getName());
+            reqClassName = getPackageName(method) + ".jaxws." + StringUtils.capitalize(methName);
         }
 
         WrapperBeanClass jClass = new WrapperBeanClass();

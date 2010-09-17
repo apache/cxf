@@ -129,6 +129,11 @@ public final class ResponseWrapper extends Wrapper {
     @Override
     public WrapperBeanClass getWrapperBeanClass(final Method method) {
         javax.xml.ws.ResponseWrapper resWrapper = method.getAnnotation(javax.xml.ws.ResponseWrapper.class);
+        javax.jws.WebMethod webMethod = method.getAnnotation(javax.jws.WebMethod.class);
+        String methName = webMethod == null ? null : webMethod.operationName();
+        if (StringUtils.isEmpty(methName)) {
+            methName = method.getName();
+        }
         String resClassName = getClassName();
         String resNs = null;
 
@@ -138,7 +143,7 @@ public final class ResponseWrapper extends Wrapper {
         }
         if (resClassName == null) {
             resClassName = getPackageName(method) + ".jaxws."
-                + StringUtils.capitalize(method.getName())
+                + StringUtils.capitalize(methName)
                 + "Response";
         }
 
