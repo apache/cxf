@@ -200,6 +200,18 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-wstx-msv-validation</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.java.dev.msv</groupId>
+                    <artifactId>msv-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-jaxb</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -293,6 +305,7 @@
                             com.ibm*;resolution:=optional,
                             com.sun*;resolution:=optional,
                             com.ctc.wstx.msv*;resolution:=optional,
+                            org.codehaus.stax2*;resolution:=optional,
                             commonj.sdo*;resolution:=optional,
                             javax.ws.rs*;resolution:=optional,
                             javax.resource*;resolution:=optional,

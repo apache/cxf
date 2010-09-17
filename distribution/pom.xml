@@ -50,6 +50,11 @@
     <dependencies>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-bundle</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-common-utilities</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -219,6 +224,17 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>cxf-wstx-msv-validation</artifactId>
+            <version>${project.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>net.java.dev.msv</groupId>
+                    <artifactId>msv-core</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
             <version>${project.version}</version>
         </dependency>
@@ -292,11 +308,6 @@
         <dependency>
             <groupId>asm</groupId>
             <artifactId>asm</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>cxf-bundle</artifactId>
-            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>commons-logging</groupId>

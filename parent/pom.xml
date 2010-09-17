@@ -1068,6 +1068,10 @@
                         <groupId>org.apache.geronimo.specs</groupId>
                         <artifactId>geronimo-activation_1.0.2_spec</artifactId>
                     </exclusion>
+                    <exclusion>
+                        <groupId>org.apache.geronimo.specs</groupId>
+                        <artifactId>geronimo-stax-api_1.0_spec</artifactId>
+                    </exclusion>
                 </exclusions>
             </dependency>
             <dependency>
