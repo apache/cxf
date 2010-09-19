@@ -27,7 +27,14 @@ import java.util.Map;
 import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
+
 public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> {
+    
+    public static final String CACHE_CONTROL_SEPARATOR_PROPERTY =
+        "org.apache.cxf.http.cache-control.separator";
+    private static final String DEFAULT_SEPARATOR = ",";
     
     private static final String PUBLIC = "public";
     private static final String PRIVATE = "private";
@@ -51,9 +58,11 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
         int maxAge = -1;
         int sMaxAge = -1;
        
+        String separator = getSeparator();
         
-        String[] tokens = c.split(";");
-        for (String token : tokens) {
+        String[] tokens = c.split(separator);
+        for (String rawToken : tokens) {
+            String token = rawToken.trim();
             if (token.startsWith(MAX_AGE)) {
                 maxAge = Integer.parseInt(token.substring(MAX_AGE.length() + 1));
             } else if (token.startsWith(SMAX_AGE)) {
@@ -93,32 +102,36 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     }
 
     public String toString(CacheControl c) {
+        String separator = getSeparator();
+        
         StringBuilder sb = new StringBuilder();
         if (c.isPrivate()) {
             sb.append(PRIVATE);
             handleFields(c.getPrivateFields(), sb);
+            sb.append(separator);
         }
         if (c.isNoCache()) {
             sb.append(NO_CACHE);
             handleFields(c.getNoCacheFields(), sb);
+            sb.append(separator);
         }
         if (c.isNoStore()) {
-            sb.append(NO_STORE).append(';');
+            sb.append(NO_STORE).append(separator);
         }
         if (c.isNoTransform()) {
-            sb.append(NO_TRANSFORM).append(';');
+            sb.append(NO_TRANSFORM).append(separator);
         }
         if (c.isMustRevalidate()) {
-            sb.append(MUST_REVALIDATE).append(';');
+            sb.append(MUST_REVALIDATE).append(separator);
         }
         if (c.isProxyRevalidate()) {
-            sb.append(PROXY_REVALIDATE).append(';');
+            sb.append(PROXY_REVALIDATE).append(separator);
         }
         if (c.getMaxAge() != -1) {
-            sb.append(MAX_AGE).append('=').append(c.getMaxAge()).append(';');
+            sb.append(MAX_AGE).append('=').append(c.getMaxAge()).append(separator);
         }
         if (c.getSMaxAge() != -1) {
-            sb.append(SMAX_AGE).append('=').append(c.getSMaxAge()).append(';');
+            sb.append(SMAX_AGE).append('=').append(c.getSMaxAge()).append(separator);
         }
         Map<String, String> exts = c.getCacheExtension();
         for (Map.Entry<String, String> entry : exts.entrySet()) {
@@ -132,10 +145,10 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
                     sb.append(v);
                 }
             }
-            sb.append(';');
+            sb.append(separator);
         }
         String s = sb.toString();
-        return s.endsWith(";") ? s.substring(0, s.length() - 1) : s; 
+        return s.endsWith(separator) ? s.substring(0, s.length() - 1) : s; 
     }
     
     private static void addFields(List<String> fields, String token) {
@@ -155,15 +168,34 @@ public class CacheControlHeaderProvider implements HeaderDelegate<CacheControl> 
     }
 
     private static void handleFields(List<String> fields, StringBuilder sb) {
-        if (!fields.isEmpty()) {
-            sb.append('=');
+        if (fields.isEmpty()) {
+            return;
         }
+        sb.append('=');
         for (Iterator<String> it = fields.iterator(); it.hasNext();) {
             sb.append('\"').append(it.next()).append('\"');
             if (it.hasNext()) {
                 sb.append(',');
             }
         }
-        sb.append(';');
+    }
+    
+    protected String getSeparator() {
+        
+        String separator = DEFAULT_SEPARATOR;
+        
+        Message message = getCurrentMessage();
+        
+        if (message != null) {
+            Object sepProperty = message.getContextualProperty(CACHE_CONTROL_SEPARATOR_PROPERTY);
+            if (sepProperty != null) {
+                separator = sepProperty.toString();
+            }
+        }
+        return separator;
+    }
+    
+    protected Message getCurrentMessage() {
+        return PhaseInterceptorChain.getCurrentMessage();
     }
 }

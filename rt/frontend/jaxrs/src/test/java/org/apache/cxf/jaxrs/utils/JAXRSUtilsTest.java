@@ -526,18 +526,50 @@ public class JAXRSUtilsTest extends Assert {
     
     @Test
     public void testQueryParameters() throws Exception {
-        Class[] argType = {String.class, Integer.TYPE};
+        Class[] argType = {String.class, Integer.TYPE, String.class, String.class};
         Method m = Customer.class.getMethod("testQuery", argType);
         MessageImpl messageImpl = new MessageImpl();
         
-        messageImpl.put(Message.QUERY_STRING, "query=24");
+        messageImpl.put(Message.QUERY_STRING, "query=24&query2");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
                                                            messageImpl);
+        assertEquals(4, params.size());
         assertEquals("Query Parameter was not matched correctly", "24", params.get(0));
         assertEquals("Primitive Query Parameter was not matched correctly", 24, params.get(1));
+        assertEquals("", params.get(2));
+        assertNull(params.get(3));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testQueryParamAsListWithDefaultValue() throws Exception {
+        Class[] argType = {List.class, List.class, List.class, List.class};
+        Method m = Customer.class.getMethod("testQueryAsList", argType);
+        MessageImpl messageImpl = new MessageImpl();
+        messageImpl.put(Message.QUERY_STRING, "query2=query2Value&query3");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(4, params.size());
+        List<String> queryList = (List<String>)params.get(0);
+        assertNotNull(queryList);
+        assertEquals(1, queryList.size());
+        assertEquals("default", queryList.get(0));
         
+        List<String> queryList2 = (List<String>)params.get(1);
+        assertNotNull(queryList2);
+        assertEquals(1, queryList2.size());
+        assertEquals("query2Value", queryList2.get(0));
         
+        List<String> queryList3 = (List<String>)params.get(2);
+        assertNotNull(queryList3);
+        assertEquals(1, queryList3.size());
+        assertEquals("", queryList3.get(0));
+        
+        List<String> queryList4 = (List<String>)params.get(3);
+        assertNotNull(queryList4);
+        assertEquals(0, queryList4.size());
     }
     
     @Test
