@@ -112,7 +112,7 @@ public class Server extends AbstractBusTestServerBase {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(Hello.class);
         svrFactory.setAddress(address);
-        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
+        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         svrFactory.setServiceBean(implementor);
         svrFactory.create();
     }

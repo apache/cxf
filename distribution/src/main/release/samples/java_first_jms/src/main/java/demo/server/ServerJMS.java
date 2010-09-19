@@ -21,6 +21,8 @@ package demo.server;
 
 import java.lang.reflect.Method;
 
+import javax.xml.ws.Endpoint;
+
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
@@ -29,14 +31,32 @@ import demo.service.impl.HelloWorldImpl;
 
 
 public final class ServerJMS {
+    private static final String JMS_ENDPOINT_URI = "jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
+                                  + "&jndiConnectionFactoryName=ConnectionFactory"
+                                  + "&jndiInitialContextFactory"
+                                  + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory";
+
     private ServerJMS() {
         //
     }
 
     public static void main(String args[]) throws Exception {
 
-        boolean amqBroker = args.length > 0 && "-activemqbroker".equals(args[0]);
-        if (amqBroker) {
+        boolean launchAmqBroker = false;
+        boolean jaxws = false;
+
+        for (String arg : args) {
+            if ("-activemqbroker".equals(arg)) {
+                launchAmqBroker = true;
+            } else if ("-jaxws".equals(arg)) {
+                jaxws = true;
+            } else {
+                System.err.println("Invalid argument " + arg);
+                return;
+            }
+        }
+
+        if (launchAmqBroker) {
             /*
              * The following make it easier to run this against something other than ActiveMQ. You will have
              * to get a JMS broker onto the right port of localhost.
@@ -54,20 +74,29 @@ public final class ServerJMS {
             startMethod.invoke(broker);
         }
 
-        Object implementor = new HelloWorldImpl();
-        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
-        svrFactory.setServiceClass(HelloWorld.class);
-        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
-        svrFactory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
-                              + "&jndiConnectionFactoryName=ConnectionFactory"
-                              + "&jndiInitialContextFactory"
-                              + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        svrFactory.setServiceBean(implementor);
-        svrFactory.create();
+        if (jaxws) {
+            launchJaxwsApi();
+        } else {
+            launchCxfApi();
+        }
 
         System.out.println("Server ready... Press any key to exit");
         System.in.read();
         System.out.println("Server exiting");
         System.exit(0);
+    }
+
+    private static void launchCxfApi() {
+        Object implementor = new HelloWorldImpl();
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        svrFactory.setServiceClass(HelloWorld.class);
+        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
+        svrFactory.setAddress(JMS_ENDPOINT_URI);
+        svrFactory.setServiceBean(implementor);
+        svrFactory.create();
+    }
+
+    private static void launchJaxwsApi() {
+        Endpoint.publish(JMS_ENDPOINT_URI, new HelloWorldImpl());
     }
 }

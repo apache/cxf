@@ -19,27 +19,63 @@
 
 package demo.client;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.Service;
+import javax.xml.ws.soap.SOAPBinding;
+
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 import demo.service.HelloWorld;
 
 public final class ClientJMS {
+    private static final String JMS_ENDPOINT_URI = "jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
+                               + "&jndiConnectionFactoryName=ConnectionFactory" + "&jndiInitialContextFactory"
+                               + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory";
+
+    private final static QName SERVICE_QNAME =
+        new QName("http://impl.service.demo/", "HelloWorldImplService");
+    private final static QName PORT_QNAME =
+        new QName("http://impl.service.demo/", "HelloWorldImplPort");
+
     private ClientJMS() {
         //
     }
 
     public static void main(String[] args) throws Exception {
-        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(HelloWorld.class);
-        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
-        factory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
-            + "&jndiConnectionFactoryName=ConnectionFactory"
-            + "&jndiInitialContextFactory"
-            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory");
-        HelloWorld client = (HelloWorld)factory.create();
+        boolean jaxws = false;
+        for (String arg : args) {
+            if ("-jaxws".equals(arg)) {
+                jaxws = true;
+            } else {
+                System.err.println("Invalid argument " + arg);
+                return;
+            }
+        }
+        HelloWorld client = null;
+        if (jaxws) {
+            client = createClientJaxWs();
+        } else {
+            client = createClientCxf();
+        }
         String reply = client.sayHi("HI");
         System.out.println(reply);
         System.exit(0);
+    }
+
+    private static HelloWorld createClientJaxWs() {
+        Service service = Service.create(SERVICE_QNAME);
+        // Add a port to the Service
+        service.addPort(PORT_QNAME, JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID, JMS_ENDPOINT_URI);
+        return service.getPort(HelloWorld.class);
+    }
+
+    private static HelloWorld createClientCxf() {
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        factory.setServiceClass(HelloWorld.class);
+        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
+        factory.setAddress(JMS_ENDPOINT_URI);
+        HelloWorld client = (HelloWorld)factory.create();
+        return client;
     }
 }

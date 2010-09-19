@@ -1193,7 +1193,7 @@ public class JMSClientServerTest extends AbstractBusClientServerTestBase {
             + JMS_PORT;
 
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
+        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         factory.setServiceClass(Hello.class);
         factory.setAddress(address);
         Hello client = (Hello)factory.create();
