@@ -22,6 +22,7 @@ package demo.server;
 import java.lang.reflect.Method;
 
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 
 import demo.service.HelloWorld;
 import demo.service.impl.HelloWorldImpl;
@@ -56,7 +57,8 @@ public final class ServerJMS {
         Object implementor = new HelloWorldImpl();
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(HelloWorld.class);
-        svrFactory.setAddress("jms://");
+        svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
+        svrFactory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000");
         svrFactory.setServiceBean(implementor);
         svrFactory.create();
 
