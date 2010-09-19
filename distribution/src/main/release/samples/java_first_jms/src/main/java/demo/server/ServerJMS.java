@@ -58,7 +58,10 @@ public final class ServerJMS {
         JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
         svrFactory.setServiceClass(HelloWorld.class);
         svrFactory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
-        svrFactory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000");
+        svrFactory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
+                              + "&jndiConnectionFactoryName=ConnectionFactory"
+                              + "&jndiInitialContextFactory"
+                              + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         svrFactory.setServiceBean(implementor);
         svrFactory.create();
 

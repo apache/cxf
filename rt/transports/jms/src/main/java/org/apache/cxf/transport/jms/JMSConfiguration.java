@@ -37,18 +37,18 @@ import org.springframework.transaction.PlatformTransactionManager;
 @NoJSR250Annotations
 public class JMSConfiguration implements InitializingBean {
     /**
-     * The use of -1 is to make easier to determine 
+     * The use of -1 is to make easier to determine
      * if the setCacheLevel has been called.
      */
     public static final int DEFAULT_VALUE = -1;
-    
+
     static final boolean DEFAULT_USEJMS11 = true;
-    
+
     private boolean usingEndpointInfo = true;
-    
+
     private JmsTemplate jmsTemplate;
     private AbstractMessageListenerContainer messageListenerContainer;
-    
+
     private JndiTemplate jndiTemplate;
     private ConnectionFactory connectionFactory;
     private DestinationResolver destinationResolver;
@@ -66,7 +66,7 @@ public class JMSConfiguration implements InitializingBean {
     private int priority = Message.DEFAULT_PRIORITY;
     private long timeToLive = Message.DEFAULT_TIME_TO_LIVE;
     private boolean sessionTransacted;
-    
+
     private int concurrentConsumers = 1;
     private int maxConcurrentConsumers = 1;
     private int maxSuspendedContinuations = DEFAULT_VALUE;
@@ -95,17 +95,17 @@ public class JMSConfiguration implements InitializingBean {
     //For jms spec.
     private String targetService;
     private String requestURI;
-    
+
     private ConnectionFactory wrappedConnectionFactory;
-    
+
     private JNDIConfiguration jndiConfig;
-    
+
     public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
         if (targetDestination == null ||  getOrCreateWrappedConnectionFactory() == null) {
             throw new ConfigurationException(msg);
         }
     }
-    
+
     public String getCacheLevelName() {
         return cacheLevelName;
     }
@@ -142,7 +142,7 @@ public class JMSConfiguration implements InitializingBean {
     public boolean isUsingEndpointInfo() {
         return this.usingEndpointInfo;
     }
-    
+
     public void setUsingEndpointInfo(boolean usingEndpointInfo) {
         this.usingEndpointInfo = usingEndpointInfo;
     }
@@ -233,7 +233,7 @@ public class JMSConfiguration implements InitializingBean {
     public boolean isSetConduitSelectorPrefix() {
         return conduitSelectorPrefix != null;
     }
-    
+
     public boolean isSubscriptionDurable() {
         return subscriptionDurable;
     }
@@ -284,7 +284,7 @@ public class JMSConfiguration implements InitializingBean {
     public void setReplyToDestination(String replyToDestination) {
         this.replyToDestination = replyToDestination;
     }
-    
+
     public String getMessageType() {
         return messageType;
     }
@@ -348,7 +348,7 @@ public class JMSConfiguration implements InitializingBean {
     public void setMaxConcurrentConsumers(int maxConcurrentConsumers) {
         this.maxConcurrentConsumers = maxConcurrentConsumers;
     }
-    
+
     public int getMaxSuspendedContinuations() {
         return maxSuspendedContinuations;
     }
@@ -356,7 +356,7 @@ public class JMSConfiguration implements InitializingBean {
     public void setMaxSuspendedContinuations(int maxSuspendedContinuations) {
         this.maxSuspendedContinuations = maxSuspendedContinuations;
     }
-    
+
     public int getReconnectPercentOfMax() {
         return reconnectPercentOfMax;
     }
@@ -414,17 +414,17 @@ public class JMSConfiguration implements InitializingBean {
     public boolean isAcceptMessagesWhileStopping() {
         return acceptMessagesWhileStopping;
     }
-    
+
     public void setAcceptMessagesWhileStopping(boolean acceptMessagesWhileStopping) {
         this.acceptMessagesWhileStopping = acceptMessagesWhileStopping;
     }
-    
+
     /**
      * Tries to creates a ConnectionFactory from jndi if none was set as a property
-     * by using the jndConfig. Then it determiens if the connectionFactory should be wrapped
+     * by using the jndConfig. Then it determines if the connectionFactory should be wrapped
      * into a SingleConnectionFactory and wraps it if necessary. After the first call the
      * same connectionFactory will be returned for all subsequent calls
-     * 
+     *
      * @return usable connectionFactory
      */
     public synchronized ConnectionFactory getOrCreateWrappedConnectionFactory() {
@@ -442,7 +442,7 @@ public class JMSConfiguration implements InitializingBean {
                     }
                 } else {
                     @SuppressWarnings("deprecation")
-                    SingleConnectionFactory scf2 
+                    SingleConnectionFactory scf2
                         = new org.springframework.jms.connection.SingleConnectionFactory102(connectionFactory,
                                                                                             pubSubDomain);
                     scf = scf2;
@@ -461,7 +461,7 @@ public class JMSConfiguration implements InitializingBean {
     public ConnectionFactory getWrappedConnectionFactory() {
         return wrappedConnectionFactory;
     }
-    
+
     public synchronized void destroyWrappedConnectionFactory() {
         if (wrappedConnectionFactory instanceof SingleConnectionFactory) {
             ((SingleConnectionFactory)wrappedConnectionFactory).destroy();
@@ -471,7 +471,7 @@ public class JMSConfiguration implements InitializingBean {
             wrappedConnectionFactory = null;
         }
     }
-    
+
     /**
      * Only for tests
      * @return
@@ -511,7 +511,7 @@ public class JMSConfiguration implements InitializingBean {
     public String getRequestURI() {
         return requestURI;
     }
-    
+
     public boolean isEnforceSpec() {
         if (!isSetEnforceSpec()) {
             return true;
@@ -522,7 +522,7 @@ public class JMSConfiguration implements InitializingBean {
     public void setEnforceSpec(boolean enforceSpec) {
         this.enforceSpec = enforceSpec;
     }
-    
+
     public boolean isSetEnforceSpec() {
         return this.enforceSpec != null;
     }

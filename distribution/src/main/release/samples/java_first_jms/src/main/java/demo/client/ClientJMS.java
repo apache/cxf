@@ -20,6 +20,8 @@
 package demo.client;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
+
 import demo.service.HelloWorld;
 
 public final class ClientJMS {
@@ -30,7 +32,11 @@ public final class ClientJMS {
     public static void main(String[] args) throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(HelloWorld.class);
-        factory.setAddress("jms://");
+        factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICIATION_TRANSPORTID);
+        factory.setAddress("jms:queue:test.cxf.jmstransport.queue?timeToLive=1000"
+            + "&jndiConnectionFactoryName=ConnectionFactory"
+            + "&jndiInitialContextFactory"
+            + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory");
         HelloWorld client = (HelloWorld)factory.create();
         String reply = client.sayHi("HI");
         System.out.println(reply);
