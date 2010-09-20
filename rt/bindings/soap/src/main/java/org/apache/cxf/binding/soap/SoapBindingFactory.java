@@ -111,7 +111,8 @@ public class SoapBindingFactory extends AbstractBindingFactory {
         "http://schemas.xmlsoap.org/wsdl/soap/",
         "http://schemas.xmlsoap.org/wsdl/soap12/",
         "http://schemas.xmlsoap.org/wsdl/soap/http",
-        "http://www.w3.org/2003/05/soap/bindings/HTTP/"
+        "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+        "http://www.w3.org/2010/soapjms/"        
     );
     
     

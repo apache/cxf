@@ -36,7 +36,7 @@ public final class ClientJMS {
     private final static QName SERVICE_QNAME =
         new QName("http://impl.service.demo/", "HelloWorldImplService");
     private final static QName PORT_QNAME =
-        new QName("http://impl.service.demo/", "HelloWorldImplPort");
+        new QName("http://service.demo/", "HelloWorldPort");
 
     private ClientJMS() {
         //
