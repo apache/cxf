@@ -48,6 +48,12 @@
     </build>
     <profiles>
         <profile>
+            <id>jaxws</id>
+            <properties>
+                <usingJaxws>-jaxws</usingJaxws>
+            </properties>
+        </profile>
+        <profile>
             <id>server</id>
             <build>
                 <defaultGoal>test</defaultGoal>
@@ -55,6 +61,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2</version>
                         <executions>
                             <execution>
                                 <phase>test</phase>
@@ -65,6 +72,7 @@
                                     <mainClass>demo.server.ServerJMS</mainClass>
                                     <arguments>
                                     	<argument>-activemqbroker</argument>
+                                    	<argument>${usingJaxws}</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
@@ -81,6 +89,7 @@
                     <plugin>
                         <groupId>org.codehaus.mojo</groupId>
                         <artifactId>exec-maven-plugin</artifactId>
+                        <version>1.2</version>
                         <executions>
                             <execution>
                                 <phase>test</phase>
@@ -89,6 +98,9 @@
                                 </goals>
                                 <configuration>
                                     <mainClass>demo.client.ClientJMS</mainClass>
+                                    <arguments>
+                                    	<argument>${usingJaxws}</argument>
+                                    </arguments>
                                 </configuration>
                             </execution>
                         </executions>
