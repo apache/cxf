@@ -198,6 +198,22 @@ public class JSONProviderTest extends Assert {
     }
     
     @Test
+    public void testWriteBookWithStringConverter() throws Exception {
+        JSONProvider p = new JSONProvider();
+        p.setConvertTypesToStrings(true);
+        Book book = new Book("CXF", 125);
+        
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        
+        p.writeTo(book, (Class)Book.class, Book.class, Book.class.getAnnotations(), 
+                  MediaType.APPLICATION_JSON_TYPE, new MetadataMap<String, Object>(), os);
+        
+        String s = os.toString();
+        assertEquals("{\"Book\":{\"id\":\"125\",\"name\":\"CXF\",\"state\":\"\"}}", s);
+        
+    }
+    
+    @Test
     public void testWriteToSingleTagBadgerFish() throws Exception {
         JSONProvider p = new JSONProvider();
         p.setConvention("badgerfish");

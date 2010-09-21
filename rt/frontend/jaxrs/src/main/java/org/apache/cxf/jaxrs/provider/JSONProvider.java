@@ -54,6 +54,9 @@ import org.apache.cxf.jaxrs.ext.MessageContext;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.codehaus.jettison.mapped.Configuration;
+import org.codehaus.jettison.mapped.SimpleConverter;
+import org.codehaus.jettison.mapped.TypeConverter;
 
 @Produces("application/json")
 @Consumes("application/json")
@@ -77,12 +80,23 @@ public class JSONProvider extends AbstractJAXBProvider  {
     private boolean readXsiType = true;
     private boolean ignoreNamespaces;
     private String convention = MAPPED_CONVENTION;
+    private TypeConverter typeConverter;
     
     public void setConvention(String value) {
         if (!MAPPED_CONVENTION.equals(value) && !BADGER_FISH_CONVENTION.equals(value)) {
             throw new IllegalArgumentException("Unsupported convention \"" + value);
         }
         convention = value;
+    }
+    
+    public void setConvertTypesToStrings(boolean convert) {
+        if (convert) {
+            this.setTypeConverter(new SimpleConverter());
+        }
+    }
+    
+    public void setTypeConverter(TypeConverter converter) {
+        this.typeConverter = converter;
     }
     
     public void setIgnoreNamespaces(boolean ignoreNamespaces) {
@@ -339,8 +353,12 @@ public class JSONProvider extends AbstractJAXBProvider  {
         }
         
         QName qname = getQName(actualClass, genericType, actualObject, true);
+        
+        Configuration config = 
+            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, typeConverter);
+        
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
-             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys,
+             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys,
              isCollection || dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         writer = JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);

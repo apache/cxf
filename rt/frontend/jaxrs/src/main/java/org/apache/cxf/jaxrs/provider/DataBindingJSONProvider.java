@@ -36,6 +36,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.codehaus.jettison.mapped.Configuration;
 
 @Provider
 @Produces("application/json")
@@ -93,8 +94,10 @@ public class DataBindingJSONProvider<T> extends DataBindingProvider<T> {
         } else {
             qname = getQName(InjectionUtils.getActualType(genericType));
         }
+        Configuration config = 
+            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, qname, 
-             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys, dropRootElement);
+             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
         writer = JSONUtils.createIgnoreMixedContentWriterIfNeeded(writer, ignoreMixedContent);
         return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }

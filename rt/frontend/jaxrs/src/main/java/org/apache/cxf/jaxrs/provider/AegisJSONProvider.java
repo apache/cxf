@@ -45,6 +45,7 @@ import org.apache.cxf.aegis.AegisWriter;
 import org.apache.cxf.aegis.type.AegisType;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.codehaus.jettison.mapped.Configuration;
 
 @Provider
 @Produces({"application/json" })
@@ -125,8 +126,10 @@ public final class AegisJSONProvider<T> extends AegisElementProvider<T> {
     @Override
     protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
         
+        Configuration config = 
+            JSONUtils.createConfiguration(namespaceMap, writeXsiType && !ignoreNamespaces, null);
         XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, 
-             writeXsiType && !ignoreNamespaces, namespaceMap, serializeAsArray, arrayKeys, dropRootElement);
+             writeXsiType && !ignoreNamespaces, config, serializeAsArray, arrayKeys, dropRootElement);
         return JSONUtils.createIgnoreNsWriterIfNeeded(writer, ignoreNamespaces);
     }
 
