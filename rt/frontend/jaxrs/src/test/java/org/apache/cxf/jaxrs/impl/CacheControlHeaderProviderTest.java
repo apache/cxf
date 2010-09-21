@@ -21,17 +21,18 @@ package org.apache.cxf.jaxrs.impl;
 
 import javax.ws.rs.core.CacheControl;
 
+import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
 public class CacheControlHeaderProviderTest extends Assert {
     
-    
-        
     @Test
     public void testFromSimpleString() {
         CacheControl c = CacheControl.valueOf(
-            "public;must-revalidate");
+            "public,must-revalidate");
         assertTrue(!c.isPrivate() && !c.isNoStore()
                    && c.isMustRevalidate() && !c.isProxyRevalidate());
         assertTrue(!c.isNoCache()
@@ -42,6 +43,27 @@ public class CacheControlHeaderProviderTest extends Assert {
     @Test
     public void testFromComplexString() {
         CacheControl c = CacheControl.valueOf(
+            "private=\"foo\",no-cache=\"bar\",no-store,no-transform,"
+            + "must-revalidate,proxy-revalidate,max-age=2,s-maxage=3");
+        assertTrue(c.isPrivate() && c.isNoStore()
+                   && c.isMustRevalidate() && c.isProxyRevalidate() && c.isNoCache());
+        assertTrue(c.isNoTransform() && c.getNoCacheFields().size() == 1
+                   && c.getPrivateFields().size() == 1);
+        assertEquals("foo", c.getPrivateFields().get(0));
+        assertEquals("bar", c.getNoCacheFields().get(0));
+        
+    }
+    
+    @Test
+    public void testFromComplexStringWithSemicolon() {
+        CacheControlHeaderProvider cp = new CacheControlHeaderProvider() {
+            protected Message getCurrentMessage() {
+                Message m = new MessageImpl();
+                m.put(CacheControlHeaderProvider.CACHE_CONTROL_SEPARATOR_PROPERTY, ";");
+                return m;
+            }
+        };
+        CacheControl c = cp.fromString(
             "private=\"foo\";no-cache=\"bar\";no-store;no-transform;"
             + "must-revalidate;proxy-revalidate;max-age=2;s-maxage=3");
         assertTrue(c.isPrivate() && c.isNoStore()
@@ -56,8 +78,8 @@ public class CacheControlHeaderProviderTest extends Assert {
     
     @Test
     public void testToString() {
-        String s = "private=\"foo\";no-cache=\"bar\";no-store;no-transform;"
-            + "must-revalidate;proxy-revalidate;max-age=2;s-maxage=3";
+        String s = "private=\"foo\",no-cache=\"bar\",no-store,no-transform,"
+            + "must-revalidate,proxy-revalidate,max-age=2,s-maxage=3";
         String parsed = CacheControl.valueOf(s).toString();
         assertEquals(s, parsed);       
     }
@@ -66,7 +88,7 @@ public class CacheControlHeaderProviderTest extends Assert {
     public void testNoCacheEnabled() {
         CacheControl cc = new CacheControl();
         cc.setNoCache(true);
-        assertEquals("no-cache;no-transform", cc.toString());
+        assertEquals("no-cache,no-transform", cc.toString());
     }
     
     @Test

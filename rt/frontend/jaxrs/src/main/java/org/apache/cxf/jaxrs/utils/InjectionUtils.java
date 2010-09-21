@@ -667,6 +667,8 @@ public final class InjectionUtils {
                 if (paramType.isPrimitive()) {
                     paramValues = Collections.singletonList(
                         boolean.class == paramType ? "false" : "0");
+                } else if (InjectionUtils.isSupportedCollectionOrArray(paramType)) {
+                    paramValues = Collections.emptyList();
                 } else {
                     return null;
                 }
