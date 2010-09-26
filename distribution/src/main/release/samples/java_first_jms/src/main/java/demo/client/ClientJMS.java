@@ -21,7 +21,6 @@ package demo.client;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
@@ -33,9 +32,9 @@ public final class ClientJMS {
                                + "&jndiConnectionFactoryName=ConnectionFactory" + "&jndiInitialContextFactory"
                                + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory";
 
-    private final static QName SERVICE_QNAME =
+    private static final QName SERVICE_QNAME =
         new QName("http://impl.service.demo/", "HelloWorldImplService");
-    private final static QName PORT_QNAME =
+    private static final QName PORT_QNAME =
         new QName("http://service.demo/", "HelloWorldPort");
 
     private ClientJMS() {
