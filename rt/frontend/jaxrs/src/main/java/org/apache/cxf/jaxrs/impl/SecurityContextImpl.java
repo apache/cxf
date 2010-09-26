@@ -25,6 +25,7 @@ import java.util.List;
 import javax.ws.rs.core.SecurityContext;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.message.Message;
 
 public class SecurityContextImpl implements SecurityContext {
@@ -52,8 +53,7 @@ public class SecurityContextImpl implements SecurityContext {
 
     
     public boolean isSecure() {
-        String value = m.getExchange().getDestination().getAddress()
-            .getAddress().getValue();
+        String value = HttpUtils.getEndpointAddress(m);
         return value.startsWith("https://");
     }
 

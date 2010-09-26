@@ -46,6 +46,8 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
     protected ServletTransportFactory servletTransportFactory;
     protected ServletController controller;
     
+    private boolean disableAddressUpdates;
+        
     public static Logger getLogger() {
         return LogUtils.getL7dLogger(AbstractCXFServlet.class);
     }
@@ -56,6 +58,10 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
                                   servletConfig,
                                   this.getServletContext(), 
                                   bus);
+    
+        if (servletConfig.getInitParameter("disable-address-updates") == null) {
+            newController.setDisableAddressUpdates(disableAddressUpdates);
+        }
         
         return newController;
     }
@@ -145,4 +151,10 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
         }
     }
 
+    // this makes it a bit easier to disable the address 
+    // updates when creating servlets programmatically
+    public void setDisableAddressUpdates(boolean disableAddressUpdates) {
+        this.disableAddressUpdates = disableAddressUpdates;
+    }
+    
 }
