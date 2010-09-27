@@ -129,6 +129,10 @@ public class WSDLServiceFactory extends AbstractServiceFactoryBean {
                 services = new WSDLServiceBuilder(getBus()).buildServices(definition, 
                                                                           wsdlService,
                                                                           endpointName);
+                if (services.size() == 0) {
+                    throw new ServiceConstructionException(
+                        new Message("NO_SUCH_ENDPOINT_EXC", LOG, endpointName));
+                }
             } catch (XmlSchemaException ex) {
                 throw new ServiceConstructionException(new Message("SERVICE_CREATION_MSG", LOG), ex);
             }

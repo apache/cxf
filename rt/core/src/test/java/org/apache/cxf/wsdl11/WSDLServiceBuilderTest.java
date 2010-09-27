@@ -69,6 +69,7 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -104,8 +105,13 @@ public class WSDLServiceBuilderTest extends Assert {
     public void setUpBasic() throws Exception {
         setUpWSDL(WSDL_PATH, 0);
     }
-
+    
     private void setUpWSDL(String wsdl, int serviceSeq) throws Exception {
+        setUpDefinition(wsdl, serviceSeq);
+        buildService();
+    }
+    
+    private void setUpDefinition(String wsdl, int serviceSeq) throws Exception {
         URL url = getClass().getResource(wsdl);
         assertNotNull("could not find wsdl " + wsdl, url);
         String wsdlUrl = url.toString();
@@ -127,7 +133,13 @@ public class WSDLServiceBuilderTest extends Assert {
                 }
             }
         }
+    }
+    
+    private void buildService() throws Exception {
+        buildService(null);       
+    }
 
+    private void buildService(QName endpointName) throws Exception {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         bindingFactoryManager = control.createMock(BindingFactoryManager.class);
@@ -148,9 +160,22 @@ public class WSDLServiceBuilderTest extends Assert {
         
 
         control.replay();
-        serviceInfos = wsdlServiceBuilder.buildServices(def, service);
-        serviceInfo = serviceInfos.get(0);
+        serviceInfos = wsdlServiceBuilder.buildServices(def, service, endpointName);
+        if (serviceInfos.size() > 0) {
+            serviceInfo = serviceInfos.get(0);
+        } else {
+            serviceInfo = null;
+        }
 
+    }
+    
+    @Test 
+    public void testBuildServiceWithWrongEndpointName() throws Exception {
+        setUpWSDL(WSDL_PATH, 0);
+        buildService(new QName("http://apache.org/hello_world_soap_http",
+                "NoExitSoapPort"));
+        assertEquals("Should not build any serviceInfo.", 0, serviceInfos.size());
+        assertEquals("Should not build any serviceInfo.", null, serviceInfo);
     }
 
     @Test
