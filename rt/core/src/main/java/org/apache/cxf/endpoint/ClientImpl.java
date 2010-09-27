@@ -681,7 +681,7 @@ public class ClientImpl
         }
         List<Interceptor> i3 = endpoint.getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Interceptors contributed by endpoint: " + i2);
+            LOG.fine("Interceptors contributed by endpoint: " + i3);
         }
         List<Interceptor> i4 = endpoint.getBinding().getInInterceptors();
         if (LOG.isLoggable(Level.FINE)) {
