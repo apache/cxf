@@ -789,7 +789,8 @@ public final class JAXRSUtils {
         } else if (Request.class.isAssignableFrom(clazz)) {
             o = new RequestImpl(contextMessage);
         } else if (SecurityContext.class.isAssignableFrom(clazz)) {
-            o = new SecurityContextImpl(contextMessage);
+            SecurityContext customContext = contextMessage.get(SecurityContext.class);
+            o = customContext == null ? new SecurityContextImpl(contextMessage) : customContext;
         } else if (Providers.class.isAssignableFrom(clazz)) {
             o = new ProvidersImpl(contextMessage);
         } else if (ContextResolver.class.isAssignableFrom(clazz)) {

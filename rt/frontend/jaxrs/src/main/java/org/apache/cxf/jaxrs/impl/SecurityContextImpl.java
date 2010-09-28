@@ -20,6 +20,7 @@
 package org.apache.cxf.jaxrs.impl;
 
 import java.security.Principal;
+import java.util.List;
 
 import javax.ws.rs.core.SecurityContext;
 
@@ -35,12 +36,13 @@ public class SecurityContextImpl implements SecurityContext {
         this.m = m;
     }
 
-    // TODO
     public String getAuthenticationScheme() {
         if (m.get(AuthorizationPolicy.class) != null) {
             return SecurityContext.BASIC_AUTH;
         }
-        return "Unknown scheme";
+        List<String> authorizationValues = new HttpHeadersImpl(m).getRequestHeader("Authorization");
+        
+        return authorizationValues.size() > 0 ? authorizationValues.get(0) : "Unknown scheme";
     }
 
     public Principal getUserPrincipal() {

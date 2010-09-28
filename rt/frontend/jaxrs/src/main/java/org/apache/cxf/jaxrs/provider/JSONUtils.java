@@ -48,6 +48,7 @@ import org.codehaus.jettison.mapped.Configuration;
 import org.codehaus.jettison.mapped.MappedNamespaceConvention;
 import org.codehaus.jettison.mapped.MappedXMLInputFactory;
 import org.codehaus.jettison.mapped.MappedXMLStreamWriter;
+import org.codehaus.jettison.mapped.TypeConverter;
 
 public final class JSONUtils {
 
@@ -67,19 +68,15 @@ public final class JSONUtils {
         XMLInputFactory factory = new BadgerFishXMLInputFactory();
         return factory.createXMLStreamReader(is);
     }
-    
+        
     public static XMLStreamWriter createStreamWriter(OutputStream os, 
                                                      QName qname, 
                                                      boolean writeXsiType,
-                                                     ConcurrentHashMap<String, String> namespaceMap,
+                                                     Configuration config,
                                                      boolean serializeAsArray,
                                                      List<String> arrayKeys,
                                                      boolean dropRootElement) throws Exception {
-        if (writeXsiType) {
-            namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
-        }
-        Configuration c = new Configuration(namespaceMap);
-        MappedNamespaceConvention convention = new MappedNamespaceConvention(c);
+        MappedNamespaceConvention convention = new MappedNamespaceConvention(config);
         AbstractXMLStreamWriter xsw = new MappedXMLStreamWriter(
                                             convention, 
                                             new OutputStreamWriter(os, UTF8));
@@ -99,6 +96,19 @@ public final class JSONUtils {
         
         return writer;
     }    
+    
+    public static Configuration createConfiguration(ConcurrentHashMap<String, String> namespaceMap,
+                                                    boolean writeXsiType,
+                                                    TypeConverter converter) {
+        if (writeXsiType) {
+            namespaceMap.putIfAbsent(XSI_URI, XSI_PREFIX);
+        }
+        Configuration c = new Configuration(namespaceMap);
+        if (converter != null) {
+            c.setTypeConverter(converter);
+        }
+        return c;
+    }
     
     public static XMLStreamWriter createIgnoreMixedContentWriterIfNeeded(XMLStreamWriter writer, 
                                                                          boolean ignoreMixedContent) {

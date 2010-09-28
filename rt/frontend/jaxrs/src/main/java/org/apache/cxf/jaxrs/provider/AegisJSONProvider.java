@@ -38,6 +38,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.codehaus.jettison.mapped.Configuration;
 
 @Provider
 @Produces({"application/json" })
@@ -76,7 +77,11 @@ public final class AegisJSONProvider extends AegisElementProvider  {
     @Override
     protected XMLStreamWriter createStreamWriter(QName typeQName, OutputStream os) throws Exception {
         namespaceMap.putIfAbsent(typeQName.getNamespaceURI(), "ns1");
-        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, writeXsiType, namespaceMap, 
+        
+        Configuration config = 
+            JSONUtils.createConfiguration(namespaceMap, writeXsiType, null);
+        
+        XMLStreamWriter writer = JSONUtils.createStreamWriter(os, typeQName, writeXsiType, config, 
                                                               serializeAsArray, arrayKeys, dropRootElement);
         return writer;
     }
