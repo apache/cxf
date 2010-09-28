@@ -43,7 +43,7 @@ http://cxf.apache.org/schemas/core.xsd">
   <import resource="classpath:META-INF/cxf/cxf-extension-jaxrs-binding.xml" />
   <import resource="classpath:META-INF/cxf/cxf-servlet.xml" />
 
-  <bean class="org.apache.cxf.systest.jaxrs.JAXRSOverlappingDestinationsTest.Resource" 
+  <bean class="org.apache.cxf.systest.jaxrs.ManyDestinationsResource" 
         id="serviceBean"/>
   
   <jaxrs:server address="/">

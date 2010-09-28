@@ -24,13 +24,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
-
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -133,48 +126,5 @@ public class JAXRSOverlappingDestinationsTest extends AbstractBusClientServerTes
         }
     }
     
-    @Path("/bookstore")
-    public static class Resource {
-
-        private volatile boolean locked;
-        
-        @GET
-        @Produces("text/plain")
-        @Path("request")
-        public String getRequestPath(@Context UriInfo ui, @QueryParam("delay") String delay) 
-            throws Exception {
-            if (delay != null) {
-                Thread.sleep(5000);
-            }
-            return ui.getRequestUri().toString();
-        }
-        
-        
-        @GET
-        @Path("/uris")
-        @Produces("text/plain")
-        public String getUris(@Context UriInfo uriInfo) {
-            String baseUriOnEntry = uriInfo.getRequestUri().toString();
-            try {
-                while (locked) { Thread.sleep(1000); }
-            } catch (InterruptedException x) {
-                // ignore
-            }
-            String baseUriOnExit = uriInfo.getRequestUri().toString();
-            if (!baseUriOnEntry.equals(baseUriOnExit)) {
-                throw new RuntimeException();
-            }
-            return baseUriOnExit;
-        }
-
-        @GET
-        @Path("/lock")
-        @Produces("text/plain")
-        public String lock() { locked = true; return "locked"; }
-
-        @GET
-        @Path("/unlock")
-        @Produces("text/plain")
-        public String unlock() { locked = false; return "unlocked"; }
-    }
+    
 }
