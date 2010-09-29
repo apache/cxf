@@ -26,8 +26,10 @@ import javax.jws.soap.SOAPBinding;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
+
 
 @WebService(name = "DocLitBareCodeFirstService",
             targetNamespace = "http://cxf.apache.org/systest/jaxws/DocLitBareCodeFirstService")
@@ -43,6 +45,37 @@ public interface DocLitBareCodeFirstService {
                   GreetMeRequest gmr); 
     
     
+    @XmlList
+    @WebResult(name = "Items", targetNamespace = "http://namespace/result", partName = "parameter")
+    @WebMethod
+    java.math.BigInteger[] sayTest(
+        @WebParam(partName = "parameter", name = "SayTestRequest", targetNamespace = "http://www.tum.de/test")
+        SayTestRequest parameter
+    );
+    
+    
+    @XmlAccessorType(XmlAccessType.FIELD) 
+    @XmlType(name = "SayTestRequest", 
+             namespace = "http://cxf.apache.org/test/request/bare", 
+             propOrder = { "name" }) 
+    @XmlRootElement(namespace = "http://cxf.apache.org/test/request/bare",
+                    name = "SayTestObject") 
+    static class SayTestRequest  {
+        String name;
+        
+        public SayTestRequest() {
+        }
+        public SayTestRequest(String n) {
+            name = n;
+        }
+        
+        public void setName(String n) {
+            name = n;
+        }
+        public String getName() {
+            return name;
+        }
+    }
     @XmlAccessorType(XmlAccessType.FIELD) 
     @XmlType(name = "GreetMeRequest", 
              namespace = "http://cxf.apache.org/test/request/bare", 
