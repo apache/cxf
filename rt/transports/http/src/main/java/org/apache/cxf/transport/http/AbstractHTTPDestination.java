@@ -180,9 +180,6 @@ public abstract class AbstractHTTPDestination
     }
     
     protected void updateResponseHeaders(Message message) {
-        if (MessageUtils.isPartialResponse(message)) {
-            message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
-        }
         Map<String, List<String>> responseHeaders =
             CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
         if (responseHeaders == null) {
@@ -540,7 +537,7 @@ public abstract class AbstractHTTPDestination
                     }
                 }
                 response.setStatus(status);
-            } else if (oneWay) {
+            } else if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setStatus(HttpURLConnection.HTTP_ACCEPTED);
             } else {
                 response.setStatus(HttpURLConnection.HTTP_OK);
@@ -548,7 +545,6 @@ public abstract class AbstractHTTPDestination
 
             copyResponseHeaders(outMessage, response);
 
-            
             if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setContentLength(0);
                 response.flushBuffer();
@@ -598,9 +594,6 @@ public abstract class AbstractHTTPDestination
          * @param message the message to be sent.
          */
         public void prepare(Message message) throws IOException {
-            if (MessageUtils.isPartialResponse(message)) {
-                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_ACCEPTED);
-            }
             message.put(HTTP_RESPONSE, response);
             OutputStream os = message.getContent(OutputStream.class);
             if (os == null) {

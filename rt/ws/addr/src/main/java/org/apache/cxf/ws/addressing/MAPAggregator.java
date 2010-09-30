@@ -1000,6 +1000,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             //inMessage.remove(AbstractHTTPDestination.HTTP_REQUEST);
             //inMessage.remove(AbstractHTTPDestination.HTTP_RESPONSE);
             inMessage.remove(Message.ASYNC_POST_RESPONSE_DISPATCH);
+            updateResponseCode(inMessage);
 
             //cache this inputstream since it's defer to use in case of async
             try {
@@ -1014,6 +1015,20 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 e.printStackTrace();
             }
         }
+        
+        private void updateResponseCode(Message message) {
+            Object o = message.get("HTTP.RESPONSE");
+            if (o != null) {
+                try {
+                    o.getClass().getMethod("setStatus", Integer.TYPE)
+                        .invoke(o, HttpURLConnection.HTTP_ACCEPTED);
+                } catch (Throwable t) {
+                    //ignore
+                }
+            }
+            
+        }
+        
     }
     
     /**
