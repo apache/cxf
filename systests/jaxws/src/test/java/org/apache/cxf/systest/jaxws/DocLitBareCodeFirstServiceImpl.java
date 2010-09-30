@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.jaxws;
 
+import java.math.BigInteger;
+
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.soap.SOAPException;
@@ -52,6 +54,15 @@ public class DocLitBareCodeFirstServiceImpl implements DocLitBareCodeFirstServic
         GreetMeResponse resp = new GreetMeResponse();
         resp.setName(gmr.getName());
         return resp;
+    }
+
+    public BigInteger[] sayTest(SayTestRequest parameter) {
+        return new BigInteger[] {
+            BigInteger.valueOf(0),
+            BigInteger.valueOf(1),
+            BigInteger.valueOf(2),
+            BigInteger.valueOf(3),
+        };
     }
 
 }

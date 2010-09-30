@@ -32,6 +32,7 @@ import java.util.logging.Logger;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import javax.xml.namespace.QName;
@@ -54,6 +55,9 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSimpleType;
+import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
+import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
 /**
@@ -139,8 +143,20 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
 
         boolean isFromWrapper = part.getMessageInfo().getOperation().isUnwrapped();
-        if (isFromWrapper && clazz.isArray() && !Byte.TYPE.equals(clazz.getComponentType())) {
-            clazz = clazz.getComponentType();
+        boolean isList = false;
+        if (clazz.isArray()) {
+            if (isFromWrapper && !Byte.TYPE.equals(clazz.getComponentType())) {
+                clazz = clazz.getComponentType();
+            } else if (!isFromWrapper) {
+                Annotation[] anns = (Annotation[])part.getProperty("parameter.annotations");
+                for (Annotation a : anns) {
+                    if (a instanceof XmlList) {
+                        part.setProperty("honor.jaxb.annotations", Boolean.TRUE);
+                        clazz = clazz.getComponentType();
+                        isList = true;
+                    }
+                }
+            }
         }
 
         JAXBBeanInfo beanInfo = getBeanInfo(clazz);
@@ -203,8 +219,21 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         } else  {
             QName typeName = getTypeName(beanInfo);
             if (typeName != null) {
-                part.setTypeQName(typeName);
-                part.setXmlSchema(schemas.getTypeByQName(typeName));
+                XmlSchemaType type = schemas.getTypeByQName(typeName);
+                if  (isList && type instanceof XmlSchemaSimpleType) {
+                    XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(null);
+                    XmlSchemaSimpleTypeList list = new XmlSchemaSimpleTypeList();
+                    XmlSchemaSimpleType stype = (XmlSchemaSimpleType)type;
+                    list.setItemTypeName(stype.getQName());
+                    simpleType.setContent(list);
+                    part.setXmlSchema(simpleType);
+                    if (part.getConcreteName() == null) {
+                        part.setConcreteName(new QName(null, part.getName().getLocalPart()));
+                    }
+                } else {
+                    part.setTypeQName(typeName);
+                    part.setXmlSchema(type);
+                }
             }
         }
     }

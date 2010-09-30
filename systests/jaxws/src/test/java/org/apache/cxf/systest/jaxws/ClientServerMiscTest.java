@@ -22,6 +22,7 @@ package org.apache.cxf.systest.jaxws;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.UndeclaredThrowableException;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -98,11 +99,19 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
                                   DocLitBareCodeFirstService.class);
         DocLitBareCodeFirstService.GreetMeRequest req = 
             new DocLitBareCodeFirstService.GreetMeRequest();
-        req.setName("Foo");
-        DocLitBareCodeFirstService.GreetMeResponse resp =
-            port.greetMe(req);
+        DocLitBareCodeFirstService.GreetMeResponse resp;
+        BigInteger i[];
         
+        req.setName("Foo");
+        resp = port.greetMe(req);
         assertEquals(req.getName(), resp.getName());
+        
+        i = port.sayTest(new DocLitBareCodeFirstService.SayTestRequest("Dan"));
+        assertEquals(4, i.length);
+        assertEquals(0, i[0].intValue());
+        assertEquals(1, i[1].intValue());
+        assertEquals(2, i[2].intValue());
+        assertEquals(3, i[3].intValue());
         
         //try with wsdl
         service = Service.create(new URL(ServerMisc.DOCLITBARE_CODEFIRST_URL + "?wsdl"),
