@@ -533,7 +533,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                     }
                 }
                 response.setStatus(status);
-            } else if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
+            } else if (oneWay && !isPartialResponse(outMessage)) {
                 response.setStatus(HttpURLConnection.HTTP_ACCEPTED);
             } else {
                 response.setStatus(HttpURLConnection.HTTP_OK);
