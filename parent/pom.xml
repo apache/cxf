@@ -64,7 +64,7 @@
         <stax.impl.version>3.2.9</stax.impl.version>
         <wsdl4j.version>1.6.2</wsdl4j.version>
         <xmlbeans.version>2.4.0</xmlbeans.version>
-        <xmlschema.version>1.4.5</xmlschema.version>
+        <xmlschema.version>1.4.7</xmlschema.version>
         <checkstyle.extension />
 
         <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
