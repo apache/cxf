@@ -450,9 +450,6 @@ public class JettyHTTPDestinationTest extends Assert {
         Message partialResponse = setUpOutMessage();
         Conduit partialBackChannel =
             destination.getBackChannel(inMessage, partialResponse, replyTo);
-        assertEquals("unexpected response code",
-                     202,
-                     partialResponse.get(Message.RESPONSE_CODE));
         partialBackChannel.prepare(partialResponse);
         verifyBackChannelSend(partialBackChannel, partialResponse, 202);
 

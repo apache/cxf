@@ -20,6 +20,7 @@
 package org.apache.cxf.ws.rm.soap;
 
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -220,6 +221,10 @@ public class RMSoapInterceptor extends AbstractSoapInterceptor {
                 }
             }
             Node node = hdr.getFirstChild();
+            if (node != null && MessageUtils.isPartialResponse(message)) {
+                // make sure the response is returned as HTTP 200 and not 202
+                message.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
+            }
             while (node != null) {
                 Header holder = new Header(new QName(node.getNamespaceURI(), node.getLocalName()), node);
                 header.add(holder);

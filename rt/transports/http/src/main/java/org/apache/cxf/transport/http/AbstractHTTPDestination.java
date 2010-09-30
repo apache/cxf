@@ -533,7 +533,7 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                     }
                 }
                 response.setStatus(status);
-            } else if (oneWay) {
+            } else if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setStatus(HttpURLConnection.HTTP_ACCEPTED);
             } else {
                 response.setStatus(HttpURLConnection.HTTP_OK);
@@ -541,7 +541,6 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
 
             copyResponseHeaders(outMessage, response);
 
-            
             if (oneWay && !isPartialResponse(outMessage)) {
                 response.setContentLength(0);
                 response.flushBuffer();
