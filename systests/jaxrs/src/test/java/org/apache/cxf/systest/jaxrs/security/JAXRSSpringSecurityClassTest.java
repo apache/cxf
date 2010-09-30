@@ -62,6 +62,19 @@ public class JAXRSSpringSecurityClassTest extends AbstractSpringSecurityTest {
     }
     
     @Test
+    public void testBookFromHttpRequestParameters() throws Exception {
+        
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstorestorage/bookforms2", 
+                                        "foo", "bar", null);
+        
+        Response r = wc.form(new Form().set("name", "CXF Rocks").set("id", "123"));
+        
+        Book b = readBook((InputStream)r.getEntity());
+        assertEquals("CXF Rocks", b.getName());
+        assertEquals(123L, b.getId());
+    }
+    
+    @Test
     public void testGetBookUserAdmin() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/bookstorestorage/thosebooks/123"; 
