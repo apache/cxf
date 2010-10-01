@@ -9,6 +9,13 @@
 ##
 #set( $url = "${serverUrl}/secure/IssueNavigator.jspa?view=rss&&pid=${projectId}&status=1&tempMax=500&reset=true&decorator=none&updated%3Aprevious=-4w" )
 #set( $jirarss = $rss.fetch( $url ) )
+#set( $issues = $jirarss.issues() )
+#set( $issues = $jirarss.fillAttachments() )
+#foreach( $issue in $issues )
+#set( $link = $issue.link.substring(4))
+#set( $link = "https$link")
+#set( $void = $issue.setLink($link))
+#end 
 #set( $issues = $jirarss.fillAttachments() )
 #set( $void = $date.format("yyyy-MM-dd") )
 ##
@@ -16,7 +23,7 @@
 TO: $to
 FROM: $from
 SUBJECT: Issues with Attachments: week of $date
- 
+
 #end
 ##
 #foreach( $issue in $issues )
