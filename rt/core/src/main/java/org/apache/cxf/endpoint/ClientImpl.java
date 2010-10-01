@@ -304,7 +304,7 @@ public class ClientImpl
                            Object[] params,
                            Exchange exchange) throws Exception {
         Map<String, Object> context = new HashMap<String, Object>();
-        Map<String, Object> resp = getResponseContext();
+        Map<String, Object> resp = new HashMap<String, Object>();
         resp.clear();
         Map<String, Object> req = new HashMap<String, Object>(getRequestContext());
         context.put(RESPONSE_CONTEXT, resp);
@@ -594,6 +594,7 @@ public class ClientImpl
                 if (LOG.isLoggable(Level.FINE)) {
                     LOG.fine("set responseContext to be" + resContext);
                 }
+                responseContext.put(Thread.currentThread(), resContext);
             }
             resList = inMsg.getContent(List.class);
         }
@@ -741,7 +742,9 @@ public class ClientImpl
                                                                 .getOutMessage()
                                                                 .get(Message.INVOCATION_CONTEXT));
                 resCtx = CastUtils.cast((Map<?, ?>)resCtx.get(RESPONSE_CONTEXT));
-
+                if (resCtx != null) {
+                    responseContext.put(Thread.currentThread(), resCtx);
+                }
                 try {
                     Object obj[] = processResult(message, message.getExchange(),
                                                  null, resCtx);
