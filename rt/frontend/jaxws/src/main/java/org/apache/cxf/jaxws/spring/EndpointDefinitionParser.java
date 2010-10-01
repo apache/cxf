@@ -163,9 +163,11 @@ public class EndpointDefinitionParser extends AbstractBeanDefinitionParser {
     public static class SpringEndpointImpl extends EndpointImpl
         implements ApplicationContextAware {
     
-        public SpringEndpointImpl(Object implementor) {
-            super((Bus)null, implementor);
+        public SpringEndpointImpl(Object o) {
+            super(o instanceof Bus ? (Bus)o : null,
+                o instanceof Bus ? null : o);
         }
+
         public SpringEndpointImpl(Bus bus, Object implementor) {
             super(bus, implementor);
         }
