@@ -61,8 +61,10 @@ public final class HttpUtils {
     private static final String LOCAL_HOST = "localhost";
     private static final Pattern ENCODE_PATTERN = Pattern.compile("%[0-9a-fA-F][0-9a-fA-F]");
     private static final String CHARSET_PARAMETER = "charset";
+    
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@";
+    private static final String QUERY_RESERVED_CHARACTERS = "?/+";
     
     private HttpUtils() {
     }
@@ -75,25 +77,14 @@ public final class HttpUtils {
         return UrlUtils.pathDecode(value);
     }
     
-    public static String urlEncode(String value) {
-            
-        try {
-            value = URLEncoder.encode(value, "UTF-8");
-        } catch (UnsupportedEncodingException ex) {
-            // unlikely to happen
-        }
-        
-        return value;
-    }
-    
-    public static String pathEncode(String value) {
+    private static String componentEncode(String reservedChars, String value) {
         
         StringBuilder buffer = new StringBuilder();
         StringBuilder bufferToEncode = new StringBuilder();
         
         for (int i = 0; i < value.length(); i++) {
             char currentChar = value.charAt(i);
-            if (PATH_RESERVED_CHARACTERS.indexOf(currentChar) != -1) {
+            if (reservedChars.indexOf(currentChar) != -1) {
                 if (bufferToEncode.length() > 0) {
                     buffer.append(urlEncode(bufferToEncode.toString()));
                     bufferToEncode.setLength(0);
@@ -108,7 +99,28 @@ public final class HttpUtils {
             buffer.append(urlEncode(bufferToEncode.toString()));
         }
         
-        String result = buffer.toString();
+        return buffer.toString();
+    }
+    
+    public static String queryEncode(String value) {
+        
+        return componentEncode(QUERY_RESERVED_CHARACTERS, value);
+    }
+    
+    public static String urlEncode(String value) {
+        
+        try {
+            value = URLEncoder.encode(value, "UTF-8");
+        } catch (UnsupportedEncodingException ex) {
+            // unlikely to happen
+        }
+        
+        return value;
+    }
+    
+    public static String pathEncode(String value) {
+        
+        String result = componentEncode(PATH_RESERVED_CHARACTERS, value);
         // URLEncoder will encode '+' to %2B but will turn ' ' into '+'
         // We need to retain '+' and encode ' ' as %20
         if (result.indexOf('+') != -1) {
@@ -121,6 +133,9 @@ public final class HttpUtils {
         return result;
     }
     
+    public static boolean isPartiallyEncoded(String value) {
+        return ENCODE_PATTERN.matcher(value).find();
+    }
        
     /**
      * Encodes partially encoded string. Encode all values but those matching pattern 
@@ -138,12 +153,12 @@ public final class HttpUtils {
         int i = 0;
         while (m.find()) {
             String before = encoded.substring(i, m.start());
-            sb.append(query ? HttpUtils.urlEncode(before) : HttpUtils.pathEncode(before));
+            sb.append(query ? HttpUtils.queryEncode(before) : HttpUtils.pathEncode(before));
             sb.append(m.group());
             i = m.end();            
         }
         String tail = encoded.substring(i, encoded.length());
-        sb.append(query ? HttpUtils.urlEncode(tail) : HttpUtils.pathEncode(tail));
+        sb.append(query ? HttpUtils.queryEncode(tail) : HttpUtils.pathEncode(tail));
         return sb.toString();
     }
     

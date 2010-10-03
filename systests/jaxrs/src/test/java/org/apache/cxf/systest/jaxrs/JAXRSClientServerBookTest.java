@@ -57,7 +57,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookServer.class, false));
+                   launchServer(BookServer.class));
     }
     
     
@@ -493,6 +493,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                                + "?_s=name==CXF*;id=ge=123;id=lt=124",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testSearchBook123WithWebClient() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/books/search";
+                          
+        WebClient client = WebClient.create(address);
+        Book b = client.query("_s", "name==CXF*;id=ge=123;id=lt=124").get(Book.class);
+        assertEquals(b.getId(), 123L);
+        
     }
     
     @Test
