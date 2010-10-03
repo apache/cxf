@@ -117,6 +117,13 @@ public class UriBuilderImpl extends UriBuilder {
                 && thePath.length() != 0 && !thePath.startsWith("/")) {
                 thePath = "/" + thePath;
             }
+            if (theQuery != null && HttpUtils.isPartiallyEncoded(theQuery)) {
+                try {
+                    return buildURIFromEncoded(thePath, theQuery, theFragment);
+                } catch (Exception ex) {
+                    // lets try the option below
+                }
+            }
             URI uri = new URI(scheme, userInfo, host, port, 
                            thePath, theQuery, theFragment);
             if (thePath.contains("%2F")) {
@@ -585,7 +592,13 @@ public class UriBuilderImpl extends UriBuilder {
 
     @Override
     public UriBuilder replaceQuery(String queryValue) throws IllegalArgumentException {
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", true, false);
+        if (queryValue != null) {
+            // workaround to do with a conflicting and confusing requirement where spaces 
+            // passed as part of replaceQuery are encoded as %20 while those passed as part 
+            // of quertyParam are encoded as '+'
+            queryValue = queryValue.replace(" ", "%20");
+        }
+        query = JAXRSUtils.getStructuredParams(queryValue, "&", false, false);
         return this;
     }
 
@@ -655,6 +668,8 @@ public class UriBuilderImpl extends UriBuilder {
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
                 if (fromEncoded) {
+                    val = HttpUtils.encodePartiallyEncoded(val, isQuery);
+                } else if (isQuery && !val.startsWith("{") && !val.endsWith("}")) { 
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
                 }
                 b.append(entry.getKey());
