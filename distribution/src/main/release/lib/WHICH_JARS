@@ -35,6 +35,8 @@ For Java2WSDL and WSDL2Java:
 - velocity.jar
 - commons-collections.jar
 - commons-lang.jar
+- cxf-xjc*.jar (optional, these are xjc extensions for providing enhanced
+        JAXB code generation)
 
 For JAX-WS support:
 - geronimo-ws-metadata.jar [6]
@@ -62,6 +64,9 @@ For standalone HTTP support:
 For Aegis support:
 - jdom.jar (optional, if you want to map xsd:anyType to JDOM)
 
+For XmlBeans databinding support:
+- xmlbeans.jar
+
 For WS-Security support:
 - bcprov-jdk15.jar
 - xalan.jar
@@ -74,15 +79,21 @@ For HTTP Binding support:
 - jettison.jar (Needed for JSON services only)
 
 For JAX-RS support:
-- abdera*
-- axiom*
+- abdera*  (optional: for AtomPub support, but also needed for the 
+            Management log browser console)
+- commons-codec.jar (Needed for Abdera)
+- jaxen.jar (Needed for Abdera)
+- axiom* (Needed for Abdera)
 - jsr311-api.jar
 - jettison.jar (Needed for JSON services only)
 
 For JMS transport
 - geronimo-jms.jar (Or the Sun equivalent)
 - spring-jms.jar
+- commons-pool.jar
 
 For CORBA support:
 - antlr.jar
 
+For JavaScript functionality:
+- js.jar
