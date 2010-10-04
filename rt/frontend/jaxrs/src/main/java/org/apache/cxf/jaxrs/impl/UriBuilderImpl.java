@@ -592,7 +592,7 @@ public class UriBuilderImpl extends UriBuilder {
             // of quertyParam are encoded as '+'
             queryValue = queryValue.replace(" ", "%20");
         }
-        query = JAXRSUtils.getStructuredParams(queryValue, "&", false, false);
+        query = JAXRSUtils.getStructuredParams(queryValue, "&", false, true);
         return this;
     }
 
@@ -661,9 +661,7 @@ public class UriBuilderImpl extends UriBuilder {
             Map.Entry<String, List<String>> entry = it.next();
             for (Iterator<String> sit = entry.getValue().iterator(); sit.hasNext();) {
                 String val = sit.next();
-                if (fromEncoded) {
-                    val = HttpUtils.encodePartiallyEncoded(val, isQuery);
-                } else if (isQuery && !val.startsWith("{") && !val.endsWith("}")) { 
+                if (fromEncoded  || (isQuery && !val.startsWith("{") && !val.endsWith("}"))) { 
                     val = HttpUtils.encodePartiallyEncoded(val, isQuery);
                 }
                 b.append(entry.getKey());

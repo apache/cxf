@@ -167,7 +167,7 @@ public class UriBuilderImplTest extends Assert {
             .matrixParam("m", "m1 ", "m2+%20")
             .queryParam("q", "q1 ", "q2+q3%20").clone().buildFromEncoded("a+ ", "b%2B%20 ");   
         assertEquals("URI is not built correctly", 
-                     "http://bar/a+%20/b%2B%20%20;m=m1%20;m=m2+%20?q=q1+&q=q2+q3%20", 
+                     "http://bar/a+%20/b%2B%20%20;m=m1%20;m=m2+%20?q=q1+&q=q2%2Bq3%20", 
                      newUri.toString());
     }
     
@@ -176,7 +176,7 @@ public class UriBuilderImplTest extends Assert {
         URI uri = new URI("http://bar/foo+%20%2B?q=a+b%20%2B");
         URI newUri = new UriBuilderImpl(uri).buildFromEncoded();   
         assertEquals("URI is not built correctly", 
-                     "http://bar/foo+%20%2B?q=a+b%20%2B", newUri.toString());
+                     "http://bar/foo+%20%2B?q=a%2Bb%20%2B", newUri.toString());
     }
     
     @Test
@@ -215,7 +215,7 @@ public class UriBuilderImplTest extends Assert {
     public void testEncodedAddedQuery() throws Exception {
         URI uri = new URI("http://bar");
         URI newUri = new UriBuilderImpl(uri).queryParam("q", "a+b%20%2B").buildFromEncoded();   
-        assertEquals("URI is not built correctly", "http://bar?q=a+b%20%2B", newUri.toString());
+        assertEquals("URI is not built correctly", "http://bar?q=a%2Bb%20%2B", newUri.toString());
     }
     
     @Test

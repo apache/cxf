@@ -64,7 +64,7 @@ public final class HttpUtils {
     
     // there are more of such characters, ex, '*' but '*' is not affected by UrlEncode
     private static final String PATH_RESERVED_CHARACTERS = "=@";
-    private static final String QUERY_RESERVED_CHARACTERS = "?/+";
+    private static final String QUERY_RESERVED_CHARACTERS = "?/";
     
     private HttpUtils() {
     }
