@@ -935,8 +935,8 @@ public final class JAXRSUtils {
                 String value = null;
                 if (values.length == 1) {
                     value = "";
-                } else if (decode) {
-                    value = (";".equals(sep) || !decodePlus)
+                } else if (decode || (decodePlus && values[1].contains("+"))) {
+                    value = (";".equals(sep))
                         ? HttpUtils.pathDecode(values[1]) : HttpUtils.urlDecode(values[1]); 
                 } else {
                     value = values[1];

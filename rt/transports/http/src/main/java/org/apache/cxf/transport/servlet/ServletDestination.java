@@ -20,6 +20,7 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
+import java.net.URI;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
@@ -99,7 +100,13 @@ public class ServletDestination extends AbstractHTTPDestination {
  
     }
     protected String getBasePath(String contextPath) throws IOException {
-        return contextPath + getAddress().getAddress().getValue();
+        
+        String address = getAddress().getAddress().getValue();
+        if (address.startsWith("http")) {
+            return URI.create(address).getPath();
+        }
+        
+        return contextPath + address;
     }
     
     @Override
