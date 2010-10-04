@@ -95,42 +95,19 @@
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
             <version>${abdera.version}</version>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
             <version>${abdera.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>jaxen</groupId>
-            <artifactId>jaxen</artifactId>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-extensions-json</artifactId>
             <version>${abdera.version}</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.abdera</groupId>
-                    <artifactId>abdera-client</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.abdera</groupId>
-                    <artifactId>abdera-server</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.abdera</groupId>
-                    <artifactId>abdera-extensions-html</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.geronimo.specs</groupId>
-                    <artifactId>geronimo-activation_1.0.2_spec</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>stax</groupId>
-                    <artifactId>stax-api</artifactId>
-                </exclusion>
-            </exclusions>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>${servlet-api.group}</groupId>
