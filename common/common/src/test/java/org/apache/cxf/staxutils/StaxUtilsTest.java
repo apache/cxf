@@ -50,7 +50,15 @@ public class StaxUtilsTest extends Assert {
     private InputStream getTestStream(String resource) {
         return getClass().getResourceAsStream(resource);
     }
-
+    @Test
+    public void testCommentNode() throws Exception {
+        //CXF-3034
+        Document document = DocumentBuilderFactory.newInstance()
+            .newDocumentBuilder().newDocument();
+        Element root = document.createElementNS("urn:test", "root");
+        root.appendChild(document.createComment("test comment"));
+        StaxUtils.copy(StaxUtils.createXMLStreamReader(root), StaxUtils.createXMLStreamWriter(System.out));
+    }
     @Test
     public void testToNextElement() {
         String soapMessage = "./resources/sayHiRpcLiteralReq.xml";
