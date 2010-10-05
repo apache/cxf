@@ -24,7 +24,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.cxf.aegis.AegisContext;
+import org.apache.cxf.aegis.type.AbstractTypeCreator;
+import org.apache.cxf.aegis.type.DefaultTypeMapping;
 import org.apache.cxf.aegis.type.TypeCreationOptions;
+import org.apache.cxf.aegis.type.TypeCreator;
+import org.apache.cxf.aegis.type.TypeMapping;
+import org.apache.cxf.aegis.type.XMLTypeCreator;
+import org.apache.cxf.aegis.type.java5.Java5TypeCreator;
+import org.apache.cxf.common.util.SOAPConstants;
 
 /**
  * Class that sets options to disable xml namespaces.
@@ -33,6 +40,29 @@ class NoNamespaceAegisElementProvider extends AegisElementProvider<Object> {
     /*
      * This can't use the cache in AbstractAegisProvider. It could have its own cache.
      */
+
+    private TypeCreator createTypeCreator(TypeCreationOptions options) {
+        AbstractTypeCreator xmlCreator = createRootTypeCreator(options);
+
+        Java5TypeCreator j5Creator = new NoNamespaceJava5TypeCreator();
+        j5Creator.setNextCreator(createDefaultTypeCreator(options));
+        j5Creator.setConfiguration(options);
+        xmlCreator.setNextCreator(j5Creator);
+
+        return xmlCreator;
+    }
+
+    protected AbstractTypeCreator createRootTypeCreator(TypeCreationOptions options) {
+        AbstractTypeCreator creator = new XMLTypeCreator();
+        creator.setConfiguration(options);
+        return creator;
+    }
+
+    protected AbstractTypeCreator createDefaultTypeCreator(TypeCreationOptions options) {
+        AbstractTypeCreator creator = new NoNamespaceTypeCreator();
+        creator.setConfiguration(options);
+        return creator;
+    }
 
     @Override
     protected AegisContext getAegisContext(Class<?> plainClass, Type genericType) {
@@ -45,6 +75,12 @@ class NoNamespaceAegisElementProvider extends AegisElementProvider<Object> {
         rootClasses.add(genericType);
         context.setTypeCreationOptions(tco);
         context.setRootClasses(rootClasses);
+        TypeMapping baseMapping = DefaultTypeMapping.createSoap11TypeMapping(true, false, false);
+        DefaultTypeMapping mapping = new DefaultTypeMapping(SOAPConstants.XSD, baseMapping);
+        TypeCreator stockTypeCreator = createTypeCreator(tco);
+
+        mapping.setTypeCreator(stockTypeCreator);
+        context.setTypeMapping(mapping);
         context.initialize();
         return context;
     }
