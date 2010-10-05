@@ -23,6 +23,7 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URI;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -58,6 +59,7 @@ import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.SecurityContext;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriBuilder;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
@@ -110,6 +112,14 @@ public class BookStore {
         
         Response response = Response.serverError().entity("This is a WebApplicationException").build();
         throw new WebApplicationException(response);
+    }
+    
+    @GET
+    @Path("tempredirect")
+    public Response tempRedirect() {
+        URI uri = UriBuilder.fromPath("whatever/redirection")
+            .queryParam("css1", "http://bar").build();
+        return Response.temporaryRedirect(uri).build();
     }
     
     @GET

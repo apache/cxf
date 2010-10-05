@@ -93,15 +93,19 @@ public final class ResponseBuilderImpl extends ResponseBuilder {
         return setHeader(HttpHeaders.CONTENT_LANGUAGE, language);
     }
 
-    public ResponseBuilder location(URI location) {
-        if (!location.isAbsolute()) {
+    public ResponseBuilder location(URI loc) {
+        if (!loc.isAbsolute()) {
             Message currentMessage = PhaseInterceptorChain.getCurrentMessage();
             if (currentMessage != null) {
+                
                 UriInfo ui = new UriInfoImpl(currentMessage.getExchange().getInMessage(), null);
-                location = ui.getBaseUriBuilder().path(location.toString()).build();
+                loc = ui.getBaseUriBuilder()
+                        .path(loc.getRawPath())
+                        .replaceQuery(loc.getRawQuery())
+                        .fragment(loc.getRawFragment()).buildFromEncoded();
             }
         }
-        return setHeader(HttpHeaders.LOCATION, location);
+        return setHeader(HttpHeaders.LOCATION, loc);
     }
 
     public ResponseBuilder contentLocation(URI location) {
