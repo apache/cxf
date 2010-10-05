@@ -384,6 +384,81 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             throw new Fault(e);
         }
     }
+    private WSSecBase doEncryptionDerived(TokenWrapper recToken,
+                                          SecurityToken encrTok,
+                                          Token encrToken,
+                                          boolean attached,
+                                          Vector<WSEncryptionPart> encrParts,
+                                          boolean atEnd) {
+        try {
+            WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
+            if (recToken.getToken().getSPConstants() == SP12Constants.INSTANCE) {
+                dkEncr.setWscVersion(ConversationConstants.VERSION_05_12);
+            }
+
+            if (attached && encrTok.getAttachedReference() != null) {
+                dkEncr.setExternalKey(encrTok.getSecret(),
+                                      (Element)saaj.getSOAPPart()
+                                          .importNode((Element) encrTok.getAttachedReference(),
+                                true));
+            } else if (encrTok.getUnattachedReference() != null) {
+                dkEncr.setExternalKey(encrTok.getSecret(), (Element)saaj.getSOAPPart()
+                        .importNode((Element) encrTok.getUnattachedReference(),
+                                true));
+            } else if (!isRequestor()) { 
+                // If the Encrypted key used to create the derived key is not
+                // attached use key identifier as defined in WSS1.1 section
+                // 7.7 Encrypted Key reference
+                SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
+                if (encrTok.getSHA1() != null) {
+                    tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
+                }
+                dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
+            } else {
+                if (attached) {
+                    String id = encrTok.getWsuId();
+                    if (id == null && encrToken instanceof SecureConversationToken) {
+                        dkEncr.setTokenIdDirectId(true);
+                        id = encrTok.getId();
+                    } else if (id == null) {
+                        id = encrTok.getId();
+                    }
+                    if (id.startsWith("#")) {
+                        id = id.substring(1);
+                    }
+                    dkEncr.setExternalKey(encrTok.getSecret(), id);
+                } else {
+                    dkEncr.setTokenIdDirectId(true);
+                    dkEncr.setExternalKey(encrTok.getSecret(), encrTok.getId());
+                }
+            }
+            
+            if (encrTok.getSHA1() != null) {
+                dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                        + WSConstants.ENC_KEY_VALUE_TYPE);
+            } else {
+                dkEncr.setCustomValueType(encrTok.getTokenType());
+            }
+            
+            dkEncr.setSymmetricEncAlgorithm(sbinding.getAlgorithmSuite().getEncryption());
+            dkEncr.setDerivedKeyLength(sbinding.getAlgorithmSuite()
+                                           .getEncryptionDerivedKeyLength() / 8);
+            dkEncr.prepare(saaj.getSOAPPart());
+            Element encrDKTokenElem = null;
+            encrDKTokenElem = dkEncr.getdktElement();
+            addDerivedKeyElement(encrDKTokenElem);
+            Element refList = dkEncr.encryptForExternalRef(null, encrParts);
+            if (atEnd) {
+                this.insertBeforeBottomUp(refList);
+            } else {
+                this.addDerivedKeyElement(refList);                        
+            }
+            return dkEncr;
+        } catch (Exception e) {
+            policyNotAsserted(recToken, e);
+        }
+        return null;
+    }
     
     private WSSecBase doEncryption(TokenWrapper recToken,
                                    SecurityToken encrTok,
@@ -397,73 +472,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             policyAsserted(encrToken);
             AlgorithmSuite algorithmSuite = sbinding.getAlgorithmSuite();
             if (encrToken.isDerivedKeys()) {
-                try {
-                    WSSecDKEncrypt dkEncr = new WSSecDKEncrypt();
-                    if (recToken.getToken().getSPConstants() == SP12Constants.INSTANCE) {
-                        dkEncr.setWscVersion(ConversationConstants.VERSION_05_12);
-                    }
-
-                    if (attached && encrTok.getAttachedReference() != null) {
-                        dkEncr.setExternalKey(encrTok.getSecret(),
-                                              (Element)saaj.getSOAPPart()
-                                                  .importNode((Element) encrTok.getAttachedReference(),
-                                        true));
-                    } else if (encrTok.getUnattachedReference() != null) {
-                        dkEncr.setExternalKey(encrTok.getSecret(), (Element)saaj.getSOAPPart()
-                                .importNode((Element) encrTok.getUnattachedReference(),
-                                        true));
-                    } else if (!isRequestor()) { 
-                        // If the Encrypted key used to create the derived key is not
-                        // attached use key identifier as defined in WSS1.1 section
-                        // 7.7 Encrypted Key reference
-                        SecurityTokenReference tokenRef = new SecurityTokenReference(saaj.getSOAPPart());
-                        if (encrTok.getSHA1() != null) {
-                            tokenRef.setKeyIdentifierEncKeySHA1(encrTok.getSHA1());
-                        }
-                        dkEncr.setExternalKey(encrTok.getSecret(), tokenRef.getElement());
-                    } else {
-                        if (attached) {
-                            String id = encrTok.getWsuId();
-                            if (id == null && encrToken instanceof SecureConversationToken) {
-                                dkEncr.setTokenIdDirectId(true);
-                                id = encrTok.getId();
-                            } else if (id == null) {
-                                id = encrTok.getId();
-                            }
-                            if (id.startsWith("#")) {
-                                id = id.substring(1);
-                            }
-                            dkEncr.setExternalKey(encrTok.getSecret(), id);
-                        } else {
-                            dkEncr.setTokenIdDirectId(true);
-                            dkEncr.setExternalKey(encrTok.getSecret(), encrTok.getId());
-                        }
-                    }
-                    
-                    if (encrTok.getSHA1() != null) {
-                        dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
-                                + WSConstants.ENC_KEY_VALUE_TYPE);
-                    } else {
-                        dkEncr.setCustomValueType(encrTok.getTokenType());
-                    }
-                    
-                    dkEncr.setSymmetricEncAlgorithm(sbinding.getAlgorithmSuite().getEncryption());
-                    dkEncr.setDerivedKeyLength(sbinding.getAlgorithmSuite()
-                                                   .getEncryptionDerivedKeyLength() / 8);
-                    dkEncr.prepare(saaj.getSOAPPart());
-                    Element encrDKTokenElem = null;
-                    encrDKTokenElem = dkEncr.getdktElement();
-                    addDerivedKeyElement(encrDKTokenElem);
-                    Element refList = dkEncr.encryptForExternalRef(null, encrParts);
-                    if (atEnd) {
-                        this.insertBeforeBottomUp(refList);
-                    } else {
-                        this.addDerivedKeyElement(refList);                        
-                    }
-                    return dkEncr;
-                } catch (Exception e) {
-                    policyNotAsserted(recToken, e);
-                }
+                return doEncryptionDerived(recToken, encrTok, encrToken,
+                                           attached, encrParts, atEnd);
             } else {
                 try {
                     WSSecEncrypt encr = new WSSecEncrypt();
