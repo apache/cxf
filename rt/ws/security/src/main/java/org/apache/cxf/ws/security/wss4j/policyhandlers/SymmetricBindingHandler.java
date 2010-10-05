@@ -424,7 +424,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     } else {
                         if (attached) {
                             String id = encrTok.getWsuId();
-                            if (id == null) {
+                            if (id == null && encrToken instanceof SecureConversationToken) {
+                                dkEncr.setTokenIdDirectId(true);
+                                id = encrTok.getId();
+                            } else if (id == null) {
                                 id = encrTok.getId();
                             }
                             if (id.startsWith("#")) {
@@ -432,6 +435,7 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                             }
                             dkEncr.setExternalKey(encrTok.getSecret(), id);
                         } else {
+                            dkEncr.setTokenIdDirectId(true);
                             dkEncr.setExternalKey(encrTok.getSecret(), encrTok.getId());
                         }
                     }
@@ -439,6 +443,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     if (encrTok.getSHA1() != null) {
                         dkEncr.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                                 + WSConstants.ENC_KEY_VALUE_TYPE);
+                    } else {
+                        dkEncr.setCustomValueType(encrTok.getTokenType());
                     }
                     
                     dkEncr.setSymmetricEncAlgorithm(sbinding.getAlgorithmSuite().getEncryption());
@@ -464,7 +470,10 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                     String encrTokId = encrTok.getId();
                     if (attached) {
                         encrTokId = encrTok.getWsuId();
-                        if (encrTokId == null) {
+                        if (encrTokId == null && encrToken instanceof SecureConversationToken) {
+                            encr.setEncKeyIdDirectId(true);
+                            encrTokId = encrTok.getId();
+                        } else if (encrTokId == null) {
                             encrTokId = encrTok.getId();
                         }
                         if (encrTokId.startsWith("#")) {
@@ -570,6 +579,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             }
             dkSign.setExternalKey(tok.getSecret(), tokenRef.getElement());
         } else {
+            if (policyToken instanceof SecureConversationToken) {
+                dkSign.setTokenIdDirectId(true);
+            }
             dkSign.setExternalKey(tok.getSecret(), tok.getId());
         }
 
@@ -580,6 +592,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             //Set the value type of the reference
             dkSign.setCustomValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                 + WSConstants.ENC_KEY_VALUE_TYPE);
+        } else {
+            dkSign.setCustomValueType(tok.getTokenType());
         }
         
         try {
@@ -652,6 +666,9 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
             if (included) {
                 sigTokId = tok.getWsuId();
                 if (sigTokId == null) {
+                    if (policyToken instanceof SecureConversationToken) {
+                        sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING_DIRECT);
+                    }
                     sigTokId = tok.getId();                    
                 }
                 if (sigTokId.startsWith("#")) {
