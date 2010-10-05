@@ -71,8 +71,9 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         // requires ws-a support to propagate reference parameters
         createStaticBus("org/apache/cxf/systest/factory_pattern/cxf_multiplex.xml");
         Map<String, String> props = new HashMap<String, String>();    
-        if (System.getProperty("activemq.store.dir") != null) {
-            props.put("activemq.store.dir", System.getProperty("activemq.store.dir"));
+        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
+            props.put("org.apache.activemq.default.directory.prefix", 
+                      System.getProperty("org.apache.activemq.default.directory.prefix"));
         }
         props.put("java.util.logging.config.file", 
                   System.getProperty("java.util.logging.config.file"));
