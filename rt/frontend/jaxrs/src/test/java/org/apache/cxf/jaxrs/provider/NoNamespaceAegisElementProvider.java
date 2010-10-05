@@ -36,7 +36,7 @@ import org.apache.cxf.common.util.SOAPConstants;
 /**
  * Class that sets options to disable xml namespaces.
  */
-class NoNamespaceAegisElementProvider extends AegisElementProvider<Object> {
+class NoNamespaceAegisElementProvider<T> extends AegisElementProvider<T> {
     /*
      * This can't use the cache in AbstractAegisProvider. It could have its own cache.
      */

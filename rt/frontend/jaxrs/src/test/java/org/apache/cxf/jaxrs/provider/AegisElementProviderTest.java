@@ -81,6 +81,17 @@ public class AegisElementProviderTest extends Assert {
         assertEquals(Boolean.TRUE, bean.getBoolValue());
     }
 
+
+    @Test
+    public void testNoNamespaceReadFrom() throws Exception {
+        MessageBodyReader<AegisTestBean> p = new NoNamespaceAegisElementProvider<AegisTestBean>();
+        byte[] bytes = noNamespaceXml.getBytes("utf-8");
+        AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
+                                          null, null, new ByteArrayInputStream(bytes));
+        assertEquals("hovercraft", bean.getStrValue());
+        assertEquals(Boolean.TRUE, bean.getBoolValue());
+    }
+
     @Test
     public void testWriteTo() throws Exception {
         MessageBodyWriter<Object> p = new AegisElementProvider<Object>();
@@ -96,7 +107,7 @@ public class AegisElementProviderTest extends Assert {
 
     @Test
     public void testNoNamespaceWriteTo() throws Exception {
-        MessageBodyWriter<Object> p = new NoNamespaceAegisElementProvider();
+        MessageBodyWriter<Object> p = new NoNamespaceAegisElementProvider<Object>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
