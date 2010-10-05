@@ -28,6 +28,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.httpclient.Header;
@@ -67,6 +68,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         Response r = client.header("OnewayRequest", "true").post(null);
         assertEquals(202, r.getStatus());
     }
+    
+    @Test
+    public void testTempRedirectWebClient() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/tempredirect");
+        Response r = client.type("*/*").get();
+        assertEquals(307, r.getStatus());
+        MultivaluedMap<String, Object> map = r.getMetadata();
+        assertEquals("http://localhost:" + PORT + "/whatever/redirection?css1=http%3A//bar",
+                     map.getFirst("Location").toString());
+    }
+    
     
     @Test
     public void testOnewayProxy() throws Exception {
