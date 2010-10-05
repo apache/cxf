@@ -40,45 +40,47 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class AegisElementProviderTest extends Assert {
-    
+
     private Properties properties;
     private String simpleBeanXml;
-    
+    private String noNamespaceXml;
+
     @Before
     public void before() throws InvalidPropertiesFormatException, IOException {
         properties = new Properties();
         properties.loadFromXML(getClass().getResourceAsStream("jsonCases.xml"));
         simpleBeanXml = properties.getProperty("simpleBeanXml");
+        noNamespaceXml = properties.getProperty("noNamespaceBeanXml");
     }
-    
+
     @After
     public void clearCache() {
         AbstractAegisProvider.clearContexts();
     }
-    
+
     @Test
     public void testIsWriteable() {
         MessageBodyWriter<Object> p = new AegisElementProvider<Object>();
         assertTrue(p.isWriteable(AegisTestBean.class, null, null, null));
     }
-    
+
     @Test
     public void testIsReadable() {
         MessageBodyReader<Object> p = new AegisElementProvider<Object>();
         assertTrue(p.isReadable(AegisTestBean.class, null, null, null));
     }
-    
-    
+
+
     @Test
     public void testReadFrom() throws Exception {
         MessageBodyReader<AegisTestBean> p = new AegisElementProvider<AegisTestBean>();
         byte[] simpleBytes = simpleBeanXml.getBytes("utf-8");
-        AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null, 
+        AegisTestBean bean = p.readFrom(AegisTestBean.class, null, null,
                                           null, null, new ByteArrayInputStream(simpleBytes));
         assertEquals("hovercraft", bean.getStrValue());
         assertEquals(Boolean.TRUE, bean.getBoolValue());
     }
-    
+
     @Test
     public void testWriteTo() throws Exception {
         MessageBodyWriter<Object> p = new AegisElementProvider<Object>();
@@ -91,13 +93,25 @@ public class AegisElementProviderTest extends Assert {
         String xml = new String(bytes, "utf-8");
         assertEquals(simpleBeanXml, xml);
     }
-    
-    
+
+    @Test
+    public void testNoNamespaceWriteTo() throws Exception {
+        MessageBodyWriter<Object> p = new NoNamespaceAegisElementProvider();
+        ByteArrayOutputStream os = new ByteArrayOutputStream();
+        AegisTestBean bean = new AegisTestBean();
+        bean.setBoolValue(Boolean.TRUE);
+        bean.setStrValue("hovercraft");
+        p.writeTo(bean, null, null, null, null, null, os);
+        byte[] bytes = os.toByteArray();
+        String xml = new String(bytes, "utf-8");
+        assertEquals(noNamespaceXml, xml);
+    }
+
     @Test
     public void testReadWriteComplexMap() throws Exception {
-        Map<AegisTestBean, AegisSuperBean> testMap = 
+        Map<AegisTestBean, AegisSuperBean> testMap =
             new HashMap<AegisTestBean, AegisSuperBean>();
-        
+
         Class<InterfaceWithMap> iwithMapClass = InterfaceWithMap.class;
         Method method = iwithMapClass.getMethod("mapFunction");
         Type mapType = method.getGenericReturnType();
@@ -105,24 +119,24 @@ public class AegisElementProviderTest extends Assert {
         AegisTestBean bean = new AegisTestBean();
         bean.setBoolValue(Boolean.TRUE);
         bean.setStrValue("hovercraft");
-        
+
         AegisSuperBean bean2 = new AegisSuperBean();
         bean2.setBoolValue(Boolean.TRUE);
         bean2.setStrValue("hovercraft2");
         testMap.put(bean, bean2);
-        
-        MessageBodyWriter<Map<AegisTestBean, AegisSuperBean>> writer 
+
+        MessageBodyWriter<Map<AegisTestBean, AegisSuperBean>> writer
             = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
         ByteArrayOutputStream os = new ByteArrayOutputStream();
-        
+
         writer.writeTo(testMap, testMap.getClass(), mapType, null, null, null, os);
         byte[] bytes = os.toByteArray();
         String xml = new String(bytes, "utf-8");
-        MessageBodyReader<Map<AegisTestBean, AegisSuperBean>> reader 
-            = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();         
+        MessageBodyReader<Map<AegisTestBean, AegisSuperBean>> reader
+            = new AegisElementProvider<Map<AegisTestBean, AegisSuperBean>>();
         byte[] simpleBytes = xml.getBytes("utf-8");
-        
-        Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, null, 
+
+        Map<AegisTestBean, AegisSuperBean> map2 = reader.readFrom(null, mapType, null,
                                           null, null, new ByteArrayInputStream(simpleBytes));
         assertEquals(1, map2.size());
         Map.Entry<AegisTestBean, AegisSuperBean> entry = map2.entrySet().iterator().next();
@@ -132,14 +146,14 @@ public class AegisElementProviderTest extends Assert {
         AegisTestBean bean22 = entry.getValue();
         assertEquals("hovercraft2", bean22.getStrValue());
         assertEquals(Boolean.TRUE, bean22.getBoolValue());
-        
+
     }
-    
+
     public static class AegisSuperBean extends AegisTestBean {
     }
-    
+
     private static interface InterfaceWithMap {
         Map<AegisTestBean, AegisSuperBean> mapFunction();
     }
-    
+
 }
