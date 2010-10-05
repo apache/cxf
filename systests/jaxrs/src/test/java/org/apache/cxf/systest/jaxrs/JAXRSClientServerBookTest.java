@@ -77,6 +77,19 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         MultivaluedMap<String, Object> map = r.getMetadata();
         assertEquals("http://localhost:" + PORT + "/whatever/redirection?css1=http%3A//bar",
                      map.getFirst("Location").toString());
+        List<Object> cookies = r.getMetadata().get("Set-Cookie");
+        assertNotNull(cookies);
+        assertEquals(2, cookies.size());
+    }
+    
+    @Test
+    public void testSetCookieWebClient() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/setcookies");
+        Response r = client.type("*/*").get();
+        assertEquals(200, r.getStatus());
+        List<Object> cookies = r.getMetadata().get("Set-Cookie");
+        assertNotNull(cookies);
+        assertEquals(1, cookies.size());
     }
     
     
@@ -235,6 +248,9 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertTrue(values.contains("POST") && values.contains("GET")
                    && values.contains("DELETE") && values.contains("PUT"));
         assertEquals(0, ((InputStream)response.getEntity()).available());
+        List<Object> date = response.getMetadata().get("Date");
+        assertNotNull(date);
+        assertEquals(1, date.size());
     }
     
     @Test
