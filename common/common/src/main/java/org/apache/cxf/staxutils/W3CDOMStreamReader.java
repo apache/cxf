@@ -27,6 +27,7 @@ import javax.xml.stream.XMLStreamException;
 
 import org.w3c.dom.Attr;
 
+import org.w3c.dom.Comment;
 import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Element;
@@ -330,6 +331,8 @@ public class W3CDOMStreamReader extends AbstractDOMStreamReader<Node, Node> {
     public String getText() {
         if (content instanceof Text) {
             return ((Text)content).getData();
+        } else if (content instanceof Comment) {
+            return ((Comment)content).getData();
         }
         return DOMUtils.getRawContent(getCurrentNode());
     }
