@@ -44,6 +44,8 @@ import org.apache.cxf.ws.security.tokenstore.MemoryTokenStore;
 import org.apache.cxf.ws.security.tokenstore.SecurityToken;
 import org.apache.cxf.ws.security.tokenstore.TokenStore;
 import org.apache.cxf.ws.security.trust.STSClient;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
+import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
@@ -55,6 +57,14 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
 
     public IssuedTokenInterceptorProvider() {
         super(Arrays.asList(SP11Constants.ISSUED_TOKEN, SP12Constants.ISSUED_TOKEN));
+        
+        //issued tokens can be attached as a supporting token without
+        //any type of binding.  Make sure we can support that.
+        this.getOutInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
+        this.getOutFaultInterceptors().add(PolicyBasedWSS4JOutInterceptor.INSTANCE);
+        this.getInInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
+        this.getInFaultInterceptors().add(PolicyBasedWSS4JInInterceptor.INSTANCE);
+        
         this.getOutInterceptors().add(new IssuedTokenOutInterceptor());
         this.getOutFaultInterceptors().add(new IssuedTokenOutInterceptor());
         this.getInInterceptors().add(new IssuedTokenInInterceptor());
@@ -186,6 +196,7 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
         public IssuedTokenInInterceptor() {
             super(Phase.PRE_PROTOCOL);
             addAfter(WSS4JInInterceptor.class.getName());
+            addAfter(PolicyBasedWSS4JInInterceptor.class.getName());
         }
 
         public void handleMessage(Message message) throws Fault {
