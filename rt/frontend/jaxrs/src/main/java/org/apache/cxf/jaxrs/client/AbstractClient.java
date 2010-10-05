@@ -335,14 +335,20 @@ public class AbstractClient implements Client {
             if (null == entry.getKey()) {
                 continue;
             }
-            if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
-                currentResponseBuilder.header(entry.getKey(), entry.getValue());
-            } else if (entry.getValue().size() > 0) {
-                String[] values = entry.getValue().get(0).split(",");
-                for (String s : values) {
-                    String theValue = s.trim();
-                    if (theValue.length() > 0) {
-                        currentResponseBuilder.header(entry.getKey(), theValue);
+            if (entry.getValue().size() > 0) {
+                if (HttpUtils.isDateRelatedHeader(entry.getKey())) {
+                    currentResponseBuilder.header(entry.getKey(), entry.getValue().get(0));
+                    continue;                    
+                }
+                boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
+                                          && entry.getValue().get(0).contains(HttpHeaders.EXPIRES));
+                for (String val : entry.getValue()) {
+                    String[] values = splitPossible ? val.split(",") : new String[]{val};
+                    for (String s : values) {
+                        String theValue = s.trim();
+                        if (theValue.length() > 0) {
+                            currentResponseBuilder.header(entry.getKey(), theValue);
+                        }
                     }
                 }
             }

@@ -45,6 +45,7 @@ import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.httpclient.methods.RequestEntity;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.multipart.Attachment;
@@ -250,6 +251,23 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
         client.type("multipart/related;type=text/xml").accept("text/xml");
         Book book = client.post(is1, Book.class);
         assertEquals("CXF in Action - 2", book.getName());
+    }
+    
+    @Test
+    public void testAddCollectionOfBooksWithProxy() {
+        String address = "http://localhost:" + PORT;
+        MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
+        
+        WebClient.client(client).header("Content-Type", "multipart/mixed;type=application/xml");
+        
+        List<Book> books = new ArrayList<Book>();
+        books.add(new Book("CXF 1", 1L));
+        books.add(new Book("CXF 2", 2L));
+        List<Book> books2 = client.addBooks(books);
+        assertNotSame(books, books2);
+        assertEquals(2, books2.size());
+        assertEquals(books.get(0).getId(), books2.get(0).getId());
+        assertEquals(books.get(1).getId(), books2.get(1).getId());
     }
     
     @Test

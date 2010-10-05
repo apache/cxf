@@ -116,10 +116,21 @@ public class BookStore {
     
     @GET
     @Path("tempredirect")
-    public Response tempRedirect() {
+    public Response tempRedirectAndSetCookies() {
         URI uri = UriBuilder.fromPath("whatever/redirection")
             .queryParam("css1", "http://bar").build();
-        return Response.temporaryRedirect(uri).build();
+        return Response.temporaryRedirect(uri)
+                       .header("Set-Cookie", "a=b").header("Set-Cookie", "c=d")
+                       .build();
+    }
+    
+    @GET
+    @Path("setcookies")
+    public Response setComplexCookies() {
+        return Response.ok().header("Set-Cookie", 
+                                    "bar.com.anoncart=107894933471602436; Domain=.bar.com;"
+                                    + " Expires=Thu, 01-Oct-2020 23:44:22 GMT; Path=/")
+                                    .build();
     }
     
     @GET
