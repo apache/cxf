@@ -48,8 +48,9 @@ public class JMSTransactionClientServerTest extends AbstractBusClientServerTestB
             return;
         }
         Map<String, String> props = new HashMap<String, String>();                
-        if (System.getProperty("activemq.store.dir") != null) {
-            props.put("activemq.store.dir", System.getProperty("activemq.store.dir"));
+        if (System.getProperty("org.apache.activemq.default.directory.prefix") != null) {
+            props.put("org.apache.activemq.default.directory.prefix",
+                      System.getProperty("org.apache.activemq.default.directory.prefix"));
         }
         props.put("java.util.logging.config.file", 
                   System.getProperty("java.util.logging.config.file"));
