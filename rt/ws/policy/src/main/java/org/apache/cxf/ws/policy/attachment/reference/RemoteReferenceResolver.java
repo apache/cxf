@@ -46,7 +46,7 @@ public class RemoteReferenceResolver implements ReferenceResolver {
 
     public Policy resolveReference(String uri) {
         int pos = uri.indexOf('#');
-        String documentURI = uri.substring(0, pos);
+        String documentURI = pos == -1 ? uri : uri.substring(0, pos);
         ExtendedURIResolver resolver = new ExtendedURIResolver();
         InputSource is = resolver.resolve(documentURI, baseURI);
         if (null == is) {
@@ -60,16 +60,20 @@ public class RemoteReferenceResolver implements ReferenceResolver {
         } finally {
             resolver.close();
         }
-        String id = uri.substring(pos + 1);
-        for (Element elem : PolicyConstants
-                .findAllPolicyElementsOfLocalName(doc,
-                                                  PolicyConstants.POLICY_ELEM_NAME)) {
-            
-            if (id.equals(elem.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
-                                              PolicyConstants.WSU_ID_ATTR_NAME))) {
-                return builder.getPolicy(elem);
+        if (pos == -1) {
+            return builder.getPolicy(doc.getDocumentElement());
+        } else {
+            String id = uri.substring(pos + 1);
+            for (Element elem : PolicyConstants
+                    .findAllPolicyElementsOfLocalName(doc,
+                                                      PolicyConstants.POLICY_ELEM_NAME)) {
+                
+                if (id.equals(elem.getAttributeNS(PolicyConstants.WSU_NAMESPACE_URI,
+                                                  PolicyConstants.WSU_ID_ATTR_NAME))) {
+                    return builder.getPolicy(elem);
+                }
             }
-        }
+        } 
         
         return null;
     }

@@ -80,11 +80,11 @@ public abstract class AbstractPolicyProvider implements PolicyProvider {
     }
     
     protected Policy resolveExternal(PolicyReference ref,  String baseURI) {
-        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
         Policy resolved = registry.lookup(ref.getURI());
         if (null != resolved) {
             return resolved;
         }
+        ReferenceResolver resolver = new RemoteReferenceResolver(baseURI, builder);
         return resolver.resolveReference(ref.getURI());
     }
     
