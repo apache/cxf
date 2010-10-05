@@ -873,7 +873,7 @@ public class PolicyBasedWss4JInOutTest extends AbstractSecurityTest {
     }
     
     private PolicyBasedWSS4JOutInterceptorInternal getOutInterceptor() {
-        return (new PolicyBasedWSS4JOutInterceptor()).createEndingInterceptor();
+        return PolicyBasedWSS4JOutInterceptor.INSTANCE.createEndingInterceptor();
     }
     
     private PolicyBasedWSS4JInInterceptor getInInterceptor(List<CoverageType> types) {

@@ -86,6 +86,8 @@ import org.apache.ws.security.handler.WSHandlerConstants;
  */
 public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     public static final String PROPERTIES_CACHE = "ws-security.properties.cache";
+    public static final PolicyBasedWSS4JInInterceptor INSTANCE 
+        = new PolicyBasedWSS4JInInterceptor();
 
     /**
      * 
