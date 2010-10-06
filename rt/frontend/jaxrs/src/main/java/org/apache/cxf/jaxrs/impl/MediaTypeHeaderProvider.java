@@ -33,7 +33,7 @@ import javax.ws.rs.ext.RuntimeDelegate.HeaderDelegate;
 public class MediaTypeHeaderProvider implements HeaderDelegate<MediaType> {
 
     private static final Pattern COMPLEX_PARAMETERS = 
-        Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-]+))");
+        Pattern.compile("(([\\w-]+=\"[^\"]*\")|([\\w-]+=[\\w-/]+))");
     
     public MediaType fromString(String mType) {
         

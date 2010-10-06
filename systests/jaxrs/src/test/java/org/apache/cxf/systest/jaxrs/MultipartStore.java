@@ -296,6 +296,14 @@ public class MultipartStore {
     }
     
     @POST
+    @Path("/books/jaxbonly")
+    @Consumes("multipart/mixed;type=text/xml")
+    @Produces("multipart/mixed;type=text/xml")
+    public List<Book> addBooksWithoutHeader(List<Book> books) {
+        return addBooks(books);
+    }
+    
+    @POST
     @Path("/books/jaxbjson")
     @Produces("text/xml")
     public Response addBookJaxbJson(

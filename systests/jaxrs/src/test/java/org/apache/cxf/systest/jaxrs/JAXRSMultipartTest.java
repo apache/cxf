@@ -255,15 +255,26 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testAddCollectionOfBooksWithProxy() {
+        doTestAddCollectionOfBooksWithProxy(true);
+    }
+    
+    @Test
+    public void testAddCollectionOfBooksWithProxyWithoutHeader() {
+        doTestAddCollectionOfBooksWithProxy(false);
+    }
+    
+    public void doTestAddCollectionOfBooksWithProxy(boolean addHeader) {
         String address = "http://localhost:" + PORT;
         MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
         
-        WebClient.client(client).header("Content-Type", "multipart/mixed;type=application/xml");
+        if (addHeader) {
+            WebClient.client(client).header("Content-Type", "multipart/mixed;type=application/xml");
+        }
         
         List<Book> books = new ArrayList<Book>();
         books.add(new Book("CXF 1", 1L));
         books.add(new Book("CXF 2", 2L));
-        List<Book> books2 = client.addBooks(books);
+        List<Book> books2 = addHeader ? client.addBooks(books) : client.addBooksWithoutHeader(books);
         assertNotSame(books, books2);
         assertEquals(2, books2.size());
         assertEquals(books.get(0).getId(), books2.get(0).getId());
