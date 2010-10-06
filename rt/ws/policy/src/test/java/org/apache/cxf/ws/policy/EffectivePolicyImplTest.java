@@ -200,7 +200,7 @@ public class EffectivePolicyImplTest extends Assert {
         Policy mp = control.createMock(Policy.class);
         EasyMock.expect(engine.getAggregatedMessagePolicy(bmi)).andReturn(mp);
         EasyMock.expect(merged.merge(mp)).andReturn(merged);
-        EasyMock.expect(merged.normalize(true)).andReturn(merged);
+        EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
         
         control.replay();
         EffectivePolicyImpl epi = new EffectivePolicyImpl();
@@ -228,7 +228,7 @@ public class EffectivePolicyImplTest extends Assert {
         Policy fp = control.createMock(Policy.class);
         EasyMock.expect(engine.getAggregatedFaultPolicy(bfi)).andReturn(fp);
         EasyMock.expect(merged.merge(fp)).andReturn(merged);
-        EasyMock.expect(merged.normalize(true)).andReturn(merged);
+        EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
         
         control.replay();
         EffectivePolicyImpl epi = new EffectivePolicyImpl();
