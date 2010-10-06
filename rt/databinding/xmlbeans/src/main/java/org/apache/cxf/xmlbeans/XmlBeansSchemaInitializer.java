@@ -54,6 +54,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaException;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.apache.xmlbeans.SchemaType;
@@ -61,13 +62,15 @@ import org.apache.xmlbeans.SchemaTypeSystem;
 import org.apache.xmlbeans.XmlAnySimpleType;
 import org.apache.xmlbeans.XmlObject;
 import org.apache.xmlbeans.impl.schema.BuiltinSchemaTypeSystem;
+import org.apache.xmlbeans.impl.schema.SchemaTypeSystemImpl;
 
 /**
  * Walks the service model and sets up the element/type names.
  */
 class XmlBeansSchemaInitializer extends ServiceModelVisitor {
 
-
+    public static final String XML_BEANS_SCHEMA_PREFIX = "schema" 
+        + SchemaTypeSystemImpl.METADATA_PACKAGE_GEN + "/src/";
     private static final Logger LOG = LogUtils.getLogger(XmlBeansSchemaInitializer.class);
     private static final Map<Class<?>, Class<? extends XmlAnySimpleType>> CLASS_MAP 
         = new HashMap<Class<?>, Class<? extends XmlAnySimpleType>>();
@@ -75,6 +78,7 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
     private XmlBeansDataBinding dataBinding;
     private Map<String, XmlSchema> schemaMap 
         = new HashMap<String, XmlSchema>();
+    private URIResolver schemaResolver;
     
     static {
         CLASS_MAP.put(String.class, org.apache.xmlbeans.XmlString.class);
@@ -105,6 +109,7 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
         super(serviceInfo);
         schemas = col;
         dataBinding = db;
+        schemaResolver = serviceInfo.getXmlSchemaCollection().getXmlSchemaCollection().getSchemaResolver();
     }
     
     public class XMLSchemaResolver implements URIResolver {
@@ -148,10 +153,29 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
 
         return schema;
     }
-    XmlSchema getSchema(SchemaTypeSystem sts, String file) {
+    protected XmlSchema getSchema(SchemaTypeSystem sts, String file) {
         if (schemaMap.containsKey(file)) {
             return schemaMap.get(file);
         }
+
+        try {
+            InputSource fileSource = schemaResolver.resolveEntity(null, 
+                                                                        file, 
+                                                                        null);
+            String systemId = removePrefix(fileSource.getSystemId(),
+                                           XML_BEANS_SCHEMA_PREFIX);
+
+            return getSchemaInternal(sts, systemId);
+        } catch (XmlSchemaException e) {
+            if (LOG.isLoggable(Level.FINEST)) {
+                LOG.log(Level.FINEST,
+                        "The XML catalog is not configured to map the file [" + file + "] ", e);
+            }
+        }
+        return getSchemaInternal(sts, file);
+    }
+        
+    protected XmlSchema getSchemaInternal(SchemaTypeSystem sts, String file) {
         InputStream ins = sts.getSourceAsStream(file);
         if (ins == null) {
             return null;
@@ -181,7 +205,18 @@ class XmlBeansSchemaInitializer extends ServiceModelVisitor {
             throw new RuntimeException("Failed to find schema for: " + file, e);
         }
     }
-
+    /**
+     * Removes the prefix ending with the given suffix. For instance, the value
+     * XYZ where the prefix is Y, the result will be Z. The removed string is XY.
+     *
+     * @param value the value from where the returned string is extracted
+     * @param prefixSuffix the prefix
+     * @return the rest of the string
+     */
+    protected String removePrefix(String value, String prefixSuffix) {
+        return value.substring(value.indexOf(prefixSuffix) + prefixSuffix.length());
+    } 
+    
     @Override
     public void begin(MessagePartInfo part) {
         LOG.finest(part.getName().toString());

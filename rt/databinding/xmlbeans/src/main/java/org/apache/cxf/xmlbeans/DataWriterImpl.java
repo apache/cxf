@@ -20,7 +20,9 @@
 package org.apache.cxf.xmlbeans;
 
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -45,6 +47,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.staxutils.StaxUtils;
+import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.XmlAnySimpleType;
@@ -68,7 +71,12 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
         try {
             Class<?> typeClass = part.getTypeClass();
-            if (!XmlObject.class.isAssignableFrom(typeClass)) {
+            if (typeClass == null) {
+                typeClass = obj.getClass();
+            }
+            XmlSchemaAnnotated schemaType = part ==  null ? null : part.getXmlSchema();
+            
+            if (!XmlObject.class.isAssignableFrom(typeClass) && part != null) {
                 typeClass = (Class<?>)part.getProperty(XmlAnySimpleType.class.getName());
                 
                 Class<?> cls[] = typeClass.getDeclaredClasses();
@@ -95,7 +103,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
 
             
             if (obj != null
-                || !(part.getXmlSchema() instanceof XmlSchemaElement)) {
+                || !(schemaType instanceof XmlSchemaElement)) {
                 XmlOptions options = new XmlOptions();
                 if (schema != null) {
                     options.setValidateOnSet();
@@ -143,7 +151,20 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                     XmlTokenSource source = (XmlTokenSource)obj;
                     reader = source.newCursor().newXMLStreamReader(options);                    
                 }
-                SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
+                SchemaType st = part == null ? null 
+                    : (SchemaType)part.getProperty(SchemaType.class.getName());
+                if (st == null) {
+                    try {
+                        Field f = typeClass.getField("type");
+                        if (Modifier.isStatic(f.getModifiers())) {
+                            st = (SchemaType)f.get(null);
+                            part.setProperty(SchemaType.class.getName(), st);
+                        }
+                    } catch (Exception es) {
+                        //ignore
+                        es.printStackTrace();
+                    }
+                }
                 int i = reader.getEventType();
                 if (i == XMLStreamReader.START_DOCUMENT) {
                     i = reader.next();
