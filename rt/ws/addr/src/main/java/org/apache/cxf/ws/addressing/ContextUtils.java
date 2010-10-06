@@ -415,47 +415,11 @@ public final class ContextUtils {
                         fullResponse = createMessage(exchange);
                     }
                     exchange.setOutMessage(fullResponse);
-                    final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
-                    exchange.setDestination(new Destination() {
-                        public EndpointReferenceType getAddress() {
-                            return reference;
-                        }
-                        public Conduit getBackChannel(Message inMessage, Message partialResponse,
-                                                      EndpointReferenceType address) throws IOException {
-                            Bus bus = inMessage.getExchange().get(Bus.class);
-                            //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
-                            //we don't wait for a response.
-                            inMessage.getExchange().setOneWay(true);
-                            ConduitInitiator conduitInitiator 
-                                = bus.getExtension(ConduitInitiatorManager.class)
-                                    .getConduitInitiatorForUri(reference.getAddress().getValue());
-                            if (conduitInitiator != null) {
-                                Conduit c = conduitInitiator.getConduit(ei, reference);
-                                // ensure decoupled back channel input stream is closed
-                                c.setMessageObserver(new MessageObserver() {
-                                    public void onMessage(Message m) {
-                                        InputStream is = m.getContent(InputStream.class);
-                                        if (is != null) {
-                                            try {
-                                                is.close();
-                                            } catch (Exception e) {
-                                                // ignore
-                                            }
-                                        }
-                                    }
-                                });
-                                return c;
-                            }
-                            return null;
-                        }
-                        public MessageObserver getMessageObserver() {
-                            return null;
-                        }
-                        public void shutdown() {
-                        }
-                        public void setMessageObserver(MessageObserver observer) {
-                        }
-                    });
+                    
+                    Destination destination = createDecoupledDestination(
+                        exchange, reference);
+                    exchange.setDestination(destination);
+                         
                     
                     if (retrieveAsyncPostResponseDispatch(inMessage)) {
                         //need to suck in all the data from the input stream as
@@ -488,6 +452,51 @@ public final class ContextUtils {
         }
     }
 
+    public static Destination createDecoupledDestination(
+        Exchange exchange, final EndpointReferenceType reference) {
+
+        final EndpointInfo ei = exchange.get(Endpoint.class).getEndpointInfo();
+        return new Destination() {
+            public EndpointReferenceType getAddress() {
+                return reference;
+            }
+            public Conduit getBackChannel(Message inMessage, Message partialResponse,
+                                          EndpointReferenceType address) throws IOException {
+                Bus bus = inMessage.getExchange().get(Bus.class);
+                //this is a response targeting a decoupled endpoint.   Treat it as a oneway so
+                //we don't wait for a response.
+                inMessage.getExchange().setOneWay(true);
+                ConduitInitiator conduitInitiator 
+                    = bus.getExtension(ConduitInitiatorManager.class)
+                        .getConduitInitiatorForUri(reference.getAddress().getValue());
+                if (conduitInitiator != null) {
+                    Conduit c = conduitInitiator.getConduit(ei, reference);
+                    // ensure decoupled back channel input stream is closed
+                    c.setMessageObserver(new MessageObserver() {
+                        public void onMessage(Message m) {
+                            InputStream is = m.getContent(InputStream.class);
+                            if (is != null) {
+                                try {
+                                    is.close();
+                                } catch (Exception e) {
+                                    // ignore
+                                }
+                            }
+                        }
+                    });
+                    return c;
+                }
+                return null;
+            }
+            public MessageObserver getMessageObserver() {
+                return null;
+            }
+            public void shutdown() {
+            }
+            public void setMessageObserver(MessageObserver observer) {
+            }
+        };
+    }
     
     /**
      * Propogate inbound MAPs onto full reponse & fault messages.
@@ -905,7 +914,7 @@ public final class ContextUtils {
      * @param message the current message
      * @return the Method from the BindingOperationInfo
      */
-    private static Message createMessage(Exchange exchange) {
+    public static Message createMessage(Exchange exchange) {
         Endpoint ep = exchange.get(Endpoint.class);
         Message msg = null;
         if (ep != null) {
