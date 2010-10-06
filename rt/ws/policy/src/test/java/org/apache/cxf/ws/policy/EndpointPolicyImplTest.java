@@ -133,7 +133,7 @@ public class EndpointPolicyImplTest extends Assert {
         EasyMock.expect(engine.getAggregatedEndpointPolicy(ei)).andReturn(ep);
         Policy merged = control.createMock(Policy.class);
         EasyMock.expect(sp.merge(ep)).andReturn(merged);
-        EasyMock.expect(merged.normalize(true)).andReturn(merged);
+        EasyMock.expect(merged.normalize(null, true)).andReturn(merged);
         
         control.replay();
         EndpointPolicyImpl epi = new EndpointPolicyImpl(ei, engine, true, null);
@@ -191,7 +191,7 @@ public class EndpointPolicyImplTest extends Assert {
         p2.addAssertion(mockAssertion(aqn2, 5, true));
         control.replay();
         
-        epi.setPolicy((Policy)p1.normalize(true));
+        epi.setPolicy((Policy)p1.normalize(null, true));
                 
         Policy ep = epi.updatePolicy(p2).getPolicy();
         

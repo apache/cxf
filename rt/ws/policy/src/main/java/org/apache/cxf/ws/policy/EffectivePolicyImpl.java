@@ -131,7 +131,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         if (null != bmi) {
             policy = policy.merge(engine.getAggregatedMessagePolicy(bmi));
         }
-        policy = (Policy)policy.normalize(true);
+        policy = (Policy)policy.normalize(engine.getRegistry(), true);
         return assertor;
     }
     
@@ -140,7 +140,7 @@ public class EffectivePolicyImpl implements EffectivePolicy {
         policy = engine.getServerEndpointPolicy(ei, (Destination)null).getPolicy();         
         policy = policy.merge(engine.getAggregatedOperationPolicy(boi));
         policy = policy.merge(engine.getAggregatedFaultPolicy(bfi));
-        policy = (Policy)policy.normalize(true);
+        policy = (Policy)policy.normalize(engine.getRegistry(), true);
     }
 
     void chooseAlternative(PolicyEngineImpl engine, Assertor assertor) {
