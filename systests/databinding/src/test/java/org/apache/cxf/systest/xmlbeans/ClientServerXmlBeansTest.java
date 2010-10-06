@@ -19,10 +19,15 @@
 
 package org.apache.cxf.systest.xmlbeans;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPBinding;
@@ -30,7 +35,9 @@ import javax.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -207,5 +214,49 @@ public class ClientServerXmlBeansTest extends AbstractBusClientServerTestBase {
         }
 
     }
-
+    @Test
+    public void testXmlBeansHeader() throws Exception {
+        //CXF-2955
+        SpringBusFactory factory = new SpringBusFactory();
+        Bus bus = factory.createBus("org/apache/cxf/systest/xmlbeans/cxf_no_wsdl.xml");
+        BusFactory.setDefaultBus(bus);
+        URL wsdl = this.getClass().getResource("/wsdl_systest_databinding/xmlbeans/hello_world.wsdl");
+        assertNotNull("We should have found the WSDL here. " , wsdl);      
+        
+        SOAPService ss = new SOAPService(wsdl, SERVICE_NAME);
+        QName soapPort = new QName("http://apache.org/hello_world_soap_http/xmlbeans", "SoapPort");
+        ss.addPort(soapPort, SOAPBinding.SOAP11HTTP_BINDING, "http://localhost:" 
+                   + NOWSDL_PORT + "/SoapContext/SoapPort");
+        Greeter port = ss.getPort(soapPort, Greeter.class);
+        
+        Client client = ClientProxy.getClient(port);
+        
+        List<Header> headers = new ArrayList<Header>();
+        org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument doc 
+            = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.Factory.newInstance();
+        doc.addNewGreetMe().setRequestType("doc format header");
+        Header head = new Header(new QName("", "doc"), doc,
+                                 client.getEndpoint().getService().getDataBinding());
+        headers.add(head);
+        org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.GreetMe gm 
+            = org.apache.helloWorldSoapHttp.xmlbeans.types.GreetMeDocument.GreetMe.Factory.newInstance();
+        gm.setRequestType("non-doc format header");
+        head = new Header(new QName("http://somenamespace.com", "nondocheader"), gm,
+                          client.getEndpoint().getService().getDataBinding());
+        headers.add(head);
+        ((BindingProvider)port).getRequestContext().put(Header.HEADER_LIST, headers);
+        
+        String resp; 
+        ClientProxy.getClient(port).getInInterceptors().add(new LoggingInInterceptor());
+        
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        ClientProxy.getClient(port).getOutInterceptors().add(new LoggingOutInterceptor(pw));
+        resp = port.sayHi();
+        assertEquals("We should get the right response", resp, "Bonjour");
+        assertTrue(sw.toString().contains("doc format header"));
+        assertTrue(sw.toString().contains("non-doc format header"));
+        assertTrue(sw.toString().contains("nondocheader"));
+        
+    }
 }
