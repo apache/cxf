@@ -20,6 +20,7 @@
 package org.apache.cxf.bus;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -90,6 +91,9 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         Object obj = extensions.get(extensionType);
         if (obj == null) {
             ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+            if (loc == null) {
+                loc = createConfiguredBeanLocator();
+            }
             if (loc != null) {
                 //force loading
                 Collection<?> objs = loc.getBeansOfType(extensionType);
@@ -107,6 +111,33 @@ public class CXFBusImpl extends AbstractBasicInterceptorProvider implements Bus 
         return null;
     }
     
+    protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
+        ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+        if (loc == null) {
+            loc = new ConfiguredBeanLocator() {
+                public List<String> getBeanNamesOfType(Class<?> type) {
+                    return null;
+                }
+                public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
+                    return null;
+                }
+                public <T> T getBeanOfType(String name, Class<T> type) {
+                    return null;
+                }
+                public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
+                    return false;
+                }
+                public boolean hasConfiguredPropertyValue(String beanName, 
+                                                          String propertyName,
+                                                          String value) {
+                    return false;
+                }
+            };
+            this.setExtension(loc, ConfiguredBeanLocator.class);
+        }
+        return loc;
+    }
+
     public <T> void setExtension(T extension, Class<T> extensionType) {
         extensions.put(extensionType, extension);
     }

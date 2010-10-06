@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.bus.extension;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.cxf.binding.BindingFactory;
@@ -27,6 +30,7 @@ import org.apache.cxf.binding.BindingFactoryManagerImpl;
 import org.apache.cxf.bus.BusState;
 import org.apache.cxf.bus.CXFBusImpl;
 import org.apache.cxf.buslifecycle.BusLifeCycleManager;
+import org.apache.cxf.configuration.ConfiguredBeanLocator;
 import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.NullConfigurer;
 import org.apache.cxf.resource.DefaultResourceManager;
@@ -52,7 +56,7 @@ public class ExtensionManagerBus extends CXFBusImpl {
     
     public static final String BUS_PROPERTY_NAME = "bus";
     private static final String BUS_ID_PROPERTY_NAME = "org.apache.cxf.bus.id";
-    
+    private final ExtensionManagerImpl extensionManager;
     
     public ExtensionManagerBus(Map<Class, Object> e, Map<String, Object> properties) {
         super(e);
@@ -88,11 +92,11 @@ public class ExtensionManagerBus extends CXFBusImpl {
         
         extensions.put(ResourceManager.class, resourceManager);
 
-        ExtensionManagerImpl em = new ExtensionManagerImpl(new String[0],
-                                                           Thread.currentThread().getContextClassLoader(),
-                                                           extensions,
-                                                           resourceManager, 
-                                                           this);
+        extensionManager = new ExtensionManagerImpl(new String[0],
+                                                    Thread.currentThread().getContextClassLoader(),
+                                                    extensions,
+                                                    resourceManager, 
+                                                    this);
                                   
         setState(BusState.INITIAL);
         
@@ -104,33 +108,76 @@ public class ExtensionManagerBus extends CXFBusImpl {
         DestinationFactoryManager dfm = this.getExtension(DestinationFactoryManager.class);
         if (null == dfm) {
             dfm = new DestinationFactoryManagerImpl(
-                new DeferredMap<DestinationFactory>(em, DestinationFactory.class),
+                new DeferredMap<DestinationFactory>(extensionManager,
+                        DestinationFactory.class),
                 this);
         }
 
         ConduitInitiatorManager cfm = this.getExtension(ConduitInitiatorManager.class);
         if (null == cfm) {
-            cfm = new ConduitInitiatorManagerImpl(new DeferredMap<ConduitInitiator>(em, 
+            cfm = new ConduitInitiatorManagerImpl(new DeferredMap<ConduitInitiator>(extensionManager, 
                 ConduitInitiator.class), this);
         }
         
         BindingFactoryManager bfm = this.getExtension(BindingFactoryManager.class);
         if (null == bfm) {
-            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(em, BindingFactory.class),
+            bfm = new BindingFactoryManagerImpl(new DeferredMap<BindingFactory>(extensionManager,
+                                                    BindingFactory.class),
                                                 this);
             extensions.put(BindingFactoryManager.class, bfm);
         }
-        em.load(new String[] {ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
-                              ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
+        extensionManager.load(new String[] {
+            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE,
+            ExtensionManagerImpl.BUS_EXTENSION_RESOURCE_COMPAT});
         
         
-        this.setExtension(em, ExtensionManager.class);
+        this.setExtension(extensionManager, ExtensionManager.class);
     }
 
     public ExtensionManagerBus() {
         this(null, null);
     }
-    
+    protected synchronized ConfiguredBeanLocator createConfiguredBeanLocator() {
+        ConfiguredBeanLocator loc = (ConfiguredBeanLocator)extensions.get(ConfiguredBeanLocator.class);
+        if (loc == null) {
+            loc = new ConfiguredBeanLocator() {
+                public List<String> getBeanNamesOfType(Class<?> type) {
+                    return null;
+                }
+                public <T> Collection<? extends T> getBeansOfType(Class<T> type) {
+                    extensionManager.activateAllByType(type);
+                    List<T> lst = new ArrayList<T>();
+                    for (Object o : extensions.values()) {
+                        if (type.isInstance(o)) {
+                            lst.add(type.cast(o));
+                        }
+                    }
+                    return lst;
+                }
+                public <T> T getBeanOfType(String name, Class<T> type) {
+                    T t = extensionManager.getExtension(name, type);
+                    if (t != null) {
+                        return t;
+                    }
+                    extensionManager.activateAllByType(type);
+                    return type.cast(extensions.get(type));
+                }
+                public <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener) {
+                    int s = extensions.size();
+                    extensionManager.activateAllByType(type);
+                    return s != extensions.size();
+                }
+                public boolean hasConfiguredPropertyValue(String beanName, 
+                                                          String propertyName,
+                                                          String value) {
+                    return false;
+                }
+            };
+            this.setExtension(loc, ConfiguredBeanLocator.class);
+        }
+        return loc;
+    }
+
     private String getBusId(Map<String, Object> properties) {
 
         String busId = null;
