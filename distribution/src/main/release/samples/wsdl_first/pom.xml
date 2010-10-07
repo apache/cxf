@@ -44,6 +44,7 @@
             <plugins>
                 <plugin>
                     <artifactId>maven-war-plugin</artifactId>
+                    <version>2.1</version>
                     <configuration>
                         <webXml>${cxf.release.base}/etc/web.xml</webXml>
                         <webResources>
