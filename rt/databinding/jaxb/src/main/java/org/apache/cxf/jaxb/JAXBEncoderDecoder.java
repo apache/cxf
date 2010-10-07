@@ -835,7 +835,11 @@ public final class JAXBEncoderDecoder {
                 Enumeration enm = (Enumeration)c2.getClass().getMethod("getAllPrefixes").invoke(c2);
                 while (enm.hasMoreElements()) {
                     String s = (String)enm.nextElement();
-                    nsMap.put(s, c.getNamespaceURI(s));
+                    if (s == null) {
+                        nsMap.put("", c.getNamespaceURI(s));
+                    } else {
+                        nsMap.put(s, c.getNamespaceURI(s));
+                    }
                 }
             } catch (Throwable t2) {
                 //ignore
@@ -844,7 +848,11 @@ public final class JAXBEncoderDecoder {
         if (!nsMap.isEmpty()) {
             for (int x = 0; x < source.getNamespaceCount(); x++) {
                 String pfx = source.getNamespacePrefix(x);
-                nsMap.remove(pfx);
+                if (pfx == null) { 
+                    nsMap.remove("");
+                } else {
+                    nsMap.remove(pfx);
+                }
             }
             if (!nsMap.isEmpty()) {
                 @SuppressWarnings("unchecked")
