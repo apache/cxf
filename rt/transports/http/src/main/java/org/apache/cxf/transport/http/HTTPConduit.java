@@ -2265,8 +2265,11 @@ public class HTTPConduit
             inMessage.put(Message.ENCODING, normalizedEncoding);            
                         
             if (maintainSession) {
-                List<String> cookies = connection.getHeaderFields().get("Set-Cookie");
-                Cookie.handleSetCookie(sessionCookies, cookies);
+                for (Map.Entry<String, List<String>> h : connection.getHeaderFields().entrySet()) {
+                    if ("Set-Cookie".equalsIgnoreCase(h.getKey())) {
+                        Cookie.handleSetCookie(sessionCookies, h.getValue());
+                    }
+                }
             }
             if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
                 in = in == null
