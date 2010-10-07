@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.0</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -111,12 +111,12 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq1.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq2.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq3.xml" todir="${basedir}/target/classes/demo/hwDispatch/client"/>
-                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp1.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
-                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp2.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
-                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp3.xml" todir="${basedir}/target/classes/demo/hwDispatch/server"/>
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq1.xml" todir="${basedir}/target/classes/demo/hwDispatch/client" />
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq2.xml" todir="${basedir}/target/classes/demo/hwDispatch/client" />
+                                <copy file="${basedir}/src/demo/hwDispatch/client/GreetMeDocLiteralReq3.xml" todir="${basedir}/target/classes/demo/hwDispatch/client" />
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp1.xml" todir="${basedir}/target/classes/demo/hwDispatch/server" />
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp2.xml" todir="${basedir}/target/classes/demo/hwDispatch/server" />
+                                <copy file="${basedir}/src/demo/hwDispatch/server/GreetMeDocLiteralResp3.xml" todir="${basedir}/target/classes/demo/hwDispatch/server" />
 	    	            
 
 

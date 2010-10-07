@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.0</version>
         <relativePath>../..</relativePath>
     </parent>
     <properties>
@@ -52,8 +52,8 @@
 	    	        </goals>
 	    	        <configuration>
 	    	            <tasks>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
-	    	               <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client"/>
+	    	               <copy file="${basedir}/src/demo/jaxrs/client/add_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
+	    	               <copy file="${basedir}/src/demo/jaxrs/client/update_customer.xml" todir="${basedir}/target/classes/demo/jaxrs/client" />
 	    	            </tasks>
 	    	        </configuration>
 	    	    </execution>

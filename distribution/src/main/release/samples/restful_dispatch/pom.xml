@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.0</version>
     </parent>
     <properties>
         <cxf.version>${project.version}</cxf.version>
@@ -51,9 +51,9 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/restful/client/CustomerJohnReq.xml" todir="${basedir}/target/classes/demo/restful/client"/>
-                                <copy file="${basedir}/src/demo/restful/server/CustomerJohnResp.xml" todir="${basedir}/target/classes/demo/restful/server"/>
-                                <copy file="${basedir}/src/demo/restful/server/CustomerAllResp.xml" todir="${basedir}/target/classes/demo/restful/server"/>
+                                <copy file="${basedir}/src/demo/restful/client/CustomerJohnReq.xml" todir="${basedir}/target/classes/demo/restful/client" />
+                                <copy file="${basedir}/src/demo/restful/server/CustomerJohnResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
+                                <copy file="${basedir}/src/demo/restful/server/CustomerAllResp.xml" todir="${basedir}/target/classes/demo/restful/server" />
                             </tasks>
                         </configuration>
                     </execution>

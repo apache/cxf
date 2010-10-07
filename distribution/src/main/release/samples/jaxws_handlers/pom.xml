@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.3.0-SNAPSHOT</version>
+        <version>2.3.0</version>
     </parent>
 
     <properties>
@@ -73,7 +73,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/handlers/common/demo_handlers.xml" todir="${basedir}/target/classes/demo/handlers/common"/>
+                                <copy file="${basedir}/src/demo/handlers/common/demo_handlers.xml" todir="${basedir}/target/classes/demo/handlers/common" />
                             </tasks>
                         </configuration>
                     </execution>
