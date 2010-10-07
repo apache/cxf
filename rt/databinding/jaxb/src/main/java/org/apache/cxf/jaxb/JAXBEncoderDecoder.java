@@ -34,9 +34,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.logging.Logger;
 
 
@@ -49,7 +52,9 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.adapters.HexBinaryAdapter;
 import javax.xml.bind.attachment.AttachmentMarshaller;
 import javax.xml.bind.attachment.AttachmentUnmarshaller;
+import javax.xml.namespace.NamespaceContext;
 import javax.xml.namespace.QName;
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLEventWriter;
 import javax.xml.stream.XMLStreamConstants;
@@ -723,7 +728,6 @@ public final class JAXBEncoderDecoder {
     public static Object unmarshall(Unmarshaller u, Object source, QName elName,
                                     Class<?> clazz, boolean unwrap) {
         Object obj = null;
-
         try {
             boolean unmarshalWithClass = true;
 
@@ -751,11 +755,22 @@ public final class JAXBEncoderDecoder {
                 // as it doesn't read beyond the end so the DepthXMLStreamReader state
                 // would be OK when it returns.   The main winner is FastInfoset where parsing
                 // a testcase I have goes from about 300/sec to well over 1000.
+                
                 DepthXMLStreamReader dr = (DepthXMLStreamReader)source;
-                obj = unmarshalWithClass ? u.unmarshal(dr.getReader(), clazz) : u
+                XMLStreamReader reader = dr.getReader();
+                if (u.getSchema() != null) {
+                    //validating, but we may need more namespaces
+                    reader = findExtraNamespaces(reader);
+                }
+                obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
                     .unmarshal(dr.getReader());
             } else if (source instanceof XMLStreamReader) {
-                obj = unmarshalWithClass ? u.unmarshal((XMLStreamReader)source, clazz) : u
+                XMLStreamReader reader = (XMLStreamReader)source;
+                if (u.getSchema() != null) {
+                    //validating, but we may need more namespaces
+                    reader = findExtraNamespaces(reader);
+                }
+                obj = unmarshalWithClass ? u.unmarshal(reader, clazz) : u
                     .unmarshal((XMLStreamReader)source);
             } else if (source instanceof XMLEventReader) {
                 obj = unmarshalWithClass ? u.unmarshal((XMLEventReader)source, clazz) : u
@@ -781,6 +796,98 @@ public final class JAXBEncoderDecoder {
             }
         }
         return unwrap ? getElementValue(obj) : obj;
+    }
+    
+    private static XMLStreamReader findExtraNamespaces(XMLStreamReader source) {
+        //due to a deficiency in the Stax API, there isn't a way to get all
+        //the namespace prefixes that are "valid" at this point.  Thus, JAXB
+        //cannot set all the prefixes into the validator (which also doesn't allow
+        //setting a NSContext, just allows declaring of prefixes) so resolving 
+        //prefixes and such will fail if they were declared on any of the parent 
+        //elements.
+        //
+        //We'll use some reflection to grab the known namespaces from woodstox
+        //or the xerces parser and fake extra namespace decls on the root elements.
+        //slight performance penalty, but there already is a penalty if you are validating
+        //anyway.
+        
+        NamespaceContext c = source.getNamespaceContext();
+        final Map<String, String> nsMap = new TreeMap<String, String>();
+        try {
+            try {
+                //Woodstox version
+                c = (NamespaceContext)c.getClass().getMethod("createNonTransientNsContext", Location.class)
+                    .invoke(c, new Object[1]);
+            } catch (Throwable t) {
+                //ignore
+            }
+            Field f = c.getClass().getDeclaredField("mNamespaces");
+            f.setAccessible(true);
+            String ns[] = (String[])f.get(c);
+            for (int x = 0; x < ns.length; x += 2) {
+                nsMap.put(ns[x], ns[x + 1]);
+            }
+        } catch (Throwable t) {
+            //internal JDK/xerces version
+            try {
+                Field f = c.getClass().getDeclaredField("fNamespaceContext");
+                f.setAccessible(true);
+                Object c2 = f.get(c);
+                Enumeration enm = (Enumeration)c2.getClass().getMethod("getAllPrefixes").invoke(c2);
+                while (enm.hasMoreElements()) {
+                    String s = (String)enm.nextElement();
+                    nsMap.put(s, c.getNamespaceURI(s));
+                }
+            } catch (Throwable t2) {
+                //ignore
+            }
+        }
+        if (!nsMap.isEmpty()) {
+            for (int x = 0; x < source.getNamespaceCount(); x++) {
+                String pfx = source.getNamespacePrefix(x);
+                nsMap.remove(pfx);
+            }
+            if (!nsMap.isEmpty()) {
+                @SuppressWarnings("unchecked")
+                final Map.Entry<String, String> namespaces[] 
+                    = nsMap.entrySet().toArray(new Map.Entry[nsMap.size()]);
+                //OK. we have extra namespaces.  We'll need to wrapper the reader
+                //with a new one that will fake extra namespace events
+                source = new DepthXMLStreamReader(source) {
+                    public int getNamespaceCount() {
+                        if (getDepth() == 0 && isStartElement()) {
+                            return super.getNamespaceCount() + nsMap.size(); 
+                        }
+                        return super.getNamespaceCount();
+                    }
+
+                    public String getNamespacePrefix(int arg0) {
+                        if (getDepth() == 0 && isStartElement()) {
+                            int i = super.getNamespaceCount();
+                            if (arg0 >= i) {
+                                arg0 -= i;
+                                return namespaces[arg0].getKey();
+                            }
+                        }
+                        return super.getNamespacePrefix(arg0);
+                    }
+
+                    public String getNamespaceURI(int arg0) {
+                        if (getDepth() == 0 && isStartElement()) {
+                            int i = super.getNamespaceCount();
+                            if (arg0 >= i) {
+                                arg0 -= i;
+                                return namespaces[arg0].getValue();
+                            }
+                        }
+                        return super.getNamespaceURI(arg0);
+                    }
+                    
+                };
+            }
+        }
+        
+        return source;
     }
 
     public static Object getElementValue(Object obj) {
