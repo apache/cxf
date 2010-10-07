@@ -13,7 +13,7 @@ Initial Setup
    JDK location, and that your PATH includes %JAVA_HOME%\bin (windows) or 
    $JAVA_HOME$/bin (unix).
 
-3) Install Maven 2.0.9 or newer, which can be downloaded from 
+3) Install Maven 2.2.1 or newer, which can be downloaded from 
    http://maven.apache.org/download.html. Make sure that your PATH includes 
    the MVN_HOME/bin directory. 
 
