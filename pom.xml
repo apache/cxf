@@ -42,8 +42,8 @@
 
     <properties>
         <compiler.fork>false</compiler.fork>
-        <cxf.build-utils.version>2.3.0-SNAPSHOT</cxf.build-utils.version>
-        <cxf.xjc-utils.version>2.3.0-SNAPSHOT</cxf.xjc-utils.version>
+        <cxf.build-utils.version>2.3.0</cxf.build-utils.version>
+        <cxf.xjc-utils.version>2.3.0</cxf.xjc-utils.version>
         <jdk.version>1.6</jdk.version>
     </properties>
 
