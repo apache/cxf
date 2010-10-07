@@ -280,7 +280,6 @@ public final class JAXBEncoderDecoder {
                 throw new Fault(new Message("UNKNOWN_SOURCE", LOG, source.getClass().getName()));
             }
         } catch (Exception ex) {
-            ex.printStackTrace();
             if (ex instanceof javax.xml.bind.MarshalException) {
                 javax.xml.bind.MarshalException marshalEx = (javax.xml.bind.MarshalException)ex;
                 Message faultMessage = new Message("MARSHAL_ERROR", LOG, marshalEx.getLinkedException()
