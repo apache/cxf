@@ -75,7 +75,9 @@ public class MAPCodec extends AbstractSoapInterceptor {
 
     private static final Logger LOG = LogUtils.getL7dLogger(MAPCodec.class);
     private static final String IS_REFERENCE_PARAM_ATTR_NAME = "IsReferenceParameter";
-
+    private static final String ONE_WAY_DECOUPLED_FAULT_SUPPORT = 
+        "org.apache.cxf.ws.addressing.oneway.decoupled_fault_support";
+    
     /**
      * REVISIT: map usage that the *same* interceptor instance 
      * is used in all chains.
@@ -121,8 +123,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param message the messsage message
      */
     public void handleFault(SoapMessage message) {
-        AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, true, false);
         if (!message.getExchange().isOneWay()) {
+            AddressingProperties maps = ContextUtils.retrieveMAPs(message, false, true, false);
             if (ContextUtils.isRequestor(message)
                 && maps != null) {
                 //fault occurred trying to send the message, remove it
@@ -147,6 +149,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
                     }
                 }
             }
+        } else if (MessageUtils.getContextualBoolean(message, 
+                                                     ONE_WAY_DECOUPLED_FAULT_SUPPORT, 
+                                                     false)) {
+            new OneWayDecoupledFaultHandler().handleFault(message);
         }
     }
 
