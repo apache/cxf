@@ -20,7 +20,8 @@
 typedef sequence<long> longSequence;
 typedef sequence<string> stringSequence;
 
-typedef sequence<long, 10> boundedLongSequence;
+const long  upperBound   = 10;
+typedef sequence<long, upperBound> boundedLongSequence;
 typedef sequence<string, 2> boundedStringSequence;
 
 typedef sequence<longSequence>            longSequenceSequence;
