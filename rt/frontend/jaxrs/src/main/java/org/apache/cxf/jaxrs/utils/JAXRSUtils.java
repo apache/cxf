@@ -530,11 +530,16 @@ public final class JAXRSUtils {
         for (int i = 0; i < parameterTypes.length; i++) {
             Class<?> param = parameterTypes[i]; 
             Type genericParam = genericParameterTypes[i];
-            if (param == Object.class && genericParam instanceof TypeVariable) {
+            if (genericParam instanceof TypeVariable) {
                 genericParam = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
                                                            (TypeVariable)genericParam);
-                param = (Class)genericParam; 
             }
+            if (param == Object.class) {
+                param = (Class)genericParam; 
+            } else if (genericParam == Object.class) {
+                genericParam = param;
+            }
+            
             
             Object paramValue = processParameter(param, 
                                                  genericParam,

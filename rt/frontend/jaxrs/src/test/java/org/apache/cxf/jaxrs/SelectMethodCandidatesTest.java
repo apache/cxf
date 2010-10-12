@@ -30,6 +30,9 @@ import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.fortest.BookEntity;
 import org.apache.cxf.jaxrs.fortest.BookEntity2;
 import org.apache.cxf.jaxrs.fortest.GenericEntityImpl;
+import org.apache.cxf.jaxrs.fortest.GenericEntityImpl2;
+import org.apache.cxf.jaxrs.fortest.GenericEntityImpl3;
+import org.apache.cxf.jaxrs.fortest.GenericEntityImpl4;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -61,6 +64,62 @@ public class SelectMethodCandidatesTest extends Assert {
     @Test
     public void testFindFromAbstractGenericInterface() throws Exception {
         doTestGenericSuperType(GenericEntityImpl.class, "POST");
+    }
+    
+    @Test
+    public void testFindFromAbstractGenericInterface2() throws Exception {
+        doTestGenericSuperType(GenericEntityImpl2.class, "POST");
+    }
+    
+    @Test
+    public void testFindFromAbstractGenericImpl3() throws Exception {
+        doTestGenericSuperType(GenericEntityImpl3.class, "POST");
+    }
+    
+    @Test
+    public void testFindFromAbstractGenericImpl4() throws Exception {
+        JAXRSServiceFactoryBean sf = new JAXRSServiceFactoryBean();
+        sf.setResourceClasses(GenericEntityImpl4.class);
+        sf.create();
+        List<ClassResourceInfo> resources = ((JAXRSServiceImpl)sf.getService()).getClassResourceInfos();
+        String contentTypes = "text/xml";
+        String acceptContentTypes = "text/xml";
+        
+        Message m = new MessageImpl();
+        m.put(Message.CONTENT_TYPE, "text/xml");
+        Exchange ex = new ExchangeImpl();
+        ex.setInMessage(m);
+        m.setExchange(ex);
+        Endpoint e = EasyMock.createMock(Endpoint.class);
+        e.get(ProviderFactory.class.getName());
+        EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).times(2);
+        e.get("org.apache.cxf.jaxrs.comparator");
+        EasyMock.expectLastCall().andReturn(null);
+        EasyMock.replay(e);
+        ex.put(Endpoint.class, e);
+        
+        MetadataMap<String, String> values = new MetadataMap<String, String>();
+        ClassResourceInfo resource = JAXRSUtils.selectResourceClass(resources, "/books", values,
+                                                                    m);
+        OperationResourceInfo ori = JAXRSUtils.findTargetMethod(resource, 
+                                                                m, 
+                                    "POST", values, contentTypes, 
+                                    JAXRSUtils.sortMediaTypes(acceptContentTypes),
+                                    true);
+        assertNotNull(ori);
+        assertEquals("resourceMethod needs to be selected", "postEntity",
+                     ori.getMethodToInvoke().getName());
+        
+        String value = "<Books><Book><name>The Book</name><id>2</id></Book></Books>";
+        m.setContent(InputStream.class, new ByteArrayInputStream(value.getBytes()));
+        List<Object> params = JAXRSUtils.processParameters(ori, values, m);
+        assertEquals(1, params.size());
+        List<?> books = (List<?>)params.get(0);
+        assertEquals(1, books.size());
+        Book book = (Book)books.get(0);
+        assertNotNull(book);
+        assertEquals(2L, book.getId());
+        assertEquals("The Book", book.getName());
     }
     
     @Test

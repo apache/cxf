@@ -114,6 +114,11 @@ public final class InjectionUtils {
             }
         }
         
+        Type[] bounds = var.getBounds();
+        if (bounds.length > pos && bounds[pos] != Object.class) {
+            return bounds[pos];
+        }
+                
         Type genericSubtype = serviceClass.getGenericSuperclass();
         if (genericSubtype == Object.class) {
             Type[] genInterfaces = serviceClass.getGenericInterfaces();
@@ -122,8 +127,9 @@ public final class InjectionUtils {
                 break;
             }
         }
-        return genericSubtype != Object.class ? InjectionUtils.getActualType(genericSubtype, pos)
+        Type result = genericSubtype != Object.class ? InjectionUtils.getActualType(genericSubtype, pos)
                                               : genericSubtype;
+        return result == null ? Object.class : result;
     }
     
     public static boolean invokeBooleanGetter(Object o, String name) {
@@ -200,16 +206,22 @@ public final class InjectionUtils {
             return null;
         }
         if (!ParameterizedType.class.isAssignableFrom(genericType.getClass())) {
-            Class<?> cls =  (Class<?>)genericType;
+            if (genericType instanceof TypeVariable) {
+                genericType = getType(((TypeVariable)genericType).getBounds(), pos);
+            }
+            Class<?> cls = (Class<?>)genericType;
             return cls.isArray() ? cls.getComponentType() : cls;
         }
         ParameterizedType paramType = (ParameterizedType)genericType;
-        Type[] types = paramType.getActualTypeArguments();
+        Type t = getType(paramType.getActualTypeArguments(), pos);
+        return t instanceof Class ? (Class<?>)t : getActualType(t, pos);
+    }
+    
+    public static Type getType(Type[] types, int pos) {
         if (pos >= types.length) {
             throw new RuntimeException("No type can be found at position " + pos);
         }
-        Type t = types[pos];
-        return t instanceof Class ? (Class<?>)t : getActualType(t, pos);
+        return types[pos];    
     }
     
     public static Class<?> getRawType(Type genericType) {
