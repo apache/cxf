@@ -19,10 +19,16 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
+import java.util.Iterator;
+import java.util.List;
+
 import javax.xml.namespace.QName;
 
 import antlr.collections.AST;
 
+import org.apache.cxf.binding.corba.wsdl.Const;
+import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
+import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
@@ -94,6 +100,21 @@ public final class TypesUtils {
         } while (anonSchemaType != null);
         
         return scopedName;
+    }
+    
+    public static String getConstValueByName(AST node, TypeMappingType typeMap) {
+        List<CorbaTypeImpl> types = typeMap.getStructOrExceptionOrUnion();
+        for (Iterator<CorbaTypeImpl> it = types.iterator(); it.hasNext();) {
+            CorbaTypeImpl corbaType = it.next();
+            if (corbaType instanceof Const) {
+                Const corbaConst = (Const) corbaType;
+                String name = corbaConst.getQName().getLocalPart();
+                if (name.equals(node.getText())) {
+                    return corbaConst.getValue();
+                }
+            }             
+        }
+        return null;
     }
 
 }

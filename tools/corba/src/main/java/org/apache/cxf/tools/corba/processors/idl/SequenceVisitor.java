@@ -66,7 +66,14 @@ public class SequenceVisitor extends VisitorBase {
         // REVISIT: TypesUtils.getPrimitiveCorbaTypeNameNode should be renamed
         // to something more suitable and should be made more general.
         AST boundNode = TypesUtils.getCorbaTypeNameNode(simpleTypeSpecNode); 
-
+        //get chance to check if bound is symbol name which defined as const,
+        //if so, replace the symbol name with defined const
+        if (boundNode != null) {
+            String constValue = TypesUtils.getConstValueByName(boundNode, typeMap);
+            if (constValue != null) {
+                boundNode.setText(constValue);
+            }
+        }
         
         SimpleTypeSpecVisitor visitor = new SimpleTypeSpecVisitor(new Scope(getScope(), identifierNode),
                                                                   definition,
