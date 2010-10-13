@@ -23,7 +23,9 @@
 	<groupId>org.apache.cxf.samples</groupId>
 	<artifactId>java_first_jaxws_jms</artifactId>
 	<name>Java First demo using JAX-WS and JMS</name>
-	<parent>
+    <version>2.3.1-SNAPSHOT</version>
+
+    <parent>
 	  <groupId>org.apache.cxf.samples</groupId>
 	  <artifactId>cxf-samples</artifactId>
 	  <version>2.3.1-SNAPSHOT</version>
