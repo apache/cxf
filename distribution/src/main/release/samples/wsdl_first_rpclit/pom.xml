@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first_rpclit</artifactId>
     <name>WSDL first demo using RPC-Literal Style</name>
+    <version>2.3.1-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>

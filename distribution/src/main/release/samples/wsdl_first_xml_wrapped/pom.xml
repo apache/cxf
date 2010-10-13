@@ -21,6 +21,8 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first_xml_wrapped</artifactId>
     <name>CXF sample using WRAPPED Style in XML Binding (pure XML over HTTP)</name>
+    <version>2.3.1-SNAPSHOT</version>
+
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

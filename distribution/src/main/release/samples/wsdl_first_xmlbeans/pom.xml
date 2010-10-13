@@ -21,6 +21,8 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wsdl_first_xmlbeans</artifactId>
     <name>WSDL first demo using Document/Literal Style and XMLBeans DataBinding</name>
+    <version>2.3.1-SNAPSHOT</version>
+
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>

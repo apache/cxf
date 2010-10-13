@@ -21,6 +21,7 @@
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>mtom</artifactId>
     <name>MTOM Demo for SWA and XOP</name>
+    <version>2.3.1-SNAPSHOT</version>
 
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
