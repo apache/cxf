@@ -583,7 +583,7 @@
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
                             <artifactId>cxf-buildtools</artifactId>
-                            <version>${project.version}</version>
+                            <version>${cxf.build-utils.version}</version>
                         </dependency>
                     </dependencies>
                 </plugin>
