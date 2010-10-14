@@ -28,8 +28,12 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.wssec10.server.AuthorizedServer;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -42,6 +46,7 @@ import wssec.wssec10.PingService;
  *
  */
 public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServerTestBase {
+    static final String SSL_PORT = allocatePort(AuthorizedServer.class, 1);
     static final String PORT = allocatePort(AuthorizedServer.class);
 
     private static final String INPUT = "foo";
@@ -58,9 +63,9 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     }
 
     @Test
-    public void testClientServerAuthorized() {
+    public void testClientServerUTOnlyAuthorized() {
 
-        IPingService port = getPort(
+        IPingService port = getUTOnlyPort(
             "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml", false);
         
         final String output = port.echo(INPUT);
@@ -68,9 +73,9 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
     }
     
     @Test
-    public void testClientServerUnauthorized() {
+    public void testClientServerUTOnlyUnauthorized() {
 
-        IPingService port = getPort(
+        IPingService port = getUTOnlyPort(
             "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml", true);
         
         try {
@@ -81,7 +86,48 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         }
     }
     
-    private static IPingService getPort(String configName, boolean hashed) {
+    @Test
+    public void testClientServerComplexPolicyAuthorized() {
+
+        IPingService port = getComplexPolicyPort(
+            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml");
+        
+        final String output = port.echo(INPUT);
+        assertEquals(INPUT, output);
+    }
+    
+    @Test
+    public void testClientServerComplexPolicyUnauthorized() {
+
+        IPingService port = getComplexPolicyPort(
+            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml");
+        
+        try {
+            port.echo(INPUT);
+            fail("Frank is unauthorized");
+        } catch (Exception ex) {
+            assertEquals("Unauthorized", ex.getMessage());
+        }
+    }
+    
+    private static IPingService getComplexPolicyPort(String configName) {
+        Bus bus = new SpringBusFactory().createBus(configName);
+        
+        BusFactory.setDefaultBus(bus);
+        BusFactory.setThreadDefaultBus(bus);
+        PingService svc = new PingService(getWsdlLocation("UserNameOverTransport"));
+        final IPingService port = 
+            svc.getPort(
+                new QName(
+                    "http://WSSec/wssec10",
+                    "UserNameOverTransport" + "_IPingService"
+                ),
+                IPingService.class
+            );
+        return port;
+    }
+    
+    private static IPingService getUTOnlyPort(String configName, boolean hashed) {
         Bus bus = new SpringBusFactory().createBus(configName);
         
         BusFactory.setDefaultBus(bus);
@@ -108,5 +154,20 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         
     }
 
+    
+    private static URL getWsdlLocation(String portPrefix) {
+        try {
+            if ("UserNameOverTransport".equals(portPrefix)) {
+                return new URL("https://localhost:" + SSL_PORT + "/" + portPrefix + "?wsdl");
+            } else if ("MutualCertificate10SignEncrypt".equals(portPrefix)) {
+                return new URL("http://localhost:" + PORT + "/" + portPrefix + "?wsdl");
+            } else if ("MutualCertificate10SignEncryptRsa15TripleDes".equals(portPrefix)) {
+                return new URL("http://localhost:" + PORT + "/" + portPrefix + "?wsdl");
+            }
+        } catch (MalformedURLException mue) {
+            return null;
+        }
+        return null;
+    }
     
 }

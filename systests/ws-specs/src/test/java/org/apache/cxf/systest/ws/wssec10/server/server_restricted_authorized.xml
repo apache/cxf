@@ -39,6 +39,34 @@
     ">
     <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
     
+    <!-- -->
+    <!-- Any services listening on port 9001 must use the following -->
+    <!-- Transport Layer Security (TLS) settings -->
+    <!-- -->
+    <httpj:engine-factory id="tls-settings">
+        <httpj:engine port="${testutil.ports.AuthorizedServer.1}">
+            <httpj:tlsServerParameters>
+                <sec:keyManagers keyPassword="password">
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/bob.jks"/>
+                </sec:keyManagers>
+                <sec:trustManagers>
+                    <sec:keyStore type="jks" password="password" resource="org/apache/cxf/systest/ws/wssec10/certs/restricted/alice.jks"/>
+                </sec:trustManagers> 
+
+                <!--
+                <sec:cipherSuitesFilter>
+                    <sec:include>.*_EXPORT_.*</sec:include>
+                    <sec:include>.*_EXPORT1024_.*</sec:include>
+                    <sec:include>.*_WITH_DES_.*</sec:include>
+                    <sec:include>.*_WITH_NULL_.*</sec:include>
+                    <sec:exclude>.*_DH_anon_.*</sec:exclude>
+                </sec:cipherSuitesFilter>
+                <sec:clientAuthentication want="true" required="true"/>
+                -->
+            </httpj:tlsServerParameters>
+        </httpj:engine>
+    </httpj:engine-factory>
+    
     <cxf:bus>
         <cxf:features>
             <p:policies/>
@@ -53,7 +81,7 @@
 
     <bean id="customUTInterceptor" class="org.apache.cxf.systest.ws.wssec10.server.CustomUsernameTokenInterceptor"/>
 
-
+    <bean id="simpleUTInterceptor" class="org.apache.cxf.systest.ws.wssec10.server.SimpleUsernameTokenInterceptor"/>
     <bean id="authorizationInterceptor" class="org.apache.cxf.interceptor.security.SimpleAuthorizingInterceptor">
         <property name="methodRolesMap">
             <map>
@@ -90,4 +118,30 @@
      
     </jaxws:endpoint>
     
+    <!-- -->
+    <!-- Scenario 3.1 -->
+    <!-- -->
+    <jaxws:endpoint 
+       id="UserNameOverTransport"
+       address="https://localhost:${testutil.ports.AuthorizedServer.1}/UserNameOverTransport" 
+       serviceName="interop:PingService"
+       endpointName="interop:UserNameOverTransport_IPingService"
+       implementor="org.apache.cxf.systest.ws.wssec10.server.UserNameOverTransportRestricted"
+       depends-on="tls-settings">
+        
+       <jaxws:properties>
+            <entry key="ws-security.username" value="Alice"/>
+            <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
+            
+            <!-- new property -->
+            <entry key="ws-security.ut.no-callbacks" value="true"/>
+        </jaxws:properties> 
+
+        <jaxws:inInterceptors>
+            <ref bean="simpleUTInterceptor"/>
+            <ref bean="authorizationInterceptor"/>
+       </jaxws:inInterceptors> 
+     
+    </jaxws:endpoint>
+        
 </beans>

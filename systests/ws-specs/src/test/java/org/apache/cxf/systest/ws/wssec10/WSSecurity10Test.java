@@ -28,9 +28,14 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
+import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.systest.ws.wssec10.server.Server;
 import org.apache.cxf.systest.ws.wssec11.WSSecurity11Common;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -95,7 +100,16 @@ public class WSSecurity10Test extends AbstractBusClientServerTestBase {
                     ),
                     IPingService.class
                 );
+         
+            Client cl = ClientProxy.getClient(port);
             
+            HTTPConduit http = (HTTPConduit) cl.getConduit();
+             
+            HTTPClientPolicy httpClientPolicy = new HTTPClientPolicy();
+            httpClientPolicy.setConnectionTimeout(0);
+            httpClientPolicy.setReceiveTimeout(0);
+             
+            http.setClient(httpClientPolicy);
             final String output = port.echo(INPUT);
             assertEquals(INPUT, output);
         }
