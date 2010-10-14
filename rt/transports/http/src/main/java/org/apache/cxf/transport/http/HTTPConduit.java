@@ -1639,7 +1639,9 @@ public class HTTPConduit
         }
         message.put(KEY_HTTP_CONNECTION, connection);
 
-        connection.setFixedLengthStreamingMode(stream.size());
+        if (stream != null) {
+            connection.setFixedLengthStreamingMode(stream.size());
+        }
         
         // Need to set the headers before the trust decision
         // because they are set before the connect().
@@ -2009,9 +2011,10 @@ public class HTTPConduit
          */
         protected void handleRetransmits() throws IOException {
             // If we have a cachedStream, we are caching the request.
-            if (cachedStream != null) {
+            if (cachedStream != null
+                || ("GET".equals(connection.getRequestMethod()) && getClient().isAutoRedirect())) {
 
-                if (LOG.isLoggable(Level.FINE)) {
+                if (LOG.isLoggable(Level.FINE) && cachedStream != null) {
                     LOG.fine("Conduit \""
                              + getConduitName() 
                              + "\" Transmit cached message to: " 
