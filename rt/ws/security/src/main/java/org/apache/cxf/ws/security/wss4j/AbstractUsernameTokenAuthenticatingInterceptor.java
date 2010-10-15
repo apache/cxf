@@ -181,7 +181,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     @Override 
     protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
         if (!supportDigestPasswords) {
-            return super.getSecurityEngine(false);
+            return super.getSecurityEngine(true);
         }
         Map<QName, Object> profiles = new HashMap<QName, Object>(3);
         
