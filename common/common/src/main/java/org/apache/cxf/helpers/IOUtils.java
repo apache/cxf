@@ -134,6 +134,9 @@ public final class IOUtils {
         n = input.read(buffer);
         int total = 0;
         while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
             output.write(buffer, 0, n);
             total += n;
             n = input.read(buffer);
@@ -147,6 +150,9 @@ public final class IOUtils {
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
             output.write(buffer, 0, n);
             n = input.read(buffer);
         }
@@ -169,6 +175,9 @@ public final class IOUtils {
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
             buf.append(newStringFromBytes(buffer, 0, n));
             n = input.read(buffer);
         }
@@ -183,6 +192,9 @@ public final class IOUtils {
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
+            if (n == 0) {
+                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
+            }
             buf.append(new String(buffer, 0, n));
             n = input.read(buffer);
         }
