@@ -1356,6 +1356,7 @@ public abstract class AbstractBindingBuilder {
         }
         sig.setUserInfo(user, password);
         sig.setSignatureAlgorithm(binding.getAlgorithmSuite().getAsymmetricSignature());
+        sig.setDigestAlgo(binding.getAlgorithmSuite().getDigest());
         sig.setSigCanonicalization(binding.getAlgorithmSuite().getInclusiveC14n());
         
         try {
