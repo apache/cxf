@@ -29,7 +29,11 @@ import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
 import javax.xml.namespace.QName;
 
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.SecurityToken;
+import org.apache.cxf.common.security.UsernameToken;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
@@ -68,11 +72,12 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     private boolean supportDigestPasswords;
     
     public AbstractUsernameTokenAuthenticatingInterceptor() {
-        super();
+        this(new HashMap<String, Object>());
     }
     
     public AbstractUsernameTokenAuthenticatingInterceptor(Map<String, Object> properties) {
         super(properties);
+        getAfter().add(PolicyBasedWSS4JInInterceptor.class.getName());
     }
     
     public void setSupportDigestPasswords(boolean support) {
@@ -81,6 +86,23 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     
     public boolean getSupportDigestPasswords() {
         return supportDigestPasswords;
+    }
+    
+    @Override
+    public void handleMessage(SoapMessage msg) throws Fault {
+        SecurityToken token = msg.get(SecurityToken.class);
+        SecurityContext context = msg.get(SecurityContext.class);
+        if (token == null || context == null || context.getUserPrincipal() == null) {
+            super.handleMessage(msg);
+            return;
+        }
+        UsernameToken ut = (UsernameToken)token;
+        
+        Subject subject = createSubject(ut.getName(), ut.getPassword(), ut.isHashed(),
+                                        ut.getNonce(), ut.getCreatedTime());
+        
+        SecurityContext sc = doCreateSecurityContext(context.getUserPrincipal(), subject);
+        msg.put(SecurityContext.class, sc);
     }
     
     @Override

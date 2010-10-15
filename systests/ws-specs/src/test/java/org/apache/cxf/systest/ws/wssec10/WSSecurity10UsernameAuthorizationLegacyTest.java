@@ -28,7 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.bus.spring.SpringBusFactory;
-import org.apache.cxf.systest.ws.wssec10.server.AuthorizedServer;
+import org.apache.cxf.systest.ws.wssec10.server.AuthorizedServer2;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -41,9 +41,9 @@ import wssec.wssec10.PingService;
 /**
  *
  */
-public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServerTestBase {
-    static final String SSL_PORT = allocatePort(AuthorizedServer.class, 1);
-    static final String PORT = allocatePort(AuthorizedServer.class);
+public class WSSecurity10UsernameAuthorizationLegacyTest extends AbstractBusClientServerTestBase {
+    static final String SSL_PORT = allocatePort(AuthorizedServer2.class, 1);
+    static final String PORT = allocatePort(AuthorizedServer2.class);
 
     private static final String INPUT = "foo";
     
@@ -54,34 +54,10 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
             "Server failed to launch",
             // run the server in the same process
             // set this to false to fork
-            launchServer(AuthorizedServer.class, true)
+            launchServer(AuthorizedServer2.class, true)
         );
     }
 
-    @Test
-    public void testClientServerUTOnlyAuthorized() {
-
-        IPingService port = getUTOnlyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted.xml", false);
-        
-        final String output = port.echo(INPUT);
-        assertEquals(INPUT, output);
-    }
-    
-    @Test
-    public void testClientServerUTOnlyUnauthorized() {
-
-        IPingService port = getUTOnlyPort(
-            "org/apache/cxf/systest/ws/wssec10/client/client_restricted_unauthorized.xml", true);
-        
-        try {
-            port.echo(INPUT);
-            fail("Frank is unauthorized");
-        } catch (Exception ex) {
-            assertEquals("Unauthorized", ex.getMessage());
-        }
-    }
-    
     @Test
     public void testClientServerComplexPolicyAuthorized() {
 
@@ -123,33 +99,6 @@ public class WSSecurity10UsernameAuthorizationTest extends AbstractBusClientServ
         return port;
     }
     
-    private static IPingService getUTOnlyPort(String configName, boolean hashed) {
-        Bus bus = new SpringBusFactory().createBus(configName);
-        
-        BusFactory.setDefaultBus(bus);
-        BusFactory.setThreadDefaultBus(bus);
-        PingService svc = new PingService(getWsdlLocation(hashed));
-        final IPingService port = 
-            svc.getPort(
-                new QName(
-                    "http://WSSec/wssec10",
-                    hashed ? "UserName_IPingService_hashed" : "UserName_IPingService"
-                ),
-                IPingService.class
-            );
-        return port;
-    }
-    
-    private static URL getWsdlLocation(boolean hashed) {
-        try {
-            return new URL("http://localhost:" + PORT + "/" 
-                           + (hashed ? "HashedUserName" : "UserName") + "?wsdl");
-        } catch (MalformedURLException mue) {
-            return null;
-        }
-        
-    }
-
     
     private static URL getWsdlLocation(String portPrefix) {
         try {
