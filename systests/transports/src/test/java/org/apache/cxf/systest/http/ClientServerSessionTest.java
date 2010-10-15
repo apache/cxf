@@ -175,4 +175,69 @@ public class ClientServerSessionTest extends AbstractBusClientServerTestBase {
         
     }
     
+    @Test    
+    public void testInvocationWithSessionFactory() throws Exception {
+        doSessionsTest("http://localhost:" + PORT + "/Stateful1");
+    }
+    @Test    
+    public void testInvocationWithSessionAnnotation() throws Exception {
+        doSessionsTest("http://localhost:" + PORT + "/Stateful2");
+    }
+    @Test    
+    public void testInvocationWithPerRequestAnnotation() throws Exception {
+        GreeterService service = new GreeterService();
+        assertNotNull(service);
+
+        Greeter greeter = service.getGreeterPort();
+        BindingProvider bp = (BindingProvider)greeter;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                   "http://localhost:" + PORT + "/PerRequest");
+        bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+        String result = greeter.greetMe("World");
+        assertEquals("Hello World", result);
+        assertEquals("Bonjour default", greeter.sayHi());
+    }
+    @Test    
+    public void testInvocationWithSpringBeanAnnotation() throws Exception {
+        GreeterService service = new GreeterService();
+        assertNotNull(service);
+
+        Greeter greeter = service.getGreeterPort();
+        BindingProvider bp = (BindingProvider)greeter;
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, 
+                                   "http://localhost:" + PORT + "/SpringBean");
+        bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+        String result = greeter.greetMe("World");
+        assertEquals("Hello World", result);
+        assertEquals("Bonjour World", greeter.sayHi());
+    }
+    
+    private void doSessionsTest(String url) {
+        GreeterService service = new GreeterService();
+        assertNotNull(service);
+
+        Greeter greeter = service.getGreeterPort();
+        Greeter greeter2 = service.getGreeterPort();
+        
+        BindingProvider bp = (BindingProvider)greeter;
+
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+        bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+
+        bp = (BindingProvider)greeter2;
+
+        bp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY, url);
+        bp.getRequestContext().put(BindingProvider.SESSION_MAINTAIN_PROPERTY, true);
+
+        String result = greeter.greetMe("World");
+        assertEquals("Hello World", result);
+        assertEquals("Bonjour World", greeter.sayHi());
+        
+        result = greeter2.greetMe("Universe");
+        assertEquals("Hello Universe", result);
+        assertEquals("Bonjour Universe", greeter2.sayHi());
+        
+        //make sure session 1 was maintained
+        assertEquals("Bonjour World", greeter.sayHi());
+    }
 }

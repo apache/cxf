@@ -39,11 +39,11 @@ public class HTTPSession implements Session {
     }
 
     public Object get(Object key) {
-        return getSession().getAttribute((String)key);
+        return getSession().getAttribute(key.toString());
     }
 
     public void put(Object key, Object value) {
-        getSession().setAttribute((String)key, value);
+        getSession().setAttribute(key.toString(), value);
     }
 
     public HttpSession getSession() {

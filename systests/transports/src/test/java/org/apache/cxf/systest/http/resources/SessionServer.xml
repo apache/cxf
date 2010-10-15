@@ -22,7 +22,7 @@
   xmlns:sec="http://cxf.apache.org/configuration/security"
   xmlns:http="http://cxf.apache.org/transports/http/configuration"
   xmlns:httpj="http://cxf.apache.org/transports/http-jetty/configuration"
-  xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+  xmlns:jaxws="http://cxf.apache.org/jaxws"
   xsi:schemaLocation="
   		   http://cxf.apache.org/configuration/security
   		      http://cxf.apache.org/schemas/configuration/security.xsd
@@ -30,6 +30,8 @@
               http://cxf.apache.org/schemas/configuration/http-conf.xsd
            http://cxf.apache.org/transports/http-jetty/configuration
               http://cxf.apache.org/schemas/configuration/http-jetty.xsd
+           http://cxf.apache.org/jaxws     
+              http://cxf.apache.org/schemas/jaxws.xsd
            http://www.springframework.org/schema/beans
               http://www.springframework.org/schema/beans/spring-beans.xsd">
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
@@ -37,6 +39,37 @@
   <httpj:engine-factory bus="cxf">
 	 <httpj:engine port="${testutil.ports.SessionServer}">
 	     <httpj:sessionSupport>true</httpj:sessionSupport>	    
+         <httpj:reuseAddress>false</httpj:reuseAddress>
 	  </httpj:engine>
-   </httpj:engine-factory>  
+   </httpj:engine-factory>
+   
+   <jaxws:endpoint 
+       address="http://localhost:${testutil.ports.SessionServer}/SoapContext/GreeterPort"
+       implementor="org.apache.cxf.systest.http.GreeterSessionImpl"/> 
+        
+        
+   <jaxws:endpoint address="http://localhost:${testutil.ports.SessionServer}/Stateful1"
+       implementorClass="org.apache.cxf.systest.http.StatefulGreeterImpl">
+       <jaxws:invoker>
+           <bean class="org.apache.cxf.jaxws.JAXWSMethodInvoker">
+                <constructor-arg>
+                    <bean class="org.apache.cxf.service.invoker.SessionFactory">
+                        <constructor-arg value="org.apache.cxf.systest.http.StatefulGreeterImpl"/>
+                    </bean>
+                </constructor-arg>
+           </bean>
+       </jaxws:invoker>
+   </jaxws:endpoint>
+       
+   <jaxws:endpoint address="http://localhost:${testutil.ports.SessionServer}/Stateful2"
+       implementorClass="org.apache.cxf.systest.http.SessionAnnotationGreeterImpl"/>
+       
+   <jaxws:endpoint address="http://localhost:${testutil.ports.SessionServer}/PerRequest"
+       implementorClass="org.apache.cxf.systest.http.PerRequestAnnotationGreeterImpl"/>
+
+   <bean id="SpringBean" class="org.apache.cxf.systest.http.SpringAnnotationGreeterImpl"/>
+
+   <jaxws:endpoint address="http://localhost:${testutil.ports.SessionServer}/SpringBean"
+       implementorClass="org.apache.cxf.systest.http.SpringAnnotationGreeterImpl"/>
+         
 </beans>

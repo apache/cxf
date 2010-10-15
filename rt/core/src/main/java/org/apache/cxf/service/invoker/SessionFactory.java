@@ -42,10 +42,10 @@ public class SessionFactory implements Factory {
         Service serv = e.get(Service.class);
         Object o = null;
         synchronized (serv) {
-            o = e.getSession().get(serv.getName());
+            o = e.getSession().get(serv.getName().toString());
             if (o == null) {
                 o = factory.create(e);
-                e.getSession().put(serv.getName(), o);
+                e.getSession().put(serv.getName().toString(), o);
             }
         }
         return o;

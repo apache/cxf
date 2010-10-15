@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.annotations.DataBinding;
 import org.apache.cxf.annotations.EndpointProperties;
 import org.apache.cxf.annotations.EndpointProperty;
+import org.apache.cxf.annotations.FactoryType;
 import org.apache.cxf.annotations.FastInfoset;
 import org.apache.cxf.annotations.GZIP;
 import org.apache.cxf.annotations.Logging;
@@ -46,6 +47,14 @@ import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.resource.ResourceManager;
+import org.apache.cxf.service.invoker.Factory;
+import org.apache.cxf.service.invoker.FactoryInvoker;
+import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.invoker.PerRequestFactory;
+import org.apache.cxf.service.invoker.PooledFactory;
+import org.apache.cxf.service.invoker.SessionFactory;
+import org.apache.cxf.service.invoker.SingletonFactory;
+import org.apache.cxf.service.invoker.SpringBeanFactory;
 import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.FaultInfo;
@@ -128,6 +137,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 addEndpointProperties(server.getEndpoint(), bus, props.value());
             }
             addBindingOperationDocs(server);
+            setScope(factory, server, cls);
             break;
         }
         case INTERFACE_OPERATION_BOUND: {
@@ -145,6 +155,44 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
         default:
             //do nothing
+        }
+    }
+
+    private void setScope(AbstractServiceFactoryBean factory, Server server, Class<?> cls) {
+        FactoryType scope = cls.getAnnotation(FactoryType.class);
+        if (scope != null) {
+            Invoker i = server.getEndpoint().getService().getInvoker();
+            if (i instanceof FactoryInvoker) {
+                Factory f;
+                if (scope.factoryClass() == FactoryType.DEFAULT.class) {
+                    switch (scope.value()) {
+                    case Session:
+                        f = new SessionFactory(cls);
+                        break;
+                    case PerRequest:
+                        f = new PerRequestFactory(cls);
+                        break;
+                    case Pooled:
+                        f = new PooledFactory(cls, Integer.parseInt(scope.args()[0]));
+                        break;
+                    case Spring:
+                        f = new SpringBeanFactory(scope.args()[0]);
+                        break;
+                    default:
+                        f = new SingletonFactory(cls);
+                        break;
+                    }
+                } else {
+                    try {
+                        f = (Factory)scope.factoryClass().getConstructor(Class.class, String[].class)
+                            .newInstance(cls, scope.args());
+                    } catch (Throwable t) {
+                        throw new ServiceConstructionException(t);
+                    }
+                }
+                ((FactoryInvoker)i).setFactory(f);
+            }
+            
         }
     }
 
