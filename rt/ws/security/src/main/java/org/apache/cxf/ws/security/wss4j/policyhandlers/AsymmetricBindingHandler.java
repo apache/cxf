@@ -400,11 +400,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             insertBeforeBottomUp(sig.getSignatureElement());
             sigParts.addAll(this.getSignedParts());
             
-            AlgorithmSuite algorithmSuite = abinding.getAlgorithmSuite();
-            sig.setSignatureAlgorithm(algorithmSuite.getAsymmetricSignature());
-            sig.setDigestAlgo(algorithmSuite.getDigest());
-            sig.setSigCanonicalization(algorithmSuite.getInclusiveC14n());
-
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();
             signatures.add(sig.getSignatureValue());
