@@ -20,6 +20,7 @@ package org.apache.cxf.attachment;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PushbackInputStream;
 import java.util.Collection;
@@ -395,6 +396,65 @@ public class AttachmentDeserializerTest extends Assert {
         ad.initializeAttachments();
         message.getAttachments().size();
 
+    }
+    @Test
+    public void testDoesntReturnZero() throws Exception {
+        String contentType = "multipart/mixed;boundary=----=_Part_1";
+        byte[] messageBytes = (
+                  "------=_Part_1\n\n"
+                + "JJJJ\n"
+                + "------=_Part_1"
+                + "\n\nContent-Transfer-Encoding: binary\n\n"
+                + "ABCD1\r\n"
+                + "------=_Part_1"
+                + "\n\nContent-Transfer-Encoding: binary\n\n"
+                + "ABCD2\r\n"
+                + "------=_Part_1"
+                + "\n\nContent-Transfer-Encoding: binary\n\n"
+                + "ABCD3\r\n"
+                + "------=_Part_1--").getBytes("UTF-8");
+        ByteArrayInputStream in = new ByteArrayInputStream(messageBytes) {
+            public int read(byte[] b, int off, int len) {
+                return super.read(b, off, len >= 2 ? 2 : len); 
+            }
+        };
+        
+        Message message = new MessageImpl();
+        message.put(Message.CONTENT_TYPE, contentType);
+        message.setContent(InputStream.class, in);
+        message.put(AttachmentDeserializer.ATTACHMENT_DIRECTORY, System
+                .getProperty("java.io.tmpdir"));
+        message.put(AttachmentDeserializer.ATTACHMENT_MEMORY_THRESHOLD, String
+                .valueOf(AttachmentDeserializer.THRESHOLD));
+
+
+        AttachmentDeserializer ad 
+            = new AttachmentDeserializer(message, 
+                                         Collections.singletonList("multipart/mixed"));
+
+        ad.initializeAttachments();
+        
+        String s = getString(message.getContent(InputStream.class));
+        assertEquals("JJJJ", s.trim());
+        int count = 1;
+        for (Attachment a : message.getAttachments()) {
+            s = getString(a.getDataHandler().getInputStream());
+            assertEquals("ABCD" + count++, s);
+        }
+    }
+    
+    private String getString(InputStream ins) throws Exception {
+        ByteArrayOutputStream bout = new ByteArrayOutputStream(100);
+        byte b[] = new byte[100];
+        int i = ins.read(b);
+        while (i > 0) {
+            bout.write(b, 0 , i);
+            i = ins.read(b);
+        }
+        if (i == 0) {
+            throw new IOException("Should not be 0");
+        }
+        return bout.toString();
     }
 
 }

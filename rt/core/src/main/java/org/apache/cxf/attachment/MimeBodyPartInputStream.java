@@ -70,9 +70,20 @@ public class MimeBodyPartInputStream extends InputStream {
         if (len > pbAmount) {
             len = pbAmount;  //can only pushback that much so make sure we can
         }
-        if (len > 0) {
-            len = inStream.read(b, off, len);
+        int read = 0;
+        int idx = 0;
+        while (read >= 0 && idx < len && idx < (boundary.length * 2)) {
+            //make sure we read enough to detect the boundary
+            read = inStream.read(b, off + idx, len - idx);
+            if (read != -1) {
+                idx += read;
+            }
         }
+        if (read == -1 && idx == 0) {
+            return -1;
+        }
+        len = idx;
+        
         int i = processBuffer(b, off, len);
         if (bufferCreated && i > 0) {
             // read more than we need, push it back
@@ -86,6 +97,7 @@ public class MimeBodyPartInputStream extends InputStream {
         } else if (i == 0 && boundaryFound) {
             return -1;
         }
+        
         return i;
     }
 
