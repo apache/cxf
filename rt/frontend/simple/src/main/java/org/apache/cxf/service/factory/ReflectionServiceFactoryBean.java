@@ -1247,7 +1247,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         for (MessagePartInfo mpi : unwrappedMessage.getMessageParts()) {
             el = new XmlSchemaElement(schema, false);
-            // We hope that we can't have parts that differe only in namespace.
+            // We hope that we can't have parts that different only in namespace.
             el.setName(mpi.getName().getLocalPart());
             Map<Class, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
             if (mpi.isElement()) {
