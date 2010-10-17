@@ -27,7 +27,11 @@ import java.util.logging.Logger;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.QName;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.w3c.dom.DOMError;
 import org.w3c.dom.DOMErrorHandler;
@@ -37,6 +41,7 @@ import org.w3c.dom.ls.LSInput;
 import org.w3c.dom.ls.LSResourceResolver;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.helpers.XMLUtils;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaComplexContent;
@@ -131,6 +136,7 @@ public class ImportRepairTest extends Assert {
 
         createAttributeImportingType(importingSchema);
 
+
         /*
          * Notice that no imports have been added. In an ideal world, XmlSchema would do this for us.
          */
@@ -157,6 +163,7 @@ public class ImportRepairTest extends Assert {
             }
             Document document = new XmlSchemaSerializer().serializeSchema(schema, false)[0];
             DOMLSInput input = new DOMLSInput(document, schema.getTargetNamespace());
+            dumpSchema(document);
             resolverMap.put(schema.getTargetNamespace(), input);
             inputs.add(input);
         }
@@ -172,7 +179,11 @@ public class ImportRepairTest extends Assert {
         schemaLoader.getConfig().setParameter("error-handler", new DOMErrorHandler() {
 
             public boolean handleError(DOMError error) {
-                LOG.info("Schema parsing error: " + error.getMessage());
+                LOG.info("Schema parsing error: " + error.getMessage()
+                         + " " + error.getType()
+                         + " " + error.getLocation().getUri()
+                         + " " + error.getLocation().getLineNumber()
+                         + ":" + error.getLocation().getColumnNumber());
                 throw new DOMErrorException(error);
             }
         });
@@ -185,6 +196,17 @@ public class ImportRepairTest extends Assert {
         });
 
         schemaLoader.loadInputList(new ListLSInput(inputs));
+    }
+
+    private void dumpSchema(Document document) {
+        try {
+            Transformer t = XMLUtils.newTransformer(2);
+            t.setOutputProperty(OutputKeys.INDENT, "yes");
+            t.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
+            t.transform(new DOMSource(document), new StreamResult(System.err));
+        } catch (Exception e) {
+            //
+        }
     }
 
     private void createTypeImportedByElement(XmlSchema elementTypeSchema) {

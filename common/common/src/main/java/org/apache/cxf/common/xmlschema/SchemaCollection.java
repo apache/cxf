@@ -41,7 +41,6 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
@@ -53,7 +52,6 @@ import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
 
-
 /**
  * Wrapper class for XmlSchemaCollection that deals with various quirks and bugs.
  */
@@ -62,7 +60,6 @@ public class SchemaCollection {
     private XmlSchemaCollection schemaCollection;
     private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
         = new HashMap<XmlSchema, Set<XmlSchemaType>>();
-
 
     public SchemaCollection() {
         this(new XmlSchemaCollection());
@@ -106,8 +103,7 @@ public class SchemaCollection {
     }
 
     public XmlSchemaType getTypeByQName(QName schemaTypeName) {
-        XmlSchemaType xst = schemaCollection.getTypeByQName(schemaTypeName);
-        return xst;
+        return schemaCollection.getTypeByQName(schemaTypeName);
     }
 
     public XmlSchema[] getXmlSchema(String systemId) {
@@ -242,18 +238,15 @@ public class SchemaCollection {
         /*
          * We need to visit all the top-level items.
          */
-        for (XmlSchemaObject item : schema.getItems()) {
-            if (item instanceof XmlSchemaElement) {
-                addElementCrossImportsElement(schema, (XmlSchemaElement)item);
-            } else if (item instanceof XmlSchemaAttribute) {
-                XmlSchemaAttribute attr = (XmlSchemaAttribute)item;
-                XmlSchemaUtils.addImportIfNeeded(schema, attr.getRef().getTargetQName());
-                XmlSchemaUtils.addImportIfNeeded(schema, attr.getSchemaTypeName());
-                /* Attributes have simple types and simple types don't have bases. */
-            } else if (item instanceof XmlSchemaType) {
-                XmlSchemaType type = (XmlSchemaType)item;
-                addCrossImportsType(schema, type);
-            }
+        for (XmlSchemaElement element : schema.getElements().values()) {
+            addElementCrossImportsElement(schema, element);
+        }
+        for (XmlSchemaAttribute attribute : schema.getAttributes().values()) {
+            XmlSchemaUtils.addImportIfNeeded(schema, attribute.getRef().getTargetQName());
+            XmlSchemaUtils.addImportIfNeeded(schema, attribute.getSchemaTypeName());
+        }
+        for (XmlSchemaType type : schema.getSchemaTypes().values()) {
+            addCrossImportsType(schema, type);
         }
     }
 
@@ -269,8 +262,8 @@ public class SchemaCollection {
     }
 
     /**
-     * Determines whether the schema has already received (cross) imports for
-     * the schemaType
+     * Determines whether the schema has already received (cross) imports for the schemaType
+     *
      * @param schema
      * @param schemaType
      * @return false if cross imports for schemaType must still be added to schema
@@ -295,18 +288,15 @@ public class SchemaCollection {
     }
 
     private void addCrossImportsType(XmlSchema schema, XmlSchemaType schemaType) {
-        if (schemaType != null) {
-            // the base type might cross schemas.
-
-            if (schemaType instanceof XmlSchemaComplexType) {
-                XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
-                XmlSchemaUtils.addImportIfNeeded(schema, complexType.getBaseSchemaTypeName());
-                addCrossImports(schema, complexType.getContentModel());
-                addCrossImportsAttributeList(schema, complexType.getAttributes());
-                // could it be a choice or something else?
-                XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(complexType);
-                addCrossImportsSequence(schema, sequence);
-            }
+        // the base type might cross schemas.
+        if (schemaType instanceof XmlSchemaComplexType) {
+            XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
+            XmlSchemaUtils.addImportIfNeeded(schema, complexType.getBaseSchemaTypeName());
+            addCrossImports(schema, complexType.getContentModel());
+            addCrossImportsAttributeList(schema, complexType.getAttributes());
+            // could it be a choice or something else?
+            XmlSchemaSequence sequence = XmlSchemaUtils.getSequence(complexType);
+            addCrossImportsSequence(schema, sequence);
         }
     }
 
@@ -318,14 +308,13 @@ public class SchemaCollection {
         }
     }
 
-    private void addCrossImportsAttributeList(XmlSchema schema,
-                                              List<XmlSchemaAttributeOrGroupRef> list) {
+    private void addCrossImportsAttributeList(XmlSchema schema, List<XmlSchemaAttributeOrGroupRef> list) {
         for (XmlSchemaAttributeOrGroupRef attr : list) {
             QName ref = null;
             if (attr instanceof XmlSchemaAttribute) {
                 ref = ((XmlSchemaAttribute)attr).getRef().getTargetQName();
             } else {
-                XmlSchemaAttributeGroupRef groupRef = (XmlSchemaAttributeGroupRef) attr;
+                XmlSchemaAttributeGroupRef groupRef = (XmlSchemaAttributeGroupRef)attr;
                 ref = groupRef.getRef().getTargetQName();
             }
 
@@ -344,7 +333,7 @@ public class SchemaCollection {
             return;
         }
         if (content instanceof XmlSchemaComplexContentExtension) {
-            XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension) content;
+            XmlSchemaComplexContentExtension extension = (XmlSchemaComplexContentExtension)content;
             XmlSchemaUtils.addImportIfNeeded(schema, extension.getBaseTypeName());
             addCrossImportsAttributeList(schema, extension.getAttributes());
             XmlSchemaParticle particle = extension.getParticle();
@@ -352,15 +341,15 @@ public class SchemaCollection {
                 addCrossImportsSequence(schema, (XmlSchemaSequence)particle);
             }
         } else if (content instanceof XmlSchemaComplexContentRestriction) {
-            XmlSchemaComplexContentRestriction restriction = (XmlSchemaComplexContentRestriction) content;
+            XmlSchemaComplexContentRestriction restriction = (XmlSchemaComplexContentRestriction)content;
             XmlSchemaUtils.addImportIfNeeded(schema, restriction.getBaseTypeName());
             addCrossImportsAttributeList(schema, restriction.getAttributes());
         } else if (content instanceof XmlSchemaSimpleContentExtension) {
-            XmlSchemaSimpleContentExtension extension = (XmlSchemaSimpleContentExtension) content;
+            XmlSchemaSimpleContentExtension extension = (XmlSchemaSimpleContentExtension)content;
             XmlSchemaUtils.addImportIfNeeded(schema, extension.getBaseTypeName());
             addCrossImportsAttributeList(schema, extension.getAttributes());
         } else if (content instanceof XmlSchemaSimpleContentRestriction) {
-            XmlSchemaSimpleContentRestriction restriction = (XmlSchemaSimpleContentRestriction) content;
+            XmlSchemaSimpleContentRestriction restriction = (XmlSchemaSimpleContentRestriction)content;
             XmlSchemaUtils.addImportIfNeeded(schema, restriction.getBaseTypeName());
             addCrossImportsAttributeList(schema, restriction.getAttributes());
         }
