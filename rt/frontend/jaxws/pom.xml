@@ -6,9 +6,9 @@
   to you under the Apache License, Version 2.0 (the
   "License"); you may not use this file except in compliance
   with the License. You may obtain a copy of the License at
- 
+
   http://www.apache.org/licenses/LICENSE-2.0
- 
+
   Unless required by applicable law or agreed to in writing,
   software distributed under the License is distributed on an
   "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
@@ -33,7 +33,7 @@
     </parent>
 
     <properties>
-        <spi-dir>spi-2.1</spi-dir>
+        <cxf.spi-dir>spi-2.1</cxf.spi-dir>
     </properties>
     <dependencies>
         <dependency>
@@ -53,10 +53,10 @@
             <scope>test</scope>
         </dependency>
 
-        <dependency>                                                      
-             <groupId>xml-resolver</groupId>                               
+        <dependency>
+             <groupId>xml-resolver</groupId>
              <artifactId>xml-resolver</artifactId>
-         </dependency> 
+         </dependency>
 
         <dependency>
             <groupId>asm</groupId>
@@ -110,13 +110,13 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-web</artifactId>
             <scope>provided</scope>
-            <version>${spring.version}</version>
+            <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-webmvc</artifactId>
             <scope>provided</scope>
-            <version>${spring.version}</version>
+            <version>${cxf.spring.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -139,10 +139,10 @@
             <scope>provided</scope>
         </dependency>
         <dependency>
-            <groupId>${servlet-api.group}</groupId>
-            <artifactId>${servlet-api.artifact}</artifactId>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
             <scope>provided</scope>
-        </dependency>        
+        </dependency>
     </dependencies>
 
     <build>
@@ -172,7 +172,7 @@
                          <configuration>
                              <resources>
                                  <resource>
-                                     <directory>${basedir}/src/main/${spi-dir}</directory>
+                                     <directory>${basedir}/src/main/${cxf.spi-dir}</directory>
                                  </resource>
                              </resources>
                          </configuration>
@@ -287,7 +287,7 @@
                 <jdk>1.5</jdk>
             </activation>
             <properties>
-                <spi-dir>spi-2.2</spi-dir>
+                <cxf.spi-dir>spi-2.2</cxf.spi-dir>
             </properties>
             <dependencies>
                 <dependency>
@@ -299,8 +299,8 @@
                     <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>${stax.impl.groupId}</groupId>
-                    <artifactId>${stax.impl.artifactId}</artifactId>
+                    <groupId>cxf.stax.impl.groupId}</groupId>
+                    <artifactId>${cxf.stax.impl.artifactId}</artifactId>
                 </dependency>
                 <dependency>
                     <groupId>javax.xml.soap</groupId>
@@ -315,8 +315,8 @@
                      <artifactId>geronimo-ws-metadata_2.0_spec</artifactId>
                  </dependency>
                  <dependency>
-                     <groupId>${saaj.impl.groupId}</groupId>
-                     <artifactId>${saaj.impl.artifactId}</artifactId>
+                     <groupId>${cxf.saaj.impl.groupId}</groupId>
+                     <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
                  </dependency>
             </dependencies>
             <build>

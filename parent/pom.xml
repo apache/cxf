@@ -34,55 +34,55 @@
 
     <properties>
         <cxf.protect-xmlschema-collections>false</cxf.protect-xmlschema-collections>
-        <surefire.fork.mode>once</surefire.fork.mode>
-        <surefire.format>brief</surefire.format>
-        <surefire.usefile>false</surefire.usefile>
-        <surefire.parallel.mode />
-        <surefire.fork.vmargs>-ea</surefire.fork.vmargs>
-        <server.launcher.vmargs>-ea</server.launcher.vmargs>
-        <compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</compile.flags>
-        <compile.show.deprecation>true</compile.show.deprecation>
+        <cxf.surefire.fork.mode>once</cxf.surefire.fork.mode>
+        <cxf.surefire.format>brief</cxf.surefire.format>
+        <cxf.surefire.usefile>false</cxf.surefire.usefile>
+        <cxf.surefire.parallel.mode />
+        <cxf.surefire.fork.vmargs>-ea</cxf.surefire.fork.vmargs>
+        <cxf.server.launcher.vmargs>-ea</cxf.server.launcher.vmargs>
+        <cxf.compile.flags>-Xlint:unchecked,deprecation,fallthrough,finally</cxf.compile.flags>
+        <cxf.compile.show.deprecation>true</cxf.compile.show.deprecation>
 
-        <eclipse.outputDirectory>${basedir}/target/classes</eclipse.outputDirectory>
-        <saaj.impl.groupId>com.sun.xml.messaging.saaj</saaj.impl.groupId>
-        <saaj.impl.artifactId>saaj-impl</saaj.impl.artifactId>
-        <saaj.impl.version>1.3.2</saaj.impl.version>
+        <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
+        <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
+        <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
+        <cxf.saaj.impl.version>1.3.2</cxf.saaj.impl.version>
 
         <!-- please maintain alphabetical order here -->
-        <abdera.version>1.1</abdera.version>
-        <activemq.version>5.4.1</activemq.version>
-        <derby.version>10.2.2.0</derby.version>
-        <jaxb.version>2.1</jaxb.version>
-        <jaxb.impl.version>2.1.13</jaxb.impl.version>
-        <jaxb.xjc.version>2.1.13</jaxb.xjc.version>
-        <jaxb22.version>2.2.1</jaxb22.version>
-        <jaxb22.impl.version>2.2.1.1</jaxb22.impl.version>
-        <jaxb22.xjc.version>2.2.1.1</jaxb22.xjc.version>
-        <jdom.version>1.0</jdom.version>
-        <jetty.version>7.1.6.v20100715</jetty.version>
-        <msv.version>2010.1</msv.version>
-        <rhino.version>1.7R1</rhino.version>
-        <saaj.version>1.3</saaj.version>
-        <servlet-api.group>org.apache.geronimo.specs</servlet-api.group>
-        <servlet-api.artifact>geronimo-servlet_3.0_spec</servlet-api.artifact>
-        <servlet-api.version>1.0</servlet-api.version>
-        <spring.version>3.0.4.RELEASE</spring.version>
-        <spring.mock>spring-test</spring.mock>
-        <stax.impl.groupId>org.codehaus.woodstox</stax.impl.groupId>
-        <stax.impl.artifactId>woodstox-core-asl</stax.impl.artifactId>
-        <stax.impl.version>4.0.8</stax.impl.version>
-        <wsdl4j.version>1.6.2</wsdl4j.version>
-        <xmlbeans.version>2.4.0</xmlbeans.version>
-        <xmlschema.version>2.0-SNAPSHOT</xmlschema.version>
-        <checkstyle.extension />
+        <cxf.abdera.version>1.1</cxf.abdera.version>
+        <cxf.activemq.version>5.4.1</cxf.activemq.version>
+        <cxf.derby.version>10.2.2.0</cxf.derby.version>
+        <cxf.jaxb.version>2.1</cxf.jaxb.version>
+        <cxf.jaxb.impl.version>2.1.13</cxf.jaxb.impl.version>
+        <cxf.jaxb.xjc.version>2.1.13</cxf.jaxb.xjc.version>
+        <cxf.jaxb22.version>2.2.1</cxf.jaxb22.version>
+        <cxf.jaxb22.impl.version>2.2.1.1</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.xjc.version>2.2.1.1</cxf.jaxb22.xjc.version>
+        <cxf.jdom.version>1.0</cxf.jdom.version>
+        <cxf.jetty.version>7.1.6.v20100715</cxf.jetty.version>
+        <cxf.msv.version>2010.1</cxf.msv.version>
+        <cxf.rhino.version>1.7R1</cxf.rhino.version>
+        <cxf.saaj.version>1.3</cxf.saaj.version>
+        <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
+        <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
+        <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
+        <cxf.spring.version>3.0.4.RELEASE</cxf.spring.version>
+        <cxf.spring.mock>spring-test</cxf.spring.mock>
+        <cxf.stax.impl.groupId>org.codehaus.woodstox</cxf.stax.impl.groupId>
+        <cxf.stax.impl.artifactId>woodstox-core-asl</cxf.stax.impl.artifactId>
+        <cxf.stax.impl.version>4.0.8</cxf.stax.impl.version>
+        <cxf.wsdl4j.version>1.6.2</cxf.wsdl4j.version>
+        <cxf.xmlbeans.version>2.4.0</cxf.xmlbeans.version>
+        <cxf.xmlschema.version>2.0-SNAPSHOT</cxf.xmlschema.version>
+        <cxf.checkstyle.extension />
 
-        <spring.validation.mode>VALIDATION_AUTO</spring.validation.mode>
+        <cxf.spring.validation.mode>VALIDATION_AUTO</cxf.spring.validation.mode>
 
-        <downloadSources>true</downloadSources>
+        <cxf.downloadSources>true</cxf.downloadSources>
 
-        <pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</pmd.eclipse.ruleset>
+        <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</cxf.pmd.eclipse.ruleset>
 
-        <resources.base.path />
+        <cxf.resources.base.path />
 
     </properties>
 
@@ -141,7 +141,7 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-eclipse-plugin</artifactId>
                     <configuration>
-                        <outputDirectory>${eclipse.outputDirectory}</outputDirectory>
+                        <outputDirectory>${cxf.eclipse.outputDirectory}</outputDirectory>
                         <buildcommands>
                             <java.lang.String>org.eclipse.jdt.core.javabuilder</java.lang.String>
                             <java.lang.String>net.sf.eclipsecs.core.CheckstyleBuilder</java.lang.String>
@@ -156,7 +156,7 @@
                         <additionalConfig>
                             <file>
                                 <name>.checkstyle</name>
-                                <location>/cxf-eclipse-checkstyle${checkstyle.extension}</location>
+                                <location>/cxf-eclipse-checkstyle${cxf.checkstyle.extension}</location>
                             </file>
                             <file>
                                 <name>.pmd</name>
@@ -188,11 +188,11 @@
                             <id>validate</id>
                             <phase>validate</phase>
                             <configuration>
-                                <configLocation>${resources.base.path}cxf-checkstyle${checkstyle.extension}.xml</configLocation>
+                                <configLocation>${cxf.resources.base.path}cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
                                 <consoleOutput>true</consoleOutput>
                                 <failsOnError>true</failsOnError>
                                 <linkXRef>false</linkXRef>
-                                <suppressionsLocation>${resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
+                                <suppressionsLocation>${cxf.resources.base.path}cxf-checkstyle-suppressions.xml</suppressionsLocation>
                                 <sourceDirectory>${basedir}/src</sourceDirectory>
                                 <excludes>**/archetype-resources/**/*.java</excludes>
                             </configuration>
@@ -215,8 +215,8 @@
                     </dependencies>
                     <configuration>
                         <rulesets>
-                            <ruleset>${resources.base.path}cxf-pmd-ruleset.xml</ruleset>
-                            <ruleset>${resources.base.path}cxf-pmd-custom.xml</ruleset>
+                            <ruleset>${cxf.resources.base.path}cxf-pmd-ruleset.xml</ruleset>
+                            <ruleset>${cxf.resources.base.path}cxf-pmd-custom.xml</ruleset>
                         </rulesets>
                         <sourceEncoding>UTF-8</sourceEncoding>
                         <targetJdk>1.5</targetJdk>
@@ -252,12 +252,12 @@
                             <exclude>**/*$*</exclude>
                         </excludes>
                         <!--disableXmlReport>true</disableXmlReport-->
-                        <reportFormat>${surefire.format}</reportFormat>
-                        <useFile>${surefire.usefile}</useFile>
-                        <forkMode>${surefire.fork.mode}</forkMode>
+                        <reportFormat>${cxf.surefire.format}</reportFormat>
+                        <useFile>${cxf.surefire.usefile}</useFile>
+                        <forkMode>${cxf.surefire.fork.mode}</forkMode>
                         <childDelegation>false</childDelegation>
-                        <argLine>${surefire.fork.vmargs}</argLine>
-                        <parallel>${surefire.parallel.mode}</parallel>
+                        <argLine>${cxf.surefire.fork.vmargs}</argLine>
+                        <parallel>${cxf.surefire.parallel.mode}</parallel>
                         <systemPropertyVariables>
 			        <org.apache.ws.commons.schema.protectReadOnlyCollections>${cxf.protect-xmlschema-collections}</org.apache.ws.commons.schema.protectReadOnlyCollections>
                                 <useRandomPorts>true</useRandomPorts>
@@ -267,7 +267,7 @@
                                 <org.apache.activemq.default.directory.prefix>${basedir}/target/ActiveMQ/</org.apache.activemq.default.directory.prefix>
                                 <derby.system.home>${basedir}/target/derby</derby.system.home>
                                 <spring.validation.mode>${spring.validation.mode}</spring.validation.mode>
-                                <server.launcher.vmargs>${server.launcher.vmargs}</server.launcher.vmargs>
+                                <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                                 <!-- If we close the port after a client in the same JVM has opened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until
                                 some timeout occurs.   That may cause some tests to timeout/hang. -->
@@ -505,9 +505,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>${stax.impl.groupId}</groupId>
-                <artifactId>${stax.impl.artifactId}</artifactId>
-                <version>${stax.impl.version}</version>
+                <groupId>${cxf.stax.impl.groupId}</groupId>
+                <artifactId>${cxf.stax.impl.artifactId}</artifactId>
+                <version>${cxf.stax.impl.version}</version>
                 <!-- these are motivated by Woodstox, but they can't hurt with others. -->
                 <exclusions>
                     <exclusion>
@@ -535,7 +535,7 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-server</artifactId>
-                <version>${jetty.version}</version>
+                <version>${cxf.jetty.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -546,12 +546,12 @@
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-webapp</artifactId>
-                <version>${jetty.version}</version>
+                <version>${cxf.jetty.version}</version>
 	    </dependency>
             <dependency>
                 <groupId>org.eclipse.jetty</groupId>
                 <artifactId>jetty-servlet</artifactId>
-                <version>${jetty.version}</version>
+                <version>${cxf.jetty.version}</version>
 	    </dependency>
             <dependency>
                 <groupId>xalan</groupId>
@@ -567,7 +567,7 @@
             <dependency>
                 <groupId>org.apache.ws.commons.schema</groupId>
                 <artifactId>XmlSchema</artifactId>
-                <version>${xmlschema.version}</version>
+                <version>${cxf.xmlschema.version}</version>
                 <exclusions>
                     <!-- on IBM jdk, XmlSchema pulls these in -->
                     <exclusion>
@@ -583,7 +583,7 @@
             <dependency>
                 <groupId>javax.xml.soap</groupId>
                 <artifactId>saaj-api</artifactId>
-                <version>${saaj.version}</version>
+                <version>${cxf.saaj.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.activation</groupId>
@@ -598,7 +598,7 @@
             <dependency>
                 <groupId>javax.xml.bind</groupId>
                 <artifactId>jaxb-api</artifactId>
-                <version>${jaxb.version}</version>
+                <version>${cxf.jaxb.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml.bind</groupId>
@@ -619,9 +619,9 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>${saaj.impl.groupId}</groupId>
-                <artifactId>${saaj.impl.artifactId}</artifactId>
-                <version>${saaj.impl.version}</version>
+                <groupId>${cxf.saaj.impl.groupId}</groupId>
+                <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
+                <version>${cxf.saaj.impl.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.activation</groupId>
@@ -637,7 +637,7 @@
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-impl</artifactId>
-                <version>${jaxb.impl.version}</version>
+                <version>${cxf.jaxb.impl.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml.bind</groupId>
@@ -664,17 +664,17 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-jms</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-tx</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-core</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -697,7 +697,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-beans</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -720,7 +720,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-context</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -743,7 +743,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-web</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -766,7 +766,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-webmvc</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -789,7 +789,7 @@
             <dependency>
                 <groupId>org.springframework</groupId>
                 <artifactId>spring-aop</artifactId>
-                <version>${spring.version}</version>
+                <version>${cxf.spring.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>log4j</groupId>
@@ -890,8 +890,8 @@
 
             <dependency>
                 <groupId>org.springframework</groupId>
-                <artifactId>${spring.mock}</artifactId>
-                <version>${spring.version}</version>
+                <artifactId>${cxf.spring.mock}</artifactId>
+                <version>${cxf.spring.version}</version>
             </dependency>
 
             <dependency>
@@ -945,12 +945,12 @@
             <dependency>
                 <groupId>wsdl4j</groupId>
                 <artifactId>wsdl4j</artifactId>
-                <version>${wsdl4j.version}</version>
+                <version>${cxf.wsdl4j.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.sun.xml.bind</groupId>
                 <artifactId>jaxb-xjc</artifactId>
-                <version>${jaxb.xjc.version}</version>
+                <version>${cxf.jaxb.xjc.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.xml.bind</groupId>
@@ -973,9 +973,9 @@
                 <version>1.1.1</version>
             </dependency>
             <dependency>
-                <groupId>${servlet-api.group}</groupId>
-                <artifactId>${servlet-api.artifact}</artifactId>
-                <version>${servlet-api.version}</version>
+                <groupId>${cxf.servlet-api.group}</groupId>
+                <artifactId>${cxf.servlet-api.artifact}</artifactId>
+                <version>${cxf.servlet-api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
@@ -1020,7 +1020,7 @@
             <dependency>
                 <groupId>org.apache.activemq</groupId>
                 <artifactId>activemq-core</artifactId>
-                <version>${activemq.version}</version>
+                <version>${cxf.activemq.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
@@ -1031,12 +1031,12 @@
             <dependency>
                 <groupId>rhino</groupId>
                 <artifactId>js</artifactId>
-                <version>${rhino.version}</version>
+                <version>${cxf.rhino.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.xmlbeans</groupId>
                 <artifactId>xmlbeans</artifactId>
-                <version>${xmlbeans.version}</version>
+                <version>${cxf.xmlbeans.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>stax</groupId>
@@ -1063,7 +1063,7 @@
             <dependency>
                 <groupId>org.apache.abdera</groupId>
                 <artifactId>abdera-core</artifactId>
-                <version>${abdera.version}</version>
+                <version>${cxf.abdera.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
@@ -1078,7 +1078,7 @@
             <dependency>
                 <groupId>org.apache.abdera</groupId>
                 <artifactId>abdera-extensions-json</artifactId>
-                <version>${abdera.version}</version>
+                <version>${cxf.abdera.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>javax.servlet</groupId>
@@ -1109,7 +1109,7 @@
             <dependency>
                 <groupId>org.apache.abdera</groupId>
                 <artifactId>abdera-parser</artifactId>
-                <version>${abdera.version}</version>
+                <version>${cxf.abdera.version}</version>
                 <exclusions>
                     <exclusion>
                         <groupId>org.apache.geronimo.specs</groupId>
@@ -1275,7 +1275,7 @@
             <dependency>
                 <groupId>net.java.dev.msv</groupId>
                 <artifactId>msv-core</artifactId>
-                <version>${msv.version}</version>
+                <version>${cxf.msv.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -1303,7 +1303,7 @@
                 <version>2.6</version>
                 <configuration>
                     <encoding>UTF-8</encoding>
-                    <configLocation>cxf-checkstyle${checkstyle.extension}.xml</configLocation>
+                    <configLocation>cxf-checkstyle${cxf.checkstyle.extension}.xml</configLocation>
                     <consoleOutput>true</consoleOutput>
                     <failsOnError>true</failsOnError>
                     <linkXRef>false</linkXRef>
@@ -1322,9 +1322,9 @@
                 <jdk>1.5</jdk>
             </activation>
             <properties>
-                <jaxb.version>${jaxb22.version}</jaxb.version>
-                <jaxb.impl.version>${jaxb22.impl.version}</jaxb.impl.version>
-                <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
+                <jaxb.version>${cxf.jaxb22.version}</jaxb.version>
+                <jaxb.impl.version>${cxf.jaxb22.impl.version}</jaxb.impl.version>
+                <jaxb.xjc.version>${cxf.jaxb22.impl.version}</jaxb.xjc.version>
                 <jdk.version>1.5</jdk.version>
             </properties>
         </profile>
@@ -1404,9 +1404,9 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-compiler-plugin</artifactId>
                         <configuration>
-                            <showDeprecation>${compile.show.deprecation}</showDeprecation>
+                            <showDeprecation>${cxf.compile.show.deprecation}</showDeprecation>
                             <showWarnings>true</showWarnings>
-                            <compilerArgument>${compile.flags}</compilerArgument>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -1419,7 +1419,7 @@
         <profile>
             <id>set.eclipse.output</id>
             <properties>
-                <eclipse.outputDirectory>${basedir}/eclipse-classes</eclipse.outputDirectory>
+                <cxf.eclipse.outputDirectory>${basedir}/eclipse-classes</cxf.eclipse.outputDirectory>
             </properties>
         </profile>
 
@@ -1441,7 +1441,7 @@
                         <configuration>
                             <showDeprecation>true</showDeprecation>
                             <showWarnings>true</showWarnings>
-                            <compilerArgument>${compile.flags}</compilerArgument>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
                         </configuration>
                     </plugin>
                     <plugin>
@@ -1500,7 +1500,7 @@
                         <configuration>
                             <showDeprecation>true</showDeprecation>
                             <showWarnings>true</showWarnings>
-                            <compilerArgument>${compile.flags}</compilerArgument>
+                            <compilerArgument>${cxf.compile.flags}</compilerArgument>
                             <fork>true</fork>
                             <maxmem>512M</maxmem>
                         </configuration>

@@ -69,8 +69,8 @@
             <artifactId>XmlSchema</artifactId>
         </dependency>
         <dependency>
-	    <groupId>${stax.impl.groupId}</groupId>
-	    <artifactId>${stax.impl.artifactId}</artifactId>
+	    <groupId>${cxf.stax.impl.groupId}</groupId>
+	    <artifactId>${cxf.stax.impl.artifactId}</artifactId>
         </dependency>
         <dependency>
             <groupId>wsdl4j</groupId>

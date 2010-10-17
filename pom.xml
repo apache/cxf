@@ -28,8 +28,8 @@
     <packaging>pom</packaging>
 
     <scm>
-        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/tags/cxf-2.3.0</connection>
-        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/tags/cxf-2.3.0</developerConnection>
+        <connection>scm:svn:http://svn.apache.org/repos/asf/cxf/trunk</connection>
+        <developerConnection>scm:svn:https://svn.apache.org/repos/asf/cxf/trunk</developerConnection>
     </scm>
     <issueManagement>
         <system>jira</system>
@@ -41,10 +41,10 @@
     </prerequisites>
 
     <properties>
-        <compiler.fork>false</compiler.fork>
+        <cxf.compiler.fork>false</cxf.compiler.fork>
         <cxf.build-utils.version>2.3.0</cxf.build-utils.version>
         <cxf.xjc-utils.version>2.3.0</cxf.xjc-utils.version>
-        <jdk.version>1.6</jdk.version>
+        <cxf.jdk.version>1.6</cxf.jdk.version>
     </properties>
 
     <distributionManagement>
@@ -209,10 +209,10 @@
                             <artifactId>maven-compiler-plugin</artifactId>
                             <version>2.3.2</version>
                             <configuration>
-                                <source>${jdk.version}</source>
-                                <target>${jdk.version}</target>
+                                <source>${cxf.jdk.version}</source>
+                                <target>${cxf.jdk.version}</target>
                                 <maxmem>256M</maxmem>
-                                <fork>${compiler.fork}</fork>
+                                <fork>${cxf.compiler.fork}</fork>
                             </configuration>
                         </plugin>
                     </plugins>
@@ -506,7 +506,7 @@
                         <source>1.5</source>
                         <target>1.5</target>
                         <maxmem>256M</maxmem>
-                        <fork>${compiler.fork}</fork>
+                        <fork>${cxf.compiler.fork}</fork>
                         <encoding>UTF-8</encoding>
                     </configuration>
                 </plugin>
