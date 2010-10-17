@@ -259,18 +259,18 @@ public final class IriDecoderHelper {
                 }
             }
             Element ec = null;
-            QName qn = elChild.getQName();
+            QName qn = elChild.getWireName();
             if (StringUtils.isEmpty(qn.getNamespaceURI()) && unQualified) {
                 ec = doc.createElement(elChild.getQName().getLocalPart());
             } else {
 
-                if (!elChild.getQName().getNamespaceURI().equals(qname.getNamespaceURI())) {
-                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(),
-                                             elChild.getQName().getLocalPart());
-                    ec.setAttribute(XMLConstants.XMLNS_ATTRIBUTE, elChild.getQName().getNamespaceURI());
+                if (!qn.getNamespaceURI().equals(qname.getNamespaceURI())) {
+                    ec = doc.createElementNS(qn.getNamespaceURI(),
+                                             qn.getLocalPart());
+                    ec.setAttribute(XMLConstants.XMLNS_ATTRIBUTE, qn.getNamespaceURI());
                 } else {
-                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(),
-                                             "ns1:" + elChild.getQName().getLocalPart());
+                    ec = doc.createElementNS(qn.getNamespaceURI(),
+                                             "ns1:" + qn.getLocalPart());
                 }
             }
 
