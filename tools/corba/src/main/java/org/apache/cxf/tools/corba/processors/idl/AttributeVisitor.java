@@ -244,9 +244,6 @@ public class AttributeVisitor extends VisitorBase {
         result.setName(name);
         result.setSchemaType(complex);
 
-
-        schema.getItems().add(result);
-
         return result;
     }
 

@@ -75,7 +75,7 @@ public class ExceptionVisitor extends VisitorBase {
         // xmlschema:exception
         Scope scopedName = new Scope(getScope(), identifierNode);
         String exceptionName = mapper.mapToQName(scopedName);
-        XmlSchemaElement element = new XmlSchemaElement(schema, false);
+        XmlSchemaElement element = new XmlSchemaElement(schema, true);
         element.setName(mapper.mapToQName(scopedName));
 
         String exceptionTypeName = exceptionName + TYPE_SUFFIX;

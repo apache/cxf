@@ -52,7 +52,7 @@ import org.junit.rules.TemporaryFolder;
 public class ProcessorTestBase extends Assert {
 
     public static final List<String> DEFAULT_IGNORE_ATTR = Arrays.asList(new String[]{"attributeFormDefault",
-                                                                                      "elementFormDefault", 
+                                                                                      "elementFormDefault",
                                                                                       "form",
                                                                                       "version",
                                                                                       "part@name"});
@@ -68,7 +68,7 @@ public class ProcessorTestBase extends Assert {
         }
     };
     //CHECKSTYLE:ON
-    
+
     protected File output;
     protected ToolContext env = new ToolContext();
 
@@ -198,7 +198,7 @@ public class ProcessorTestBase extends Assert {
         return assertXmlEquals(expected, source, attr);
     }
 
-    public boolean assertXmlEquals(final File expected, final File source, 
+    public boolean assertXmlEquals(final File expected, final File source,
                                    final List<String> ignoreAttr) throws Exception {
         List<Tag> expectedTags = ToolsStaxUtils.getTags(expected);
         List<Tag> sourceTags = ToolsStaxUtils.getTags(source);
@@ -208,8 +208,8 @@ public class ProcessorTestBase extends Assert {
         for (Tag expectedTag : expectedTags) {
             Tag sourceTag = iterator.next();
             if (!expectedTag.getName().equals(sourceTag.getName())) {
-                throw new ComparisonFailure("Tags not equal: ", 
-                                            expectedTag.getName().toString(), 
+                throw new ComparisonFailure("Tags not equal: ",
+                                            expectedTag.getName().toString(),
                                             sourceTag.getName().toString());
             }
             for (Map.Entry<QName, String> attr : expectedTag.getAttributes().entrySet()) {
@@ -219,9 +219,9 @@ public class ProcessorTestBase extends Assert {
 
                 if (sourceTag.getAttributes().containsKey(attr.getKey())) {
                     if (!sourceTag.getAttributes().get(attr.getKey()).equals(attr.getValue())) {
-                        throw new ComparisonFailure("Attributes not equal: ", 
-                                                attr.getKey() + ":" + attr.getValue(), 
-                                                attr.getKey() + ":" 
+                        throw new ComparisonFailure("Attributes not equal: ",
+                                                attr.getKey() + ":" + attr.getValue(),
+                                                attr.getKey() + ":"
                                                 + sourceTag.getAttributes().get(attr.getKey()).toString());
                     }
                 } else {
@@ -231,8 +231,8 @@ public class ProcessorTestBase extends Assert {
 
             if (!StringUtils.isEmpty(expectedTag.getText())
                 && !expectedTag.getText().equals(sourceTag.getText())) {
-                throw new ComparisonFailure("Text not equal: ", 
-                                            expectedTag.getText().toString(), 
+                throw new ComparisonFailure("Text not equal: ",
+                                            expectedTag.getText().toString(),
                                             sourceTag.getText().toString());
             }
         }
@@ -245,7 +245,7 @@ public class ProcessorTestBase extends Assert {
 
     protected void assertAttributesEquals(QName element,
                                           Map<QName, String> q1,
-                                          Map<QName, String> q2, 
+                                          Map<QName, String> q2,
                                           Collection<String> ignoreAttr) {
         for (Map.Entry<QName, String>  attr : q1.entrySet()) {
             if (ignoreAttr.contains(attr.getKey().getLocalPart())
@@ -253,52 +253,53 @@ public class ProcessorTestBase extends Assert {
                                        + attr.getKey().getLocalPart())) {
                 continue;
             }
-            
+
             String found = q2.get(attr.getKey());
             if (found == null) {
-                throw new AssertionError("Attribute: " + attr.getKey() 
-                                         + " is missing in " 
-                                         + element);                
+                throw new AssertionError("Attribute: " + attr.getKey()
+                                         + " is missing in "
+                                         + element);
             }
             if (!found.equals(attr.getValue())) {
-                throw new ComparisonFailure("Attribute not equal: ", 
-                                            attr.getKey() + ":" + attr.getValue(), 
-                                            attr.getKey() + ":" + found); 
+                throw new ComparisonFailure("Attribute not equal: ",
+                                            attr.getKey() + ":" + attr.getValue(),
+                                            attr.getKey() + ":" + found);
             }
         }
     }
 
-    protected void assertTagEquals(Tag expected, Tag source, 
-                                   final List<String> ignoreAttr, 
+    protected void assertTagEquals(Tag expected, Tag source,
+                                   final List<String> ignoreAttr,
                                    final List<String> ignoreTag) {
         if (!expected.getName().equals(source.getName())) {
-            throw new ComparisonFailure("Tags not equal: ", 
-                                        expected.getName().toString(), 
+            throw new ComparisonFailure("Tags not equal: ",
+                                        expected.getName().toString(),
                                         source.getName().toString());
         }
 
-        assertAttributesEquals(expected.getName(), 
+        assertAttributesEquals(expected.getName(),
                                expected.getAttributes(), source.getAttributes(), ignoreAttr);
         assertAttributesEquals(expected.getName(),
                                source.getAttributes(), expected.getAttributes(), ignoreAttr);
 
         if (!StringUtils.isEmpty(expected.getText())
                 && !expected.getText().equals(source.getText())) {
-            throw new ComparisonFailure("Text not equal: ", 
-                                        expected.getText().toString(), 
+            throw new ComparisonFailure("Text not equal: ",
+                                        expected.getText().toString(),
                                         source.getText().toString());
         }
 
         if (!expected.getTags().isEmpty()) {
             for (Tag expectedTag : expected.getTags()) {
-                if (ignoreTag.contains(expectedTag.getName().getLocalPart()) 
+                if (ignoreTag.contains(expectedTag.getName().getLocalPart())
                     && expectedTag.getTags().isEmpty()) {
                     continue;
-                } 
+                }
                 Tag sourceTag = getFromSource(source, expectedTag);
                 if (sourceTag == null) {
-                    throw new AssertionError("\n" + expected.toString() 
-                                             + " is missing in the source file");
+                    throw new AssertionError("\n" + expected.toString()
+                                             + " is missing in the source file:"
+                                             + "\n" + source.toString());
                 }
                 assertTagEquals(expectedTag, sourceTag, ignoreAttr, ignoreTag);
             }
@@ -314,7 +315,7 @@ public class ProcessorTestBase extends Assert {
         return null;
     }
 
-    public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag) 
+    public void assertWsdlEquals(final File expected, final File source, List<String> attr, List<String> tag)
         throws Exception {
         Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
         Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
@@ -326,7 +327,7 @@ public class ProcessorTestBase extends Assert {
     }
 
     public void assertWsdlEquals(final InputStream expected, final InputStream source,
-                                 List<String> attr, List<String> tag) 
+                                 List<String> attr, List<String> tag)
         throws Exception {
         Tag expectedTag = ToolsStaxUtils.getTagTree(expected, attr);
         Tag sourceTag = ToolsStaxUtils.getTagTree(source, attr);
