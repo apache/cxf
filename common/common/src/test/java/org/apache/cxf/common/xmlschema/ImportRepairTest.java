@@ -66,6 +66,9 @@ import org.junit.Test;
  *
  */
 public class ImportRepairTest extends Assert {
+
+    static boolean dumpSchemas;
+
     private static final class ListLSInput implements LSInputList {
         private final List<DOMLSInput> inputs;
 
@@ -199,6 +202,9 @@ public class ImportRepairTest extends Assert {
     }
 
     private void dumpSchema(Document document) {
+        if (!dumpSchemas) {
+            return;
+        }
         try {
             Transformer t = XMLUtils.newTransformer(2);
             t.setOutputProperty(OutputKeys.INDENT, "yes");
