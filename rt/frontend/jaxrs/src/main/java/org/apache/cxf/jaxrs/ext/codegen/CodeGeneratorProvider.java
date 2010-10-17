@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -62,7 +63,6 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -89,6 +89,7 @@ import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.staxutils.StaxUtils;
 
 public class CodeGeneratorProvider implements RequestHandler {
     public static final String CODE_QUERY = "_code";
@@ -186,9 +187,9 @@ public class CodeGeneratorProvider implements RequestHandler {
                 zipSource(srcDir, zipDir);
                 return getLink(zipDir, m);
             } catch (Exception ex) {
-                LOG.warning("Code can not be generated for " 
-                            + resourceClass != null ? resourceClass.getServiceClass().getName() 
-                                : "this service");
+                LOG.log(Level.WARNING, "Code can not be generated for " 
+                            + (resourceClass != null ? resourceClass.getServiceClass().getName() 
+                                : "this service"), ex);
                 FileUtils.removeDir(zipDir);
                 return Response.noContent().build();
             } finally {
@@ -769,8 +770,7 @@ public class CodeGeneratorProvider implements RequestHandler {
     
     private Element readWadl(String wadl) {
         try {
-            Document doc = DOMUtils.readXml(new StringReader(wadl));
-            return doc.getDocumentElement();
+            return StaxUtils.read(new InputSource(new StringReader(wadl))).getDocumentElement();
         } catch (Exception ex) {
             throw new IllegalStateException("Unable to read wadl", ex);
         }
@@ -801,21 +801,22 @@ public class CodeGeneratorProvider implements RequestHandler {
     
     private JCodeModel createCodeModel(List<Element> schemaElements, Set<String> type) {
         
-        SchemaCompiler compiler = createCompiler(type);
 
+        SchemaCompiler compiler = createCompiler(type);
         addSchemas(schemaElements, compiler);
         
-        S2JJAXBModel intermediateModel = compiler.bind();
         
         Object elForRun = ReflectionInvokationHandler
             .createProxyWrapper(new InnerErrorListener(),
                             JAXBUtils.getParamClass(compiler, "setErrorListener"));
         
+        compiler.setErrorListener(elForRun);
+        S2JJAXBModel intermediateModel = compiler.bind();
         JCodeModel codeModel = intermediateModel.generateCode(null, elForRun);
         JAXBUtils.logGeneratedClassNames(LOG, codeModel);
         return codeModel;
     }
-    
+
     private SchemaCompiler createCompiler(Set<String> typeClassNames) {
         return JAXBUtils.createSchemaCompilerWithDefaultAllocator(typeClassNames);
     }

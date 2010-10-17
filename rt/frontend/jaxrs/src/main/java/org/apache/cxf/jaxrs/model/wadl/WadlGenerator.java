@@ -62,6 +62,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PackageUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
@@ -999,7 +1000,8 @@ public class WadlGenerator implements RequestHandler {
 
         public void write(StringBuilder sb) {
             for (XmlSchema xs : coll.getXmlSchemas()) {
-                if (xs.getItems().isEmpty()) {
+                if (xs.getItems().isEmpty()
+                    || WSDLConstants.NS_SCHEMA_XSD.equals(xs.getTargetNamespace())) {
                     continue;
                 }
                 StringWriter writer = new StringWriter();
