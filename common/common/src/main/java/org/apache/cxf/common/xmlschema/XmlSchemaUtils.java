@@ -84,7 +84,7 @@ public final class XmlSchemaUtils {
      */
     public static void setElementName(XmlSchemaElement element, String name) {
         if (name != null
-            && element.getRef().getTarget() != null
+            && element.isRef()
             && !element.getRef().getTargetQName().getLocalPart().equals(name)
             && (element.getQName() == null || element.getQName().getLocalPart().equals(name))) {
             LOG.severe("Attempt to set the name of an element with a reference name.");
@@ -409,7 +409,7 @@ public final class XmlSchemaUtils {
         }
 
         XmlSchemaElement originalElement = element;
-        while (element.getSchemaType() == null && element.getRef().getTarget() != null) {
+        while (element.getSchemaType() == null && element.isRef()) {
             /*
              * This code assumes that all schemas are in the collection.
              */
@@ -475,7 +475,7 @@ public final class XmlSchemaUtils {
 
     public static XmlSchemaElement getReferredElement(XmlSchemaElement element,
                                                       SchemaCollection xmlSchemaCollection) {
-        if (element.getRef() != null) {
+        if (element.isRef()) {
             /*
              * Calling getTarget works if everything is in the collection already.
              */
@@ -508,7 +508,7 @@ public final class XmlSchemaUtils {
     }
 
     public static boolean isAttributeNameQualified(XmlSchemaAttribute attribute, XmlSchema schema) {
-        if (attribute.getRef() != null) {
+        if (attribute.isRef()) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
         if (attribute.getForm().equals(XmlSchemaForm.QUALIFIED)) {
@@ -545,7 +545,7 @@ public final class XmlSchemaUtils {
         if (attribute.getQName() == null) {
             throw new RuntimeException("getSchemaQualifier on anonymous element.");
         }
-        if (attribute.getRef() != null) {
+        if (attribute.isRef()) {
             throw new RuntimeException("getSchemaQualified on the 'from' side of ref=.");
         }
 
@@ -564,7 +564,7 @@ public final class XmlSchemaUtils {
     }
 
     public static boolean isElementNameQualified(XmlSchemaElement element, XmlSchema schema) {
-        if (element.getRef() != null) {
+        if (element.isRef()) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
         if (element.getForm().equals(XmlSchemaForm.QUALIFIED)) {
@@ -602,7 +602,7 @@ public final class XmlSchemaUtils {
         if (qn == null) {
             throw new RuntimeException("isElementQualified on anonymous element.");
         }
-        if (element.getRef() != null) {
+        if (element.isRef()) {
             throw new RuntimeException("isElementQualified on the 'from' side of ref=.");
         }
 
