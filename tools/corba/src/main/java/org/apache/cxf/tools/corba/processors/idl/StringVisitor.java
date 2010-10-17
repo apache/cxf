@@ -154,7 +154,7 @@ public class StringVisitor extends VisitorBase {
 
     private void visitBoundedString() {
         // xmlschema:bounded string
-        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, false);
+        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, true);
         simpleType.setName(stringScopedName.toString());
         XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
         restriction.setBaseTypeName(Constants.XSD_STRING);

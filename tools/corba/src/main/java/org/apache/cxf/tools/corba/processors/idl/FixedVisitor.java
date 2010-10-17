@@ -96,7 +96,7 @@ public class FixedVisitor extends VisitorBase {
         }
 
         // xmlschema:fixed
-        XmlSchemaSimpleType fixedSimpleType = new XmlSchemaSimpleType(schema, false);
+        XmlSchemaSimpleType fixedSimpleType = new XmlSchemaSimpleType(schema, true);
         XmlSchemaSimpleTypeRestriction fixedRestriction = new XmlSchemaSimpleTypeRestriction();
         fixedRestriction.setBaseTypeName(Constants.XSD_DECIMAL);
         XmlSchemaTotalDigitsFacet fixedTotalDigits = new XmlSchemaTotalDigitsFacet();

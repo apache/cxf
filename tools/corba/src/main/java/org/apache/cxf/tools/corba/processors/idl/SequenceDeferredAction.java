@@ -34,34 +34,34 @@ public class SequenceDeferredAction implements SchemaDeferredAction {
     protected Sequence sequence;
     protected XmlSchemaElement element;
     protected XmlSchema schema;
-    protected XmlSchemaCollection schemas;    
-    
+    protected XmlSchemaCollection schemas;
+
     public SequenceDeferredAction(Sequence sequenceType,
                                   Anonsequence anonSequenceType,
                                   XmlSchemaElement elem) {
         anonSequence = anonSequenceType;
         sequence = sequenceType;
-        element = elem;        
+        element = elem;
     }
-    
+
     public SequenceDeferredAction(Anonsequence anonSequenceType) {
-        anonSequence = anonSequenceType;         
+        anonSequence = anonSequenceType;
     }
-    
+
     public SequenceDeferredAction(Sequence sequenceType) {
-        sequence = sequenceType;         
+        sequence = sequenceType;
     }
-    
+
     public SequenceDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
+
     public SequenceDeferredAction(XmlSchemaCollection xmlSchemas,
                                   XmlSchema xmlSchema) {
         schemas = xmlSchemas;
-        schema = xmlSchema;                       
+        schema = xmlSchema;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (anonSequence != null) {
             anonSequence.setElemtype(ctype.getQName());
@@ -78,14 +78,9 @@ public class SequenceDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-        }        
-        if (schemas != null
-            && schemas.getTypeByQName(stype.getQName()) == null) {
-            schema.getItems().add(stype);
-            schema.addType(stype);
         }
     }
-        
+
 }
 
 

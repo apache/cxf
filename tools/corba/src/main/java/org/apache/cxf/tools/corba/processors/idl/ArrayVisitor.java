@@ -137,10 +137,6 @@ public class ArrayVisitor extends VisitorBase {
             }
         }
 
-        // add schemaType
-        schema.getItems().add(stype);
-        schema.addType(stype);
-
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(ctype);
 
@@ -185,11 +181,6 @@ public class ArrayVisitor extends VisitorBase {
                                                            getFullyQualifiedName()));
             }
 
-
-            // add schemaType
-            schema.getItems().add(result.getSchemaType());
-            schema.addType(result.getSchemaType());
-
             // add corbaType
             typeMap.getStructOrExceptionOrUnion().add(result.getCorbaType());
         }
@@ -199,7 +190,7 @@ public class ArrayVisitor extends VisitorBase {
 
     private XmlSchemaComplexType generateSchemaArray(Scope scopedName, Long size,
                                                      XmlSchemaType type, Scope fQName) {
-        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, false);
+        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, true);
         complexType.setName(mapper.mapToQName(scopedName));
 
         XmlSchemaSequence sequence = new XmlSchemaSequence();

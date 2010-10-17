@@ -80,7 +80,7 @@ public class ExceptionVisitor extends VisitorBase {
 
         String exceptionTypeName = exceptionName + TYPE_SUFFIX;
 
-        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, false);
+        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, true);
         complexType.setName(exceptionTypeName);
         //complexType.setQName(new QName(schema.getTargetNamespace(), exceptionTypeName));
         XmlSchemaSequence sequence = new XmlSchemaSequence();
@@ -140,11 +140,6 @@ public class ExceptionVisitor extends VisitorBase {
 
             memberTypeNode = memberNode.getNextSibling();
         }
-
-        schema.addType(complexType);
-        schema.getItems().add(element);
-        schema.getItems().add(complexType);
-
 
         // add exception to corba typemap
         typeMap.getStructOrExceptionOrUnion().add(exception);

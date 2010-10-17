@@ -67,13 +67,6 @@ public class DeclaratorVisitor extends VisitorBase {
             arrayVisitor.visit(node);
 
         } else {
-            // add schemaType
-            if ((getSchemaType() != null)
-                && (schemas.getTypeByQName(getSchemaType().getQName()) == null)
-                && (schema.getTypeByName(getSchemaType().getQName()) == null)) {
-                schema.getItems().add(getSchemaType());
-                schema.addType(getSchemaType());
-            }
             // add corbaType
             typeMap.getStructOrExceptionOrUnion().add(getCorbaType());
         }
@@ -162,16 +155,12 @@ public class DeclaratorVisitor extends VisitorBase {
         if (nextCorbaType != null) {
             typeMap.getStructOrExceptionOrUnion().add(nextCorbaType);
         }
-        if (nextSchemaType != null) {
-            schema.getItems().add(nextSchemaType);
-            schema.addType(nextSchemaType);
-        }
     }
 
 
     private XmlSchemaComplexType duplicateXmlSchemaComplexType(Scope newScope) {
         XmlSchemaComplexType oldSchemaType = (XmlSchemaComplexType) getSchemaType();
-        XmlSchemaComplexType newSchemaType = new XmlSchemaComplexType(schema, false);
+        XmlSchemaComplexType newSchemaType = new XmlSchemaComplexType(schema, true);
 
         newSchemaType.setName(newScope.toString());
         newSchemaType.setParticle(oldSchemaType.getParticle());

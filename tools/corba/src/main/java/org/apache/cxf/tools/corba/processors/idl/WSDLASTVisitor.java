@@ -95,8 +95,6 @@ public final class WSDLASTVisitor implements ASTVisitor {
         schema = manager.createXmlSchemaForDefinition(definition, schemans, schemas);
         declaredWSAImport = false;
 
-        addAnyType();
-
         typeMap = manager.createCorbaTypeMap(definition, corbatypemaptns);
 
         // idl:sequence<octet> maps to xsd:base64Binary by default
@@ -434,27 +432,6 @@ public final class WSDLASTVisitor implements ASTVisitor {
         def.setExtensionRegistry(definition.getExtensionRegistry());
 
         return def;
-    }
-
-    /**
-     * Older versions of XmlSchema forgot to include anyType in the schema.
-     */
-    private void addAnyType() {
-        if (schemas.getTypeByQName(Constants.XSD_ANYTYPE) != null) {
-            return;
-        }
-
-        XmlSchema[] schemaList = schemas.getXmlSchemas();
-        if (schemaList != null) {
-            for (int i = 0; i < schemaList.length; i++) {
-                if (schemaList[i].getTargetNamespace().equals(Constants.URI_2001_SCHEMA_XSD)) {
-                    XmlSchemaType anyType = new XmlSchemaType(schemaList[i], false) { };
-                    anyType.setName(Constants.XSD_ANYTYPE.getLocalPart());
-                    schemaList[i].addType(anyType);
-                    break;
-                }
-            }
-        }
     }
 
     public boolean getDeclaredWSAImport() {

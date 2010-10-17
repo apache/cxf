@@ -478,23 +478,24 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             schema = schemaInfo.getSchema();
         }
 
-        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, false);
-        ct.setName(part.getElementQName().getLocalPart());
         // Before updating everything, make sure we haven't added this
         // type yet.  Multiple methods that throw the same exception
         // types will cause duplicates.
-        if (schema.getTypeByName(ct.getQName()) != null) {
+        String partLocalName = part.getElementQName().getLocalPart();
+        XmlSchemaType existingType = schema.getTypeByName(partLocalName);
+        if (existingType != null) {
             return;
         }
 
+        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
+        ct.setName(partLocalName);
+
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        el.setName(part.getElementQName().getLocalPart());
+        el.setName(partLocalName);
         part.setXmlSchema(el);
 
-        schema.getItems().add(ct);
-        schema.addType(ct);
         schemaInfo.setElement(null);
-        el.setSchemaTypeName(part.getElementQName());
+        el.setSchemaTypeName(ct.getQName());
 
         XmlSchemaSequence seq = new XmlSchemaSequence();
         ct.setParticle(seq);
