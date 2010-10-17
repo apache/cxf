@@ -42,7 +42,6 @@ import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
-import org.apache.cxf.common.xmlschema.XmlSchemaUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.ServiceModelVisitor;
 import org.apache.cxf.service.model.FaultInfo;
@@ -352,7 +351,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                                              MessagePartInfo part,
                                              QName typeName, SchemaInfo schemaInfo) {
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        XmlSchemaUtils.setElementQName(el, part.getElementQName());
+        el.setName(part.getElementQName().getLocalPart());
         el.setNillable(true);
         el.setSchemaTypeName(typeName);
         part.setXmlSchema(el);
@@ -376,7 +375,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                 && !isExistSchemaElement(schemaInfo.getSchema(), part.getElementQName())) {
 
                 XmlSchemaElement el = new XmlSchemaElement(schemaInfo.getSchema(), true);
-                XmlSchemaUtils.setElementQName(el, part.getElementQName());
+                el.setName(part.getElementQName().getLocalPart());
                 el.setNillable(true);
 
                 schemaInfo.setElement(null);
@@ -408,7 +407,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             }
 
             XmlSchemaElement el = new XmlSchemaElement(schemaInfo.getSchema(), true);
-            XmlSchemaUtils.setElementQName(el, part.getElementQName());
+            el.setName(part.getElementQName().getLocalPart());
 
             schemaInfo.setElement(null);
 
@@ -432,12 +431,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                         if (beanInfo != null) {
                             el = new XmlSchemaElement(schemaInfo.getSchema(), false);
                             el.setName(m.getName().substring(beginIdx));
-
-                            String ns = schemaInfo.getSchema().getElementFormDefault()
-                                .equals(XmlSchemaForm.UNQUALIFIED)
-                                ? "" : part.getElementQName().getLocalPart();
-                            XmlSchemaUtils.setElementQName(el,
-                                                           new QName(ns, m.getName().substring(beginIdx)));
                             Iterator<QName> itr = beanInfo.getTypeNames().iterator();
                             if (!itr.hasNext()) {
                                 return;
@@ -495,7 +488,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
         }
 
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        XmlSchemaUtils.setElementQName(el, part.getElementQName());
+        el.setName(part.getElementQName().getLocalPart());
         part.setXmlSchema(el);
 
         schema.getItems().add(ct);
@@ -556,7 +549,6 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
                               QName name, boolean isArray) {
         XmlSchemaElement el = new XmlSchemaElement(schema, false);
         el.setName(name.getLocalPart());
-        XmlSchemaUtils.setElementQName(el, name);
 
         if (isArray) {
             el.setMinOccurs(0);
@@ -571,7 +563,7 @@ class JAXBSchemaInitializer extends ServiceModelVisitor {
             QName ename = new QName(beanInfo.getElementNamespaceURI(null),
                                    beanInfo.getElementLocalName(null));
             XmlSchemaElement el2 = schemas.getElementByQName(ename);
-            XmlSchemaUtils.setElementQName(el, null);
+            el.setName(null);
             el.getRef().setTargetQName(el2.getRef().getTargetQName());
         } else {
             Iterator<QName> itr = beanInfo.getTypeNames().iterator();

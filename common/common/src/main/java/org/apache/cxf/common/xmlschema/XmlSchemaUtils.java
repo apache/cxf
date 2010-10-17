@@ -77,37 +77,6 @@ public final class XmlSchemaUtils {
     }
 
     /**
-     * Wrapper around XmlSchemaElement.setQName that checks for inconsistency with
-     * refName.
-     * @param element
-     * @param name
-     */
-    public static void setElementQName(XmlSchemaElement element, QName name) {
-        if (name != null && element.getRef().getTarget() != null
-            && !element.getRef().getTargetQName().equals(name)) {
-            LOG.severe("Attempt to set the QName of an element with a reference name");
-            throw new
-                XmlSchemaInvalidOperation("Attempt to set the QName of an element "
-                                          + "with a reference name.");
-        }
-
-        /*
-         * An element's namespace must match the containing namespace.
-         */
-        if (!element.getParent().getTargetNamespace().equals(name.getNamespaceURI())) {
-            LOG.severe("Attempt to set the QName of an element to a namespace that "
-                       + "is outside of the containing schema");
-            throw new
-                XmlSchemaInvalidOperation("Attempt to set the QName of an element to a namespace "
-                                          + "that is outside of the containing schema");
-        }
-
-        element.setName(name.getLocalPart());
-        // in CXF, we want them to be consistent.
-        setNameFromQName(element, name);
-    }
-
-    /**
      * Wrapper around XmlSchemaElement.setName that checks for inconsistency with
      * refName.
      * @param element

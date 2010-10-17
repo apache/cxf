@@ -1040,7 +1040,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         si.setElement(null); //cached element is now invalid
 
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        XmlSchemaUtils.setElementQName(el, mpi.getElementQName());
+        el.setName(mpi.getElementQName().getLocalPart());
         el.setNillable(true);
 
         XmlSchemaType tp = (XmlSchemaType)mpi.getXmlSchema();
@@ -1144,7 +1144,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
             schemaInfo.setElement(null); //cached element is now invalid
             XmlSchemaElement el = new XmlSchemaElement(schema, true);
-            XmlSchemaUtils.setElementQName(el, qname);
+            el.setName(qname.getLocalPart());
             el.setNillable(true);
 
             if (mpi.isElement()) {
@@ -1230,7 +1230,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         XmlSchema schema = info.getSchema();
         info.setElement(null); // the cached schema will be no good
         XmlSchemaElement el = new XmlSchemaElement(schema, true);
-        XmlSchemaUtils.setElementQName(el, wrapperName);
+        el.setName(wrapperName.getLocalPart());
 
         wrappedMessage.getMessageParts().get(0).setXmlSchema(el);
 
@@ -1247,11 +1247,12 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
 
         for (MessagePartInfo mpi : unwrappedMessage.getMessageParts()) {
             el = new XmlSchemaElement(schema, false);
-            XmlSchemaUtils.setElementQName(el, mpi.getName());
+            // We hope that we can't have parts that differe only in namespace.
+            el.setName(mpi.getName().getLocalPart());
             Map<Class, Boolean> jaxbAnnoMap = getJaxbAnnoMap(mpi);
             if (mpi.isElement()) {
                 addImport(schema, mpi.getElementQName().getNamespaceURI());
-                XmlSchemaUtils.setElementQName(el, null);
+                el.setName(null);
                 XmlSchemaUtils.setElementRefName(el, mpi.getElementQName());
             } else {
                 if (mpi.getTypeQName() != null && !jaxbAnnoMap.containsKey(XmlList.class)) {
@@ -1296,7 +1297,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
                     mpi.setElement(true);
                     mpi.setElementQName(newName);
                     mpi.setConcreteName(newName);
-                    XmlSchemaUtils.setElementQName(el, newName);
+                    el.setName(newName.getLocalPart());
                     el.setForm(XmlSchemaForm.QUALIFIED);
                 }
 
@@ -1320,8 +1321,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             }
             if (Boolean.TRUE.equals(mpi.getProperty(HEADER))) {
                 QName qn = (QName)mpi.getProperty(ELEMENT_NAME);
-
-                XmlSchemaUtils.setElementQName(el, qn);
+                el.setName(qn.getLocalPart());
 
                 SchemaInfo headerSchemaInfo = getOrCreateSchema(serviceInfo, qn.getNamespaceURI(),
                                                                 getQualifyWrapperSchema());
