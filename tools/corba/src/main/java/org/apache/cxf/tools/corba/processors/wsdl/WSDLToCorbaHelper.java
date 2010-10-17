@@ -301,6 +301,7 @@ public class WSDLToCorbaHelper {
         if (schemaType == null) {
             if (element.getRef().getTarget() != null) {
                 schemaType = findSchemaType(element.getRef().getTarget().getSchemaTypeName());
+                schemaName = element.getRef().getTargetQName();
             } else {
                 schemaType = findSchemaType(element.getSchemaTypeName());
             }
@@ -1594,6 +1595,9 @@ public class WSDLToCorbaHelper {
 
     private boolean getElementQualification(XmlSchemaElement element, String uri) {
         QName schemaName = element.getQName();
+        if (element.isRef()) {
+            schemaName = element.getRef().getTargetQName();
+        }
 
         if (schemaName.getNamespaceURI().equals("")) {
             schemaName = new QName(uri, schemaName.getLocalPart());

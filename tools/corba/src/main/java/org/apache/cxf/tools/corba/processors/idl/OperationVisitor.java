@@ -341,7 +341,7 @@ public class OperationVisitor extends VisitorBase {
                                         XmlSchemaType schemaType,
                                         Scope fqName,
                                         String name) {
-        XmlSchemaElement element = new XmlSchemaElement(schema, true);
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         element.setName(name);
         if (schemaType != null) {
             element.setSchemaTypeName(schemaType.getQName());
@@ -352,6 +352,7 @@ public class OperationVisitor extends VisitorBase {
             wsdlVisitor.getDeferredActions().
                 add(fqName, new OperationDeferredAction(element));
         }
+        schemaSequence.getItems().add(element);
 
         return element;
     }

@@ -389,7 +389,7 @@ public final class ProcessorUtil {
                 XmlSchemaElement subElement = (XmlSchemaElement)seqMember;
 
                 if (subElement.getQName() != null) {
-                    qnames.add(new WrapperElement(subElement.getQName(), subElement.getSchemaTypeName()));
+                    qnames.add(new WrapperElement(subElement.getWireName(), subElement.getSchemaTypeName()));
                 } else {
                     qnames.add(new WrapperElement(subElement.getRef().getTargetQName(),
                                                   subElement.getSchemaTypeName()));
