@@ -38,7 +38,7 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 public class ExceptionVisitor extends VisitorBase {
 
     private static final String TYPE_SUFFIX = "Type";
-    
+
     public ExceptionVisitor(Scope scope,
                             Definition defn,
                             XmlSchema schemaRef,
@@ -52,13 +52,13 @@ public class ExceptionVisitor extends VisitorBase {
         }
         return false;
     }
-    
+
     public void visit(AST node) {
         // <exception_dcl> ::= "exception" <identifier> "{" <member>* "}"
         // <member> ::= <type_spec> <declarators> ";"
 
         // <type_spec> visited by TypesVisitor
-        
+
         // Following should be visited by a separate visitor
         // <declarators> ::= <declarator> { "," <declarator> }*
         // <declarator> ::= <simple_declarator>
@@ -68,35 +68,34 @@ public class ExceptionVisitor extends VisitorBase {
         // <array_declarator> ::= <identifier> <fixed_array_size>+
         // <fixed_array_size> ::= "[" <positive_int_const> "]"
 
-        
+
         AST identifierNode = node.getFirstChild();
         Scope exceptionScope = new Scope(getScope(), identifierNode);
-        
+
         // xmlschema:exception
         Scope scopedName = new Scope(getScope(), identifierNode);
         String exceptionName = mapper.mapToQName(scopedName);
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         element.setName(mapper.mapToQName(scopedName));
-        element.setQName(new QName(schema.getTargetNamespace(), exceptionName));
 
         String exceptionTypeName = exceptionName + TYPE_SUFFIX;
 
-        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, false);
         complexType.setName(exceptionTypeName);
         //complexType.setQName(new QName(schema.getTargetNamespace(), exceptionTypeName));
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         complexType.setParticle(sequence);
 
         element.setSchemaTypeName(complexType.getQName());
-        
+
         // corba:exception
-        org.apache.cxf.binding.corba.wsdl.Exception exception 
+        org.apache.cxf.binding.corba.wsdl.Exception exception
             = new org.apache.cxf.binding.corba.wsdl.Exception();
         exception.setQName(new QName(typeMap.getTargetNamespace(), exceptionName));
         exception.setType(complexType.getQName());
         exception.setRepositoryID(scopedName.toIDLRepositoryID());
 
-        
+
         // exception members
         AST memberTypeNode = identifierNode.getNextSibling();
         while (memberTypeNode != null) {
@@ -111,10 +110,10 @@ public class ExceptionVisitor extends VisitorBase {
             XmlSchemaType stype = visitor.getSchemaType();
             CorbaTypeImpl ctype = visitor.getCorbaType();
             Scope fullyQualifiedName = visitor.getFullyQualifiedName();
-            
+
             // needed for anonymous arrays in exceptions
             if (ArrayVisitor.accept(memberNode)) {
-                Scope anonScope = new Scope(exceptionScope, 
+                Scope anonScope = new Scope(exceptionScope,
                                             TypesUtils.getCorbaTypeNameNode(memberTypeNode));
                 ArrayVisitor arrayVisitor = new ArrayVisitor(anonScope,
                                                              definition,
@@ -129,27 +128,27 @@ public class ExceptionVisitor extends VisitorBase {
                 ctype = arrayVisitor.getCorbaType();
             }
 
-            
+
             XmlSchemaElement member = createElementType(memberNode, stype,
                                                         fullyQualifiedName);
             sequence.getItems().add(member);
 
-            MemberType memberType = createMemberType(memberNode, ctype, 
+            MemberType memberType = createMemberType(memberNode, ctype,
                                                      fullyQualifiedName);
             exception.getMember().add(memberType);
-            
-            
+
+
             memberTypeNode = memberNode.getNextSibling();
         }
 
         schema.addType(complexType);
         schema.getItems().add(element);
         schema.getItems().add(complexType);
-        
-        
+
+
         // add exception to corba typemap
         typeMap.getStructOrExceptionOrUnion().add(exception);
-        
+
         setSchemaType(complexType);
         setCorbaType(exception);
         createFaultMessage(element.getQName());
@@ -160,11 +159,11 @@ public class ExceptionVisitor extends VisitorBase {
         // messages
         Message faultMsg = definition.createMessage();
 
-        faultMsg.setQName(new QName(definition.getTargetNamespace(), exceptionName));        
+        faultMsg.setQName(new QName(definition.getTargetNamespace(), exceptionName));
         faultMsg.setUndefined(false);
         // message - part
         Part part = definition.createPart();
-        part.setName("exception");           
+        part.setName("exception");
         part.setElementName(qname);
         faultMsg.addPart(part);
 
@@ -174,11 +173,11 @@ public class ExceptionVisitor extends VisitorBase {
 
         definition.addMessage(faultMsg);
     }
-    
+
     private XmlSchemaElement createElementType(AST memberNode, XmlSchemaType stype,
                                                Scope fqName) {
         // xmlschema:member
-        XmlSchemaElement member = new XmlSchemaElement();
+        XmlSchemaElement member = new XmlSchemaElement(schema, false);
         String memberName = memberNode.toString();
         member.setName(memberName);
         if (stype != null) {
@@ -189,12 +188,12 @@ public class ExceptionVisitor extends VisitorBase {
             }
         } else {
             wsdlVisitor.getDeferredActions().
-                add(fqName, new ExceptionDeferredAction(member)); 
+                add(fqName, new ExceptionDeferredAction(member));
         }
         return member;
     }
-    
-    private MemberType createMemberType(AST memberNode, CorbaTypeImpl ctype, 
+
+    private MemberType createMemberType(AST memberNode, CorbaTypeImpl ctype,
                                         Scope fqName) {
         // corba:member
         MemberType memberType = new MemberType();
@@ -205,8 +204,8 @@ public class ExceptionVisitor extends VisitorBase {
             wsdlVisitor.getDeferredActions().
                 add(fqName, new ExceptionDeferredAction(memberType));
         }
-        
+
         return memberType;
     }
-    
+
 }

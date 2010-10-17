@@ -19,22 +19,21 @@
 
 package org.apache.cxf.common.xmlschema;
 
-import java.io.Reader;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.xml.namespace.QName;
-import javax.xml.transform.Source;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.xml.sax.InputSource;
 
-import org.apache.ws.commons.schema.ValidationEventHandler;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaAttributeGroupRef;
+import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentRestriction;
@@ -43,19 +42,16 @@ import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
-import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaSimpleContentRestriction;
-import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.extensions.ExtensionRegistry;
 import org.apache.ws.commons.schema.resolver.URIResolver;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 import org.apache.ws.commons.schema.utils.NamespacePrefixList;
-import org.apache.ws.commons.schema.utils.TargetNamespaceValidator;
 
 
 /**
@@ -64,7 +60,7 @@ import org.apache.ws.commons.schema.utils.TargetNamespaceValidator;
 public class SchemaCollection {
 
     private XmlSchemaCollection schemaCollection;
-    private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema 
+    private Map<XmlSchema, Set<XmlSchemaType>> xmlTypesCheckedForCrossImportsPerSchema
         = new HashMap<XmlSchema, Set<XmlSchemaType>>();
 
 
@@ -98,17 +94,7 @@ public class SchemaCollection {
     }
 
     public XmlSchemaAttribute getAttributeByQName(QName qname) {
-        String uri = qname.getNamespaceURI();
-        for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
-            if (uri.equals(schema.getTargetNamespace())) {
-                XmlSchemaObjectTable attributes = schema.getAttributes();
-                XmlSchemaAttribute attribute = (XmlSchemaAttribute)attributes.getItem(qname);
-                if (attribute != null) {
-                    return attribute;
-                }
-            }
-        }
-        return null;
+        return schemaCollection.getAttributeByQName(qname);
     }
 
     public ExtensionRegistry getExtReg() {
@@ -121,24 +107,6 @@ public class SchemaCollection {
 
     public XmlSchemaType getTypeByQName(QName schemaTypeName) {
         XmlSchemaType xst = schemaCollection.getTypeByQName(schemaTypeName);
-
-        // HACKY workaround for WSCOMMONS-355
-        if (xst == null && "http://www.w3.org/2001/XMLSchema".equals(schemaTypeName.getNamespaceURI())) {
-            XmlSchema sch = getSchemaByTargetNamespace(schemaTypeName.getNamespaceURI());
-
-            if ("anySimpleType".equals(schemaTypeName.getLocalPart())) {
-                XmlSchemaSimpleType type = new XmlSchemaSimpleType(sch);
-                type.setName(schemaTypeName.getLocalPart());
-                sch.addType(type);
-                xst = type;
-            } else if ("anyType".equals(schemaTypeName.getLocalPart())) {
-                XmlSchemaType type = new XmlSchemaType(sch);
-                type.setName(schemaTypeName.getLocalPart());
-                sch.addType(type);
-                xst = type;
-            }
-        }
-
         return xst;
     }
 
@@ -158,37 +126,16 @@ public class SchemaCollection {
         schemaCollection.init();
     }
 
-    public XmlSchema read(Document doc, String uri, ValidationEventHandler veh,
-                          TargetNamespaceValidator validator) {
-        return schemaCollection.read(doc, uri, veh, validator);
-    }
-
-    public XmlSchema read(Document doc, String uri, ValidationEventHandler veh) {
-        return schemaCollection.read(doc, uri, veh);
-    }
-
-    public XmlSchema read(Document doc, ValidationEventHandler veh) {
-        return schemaCollection.read(doc, veh);
-    }
-
     public XmlSchema read(Element elem, String uri) {
         return schemaCollection.read(elem, uri);
     }
 
+    public XmlSchema read(Document d, String uri) {
+        return schemaCollection.read(d, uri);
+    }
+
     public XmlSchema read(Element elem) {
         return schemaCollection.read(elem);
-    }
-
-    public XmlSchema read(InputSource inputSource, ValidationEventHandler veh) {
-        return schemaCollection.read(inputSource, veh);
-    }
-
-    public XmlSchema read(Reader r, ValidationEventHandler veh) {
-        return schemaCollection.read(r, veh);
-    }
-
-    public XmlSchema read(Source source, ValidationEventHandler veh) {
-        return schemaCollection.read(source, veh);
     }
 
     public void setBaseUri(String baseUri) {
@@ -209,7 +156,7 @@ public class SchemaCollection {
 
     /**
      * This function is not part of the XmlSchema API. Who knows why?
-     * 
+     *
      * @param namespaceURI targetNamespace
      * @return schema, or null.
      */
@@ -239,7 +186,7 @@ public class SchemaCollection {
     /**
      * Once upon a time, XmlSchema had a bug in the constructor used in this function. So this wrapper was
      * created to hold a workaround.
-     * 
+     *
      * @param namespaceURI TNS for new schema.
      * @return new schema
      */
@@ -250,7 +197,7 @@ public class SchemaCollection {
 
     /**
      * Validate that a qualified name points to some namespace in the schema.
-     * 
+     *
      * @param qname
      */
     public void validateQNameNamespace(QName qname) {
@@ -282,18 +229,6 @@ public class SchemaCollection {
         }
     }
 
-    public void addGlobalElementToSchema(XmlSchemaElement element) {
-        synchronized (this) {
-            XmlSchema schema = getSchemaByTargetNamespace(element.getQName().getNamespaceURI());
-            if (schema == null) {
-                schema = newXmlSchemaInCollection(element.getQName().getNamespaceURI());
-            }
-            schema.getItems().add(element);
-            // believe it or not, it is up to us to do both of these adds!
-            schema.getElements().add(element.getQName(), element);
-        }
-    }
-
     public void addCrossImports() {
         /*
          * We need to inventory all the cross-imports to see if any are missing.
@@ -307,17 +242,14 @@ public class SchemaCollection {
         /*
          * We need to visit all the top-level items.
          */
-        for (int x = 0; x < schema.getItems().getCount(); x++) {
-            XmlSchemaObject item = schema.getItems().getItem(x);
+        for (XmlSchemaObject item : schema.getItems()) {
             if (item instanceof XmlSchemaElement) {
-                addElementCrossImportsElement(schema, item);
+                addElementCrossImportsElement(schema, (XmlSchemaElement)item);
             } else if (item instanceof XmlSchemaAttribute) {
                 XmlSchemaAttribute attr = (XmlSchemaAttribute)item;
-                XmlSchemaUtils.addImportIfNeeded(schema, attr.getRefName());
+                XmlSchemaUtils.addImportIfNeeded(schema, attr.getRef().getTargetQName());
                 XmlSchemaUtils.addImportIfNeeded(schema, attr.getSchemaTypeName());
-                if (attr.getSchemaType() != null) {
-                    XmlSchemaUtils.addImportIfNeeded(schema, attr.getSchemaType().getBaseSchemaTypeName());
-                }
+                /* Attributes have simple types and simple types don't have bases. */
             } else if (item instanceof XmlSchemaType) {
                 XmlSchemaType type = (XmlSchemaType)item;
                 addCrossImportsType(schema, type);
@@ -325,9 +257,9 @@ public class SchemaCollection {
         }
     }
 
-    private void addElementCrossImportsElement(XmlSchema schema, XmlSchemaObject item) {
+    private void addElementCrossImportsElement(XmlSchema schema, XmlSchemaElement item) {
         XmlSchemaElement element = (XmlSchemaElement)item;
-        XmlSchemaUtils.addImportIfNeeded(schema, element.getRefName());
+        XmlSchemaUtils.addImportIfNeeded(schema, element.getRef().getTargetQName());
         XmlSchemaUtils.addImportIfNeeded(schema, element.getSchemaTypeName());
         // if there's an anonymous type, it might have element refs in it.
         XmlSchemaType schemaType = element.getSchemaType();
@@ -365,9 +297,10 @@ public class SchemaCollection {
     private void addCrossImportsType(XmlSchema schema, XmlSchemaType schemaType) {
         if (schemaType != null) {
             // the base type might cross schemas.
-            XmlSchemaUtils.addImportIfNeeded(schema, schemaType.getBaseSchemaTypeName());
+
             if (schemaType instanceof XmlSchemaComplexType) {
                 XmlSchemaComplexType complexType = (XmlSchemaComplexType)schemaType;
+                XmlSchemaUtils.addImportIfNeeded(schema, complexType.getBaseSchemaTypeName());
                 addCrossImports(schema, complexType.getContentModel());
                 addCrossImportsAttributeList(schema, complexType.getAttributes());
                 // could it be a choice or something else?
@@ -378,19 +311,27 @@ public class SchemaCollection {
     }
 
     private void addCrossImportsSequence(XmlSchema schema, XmlSchemaSequence sequence) {
-        XmlSchemaObjectCollection items = sequence.getItems();
-        for (int x = 0; x < items.getCount(); x++) {
-            XmlSchemaObject seqItem = items.getItem(x);
-            if (seqItem instanceof XmlSchemaElement) {
-                addElementCrossImportsElement(schema, seqItem);
+        for (XmlSchemaSequenceMember seqMember : sequence.getItems()) {
+            if (seqMember instanceof XmlSchemaElement) {
+                addElementCrossImportsElement(schema, (XmlSchemaElement)seqMember);
             }
         }
     }
 
-    private void addCrossImportsAttributeList(XmlSchema schema, XmlSchemaObjectCollection attributes) {
-        for (int x = 0; x < attributes.getCount(); x++) {
-            XmlSchemaAttribute attr = (XmlSchemaAttribute)attributes.getItem(x);
-            XmlSchemaUtils.addImportIfNeeded(schema, attr.getRefName());
+    private void addCrossImportsAttributeList(XmlSchema schema,
+                                              List<XmlSchemaAttributeOrGroupRef> list) {
+        for (XmlSchemaAttributeOrGroupRef attr : list) {
+            QName ref = null;
+            if (attr instanceof XmlSchemaAttribute) {
+                ref = ((XmlSchemaAttribute)attr).getRef().getTargetQName();
+            } else {
+                XmlSchemaAttributeGroupRef groupRef = (XmlSchemaAttributeGroupRef) attr;
+                ref = groupRef.getRef().getTargetQName();
+            }
+
+            if (ref != null) {
+                XmlSchemaUtils.addImportIfNeeded(schema, ref);
+            }
         }
     }
 
@@ -425,18 +366,4 @@ public class SchemaCollection {
         }
     }
 
-    public static void addGlobalElementToSchema(XmlSchema schema, XmlSchemaElement element) {
-        synchronized (schema) {
-            schema.getItems().add(element);
-            // believe it or not, it is up to us to do both of these adds!
-            schema.getElements().add(element.getQName(), element);
-        }
-    }
-
-    public static void addGlobalTypeToSchema(XmlSchema schema, XmlSchemaType type) {
-        synchronized (schema) {
-            schema.getItems().add(type);
-            schema.addType(type);
-        }
-    }
 }

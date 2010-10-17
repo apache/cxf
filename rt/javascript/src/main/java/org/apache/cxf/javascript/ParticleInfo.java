@@ -63,7 +63,7 @@ public final class ParticleInfo implements ItemInfo {
     /**
      * Create an elementInfo that stores information about a global, named,
      * element.
-     * 
+     *
      * @param element the element
      * @param currentSchema the schema it came from.
      * @param schemaCollection the collection of all schemas.
@@ -91,7 +91,7 @@ public final class ParticleInfo implements ItemInfo {
      * that in some cases the code in ServiceJavascriptBuilder uses a local
      * element (or xa:any) from inside the part element, instead of the part
      * element itself.
-     * 
+     *
      * @param element the element, or null
      * @param schemaCollection the schema collection, for resolving types.
      * @param javascriptName javascript variable name
@@ -120,7 +120,7 @@ public final class ParticleInfo implements ItemInfo {
 
     /**
      * Fill in an ElementInfo for an element or xs:any from a sequence.
-     * 
+     *
      * @param sequenceElement
      * @param currentSchema
      * @param schemaCollection
@@ -130,19 +130,19 @@ public final class ParticleInfo implements ItemInfo {
     public static ParticleInfo forLocalItem(XmlSchemaObject sequenceObject, XmlSchema currentSchema,
                                             SchemaCollection schemaCollection,
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
-        XmlSchemaParticle sequenceParticle = XmlSchemaUtils.getObjectParticle(sequenceObject, contextName);
+        XmlSchemaParticle sequenceParticle =
+            XmlSchemaUtils.getObjectParticle((XmlSchemaObject)sequenceObject, contextName);
         ParticleInfo elementInfo = new ParticleInfo();
         XmlSchemaParticle realParticle = sequenceParticle;
 
         if (sequenceParticle instanceof XmlSchemaElement) {
             XmlSchemaElement sequenceElement = (XmlSchemaElement)sequenceParticle;
 
-            if (sequenceElement.getRefName() != null) {
-                XmlSchemaElement refElement = schemaCollection
-                    .getElementByQName(sequenceElement.getRefName());
+            if (sequenceElement.getRef().getTargetQName() != null) {
+                XmlSchemaElement refElement = sequenceElement.getRef().getTarget();
                 if (refElement == null) {
                     Message message = new Message("ELEMENT_DANGLING_REFERENCE", LOG, sequenceElement
-                        .getQName(), sequenceElement.getRefName());
+                        .getQName(), sequenceElement.getRef().getTargetQName());
                     throw new UnsupportedConstruct(message.toString());
                 }
                 realParticle = refElement;
@@ -163,14 +163,14 @@ public final class ParticleInfo implements ItemInfo {
 
     private static void factoryCommon(XmlSchemaParticle particle, XmlSchema currentSchema,
                                       SchemaCollection schemaCollection,
-                                      NamespacePrefixAccumulator prefixAccumulator, 
+                                      NamespacePrefixAccumulator prefixAccumulator,
                                       ParticleInfo elementInfo) {
 
         if (particle instanceof XmlSchemaElement) {
             XmlSchemaElement element = (XmlSchemaElement)particle;
             QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, currentSchema);
-            String elementNamespaceURI = elementQName.getNamespaceURI(); 
-                
+            String elementNamespaceURI = elementQName.getNamespaceURI();
+
             boolean elementNoNamespace = "".equals(elementNamespaceURI);
 
             XmlSchema elementSchema = null;
@@ -191,7 +191,7 @@ public final class ParticleInfo implements ItemInfo {
             elementInfo.javascriptName = elementQName.getLocalPart();
             String schemaDefaultValue = element.getDefaultValue();
             /*
-             * Schema default values are carried as strings. 
+             * Schema default values are carried as strings.
              * In javascript, for actual strings, we need quotes, but not for
              * numbers. The following is a trick.
              */
@@ -238,7 +238,7 @@ public final class ParticleInfo implements ItemInfo {
                 }
             }
             builder.append('\'');
-            schemaDefaultValue = builder.toString(); 
+            schemaDefaultValue = builder.toString();
         }
         return schemaDefaultValue;
     }
@@ -252,7 +252,7 @@ public final class ParticleInfo implements ItemInfo {
                 elementInfo.anyType = true;
             } else {
                 elementInfo.type = schemaCollection.getTypeByQName(element.getSchemaTypeName());
-                if (elementInfo.type == null 
+                if (elementInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
                     XmlSchemaUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
@@ -272,7 +272,7 @@ public final class ParticleInfo implements ItemInfo {
      * This method returns the QName for the type or element, accordingly. If a
      * schema has a local element with an anonymous, complex, type, this will
      * throw. This will need to be fixed.
-     * 
+     *
      * @return the qname.
      */
     public QName getControllingName() {
@@ -367,7 +367,7 @@ public final class ParticleInfo implements ItemInfo {
 
     /**
      * *
-     * 
+     *
      * @return Returns the defaultValue.
      */
     public String getDefaultValue() {
@@ -387,7 +387,7 @@ public final class ParticleInfo implements ItemInfo {
 
     /**
      * True if this describes a global, named, element.
-     * 
+     *
      * @return
      */
     public boolean isGlobal() {

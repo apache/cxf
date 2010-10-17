@@ -40,40 +40,40 @@ public class EnumVisitor extends VisitorBase {
                        WSDLASTVisitor wsdlVisitor) {
         super(scope, defn, schemaRef, wsdlVisitor);
     }
-    
+
     public static boolean accept(AST node) {
         if (node.getType() == IDLTokenTypes.LITERAL_enum) {
             return true;
         }
         return false;
     }
-    
+
     public void visit(AST enumNode) {
         // <enum_type> ::= "enum" <identifier> "{" <enumerator> {"," <enumerator>}* "}"
         // <enumerator> ::= <identifier>
-        
-        
+
+
         AST enumNameNode = enumNode.getFirstChild();
         Scope enumNameScope = new Scope(getScope(), enumNameNode);
 
         // xmlschema:enum
-        XmlSchemaSimpleType enumSchemaSimpleType = new XmlSchemaSimpleType(schema);
+        XmlSchemaSimpleType enumSchemaSimpleType = new XmlSchemaSimpleType(schema, true);
         enumSchemaSimpleType.setName(mapper.mapToQName(enumNameScope));
-        
+
         XmlSchemaSimpleTypeRestriction enumSchemaSimpleTypeRestriction = new XmlSchemaSimpleTypeRestriction();
         enumSchemaSimpleTypeRestriction.setBaseTypeName(Constants.XSD_STRING);
-        
+
         //XmlSchemaSimpleTypeContent xmlSchemaSimpleTypeContent = enumSchemaSimpleTypeRestriction;
         enumSchemaSimpleType.setContent(enumSchemaSimpleTypeRestriction);
 
-        
+
         // corba:enum
         Enum corbaEnum = new Enum();
         corbaEnum.setQName(new QName(typeMap.getTargetNamespace(), enumNameScope.toString()));
         corbaEnum.setRepositoryID(enumNameScope.toIDLRepositoryID());
         corbaEnum.setType(enumSchemaSimpleType.getQName());
-        
-        
+
+
         AST node = enumNameNode.getNextSibling();
         while (node != null) {
             // xmlschema:enumeration
@@ -85,13 +85,9 @@ public class EnumVisitor extends VisitorBase {
             Enumerator enumerator = new Enumerator();
             enumerator.setValue(node.toString());
             corbaEnum.getEnumerator().add(enumerator);
-            
+
             node = node.getNextSibling();
         }
-        
-        // add schemaType
-        schema.getItems().add(enumSchemaSimpleType);
-        schema.addType(enumSchemaSimpleType);
 
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(corbaEnum);

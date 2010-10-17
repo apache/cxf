@@ -19,8 +19,8 @@
 
 package org.apache.cxf.javascript.types;
 
-import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import javax.xml.namespace.QName;
@@ -41,20 +41,17 @@ import org.apache.cxf.javascript.UnsupportedConstruct;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
-import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
-import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 /**
- * Generate Javascript for a schema, and provide information needed for the
- * service builder. As of this pass, there is no support for non-sequence types
- * or for attribute mappings.
+ * Generate Javascript for a schema, and provide information needed for the service builder. As of this pass,
+ * there is no support for non-sequence types or for attribute mappings.
  */
 public class SchemaJavascriptBuilder {
 
@@ -63,7 +60,7 @@ public class SchemaJavascriptBuilder {
     private SchemaCollection xmlSchemaCollection;
     private NameManager nameManager;
     private NamespacePrefixAccumulator prefixAccumulator;
-    //private SchemaInfo schemaInfo;
+    // private SchemaInfo schemaInfo;
 
     // In general, I (bimargulies) hate fields that are temporary communications
     // between members of a class. However, given the style restrictions on the
@@ -79,7 +76,7 @@ public class SchemaJavascriptBuilder {
         this.nameManager = nameManager;
         this.prefixAccumulator = prefixAccumulator;
     }
-    
+
     public String generateCodeForSchemaCollection(XmlSchemaCollection collection) {
         StringBuilder accumulatedCode = new StringBuilder();
         for (XmlSchema schema : collection.getXmlSchemas()) {
@@ -100,16 +97,13 @@ public class SchemaJavascriptBuilder {
         }
         code.append("\n//\n");
 
-        XmlSchemaObjectTable schemaTypes = schema.getSchemaTypes();
-        Iterator namesIterator = schemaTypes.getNames();
-        while (namesIterator.hasNext()) {
-            QName name = (QName)namesIterator.next();
-            XmlSchemaObject xmlSchemaObject = (XmlSchemaObject)schemaTypes.getItem(name);
-            if (xmlSchemaObject instanceof XmlSchemaComplexType) {
+        Map<QName, XmlSchemaType> schemaTypes = schema.getSchemaTypes();
+        for (Map.Entry<QName, XmlSchemaType> e : schemaTypes.entrySet()) {
+            XmlSchemaType type = e.getValue();
+            if (type instanceof XmlSchemaComplexType) {
                 try {
-                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)xmlSchemaObject;
-                    if (!JavascriptUtils.notVeryComplexType(complexType)
-                        && complexType.getName() != null) {
+                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)type;
+                    if (!JavascriptUtils.notVeryComplexType(complexType) && complexType.getName() != null) {
                         complexTypeConstructorAndAccessors(complexType.getQName(), complexType);
                         complexTypeSerializerFunction(complexType.getQName(), complexType);
                         domDeserializerFunction(complexType.getQName(), complexType);
@@ -119,8 +113,8 @@ public class SchemaJavascriptBuilder {
                     continue; // it could be empty, but the style checker
                     // would complain.
                 }
-            } else if (xmlSchemaObject instanceof XmlSchemaSimpleType) {
-                XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)xmlSchemaObject;
+            } else if (type instanceof XmlSchemaSimpleType) {
+                XmlSchemaSimpleType simpleType = (XmlSchemaSimpleType)type;
                 if (XmlSchemaUtils.isEumeration(simpleType)) {
                     List<String> values = XmlSchemaUtils.enumeratorValues(simpleType);
                     code.append("//\n");
@@ -133,50 +127,37 @@ public class SchemaJavascriptBuilder {
             }
         }
 
-        // now add in global elements with anonymous types.
-        schemaTypes = schema.getElements();
-        namesIterator = schemaTypes.getNames();
-        while (namesIterator.hasNext()) {
-            QName name = (QName)namesIterator.next();
-            XmlSchemaObject xmlSchemaObject = (XmlSchemaObject)schemaTypes.getItem(name);
-            if (xmlSchemaObject instanceof XmlSchemaElement) { // the
-                // alternative
-                // is too wierd
-                // to
-                // contemplate.
-                try {
-                    XmlSchemaElement element = (XmlSchemaElement)xmlSchemaObject;
-                    if (element.getSchemaTypeName() == null && element.getSchemaType() == null) {
-                        Message message = new Message("ELEMENT_MISSING_TYPE", LOG, element.getQName(),
-                                                      element.getSchemaTypeName(), 
-                                                      schema.getTargetNamespace());
-                        LOG.warning(message.toString());
-                        continue;
-                    }
-                    XmlSchemaType type;
-                    if (element.getSchemaType() != null) {
-                        type = element.getSchemaType();
-                    } else {
-                        type = schema.getTypeByName(element.getSchemaTypeName());
-                    }
-                    if (!(type instanceof XmlSchemaComplexType)) {
-                        // we never make classes for simple type.
-                        continue;
-                    }
-
-                    XmlSchemaComplexType complexType = (XmlSchemaComplexType)type;
-                    // for named types we don't bother to generate for the
-                    // element.
-                    if (!JavascriptUtils.notVeryComplexType(complexType)
-                        && complexType.getName() == null) {
-                        complexTypeConstructorAndAccessors(element.getQName(), complexType);
-                        complexTypeSerializerFunction(element.getQName(), complexType);
-                        domDeserializerFunction(element.getQName(), complexType);
-                    }
-                } catch (UnsupportedConstruct usc) {
-                    continue; // it could be empty, but the style checker
-                    // would complain.
+        for (Map.Entry<QName, XmlSchemaElement> e : schema.getElements().entrySet()) {
+            XmlSchemaElement element = e.getValue();
+            try {
+                if (element.getSchemaTypeName() == null && element.getSchemaType() == null) {
+                    Message message = new Message("ELEMENT_MISSING_TYPE", LOG, element.getQName(),
+                                                  element.getSchemaTypeName(), schema.getTargetNamespace());
+                    LOG.warning(message.toString());
+                    continue;
                 }
+                XmlSchemaType type;
+                if (element.getSchemaType() != null) {
+                    type = element.getSchemaType();
+                } else {
+                    type = schema.getTypeByName(element.getSchemaTypeName());
+                }
+                if (!(type instanceof XmlSchemaComplexType)) {
+                    // we never make classes for simple type.
+                    continue;
+                }
+
+                XmlSchemaComplexType complexType = (XmlSchemaComplexType)type;
+                // for named types we don't bother to generate for the
+                // element.
+                if (!JavascriptUtils.notVeryComplexType(complexType) && complexType.getName() == null) {
+                    complexTypeConstructorAndAccessors(element.getQName(), complexType);
+                    complexTypeSerializerFunction(element.getQName(), complexType);
+                    domDeserializerFunction(element.getQName(), complexType);
+                }
+            } catch (UnsupportedConstruct usc) {
+                continue; // it could be empty, but the style checker
+                // would complain.
             }
         }
 
@@ -206,31 +187,24 @@ public class SchemaJavascriptBuilder {
         // to assist in debugging we put a type property into every object.
         utils.appendLine("this.typeMarker = '" + typeObjectName + "';");
         for (XmlSchemaObject thing : items) {
-            ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
-                                                              xmlSchema,
-                                                              xmlSchemaCollection, 
-                                                              prefixAccumulator, 
-                                                              type.getQName()); 
+            ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
+                                                              prefixAccumulator, type.getQName());
             constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
         }
-        
+
         for (XmlSchemaAnnotated thing : attrs) {
-            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, xmlSchema,
-                                                                xmlSchemaCollection,
-                                                                prefixAccumulator,
-                                                                type.getQName());
+            AttributeInfo itemInfo = AttributeInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
+                                                                prefixAccumulator, type.getQName());
             constructOneItem(type, elementPrefix, typeObjectName, itemInfo);
         }
-        
+
         code.append("}\n\n");
         code.append(accessors.toString());
     }
 
-    private void constructOneItem(XmlSchemaComplexType type, 
-                                  final String elementPrefix, 
-                                  String typeObjectName, 
-                                  ItemInfo itemInfo) {
-            
+    private void constructOneItem(XmlSchemaComplexType type, final String elementPrefix,
+                                  String typeObjectName, ItemInfo itemInfo) {
+
         String accessorSuffix = StringUtils.capitalize(itemInfo.getJavascriptName());
 
         String accessorName = typeObjectName + "_get" + accessorSuffix;
@@ -267,12 +241,11 @@ public class SchemaJavascriptBuilder {
         accessors.append("// element set for " + itemInfo.getJavascriptName() + "\n");
         accessors.append("// setter function is is " + setFunctionProperty + "\n");
         accessors.append("//\n");
-        accessors.append("function " + accessorName + "() { return this._"
-                         + itemInfo.getJavascriptName() + ";}\n\n");
+        accessors.append("function " + accessorName + "() { return this._" + itemInfo.getJavascriptName()
+                         + ";}\n\n");
         accessors.append(getFunctionProperty + " = " + accessorName + ";\n\n");
         accessorName = typeObjectName + "_set" + accessorSuffix;
-        accessors.append("function " + accessorName + "(value) { this._" 
-                         + itemInfo.getJavascriptName()
+        accessors.append("function " + accessorName + "(value) { this._" + itemInfo.getJavascriptName()
                          + " = value;}\n\n");
         accessors.append(setFunctionProperty + " = " + accessorName + ";\n");
 
@@ -290,18 +263,16 @@ public class SchemaJavascriptBuilder {
             if (itemInfo.getDefaultValue() == null) {
                 itemInfo.setDefaultValue(utils.getDefaultValueForSimpleType(itemInfo.getType()));
             }
-            utils.appendLine("this._" + itemInfo.getJavascriptName() + " = "
-                             + itemInfo.getDefaultValue() + ";");
+            utils.appendLine("this._" + itemInfo.getJavascriptName() + " = " + itemInfo.getDefaultValue()
+                             + ";");
         }
     }
 
     /**
-     * Produce a serializer function for a type. These functions emit the
-     * surrounding element XML if the caller supplies an XML element name. It's
-     * not quite as simple as that, though. The element name may need namespace
-     * qualification, and this function will add more namespace prefixes as
-     * needed.
-     * 
+     * Produce a serializer function for a type. These functions emit the surrounding element XML if the
+     * caller supplies an XML element name. It's not quite as simple as that, though. The element name may
+     * need namespace qualification, and this function will add more namespace prefixes as needed.
+     *
      * @param type
      * @return
      */
@@ -348,19 +319,16 @@ public class SchemaJavascriptBuilder {
     }
 
     private void complexTypeSerializeAttributes(XmlSchemaComplexType type, String string) {
-        XmlSchemaObjectCollection attributes = type.getAttributes();
-        for (int ax = 0; ax < attributes.getCount(); ax++) {
-            @SuppressWarnings("unused") // work in progress.
-            XmlSchemaAttribute attribute = (XmlSchemaAttribute)attributes.getItem(ax);
-        }
+        @SuppressWarnings("unused")
+        List<XmlSchemaAttributeOrGroupRef> attributes = type.getAttributes();
+        // work in progress.
     }
 
     /**
-     * Build the serialization code for a complex type. At the top level, this
-     * operates on single items, so it does not pay attention to minOccurs and
-     * maxOccurs. However, as it works through the sequence, it manages optional
-     * elements and arrays.
-     * 
+     * Build the serialization code for a complex type. At the top level, this operates on single items, so it
+     * does not pay attention to minOccurs and maxOccurs. However, as it works through the sequence, it
+     * manages optional elements and arrays.
+     *
      * @param type
      * @param elementPrefix
      * @param bodyNamespaceURIs
@@ -370,12 +338,9 @@ public class SchemaJavascriptBuilder {
                                              JavascriptUtils bodyUtils) {
         List<XmlSchemaObject> items = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
         for (XmlSchemaObject sequenceItem : items) {
-            ParticleInfo itemInfo = ParticleInfo.forLocalItem(sequenceItem, 
-                                                              xmlSchema, 
-                                                              xmlSchemaCollection, 
-                                                              prefixAccumulator, 
-                                                              type.getQName()); 
-                
+            ParticleInfo itemInfo = ParticleInfo.forLocalItem(sequenceItem, xmlSchema, xmlSchemaCollection,
+                                                              prefixAccumulator, type.getQName());
+
             // If the item is 'any', it could be ANY of our top-level elements.
             if (itemInfo.isAny()) {
                 serializeAny(itemInfo, bodyUtils);
@@ -392,16 +357,15 @@ public class SchemaJavascriptBuilder {
     }
 
     /**
-     * Generate a JavaScript function that takes an element for a complex type
-     * and walks through its children using them to fill in the values for a
-     * JavaScript object.
-     * 
+     * Generate a JavaScript function that takes an element for a complex type and walks through its children
+     * using them to fill in the values for a JavaScript object.
+     *
      * @param type schema type for the process
      * @return the string contents of the JavaScript.
      */
     public void domDeserializerFunction(QName name, XmlSchemaComplexType type) {
         utils = new JavascriptUtils(code);
-        
+
         List<XmlSchemaObject> contentElements = XmlSchemaUtils.getContentElements(type, xmlSchemaCollection);
         String typeObjectName = nameManager.getJavascriptName(name);
         code.append("function " + typeObjectName + "_deserialize (cxfjsutils, element) {\n");
@@ -416,20 +380,14 @@ public class SchemaJavascriptBuilder {
         for (int i = 0; i < contentElements.size(); i++) {
             XmlSchemaObject contentElement = contentElements.get(i);
             utils.appendLine("cxfjsutils.trace('curElement: ' + cxfjsutils.traceElementName(curElement));");
-            ParticleInfo itemInfo = ParticleInfo.forLocalItem(contentElement,
-                                                              xmlSchema,
-                                                              xmlSchemaCollection, 
-                                                              prefixAccumulator, 
-                                                              type.getQName()); 
+            ParticleInfo itemInfo = ParticleInfo.forLocalItem(contentElement, xmlSchema, xmlSchemaCollection,
+                                                              prefixAccumulator, type.getQName());
             if (itemInfo.isAny()) {
                 ParticleInfo nextItem = null;
                 if (i != nContentElements - 1) {
                     XmlSchemaObject nextThing = contentElements.get(i + 1);
-                    nextItem = ParticleInfo.forLocalItem(nextThing, 
-                                                         xmlSchema, 
-                                                         xmlSchemaCollection, 
-                                                         prefixAccumulator, 
-                                                         type.getQName()); 
+                    nextItem = ParticleInfo.forLocalItem(nextThing, xmlSchema, xmlSchemaCollection,
+                                                         prefixAccumulator, type.getQName());
                     // theoretically, you could have two anys with different
                     // namespaces.
                     if (nextItem.isAny()) {
@@ -444,7 +402,7 @@ public class SchemaJavascriptBuilder {
         utils.appendLine("return newobject;");
         code.append("}\n\n");
     }
-    
+
     private String buildNamespaceList(String anyNamespaceSpec) {
         StringBuilder nslist = new StringBuilder();
         String[] namespaces = anyNamespaceSpec.split("\\s");
@@ -468,14 +426,12 @@ public class SchemaJavascriptBuilder {
         return nslist.toString();
     }
 
-    private void deserializeAny(XmlSchemaComplexType type, 
-                                ParticleInfo itemInfo, 
-                                ParticleInfo nextItem) {
+    private void deserializeAny(XmlSchemaComplexType type, ParticleInfo itemInfo, ParticleInfo nextItem) {
         XmlSchemaAny any = (XmlSchemaAny)itemInfo.getParticle();
-        
+
         boolean array = XmlSchemaUtils.isParticleArray(any);
         boolean optional = XmlSchemaUtils.isParticleOptional(any);
-        
+
         if (array) {
             utils.appendLine("var anyObject = [];");
         } else {
@@ -491,10 +447,8 @@ public class SchemaJavascriptBuilder {
         }
         String matchType;
         String namespaceList = "[]";
-        
-        if (anyNamespaceSpec == null 
-            || "##any".equals(anyNamespaceSpec) 
-            || "".equals(anyNamespaceSpec)) {
+
+        if (anyNamespaceSpec == null || "##any".equals(anyNamespaceSpec) || "".equals(anyNamespaceSpec)) {
             matchType = "org_apache_cxf_any_ns_matcher.ANY";
         } else if ("##other".equals(anyNamespaceSpec)) {
             matchType = "org_apache_cxf_any_ns_matcher.OTHER";
@@ -504,19 +458,16 @@ public class SchemaJavascriptBuilder {
             matchType = "org_apache_cxf_any_ns_matcher.LISTED";
             namespaceList = buildNamespaceList(anyNamespaceSpec);
         }
-        
+
         String nextLocalPartConstant = "null";
         if (nextElement != null) {
             nextLocalPartConstant = "'" + nextElement.getQName().getLocalPart() + "'";
         }
-        
-        utils.appendLine("var matcher = new org_apache_cxf_any_ns_matcher("
-                         + matchType
-                         + ", '" + xmlSchema.getTargetNamespace() + "'"
-                         + ", " + namespaceList
-                         + ", " + nextLocalPartConstant
-                         + ");");
-        
+
+        utils.appendLine("var matcher = new org_apache_cxf_any_ns_matcher(" + matchType + ", '"
+                         + xmlSchema.getTargetNamespace() + "'" + ", " + namespaceList + ", "
+                         + nextLocalPartConstant + ");");
+
         if (array) {
             utils.appendLine("var anyNeeded = " + any.getMinOccurs() + ";");
             utils.appendLine("var anyAllowed = " + any.getMaxOccurs() + ";");
@@ -527,23 +478,23 @@ public class SchemaJavascriptBuilder {
             utils.appendLine("var anyNeeded = 1;");
             utils.appendLine("var anyAllowed = 1;");
         }
-        
+
         utils.startWhile("anyNeeded > 0 || anyAllowed > 0");
 
         utils.appendLine("var anyURI;");
         utils.appendLine("var anyLocalPart;");
         utils.appendLine("var anyMatched = false;");
         utils.startIf("curElement");
-        
+
         utils.appendLine("anyURI = cxfjsutils.getElementNamespaceURI(curElement);");
         utils.appendLine("anyLocalPart = cxfjsutils.getNodeLocalName(curElement);");
         utils.appendLine("var anyQName = '{' + anyURI + '}' + anyLocalPart;");
-        utils.appendLine("cxfjsutils.trace('any match: ' + anyQName);"); 
+        utils.appendLine("cxfjsutils.trace('any match: ' + anyQName);");
         utils.appendLine("anyMatched = matcher.match(anyURI, anyLocalPart)");
-        utils.appendLine("cxfjsutils.trace(' --> ' + anyMatched);"); 
+        utils.appendLine("cxfjsutils.trace(' --> ' + anyMatched);");
 
         utils.endBlock(); // curElement != null
-        
+
         utils.startIf("anyMatched"); // if match
         utils.appendLine("anyDeserializer = "
                          + "cxfjsutils.interfaceObject.globalElementDeserializers[anyQName];");
@@ -560,10 +511,10 @@ public class SchemaJavascriptBuilder {
         } else {
             utils.appendLine("anyObject = anyValue;");
         }
-        
+
         utils.appendLine("anyNeeded--;");
         utils.appendLine("anyAllowed--;");
-        // if we consumed the element, we advance. 
+        // if we consumed the element, we advance.
         utils.appendLine("curElement = cxfjsutils.getNextElementSibling(curElement);");
         utils.appendElse(); // match
         // non-matching case
@@ -578,19 +529,16 @@ public class SchemaJavascriptBuilder {
     }
 
     private void deserializeElement(XmlSchemaComplexType type, XmlSchemaObject thing) {
-        ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, 
-                                                          xmlSchema,
-                                                          xmlSchemaCollection, 
-                                                          prefixAccumulator, 
-                                                          type.getQName());
+        ParticleInfo itemInfo = ParticleInfo.forLocalItem(thing, xmlSchema, xmlSchemaCollection,
+                                                          prefixAccumulator, type.getQName());
         XmlSchemaType itemType = itemInfo.getType();
         boolean simple = itemType instanceof XmlSchemaSimpleType
-            || JavascriptUtils.notVeryComplexType(itemType);
+                         || JavascriptUtils.notVeryComplexType(itemType);
         boolean mtomCandidate = JavascriptUtils.mtomCandidateType(itemType);
         String accessorName = "set" + StringUtils.capitalize(itemInfo.getJavascriptName());
         utils.appendLine("cxfjsutils.trace('processing " + itemInfo.getJavascriptName() + "');");
-        XmlSchemaElement element = (XmlSchemaElement) itemInfo.getParticle();
-        QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, xmlSchema); 
+        XmlSchemaElement element = (XmlSchemaElement)itemInfo.getParticle();
+        QName elementQName = XmlSchemaUtils.getElementQualifiedName(element, xmlSchema);
         String elementNamespaceURI = elementQName.getNamespaceURI();
         boolean elementNoNamespace = "".equals(elementNamespaceURI);
         XmlSchema elementSchema = null;
@@ -598,15 +546,13 @@ public class SchemaJavascriptBuilder {
             elementSchema = xmlSchemaCollection.getSchemaByTargetNamespace(elementNamespaceURI);
         }
         boolean qualified = !elementNoNamespace
-                            && XmlSchemaUtils.isElementQualified(element, 
-                                                                 itemInfo.isGlobal(), 
-                                                                 xmlSchema,
+                            && XmlSchemaUtils.isElementQualified(element, itemInfo.isGlobal(), xmlSchema,
                                                                  elementSchema);
 
         if (!qualified) {
             elementNamespaceURI = "";
         }
-        
+
         String localName = elementQName.getLocalPart();
         String valueTarget = "item";
 
@@ -631,9 +577,8 @@ public class SchemaJavascriptBuilder {
                 utils.appendLine(valueTarget + " = cxfjsutils.deserializeBase64orMom(curElement);");
             } else {
                 utils.appendLine("value = cxfjsutils.getNodeText(curElement);");
-                utils.appendLine(valueTarget 
-                                 + " = " 
-                                 + utils.javascriptParseExpression(itemType, "value") + ";");
+                utils.appendLine(valueTarget + " = " + utils.javascriptParseExpression(itemType, "value")
+                                 + ";");
             }
         } else {
             XmlSchemaComplexType complexType = (XmlSchemaComplexType)itemType;
@@ -643,10 +588,7 @@ public class SchemaJavascriptBuilder {
             }
 
             String elTypeJsName = nameManager.getJavascriptName(baseQName);
-            utils.appendLine(valueTarget 
-                             + " = " 
-                             + elTypeJsName 
-                             + "_deserialize(cxfjsutils, curElement);");
+            utils.appendLine(valueTarget + " = " + elTypeJsName + "_deserialize(cxfjsutils, curElement);");
         }
 
         utils.endBlock(); // the if for the nil.
@@ -655,8 +597,7 @@ public class SchemaJavascriptBuilder {
             utils.appendLine("curElement = cxfjsutils.getNextElementSibling(curElement);");
             utils.endBlock();
             utils.appendLine("  while(curElement != null && cxfjsutils.isNodeNamedNS(curElement, '"
-                             + elementNamespaceURI + "', '" 
-                             + localName + "'));");
+                             + elementNamespaceURI + "', '" + localName + "'));");
         }
         utils.appendLine("newobject." + accessorName + "(item);");
         utils.appendLine("var item = null;");

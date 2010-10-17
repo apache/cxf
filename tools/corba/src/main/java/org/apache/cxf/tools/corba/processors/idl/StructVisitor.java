@@ -38,7 +38,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class StructVisitor extends VisitorBase {
-    
+
     public StructVisitor(Scope scope,
                          Definition defn,
                          XmlSchema schemaRef,
@@ -52,7 +52,7 @@ public class StructVisitor extends VisitorBase {
         }
         return false;
     }
-    
+
     public void visit(AST node) {
         // <struct_type> ::= "struct" <identifier> "{" <member_list> "}"
         // <member_list> ::= <member>+
@@ -66,16 +66,16 @@ public class StructVisitor extends VisitorBase {
             visitDeclaredStruct(identifierNode);
         }
     }
-        
+
     public void visitDeclaredStruct(AST identifierNode) {
-        Scope structScope = new Scope(getScope(), identifierNode);        
+        Scope structScope = new Scope(getScope(), identifierNode);
 
         // xmlschema:struct
-        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, true);
         complexType.setName(mapper.mapToQName(structScope));
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         complexType.setParticle(sequence);
-        
+
         // corba:struct
         Struct struct = new Struct();
         struct.setQName(new QName(typeMap.getTargetNamespace(), structScope.toString()));
@@ -85,22 +85,19 @@ public class StructVisitor extends VisitorBase {
         boolean recursiveAdd = addRecursiveScopedName(identifierNode);
 
         // struct members
-        visitStructMembers(identifierNode, struct, sequence, structScope);        
-        
+        visitStructMembers(identifierNode, struct, sequence, structScope);
+
         if (recursiveAdd) {
             removeRecursiveScopedName(identifierNode);
         }
-        // add schemaType
-        schema.getItems().add(complexType);
-        schema.addType(complexType);
 
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(struct);
-        
+
         // REVISIT: are there assignment needed?
         setSchemaType(complexType);
         setCorbaType(struct);
-        
+
         // Need to check if the struct was forward declared
         processForwardStructActions(structScope);
 
@@ -108,14 +105,14 @@ public class StructVisitor extends VisitorBase {
         // the list of scopedNames so that we inidicate that is no longer simply forward declared.
         scopedNames.remove(structScope);
     }
-    
+
     private void visitStructMembers(AST identifierNode, Struct struct,
                                     XmlSchemaSequence sequence,
                                     Scope structScope) {
         AST memberTypeNode = identifierNode.getNextSibling();
         while (memberTypeNode != null) {
             AST memberNode = TypesUtils.getCorbaTypeNameNode(memberTypeNode);
-            
+
             XmlSchemaType schemaType = null;
             CorbaTypeImpl corbaType = null;
             Scope fqName = null;
@@ -125,10 +122,10 @@ public class StructVisitor extends VisitorBase {
                                                         schema,
                                                         wsdlVisitor,
                                                         null);
-                visitor.visit(memberTypeNode);                
+                visitor.visit(memberTypeNode);
                 schemaType = visitor.getSchemaType();
                 corbaType = visitor.getCorbaType();
-                fqName = visitor.getFullyQualifiedName();                
+                fqName = visitor.getFullyQualifiedName();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
@@ -145,7 +142,7 @@ public class StructVisitor extends VisitorBase {
 
                 XmlSchemaType memberSchemaType = schemaType;
                 CorbaTypeImpl memberCorbaType = corbaType;
-                // needed for anonymous arrays in structs 
+                // needed for anonymous arrays in structs
                 if (ArrayVisitor.accept(memberNode)) {
                     Scope anonScope = new Scope(structScope,
                                                 TypesUtils.getCorbaTypeNameNode(memberTypeNode));
@@ -163,25 +160,25 @@ public class StructVisitor extends VisitorBase {
                     fqName = arrayVisitor.getFullyQualifiedName();
                 }
 
-                XmlSchemaElement member = 
+                XmlSchemaElement member =
                     createXmlSchemaElement(memberNode, memberSchemaType, fqName);
-                sequence.getItems().add(member);           
-                MemberType memberType = 
-                    createMemberType(memberNode, memberCorbaType, fqName);            
+                sequence.getItems().add(member);
+                MemberType memberType =
+                    createMemberType(memberNode, memberCorbaType, fqName);
                 struct.getMember().add(memberType);
-                
+
                 memberNode = memberNode.getNextSibling();
             }
-            
+
             memberTypeNode = memberNode;
         }
     }
-    
-    private XmlSchemaElement createXmlSchemaElement(AST memberNode, 
+
+    private XmlSchemaElement createXmlSchemaElement(AST memberNode,
                                                     XmlSchemaType schemaType,
                                                     Scope fqName) {
         // xmlschema:member
-        XmlSchemaElement member = new XmlSchemaElement();
+        XmlSchemaElement member = new XmlSchemaElement(schema, false);
         String memberName = memberNode.toString();
         member.setName(memberName);
         member.setSchemaType(schemaType);
@@ -196,7 +193,7 @@ public class StructVisitor extends VisitorBase {
         }
         return member;
     }
-    
+
     private MemberType createMemberType(AST memberNode,
                                         CorbaTypeImpl corbaType,
                                         Scope fqName) {
@@ -204,25 +201,25 @@ public class StructVisitor extends VisitorBase {
         String memberName = memberNode.toString();
         MemberType memberType = new MemberType();
         memberType.setName(memberName);
-        if (corbaType != null) {                            
+        if (corbaType != null) {
             memberType.setIdltype(corbaType.getQName());
         } else {
             wsdlVisitor.getDeferredActions().
-                add(fqName, new StructDeferredAction(memberType)); 
+                add(fqName, new StructDeferredAction(memberType));
         }
         return memberType;
     }
-    
+
     private void visitForwardDeclaredStruct(AST identifierNode) {
-        String structName = identifierNode.toString();        
+        String structName = identifierNode.toString();
         Scope structScope = new Scope(getScope(), structName);
-        
+
         ScopeNameCollection scopedNames = wsdlVisitor.getScopedNames();
         if (scopedNames.getScope(structScope) == null) {
             scopedNames.add(structScope);
-        }        
+        }
     }
- 
+
     // Process any actions that were defered for a forward declared struct
     private void processForwardStructActions(Scope structScope) {
         if (wsdlVisitor.getDeferredActions() != null) {
@@ -231,24 +228,24 @@ public class StructVisitor extends VisitorBase {
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
                 CorbaTypeImpl ctype = getCorbaType();
-                Iterator iterator = list.iterator();                    
+                Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();
-                    action.execute(stype, ctype);                       
+                    action.execute(stype, ctype);
                 }
-                iterator = list.iterator();                    
+                iterator = list.iterator();
                 while (iterator.hasNext()) {
                     iterator.next();
-                    iterator.remove();                       
-                }                                          
-            }            
-        }   
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     private boolean addRecursiveScopedName(AST identifierNode) {
-        String structName = identifierNode.toString();        
+        String structName = identifierNode.toString();
         Scope structScope = new Scope(getScope(), structName);
-        
+
         ScopeNameCollection scopedNames = wsdlVisitor.getScopedNames();
         if (scopedNames.getScope(structScope) == null) {
             scopedNames.add(structScope);
@@ -258,9 +255,9 @@ public class StructVisitor extends VisitorBase {
     }
 
     private void removeRecursiveScopedName(AST identifierNode) {
-        String structName = identifierNode.toString();        
+        String structName = identifierNode.toString();
         Scope structScope = new Scope(getScope(), structName);
-        
+
         ScopeNameCollection scopedNames = wsdlVisitor.getScopedNames();
         scopedNames.remove(structScope);
     }

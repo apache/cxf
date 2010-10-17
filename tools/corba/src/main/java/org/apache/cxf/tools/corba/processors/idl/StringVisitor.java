@@ -42,7 +42,7 @@ public class StringVisitor extends VisitorBase {
     private AST identifierNode;
     private Scope stringScopedName;
 
-    
+
     public StringVisitor(Scope scope,
                          Definition definition,
                          XmlSchema schemaRef,
@@ -56,7 +56,7 @@ public class StringVisitor extends VisitorBase {
     }
 
     public static boolean accept(AST node) {
-        if ((node.getType() == IDLTokenTypes.LITERAL_string) 
+        if ((node.getType() == IDLTokenTypes.LITERAL_string)
             || (node.getType() == IDLTokenTypes.LITERAL_wstring)) {
             return true;
         }
@@ -69,18 +69,18 @@ public class StringVisitor extends VisitorBase {
         }
         return true;
     }
-    
+
     public void visit(AST node) {
         // <string_type> ::= "string" "<" <positive_int_const> ">"
         //                 | "string"
         // <wstring_type> ::= "wstring" "<" <positive_int_const> ">"
         //                  | "wstring"
 
-        
+
         stringNode = node;
         boundNode = stringNode.getFirstChild();
 
-        if (identifierNode == null) {    
+        if (identifierNode == null) {
             stringScopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
         } else {
             if (identifierNode.getFirstChild() == null) {
@@ -90,9 +90,9 @@ public class StringVisitor extends VisitorBase {
                 Scope anonScope = new Scope(getScope(), identifierNode);
                 stringScopedName = TypesUtils.generateAnonymousScopedName(anonScope, schema);
                 identifierNode = null;
-            } 
+            }
         }
-        
+
         if (boundNode != null
             && !wsdlVisitor.getBoundedStringOverride()) {
             if (identifierNode != null) {
@@ -108,10 +108,10 @@ public class StringVisitor extends VisitorBase {
             visitUnboundedString();
         }
     }
-    
+
     private void visitAnonBoundedString() {
         // xmlschema:bounded anon string
-        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema);
+        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, true);
         simpleType.setName(stringScopedName.toString());
         XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
         restriction.setBaseTypeName(Constants.XSD_STRING);
@@ -120,9 +120,6 @@ public class StringVisitor extends VisitorBase {
         restriction.getFacets().add(maxLengthFacet);
         simpleType.setContent(restriction);
 
-        // add schemaType
-        schema.getItems().add(simpleType);
-        schema.addType(simpleType);
         setSchemaType(simpleType);
 
         CorbaTypeImpl anon = null;
@@ -134,30 +131,30 @@ public class StringVisitor extends VisitorBase {
             anonstring.setType(simpleType.getQName());
 
             anon = anonstring;
-            
+
         } else if (stringNode.getType() == IDLTokenTypes.LITERAL_wstring) {
             // corba:anonwstring
             Anonwstring anonwstring = new Anonwstring();
             anonwstring.setQName(new QName(typeMap.getTargetNamespace(), stringScopedName.toString()));
             anonwstring.setBound(new Long(boundNode.toString()));
             anonwstring.setType(simpleType.getQName());
-            
+
             anon = anonwstring;
-            
-        } else { 
+
+        } else {
             // should never get here
             throw new RuntimeException("StringVisitor attempted to visit an invalid node");
         }
-        
-        
+
+
         // add corba:anonstring
         typeMap.getStructOrExceptionOrUnion().add(anon);
         setCorbaType(anon);
     }
-    
+
     private void visitBoundedString() {
         // xmlschema:bounded string
-        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema);
+        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, false);
         simpleType.setName(stringScopedName.toString());
         XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
         restriction.setBaseTypeName(Constants.XSD_STRING);
@@ -167,7 +164,7 @@ public class StringVisitor extends VisitorBase {
         simpleType.setContent(restriction);
 
         setSchemaType(simpleType);
-                       
+
         Scope anonstringScopedName = new Scope(getScope(), "_Anon1_" + stringScopedName.tail());
         String anonstringName = anonstringScopedName.toString();
         CorbaTypeImpl anon = null;
@@ -179,21 +176,21 @@ public class StringVisitor extends VisitorBase {
             anonstring.setType(simpleType.getQName());
 
             anon = anonstring;
-            
+
         } else if (stringNode.getType() == IDLTokenTypes.LITERAL_wstring) {
             // corba:anonwstring
             Anonwstring anonwstring = new Anonwstring();
             anonwstring.setQName(new QName(typeMap.getTargetNamespace(), anonstringName));
             anonwstring.setBound(new Long(boundNode.toString()));
             anonwstring.setType(simpleType.getQName());
-            
+
             anon = anonwstring;
-            
-        } else { 
+
+        } else {
             // should never get here
             throw new RuntimeException("StringVisitor attempted to visit an invalid node");
         }
-        
+
         // add corba:anonstring
         typeMap.getStructOrExceptionOrUnion().add(anon);
 
@@ -207,12 +204,12 @@ public class StringVisitor extends VisitorBase {
         // add corba:alias
         setCorbaType(alias);
     }
-    
+
     private void visitUnboundedString() {
         // schema type
         setSchemaType(schemas.getTypeByQName(Constants.XSD_STRING));
 
-        
+
         // corba type
         CorbaTypeImpl corbaString = new CorbaTypeImpl();
         if (stringNode.getType() == IDLTokenTypes.LITERAL_string) {
@@ -221,7 +218,7 @@ public class StringVisitor extends VisitorBase {
         } else if (stringNode.getType() == IDLTokenTypes.LITERAL_wstring) {
             corbaString.setQName(CorbaConstants.NT_CORBA_WSTRING);
             corbaString.setName(CorbaConstants.NT_CORBA_WSTRING.getLocalPart());
-        } else { 
+        } else {
             // should never get here
             throw new RuntimeException("StringVisitor attempted to visit an invalid node");
         }
@@ -229,5 +226,5 @@ public class StringVisitor extends VisitorBase {
 
         setCorbaType(corbaString);
     }
-    
+
 }

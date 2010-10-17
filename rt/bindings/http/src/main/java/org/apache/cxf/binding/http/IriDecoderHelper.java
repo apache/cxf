@@ -188,11 +188,11 @@ public final class IriDecoderHelper {
         }
         return null;
     }
-    
+
     private static boolean findSchemaUnQualified(Collection<SchemaInfo> schemas, QName name) {
         for (SchemaInfo inf : schemas) {
             if (inf.getNamespaceURI().equals(name.getNamespaceURI())) {
-                return inf.getSchema().getElementFormDefault().getValue().equals(XmlSchemaForm.UNQUALIFIED);
+                return inf.getSchema().getElementFormDefault() == XmlSchemaForm.UNQUALIFIED;
             }
         }
         //Unqualified by default
@@ -202,7 +202,7 @@ public final class IriDecoderHelper {
     /**
      * Create a dom document conformant with the given schema element with the
      * input parameters.
-     * 
+     *
      * @param element
      * @param params
      * @return
@@ -214,7 +214,7 @@ public final class IriDecoderHelper {
         XmlSchemaElement element = null;
         QName qname = null;
         boolean unQualified = false;
-        
+
         XmlSchemaComplexType cplxType = null;
         if (schemaAnnotation instanceof XmlSchemaElement) {
             element = (XmlSchemaElement)schemaAnnotation;
@@ -222,7 +222,7 @@ public final class IriDecoderHelper {
             if (element.getSchemaType() instanceof XmlSchemaSimpleType) {
                 throw new Fault(new Message("SIMPLE_TYPE", BUNDLE));
             }
-            
+
             cplxType = (XmlSchemaComplexType)element.getSchemaType();
             unQualified = findSchemaUnQualified(schemas, element.getSchemaTypeName());
             if (cplxType == null) {
@@ -249,8 +249,8 @@ public final class IriDecoderHelper {
             return doc;
         }
 
-        for (int i = 0; i < seq.getItems().getCount(); i++) {
-            XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().getItem(i);
+        for (int i = 0; i < seq.getItems().size(); i++) {
+            XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().get(i);
             Param param = null;
             for (Param p : params) {
                 if (p.getName().equals(elChild.getQName().getLocalPart())) {
@@ -263,17 +263,17 @@ public final class IriDecoderHelper {
             if (StringUtils.isEmpty(qn.getNamespaceURI()) && unQualified) {
                 ec = doc.createElement(elChild.getQName().getLocalPart());
             } else {
-                
+
                 if (!elChild.getQName().getNamespaceURI().equals(qname.getNamespaceURI())) {
-                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(), 
+                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(),
                                              elChild.getQName().getLocalPart());
                     ec.setAttribute(XMLConstants.XMLNS_ATTRIBUTE, elChild.getQName().getNamespaceURI());
                 } else {
-                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(), 
-                                             "ns1:" + elChild.getQName().getLocalPart());                    
+                    ec = doc.createElementNS(elChild.getQName().getNamespaceURI(),
+                                             "ns1:" + elChild.getQName().getLocalPart());
                 }
             }
-            
+
             if (param != null) {
                 params.remove(param);
                 ec.appendChild(doc.createTextNode(param.getValue()));
@@ -311,8 +311,8 @@ public final class IriDecoderHelper {
             doc.appendChild(root);
         }
 
-        for (int i = 0; i < seq.getItems().getCount(); i++) {
-            XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().getItem(i);
+        for (int i = 0; i < seq.getItems().size(); i++) {
+            XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().get(i);
             Param param = null;
             for (Param p : params) {
                 if (p.getName().equals(elChild.getQName().getLocalPart())) {
@@ -376,7 +376,7 @@ public final class IriDecoderHelper {
                 && elem.getNamespaceURI().equals(name.getNamespaceURI())) {
                 return elem;
             }
-            elem = DOMUtils.getNextElement(elem);         
+            elem = DOMUtils.getNextElement(elem);
         }
         return null;
     }

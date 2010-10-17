@@ -40,7 +40,7 @@ public class SequenceVisitor extends VisitorBase {
     private static final String ELEMENT_NAME = "item";
 
     private AST identifierNode;
-    
+
     public SequenceVisitor(Scope scope,
                            Definition defn,
                            XmlSchema schemaRef,
@@ -49,23 +49,23 @@ public class SequenceVisitor extends VisitorBase {
         super(scope, defn, schemaRef, wsdlVisitor);
         identifierNode = identifierNodeRef;
     }
-    
+
     public static boolean accept(AST node) {
         if (node.getType() == IDLTokenTypes.LITERAL_sequence) {
             return true;
         }
         return false;
     }
-    
+
     public void visit(AST seq) {
         // <sequence_type> ::= "sequence" "<" <simple_type_spec> "," <positive_int_const> ">"
         //                   | "sequence" "<" <simple_type_spec> ">"
-        
-        
+
+
         AST simpleTypeSpecNode = seq.getFirstChild();
         // REVISIT: TypesUtils.getPrimitiveCorbaTypeNameNode should be renamed
         // to something more suitable and should be made more general.
-        AST boundNode = TypesUtils.getCorbaTypeNameNode(simpleTypeSpecNode); 
+        AST boundNode = TypesUtils.getCorbaTypeNameNode(simpleTypeSpecNode);
         //get chance to check if bound is symbol name which defined as const,
         //if so, replace the symbol name with defined const
         if (boundNode != null) {
@@ -74,18 +74,18 @@ public class SequenceVisitor extends VisitorBase {
                 boundNode.setText(constValue);
             }
         }
-        
+
         SimpleTypeSpecVisitor visitor = new SimpleTypeSpecVisitor(new Scope(getScope(), identifierNode),
                                                                   definition,
                                                                   schema,
                                                                   wsdlVisitor,
                                                                   null);
         visitor.visit(simpleTypeSpecNode);
-        
+
         XmlSchemaType stype = visitor.getSchemaType();
         CorbaTypeImpl ctype = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
-        
+
 
         long bound = -1;
         if (boundNode != null) {
@@ -99,14 +99,14 @@ public class SequenceVisitor extends VisitorBase {
         } else {
             scopedName = new Scope(getScope(), identifierNode);
         }
-              
-        XmlSchemaType schemaType = null;                
-        
+
+        XmlSchemaType schemaType = null;
+
         // According to CORBA Binding for WSDL specification,
         // idl:sequence<octet> maps to xs:base64Binary by default.
-        // 
+        //
         // wsdlVisitor.getSequenceOctetType() returns the XmlSchema type
-        // that idl:sequence<octet> should map to, as specified by the 
+        // that idl:sequence<octet> should map to, as specified by the
         // -s command line option or the default type xsd:base64Binary.
         //
         if (stype != null) {
@@ -118,7 +118,7 @@ public class SequenceVisitor extends VisitorBase {
         } else {
             schemaType = generateSchemaType(stype, scopedName, bound, fullyQualifiedName);
         }
-        
+
         CorbaTypeImpl corbaType = null;
         if (identifierNode == null) {
             corbaType = generateCorbaAnonsequence(ctype,
@@ -135,17 +135,17 @@ public class SequenceVisitor extends VisitorBase {
         }
 
 
-        setSchemaType(schemaType); 
+        setSchemaType(schemaType);
         setCorbaType(corbaType);
         setFullyQualifiedName(fullyQualifiedName);
     }
 
-    private XmlSchemaType generateSchemaType(XmlSchemaType stype, Scope scopedName, 
+    private XmlSchemaType generateSchemaType(XmlSchemaType stype, Scope scopedName,
                                              long bound, Scope fullyQualifiedName) {
-        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType ct = new XmlSchemaComplexType(schema, true);
         ct.setName(mapper.mapToQName(scopedName));
         XmlSchemaSequence sequence = new XmlSchemaSequence();
-        XmlSchemaElement el = new XmlSchemaElement();
+        XmlSchemaElement el = new XmlSchemaElement(schema, false);
         el.setName(ELEMENT_NAME);
         el.setMinOccurs(0);
         if (bound != -1) {
@@ -159,15 +159,15 @@ public class SequenceVisitor extends VisitorBase {
                 el.setNillable(true);
             }
         } else {
-            SequenceDeferredAction elementAction = 
+            SequenceDeferredAction elementAction =
                 new SequenceDeferredAction(el);
-            wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction); 
+            wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction);
         }
         sequence.getItems().add(el);
         ct.setParticle(sequence);
         return ct;
     }
-    
+
     private CorbaTypeImpl generateCorbaSequence(CorbaTypeImpl ctype,
                                                 XmlSchemaType schemaType,
                                                 Scope scopedName,
@@ -177,7 +177,7 @@ public class SequenceVisitor extends VisitorBase {
         Sequence corbaSeq = new Sequence();
         if (bound == -1) {
             bound = 0;
-        }                
+        }
         corbaSeq.setBound(bound);
         corbaSeq.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
         corbaSeq.setType(schemaType.getQName());
@@ -186,7 +186,7 @@ public class SequenceVisitor extends VisitorBase {
         if (ctype != null) {
             corbaSeq.setElemtype(ctype.getQName());
         } else {
-            SequenceDeferredAction seqAction = 
+            SequenceDeferredAction seqAction =
                 new SequenceDeferredAction(corbaSeq);
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, seqAction);
         }
@@ -204,37 +204,31 @@ public class SequenceVisitor extends VisitorBase {
         Anonsequence result = new Anonsequence();
         if (bound == -1) {
             bound = 0;
-        }                
+        }
         result.setBound(bound);
         result.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
         //REVISIT, if we add qualification then change the below.
         result.setElemname(new QName("", ELEMENT_NAME));
         if (schemaType == null || ctype == null) {
-            SequenceDeferredAction anonSeqAction = 
+            SequenceDeferredAction anonSeqAction =
                 new SequenceDeferredAction(result);
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, anonSeqAction);
         } else {
             result.setType(schemaType.getQName());
-            result.setElemtype(ctype.getQName());        
+            result.setElemtype(ctype.getQName());
         }
 
         // Need to create an action if the type was forward declared.
-        if (schemaType != null) {
-            if (schemas.getTypeByQName(schemaType.getQName()) == null 
-                && schema.getTypeByName(schemaType.getQName()) == null) {
-                schema.getItems().add(schemaType);
-                schema.addType(schemaType);
-            }
-        } else {
-            SequenceDeferredAction anonSeqAction = 
+        if (schemaType == null) {
+            SequenceDeferredAction anonSeqAction =
                 new SequenceDeferredAction(schemas, schema);
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, anonSeqAction);
         }
-        
+
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(result);
-        
+
         return result;
     }
-    
+
 }

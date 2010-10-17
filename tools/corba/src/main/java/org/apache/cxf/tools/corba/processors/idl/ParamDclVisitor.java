@@ -35,10 +35,10 @@ import org.apache.ws.commons.schema.XmlSchemaType;
 
 public class ParamDclVisitor extends VisitorBase {
 
-    private XmlSchemaSequence inWrappingSequence; 
+    private XmlSchemaSequence inWrappingSequence;
     private XmlSchemaSequence outWrappingSequence;
     private OperationType corbaOperation;
-    
+
     public ParamDclVisitor(Scope scope,
                            Definition defn,
                            XmlSchema schemaRef,
@@ -62,7 +62,7 @@ public class ParamDclVisitor extends VisitorBase {
         }
         return result;
     }
-    
+
     public void visit(AST node) {
         // <param_dcl> ::= <param_attribute> <param_type_spec> <simple_declarator>
         // <param_attribute> ::= "in"
@@ -79,14 +79,14 @@ public class ParamDclVisitor extends VisitorBase {
         XmlSchemaType schemaType = visitor.getSchemaType();
         CorbaTypeImpl corbaType = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
-        
+
         switch (node.getType()) {
-        case IDLTokenTypes.LITERAL_in: 
+        case IDLTokenTypes.LITERAL_in:
             addElement(inWrappingSequence, schemaType, nameNode.toString(), fullyQualifiedName);
             addCorbaParam(corbaType, ModeType.IN, nameNode.toString(), fullyQualifiedName);
             break;
         case IDLTokenTypes.LITERAL_out:
-            addElement(outWrappingSequence, schemaType, nameNode.toString(), fullyQualifiedName); 
+            addElement(outWrappingSequence, schemaType, nameNode.toString(), fullyQualifiedName);
             addCorbaParam(corbaType, ModeType.OUT, nameNode.toString(), fullyQualifiedName);
             break;
         case IDLTokenTypes.LITERAL_inout:
@@ -97,7 +97,7 @@ public class ParamDclVisitor extends VisitorBase {
         default:
             throw new RuntimeException("[ParamDclVisitor: illegal IDL!]");
         }
-        
+
         setSchemaType(schemaType);
         setCorbaType(corbaType);
     }
@@ -106,7 +106,7 @@ public class ParamDclVisitor extends VisitorBase {
                                         XmlSchemaType schemaType,
                                         String name,
                                         Scope fullyQualifiedName) {
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         element.setName(name);
         if (schemaType == null) {
             ParamDeferredAction elementAction;
@@ -122,7 +122,7 @@ public class ParamDclVisitor extends VisitorBase {
             }
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction);
 
-            //ParamDeferredAction elementAction = 
+            //ParamDeferredAction elementAction =
             //    new ParamDeferredAction(element);
             //wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction);
         } else {
@@ -135,16 +135,16 @@ public class ParamDclVisitor extends VisitorBase {
         return element;
     }
 
-    private void addCorbaParam(CorbaTypeImpl corbaType, ModeType mode, 
+    private void addCorbaParam(CorbaTypeImpl corbaType, ModeType mode,
                                String partName, Scope fullyQualifiedName) {
         ParamType param = new ParamType();
         param.setName(partName);
         param.setMode(mode);
-        if (corbaType ==  null) {            
-            ParamDeferredAction paramAction = 
+        if (corbaType ==  null) {
+            ParamDeferredAction paramAction =
                 new ParamDeferredAction(param);
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, paramAction);
-        } else {            
+        } else {
             param.setIdltype(corbaType.getQName());
         }
         corbaOperation.getParam().add(param);

@@ -24,9 +24,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-
 
 import javax.xml.namespace.QName;
 
@@ -52,8 +50,8 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaForm;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 
 public final class ProcessorUtil {
     private static final String KEYWORDS_PREFIX = "_";
@@ -72,7 +70,7 @@ public final class ProcessorUtil {
     public static String resolvePartType(MessagePartInfo part) {
         return NameUtil.mangleNameToClassName(getPartType(part));
     }
-    
+
     public static String getType(MessagePartInfo part, ToolContext context, boolean fullname) {
         String type = "";
         DataBindingProfile dataBinding = context.get(DataBindingProfile.class);
@@ -91,7 +89,7 @@ public final class ProcessorUtil {
         DataBindingProfile dataBinding = context.get(DataBindingProfile.class);
         if (part.isElement()) {
             return dataBinding.createDefaultValueWriter(getElementName(part), true);
-        } 
+        }
         return dataBinding.createDefaultValueWriter(part.getTypeQName(), false);
     }
     public static DefaultValueWriter getDefaultValueWriterForWrappedElement(MessagePartInfo part,
@@ -147,20 +145,20 @@ public final class ProcessorUtil {
         if (name == null) {
             String namespace = resolvePartNamespace(part);
             if ("http://www.w3.org/2005/08/addressing".equals(namespace)) {
-                //The ws-addressing stuff isn't mapped in jaxb as jax-ws specifies they 
+                //The ws-addressing stuff isn't mapped in jaxb as jax-ws specifies they
                 //need to be mapped differently
                 String pn = part.getConcreteName().getLocalPart();
                 if ("EndpointReference".equals(pn)
                     || "ReplyTo".equals(pn)
                     || "From".equals(pn)
                     || "FaultTo".equals(pn)) {
-                
+
                     name = "javax.xml.ws.wsaddressing.W3CEndpointReference";
                 }
             }
-            
+
         }
-        return name;       
+        return name;
     }
 
     public static String resolvePartNamespace(MessagePartInfo part) {
@@ -192,7 +190,7 @@ public final class ProcessorUtil {
         } else {
             return resolvePath(new File(location).getAbsolutePath());
         }
-         
+
     }
 
     public static URL getWSDLURL(String location) throws Exception {
@@ -226,26 +224,26 @@ public final class ProcessorUtil {
         QName xmlTypeName = getElementName(part);
 
         // if this flag  is true , mapping to java Type first;
-        // if not found , findd the primitive type : int ,long 
+        // if not found , findd the primitive type : int ,long
         // if not found,  find in the generated class
-       
-            
+
+
         if (!primitiveType && dataBinding != null) {
             jtype = dataBinding.getType(xmlTypeName, true);
-        } 
-        
+        }
+
         if (!primitiveType && dataBinding == null) {
             Class holderClass = JAXBUtils.holderClass(xmlTypeName.getLocalPart());
             jtype = holderClass == null ? null : holderClass.getName();
             if (jtype == null) {
                 jtype = JAXBUtils.builtInTypeToJavaType(xmlTypeName.getLocalPart());
-            }                      
+            }
         }
-        
+
         if (primitiveType) {
             jtype = JAXBUtils.builtInTypeToJavaType(xmlTypeName.getLocalPart());
         }
-            
+
         String namespace = xmlTypeName.getNamespaceURI();
         String type = resolvePartType(part, context, true);
         String userPackage = context.mapPackageName(namespace);
@@ -260,14 +258,14 @@ public final class ProcessorUtil {
                 jtype = resolvePartType(part, context, true);
             } else {
                 jtype = parsePackageName(namespace, userPackage) + "." + type;
-            }          
-        } 
-        
-        
+            }
+        }
+
+
         return jtype;
     }
 
-   
+
 
     public static String getFileOrURLName(String fileOrURL) {
         try {
@@ -309,14 +307,14 @@ public final class ProcessorUtil {
         return name + "_handler";
     }
 
-   
+
 
     public static Node cloneNode(Document document, Node node, boolean deep) throws DOMException {
         if (document == null || node == null) {
             return null;
         }
         int type = node.getNodeType();
-        
+
         if (node.getOwnerDocument() == document) {
             return node.cloneNode(deep);
         }
@@ -335,15 +333,15 @@ public final class ProcessorUtil {
             clone = document.createElementNS(node.getNamespaceURI(), node.getNodeName());
             NamedNodeMap attributes = node.getAttributes();
             for (int i = 0; i < attributes.getLength(); i++) {
-                Attr attr = (Attr)attributes.item(i);                
-                Attr attrnew = 
-                    ((Element)clone).getOwnerDocument().createAttributeNS(attr.getNamespaceURI(), 
+                Attr attr = (Attr)attributes.item(i);
+                Attr attrnew =
+                    ((Element)clone).getOwnerDocument().createAttributeNS(attr.getNamespaceURI(),
                                                                       attr.getNodeName());
                 attrnew.setValue(attr.getNodeValue());
-                ((Element)clone).setAttributeNodeNS(attrnew);    
+                ((Element)clone).setAttributeNodeNS(attrnew);
             }
             break;
-       
+
         case Node.TEXT_NODE:
             clone = document.createTextNode(node.getNodeValue());
             break;
@@ -373,43 +371,42 @@ public final class ProcessorUtil {
 
     public static List<WrapperElement> getWrappedElement(ToolContext context, QName partElement) {
         List<WrapperElement> qnames = new ArrayList<WrapperElement>();
-        
+
         ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
         SchemaCollection schema = serviceInfo.getXmlSchemaCollection();
-       
+
         XmlSchemaElement elementByName = schema.getElementByQName(partElement);
-        
+
         XmlSchemaComplexType type = (XmlSchemaComplexType)elementByName.getSchemaType();
 
         XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
-       
+
         if (seq != null) {
 
-            XmlSchemaObjectCollection items = seq.getItems();
+            List<XmlSchemaSequenceMember> items = seq.getItems();
 
-            Iterator ite = items.getIterator();
-
-            while (ite.hasNext()) {
-                XmlSchemaElement subElement = (XmlSchemaElement)ite.next();
+            for (XmlSchemaSequenceMember seqMember : items) {
+                XmlSchemaElement subElement = (XmlSchemaElement)seqMember;
 
                 if (subElement.getQName() != null) {
                     qnames.add(new WrapperElement(subElement.getQName(), subElement.getSchemaTypeName()));
                 } else {
-                    qnames.add(new WrapperElement(subElement.getRefName(), subElement.getSchemaTypeName()));
+                    qnames.add(new WrapperElement(subElement.getRef().getTargetQName(),
+                                                  subElement.getSchemaTypeName()));
                 }
             }
         }
         return qnames;
     }
-    
+
     public static boolean isSchemaFormQualified(ToolContext context, QName partElement) {
         ServiceInfo serviceInfo = (ServiceInfo)context.get(ServiceInfo.class);
         SchemaCollection schemaCol = serviceInfo.getXmlSchemaCollection();
         XmlSchema schema = schemaCol.getSchemaForElement(partElement);
         if (schema != null) {
-            return schema.getElementFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+            return schema.getElementFormDefault() == XmlSchemaForm.QUALIFIED;
         }
         return false;
-    
+
     }
 }

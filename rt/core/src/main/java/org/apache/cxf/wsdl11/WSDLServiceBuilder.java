@@ -80,9 +80,8 @@ import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 
 import static org.apache.cxf.helpers.CastUtils.cast;
 
@@ -121,7 +120,7 @@ public class WSDLServiceBuilder {
     public void setAllowElementRefs(boolean b) {
         allowRefs = b;
     }
-    
+
     private void copyExtensors(AbstractPropertiesHolder info, List<?> extList) {
         if (info != null) {
             for (ExtensibilityElement ext : cast(extList, ExtensibilityElement.class)) {
@@ -148,7 +147,7 @@ public class WSDLServiceBuilder {
         description.setName(d.getQName());
         description.setBaseURI(d.getDocumentBaseURI());
         copyExtensors(description, d.getExtensibilityElements());
-        copyExtensionAttributes(description, d);        
+        copyExtensionAttributes(description, d);
 
         List<ServiceInfo> serviceList = new ArrayList<ServiceInfo>();
         for (java.util.Iterator<QName> ite = CastUtils.cast(d.getServices().keySet().iterator()); ite
@@ -166,13 +165,13 @@ public class WSDLServiceBuilder {
         return buildServices(d, name, endpointName);
     }
 
-    private List<ServiceInfo> buildServices(Definition d, 
+    private List<ServiceInfo> buildServices(Definition d,
                                             QName name,
                                             QName endpointName,
                                             DescriptionInfo description) {
         Service service = d.getService(name);
         if (service == null) {
-            org.apache.cxf.common.i18n.Message msg = 
+            org.apache.cxf.common.i18n.Message msg =
                 new org.apache.cxf.common.i18n.Message("MISSING_SERVICE",
                                                        LOG,
                                                        name);
@@ -200,7 +199,7 @@ public class WSDLServiceBuilder {
                 PortType portType = def.getPortType((QName)entry.getKey());
                 ServiceInfo serviceInfo = this.buildMockService(def, portType);
                 serviceList.add(serviceInfo);
-                
+
                 for (Iterator it2 = d.getAllBindings().values().iterator(); it2.hasNext();) {
                     Binding b = (Binding)it2.next();
                     if (b.getPortType() == portType) {
@@ -260,8 +259,8 @@ public class WSDLServiceBuilder {
     }
 
     private List<ServiceInfo> buildServices(Definition def,
-                                            Service serv, 
-                                            QName endpointName, 
+                                            Service serv,
+                                            QName endpointName,
                                             DescriptionInfo d) {
         Map<QName, ServiceInfo> services = new LinkedHashMap<QName, ServiceInfo>();
 
@@ -275,7 +274,7 @@ public class WSDLServiceBuilder {
             description.setBaseURI(def.getDocumentBaseURI());
             copyExtensors(description, def.getExtensibilityElements());
             copyExtensionAttributes(description, def);
-            
+
             Set<Definition> done = new HashSet<Definition>();
             done.add(def);
             Collection<List<Import>> values = CastUtils.cast(def.getImports().values());
@@ -299,7 +298,7 @@ public class WSDLServiceBuilder {
             Binding binding = port.getBinding();
             PortType bindingPt = binding.getPortType();
             if (bindingPt == null) {
-                org.apache.cxf.common.i18n.Message msg = new 
+                org.apache.cxf.common.i18n.Message msg = new
                 org.apache.cxf.common.i18n.Message("BINDING_MISSING_TYPE",
                                                    LOG,
                                                    binding.getQName());
@@ -343,15 +342,15 @@ public class WSDLServiceBuilder {
 
         return new ArrayList<ServiceInfo>(services.values());
     }
- 
-    
+
+
     private void getSchemas(Definition def, ServiceInfo serviceInfo) {
         ServiceSchemaInfo serviceSchemaInfo = null;
         WSDLManager wsdlManager = bus.getExtension(WSDLManager.class);
         if (wsdlManager != null) {
             serviceSchemaInfo = wsdlManager.getSchemasForDefinition(def);
         }
-        
+
         if (serviceSchemaInfo == null) {
             SchemaUtil schemaUtil = new SchemaUtil(bus, this.schemaList);
             schemaUtil.getSchemas(def, serviceInfo);
@@ -431,7 +430,7 @@ public class WSDLServiceBuilder {
                 if (ignoreUnknownBindings) {
                     return null;
                 }
-                org.apache.cxf.common.i18n.Message msg = new 
+                org.apache.cxf.common.i18n.Message msg = new
                     org.apache.cxf.common.i18n.Message("MISSING_DESTINATION_FACTORY",
                                                        LOG,
                                                        port.getName());
@@ -617,7 +616,7 @@ public class WSDLServiceBuilder {
         // The operation's input and output message (if present) each contain
         // only a single part
         // input message must exist
-        if (inputMessage == null || inputMessage.size() == 0 
+        if (inputMessage == null || inputMessage.size() == 0
             || (inputMessage.size() > 1 && !relaxed)) {
             passedRule = false;
         }
@@ -676,12 +675,12 @@ public class WSDLServiceBuilder {
         // This should probably look at the restricted and substitute types too.
         OperationInfo unwrapped = new UnwrappedOperationInfo(opInfo);
         MessageInfo unwrappedInput = new MessageInfo(unwrapped, MessageInfo.Type.INPUT,
-                                                     inputMessage.getName()); 
+                                                     inputMessage.getName());
         MessageInfo unwrappedOutput = null;
 
         XmlSchemaComplexType xsct = null;
         if (inputEl.getSchemaType() instanceof XmlSchemaComplexType) {
-            
+
             xsct = (XmlSchemaComplexType)inputEl.getSchemaType();
             if (hasAttributes(xsct)
                 || (inputEl.isNillable() && !relaxed)
@@ -730,7 +729,7 @@ public class WSDLServiceBuilder {
     private static boolean hasAttributes(XmlSchemaComplexType complexType) {
         // Now lets see if we have any attributes...
         // This should probably look at the restricted and substitute types too.
-        if (complexType.getAnyAttribute() != null || complexType.getAttributes().getCount() > 0) {
+        if (complexType.getAnyAttribute() != null || !complexType.getAttributes().isEmpty()) {
             return true;
         }
         return false;
@@ -740,14 +739,13 @@ public class WSDLServiceBuilder {
                                                MessageInfo wrapper, boolean allowRefs) {
         if (type.getParticle() instanceof XmlSchemaSequence) {
             XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
-            XmlSchemaObjectCollection items = seq.getItems();
+            List<XmlSchemaSequenceMember> items = seq.getItems();
             boolean ret = true;
-            for (int x = 0; x < items.getCount(); x++) {
-                XmlSchemaObject o = items.getItem(x);
-                if (!(o instanceof XmlSchemaElement)) {
+            for (XmlSchemaSequenceMember seqItem : items) {
+                if (!(seqItem instanceof XmlSchemaElement)) {
                     return false;
                 }
-                XmlSchemaElement el = (XmlSchemaElement)o;
+                XmlSchemaElement el = (XmlSchemaElement)seqItem;
 
                 if (el.getSchemaTypeName() != null) {
                     MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
@@ -756,10 +754,10 @@ public class WSDLServiceBuilder {
                     mpi.setElement(true);
                     mpi.setElementQName(el.getQName());
                     mpi.setXmlSchema(el);
-                } else if (el.getRefName() != null) {
-                    MessagePartInfo mpi = wrapper.addMessagePart(el.getRefName());
-                    mpi.setTypeQName(el.getRefName());
-                    mpi.setElementQName(el.getRefName());
+                } else if (el.getRef().getTargetQName() != null) {
+                    MessagePartInfo mpi = wrapper.addMessagePart(el.getRef().getTargetQName());
+                    mpi.setTypeQName(el.getRef().getTargetQName());
+                    mpi.setElementQName(el.getRef().getTargetQName());
                     mpi.setElement(true);
                     mpi.setXmlSchema(el);
                     mpi.setProperty("isRefElement", true);
@@ -805,7 +803,7 @@ public class WSDLServiceBuilder {
                 pi.setElementQName(part.getElementName());
                 XmlSchemaElement schemaElement = schemas.getElementByQName(part.getElementName());
                 if (null == schemaElement) {
-                    org.apache.cxf.common.i18n.Message errorMessage = 
+                    org.apache.cxf.common.i18n.Message errorMessage =
                         new org.apache.cxf.common.i18n.Message("WSDL4J_BAD_ELEMENT_PART",
                                                                LOG,
                                                                part.getName(),
@@ -815,14 +813,14 @@ public class WSDLServiceBuilder {
                 pi.setElement(true);
                 pi.setXmlSchema(schemaElement);
             } else {
-                org.apache.cxf.common.i18n.Message errorMessage = 
+                org.apache.cxf.common.i18n.Message errorMessage =
                     new org.apache.cxf.common.i18n.Message("PART_NO_NAME_NO_TYPE",
                                                            LOG,
                                                            part.getName());
                 throw new WSDLRuntimeException(errorMessage);
-                
+
             }
         }
     }
-    
+
 }

@@ -44,12 +44,12 @@ import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 
 public class WSDLGenerationTester {
-    
+
     private XmlSchemaCollection schemaCol = new XmlSchemaCollection();
 
-    public WSDLGenerationTester() {    
+    public WSDLGenerationTester() {
     }
-    
+
     public void compare(XMLStreamReader orig, XMLStreamReader actual)
         throws Exception {
 
@@ -90,7 +90,7 @@ public class WSDLGenerationTester {
     }
 
     private void compareStartElement(XMLStreamReader orig, XMLStreamReader actual)
-        throws Exception {        
+        throws Exception {
         Assert.assertEquals("Start element is not matched", orig.getName(), actual.getName());
         int origAttrCount = orig.getAttributeCount();
         int actualAttrCount = actual.getAttributeCount();
@@ -102,7 +102,7 @@ public class WSDLGenerationTester {
                 origAttrCount--;
             } else {
                 Assert.assertEquals("Attribute " + origAttrName + " not found or value not matching",
-                                    orig.getAttributeValue(origAttrName.getNamespaceURI(), 
+                                    orig.getAttributeValue(origAttrName.getNamespaceURI(),
                                     origAttrName.getLocalPart()),
                                     actual.getAttributeValue(origAttrName.getNamespaceURI(),
                                     origAttrName.getLocalPart()));
@@ -114,27 +114,27 @@ public class WSDLGenerationTester {
                 || (actualAttrName.getLocalPart().equals("schemaLocation"))) {
                 //skip this atribute
                 actualAttrCount--;
-            } 
-        }       
+            }
+        }
         Assert.assertEquals("Attribute count is not matched for element " + orig.getName(),
                             origAttrCount,
                             actualAttrCount);
     }
-    
+
     private void compareEndElement(XMLStreamReader orig, XMLStreamReader actual)
         throws Exception {
         Assert.assertEquals("End element is not matched", orig.getName(), actual.getName());
     }
-                                 
+
     private void compareCharacters(XMLStreamReader orig, XMLStreamReader actual)
         throws Exception {
         Assert.assertEquals("Element Characters not matched", orig.getText(), actual.getText());
-    }                  
+    }
 
     public File writeDefinition(File targetDir, File defnFile) throws Exception {
         File bkFile = new File(targetDir, "bk_" + defnFile.getName());
         FileWriter writer = new FileWriter(bkFile);
-        WSDLFactory factory 
+        WSDLFactory factory
             = WSDLFactory.newInstance("org.apache.cxf.tools.corba.utils.TestWSDLCorbaFactoryImpl");
         WSDLReader reader = factory.newWSDLReader();
         reader.setFeature("javax.wsdl.importDocuments", false);
@@ -142,7 +142,7 @@ public class WSDLGenerationTester {
         addExtensions(extReg);
         reader.setExtensionRegistry(extReg);
         Definition wsdlDefn = reader.readWSDL(defnFile.toString());
-        WSDLWriter wsdlWriter = factory.newWSDLWriter();        
+        WSDLWriter wsdlWriter = factory.newWSDLWriter();
         wsdlWriter.writeWSDL(wsdlDefn, writer);
         writer.close();
         writer = null;
@@ -154,7 +154,7 @@ public class WSDLGenerationTester {
         File bkFile = new File(targetDir, "bk_" + schemaFile.getName());
         FileWriter writer = new FileWriter(bkFile);
         FileReader reader = new FileReader(schemaFile);
-        XmlSchema schema = schemaCol.read(reader, null);
+        XmlSchema schema = schemaCol.read(reader);
         schema.write(writer);
         reader.close();
         writer.close();
@@ -170,7 +170,7 @@ public class WSDLGenerationTester {
         JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
         JAXBExtensionHelper.addExtensions(extReg, Port.class,
                                           org.apache.cxf.binding.corba.wsdl.AddressType.class);
-        
+
         extReg.mapExtensionTypes(Binding.class, CorbaConstants.NE_CORBA_BINDING, BindingType.class);
         extReg.mapExtensionTypes(BindingOperation.class, CorbaConstants.NE_CORBA_OPERATION,
                                  org.apache.cxf.binding.corba.wsdl.OperationType.class);
@@ -179,5 +179,5 @@ public class WSDLGenerationTester {
         extReg.mapExtensionTypes(Port.class, CorbaConstants.NE_CORBA_ADDRESS,
                                  org.apache.cxf.binding.corba.wsdl.AddressType.class);
     }
-                                                     
+
 }

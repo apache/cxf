@@ -34,7 +34,6 @@ import org.apache.ws.commons.schema.XmlSchemaAttribute;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.XmlSchemaUse;
-import org.apache.ws.commons.schema.constants.Constants.BlockConstants;
 
 /**
  * All the information needed to create the JavaScript for an Xml Schema attribute
@@ -60,7 +59,7 @@ public final class AttributeInfo implements ItemInfo {
     /**
      * Create an elementInfo that stores information about a global, named,
      * element.
-     * 
+     *
      * @param attribute the element
      * @param currentSchema the schema it came from.
      * @param schemaCollection the collection of all schemas.
@@ -80,14 +79,14 @@ public final class AttributeInfo implements ItemInfo {
 
     /**
      * Fill in an AttributeInfo for an attribute or anyAttribute from a sequence.
-     * 
+     *
      * @param sequenceElement
      * @param currentSchema
      * @param schemaCollection
      * @param prefixAccumulator
      * @return
      */
-    public static AttributeInfo forLocalItem(XmlSchemaObject sequenceObject, 
+    public static AttributeInfo forLocalItem(XmlSchemaObject sequenceObject,
                                              XmlSchema currentSchema,
                                             SchemaCollection schemaCollection,
                                             NamespacePrefixAccumulator prefixAccumulator, QName contextName) {
@@ -98,15 +97,9 @@ public final class AttributeInfo implements ItemInfo {
         if (annotated instanceof XmlSchemaAttribute) {
             XmlSchemaAttribute attribute = (XmlSchemaAttribute)annotated;
             attributeInfo.use = attribute.getUse();
-            
-            if (attribute.getRefName() != null) {
-                XmlSchemaAttribute refAttribute = schemaCollection
-                    .getAttributeByQName(attribute.getRefName());
-                if (refAttribute == null) {
-                    throw new UnsupportedConstruct(LOG, "ATTRIBUTE_DANGLING_REFERENCE", attribute
-                                                   .getQName(), attribute.getRefName()); 
-                }
-                realAnnotated = refAttribute;
+
+            if (attribute.getRef().getTarget() != null) {
+                realAnnotated = attribute.getRef().getTarget();
                 attributeInfo.global = true;
             }
         } else if (annotated instanceof XmlSchemaAnyAttribute) {
@@ -114,7 +107,7 @@ public final class AttributeInfo implements ItemInfo {
             attributeInfo.xmlName = null; // unknown until runtime.
             attributeInfo.javascriptName = "any";
             attributeInfo.type = null; // runtime for any.
-            attributeInfo.use = new XmlSchemaUse(BlockConstants.OPTIONAL);
+            attributeInfo.use = XmlSchemaUse.OPTIONAL;
         } else {
             throw new UnsupportedConstruct(LOG, "UNSUPPORTED_ATTRIBUTE_ITEM", annotated, contextName);
         }
@@ -128,7 +121,7 @@ public final class AttributeInfo implements ItemInfo {
 
     private static void factoryCommon(XmlSchemaAnnotated annotated, XmlSchema currentSchema,
                                       SchemaCollection schemaCollection,
-                                      NamespacePrefixAccumulator prefixAccumulator, 
+                                      NamespacePrefixAccumulator prefixAccumulator,
                                       AttributeInfo attributeInfo) {
 
         if (annotated instanceof XmlSchemaAttribute) {
@@ -161,7 +154,7 @@ public final class AttributeInfo implements ItemInfo {
             attributeInfo.xmlName = null; // unknown until runtime.
             attributeInfo.javascriptName = "any";
             attributeInfo.type = null; // runtime for any.
-            attributeInfo.use = new XmlSchemaUse(BlockConstants.OPTIONAL);
+            attributeInfo.use = XmlSchemaUse.OPTIONAL;
         }
     }
 
@@ -173,7 +166,7 @@ public final class AttributeInfo implements ItemInfo {
                 attributeInfo.anyType = true;
             } else {
                 attributeInfo.type = schemaCollection.getTypeByQName(element.getSchemaTypeName());
-                if (attributeInfo.type == null 
+                if (attributeInfo.type == null
                     && !element.getSchemaTypeName()
                             .getNamespaceURI().equals(XmlSchemaConstants.XSD_NAMESPACE_URI)) {
                     XmlSchemaUtils.unsupportedConstruct("MISSING_TYPE", element.getSchemaTypeName()
@@ -236,7 +229,7 @@ public final class AttributeInfo implements ItemInfo {
 
     /**
      * *
-     * 
+     *
      * @return Returns the defaultValue.
      */
     public String getDefaultValue() {
@@ -248,7 +241,7 @@ public final class AttributeInfo implements ItemInfo {
 
     /**
      * True if this describes a global, named, attribute.
-     * 
+     *
      * @return
      */
     public boolean isGlobal() {
@@ -272,7 +265,7 @@ public final class AttributeInfo implements ItemInfo {
     }
 
     public boolean isOptional() {
-        return !use.equals(new XmlSchemaUse(BlockConstants.REQUIRED));
+        return !use.equals(XmlSchemaUse.REQUIRED);
     }
 
     public void setDefaultValue(String value) {

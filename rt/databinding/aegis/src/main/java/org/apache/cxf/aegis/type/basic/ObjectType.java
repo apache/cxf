@@ -48,7 +48,7 @@ import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
  * in the constructor, in the case that the type is a custom type that may not
  * have its schema in the WSDL. Can specify whether or not unknown objects
  * should be serialized as a byte stream.
- * 
+ *
  */
 public class ObjectType extends AegisType {
     private static final QName XSI_TYPE = new QName(SOAPConstants.XSI_NS, "type");
@@ -102,7 +102,7 @@ public class ObjectType extends AegisType {
 
         AegisType type = null;
         QName typeQName = null;
-        
+
         if (typeName != null) {
             typeName = typeName.trim();
             typeQName = extractQName(reader, typeName);
@@ -124,7 +124,7 @@ public class ObjectType extends AegisType {
         if (type == this) {
             throw new DatabindingException("Could not determine how to read type: " + typeQName);
         }
-        
+
         if (type == null && readToDocument) {
             type = getTypeMapping().getType(Document.class);
         }
@@ -168,7 +168,7 @@ public class ObjectType extends AegisType {
     }
 
     @Override
-    public void writeObject(Object object, MessageWriter writer, Context context) 
+    public void writeObject(Object object, MessageWriter writer, Context context)
         throws DatabindingException {
         if (null == object) {
             MessageWriter nilWriter = writer.getAttributeWriter(XSI_NIL);
@@ -188,7 +188,7 @@ public class ObjectType extends AegisType {
                 type = tm.getTypeCreator().createType(object.getClass());
                 tm.register(type);
             }
-            
+
             writer.writeXsiType(type.getSchemaType());
             boolean nextIsBeanType = type instanceof BeanType;
             if (nextIsBeanType) {
@@ -264,11 +264,9 @@ public class ObjectType extends AegisType {
     @Override
     public void writeSchema(XmlSchema root) {
         if (serializedWhenUnknown) {
-            XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root);
+            XmlSchemaSimpleType simple = new XmlSchemaSimpleType(root, true);
             simple.setName("serializedJavaObject");
-            root.addType(simple);
-            root.getItems().add(simple);
-            XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();    
+            XmlSchemaSimpleTypeRestriction restriction = new XmlSchemaSimpleTypeRestriction();
             simple.setContent(restriction);
             restriction.setBaseTypeName(XmlSchemaConstants.BASE64BINARY_QNAME);
         }

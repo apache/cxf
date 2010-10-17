@@ -32,13 +32,13 @@ import org.junit.Test;
 
 public class SchemaAddinsTest extends Assert {
     private TestUtilities testUtilities;
-    
+
     @Before
     public void before() {
         testUtilities = new TestUtilities(getClass());
         testUtilities.addDefaultNamespaces();
     }
-    
+
     @Test
     public void testAegisTypeSchema() throws Exception {
         AegisContext context = new AegisContext();
@@ -54,13 +54,13 @@ public class SchemaAddinsTest extends Assert {
             }
         }
         assertNotNull(typeSchema);
-        
-        assertNotSame(0, typeSchema.getItems().getCount());
+
+        assertNotSame(0, typeSchema.getItems().size());
         XmlSchemaSerializer serializer = new XmlSchemaSerializer();
         Document[] docs = serializer.serializeSchema(typeSchema, false);
         testUtilities.assertValid("/xsd:schema/xsd:simpleType[@name='char']", docs[0]);
-        
-        
-        
+
+
+
     }
 }

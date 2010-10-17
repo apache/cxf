@@ -33,41 +33,41 @@ import org.apache.ws.commons.schema.XmlSchemaAnnotated;
 import org.apache.ws.commons.schema.XmlSchemaAny;
 import org.apache.ws.commons.schema.XmlSchemaAnyAttribute;
 import org.apache.ws.commons.schema.XmlSchemaAttribute;
+import org.apache.ws.commons.schema.XmlSchemaAttributeOrGroupRef;
 import org.apache.ws.commons.schema.XmlSchemaComplexContentExtension;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaContent;
 import org.apache.ws.commons.schema.XmlSchemaContentModel;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaEnumerationFacet;
+import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.apache.ws.commons.schema.XmlSchemaFacet;
 import org.apache.ws.commons.schema.XmlSchemaForm;
 import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.XmlSchemaParticle;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeContent;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeRestriction;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 /**
- * Some functions that avoid problems with Commons XML Schema.  
+ * Some functions that avoid problems with Commons XML Schema.
  */
 public final class XmlSchemaUtils {
-    public static final XmlSchemaForm QUALIFIED = new XmlSchemaForm(XmlSchemaForm.QUALIFIED);
-    public static final XmlSchemaForm UNQUALIFIED = new XmlSchemaForm(XmlSchemaForm.UNQUALIFIED);
     public static final String XSI_NIL = "xsi:nil='true'";
-    public static final String XSI_NS_ATTR = WSDLConstants.NP_XMLNS + ":" 
+    public static final String XSI_NS_ATTR = WSDLConstants.NP_XMLNS + ":"
         + WSDLConstants.NP_SCHEMA_XSI + "='" + WSDLConstants.NS_SCHEMA_XSI + "'";
     public static final String XSI_NIL_WITH_PREFIX = XSI_NS_ATTR + " xsi:nil='true'";
 
     private static final Logger LOG = LogUtils.getL7dLogger(XmlSchemaUtils.class);
     private static final XmlSchemaSequence EMPTY_SEQUENCE = new XmlSchemaSequence();
-    
+
     private XmlSchemaUtils() {
     }
-    
+
     private static void setNameFromQName(XmlSchemaElement element, QName name) {
         if (name == null) {
             element.setName(null);
@@ -75,38 +75,51 @@ public final class XmlSchemaUtils {
             element.setName(name.getLocalPart());
         }
     }
-    
+
     /**
-     * Wrapper around XmlSchemaElement.setQName that checks for inconsistency with 
+     * Wrapper around XmlSchemaElement.setQName that checks for inconsistency with
      * refName.
      * @param element
      * @param name
      */
     public static void setElementQName(XmlSchemaElement element, QName name) {
-        if (name != null && element.getRefName() != null && !element.getRefName().equals(name)) {
+        if (name != null && element.getRef().getTarget() != null
+            && !element.getRef().getTargetQName().equals(name)) {
             LOG.severe("Attempt to set the QName of an element with a reference name");
-            throw new 
+            throw new
                 XmlSchemaInvalidOperation("Attempt to set the QName of an element "
                                           + "with a reference name.");
         }
-        element.setQName(name);
+
+        /*
+         * An element's namespace must match the containing namespace.
+         */
+        if (!element.getParent().getTargetNamespace().equals(name.getNamespaceURI())) {
+            LOG.severe("Attempt to set the QName of an element to a namespace that "
+                       + "is outside of the containing schema");
+            throw new
+                XmlSchemaInvalidOperation("Attempt to set the QName of an element to a namespace "
+                                          + "that is outside of the containing schema");
+        }
+
+        element.setName(name.getLocalPart());
         // in CXF, we want them to be consistent.
         setNameFromQName(element, name);
     }
 
     /**
-     * Wrapper around XmlSchemaElement.setName that checks for inconsistency with 
+     * Wrapper around XmlSchemaElement.setName that checks for inconsistency with
      * refName.
      * @param element
      * @param name
      */
     public static void setElementName(XmlSchemaElement element, String name) {
-        if (name != null 
-            && element.getRefName() != null 
-            && !element.getRefName().getLocalPart().equals(name)
+        if (name != null
+            && element.getRef().getTarget() != null
+            && !element.getRef().getTargetQName().getLocalPart().equals(name)
             && (element.getQName() == null || element.getQName().getLocalPart().equals(name))) {
             LOG.severe("Attempt to set the name of an element with a reference name.");
-            throw new 
+            throw new
                 XmlSchemaInvalidOperation("Attempt to set the name of an element "
                                           + "with a reference name.");
         }
@@ -114,25 +127,25 @@ public final class XmlSchemaUtils {
     }
 
     /**
-     * Wrapper around XmlSchemaElement.setRefName that checks for inconsistency with 
+     * Wrapper around XmlSchemaElement.setRefName that checks for inconsistency with
      * name and QName.
      * @param element
      * @param name
      */
     public static void setElementRefName(XmlSchemaElement element, QName name) {
         if (name != null
-            && ((element.getQName() != null && !element.getQName().equals(name)) 
+            && ((element.getQName() != null && !element.getQName().equals(name))
             || (element.getName() != null && !element.getName().equals(name.getLocalPart())))) {
             LOG.severe("Attempt to set the refName of an element with a name or QName");
-            throw new 
+            throw new
                 XmlSchemaInvalidOperation("Attempt to set the refName of an element "
                                           + "with a name or QName.");
         }
-        element.setRefName(name);
+        element.getRef().setTargetQName(name);
         // cxf conventionally keeps something in the name slot.
         setNameFromQName(element, name);
     }
-    
+
     /**
      * Return true if a simple type is a straightforward XML Schema representation of an enumeration.
      * If we discover schemas that are 'enum-like' with more complex structures, we might
@@ -146,16 +159,15 @@ public final class XmlSchemaUtils {
             return false;
         }
         XmlSchemaSimpleTypeRestriction restriction = (XmlSchemaSimpleTypeRestriction) content;
-        XmlSchemaObjectCollection facets = restriction.getFacets();
-        for (int x = 0; x < facets.getCount(); x++) {
-            XmlSchemaFacet facet = (XmlSchemaFacet) facets.getItem(x);
+        List<XmlSchemaFacet> facets = restriction.getFacets();
+        for (XmlSchemaFacet facet : facets) {
             if (!(facet instanceof XmlSchemaEnumerationFacet)) {
                 return false;
             }
         }
         return true;
     }
-    
+
     /**
      * Retrieve the string values for an enumeration.
      * @param type
@@ -164,16 +176,15 @@ public final class XmlSchemaUtils {
     public static List<String> enumeratorValues(XmlSchemaSimpleType type) {
         XmlSchemaSimpleTypeContent content = type.getContent();
         XmlSchemaSimpleTypeRestriction restriction = (XmlSchemaSimpleTypeRestriction) content;
-        XmlSchemaObjectCollection facets = restriction.getFacets();
-        List<String> values = new ArrayList<String>(); 
-        for (int x = 0; x < facets.getCount(); x++) {
-            XmlSchemaFacet facet = (XmlSchemaFacet) facets.getItem(x);
+        List<XmlSchemaFacet> facets = restriction.getFacets();
+        List<String> values = new ArrayList<String>();
+        for (XmlSchemaFacet facet : facets) {
             XmlSchemaEnumerationFacet enumFacet = (XmlSchemaEnumerationFacet) facet;
             values.add(enumFacet.getValue().toString());
         }
         return values;
     }
-    
+
     /**
      * Is there an import for a particular namespace in a schema?
      * @param schema
@@ -181,9 +192,8 @@ public final class XmlSchemaUtils {
      * @return
      */
     public static boolean schemaImportsNamespace(XmlSchema schema, String namespaceUri) {
-        XmlSchemaObjectCollection inc = schema.getIncludes();
-        for (int x = 0; x < inc.getCount(); x++) {
-            XmlSchemaObject what = inc.getItem(x);
+        List<XmlSchemaExternal> externals =  schema.getExternals();
+        for (XmlSchemaExternal what : externals) {
             if (what instanceof XmlSchemaImport) {
                 XmlSchemaImport imp = (XmlSchemaImport)what;
                 // already there.
@@ -194,7 +204,7 @@ public final class XmlSchemaUtils {
         }
         return false;
     }
-    
+
     /**
      * Assist in managing the required <import namespace='uri'> for imports of peer schemas.
      * @param schema
@@ -202,15 +212,14 @@ public final class XmlSchemaUtils {
      */
     public static void addImportIfNeeded(XmlSchema schema, String namespaceUri) {
         // no need to import nothing or the XSD schema, or the schema we are fixing.
-        if ("".equals(namespaceUri) 
+        if ("".equals(namespaceUri)
             || XmlSchemaConstants.XSD_NAMESPACE_URI.equals(namespaceUri)
             || schema.getTargetNamespace().equals(namespaceUri)) {
             return;
         }
-            
-        XmlSchemaObjectCollection inc = schema.getIncludes();
-        for (int x = 0; x < inc.getCount(); x++) {
-            XmlSchemaObject what = inc.getItem(x);
+
+        List<XmlSchemaExternal> externals = schema.getExternals();
+        for (XmlSchemaExternal what : externals) {
             if (what instanceof XmlSchemaImport) {
                 XmlSchemaImport imp = (XmlSchemaImport)what;
                 // already there.
@@ -219,12 +228,11 @@ public final class XmlSchemaUtils {
                 }
             }
         }
-        XmlSchemaImport imp = new XmlSchemaImport();
+        XmlSchemaImport imp = new XmlSchemaImport(schema);
         imp.setNamespace(namespaceUri);
-        inc.add(imp);
         schema.getItems().add(imp);
     }
-    
+
     /**
      * For convenience, start from a qname, and add the import if it is non-null
      * and has a namespace.
@@ -250,13 +258,13 @@ public final class XmlSchemaUtils {
      * else, so thus function implements that convention here. It is unclear if
      * that is a correct structure, and it if changes, we can simplify or
      * eliminate this function.
-     * 
+     *
      * @param name
      * @param referencingURI
      * @return
      */
     public static XmlSchemaElement findElementByRefName(SchemaCollection xmlSchemaCollection,
-                                                         QName name, 
+                                                         QName name,
                                                          String referencingURI) {
         String uri = name.getNamespaceURI();
         if ("".equals(uri)) {
@@ -277,16 +285,16 @@ public final class XmlSchemaUtils {
         if (content == null) {
             return null;
         }
-        
+
         if (!(content instanceof XmlSchemaComplexContentExtension)) {
             return null;
         }
-    
+
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
-        return ext.getBaseTypeName();        
+        return ext.getBaseTypeName();
     }
 
-    public static XmlSchemaObjectCollection getContentAttributes(XmlSchemaComplexType type) {
+    public static List<XmlSchemaAttributeOrGroupRef> getContentAttributes(XmlSchemaComplexType type) {
         XmlSchemaContentModel model = type.getContentModel();
         if (model == null) {
             return null;
@@ -298,13 +306,13 @@ public final class XmlSchemaUtils {
         if (!(content instanceof XmlSchemaComplexContentExtension)) {
             return null;
         }
-    
+
         //TODO: the anyAttribute case.
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
         return ext.getAttributes();
     }
 
-    public static List<XmlSchemaAnnotated> 
+    public static List<XmlSchemaAnnotated>
     getContentAttributes(XmlSchemaComplexType type, SchemaCollection collection) {
         List<XmlSchemaAnnotated> results = new ArrayList<XmlSchemaAnnotated>();
         QName baseTypeName = getBaseType(type);
@@ -313,22 +321,18 @@ public final class XmlSchemaUtils {
             // recurse onto the base type ...
             results.addAll(getContentAttributes(baseType, collection));
             // and now process our sequence.
-            XmlSchemaObjectCollection extAttrs = getContentAttributes(type);
-            for (int i = 0; i < extAttrs.getCount(); i++) {
-                results.add((XmlSchemaAnnotated)extAttrs.getItem(i));
-            }
+            List<XmlSchemaAttributeOrGroupRef> extAttrs = getContentAttributes(type);
+            results.addAll(extAttrs);
             return results;
         } else {
             // no base type, the simple case.
-            XmlSchemaObjectCollection attrs = type.getAttributes();
-            for (int i = 0; i < attrs.getCount(); i++) {
-                results.add((XmlSchemaAnnotated)attrs.getItem(i));
-            }
+            List<XmlSchemaAttributeOrGroupRef> attrs = type.getAttributes();
+            results.addAll(attrs);
             return results;
-        } 
+        }
     }
 
-    public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type, 
+    public static List<XmlSchemaObject> getContentElements(XmlSchemaComplexType type,
                                                            SchemaCollection collection) {
         List<XmlSchemaObject> results = new ArrayList<XmlSchemaObject>();
         QName baseTypeName = getBaseType(type);
@@ -339,16 +343,19 @@ public final class XmlSchemaUtils {
             // and now process our sequence.
             XmlSchemaSequence extSequence = getContentSequence(type);
             if (extSequence != null) {
-                for (int i = 0; i < extSequence.getItems().getCount(); i++) {
-                    results.add(extSequence.getItems().getItem(i));
+                for (XmlSchemaSequenceMember item : extSequence.getItems()) {
+                    /*
+                     * For now, leave the return type alone. Fix some day.
+                     */
+                    results.add((XmlSchemaObject)item);
                 }
             }
             return results;
         } else {
             // no base type, the simple case.
             XmlSchemaSequence sequence = getSequence(type);
-            for (int i = 0; i < sequence.getItems().getCount(); i++) {
-                results.add(sequence.getItems().getItem(i));
+            for (XmlSchemaSequenceMember item : sequence.getItems()) {
+                results.add((XmlSchemaObject)item);
             }
             return results;
         }
@@ -366,7 +373,7 @@ public final class XmlSchemaUtils {
         if (!(content instanceof XmlSchemaComplexContentExtension)) {
             return null;
         }
-    
+
         XmlSchemaComplexContentExtension ext = (XmlSchemaComplexContentExtension)content;
         XmlSchemaParticle particle = ext.getParticle();
         if (particle == null) {
@@ -403,12 +410,12 @@ public final class XmlSchemaUtils {
     /**
      * Follow a chain of references from element to element until we can obtain
      * a type.
-     * 
+     *
      * @param element
      * @return
      */
     public static XmlSchemaType getElementType(SchemaCollection xmlSchemaCollection,
-                                               String referencingURI, 
+                                               String referencingURI,
                                                XmlSchemaElement element,
                                                XmlSchemaType containingType) {
         assert element != null;
@@ -427,22 +434,23 @@ public final class XmlSchemaUtils {
         if (xmlSchemaCollection.getSchemaByTargetNamespace(referencingURI) == null) {
             referencingURI = null;
         }
-        
+
         if (referencingURI == null && containingType != null) {
             referencingURI = containingType.getQName().getNamespaceURI();
         }
-        
+
         XmlSchemaElement originalElement = element;
-        while (element.getSchemaType() == null && element.getRefName() != null) {
-            XmlSchemaElement nextElement = findElementByRefName(xmlSchemaCollection,
-                                                                element.getRefName(), 
-                                                                referencingURI);
+        while (element.getSchemaType() == null && element.getRef().getTarget() != null) {
+            /*
+             * This code assumes that all schemas are in the collection.
+             */
+            XmlSchemaElement nextElement = element.getRef().getTarget();
             assert nextElement != null;
             element = nextElement;
         }
         if (element.getSchemaType() == null) {
-            unsupportedConstruct("ELEMENT_HAS_NO_TYPE", 
-                                                originalElement.getName(), 
+            unsupportedConstruct("ELEMENT_HAS_NO_TYPE",
+                                                originalElement.getName(),
                                                 containingType.getQName(),
                                                 containingType);
         }
@@ -450,26 +458,26 @@ public final class XmlSchemaUtils {
     }
 
     /**
-     * If the object is an attribute or an anyAttribute, 
+     * If the object is an attribute or an anyAttribute,
      * return the 'Annotated'. If it's not one of those, or it's a group,
      * throw. We're not ready for groups yet.
      * @param object
      * @return
      */
     public static XmlSchemaAnnotated getObjectAnnotated(XmlSchemaObject object, QName contextName) {
-        
+
         if (!(object instanceof XmlSchemaAnnotated)) {
-            unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE", 
-                                                object.getClass().getSimpleName(), 
+            unsupportedConstruct("NON_ANNOTATED_ATTRIBUTE",
+                                                object.getClass().getSimpleName(),
                                                 contextName, object);
         }
         if (!(object instanceof XmlSchemaAttribute)
             && !(object instanceof XmlSchemaAnyAttribute)) {
-            unsupportedConstruct("EXOTIC_ATTRIBUTE", 
+            unsupportedConstruct("EXOTIC_ATTRIBUTE",
                                                 object.getClass().getSimpleName(), contextName,
                                                 object);
         }
-        
+
         return (XmlSchemaAnnotated) object;
     }
 
@@ -480,26 +488,29 @@ public final class XmlSchemaUtils {
      * @return
      */
     public static XmlSchemaParticle getObjectParticle(XmlSchemaObject object, QName contextName) {
-        
+
         if (!(object instanceof XmlSchemaParticle)) {
-            unsupportedConstruct("NON_PARTICLE_CHILD", 
-                                                object.getClass().getSimpleName(), 
+            unsupportedConstruct("NON_PARTICLE_CHILD",
+                                                object.getClass().getSimpleName(),
                                                 contextName, object);
         }
         if (!(object instanceof XmlSchemaElement)
             && !(object instanceof XmlSchemaAny)) {
-            unsupportedConstruct("GROUP_CHILD", 
+            unsupportedConstruct("GROUP_CHILD",
                                                 object.getClass().getSimpleName(), contextName,
                                                 object);
         }
-        
+
         return (XmlSchemaParticle) object;
     }
 
-    public static XmlSchemaElement getReferredElement(XmlSchemaElement element, 
+    public static XmlSchemaElement getReferredElement(XmlSchemaElement element,
                                                       SchemaCollection xmlSchemaCollection) {
-        if (element.getRefName() != null) {
-            XmlSchemaElement refElement = xmlSchemaCollection.getElementByQName(element.getRefName());
+        if (element.getRef() != null) {
+            /*
+             * Calling getTarget works if everything is in the collection already.
+             */
+            XmlSchemaElement refElement = element.getRef().getTarget();
             if (refElement == null) {
                 throw new RuntimeException("Dangling reference");
             }
@@ -511,33 +522,33 @@ public final class XmlSchemaUtils {
     public static XmlSchemaSequence getSequence(XmlSchemaComplexType type) {
         XmlSchemaParticle particle = type.getParticle();
         XmlSchemaSequence sequence = null;
-        
+
         if (particle == null) {
             // the code that uses this wants to iterate. An empty one is more useful than
             // a null pointer, and certainly an exception.
             return EMPTY_SEQUENCE;
         }
-        
+
         try {
             sequence = (XmlSchemaSequence) particle;
         } catch (ClassCastException cce) {
             unsupportedConstruct("NON_SEQUENCE_PARTICLE", type);
         }
-        
+
         return sequence;
     }
 
     public static boolean isAttributeNameQualified(XmlSchemaAttribute attribute, XmlSchema schema) {
-        if (attribute.getRefName() != null) {
+        if (attribute.getRef() != null) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
-        if (attribute.getForm().equals(QUALIFIED)) {
+        if (attribute.getForm().equals(XmlSchemaForm.QUALIFIED)) {
             return true;
         }
-        if (attribute.getForm().equals(UNQUALIFIED)) {
+        if (attribute.getForm().equals(XmlSchemaForm.UNQUALIFIED)) {
             return false;
         }
-        return schema.getAttributeFormDefault().equals(QUALIFIED);
+        return schema.getAttributeFormDefault().equals(XmlSchemaForm.QUALIFIED);
     }
 
     /**
@@ -549,7 +560,7 @@ public final class XmlSchemaUtils {
      * all we care about is the default element form of the schema and the local
      * form of the element. <br/> If, on the other hand, the element is global,
      * we might need to compare namespaces. <br/>
-     * 
+     *
      * @param attribute the attribute
      * @param global if this element is a global element (complex type ref= to
      *                it, or in a part)
@@ -565,14 +576,14 @@ public final class XmlSchemaUtils {
         if (attribute.getQName() == null) {
             throw new RuntimeException("getSchemaQualifier on anonymous element.");
         }
-        if (attribute.getRefName() != null) {
+        if (attribute.getRef() != null) {
             throw new RuntimeException("getSchemaQualified on the 'from' side of ref=.");
         }
-            
-    
+
+
         if (global) {
             return isAttributeNameQualified(attribute, attributeSchema)
-                || (localSchema != null 
+                || (localSchema != null
                     && !(attribute.getQName().getNamespaceURI().equals(localSchema.getTargetNamespace())));
         } else {
             return isAttributeNameQualified(attribute, attributeSchema);
@@ -584,16 +595,16 @@ public final class XmlSchemaUtils {
     }
 
     public static boolean isElementNameQualified(XmlSchemaElement element, XmlSchema schema) {
-        if (element.getRefName() != null) {
+        if (element.getRef() != null) {
             throw new RuntimeException("isElementNameQualified on element with ref=");
         }
-        if (element.getForm().equals(QUALIFIED)) {
+        if (element.getForm().equals(XmlSchemaForm.QUALIFIED)) {
             return true;
         }
-        if (element.getForm().equals(UNQUALIFIED)) {
+        if (element.getForm().equals(XmlSchemaForm.UNQUALIFIED)) {
             return false;
         }
-        return schema.getElementFormDefault().equals(QUALIFIED);
+        return schema.getElementFormDefault().equals(XmlSchemaForm.QUALIFIED);
     }
 
     /**
@@ -605,7 +616,7 @@ public final class XmlSchemaUtils {
      * all we care about is the default element form of the schema and the local
      * form of the element. <br/> If, on the other hand, the element is global,
      * we might need to compare namespaces. <br/>
-     * 
+     *
      * @param element the element.
      * @param global if this element is a global element (complex type ref= to
      *                it, or in a part)
@@ -622,14 +633,14 @@ public final class XmlSchemaUtils {
         if (qn == null) {
             throw new RuntimeException("isElementQualified on anonymous element.");
         }
-        if (element.getRefName() != null) {
+        if (element.getRef() != null) {
             throw new RuntimeException("isElementQualified on the 'from' side of ref=.");
         }
-            
-    
+
+
         if (global) {
             return isElementNameQualified(element, elementSchema)
-                || (localSchema != null 
+                || (localSchema != null
                     && !(qn.getNamespaceURI().equals(localSchema.getTargetNamespace())));
         } else {
             return isElementNameQualified(element, elementSchema);
@@ -644,20 +655,20 @@ public final class XmlSchemaUtils {
         return particle.getMinOccurs() == 0 && particle.getMaxOccurs() == 1;
     }
 
-    public static void unsupportedConstruct(String messageKey, 
-                                            String what, 
+    public static void unsupportedConstruct(String messageKey,
+                                            String what,
                                             QName subjectName,
                                             XmlSchemaObject subject) {
-        Message message = new Message(messageKey, LOG, what, 
+        Message message = new Message(messageKey, LOG, what,
                                       subjectName == null ? "anonymous" : subjectName,
                                       cleanedUpSchemaSource(subject));
         LOG.severe(message.toString());
         throw new UnsupportedConstruct(message);
-        
+
     }
-    
+
     public static void unsupportedConstruct(String messageKey, XmlSchemaType subject) {
-        Message message = new Message(messageKey, LOG, subject.getQName(), 
+        Message message = new Message(messageKey, LOG, subject.getQName(),
                                       cleanedUpSchemaSource(subject));
         LOG.severe(message.toString());
         throw new UnsupportedConstruct(message);
@@ -667,7 +678,7 @@ public final class XmlSchemaUtils {
         if (subject == null || subject.getSourceURI() == null) {
             return "";
         } else {
-            return subject.getSourceURI() + ":" + subject.getLineNumber(); 
+            return subject.getSourceURI() + ":" + subject.getLineNumber();
         }
     }
 }

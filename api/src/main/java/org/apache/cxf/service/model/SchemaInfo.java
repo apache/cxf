@@ -36,7 +36,7 @@ import org.apache.ws.commons.schema.XmlSchemaSerializer.XmlSchemaSerializerExcep
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
 public final class SchemaInfo extends AbstractPropertiesHolder {
-  
+
     private String namespaceUri;
     private boolean isElementQualified;
     private boolean isAttributeQualified;
@@ -45,7 +45,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     // Avoid re-serializing all the time. Particularly as a cached WSDL will
     // hold a reference to the element.
     private SoftReference<Element> cachedElement;
-    
+
     public SchemaInfo(String namespaceUri) {
         this(namespaceUri, false, false);
     }
@@ -55,7 +55,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         this.isElementQualified = qElement;
         this.isAttributeQualified = qAttribute;
     }
-    
+
     public String toString() {
         StringBuilder buffer = new StringBuilder(this.getClass().getName());
         buffer.append(" [namespaceURI: ");
@@ -63,10 +63,10 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
         buffer.append("] [systemId: ");
         buffer.append(systemId);
         buffer.append("]");
-        
+
         return buffer.toString();
     }
-    
+
     public String getNamespaceURI() {
         return namespaceUri;
     }
@@ -78,7 +78,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     public synchronized void setElement(Element el) {
         cachedElement = new SoftReference<Element>(el);
     }
-    
+
     /**
      * Build and return a DOM tree for this schema.
      * @return
@@ -143,8 +143,8 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
 
     public void setSchema(XmlSchema schema) {
         this.schema = schema;
-        isElementQualified = schema.getElementFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
-        isAttributeQualified = schema.getAttributeFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+        isElementQualified = schema.getElementFormDefault().equals(XmlSchemaForm.QUALIFIED);
+        isAttributeQualified = schema.getAttributeFormDefault().equals(XmlSchemaForm.QUALIFIED);
     }
 
     public String getSystemId() {
@@ -153,11 +153,11 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
 
     public void setSystemId(String systemId) {
         this.systemId = systemId;
-    }    
-    
+    }
+
     public XmlSchemaElement getElementByQName(QName qname) {
         String uri = qname.getNamespaceURI();
-        if (schema != null 
+        if (schema != null
             && schema.getTargetNamespace() != null
             && schema.getTargetNamespace().equals(uri)) {
             return schema.getElementByName(qname);
@@ -168,11 +168,11 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
     String getNamespaceUri() {
         return namespaceUri;
     }
-    
+
     boolean isElementQualified() {
         return isElementQualified;
     }
-    
+
     boolean isAttributeQualified() {
         return isAttributeQualified;
     }

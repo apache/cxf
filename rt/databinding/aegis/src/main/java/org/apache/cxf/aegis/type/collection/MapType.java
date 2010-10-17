@@ -75,7 +75,7 @@ public class MapType extends AegisType {
 
                         if (evReader.getName().equals(getKeyName())) {
                             AegisType kType = TypeUtil.getReadType(evReader.getXMLStreamReader(),
-                                                              context.getGlobalContext(), 
+                                                              context.getGlobalContext(),
                                                               getKeyType());
                             key = kType.readObject(evReader, context);
                         } else if (evReader.getName().equals(getValueName())) {
@@ -182,45 +182,43 @@ public class MapType extends AegisType {
 
     @Override
     public void writeSchema(XmlSchema root) {
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
+        XmlSchemaComplexType complex = new XmlSchemaComplexType(root, true);
         complex.setName(getSchemaType().getLocalPart());
-        root.addType(complex);
-        root.getItems().add(complex);
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         complex.setParticle(sequence);
 
         AegisType kType = getKeyType();
         AegisType vType = getValueType();
-        
-        XmlSchemaElement element = new XmlSchemaElement();
+
+        XmlSchemaElement element = new XmlSchemaElement(root, false);
         sequence.getItems().add(element);
         element.setName(getEntryName().getLocalPart());
         element.setMinOccurs(0);
         element.setMaxOccurs(Long.MAX_VALUE);
-        
-        XmlSchemaComplexType evType = new XmlSchemaComplexType(root);
+
+        XmlSchemaComplexType evType = new XmlSchemaComplexType(root, false);
         element.setType(evType);
-        
+
         XmlSchemaSequence evSequence = new XmlSchemaSequence();
         evType.setParticle(evSequence);
 
-        createElement(evSequence, getKeyName(), kType, false);
-        createElement(evSequence, getValueName(), vType, true);
+        createElement(root, evSequence, getKeyName(), kType, false);
+        createElement(root, evSequence, getValueName(), vType, true);
     }
 
     /**
      * Creates a element in a sequence for the key type and the value type.
      */
-    private void createElement(XmlSchemaSequence seq, QName name,
+    private void createElement(XmlSchema schema, XmlSchemaSequence seq, QName name,
                                AegisType type, boolean optional) {
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         seq.getItems().add(element);
         element.setName(name.getLocalPart());
         element.setSchemaTypeName(type.getSchemaType());
         if (optional) {
             element.setMinOccurs(0);
         } else {
-            element.setMinOccurs(1);            
+            element.setMinOccurs(1);
         }
         element.setMaxOccurs(1);
     }

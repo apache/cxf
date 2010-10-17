@@ -46,13 +46,11 @@ import org.apache.cxf.binding.corba.wsdl.CorbaConstants;
 import org.apache.cxf.binding.corba.wsdl.OperationType;
 import org.apache.cxf.binding.corba.wsdl.TypeMappingType;
 import org.apache.cxf.common.WSDLConstants;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.wsdl.JAXBExtensionHelper;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
+import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.apache.ws.commons.schema.XmlSchemaImport;
-import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
 import org.apache.ws.commons.schema.constants.Constants;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
@@ -72,22 +70,22 @@ public class WSDLSchemaManager {
         XmlSchema schema;
         boolean isGenerated;
     }
-    
+
     List<DeferredSchemaAttachment> deferredAttachments;
-    
+
     public WSDLSchemaManager() {
         defns = new HashMap<String, Definition>();
         schemas = new HashMap<String, XmlSchema>();
         importedDefns = new HashMap<File, Definition>();
-        importedSchemas = new HashMap<File, XmlSchema>();     
+        importedSchemas = new HashMap<File, XmlSchema>();
         defnSchemas = new HashMap<String, XmlSchema>();
-        
+
         deferredAttachments = new ArrayList<DeferredSchemaAttachment>();
     }
 
     public Definition createWSDLDefinition(String tns) throws WSDLException, JAXBException {
         WSDLFactory wsdlFactory = WSDLFactory.newInstance();
-        Definition wsdlDefinition = wsdlFactory.newDefinition();        
+        Definition wsdlDefinition = wsdlFactory.newDefinition();
         wsdlDefinition.setTargetNamespace(tns);
         wsdlDefinition.addNamespace("wsdl", "http://schemas.xmlsoap.org/wsdl/");
         wsdlDefinition.addNamespace(WSDLConstants.NP_SCHEMA_XSD, WSDLConstants.NS_SCHEMA_XSD);
@@ -116,9 +114,8 @@ public class WSDLSchemaManager {
         schemas.put(schemans, xmlSchema);
         return xmlSchema;
     }
-    
-    public XmlSchema createXmlSchemaForDefinition(Definition defn,
-                                                  String schemans,
+
+    public XmlSchema createXmlSchemaForDefinition(Definition defn, String schemans,
                                                   XmlSchemaCollection schemaCol) {
         XmlSchema xmlSchema = createXmlSchema(schemans, schemaCol);
         defnSchemas.put(schemans, xmlSchema);
@@ -134,11 +131,9 @@ public class WSDLSchemaManager {
             defn.addNamespace(prefix, ns);
         }
     }
-    
-    public void addWSDLDefinitionImport(Definition rootDefn,
-                                        Definition defn,
-                                        String prefix,
-                                        String fileName) {
+
+    public void addWSDLDefinitionImport(Definition rootDefn, Definition defn,
+                                        String prefix, String fileName) {
         if (!fileName.endsWith(".wsdl")) {
             fileName = fileName + ".wsdl";
         }
@@ -146,14 +141,10 @@ public class WSDLSchemaManager {
         addWSDLDefinitionImport(rootDefn, defn, prefix, file);
     }
 
-    public void addWSDLDefinitionImport(Definition rootDefn,
-                                        Definition defn,
-                                        String prefix,
-                                        File file) {
-        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null 
-            && !file.getName().equals(".wsdl")) {
-            // Only import if not already done to prevent multiple imports of the same file 
-            // in the WSDL.  Also watch out for empty fileNames, which by this point in the
+    public void addWSDLDefinitionImport(Definition rootDefn, Definition defn, String prefix, File file) {
+        if (rootDefn.getImports().get(defn.getTargetNamespace()) == null && !file.getName().equals(".wsdl")) {
+            // Only import if not already done to prevent multiple imports of the same file
+            // in the WSDL. Also watch out for empty fileNames, which by this point in the
             // code would show up as ".wsdl".
             Import importDefn = rootDefn.createImport();
             if (!ignoreImports) {
@@ -184,10 +175,9 @@ public class WSDLSchemaManager {
         // Make sure we haven't already imported the schema.
         String importNamespace = schema.getTargetNamespace();
         boolean included = false;
-        for (Iterator i = rootSchema.getIncludes().getIterator(); i.hasNext();) {
-            Object o = i.next();
-            if (o instanceof XmlSchemaImport) {
-                XmlSchemaImport imp = (XmlSchemaImport)o;
+        for (XmlSchemaExternal ext : rootSchema.getExternals()) {
+            if (ext instanceof XmlSchemaImport) {
+                XmlSchemaImport imp = (XmlSchemaImport)ext;
                 if (imp.getNamespace().equals(importNamespace)) {
                     included = true;
                     break;
@@ -196,13 +186,11 @@ public class WSDLSchemaManager {
         }
 
         if (!included) {
-            XmlSchemaImport importSchema = new XmlSchemaImport();
+            XmlSchemaImport importSchema = new XmlSchemaImport(rootSchema);
             if (!ignoreImports) {
                 importSchema.setSchemaLocation(file.toURI().toString());
             }
             importSchema.setNamespace(schema.getTargetNamespace());
-            rootSchema.getItems().add(importSchema);
-            rootSchema.getIncludes().add(importSchema);
         }
         if (!importedSchemas.containsKey(file)) {
             importedSchemas.put(file, schema);
@@ -219,16 +207,14 @@ public class WSDLSchemaManager {
     }
 
     public void addWSDLSchemaImport(Definition def, String tns, File file) throws Exception {
-        //REVISIT, check if the wsdl schema already exists.
+        // REVISIT, check if the wsdl schema already exists.
         Types types = def.getTypes();
         if (types == null) {
             types = def.createTypes();
-            def.setTypes(types);            
+            def.setTypes(types);
         }
-        Schema wsdlSchema = (Schema) 
-            def.getExtensionRegistry().createExtension(Types.class,
-                                                       new QName(Constants.URI_2001_SCHEMA_XSD,
-                                                                 "schema"));
+        Schema wsdlSchema = (Schema)def.getExtensionRegistry()
+            .createExtension(Types.class, new QName(Constants.URI_2001_SCHEMA_XSD, "schema"));
 
         addWSDLSchemaImport(wsdlSchema, tns, file);
         types.addExtensibilityElement(wsdlSchema);
@@ -236,10 +222,9 @@ public class WSDLSchemaManager {
 
     private void addWSDLSchemaImport(Schema wsdlSchema, String tns, File file) {
         if (!wsdlSchema.getImports().containsKey(tns)) {
-            SchemaImport schemaimport =  wsdlSchema.createImport();
+            SchemaImport schemaimport = wsdlSchema.createImport();
             schemaimport.setNamespaceURI(tns);
-            if (file != null
-                && !ignoreImports) {
+            if (file != null && !ignoreImports) {
                 schemaimport.setSchemaLocationURI(file.toURI().toString());
             }
             wsdlSchema.addImport(schemaimport);
@@ -247,7 +232,7 @@ public class WSDLSchemaManager {
     }
 
     private void addCorbaExtensions(ExtensionRegistry extReg) throws JAXBException {
-        try {                      
+        try {
             JAXBExtensionHelper.addExtensions(extReg, Binding.class, BindingType.class);
             JAXBExtensionHelper.addExtensions(extReg, BindingOperation.class, OperationType.class);
             JAXBExtensionHelper.addExtensions(extReg, Definition.class, TypeMappingType.class);
@@ -264,16 +249,16 @@ public class WSDLSchemaManager {
             throw new JAXBException(ex.getMessage());
         }
     }
-    
-    public void deferAttachSchemaToWSDL(Definition definition, XmlSchema schema, 
-                                        boolean isSchemaGenerated) throws Exception {
+
+    public void deferAttachSchemaToWSDL(Definition definition, XmlSchema schema, boolean isSchemaGenerated)
+        throws Exception {
         DeferredSchemaAttachment attachment = new DeferredSchemaAttachment();
         attachment.defn = definition;
         attachment.schema = schema;
         attachment.isGenerated = isSchemaGenerated;
         deferredAttachments.add(attachment);
     }
-    
+
     public void attachDeferredSchemasToWSDL() throws Exception {
         for (Iterator<DeferredSchemaAttachment> iter = deferredAttachments.iterator(); iter.hasNext();) {
             DeferredSchemaAttachment attachment = iter.next();
@@ -288,18 +273,16 @@ public class WSDLSchemaManager {
             types = definition.createTypes();
             definition.setTypes(types);
         }
-        Schema wsdlSchema = (Schema) 
-            definition.getExtensionRegistry().createExtension(Types.class,
-                                                              new QName(Constants.URI_2001_SCHEMA_XSD,
-                                                                        "schema"));
+        Schema wsdlSchema = (Schema)definition.getExtensionRegistry()
+            .createExtension(Types.class, new QName(Constants.URI_2001_SCHEMA_XSD, "schema"));
 
-        // See if a NamespaceMap has already been added to the schema (this can be the case with object 
-        // references.  If so, simply add the XSD URI to the map.  Otherwise, create a new one.
+        // See if a NamespaceMap has already been added to the schema (this can be the case with object
+        // references. If so, simply add the XSD URI to the map. Otherwise, create a new one.
         NamespaceMap nsMap = null;
         try {
             nsMap = (NamespaceMap)schema.getNamespaceContext();
         } catch (ClassCastException ex) {
-            // Consume.  This will mean that the context has not been set.
+            // Consume. This will mean that the context has not been set.
         }
         if (nsMap == null) {
             nsMap = new NamespaceMap();
@@ -313,30 +296,28 @@ public class WSDLSchemaManager {
         }
         org.w3c.dom.Element el = schema.getAllSchemas()[0].getDocumentElement();
         wsdlSchema.setElement(el);
-        
-        XmlSchemaObjectCollection imports = schema.getIncludes();
-        for (java.util.Iterator<XmlSchemaObject> it = CastUtils.cast(imports.getIterator()); it.hasNext();) {
-            XmlSchemaImport xmlSchemaImport = (XmlSchemaImport) it.next();
-            SchemaImport schemaimport =  wsdlSchema.createImport();
-            schemaimport.setNamespaceURI(xmlSchemaImport.getNamespace());
-            if (xmlSchemaImport.getSchemaLocation() != null
-                && !ignoreImports) {
-                schemaimport.setSchemaLocationURI(xmlSchemaImport.getSchemaLocation());
+
+        for (XmlSchemaExternal ext : schema.getExternals()) {
+            if (ext instanceof XmlSchemaImport) {
+                XmlSchemaImport xmlSchemaImport = (XmlSchemaImport)ext;
+                SchemaImport schemaimport = wsdlSchema.createImport();
+                schemaimport.setNamespaceURI(xmlSchemaImport.getNamespace());
+                if (xmlSchemaImport.getSchemaLocation() != null && !ignoreImports) {
+                    schemaimport.setSchemaLocationURI(xmlSchemaImport.getSchemaLocation());
+                }
+                wsdlSchema.addImport(schemaimport);
             }
-            wsdlSchema.addImport(schemaimport);  
         }
         types.addExtensibilityElement(wsdlSchema);
     }
 
     public TypeMappingType createCorbaTypeMap(Definition definition, String corbatypemaptns)
-        throws WSDLException { 
-        TypeMappingType typeMap = (TypeMappingType)
-            definition.getExtensionRegistry().createExtension(Definition.class,
-                                                              CorbaConstants.NE_CORBA_TYPEMAPPING);
+        throws WSDLException {
+        TypeMappingType typeMap = (TypeMappingType)definition.getExtensionRegistry()
+            .createExtension(Definition.class, CorbaConstants.NE_CORBA_TYPEMAPPING);
         if (corbatypemaptns == null) {
-            typeMap.setTargetNamespace(definition.getTargetNamespace()
-                + "/"
-                + CorbaConstants.NS_CORBA_TYPEMAP);
+            typeMap.setTargetNamespace(definition.getTargetNamespace() + "/"
+                                       + CorbaConstants.NS_CORBA_TYPEMAP);
         } else {
             typeMap.setTargetNamespace(corbatypemaptns);
         }

@@ -44,16 +44,16 @@ public final class ServiceModelUtil {
     public static Service getService(Exchange exchange) {
         return exchange.getService();
     }
-    
+
     public static String getTargetNamespace(Exchange exchange) {
         //all ServiceInfo's will have the same target namespace
         return getService(exchange).getServiceInfos().get(0).getTargetNamespace();
     }
-    
+
     public static BindingOperationInfo getOperation(Exchange exchange, String opName) {
         Endpoint ep = exchange.get(Endpoint.class);
         BindingInfo service = ep.getEndpointInfo().getBinding();
-        
+
         for (BindingOperationInfo b : service.getOperations()) {
             if (b.getName().getLocalPart().equals(opName)) {
                 return b;
@@ -73,17 +73,17 @@ public final class ServiceModelUtil {
     public static BindingOperationInfo getOperationForWrapperElement(Exchange exchange,
                                                                      QName opName,
                                                                      boolean output) {
-        
+
         Endpoint ep = exchange.get(Endpoint.class);
         if (ep == null) {
             return null;
         }
         BindingInfo service = ep.getEndpointInfo().getBinding();
-        Map<QName, BindingOperationInfo> wrapperMap = 
+        Map<QName, BindingOperationInfo> wrapperMap =
             CastUtils.cast(service.getProperty("ServiceModel.WRAPPER.MAP"
-                                               + (output ? "" : "_OUT"), Map.class)); 
-        
-        
+                                               + (output ? "" : "_OUT"), Map.class));
+
+
         if (wrapperMap == null) {
             wrapperMap = new HashMap<QName, BindingOperationInfo>();
             for (BindingOperationInfo b : service.getOperations()) {
@@ -128,7 +128,7 @@ public final class ServiceModelUtil {
         }
         return schemaInfo;
     }
-    
+
     public static List<String> getOperationInputPartNames(OperationInfo operation) {
         List<String> names = new ArrayList<String>();
         List<MessagePartInfo> parts = operation.getInput().getMessageParts();
@@ -141,14 +141,14 @@ public final class ServiceModelUtil {
 
             if (schema instanceof XmlSchemaElement
                 && ((XmlSchemaElement)schema).getSchemaType() instanceof XmlSchemaComplexType) {
-                XmlSchemaElement element = (XmlSchemaElement)schema;    
+                XmlSchemaElement element = (XmlSchemaElement)schema;
                 XmlSchemaComplexType cplxType = (XmlSchemaComplexType)element.getSchemaType();
                 XmlSchemaSequence seq = (XmlSchemaSequence)cplxType.getParticle();
                 if (seq == null || seq.getItems() == null) {
                     return names;
                 }
-                for (int i = 0; i < seq.getItems().getCount(); i++) {
-                    XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().getItem(i);
+                for (int i = 0; i < seq.getItems().size(); i++) {
+                    XmlSchemaElement elChild = (XmlSchemaElement)seq.getItems().get(i);
                     names.add(elChild.getName());
                 }
             } else {
@@ -156,8 +156,8 @@ public final class ServiceModelUtil {
             }
         }
         return names;
-    }  
-    
+    }
+
     public static EndpointInfo findBestEndpointInfo(QName qn, List<ServiceInfo> serviceInfos) {
         for (ServiceInfo serviceInfo : serviceInfos) {
             Collection<EndpointInfo> eps = serviceInfo.getEndpoints();
@@ -166,8 +166,8 @@ public final class ServiceModelUtil {
                     return ep;
                 }
             }
-        }        
-        
+        }
+
         EndpointInfo best = null;
         for (ServiceInfo serviceInfo : serviceInfos) {
             Collection<EndpointInfo> eps = serviceInfo.getEndpoints();
@@ -180,7 +180,7 @@ public final class ServiceModelUtil {
                 }
             }
         }
-        
+
         return best;
-    }    
+    }
 }

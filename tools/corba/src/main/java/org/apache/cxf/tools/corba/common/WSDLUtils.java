@@ -22,8 +22,6 @@ package org.apache.cxf.tools.corba.common;
 import java.io.IOException;
 import java.io.Writer;
 
-import java.util.Iterator;
-
 import javax.wsdl.Definition;
 import javax.wsdl.WSDLException;
 import javax.wsdl.xml.WSDLWriter;
@@ -44,24 +42,22 @@ public final class WSDLUtils {
     }
 
     public static boolean isElementFormQualified(SchemaCollection schemas, QName type) {
-        if (type != null) {   
+        if (type != null) {
             XmlSchema sch = schemas.getSchemaByTargetNamespace(type.getNamespaceURI());
             if (sch != null) {
-                return sch.getElementFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+                return sch.getElementFormDefault()  == XmlSchemaForm.QUALIFIED;
             }
         }
         return false;
     }
 
     public static boolean isElementFormQualified(XmlSchema schema, QName type) {
-        if (type != null) {     
+        if (type != null) {
             String uri = type.getNamespaceURI();
             if (uri.equals(schema.getTargetNamespace())) {
-                return schema.getElementFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+                return schema.getElementFormDefault() == XmlSchemaForm.QUALIFIED;
             }
-            Iterator it = schema.getIncludes().getIterator();
-            while (it.hasNext()) {
-                XmlSchemaExternal extSchema = (XmlSchemaExternal) it.next();
+            for (XmlSchemaExternal extSchema : schema.getExternals()) {
                 return isElementFormQualified(extSchema.getSchema(), type);
             }
         }
@@ -69,25 +65,25 @@ public final class WSDLUtils {
     }
 
     public static void writeWSDL(Definition def, String outputdir, String wsdlOutput)
-        throws WSDLException, IOException {     
+        throws WSDLException, IOException {
         FileWriterUtil fw = new FileWriterUtil(outputdir);
         Writer outputWriter = fw.getWriter("", wsdlOutput);
 
-        writeWSDL(def, outputWriter);   
+        writeWSDL(def, outputWriter);
     }
 
     public static void writeWSDL(Definition def, Writer outputWriter)
-        throws WSDLException, IOException {     
+        throws WSDLException, IOException {
         WSDLCorbaFactory wsdlfactory = WSDLCorbaFactory
             .newInstance("org.apache.cxf.tools.corba.common.WSDLCorbaFactoryImpl");
-        WSDLWriter writer = wsdlfactory.newWSDLWriter();        
+        WSDLWriter writer = wsdlfactory.newWSDLWriter();
         writer.writeWSDL(def, outputWriter);
-        
+
         outputWriter.flush();
         outputWriter.close();
     }
 
-    
+
     public static void writeSchema(Definition def, Writer outputWriter) throws WSDLException, IOException {
         SchemaFactory sfactory = SchemaFactory
             .newInstance("org.apache.cxf.tools.corba.common.SchemaFactoryImpl");

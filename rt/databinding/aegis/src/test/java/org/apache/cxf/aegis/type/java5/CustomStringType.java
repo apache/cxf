@@ -35,10 +35,8 @@ public class CustomStringType extends StringType {
         if (root.getTargetNamespace().equals(XMLConstants.W3C_XML_SCHEMA_NS_URI)) {
             return;
         }
-        XmlSchemaSimpleType type = new XmlSchemaSimpleType(root);
+        XmlSchemaSimpleType type = new XmlSchemaSimpleType(root, true);
         type.setName(getSchemaType().getLocalPart());
-        root.getItems().add(type);
-        root.addType(type);
         XmlSchemaSimpleContentExtension ext = new XmlSchemaSimpleContentExtension();
         ext.setBaseTypeName(XmlSchemaConstants.STRING_QNAME);
         XmlSchemaSimpleTypeRestriction content = new XmlSchemaSimpleTypeRestriction();

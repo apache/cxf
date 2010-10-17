@@ -42,8 +42,9 @@ import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
-import org.apache.ws.commons.schema.XmlSchemaGroupBase;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaParticle;
+import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.omg.CORBA.ORB;
 import org.omg.CORBA.TCKind;
 import org.omg.CORBA.TypeCode;
@@ -54,10 +55,10 @@ public final class CorbaHandlerUtils {
     }
 
     public static CorbaObjectHandler createTypeHandler(ORB orb,
-                                                       QName name, 
+                                                       QName name,
                                                        QName idlType,
                                                        CorbaTypeMap typeMap) {
-        CorbaObjectHandler handler = null;        
+        CorbaObjectHandler handler = null;
         TypeCode tc = CorbaUtils.getTypeCode(orb, idlType, typeMap);
         try {
             while (tc.kind().value() == TCKind._tk_alias) {
@@ -112,18 +113,18 @@ public final class CorbaHandlerUtils {
                 break;
             case TCKind._tk_objref:
                 handler = new CorbaObjectReferenceHandler(name, idlType, tc, type);
-                break;                
+                break;
             default:
-                handler = new CorbaObjectHandler(name, idlType, tc, type);                
+                handler = new CorbaObjectHandler(name, idlType, tc, type);
             }
         }
 
         return handler;
     }
 
-   
+
     public static CorbaObjectHandler initializeObjectHandler(ORB orb,
-                                                             QName name, 
+                                                             QName name,
                                                              QName idlType,
                                                              CorbaTypeMap typeMap,
                                                              ServiceInfo serviceInfo) {
@@ -132,7 +133,7 @@ public final class CorbaHandlerUtils {
     }
 
     public static CorbaObjectHandler initializeObjectHandler(ORB orb,
-                                                             QName name, 
+                                                             QName name,
                                                              QName idlType,
                                                              CorbaTypeMap typeMap,
                                                              ServiceInfo serviceInfo,
@@ -167,9 +168,9 @@ public final class CorbaHandlerUtils {
         }
         return obj;
     }
-    
+
     public static void initializeArrayHandler(ORB orb,
-                                              CorbaObjectHandler obj, 
+                                              CorbaObjectHandler obj,
                                               CorbaTypeMap typeMap,
                                               ServiceInfo serviceInfo,
                                               Map<QName, CorbaObjectHandler> seenTypes) {
@@ -189,15 +190,15 @@ public final class CorbaHandlerUtils {
             elementName = anonArrayType.getElemname();
         }
         for (int i = 0; i < arrayBound; ++i) {
-            CorbaObjectHandler elementObj = 
+            CorbaObjectHandler elementObj =
                 initializeObjectHandler(orb, elementName, arrayElementType, typeMap, serviceInfo,
                                         seenTypes);
             ((CorbaArrayHandler)obj).addElement(elementObj);
         }
     }
-    
+
     public static void initializeExceptionHandler(ORB orb,
-                                                  CorbaObjectHandler obj, 
+                                                  CorbaObjectHandler obj,
                                                   CorbaTypeMap typeMap,
                                                   ServiceInfo serviceInfo,
                                                   Map<QName, CorbaObjectHandler> seenTypes) {
@@ -222,9 +223,9 @@ public final class CorbaHandlerUtils {
             ((CorbaExceptionHandler)obj).addMember(memberObj);
         }
     }
-    
+
     public static void initializeSequenceHandler(ORB orb,
-                                                 CorbaObjectHandler obj, 
+                                                 CorbaObjectHandler obj,
                                                  CorbaTypeMap typeMap,
                                                  ServiceInfo serviceInfo,
                                                  Map<QName, CorbaObjectHandler> seenTypes) {
@@ -247,22 +248,22 @@ public final class CorbaHandlerUtils {
             // This is an unbounded sequence.  Store a 'template' object that we can use to create
             // new objects as needed
             CorbaObjectHandler elementObj = null;
-            
+
             // Check for a recursive type
             if (seenTypes.get(seqElementType) != null) {
                 elementObj = seenTypes.get(seqElementType);
                 elementObj.setRecursive(true);
                 ((CorbaSequenceHandler)obj).hasRecursiveTypeElement(true);
             } else {
-                elementObj = 
-                    initializeObjectHandler(orb, elementName, seqElementType, typeMap, 
+                elementObj =
+                    initializeObjectHandler(orb, elementName, seqElementType, typeMap,
                                             serviceInfo, seenTypes);
             }
             ((CorbaSequenceHandler)obj).setTemplateElement(elementObj);
         }
         for (int i = 0; i < seqBound; ++i) {
             CorbaObjectHandler elementObj = null;
-            
+
             // Check for a recursive type
             if (seenTypes.get(seqElementType) != null) {
                 // Even though this is bounded, if we have a recursive type, we'll still use the
@@ -272,16 +273,16 @@ public final class CorbaHandlerUtils {
                 ((CorbaSequenceHandler)obj).hasRecursiveTypeElement(true);
                 ((CorbaSequenceHandler)obj).setTemplateElement(elementObj);
             } else {
-                elementObj = 
+                elementObj =
                     initializeObjectHandler(orb, elementName, seqElementType, typeMap, serviceInfo,
                                             seenTypes);
                 ((CorbaSequenceHandler)obj).addElement(elementObj);
             }
         }
     }
-    
+
     public static void initializeStructHandler(ORB orb,
-                                               CorbaObjectHandler obj, 
+                                               CorbaObjectHandler obj,
                                                CorbaTypeMap typeMap,
                                                ServiceInfo serviceInfo,
                                                Map<QName, CorbaObjectHandler> seenTypes) {
@@ -314,15 +315,15 @@ public final class CorbaHandlerUtils {
 
         seenTypes.remove(obj.getIdlType());
     }
-    
+
     public static void initializeUnionHandler(ORB orb,
-                                              CorbaObjectHandler obj, 
+                                              CorbaObjectHandler obj,
                                               CorbaTypeMap typeMap,
-                                              ServiceInfo serviceInfo, 
+                                              ServiceInfo serviceInfo,
                                               Map<QName, CorbaObjectHandler> seenTypes) {
         Union unionType = (Union)obj.getType();
         // First handle the discriminator
-        CorbaObjectHandler discObj = initializeObjectHandler(orb, 
+        CorbaObjectHandler discObj = initializeObjectHandler(orb,
                                                              new QName("discriminator"),
                                                              unionType.getDiscriminator(),
                                                              typeMap,
@@ -344,7 +345,7 @@ public final class CorbaHandlerUtils {
                 branchName = new QName("", branch.getName());
             }
             QName branchIdlType = branch.getIdltype();
-            CorbaObjectHandler branchObj = 
+            CorbaObjectHandler branchObj =
                 initializeObjectHandler(orb, branchName, branchIdlType, typeMap, serviceInfo,
                                         seenTypes);
             ((CorbaUnionHandler)obj).addCase(branchObj);
@@ -370,16 +371,20 @@ public final class CorbaHandlerUtils {
         if (schemaType instanceof XmlSchemaElement) {
             stype = ((XmlSchemaElement) schemaType).getSchemaType();
             if (stype == null) {
-                stype = CorbaUtils.getXmlSchemaType(serviceInfo, 
-                                                    ((XmlSchemaElement) schemaType).getRefName());
+                stype = CorbaUtils.getXmlSchemaType(serviceInfo,
+                                                    ((XmlSchemaElement) schemaType)
+                                                        .getRef().getTargetQName());
             }
         }
-        
+
         if (stype instanceof XmlSchemaComplexType) {
             //only one element inside the XmlSchemaComplexType
             XmlSchemaComplexType ctype = (XmlSchemaComplexType) stype;
-            XmlSchemaGroupBase group = (XmlSchemaGroupBase) ctype.getParticle();
-            el = (XmlSchemaElement) group.getItems().getItem(0);
+            XmlSchemaParticle group = ctype.getParticle();
+            /* This code seems to think that we're guaranteed a sequence here */
+            XmlSchemaSequence seq = (XmlSchemaSequence) group;
+            /* and an element in it, too */
+            el = (XmlSchemaElement) seq.getItems().get(0);
         } else {
             el = (XmlSchemaElement) schemaType;
         }
@@ -452,7 +457,7 @@ public final class CorbaHandlerUtils {
                 handler = new CorbaStructHandler(name, idlType, tc, type);
                 result = new CorbaStructListener(handler, typeMap, orb, serviceInfo);
                 break;
-            case TCKind._tk_union:            
+            case TCKind._tk_union:
                 handler = new CorbaUnionHandler(name, idlType, tc, type);
                 result = new CorbaUnionListener(handler, typeMap, orb, serviceInfo);
                 break;
@@ -467,11 +472,11 @@ public final class CorbaHandlerUtils {
         }
         return result;
     }
-    
+
     public static CorbaTypeEventProducer getTypeEventProducer(CorbaObjectHandler handler,
                                                               ServiceInfo serviceInfo,
                                                               ORB orb)
-        throws CorbaBindingException {        
+        throws CorbaBindingException {
         QName idlType = handler.getIdlType();
         TypeCode tc = handler.getTypeCode();
         CorbaTypeEventProducer result = null;
@@ -541,7 +546,7 @@ public final class CorbaHandlerUtils {
     }
 
     public static boolean isAnonType(XmlSchemaObject schemaObj) {
-        boolean result = false;        
+        boolean result = false;
         if ((schemaObj != null) && !(schemaObj instanceof XmlSchemaElement)
              && !(schemaObj instanceof XmlSchemaComplexType)) {
             result = true;

@@ -46,14 +46,14 @@ public class UnionVisitor extends VisitorBase {
                         WSDLASTVisitor wsdlVisitor) {
         super(scope, defn, schemaRef, wsdlVisitor);
     }
-    
+
     public static boolean accept(AST node) {
         if (node.getType() == IDLTokenTypes.LITERAL_union) {
             return true;
         }
         return false;
     }
-    
+
     public void visit(AST unionNode) {
         // <union_type> ::= "union" <identifier> "switch" "(" <switch_type_spec> ")"
         //                  "{" <switch_body> "}"
@@ -67,8 +67,8 @@ public class UnionVisitor extends VisitorBase {
         // <case_label> ::= "case" <const_expr> ":"
         //                | "default" ":"
         // <element_spec> ::= <type_spec> <declarator>
-        
-        
+
+
         AST identifierNode = unionNode.getFirstChild();
         // Check if its a forward declaration
         if (identifierNode.getFirstChild() == null && identifierNode.getNextSibling() == null) {
@@ -77,31 +77,31 @@ public class UnionVisitor extends VisitorBase {
             visitDeclaredUnion(identifierNode);
         }
     }
-    
-    public void visitDeclaredUnion(AST identifierNode) {        
-        
+
+    public void visitDeclaredUnion(AST identifierNode) {
+
         Scope unionScope = new Scope(getScope(), identifierNode);
         AST discriminatorNode = identifierNode.getNextSibling();
         AST caseNode = discriminatorNode.getNextSibling();
         // xmlschema:union
-        XmlSchemaComplexType unionSchemaComplexType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType unionSchemaComplexType = new XmlSchemaComplexType(schema, true);
         unionSchemaComplexType.setName(mapper.mapToQName(unionScope));
-        
+
         // REVISIT
-        // TEMPORARILY 
+        // TEMPORARILY
         // using TypesVisitor to visit <const_type>
         // it should be visited by a SwitchTypeSpecVisitor
         TypesVisitor visitor = new TypesVisitor(getScope(), definition, schema, wsdlVisitor, null);
         visitor.visit(discriminatorNode);
         CorbaTypeImpl ctype = visitor.getCorbaType();
         Scope fullyQualifiedName = visitor.getFullyQualifiedName();
-        
+
         XmlSchemaChoice choice = new XmlSchemaChoice();
         choice.setMinOccurs(1);
         choice.setMaxOccurs(1);
         unionSchemaComplexType.setParticle(choice);
-        
-        
+
+
         // corba:union
         Union corbaUnion = new Union();
         corbaUnion.setQName(new QName(typeMap.getTargetNamespace(), unionScope.toString()));
@@ -111,11 +111,11 @@ public class UnionVisitor extends VisitorBase {
             corbaUnion.setDiscriminator(ctype.getQName());
         } else {
             // Discriminator type is forward declared.
-            UnionDeferredAction unionDiscriminatorAction = 
+            UnionDeferredAction unionDiscriminatorAction =
                 new UnionDeferredAction(corbaUnion);
             wsdlVisitor.getDeferredActions().add(fullyQualifiedName, unionDiscriminatorAction);
         }
-       
+
         boolean recursiveAdd = addRecursiveScopedName(identifierNode);
 
         processCaseNodes(caseNode, unionScope, choice, corbaUnion);
@@ -124,17 +124,13 @@ public class UnionVisitor extends VisitorBase {
             removeRecursiveScopedName(identifierNode);
         }
 
-        // add schemaType
-        schema.getItems().add(unionSchemaComplexType);
-        schema.addType(unionSchemaComplexType);
-
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(corbaUnion);
 
         // REVISIT: are these assignments needed?
         setSchemaType(unionSchemaComplexType);
         setCorbaType(corbaUnion);
-        
+
         // Need to check if the union was forward declared
         processForwardUnionActions(unionScope);
 
@@ -142,7 +138,7 @@ public class UnionVisitor extends VisitorBase {
         // the list of scopedNames so that we indicate that is no longer simply forward declared.
         scopedNames.remove(unionScope);
     }
-    
+
     private void processCaseNodes(AST caseNode,
                                   Scope scope,
                                   XmlSchemaChoice choice,
@@ -151,9 +147,9 @@ public class UnionVisitor extends VisitorBase {
             AST typeNode  = null;
             AST nameNode  = null;
             AST labelNode = null;
-            
+
             // xmlschema:element
-            XmlSchemaElement element = new XmlSchemaElement();
+            XmlSchemaElement element = new XmlSchemaElement(schema, false);
 
             // corba:unionbranch
             Unionbranch unionBranch = new Unionbranch();
@@ -161,22 +157,22 @@ public class UnionVisitor extends VisitorBase {
             if (caseNode.getType() == IDLTokenTypes.LITERAL_default) {
                 // default:
                 unionBranch.setDefault(true);
-                
+
                 typeNode = caseNode.getFirstChild();
                 nameNode = typeNode.getNextSibling();
             } else {
                 // case:
                 createCase(caseNode, unionBranch);
-                
+
                 labelNode = caseNode.getFirstChild();
                 if (labelNode.getType() == IDLTokenTypes.LITERAL_case) {
                     labelNode = labelNode.getNextSibling();
                 }
-                
+
                 typeNode = labelNode.getNextSibling();
                 nameNode = typeNode.getNextSibling();
             }
-            
+
 
             TypesVisitor visitor = new TypesVisitor(scope,
                                                     definition,
@@ -187,8 +183,8 @@ public class UnionVisitor extends VisitorBase {
             XmlSchemaType stype = visitor.getSchemaType();
             CorbaTypeImpl ctype = visitor.getCorbaType();
             Scope fullyQualifiedName = visitor.getFullyQualifiedName();
-            
-            
+
+
             // needed for anonymous arrays in unions
             if (ArrayVisitor.accept(nameNode)) {
                 Scope anonScope = new Scope(scope, TypesUtils.getCorbaTypeNameNode(nameNode));
@@ -205,8 +201,8 @@ public class UnionVisitor extends VisitorBase {
                 ctype = arrayVisitor.getCorbaType();
                 fullyQualifiedName = visitor.getFullyQualifiedName();
             }
-            
-            
+
+
             // xmlschema:element
             element.setName(nameNode.toString());
             if (stype != null) {
@@ -215,29 +211,29 @@ public class UnionVisitor extends VisitorBase {
                     element.setNillable(true);
                 }
             } else {
-                UnionDeferredAction elementAction = 
+                UnionDeferredAction elementAction =
                     new UnionDeferredAction(element);
-                wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction); 
+                wsdlVisitor.getDeferredActions().add(fullyQualifiedName, elementAction);
             }
             choice.getItems().add(element);
-            
-            
+
+
             // corba:unionbranch
             unionBranch.setName(nameNode.toString());
             if (ctype != null) {
                 unionBranch.setIdltype(ctype.getQName());
             } else {
                 // its type is forward declared.
-                UnionDeferredAction unionBranchAction = 
+                UnionDeferredAction unionBranchAction =
                     new UnionDeferredAction(unionBranch);
-                wsdlVisitor.getDeferredActions().add(fullyQualifiedName, unionBranchAction); 
+                wsdlVisitor.getDeferredActions().add(fullyQualifiedName, unionBranchAction);
             }
             corbaUnion.getUnionbranch().add(unionBranch);
-            
+
             caseNode = caseNode.getNextSibling();
         }
     }
-    
+
     private void createCase(AST caseNode, Unionbranch unionBranch) {
         AST node = caseNode.getFirstChild();
         if (node != null) {
@@ -246,7 +242,7 @@ public class UnionVisitor extends VisitorBase {
                 CaseType caseType = new CaseType();
                 caseType.setLabel(node.getNextSibling().toString());
                 unionBranch.getCase().add(caseType);
-                
+
                 // recursive call
                 createCase(node, unionBranch);
             } else {
@@ -257,17 +253,17 @@ public class UnionVisitor extends VisitorBase {
             }
         }
     }
-    
+
     private void visitForwardDeclaredUnion(AST identifierNode) {
-        String unionName = identifierNode.toString();        
+        String unionName = identifierNode.toString();
         Scope unionScope = new Scope(getScope(), unionName);
-        
+
         ScopeNameCollection scopedNames = wsdlVisitor.getScopedNames();
         if (scopedNames.getScope(unionScope) == null) {
             scopedNames.add(unionScope);
-        }        
+        }
     }
- 
+
     // Process any actions that were defered for a forward declared union
     private void processForwardUnionActions(Scope unionScope) {
         if (wsdlVisitor.getDeferredActions() != null) {
@@ -276,18 +272,18 @@ public class UnionVisitor extends VisitorBase {
             if ((list != null) && !list.isEmpty()) {
                 XmlSchemaType stype = getSchemaType();
                 CorbaTypeImpl ctype = getCorbaType();
-                Iterator iterator = list.iterator();                    
+                Iterator iterator = list.iterator();
                 while (iterator.hasNext()) {
                     SchemaDeferredAction action = (SchemaDeferredAction)iterator.next();
-                    action.execute(stype, ctype);                       
+                    action.execute(stype, ctype);
                 }
-                iterator = list.iterator();                    
+                iterator = list.iterator();
                 while (iterator.hasNext()) {
                     iterator.next();
-                    iterator.remove();                       
-                }                                          
-            }            
-        }   
+                    iterator.remove();
+                }
+            }
+        }
     }
 
     private boolean addRecursiveScopedName(AST identifierNode) {

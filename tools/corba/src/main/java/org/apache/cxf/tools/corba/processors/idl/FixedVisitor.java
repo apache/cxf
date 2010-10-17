@@ -35,7 +35,7 @@ import org.apache.ws.commons.schema.constants.Constants;
 public class FixedVisitor extends VisitorBase {
 
     private AST identifierNode;
-    
+
     public FixedVisitor(Scope scope,
                         Definition defn,
                         XmlSchema schemaRef,
@@ -44,21 +44,21 @@ public class FixedVisitor extends VisitorBase {
         super(scope, defn, schemaRef, wsdlVisitor);
         identifierNode = identifierNodeRef;
     }
-    
+
     public static boolean accept(AST node) {
         if (node.getType() == IDLTokenTypes.LITERAL_fixed) {
             return true;
         }
         return false;
     }
-    
+
     public void visit(AST fixedNode) {
         //      "typedef" <type_declarator>
         //      <type_declarator> ::= <type_spec> <declarators>
         //      <type_spec> ::= <simple_type_spec>
         //                    | <constr_type_spec>
         //      <simple_type_spec> ::= <base_type_spec>
-        //                           | <template_type_spec> 
+        //                           | <template_type_spec>
         //                           | <scoped_name>
         //      <base_type_spec> ::= ... omitted (integer, char, octect, etc)
         //      <template_type_spec> ::= <sequence_type>
@@ -75,12 +75,12 @@ public class FixedVisitor extends VisitorBase {
         //      <complex_declarator> ::= <array_declarator>
         //      <array_declarator> ::= <identifier> <fixed_array_size>+
         //      <fixed_array_size> ::= "[" <positive_int_const> "]"
-        
-        
+
+
         AST digitsNode = fixedNode.getFirstChild();
         AST scaleNode = digitsNode.getNextSibling();
         Scope scopedName = new Scope(getScope(), identifierNode);
-        
+
         // validate digits and scale
         Long digits = new Long(digitsNode.toString());
         Long scale = new Long(scaleNode.toString());
@@ -94,9 +94,9 @@ public class FixedVisitor extends VisitorBase {
             System.out.println("Scale cannot be greater than digits");
             return;
         }
-        
+
         // xmlschema:fixed
-        XmlSchemaSimpleType fixedSimpleType = new XmlSchemaSimpleType(schema);
+        XmlSchemaSimpleType fixedSimpleType = new XmlSchemaSimpleType(schema, false);
         XmlSchemaSimpleTypeRestriction fixedRestriction = new XmlSchemaSimpleTypeRestriction();
         fixedRestriction.setBaseTypeName(Constants.XSD_DECIMAL);
         XmlSchemaTotalDigitsFacet fixedTotalDigits = new XmlSchemaTotalDigitsFacet();
@@ -112,7 +112,7 @@ public class FixedVisitor extends VisitorBase {
         // add xmlschema:fixed
         setSchemaType(fixedSimpleType);
 
-        
+
         // corba:fixed
         Fixed corbaFixed = new Fixed();
         corbaFixed.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
@@ -121,7 +121,7 @@ public class FixedVisitor extends VisitorBase {
         corbaFixed.setRepositoryID(scopedName.toIDLRepositoryID());
         //corbaFixed.setType(Constants.XSD_DECIMAL);
         corbaFixed.setType(fixedSimpleType.getQName());
-        
+
         // add corba:fixed
         setCorbaType(corbaFixed);
     }

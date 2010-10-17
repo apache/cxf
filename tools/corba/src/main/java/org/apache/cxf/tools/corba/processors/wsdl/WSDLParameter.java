@@ -39,25 +39,24 @@ import org.apache.cxf.binding.corba.wsdl.ParamType;
 import org.apache.cxf.common.xmlschema.SchemaCollection;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
+import org.apache.ws.commons.schema.XmlSchemaAnnotationItem;
 import org.apache.ws.commons.schema.XmlSchemaAppInfo;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaObject;
-import org.apache.ws.commons.schema.XmlSchemaObjectCollection;
-import org.apache.ws.commons.schema.XmlSchemaObjectTable;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
 public final class WSDLParameter {
 
     static Definition definition;
 
-    public void processParameters(WSDLToCorbaBinding wsdlToCorbaBinding,
-            Operation operation, Definition def, SchemaCollection xmlSchemaList,
-            List<ParamType> params, List<ArgType> returns,
-            boolean simpleOrdering) throws Exception {
+    public void processParameters(WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation, Definition def,
+                                  SchemaCollection xmlSchemaList, List<ParamType> params,
+                                  List<ArgType> returns, boolean simpleOrdering) throws Exception {
 
         definition = def;
         List<ParamType> inputs = new ArrayList<ParamType>();
@@ -66,18 +65,14 @@ public final class WSDLParameter {
         boolean isWrapped = isWrappedOperation(operation, xmlSchemaList);
 
         if (isWrapped) {
-            processWrappedInputParams(wsdlToCorbaBinding, operation,
-                    xmlSchemaList, inputs);
+            processWrappedInputParams(wsdlToCorbaBinding, operation, xmlSchemaList, inputs);
         } else {
-            processInputParams(wsdlToCorbaBinding, operation, xmlSchemaList,
-                    inputs);
+            processInputParams(wsdlToCorbaBinding, operation, xmlSchemaList, inputs);
         }
         if (isWrapped) {
-            processWrappedOutputParams(wsdlToCorbaBinding, operation,
-                    xmlSchemaList, inputs, outputs);
+            processWrappedOutputParams(wsdlToCorbaBinding, operation, xmlSchemaList, inputs, outputs);
         } else {
-            processOutputParams(wsdlToCorbaBinding, operation, xmlSchemaList,
-                    inputs, outputs);
+            processOutputParams(wsdlToCorbaBinding, operation, xmlSchemaList, inputs, outputs);
         }
         processReturnParams(outputs, returnOutputs);
         orderParameters(inputs, outputs, true);
@@ -86,55 +81,47 @@ public final class WSDLParameter {
 
     }
 
-    private void processWrappedInputParams(WSDLToCorbaBinding wsdlToCorbaBinding,
-                                           Operation operation,
-                                           SchemaCollection xmlSchemaList,
-                                           List<ParamType> inputs)
+    private void processWrappedInputParams(WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation,
+                                           SchemaCollection xmlSchemaList, List<ParamType> inputs)
         throws Exception {
         Input input = operation.getInput();
 
         if (input != null) {
             Message msg = input.getMessage();
-            Part part = (Part) msg.getOrderedParts(null).iterator().next();
+            Part part = (Part)msg.getOrderedParts(null).iterator().next();
 
             XmlSchemaComplexType schemaType = null;
 
             XmlSchemaElement el = getElement(part, xmlSchemaList);
             if ((el != null) && (el.getSchemaType() != null)) {
-                schemaType = (XmlSchemaComplexType) el.getSchemaType();
+                schemaType = (XmlSchemaComplexType)el.getSchemaType();
             }
-          
-            XmlSchemaSequence seq = (XmlSchemaSequence) schemaType.getParticle();
+
+            XmlSchemaSequence seq = (XmlSchemaSequence)schemaType.getParticle();
             if (seq != null) {
-                XmlSchemaObjectCollection items = seq.getItems();
-                for (int i = 0; i < items.getCount(); i++) {
-                    el = (XmlSchemaElement) items.getItem(i);
-                    //REVISIT, handle element ref's?
-                    QName typeName = el.getSchemaTypeName();
-                    if (typeName == null) {
-                        typeName = el.getQName();
-                    }
-                    QName idltype = getIdlType(wsdlToCorbaBinding,
-                                               el.getSchemaType(),
-                                               typeName,
-                                               el.isNillable());
-                    ParamType paramtype = createParam(wsdlToCorbaBinding,
-                                                      "in",
-                                                      el.getQName().getLocalPart(),
-                                                      idltype);
-                    if (paramtype != null) {
-                        inputs.add(paramtype);
+                for (XmlSchemaSequenceMember seqItem : seq.getItems()) {
+                    if (seqItem instanceof XmlSchemaElement) {
+                        el = (XmlSchemaElement)seqItem;
+                        // REVISIT, handle element ref's?
+                        QName typeName = el.getSchemaTypeName();
+                        if (typeName == null) {
+                            typeName = el.getQName();
+                        }
+                        QName idltype = getIdlType(wsdlToCorbaBinding, el.getSchemaType(), typeName,
+                                                   el.isNillable());
+                        ParamType paramtype = createParam(wsdlToCorbaBinding, "in", el.getQName()
+                            .getLocalPart(), idltype);
+                        if (paramtype != null) {
+                            inputs.add(paramtype);
+                        }
                     }
                 }
-            }       
+            }
         }
     }
 
-    private void processInputParams(WSDLToCorbaBinding wsdlToCorbaBinding,
-                                    Operation operation,
-                                    SchemaCollection xmlSchemaList,
-                                    List<ParamType> inputs)
-        throws Exception {
+    private void processInputParams(WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation,
+                                    SchemaCollection xmlSchemaList, List<ParamType> inputs) throws Exception {
 
         Input input = operation.getInput();
 
@@ -142,7 +129,7 @@ public final class WSDLParameter {
             Message msg = input.getMessage();
             Iterator i = msg.getOrderedParts(null).iterator();
             while (i.hasNext()) {
-                Part part = (Part) i.next();
+                Part part = (Part)i.next();
                 XmlSchemaType schemaType = null;
                 boolean isObjectRef = isObjectReference(xmlSchemaList, part.getElementName());
                 if (part.getElementName() != null && !isObjectRef) {
@@ -154,14 +141,8 @@ public final class WSDLParameter {
                     if (typeName == null) {
                         typeName = el.getQName();
                     }
-                    QName idltype = getIdlType(wsdlToCorbaBinding,
-                                               schemaType,
-                                               typeName,
-                                               el.isNillable());
-                    ParamType paramtype = createParam(wsdlToCorbaBinding,
-                                                      "in",
-                                                      part.getName(),
-                                                      idltype);
+                    QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, el.isNillable());
+                    ParamType paramtype = createParam(wsdlToCorbaBinding, "in", part.getName(), idltype);
                     if (paramtype != null) {
                         inputs.add(paramtype);
                     }
@@ -171,14 +152,8 @@ public final class WSDLParameter {
                     if (isObjectRef) {
                         typeName = part.getElementName();
                     }
-                    QName idltype = getIdlType(wsdlToCorbaBinding,
-                                               schemaType,
-                                               typeName,
-                                               false);
-                    ParamType paramtype = createParam(wsdlToCorbaBinding,
-                                                      "in",
-                                                      part.getName(),
-                                                      idltype);
+                    QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, false);
+                    ParamType paramtype = createParam(wsdlToCorbaBinding, "in", part.getName(), idltype);
                     if (paramtype != null) {
                         inputs.add(paramtype);
                     }
@@ -187,38 +162,35 @@ public final class WSDLParameter {
         }
     }
 
-    private void processWrappedOutputParams(
-            WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation,
-            SchemaCollection xmlSchemaList, List<ParamType> inputs,
-            List<ParamType> outputs) throws Exception {
+    private void processWrappedOutputParams(WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation,
+                                            SchemaCollection xmlSchemaList, List<ParamType> inputs,
+                                            List<ParamType> outputs) throws Exception {
 
         Output output = operation.getOutput();
 
         if (output != null) {
             Message msg = output.getMessage();
-            Part part = (Part) msg.getOrderedParts(null).iterator().next();
+            Part part = (Part)msg.getOrderedParts(null).iterator().next();
             XmlSchemaComplexType schemaType = null;
 
             XmlSchemaElement el = getElement(part, xmlSchemaList);
             if (el != null && el.getSchemaType() != null) {
-                schemaType = (XmlSchemaComplexType) el.getSchemaType();
+                schemaType = (XmlSchemaComplexType)el.getSchemaType();
             }
-            XmlSchemaSequence seq = (XmlSchemaSequence) schemaType.getParticle();
+            XmlSchemaSequence seq = (XmlSchemaSequence)schemaType.getParticle();
             if (seq != null) {
-                XmlSchemaObjectCollection items = seq.getItems();
-                for (int i = 0; i < items.getCount(); i++) {
-                    el = (XmlSchemaElement) items.getItem(i);
-                    processWrappedOutputParam(wsdlToCorbaBinding, el, inputs, outputs);
+                for (XmlSchemaSequenceMember seqMember : seq.getItems()) {
+                    if (seqMember instanceof XmlSchemaElement) {
+                        el = (XmlSchemaElement)seqMember;
+                        processWrappedOutputParam(wsdlToCorbaBinding, el, inputs, outputs);
+                    }
                 }
             }
         }
     }
 
-    private void processWrappedOutputParam(WSDLToCorbaBinding wsdlToCorbaBinding,
-                                           XmlSchemaElement el,
-                                           List<ParamType> inputs,
-                                           List<ParamType> outputs)
-        throws Exception {
+    private void processWrappedOutputParam(WSDLToCorbaBinding wsdlToCorbaBinding, XmlSchemaElement el,
+                                           List<ParamType> inputs, List<ParamType> outputs) throws Exception {
         ParamType paramtype = null;
         for (int i = 0; i < inputs.size(); i++) {
             if (inputs.get(i).getName().equals(el.getQName().getLocalPart())) {
@@ -227,14 +199,8 @@ public final class WSDLParameter {
                 if (typeName == null) {
                     typeName = el.getQName();
                 }
-                QName idltype = getIdlType(wsdlToCorbaBinding,
-                                           el.getSchemaType(),
-                                           typeName,
-                                           el.isNillable());
-                paramtype = createParam(wsdlToCorbaBinding,
-                                        "inout",
-                                        el.getQName().getLocalPart(),
-                                        idltype);
+                QName idltype = getIdlType(wsdlToCorbaBinding, el.getSchemaType(), typeName, el.isNillable());
+                paramtype = createParam(wsdlToCorbaBinding, "inout", el.getQName().getLocalPart(), idltype);
                 if (paramtype != null) {
                     inputs.add(paramtype);
                 }
@@ -245,23 +211,17 @@ public final class WSDLParameter {
             if (typeName == null) {
                 typeName = el.getQName();
             }
-            QName idltype = getIdlType(wsdlToCorbaBinding,
-                                       el.getSchemaType(),
-                                       typeName,
-                                       el.isNillable());
-            paramtype = createParam(wsdlToCorbaBinding,
-                                    "out",
-                                    el.getQName().getLocalPart(),
-                                    idltype);
+            QName idltype = getIdlType(wsdlToCorbaBinding, el.getSchemaType(), typeName, el.isNillable());
+            paramtype = createParam(wsdlToCorbaBinding, "out", el.getQName().getLocalPart(), idltype);
             if (paramtype != null) {
                 outputs.add(paramtype);
             }
         }
     }
 
-    private void processOutputParams(WSDLToCorbaBinding wsdlToCorbaBinding,
-            Operation operation, SchemaCollection xmlSchemaList,
-            List<ParamType> inputs, List<ParamType> outputs) throws Exception {
+    private void processOutputParams(WSDLToCorbaBinding wsdlToCorbaBinding, Operation operation,
+                                     SchemaCollection xmlSchemaList, List<ParamType> inputs,
+                                     List<ParamType> outputs) throws Exception {
 
         Output output = operation.getOutput();
 
@@ -269,7 +229,7 @@ public final class WSDLParameter {
             Message msg = output.getMessage();
             Iterator i = msg.getOrderedParts(null).iterator();
             while (i.hasNext()) {
-                Part part = (Part) i.next();
+                Part part = (Part)i.next();
                 XmlSchemaType schemaType = null;
                 // check if in input list
                 String mode = "out";
@@ -277,10 +237,9 @@ public final class WSDLParameter {
                 boolean isObjectRef = isObjectReference(xmlSchemaList, part.getElementName());
                 for (int x = 0; x < inputs.size(); x++) {
                     paramtype = null;
-                    ParamType d2 = (ParamType) inputs.get(x);
+                    ParamType d2 = (ParamType)inputs.get(x);
                     if (part.getElementName() != null && !isObjectRef) {
-                        XmlSchemaElement el = getElement(part,
-                                                         xmlSchemaList);
+                        XmlSchemaElement el = getElement(part, xmlSchemaList);
                         if (el != null && el.getSchemaType() != null) {
                             schemaType = el.getSchemaType();
                         }
@@ -288,17 +247,10 @@ public final class WSDLParameter {
                         if (typeName == null) {
                             typeName = el.getQName();
                         }
-                        QName idltype = getIdlType(wsdlToCorbaBinding,
-                                                   schemaType,
-                                                   typeName,
-                                                   el.isNillable());
-                        if ((d2.getName().equals(part.getName()))
-                            && (d2.getIdltype().equals(idltype))) {
+                        QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, el.isNillable());
+                        if ((d2.getName().equals(part.getName())) && (d2.getIdltype().equals(idltype))) {
                             inputs.remove(x);
-                            paramtype = createParam(wsdlToCorbaBinding,
-                                                    "inout",
-                                                    part.getName(),
-                                                    idltype);
+                            paramtype = createParam(wsdlToCorbaBinding, "inout", part.getName(), idltype);
                             inputs.add(paramtype);
                         }
                     } else {
@@ -307,17 +259,10 @@ public final class WSDLParameter {
                         if (isObjectRef) {
                             typeName = part.getElementName();
                         }
-                        QName idltype = getIdlType(wsdlToCorbaBinding,
-                                                   schemaType,
-                                                   typeName,
-                                                   false);
-                        if ((d2.getName().equals(part.getName()))
-                            && (d2.getIdltype().equals(idltype))) {
+                        QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, false);
+                        if ((d2.getName().equals(part.getName())) && (d2.getIdltype().equals(idltype))) {
                             inputs.remove(x);
-                            paramtype = createParam(wsdlToCorbaBinding,
-                                                    "inout",
-                                                    part.getName(),
-                                                    idltype);
+                            paramtype = createParam(wsdlToCorbaBinding, "inout", part.getName(), idltype);
                             inputs.add(paramtype);
                         }
                     }
@@ -329,27 +274,15 @@ public final class WSDLParameter {
                         if (typeName == null) {
                             typeName = el.getQName();
                         }
-                        QName idltype = getIdlType(wsdlToCorbaBinding,
-                                                   schemaType,
-                                                   typeName,
-                                                   el.isNillable());
-                        paramtype = createParam(wsdlToCorbaBinding,
-                                                mode,
-                                                part.getName(),
-                                                idltype);
+                        QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, el.isNillable());
+                        paramtype = createParam(wsdlToCorbaBinding, mode, part.getName(), idltype);
                     } else {
                         QName typeName = part.getTypeName();
                         if (isObjectRef) {
                             typeName = part.getElementName();
                         }
-                        QName idltype = getIdlType(wsdlToCorbaBinding,
-                                                   schemaType,
-                                                   typeName,
-                                                   false);
-                        paramtype = createParam(wsdlToCorbaBinding,
-                                                mode,
-                                                part.getName(),
-                                                idltype);
+                        QName idltype = getIdlType(wsdlToCorbaBinding, schemaType, typeName, false);
+                        paramtype = createParam(wsdlToCorbaBinding, mode, part.getName(), idltype);
                     }
                     if (paramtype != null) {
                         outputs.add(paramtype);
@@ -359,11 +292,10 @@ public final class WSDLParameter {
         }
     }
 
-    private void processReturnParams(List<ParamType> outputs,
-                                     List<ArgType> returns) {
+    private void processReturnParams(List<ParamType> outputs, List<ArgType> returns) {
 
         if (outputs.size() > 0) {
-            ParamType d2 = (ParamType) outputs.get(0);
+            ParamType d2 = (ParamType)outputs.get(0);
 
             if (d2.getMode().value().equals("out")) {
                 ArgType argType = new ArgType();
@@ -375,19 +307,17 @@ public final class WSDLParameter {
         }
     }
 
-    private void orderParameters(List<ParamType> inputs,
-            List<ParamType> outputs, boolean simpleOrdering) {
+    private void orderParameters(List<ParamType> inputs, List<ParamType> outputs, boolean simpleOrdering) {
         ListIterator<ParamType> inputit = inputs.listIterator();
 
         while (inputit.hasNext()) {
-            ParamType d2 = (ParamType) inputit.next();
+            ParamType d2 = (ParamType)inputit.next();
             if (d2.getMode().value().equals("inout")) {
                 ListIterator it = outputs.listIterator();
 
                 while (it.hasNext()) {
-                    ParamType d3 = (ParamType) it.next();
-                    if (!d3.getName().equals(d2.getName()) 
-                        && (!simpleOrdering)
+                    ParamType d3 = (ParamType)it.next();
+                    if (!d3.getName().equals(d2.getName()) && (!simpleOrdering)
                         && (!d3.getMode().value().equals("inout"))) {
                         // the in/outs are in a different order in the
                         // output than the input
@@ -407,27 +337,25 @@ public final class WSDLParameter {
         }
     }
 
-    private static XmlSchemaType getType(Part part,
-                                         SchemaCollection xmlSchemaList)
-        throws Exception {
+    private static XmlSchemaType getType(Part part, SchemaCollection xmlSchemaList) throws Exception {
         XmlSchemaType schemaType = null;
 
         for (XmlSchema xmlSchema : xmlSchemaList.getXmlSchemas()) {
             if (part.getTypeName() != null) {
-                schemaType = findSchemaType(xmlSchema, part.getTypeName());                
+                schemaType = findSchemaType(xmlSchema, part.getTypeName());
                 if (schemaType != null) {
                     return schemaType;
                 }
             }
         }
-            
+
         return schemaType;
     }
 
-    // This willl search the current schemas and any included 
+    // This willl search the current schemas and any included
     // schemas for the schema type.
     private static XmlSchemaType findSchemaType(XmlSchema xmlSchema, QName typeName) {
-                          
+
         XmlSchemaType schemaType = xmlSchema.getTypeByName(typeName);
 
         // Endpoint reference types will give a null schemaType
@@ -435,28 +363,21 @@ public final class WSDLParameter {
         // go through the list of imports to find the definition for
         // an Endpoint
         // reference type.
-                
-        if (schemaType == null
-            && xmlSchema.getIncludes().getCount() > 0) {
-            XmlSchemaObjectCollection includes = xmlSchema.getIncludes();
-            Iterator includeIter = includes.getIterator();
-            while (includeIter.hasNext()) {
-                Object obj = includeIter.next();
-                if (obj instanceof XmlSchemaExternal) {
-                    XmlSchemaExternal extSchema = (XmlSchemaExternal) obj;
-                    if (extSchema instanceof XmlSchemaImport) {
-                        XmlSchemaImport xmlImport = (XmlSchemaImport) obj;
-                        if (xmlImport.getNamespace().equals(typeName.getNamespaceURI())) {
-                            XmlSchema importSchema = xmlImport.getSchema();
-                            schemaType = importSchema.getTypeByName(typeName);
-                        }
+
+        if (schemaType == null) {
+            for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
+                if (ext instanceof XmlSchemaImport) {
+                    XmlSchemaImport xmlImport = (XmlSchemaImport)ext;
+                    if (xmlImport.getNamespace().equals(typeName.getNamespaceURI())) {
+                        XmlSchema importSchema = xmlImport.getSchema();
+                        schemaType = importSchema.getTypeByName(typeName);
                     } else {
-                        schemaType = findSchemaType(extSchema.getSchema(), typeName);
+                        schemaType = findSchemaType(ext.getSchema(), typeName);
                         if (schemaType != null) {
                             return schemaType;
                         }
-                    }                    
-                }                                
+                    }
+                }
             }
             if (schemaType != null) {
                 return schemaType;
@@ -465,80 +386,67 @@ public final class WSDLParameter {
         return schemaType;
     }
 
-    private static XmlSchemaElement getElement(Part part,
-                                               SchemaCollection xmlSchemaList)
-        throws Exception {
+    private static XmlSchemaElement getElement(Part part, SchemaCollection xmlSchemaList) throws Exception {
         XmlSchemaElement schemaElement = null;
 
         for (XmlSchema xmlSchema : xmlSchemaList.getXmlSchemas()) {
             if (part.getElementName() != null) {
-                schemaElement = findElement(xmlSchema, part.getElementName()); 
-                if (schemaElement !=  null) {
+                schemaElement = findElement(xmlSchema, part.getElementName());
+                if (schemaElement != null) {
                     return schemaElement;
                 }
             }
         }
         return schemaElement;
     }
-    
+
     // Will check if the schema includes other schemas.
     private static XmlSchemaElement findElement(XmlSchema xmlSchema, QName elName) {
         XmlSchemaElement schemaElement = null;
-        
+
         schemaElement = xmlSchema.getElementByName(elName);
-        if (schemaElement == null) {           
+        if (schemaElement == null) {
             String prefix = definition.getPrefix(elName.getNamespaceURI());
-            QName name = new QName(elName.getNamespaceURI(), prefix
-                                   + ":" + elName.getLocalPart(), prefix);
+            QName name = new QName(elName.getNamespaceURI(), prefix + ":" + elName.getLocalPart(), prefix);
             schemaElement = xmlSchema.getElementByName(name);
         }
         if (schemaElement != null) {
             return schemaElement;
-        } else {            
-            if (xmlSchema.getIncludes() != null) {
-                Iterator schemas = xmlSchema.getIncludes().getIterator();
-                while (schemas.hasNext()) {
-                    Object obj = schemas.next();
-                    if (obj instanceof XmlSchemaExternal) {
-                        XmlSchemaExternal extSchema = (XmlSchemaExternal) obj;
-                        if (!(extSchema instanceof XmlSchemaImport)) {
-                            schemaElement = findElement(extSchema.getSchema(), elName);
-                            if (schemaElement != null) {
-                                return schemaElement;
-                            }
-                        }
+        } else {
+            for (XmlSchemaExternal ext : xmlSchema.getExternals()) {
+                if (!(ext instanceof XmlSchemaImport)) {
+                    schemaElement = findElement(ext.getSchema(), elName);
+                    if (schemaElement != null) {
+                        return schemaElement;
                     }
-                }                
+                }
             }
-        }      
+        }
         return schemaElement;
     }
 
-    private static QName getIdlType(WSDLToCorbaBinding wsdlToCorbaBinding,
-        XmlSchemaType schemaType, QName typeName, boolean nill)
-        throws Exception {
+    private static QName getIdlType(WSDLToCorbaBinding wsdlToCorbaBinding, XmlSchemaType schemaType,
+                                    QName typeName, boolean nill) throws Exception {
         QName idltype = null;
         CorbaTypeImpl corbaTypeImpl = null;
         if (schemaType == null) {
-            corbaTypeImpl = (CorbaTypeImpl) WSDLToCorbaHelper.CORBAPRIMITIVEMAP.get(typeName);
+            corbaTypeImpl = (CorbaTypeImpl)WSDLToCorbaHelper.CORBAPRIMITIVEMAP.get(typeName);
             if (nill) {
                 QName qname = corbaTypeImpl.getQName();
-                idltype = 
-                    wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart() + "_nil");
+                idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
+                                                                                       + "_nil");
             } else {
                 if (corbaTypeImpl == null) {
-                    XmlSchemaObject schemaObj = getSchemaObject(
-                        wsdlToCorbaBinding, typeName);
+                    XmlSchemaObject schemaObj = getSchemaObject(wsdlToCorbaBinding, typeName);
                     XmlSchemaAnnotation annotation = null;
                     if (schemaObj instanceof XmlSchemaType) {
-                        schemaType = (XmlSchemaType) schemaObj;
+                        schemaType = (XmlSchemaType)schemaObj;
                     } else if (schemaObj instanceof XmlSchemaElement) {
-                        XmlSchemaElement el = (XmlSchemaElement) schemaObj;
+                        XmlSchemaElement el = (XmlSchemaElement)schemaObj;
                         schemaType = el.getSchemaType();
-                        annotation = ((XmlSchemaElement) schemaObj).getAnnotation();
+                        annotation = ((XmlSchemaElement)schemaObj).getAnnotation();
                     }
-                    idltype = getSchemaTypeName(wsdlToCorbaBinding, schemaType,
-                        annotation, typeName, nill);
+                    idltype = getSchemaTypeName(wsdlToCorbaBinding, schemaType, annotation, typeName, nill);
                 } else {
                     idltype = corbaTypeImpl.getQName();
                 }
@@ -550,44 +458,40 @@ public final class WSDLParameter {
             XmlSchemaObject schemaObj = getSchemaObject(wsdlToCorbaBinding, typeName);
             XmlSchemaAnnotation annotation = null;
             if (schemaObj instanceof XmlSchemaElement) {
-                annotation = ((XmlSchemaElement) schemaObj).getAnnotation();
+                annotation = ((XmlSchemaElement)schemaObj).getAnnotation();
             }
-            idltype = getSchemaTypeName(wsdlToCorbaBinding, schemaType,
-                annotation, typeName, nill);
+            idltype = getSchemaTypeName(wsdlToCorbaBinding, schemaType, annotation, typeName, nill);
         }
         return idltype;
     }
 
-    private static XmlSchemaObject getSchemaObject(
-        WSDLToCorbaBinding wsdlToCorbaBinding, QName typeName) {
+    private static XmlSchemaElement getSchemaObject(WSDLToCorbaBinding wsdlToCorbaBinding, QName typeName) {
 
         SchemaCollection schemaList = wsdlToCorbaBinding.getHelper().getXMLSchemaList();
-        XmlSchemaObject schemaObj = null;
         for (XmlSchema s : schemaList.getXmlSchemas()) {
-            XmlSchemaObjectTable schemaTable = s.getElements();
-            schemaObj = schemaTable.getItem(typeName);
-            if (schemaObj != null) {
-                break;
+            XmlSchemaElement e = s.getElementByName(typeName);
+            if (e != null) {
+                return e;
             }
         }
-        return schemaObj;
+        return null;
     }
 
-    private static QName getSchemaTypeName(WSDLToCorbaBinding wsdlToCorbaBinding, 
-        XmlSchemaType schemaType, XmlSchemaAnnotation annotation, QName typeName, 
-        boolean nill) throws Exception {
+    private static QName getSchemaTypeName(WSDLToCorbaBinding wsdlToCorbaBinding, XmlSchemaType schemaType,
+                                           XmlSchemaAnnotation annotation, QName typeName, boolean nill)
+        throws Exception {
         QName idltype = null;
         CorbaTypeImpl corbaTypeImpl = null;
 
-        corbaTypeImpl = wsdlToCorbaBinding.getHelper().convertSchemaToCorbaType(schemaType, 
-            typeName, null, annotation, false);
+        corbaTypeImpl = wsdlToCorbaBinding.getHelper().convertSchemaToCorbaType(schemaType, typeName, null,
+                                                                                annotation, false);
         if (corbaTypeImpl == null) {
             throw new Exception("Couldn't convert schema type to corba type : " + typeName);
         } else {
             if (nill) {
                 QName qname = corbaTypeImpl.getQName();
-                idltype = 
-                    wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart() + "_nil");
+                idltype = wsdlToCorbaBinding.getHelper().createQNameCorbaNamespace(qname.getLocalPart()
+                                                                                       + "_nil");
             } else {
                 idltype = corbaTypeImpl.getQName();
             }
@@ -595,12 +499,8 @@ public final class WSDLParameter {
         return idltype;
     }
 
-
-    private static ParamType createParam(WSDLToCorbaBinding wsdlToCorbaBinding,
-                                         String mode,
-                                         String name,
-                                         QName idltype)
-        throws Exception {
+    private static ParamType createParam(WSDLToCorbaBinding wsdlToCorbaBinding, String mode, String name,
+                                         QName idltype) throws Exception {
         ParamType paramtype = new ParamType();
         ModeType modeType = ModeType.fromValue(mode);
         paramtype.setName(name);
@@ -609,8 +509,7 @@ public final class WSDLParameter {
         return paramtype;
     }
 
-    private boolean isWrappedOperation(Operation op, SchemaCollection xmlSchemaList)
-        throws Exception {
+    private boolean isWrappedOperation(Operation op, SchemaCollection xmlSchemaList) throws Exception {
         Message inputMessage = op.getInput().getMessage();
         Message outputMessage = null;
         if (op.getOutput() != null) {
@@ -639,7 +538,7 @@ public final class WSDLParameter {
         // The input message part refers to a global element decalration whose
         // localname
         // is equal to the operation name
-        Part inputPart = (Part) inputMessage.getParts().values().iterator().next();
+        Part inputPart = (Part)inputMessage.getParts().values().iterator().next();
         if (inputPart.getElementName() == null) {
             passedRule = false;
         } else {
@@ -649,7 +548,7 @@ public final class WSDLParameter {
                 passedRule = false;
             }
         }
-        
+
         if (!passedRule) {
             return false;
         }
@@ -658,17 +557,16 @@ public final class WSDLParameter {
         // The output message part refers to a global element declaration
         Part outputPart = null;
         if (outputMessage != null && outputMessage.getParts().size() == 1) {
-            outputPart = (Part) outputMessage.getParts().values().iterator().next();
+            outputPart = (Part)outputMessage.getParts().values().iterator().next();
             if (outputPart != null) {
-                if ((outputPart.getElementName() == null)
-                    || getElement(outputPart, xmlSchemaList) == null) {
+                if ((outputPart.getElementName() == null) || getElement(outputPart, xmlSchemaList) == null) {
                     passedRule = false;
                 } else {
                     outputEl = getElement(outputPart, xmlSchemaList);
                 }
             }
         }
-        
+
         if (!passedRule) {
             return false;
         }
@@ -682,14 +580,13 @@ public final class WSDLParameter {
         XmlSchemaComplexType xsct = null;
         if (inputEl.getSchemaType() instanceof XmlSchemaComplexType) {
             xsct = (XmlSchemaComplexType)inputEl.getSchemaType();
-            if (hasAttributes(xsct)
-                || !isWrappableSequence(xsct)) {
+            if (hasAttributes(xsct) || !isWrappableSequence(xsct)) {
                 passedRule = false;
             }
         } else {
             passedRule = false;
         }
-        
+
         if (!passedRule) {
             return false;
         }
@@ -697,14 +594,13 @@ public final class WSDLParameter {
         if (outputMessage != null) {
             if (outputEl != null && outputEl.getSchemaType() instanceof XmlSchemaComplexType) {
                 xsct = (XmlSchemaComplexType)outputEl.getSchemaType();
-                if (hasAttributes(xsct)
-                    || !isWrappableSequence(xsct)) {
+                if (hasAttributes(xsct) || !isWrappableSequence(xsct)) {
                     passedRule = false;
                 }
             } else {
                 passedRule = false;
             }
-        }       
+        }
 
         return passedRule;
     }
@@ -712,7 +608,7 @@ public final class WSDLParameter {
     private boolean hasAttributes(XmlSchemaComplexType complexType) {
         // Now lets see if we have any attributes...
         // This should probably look at the restricted and substitute types too.
-        if (complexType.getAnyAttribute() != null || complexType.getAttributes().getCount() > 0) {
+        if (complexType.getAnyAttribute() != null || complexType.getAttributes().size() > 0) {
             return true;
         }
         return false;
@@ -721,11 +617,10 @@ public final class WSDLParameter {
     private boolean isWrappableSequence(XmlSchemaComplexType type) {
         if (type.getParticle() instanceof XmlSchemaSequence) {
             XmlSchemaSequence seq = (XmlSchemaSequence)type.getParticle();
-            XmlSchemaObjectCollection items = seq.getItems();
+            List<XmlSchemaSequenceMember> items = seq.getItems();
 
-            for (int x = 0; x < items.getCount(); x++) {
-                XmlSchemaObject o = items.getItem(x);
-                if (!(o instanceof XmlSchemaElement)) {
+            for (XmlSchemaSequenceMember member : items) {
+                if (!(member instanceof XmlSchemaElement)) {
                     return false;
                 }
             }
@@ -743,18 +638,15 @@ public final class WSDLParameter {
             if (element != null) {
                 XmlSchemaAnnotation annotation = element.getAnnotation();
                 if (annotation != null) {
-                    XmlSchemaObjectCollection annotationColl = annotation.getItems();
-                    Iterator annotationIter = annotationColl.getIterator();
-                    while (annotationIter.hasNext()) {
-                        Object o = annotationIter.next();
-                        if (o instanceof XmlSchemaAppInfo) {
+                    List<XmlSchemaAnnotationItem> annotationColl = annotation.getItems();
+                    for (XmlSchemaAnnotationItem item : annotationColl) {
+                        if (item instanceof XmlSchemaAppInfo) {
                             return true;
                         }
                     }
                 }
             }
         }
-
         return false;
     }
 

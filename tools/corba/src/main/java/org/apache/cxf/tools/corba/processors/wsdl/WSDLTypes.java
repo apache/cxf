@@ -50,6 +50,7 @@ import org.apache.cxf.binding.corba.wsdl.Unionbranch;
 import org.apache.cxf.binding.corba.wsdl.W3CConstants;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.ws.commons.schema.XmlSchemaAnnotation;
+import org.apache.ws.commons.schema.XmlSchemaAnnotationItem;
 import org.apache.ws.commons.schema.XmlSchemaAppInfo;
 import org.apache.ws.commons.schema.XmlSchemaChoice;
 import org.apache.ws.commons.schema.XmlSchemaComplexType;
@@ -63,29 +64,28 @@ import org.apache.ws.commons.schema.XmlSchemaTotalDigitsFacet;
 
 
 public final class WSDLTypes {
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(WSDLTypes.class);
 
     private WSDLTypes() {
     }
 
-    public static CorbaTypeImpl processObject(Definition definition, XmlSchemaComplexType complex,  
+    public static CorbaTypeImpl processObject(Definition definition, XmlSchemaComplexType complex,
                                               XmlSchemaAnnotation annotation, QName typeName,
-                                              QName defaultName, String idlNamespace) 
+                                              QName defaultName, String idlNamespace)
         throws Exception {
         CorbaTypeImpl corbaTypeImpl = null;
-                
+
         if (annotation != null) {
-            Iterator i = annotation.getItems().getIterator();
-            while (i.hasNext()) {
-                XmlSchemaAppInfo appInfo = (XmlSchemaAppInfo)i.next();
+            for (XmlSchemaAnnotationItem item : annotation.getItems()) {
+                XmlSchemaAppInfo appInfo = (XmlSchemaAppInfo)item;
                 if (appInfo != null) {
                     NodeList nlist = appInfo.getMarkup();
                     Node node = nlist.item(0);
                     String info = node.getNodeValue();
-                    
-                    info.trim();                
-        
+
+                    info.trim();
+
                     if ("corba:binding=".equals(info.substring(0, 14))) {
                         String bindingName = info.substring(14);
                         QName bqname = new QName(definition.getTargetNamespace(), bindingName);
@@ -96,22 +96,22 @@ public final class WSDLTypes {
                             binding = definition.getBinding(bqname);
                         }
 
-                        if (binding != null) {    
-                            org.apache.cxf.binding.corba.wsdl.Object obj = 
+                        if (binding != null) {
+                            org.apache.cxf.binding.corba.wsdl.Object obj =
                                 new org.apache.cxf.binding.corba.wsdl.Object();
                             PortType portT = binding.getPortType();
-                            QName name = new QName(idlNamespace, portT.getQName().getLocalPart(), 
+                            QName name = new QName(idlNamespace, portT.getQName().getLocalPart(),
                                                    definition.getPrefix(idlNamespace));
                             obj.setName(name.getLocalPart());
-                            obj.setQName(name);  
-                            QName bName = binding.getQName();                           
+                            obj.setQName(name);
+                            QName bName = binding.getQName();
                             obj.setBinding(bName);
                             // get the repository id of the binding.
                             String repId = null;
                             Iterator bindIter = binding.getExtensibilityElements().iterator();
                             while (bindIter.hasNext()) {
                                 BindingType type = (BindingType)bindIter.next();
-                                repId = type.getRepositoryID();                               
+                                repId = type.getRepositoryID();
                             }
                             obj.setRepositoryID(repId);
                             obj.setType(typeName);
@@ -127,24 +127,24 @@ public final class WSDLTypes {
         }
 
         if (corbaTypeImpl == null) {
-            org.apache.cxf.binding.corba.wsdl.Object obj = 
+            org.apache.cxf.binding.corba.wsdl.Object obj =
                 new org.apache.cxf.binding.corba.wsdl.Object();
             QName name = new QName(idlNamespace, "CORBA.Object", definition.getPrefix(idlNamespace));
             obj.setName(name.getLocalPart());
-            obj.setQName(name);             
+            obj.setQName(name);
             obj.setRepositoryID("IDL:omg.org/CORBA/Object/1.0");
-            obj.setType(typeName);                       
+            obj.setType(typeName);
             corbaTypeImpl = obj;
         }
-        
+
         return corbaTypeImpl;
 
-    }         
+    }
 
-    
-    public static CorbaTypeImpl processStringType(CorbaTypeImpl corbaTypeImpl, QName name, 
+
+    public static CorbaTypeImpl processStringType(CorbaTypeImpl corbaTypeImpl, QName name,
                                                   String maxLength, String length) throws Exception {
-        boolean boundedString = true;             
+        boolean boundedString = true;
         int bound = 0;
 
         try {
@@ -162,21 +162,21 @@ public final class WSDLTypes {
         }
 
         if (boundedString) {
-            // bounded string 
+            // bounded string
             Anonstring anonString = new Anonstring();
             anonString.setBound(bound);
             anonString.setName(name.getLocalPart());
             anonString.setQName(name);
-            anonString.setType(corbaTypeImpl.getQName());            
-            corbaTypeImpl = anonString;           
-        } 
+            anonString.setType(corbaTypeImpl.getQName());
+            corbaTypeImpl = anonString;
+        }
         return corbaTypeImpl;
     }
-    
+
     public static CorbaTypeImpl mapToArray(QName name, QName schematypeName, QName arrayType,
                                            QName elName, int bound, boolean anonymous) {
         CorbaTypeImpl corbatype = null;
-            
+
         //schematypeName = checkPrefix(schematypeName);
 
         if (!anonymous) {
@@ -190,19 +190,19 @@ public final class WSDLTypes {
             corbaArray.setRepositoryID(WSDLToCorbaHelper.REPO_STRING
                                        + name.getLocalPart().replace('.', '/')
                                        + WSDLToCorbaHelper.IDL_VERSION);
-            corbaArray.setQName(name);            
+            corbaArray.setQName(name);
             corbatype = corbaArray;
         } else {
             //Create an Anonymous Array
             Anonarray corbaArray = new Anonarray();
             corbaArray.setName(name.getLocalPart());
-            corbaArray.setType(schematypeName);            
+            corbaArray.setType(schematypeName);
             corbaArray.setElemtype(arrayType);
             corbaArray.setElemname(elName);
             corbaArray.setBound(bound);
-            corbaArray.setQName(name);                        
+            corbaArray.setQName(name);
             corbatype = corbaArray;
-        }           
+        }
         return corbatype;
     }
 
@@ -238,7 +238,7 @@ public final class WSDLTypes {
         }
         return corbaTypeImpl;
     }
-    
+
     public static Union processUnionBranches(Union corbaUnion, List fields, List<String> caselist) {
         int caseIndex = 0;
 
@@ -250,7 +250,7 @@ public final class WSDLTypes {
             if (field.isSetQualified() && field.isQualified()) {
                 branch.setQualified(true);
             }
-            branch.setDefault(false);                         
+            branch.setDefault(false);
 
             CaseType c = new CaseType();
             c.setLabel((String)caselist.get(caseIndex));
@@ -259,21 +259,20 @@ public final class WSDLTypes {
             corbaUnion.getUnionbranch().add(branch);
         }
         return corbaUnion;
-    }    
+    }
 
-    
+
     public static boolean isOMGUnion(XmlSchemaComplexType type) {
         boolean isUnion = false;
 
-        if (type.getParticle() instanceof XmlSchemaSequence 
-            && type.getAttributes().getCount() == 0) {
-        
-            XmlSchemaSequence stype = (XmlSchemaSequence)type.getParticle();                
+        if (type.getParticle() instanceof XmlSchemaSequence
+            && type.getAttributes().size() == 0) {
 
-            if (stype.getItems().getCount() == 2) {
-                Iterator it = stype.getItems().getIterator();
-                XmlSchemaParticle st1 = (XmlSchemaParticle)it.next();
-                XmlSchemaParticle st2 = (XmlSchemaParticle)it.next();
+            XmlSchemaSequence stype = (XmlSchemaSequence)type.getParticle();
+
+            if (stype.getItems().size() == 2) {
+                XmlSchemaParticle st1 = (XmlSchemaParticle)stype.getItems().get(0);
+                XmlSchemaParticle st2 = (XmlSchemaParticle)stype.getItems().get(1);
                 XmlSchemaElement discEl = null;
 
                 if (st1 instanceof XmlSchemaChoice && st2 instanceof XmlSchemaElement) {
@@ -285,35 +284,33 @@ public final class WSDLTypes {
                 }
                 if (isUnion && !"discriminator".equals(discEl.getQName().getLocalPart())) {
                     isUnion = false;
-                }                
+                }
             }
         }
         return isUnion;
     }
-        
+
     public static boolean isUnion(XmlSchemaComplexType type) {
         boolean isUnion = false;
-        
-        if (type.getParticle() instanceof XmlSchemaChoice && type.getAttributes().getCount() == 0) {
+
+        if (type.getParticle() instanceof XmlSchemaChoice && type.getAttributes().size() == 0) {
             isUnion = true;
         }
 
         return isUnion;
     }
 
-    
-    public static CorbaTypeImpl processDecimalType(XmlSchemaSimpleTypeRestriction restrictionType, 
+
+    public static CorbaTypeImpl processDecimalType(XmlSchemaSimpleTypeRestriction restrictionType,
                                                    QName name, CorbaTypeImpl corbaTypeImpl,
                                                    boolean anonymous) throws Exception {
-                
+
         String tdigits = null;
         String fdigits = null;
         boolean boundedDecimal = false;
         boolean boundedScale = false;
-        Iterator iter = restrictionType.getFacets().getIterator();
-        while (iter.hasNext()) {
-            XmlSchemaFacet val = (XmlSchemaFacet)iter.next();
-            if (val instanceof XmlSchemaTotalDigitsFacet) {            
+        for (XmlSchemaFacet val : restrictionType.getFacets()) {
+            if (val instanceof XmlSchemaTotalDigitsFacet) {
                 tdigits = val.getValue().toString();
                 boundedDecimal = true;
             }
@@ -322,16 +319,16 @@ public final class WSDLTypes {
                 boundedScale = true;
             }
         }
-        
+
         int digits = 0;
         int scale = 0;
-        
+
         if (boundedDecimal) {
             try {
                 digits = Integer.parseInt(tdigits);
 
                 if ((digits > 31) || (digits < 1)) {
-                    String msg = "totalDigits facet for the type " + name 
+                    String msg = "totalDigits facet for the type " + name
                         + " cannot be more than 31 for corba fixed types";
                     LOG.log(Level.WARNING, msg);
                     boundedDecimal = false;
@@ -339,12 +336,12 @@ public final class WSDLTypes {
                     boundedDecimal = false;
                 }
             } catch (NumberFormatException ex) {
-                String msg = "totalDigits facet on the simple type restriction for type" 
+                String msg = "totalDigits facet on the simple type restriction for type"
                     + name.getLocalPart() + "is incorrect.";
-                throw new Exception(msg);                                 
+                throw new Exception(msg);
             }
         }
-        
+
         if (boundedScale) {
             try {
                 scale = Integer.parseInt(fdigits);
@@ -358,8 +355,8 @@ public final class WSDLTypes {
                     boundedScale = false;
                 }
             } catch (NumberFormatException ex) {
-                String msg = "fractionDigits facet on the simple type restriction for type" 
-                    + name.getLocalPart() + " is incorrect.";                     
+                String msg = "fractionDigits facet on the simple type restriction for type"
+                    + name.getLocalPart() + " is incorrect.";
                 throw new Exception(msg);
             }
         }
@@ -371,7 +368,7 @@ public final class WSDLTypes {
             } else {
                 Fixed fixed = (Fixed)corbaTypeImpl;
                 digits = Integer.parseInt(String.valueOf(fixed.getDigits()));
-            }            
+            }
         }
 
         if (!boundedScale) {
@@ -385,23 +382,23 @@ public final class WSDLTypes {
         }
 
         if (boundedDecimal || boundedScale) {
-            if (anonymous) { 
-                corbaTypeImpl = (CorbaTypeImpl)getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL, 
+            if (anonymous) {
+                corbaTypeImpl = (CorbaTypeImpl)getAnonFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                                                  digits, scale);
             } else {
-                corbaTypeImpl = (CorbaTypeImpl)getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL, 
+                corbaTypeImpl = (CorbaTypeImpl)getFixedCorbaType(name, W3CConstants.NT_SCHEMA_DECIMAL,
                                           digits, scale);
             }
         }
         return corbaTypeImpl;
-    }   
-    
-    
-    public static CorbaTypeImpl processBase64Type(CorbaTypeImpl corbaTypeImpl, QName name, 
-                                                  String maxLength, String length) 
+    }
+
+
+    public static CorbaTypeImpl processBase64Type(CorbaTypeImpl corbaTypeImpl, QName name,
+                                                  String maxLength, String length)
         throws Exception {
         int bound = 0;
-        boolean boundedOctet = true;    
+        boolean boundedOctet = true;
 
         try {
             if (maxLength != null) {
@@ -412,8 +409,8 @@ public final class WSDLTypes {
                 boundedOctet = false;
             }
         } catch (NumberFormatException ex) {
-            String msg = "length facet on the simple type restriction for type"                 
-                + name.getLocalPart() + " is incorrect.";                     
+            String msg = "length facet on the simple type restriction for type"
+                + name.getLocalPart() + " is incorrect.";
             throw new Exception(msg);
         }
 
@@ -423,14 +420,14 @@ public final class WSDLTypes {
 
         return corbaTypeImpl;
     }
-    
+
     //  checks if the type is an anonymous type.
     public static boolean isAnonymous(String typeName) {
         boolean anonymous = false;
-        
+
         if (typeName == null) {
             anonymous = true;
-        } else {                                                  
+        } else {
             StringTokenizer strtok = new StringTokenizer(typeName, ".");
             for (int i = 0; strtok.hasMoreTokens(); ++i) {
                 String token = strtok.nextToken();
@@ -443,8 +440,8 @@ public final class WSDLTypes {
         }
         return anonymous;
     }
-    
-    public static CorbaTypeImpl getFixedCorbaType(QName name, QName stype, int digits, int scale) {        
+
+    public static CorbaTypeImpl getFixedCorbaType(QName name, QName stype, int digits, int scale) {
         Fixed fixed = new Fixed();
         fixed.setName(name.getLocalPart());
         fixed.setQName(name);
@@ -453,10 +450,10 @@ public final class WSDLTypes {
         fixed.setScale(scale);
         fixed.setRepositoryID(WSDLToCorbaHelper.REPO_STRING
                               + name.getLocalPart().replace('.', '/')
-                              + WSDLToCorbaHelper.IDL_VERSION);       
+                              + WSDLToCorbaHelper.IDL_VERSION);
         return fixed;
     }
-    
+
     public static CorbaTypeImpl getAnonFixedCorbaType(QName name, QName stype, int digits, int scale) {
         Anonfixed fixed = new Anonfixed();
         fixed.setName(name.getLocalPart());
@@ -466,12 +463,12 @@ public final class WSDLTypes {
         fixed.setScale(scale);
         return fixed;
     }
-    
+
     public static CorbaTypeImpl getOctetCorbaType(QName name, QName stype, int bound) {
         Sequence seq = new Sequence();
         seq.setName(name.getLocalPart());
         seq.setQName(name);
-        seq.setType(stype);        
+        seq.setType(stype);
         seq.setElemtype(CorbaConstants.NT_CORBA_OCTET);
         seq.setBound(bound);
         seq.setRepositoryID(WSDLToCorbaHelper.REPO_STRING
@@ -479,6 +476,6 @@ public final class WSDLTypes {
                             + WSDLToCorbaHelper.IDL_VERSION);
         return seq;
     }
-        
-    
+
+
 }

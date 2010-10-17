@@ -39,7 +39,7 @@ public class DeclaratorVisitor extends VisitorBase {
     //                | <complex_declarator>
     // <simple_declarator> ::= <identifier>
     // <complex_declarator> ::= <array_declarator>
-    
+
     public DeclaratorVisitor(Scope scope,
                              Definition defn,
                              XmlSchema schemaRef,
@@ -52,9 +52,9 @@ public class DeclaratorVisitor extends VisitorBase {
         setCorbaType(corbaTypeRef);
         setFullyQualifiedName(fQName);
     }
-    
+
     public void visit(AST node) {
-    
+
         if (ArrayVisitor.accept(node)) {
             ArrayVisitor arrayVisitor = new ArrayVisitor(getScope(),
                                                          definition,
@@ -77,8 +77,8 @@ public class DeclaratorVisitor extends VisitorBase {
             // add corbaType
             typeMap.getStructOrExceptionOrUnion().add(getCorbaType());
         }
-        
-        AST nextDecl = node.getNextSibling(); 
+
+        AST nextDecl = node.getNextSibling();
         while (nextDecl != null) {
             Scope newScope = new Scope(getScope().getParent(), nextDecl);
 
@@ -88,14 +88,14 @@ public class DeclaratorVisitor extends VisitorBase {
                                                              schema,
                                                              wsdlVisitor,
                                                              nextDecl,
-                                                             getFullyQualifiedName()); 
+                                                             getFullyQualifiedName());
                 arrayVisitor.setSchemaType(getSchemaType());
                 arrayVisitor.setCorbaType(getCorbaType());
                 arrayVisitor.visit(nextDecl);
             } else {
                 visitNewTypes(newScope);
             }
-            
+
             nextDecl = nextDecl.getNextSibling();
         }
 
@@ -114,19 +114,19 @@ public class DeclaratorVisitor extends VisitorBase {
             //
             Alias oldAlias = (Alias) oldCorbaType;
             Alias alias = new Alias();
-            
+
             alias.setQName(newQname);
             alias.setBasetype(oldAlias.getBasetype());
             alias.setType(oldAlias.getType());
             alias.setRepositoryID(newScope.toIDLRepositoryID());
-            
+
             nextCorbaType = alias;
         } else if (oldCorbaType instanceof Sequence) {
             // Sequence
             //
-            
+
             nextSchemaType = duplicateXmlSchemaComplexType(newScope);
-            
+
             Sequence oldSequence = (Sequence) oldCorbaType;
             Sequence newSequence = new Sequence();
 
@@ -141,7 +141,7 @@ public class DeclaratorVisitor extends VisitorBase {
         } else if (oldCorbaType instanceof Fixed) {
             // Fixed
             //
-            
+
             nextSchemaType = duplicateXmlSchemaSimpleType(newScope);
 
             Fixed oldFixed = (Fixed) getCorbaType();
@@ -152,7 +152,7 @@ public class DeclaratorVisitor extends VisitorBase {
             newFixed.setScale(oldFixed.getScale());
             newFixed.setType(oldFixed.getType());
             newFixed.setRepositoryID(newScope.toIDLRepositoryID());
-            
+
             nextCorbaType = newFixed;
         } else {
             System.err.println("[DeclaratorVisitor: Unexpected CORBA type error!]");
@@ -164,24 +164,24 @@ public class DeclaratorVisitor extends VisitorBase {
         }
         if (nextSchemaType != null) {
             schema.getItems().add(nextSchemaType);
-            schema.addType(nextSchemaType);                    
+            schema.addType(nextSchemaType);
         }
     }
 
-    
+
     private XmlSchemaComplexType duplicateXmlSchemaComplexType(Scope newScope) {
         XmlSchemaComplexType oldSchemaType = (XmlSchemaComplexType) getSchemaType();
-        XmlSchemaComplexType newSchemaType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType newSchemaType = new XmlSchemaComplexType(schema, false);
 
         newSchemaType.setName(newScope.toString());
         newSchemaType.setParticle(oldSchemaType.getParticle());
 
         return newSchemaType;
     }
-    
+
     private XmlSchemaSimpleType duplicateXmlSchemaSimpleType(Scope newScope) {
         XmlSchemaSimpleType oldSimpleType = (XmlSchemaSimpleType) getSchemaType();
-        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema);
+        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, false);
         simpleType.setContent(oldSimpleType.getContent());
         simpleType.setName(newScope.toString());
         return simpleType;

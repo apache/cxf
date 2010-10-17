@@ -76,7 +76,7 @@ import org.apache.ws.commons.schema.utils.NamespaceMap;
  * not require special arrangements; the service factories do not call {{@link #initialize(Service)} until
  * after the application passes the data binding into the factory. This class adds root classes to the context
  * based on the SEI and implementation.
- * 
+ *
  * @see org.apache.cxf.aegis.AegisContext
  */
 public class AegisDatabinding extends AbstractDataBinding {
@@ -267,7 +267,7 @@ public class AegisDatabinding extends AbstractDataBinding {
         }
     }
 
-    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo, 
+    private void initializeOperation(Service s, TypeMapping serviceTM, OperationInfo opInfo,
                                      Set<AegisType> deps) {
         try {
             initializeMessage(s, serviceTM, opInfo.getInput(), IN_PARAM, deps);
@@ -322,7 +322,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                     part.setElementQName(type.getSchemaType());
                 }
             }
-            
+
             Annotation[] anns = part.getProperty("parameter.annotations", Annotation[].class);
 
             long miValue = -1;
@@ -337,7 +337,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 part.setProperty("minOccurs", Long.toString(miValue));
             }
 
-            
+
             // The concept of type.isNillable is questionable: how are types nillable?
             // However, this if at least allow .aegis.xml files to get control.
             if (part.getProperty("nillable") == null) {
@@ -360,7 +360,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                     part.setProperty("maxOccurs", moValue);
                 }
             }
-            
+
 
             part2Type.put(part, type);
 
@@ -472,8 +472,8 @@ public class AegisDatabinding extends AbstractDataBinding {
 
                 schema.setNamespaceContext(xmlsNamespaceMap);
                 schema.setTargetNamespace(entry.getKey());
-                schema.setElementFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
-                schema.setAttributeFormDefault(new XmlSchemaForm(XmlSchemaForm.QUALIFIED));
+                schema.setElementFormDefault(XmlSchemaForm.QUALIFIED);
+                schema.setAttributeFormDefault(XmlSchemaForm.QUALIFIED);
 
                 for (AegisType t : entry.getValue()) {
                     try {
@@ -600,7 +600,7 @@ public class AegisDatabinding extends AbstractDataBinding {
                 if (info.getMaxOccurs() != -1) {
                     param.setProperty("maxOccurs", Long.toString(info.getMaxOccurs()));
                 }
-                
+
                 if ((type instanceof ArrayType) && !type.isWriteOuter()) {
                     param.setProperty("org.apache.cxf.aegis.outerType", type);
                     ArrayType aType = (ArrayType) type;
@@ -616,7 +616,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
             if (!usingComponentType) {
                 // We have to register the type if we want minOccurs and such to
-                // work. (for custom types). Is this really still true with all the 
+                // work. (for custom types). Is this really still true with all the
                 // param setting above?
                 if (info.nonDefaultAttributes()) {
                     tm.register(type);

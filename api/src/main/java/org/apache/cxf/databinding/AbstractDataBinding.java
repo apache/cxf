@@ -174,7 +174,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         schema.setSystemId(systemId);
         XmlSchema xmlSchema;
         synchronized (d) {
-            xmlSchema = col.read(d, systemId, null);
+            xmlSchema = col.read(d, systemId);
             schema.setSchema(xmlSchema);
             schema.setElement(d.getDocumentElement());
         }

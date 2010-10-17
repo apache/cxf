@@ -58,11 +58,11 @@ public class AttributeVisitor extends VisitorBase {
     private static final String PART_NAME         = "parameters";
     private static final String PARAM_NAME        = "_arg";
     private static final String RETURN_PARAM_NAME = "return";
-    
+
     private ExtensionRegistry   extReg;
     private PortType            portType;
     private Binding             binding;
-    
+
     public AttributeVisitor(Scope scope,
                             Definition defn,
                             XmlSchema schemaRef,
@@ -74,7 +74,7 @@ public class AttributeVisitor extends VisitorBase {
         portType = wsdlPortType;
         binding = wsdlBinding;
     }
-    
+
     public static boolean accept(AST node) {
         if (node.getType() == IDLTokenTypes.LITERAL_readonly
             || node.getType() == IDLTokenTypes.LITERAL_attribute) {
@@ -82,18 +82,18 @@ public class AttributeVisitor extends VisitorBase {
         }
         return false;
     }
-    
+
     public void visit(AST attributeNode) {
         // <attr_dcl> ::= ["readonly"] "attribute" <param_type_spec> <simple_declarator>
         //                {"," <simple_declarator>}*
-        
-        
+
+
         AST node = attributeNode.getFirstChild();
-        
+
         AST readonlyNode = null;
         AST typeNode = null;
         AST nameNode = null;
-        
+
         if (node.getType() == IDLTokenTypes.LITERAL_readonly) {
             readonlyNode = node;
             typeNode = readonlyNode.getNextSibling();
@@ -115,15 +115,15 @@ public class AttributeVisitor extends VisitorBase {
 
     private void generateGetter(AST typeNode, AST nameNode) {
         // generate wrapped doc element in parameter
-        XmlSchemaElement inParameters = 
+        XmlSchemaElement inParameters =
             generateWrappedDocElement(null,
                                       GETTER_PREFIX + nameNode.toString(),
                                       PARAM_NAME);
         // generate wrapped doc element out parameter
-        XmlSchemaElement outParameters = 
+        XmlSchemaElement outParameters =
             generateWrappedDocElement(typeNode,
                                       GETTER_PREFIX + nameNode.toString() + RESULT_POSTFIX,
-                                      RETURN_PARAM_NAME);                                      
+                                      RETURN_PARAM_NAME);
 
         // generate input message
         Message inMsg = generateMessage(inParameters,
@@ -131,25 +131,25 @@ public class AttributeVisitor extends VisitorBase {
         // generate output message
         Message outMsg = generateMessage(outParameters,
                                          GETTER_PREFIX + nameNode.toString() + RESPONSE_POSTFIX);
-        
+
         // generate operation
         String name = GETTER_PREFIX + nameNode.toString();
         Operation op = generateOperation(name, inMsg, outMsg);
-        
-        
+
+
         // generate corba return param
         ArgType corbaReturn = generateCorbaReturnParam(typeNode);
-        
+
         // generate corba operation
         OperationType corbaOp = generateCorbaOperation(op, null, corbaReturn);
-        
+
         // generate binding
         generateCorbaBindingOperation(binding, op, corbaOp);
     }
 
     private void generateSetter(AST typeNode, AST nameNode) {
         // generate wrapped doc element in parameter
-        XmlSchemaElement inParameters = 
+        XmlSchemaElement inParameters =
             generateWrappedDocElement(typeNode,
                                       SETTER_PREFIX + nameNode.toString(),
                                       PARAM_NAME);
@@ -158,31 +158,31 @@ public class AttributeVisitor extends VisitorBase {
             generateWrappedDocElement(null,
                                       SETTER_PREFIX + nameNode.toString() + RESULT_POSTFIX,
                                       RETURN_PARAM_NAME);
-        
+
         // generate input message
         Message inMsg = generateMessage(inParameters,
                                         SETTER_PREFIX + nameNode.toString());
         // generate output message
         Message outMsg = generateMessage(outParameters,
                                          SETTER_PREFIX + nameNode.toString() + RESPONSE_POSTFIX);
-        
+
         // generate operation
         String name = SETTER_PREFIX + nameNode.toString();
         Operation op = generateOperation(name, inMsg, outMsg);
-        
-        
+
+
         // generate corba return param
         ParamType corbaParam = generateCorbaParam(typeNode);
-        
+
         // generate corba operation
         OperationType corbaOp = generateCorbaOperation(op, corbaParam, null);
-        
+
         // generate binding
         generateCorbaBindingOperation(binding, op, corbaOp);
     }
-    
+
     /** Generate a wrapped doc style XmlSchemaElement containing one element.
-     * 
+     *
      * I.e.: generateWrappedDocElement(null, "foo", "bar");
      * <xs:element name="foo">
      *   <xs:complexType>
@@ -190,7 +190,7 @@ public class AttributeVisitor extends VisitorBase {
      *     </xs:sequence>
      *   </xs:complexType>
      * </xs:element>
-     * 
+     *
      * i.e.: generateWrappedDocElement(type, "foo", "bar");
      * <xs:element name="foo">
      *   <xs:complexType>
@@ -201,15 +201,15 @@ public class AttributeVisitor extends VisitorBase {
      *   </xs:complexType>
      * </xs:element>
 
-     * 
+     *
      * @param typeNode is the type of the element wrapped in the sequence, no element is created if null.
      * @param name is the name of the wrapping element.
      * @param paramName is the name of the  wrapping element.
      * @return the wrapping element.
      */
-    private XmlSchemaElement generateWrappedDocElement(AST typeNode, String name, 
+    private XmlSchemaElement generateWrappedDocElement(AST typeNode, String name,
                                                        String paramName) {
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         if (typeNode != null) {
             ParamTypeSpecVisitor visitor = new ParamTypeSpecVisitor(getScope(),
                                                                     definition,
@@ -218,7 +218,7 @@ public class AttributeVisitor extends VisitorBase {
             visitor.visit(typeNode);
             XmlSchemaType stype = visitor.getSchemaType();
             Scope fqName = visitor.getFullyQualifiedName();
-            
+
             if (stype != null) {
                 element.setSchemaTypeName(stype.getQName());
                 if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
@@ -226,63 +226,62 @@ public class AttributeVisitor extends VisitorBase {
                 }
             } else {
                 wsdlVisitor.getDeferredActions().
-                    add(fqName, new AttributeDeferredAction(element)); 
+                    add(fqName, new AttributeDeferredAction(element));
             }
-            
+
             element.setName(paramName);
         }
-        
+
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         if (typeNode != null) {
             sequence.getItems().add(element);
         }
-        
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(schema);
+
+        XmlSchemaComplexType complex = new XmlSchemaComplexType(schema, false);
         complex.setParticle(sequence);
-        
-        XmlSchemaElement result = new XmlSchemaElement();
+
+        XmlSchemaElement result = new XmlSchemaElement(schema, true);
         result.setName(name);
-        result.setQName(new QName(definition.getTargetNamespace(), name));
         result.setSchemaType(complex);
 
-        
+
         schema.getItems().add(result);
-        
+
         return result;
     }
-    
+
     private Message generateMessage(XmlSchemaElement element, String name) {
         Part part = definition.createPart();
         part.setName(PART_NAME);
         part.setElementName(element.getQName());
-        
+
         Message result = definition.createMessage();
         result.setQName(new QName(definition.getTargetNamespace(), name));
         result.addPart(part);
         result.setUndefined(false);
-        
+
         definition.addMessage(result);
-        
+
         return result;
     }
-    
+
     private Operation generateOperation(String name, Message inputMsg, Message outputMsg) {
         Input input = definition.createInput();
         input.setName(inputMsg.getQName().getLocalPart());
         input.setMessage(inputMsg);
-        
+
         Output output = definition.createOutput();
         output.setName(outputMsg.getQName().getLocalPart());
         output.setMessage(outputMsg);
-        
+
         Operation result = definition.createOperation();
         result.setName(name);
         result.setInput(input);
         result.setOutput(output);
         result.setUndefined(false);
-        
+
         portType.addOperation(result);
-        
+
         return result;
     }
 
@@ -296,22 +295,22 @@ public class AttributeVisitor extends VisitorBase {
                                                                 wsdlVisitor);
         visitor.visit(type);
         CorbaTypeImpl corbaType = visitor.getCorbaType();
-        
+
         if (corbaType != null) {
             param.setIdltype(corbaType.getQName());
         } else {
             wsdlVisitor.getDeferredActions().
                 add(visitor.getFullyQualifiedName(), new AttributeDeferredAction(param));
         }
-        
+
         return param;
     }
-    
+
     private ParamType generateCorbaParam(AST type) {
         ParamType param = new ParamType();
         param.setName(PARAM_NAME);
         param.setMode(ModeType.IN);
-        
+
         ParamTypeSpecVisitor visitor = new ParamTypeSpecVisitor(getScope(),
                                                                 definition,
                                                                 schema,
@@ -327,11 +326,11 @@ public class AttributeVisitor extends VisitorBase {
 
         return param;
     }
-    
+
     /** Generates a corba:operation in the corba:binding container within a wsdl:binding.
-     * 
+     *
      * Only one (or none) corba parameter and only one (or none) corba return parameter are supported.
-     * 
+     *
      * @param op is the wsdl operation to bind.
      * @param param is the corba parameter, none if null.
      * @param arg is the corba return parameter, none if null.
@@ -346,27 +345,27 @@ public class AttributeVisitor extends VisitorBase {
             throw new RuntimeException(ex);
         }
         operation.setName(op.getName());
-   
+
         if (param != null) {
             operation.getParam().add(param);
         }
-        
+
         if (arg != null) {
             operation.setReturn(arg);
         }
-        
+
         return operation;
     }
-    
+
     private BindingOperation generateCorbaBindingOperation(Binding wsdlBinding,
                                                            Operation op,
                                                            OperationType corbaOp) {
         BindingInput bindingInput = definition.createBindingInput();
         bindingInput.setName(op.getInput().getName());
-        
+
         BindingOutput bindingOutput = definition.createBindingOutput();
         bindingOutput.setName(op.getOutput().getName());
-        
+
         BindingOperation bindingOperation = definition.createBindingOperation();
         bindingOperation.addExtensibilityElement(corbaOp);
         bindingOperation.setOperation(op);
@@ -374,7 +373,7 @@ public class AttributeVisitor extends VisitorBase {
 
         bindingOperation.setBindingInput(bindingInput);
         bindingOperation.setBindingOutput(bindingOutput);
-        
+
         binding.addBindingOperation(bindingOperation);
 
         return bindingOperation;

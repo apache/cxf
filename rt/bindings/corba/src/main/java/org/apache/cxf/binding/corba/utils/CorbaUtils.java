@@ -89,14 +89,14 @@ public final class CorbaUtils {
             return ref;
         }
     }
-    private static final ThreadLocal<LastExport> LAST_EXPORT_CACHE = 
+    private static final ThreadLocal<LastExport> LAST_EXPORT_CACHE =
         new ThreadLocal<LastExport>();
 
     private CorbaUtils() {
         //utility class
     }
-    
-    
+
+
     public static QName getEmptyQName() {
         return EMPTY_QNAME;
     }
@@ -106,8 +106,8 @@ public final class CorbaUtils {
         return getTypeCode(orb, type, null, typeMap, seenTypes);
     }
 
-    public static TypeCode getTypeCode(ORB orb, 
-                                       QName type, 
+    public static TypeCode getTypeCode(ORB orb,
+                                       QName type,
                                        CorbaTypeMap typeMap,
                                        Stack<QName> seenTypes) {
         return getTypeCode(orb, type, null, typeMap, seenTypes);
@@ -121,17 +121,17 @@ public final class CorbaUtils {
         return getTypeCode(orb, type, obj, typeMap, seenTypes);
     }
 
-    public static TypeCode getTypeCode(ORB orb, 
-                                       QName type, 
-                                       CorbaType obj, 
+    public static TypeCode getTypeCode(ORB orb,
+                                       QName type,
+                                       CorbaType obj,
                                        CorbaTypeMap typeMap,
                                        Stack<QName> seenTypes) {
         if (type == null) {
-            throw new CorbaBindingException("corba:typemap type or elemtype information required" 
-                    + (obj == null ? "" : " for " + obj)  
-                    + (seenTypes.empty() ? "" : ", Enclosing type: " + seenTypes.elementAt(0))); 
-        }       
-        
+            throw new CorbaBindingException("corba:typemap type or elemtype information required"
+                    + (obj == null ? "" : " for " + obj)
+                    + (seenTypes.empty() ? "" : ", Enclosing type: " + seenTypes.elementAt(0)));
+        }
+
         TypeCode tc = null;
         // first see if it is a primitive
         tc = getPrimitiveTypeCode(orb, type);
@@ -140,11 +140,11 @@ public final class CorbaUtils {
             tc = orb.get_primitive_tc(TCKind.from_int(TCKind._tk_any));
         } else if (tc == null) {
             if (typeMap == null) {
-                throw new CorbaBindingException("Unable to locate typemap for namespace \"" 
+                throw new CorbaBindingException("Unable to locate typemap for namespace \""
                                                 + type.getNamespaceURI() + "\"");
             }
-            
-            tc = typeMap.getTypeCode(type); 
+
+            tc = typeMap.getTypeCode(type);
 
             if (tc == null) {
                 if (obj == null) {
@@ -161,7 +161,7 @@ public final class CorbaUtils {
         }
         if (tc == null) {
             throw new CorbaBindingException("Corba type node with qname " + type + " is not supported");
-        }       
+        }
         return tc;
     }
 
@@ -184,29 +184,29 @@ public final class CorbaUtils {
         return null;
     }
 
-    public static TypeCode getComplexTypeCode(ORB orb, 
-                                              QName type, 
-                                              Object obj, 
-                                              CorbaTypeMap typeMap, 
+    public static TypeCode getComplexTypeCode(ORB orb,
+                                              QName type,
+                                              Object obj,
+                                              CorbaTypeMap typeMap,
                                               Stack<QName> seenTypes) {
         TypeCode tc = getAnonTypeCode(orb, type, obj, typeMap, seenTypes);
-        
+
         if (tc == null) {
             if (obj instanceof Alias) {
                 Alias aliasType = (Alias)obj;
-                tc = orb.create_alias_tc(aliasType.getRepositoryID(), 
-                                         getTypeCodeName(aliasType.getName()), 
-                                         getTypeCode(orb, aliasType.getBasetype(), typeMap, seenTypes)); 
+                tc = orb.create_alias_tc(aliasType.getRepositoryID(),
+                                         getTypeCodeName(aliasType.getName()),
+                                         getTypeCode(orb, aliasType.getBasetype(), typeMap, seenTypes));
             } else if (obj instanceof Array) {
                 Array arrayType = (Array)obj;
-                tc = orb.create_array_tc((int) arrayType.getBound(), 
+                tc = orb.create_array_tc((int) arrayType.getBound(),
                                          getTypeCode(orb, arrayType.getElemtype(), typeMap, seenTypes));
             } else if (obj instanceof Enum) {
                 Enum enumType = (Enum)obj;
                 String name = enumType.getName();
                 List enums = enumType.getEnumerator();
                 String[] members = new String[enums.size()];
-                
+
                 for (int i = 0; i < members.length; ++i) {
                     members[i] = ((Enumerator) enums.get(i)).getValue();
                 }
@@ -214,14 +214,14 @@ public final class CorbaUtils {
                 tc = orb.create_enum_tc(enumType.getRepositoryID(), name, members);
             } else if (obj instanceof Exception) {
                 Exception exceptType = (Exception)obj;
-                
+
                 // TODO: check to see if this is a recursive type.
                 List list = exceptType.getMember();
                 StructMember[] members = new StructMember[list.size()];
                 for (int i = 0; i < members.length; ++i) {
                     MemberType member = (MemberType) list.get(i);
-                    members[i] = new StructMember(member.getName(), 
-                                                  getTypeCode(orb, member.getIdltype(), typeMap, seenTypes), 
+                    members[i] = new StructMember(member.getName(),
+                                                  getTypeCode(orb, member.getIdltype(), typeMap, seenTypes),
                                                   null);
                 }
                 String name = getTypeCodeName(exceptType.getName());
@@ -240,11 +240,11 @@ public final class CorbaUtils {
                 }
             } else if (obj instanceof Sequence) {
                 Sequence seqType = (Sequence)obj;
-                tc = orb.create_sequence_tc((int) seqType.getBound(), 
+                tc = orb.create_sequence_tc((int) seqType.getBound(),
                                             getTypeCode(orb, seqType.getElemtype(), typeMap, seenTypes));
             } else if (obj instanceof Struct) {
                 Struct structType = (Struct)obj;
-                
+
                 // TODO: check to see if this is a recursive type.
                 if (seenTypes.contains(new QName(structType.getName()))) {
                     tc = orb.create_recursive_tc(structType.getRepositoryID());
@@ -254,7 +254,7 @@ public final class CorbaUtils {
                     StructMember[] members = new StructMember[list.size()];
                     for (int i = 0; i < members.length; ++i) {
                         MemberType member = (MemberType) list.get(i);
-                        members[i] = new StructMember(member.getName(), 
+                        members[i] = new StructMember(member.getName(),
                                                  getTypeCode(orb, member.getIdltype(), typeMap, seenTypes),
                                                  null);
                     }
@@ -268,23 +268,23 @@ public final class CorbaUtils {
         }
         return tc;
     }
-    
-    private static TypeCode getAnonTypeCode(ORB orb, 
-                                            QName type, 
-                                            Object obj, 
+
+    private static TypeCode getAnonTypeCode(ORB orb,
+                                            QName type,
+                                            Object obj,
                                             CorbaTypeMap typeMap,
                                             Stack<QName> seenTypes) {
         TypeCode tc = null;
         if (obj instanceof Anonarray) {
             Anonarray anonArrayType = (Anonarray)obj;
-            tc = orb.create_array_tc((int) anonArrayType.getBound(), 
+            tc = orb.create_array_tc((int) anonArrayType.getBound(),
                                      getTypeCode(orb, anonArrayType.getElemtype(), typeMap, seenTypes));
         } else if (obj instanceof Anonfixed) {
             Anonfixed anonFixedType = (Anonfixed) obj;
             tc = orb.create_fixed_tc((short) anonFixedType.getDigits(), (short) anonFixedType.getScale());
         } else if (obj instanceof Anonsequence) {
             Anonsequence anonSeqType = (Anonsequence)obj;
-            tc = orb.create_sequence_tc((int) anonSeqType.getBound(), 
+            tc = orb.create_sequence_tc((int) anonSeqType.getBound(),
                                         getTypeCode(orb, anonSeqType.getElemtype(), typeMap, seenTypes));
         } else if (obj instanceof Anonstring) {
             Anonstring anonStringType = (Anonstring)obj;
@@ -296,8 +296,8 @@ public final class CorbaUtils {
         return tc;
     }
 
-    public static TypeCode getUnionTypeCode(ORB orb, 
-                                            Object obj, 
+    public static TypeCode getUnionTypeCode(ORB orb,
+                                            Object obj,
                                             CorbaTypeMap typeMap,
                                             Stack<QName> seenTypes) {
         Union unionType = (Union)obj;
@@ -306,7 +306,7 @@ public final class CorbaUtils {
             return orb.create_recursive_tc(unionType.getRepositoryID());
         } else {
             seenTypes.push(new QName(unionType.getName()));
-        
+
             TypeCode discTC = getTypeCode(orb, unionType.getDiscriminator(), typeMap, seenTypes);
             Map<String, UnionMember> members = new LinkedHashMap<String, UnionMember>();
             List<Unionbranch> branches = unionType.getUnionbranch();
@@ -320,8 +320,8 @@ public final class CorbaUtils {
                         member.name = branch.getName();
                         member.type = getTypeCode(orb, branch.getIdltype(), typeMap, seenTypes);
                         member.label = orb.create_any();
-                        // We need to insert the labels in a way that depends on the type of the 
-                        // discriminator.  According to the CORBA specification, the following types 
+                        // We need to insert the labels in a way that depends on the type of the
+                        // discriminator.  According to the CORBA specification, the following types
                         // are permissable as discriminator types:
                         //    * signed & unsigned short
                         //    * signed & unsigned long
@@ -355,7 +355,7 @@ public final class CorbaUtils {
                             member.label.insert_boolean(Boolean.parseBoolean(cs.getLabel()));
                             break;
                         case TCKind._tk_enum:
-                            org.omg.CORBA.portable.OutputStream out = 
+                            org.omg.CORBA.portable.OutputStream out =
                                 member.label.create_output_stream();
                             Enum enumVal = (Enum)getCorbaType(unionType.getDiscriminator(), typeMap);
                             List<Enumerator> enumerators = enumVal.getEnumerator();
@@ -370,17 +370,17 @@ public final class CorbaUtils {
                         default:
                             throw new CorbaBindingException("Unsupported discriminator type");
                         }
-                        // Some orbs are strict on how the case labels are stored for 
+                        // Some orbs are strict on how the case labels are stored for
                         // each member.  So we can't
-                        // simply insert the labels as strings 
+                        // simply insert the labels as strings
                         members.put(cs.getLabel(), member);
                     }
                 }
             }
             seenTypes.pop();
-            return orb.create_union_tc(unionType.getRepositoryID(), 
-                                       getTypeCodeName(unionType.getName()), 
-                                       discTC, 
+            return orb.create_union_tc(unionType.getRepositoryID(),
+                                       getTypeCodeName(unionType.getName()),
+                                       discTC,
                                        (UnionMember[])members.values().toArray(
                                            new UnionMember[members.size()]));
         }
@@ -403,7 +403,7 @@ public final class CorbaUtils {
         // There is a possiblitity that the idl type will not have its namespace URI set if it has
         // been read directly from the WSDL file as a string. Try with the standard corba namespace URI.
         if (idltype.getNamespaceURI() == null) {
-            QName uriIdltype = new QName(CorbaConstants.NU_WSDL_CORBA, idltype.getLocalPart(), 
+            QName uriIdltype = new QName(CorbaConstants.NU_WSDL_CORBA, idltype.getLocalPart(),
                                          idltype.getPrefix());
             kind = PRIMITIVE_TYPECODES.get(uriIdltype);
             if (kind != null) {
@@ -445,16 +445,16 @@ public final class CorbaUtils {
                     name = name.substring(pos + 1);
                     corbaType.setName(name);
                 }
-                    
+
                 map.addType(name, corbaType);
                 LOG.fine("Adding type " + name);
             }
         }
         return map;
     }
-    
-    
-    
+
+
+
     public static boolean isValidURL(String url) {
         if ((url.startsWith("ior:")) || (url.startsWith("IOR:"))) {
             return true;
@@ -482,7 +482,7 @@ public final class CorbaUtils {
 
         return result;
     }
-    
+
     public static boolean isIOR(String location) {
         if ((location.startsWith("ior:")) || (location.startsWith("IOR:"))) {
             return true;
@@ -508,7 +508,7 @@ public final class CorbaUtils {
         } else if ("IOR:".equalsIgnoreCase(url)) {
             throw new RuntimeException("Proxy not initialized. URL contains a invalid ior");
         }
-    
+
         String trimmedUrl = url.trim();
         LastExport last = LAST_EXPORT_CACHE.get();
         if (last != null
@@ -537,9 +537,9 @@ public final class CorbaUtils {
             String ior = reader.readLine();
             if (ior == null) {
                 throw new RuntimeException("Invalid object reference found in file " + url);
-            }            
+            }
             result = orb.string_to_object(ior.trim());
-            reader.close();            
+            reader.close();
         } catch (java.io.IOException ex) {
             throw new RuntimeException(ex);
         }
@@ -581,11 +581,9 @@ public final class CorbaUtils {
     //Change this method to access the XmlSchemaCollection.
     private static boolean isElementFormQualified(XmlSchema schema, String uri) {
         if (uri.equals(schema.getTargetNamespace())) {
-            return schema.getElementFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+            return schema.getElementFormDefault() == XmlSchemaForm.QUALIFIED;
         }
-        Iterator it = schema.getIncludes().getIterator();
-        while (it.hasNext()) {
-            XmlSchemaExternal extSchema = (XmlSchemaExternal) it.next();
+        for (XmlSchemaExternal extSchema : schema.getExternals()) {
             return isElementFormQualified(extSchema.getSchema(), uri);
         }
         return false;
@@ -610,11 +608,9 @@ public final class CorbaUtils {
     //Change this method to access the XmlSchemaCollection.
     private static boolean isAttributeFormQualified(XmlSchema schema, String uri) {
         if (uri.equals(schema.getTargetNamespace())) {
-            return schema.getAttributeFormDefault().getValue().equals(XmlSchemaForm.QUALIFIED);
+            return schema.getAttributeFormDefault() == XmlSchemaForm.QUALIFIED;
         }
-        Iterator it = schema.getIncludes().getIterator();
-        while (it.hasNext()) {
-            XmlSchemaExternal extSchema = (XmlSchemaExternal) it.next();
+        for (XmlSchemaExternal extSchema : schema.getExternals()) {
             return isAttributeFormQualified(extSchema.getSchema(), uri);
         }
         return false;
@@ -643,9 +639,9 @@ public final class CorbaUtils {
         } else {
             list = orb.create_list(0);
         }
-        return list; 
+        return list;
     }
-             
+
 
     static {
         PRIMITIVE_TYPECODES.put(CorbaConstants.NT_CORBA_BOOLEAN, TCKind.from_int(TCKind._tk_boolean));

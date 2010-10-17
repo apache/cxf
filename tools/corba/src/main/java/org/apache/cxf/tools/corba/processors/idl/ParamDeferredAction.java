@@ -19,14 +19,13 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
-import java.util.Iterator;
-
 import org.apache.cxf.binding.corba.wsdl.CorbaTypeImpl;
 import org.apache.cxf.binding.corba.wsdl.ParamType;
 import org.apache.cxf.tools.corba.common.ReferenceConstants;
 import org.apache.ws.commons.schema.XmlSchema;
 import org.apache.ws.commons.schema.XmlSchemaCollection;
 import org.apache.ws.commons.schema.XmlSchemaElement;
+import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
@@ -39,21 +38,21 @@ public class ParamDeferredAction implements SchemaDeferredAction {
     protected Scope typeScope;
     protected WSDLSchemaManager manager;
     protected ModuleToNSMapper mapper;
-    
+
     public ParamDeferredAction(ParamType defParam, XmlSchemaElement elem) {
         param = defParam;
-        element = elem;        
+        element = elem;
     }
-    
+
     public ParamDeferredAction(ParamType defParam) {
-        param = defParam;         
+        param = defParam;
     }
-    
+
     public ParamDeferredAction(XmlSchemaElement elem) {
-        element = elem;               
+        element = elem;
     }
-    
-    public ParamDeferredAction(XmlSchemaElement elem, 
+
+    public ParamDeferredAction(XmlSchemaElement elem,
                                Scope ts,
                                XmlSchema xmlSchema,
                                XmlSchemaCollection xmlSchemas,
@@ -66,7 +65,7 @@ public class ParamDeferredAction implements SchemaDeferredAction {
         manager = man;
         mapper = map;
     }
-    
+
     public void execute(XmlSchemaType stype, CorbaTypeImpl ctype) {
         if (param != null) {
             param.setIdltype(ctype.getQName());
@@ -76,41 +75,38 @@ public class ParamDeferredAction implements SchemaDeferredAction {
             if (stype.getQName().equals(ReferenceConstants.WSADDRESSING_TYPE)) {
                 element.setNillable(true);
             }
-     
+
             if (manager == null) {
                 return;
             }
-            
+
             // Now we need to make sure we are importing any types we need
             XmlSchema importedSchema = null;
             if (stype.getQName().getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
                 boolean alreadyImported = false;
-                for (Iterator i = schema.getIncludes().getIterator(); i.hasNext();) {
-                    java.lang.Object o = i.next();
-                    if (o instanceof XmlSchemaImport) {
-                        XmlSchemaImport schemaImport = (XmlSchemaImport)o;
+                for (XmlSchemaExternal ext : schema.getExternals()) {
+                    if (ext instanceof XmlSchemaImport) {
+                        XmlSchemaImport schemaImport = (XmlSchemaImport)ext;
                         if (schemaImport.getNamespace().equals(ReferenceConstants.WSADDRESSING_NAMESPACE)) {
                             alreadyImported = true;
                             break;
                         }
                     }
                 }
-                    
+
                 if (!alreadyImported) {
                     // We need to add an import statement to include the WS addressing types
-                    XmlSchemaImport wsaImport = new XmlSchemaImport();
+                    XmlSchemaImport wsaImport = new XmlSchemaImport(schema);
                     wsaImport.setNamespace(ReferenceConstants.WSADDRESSING_NAMESPACE);
                     wsaImport.setSchemaLocation(ReferenceConstants.WSADDRESSING_LOCATION);
-                    schema.getItems().add(wsaImport);
-                    schema.getIncludes().add(wsaImport);
                 }
             } else if (!stype.getQName().getNamespaceURI().equals(schema.getTargetNamespace())) {
                 importedSchema = manager.getXmlSchema(mapper.map(typeScope));
                 manager.addXmlSchemaImport(schema, importedSchema, typeScope.toString("_"));
             }
-        }        
+        }
     }
-       
+
 }
 
 

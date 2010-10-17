@@ -54,22 +54,22 @@ public class OperationVisitor extends VisitorBase {
 
     private static final String REQUEST_SUFFIX = "Request";
     private static final String RESPONSE_SUFFIX = "Response";
-    
+
     private static final String IN_PARAMETER = "inparameter";
     private static final String OUT_PARAMETER = "outparameter";
     //private static final String INOUT_PARAMETER = "inoutparameter";
     private static final String RETURN_PARAMETER = "return";
-    
+
     private ExtensionRegistry extReg;
     private PortType portType;
     private Binding binding;
-    
+
     private Message inputMsg;
     private Message outputMsg;
-    
-    
+
+
     private OperationType corbaOperation;
-    
+
     public OperationVisitor(Scope scope,
                             Definition defn,
                             XmlSchema schemaRef,
@@ -81,7 +81,7 @@ public class OperationVisitor extends VisitorBase {
         portType = wsdlPortType;
         binding = wsdlBinding;
     }
-    
+
     public static boolean accept(Scope scope,
                                  Definition def,
                                  XmlSchema schema,
@@ -103,7 +103,7 @@ public class OperationVisitor extends VisitorBase {
         }
         return result;
     }
-    
+
     public void visit(AST node) {
         // <op_dcl> ::= [<op_attribute>] <op_type_spec>
         //              <identifier> <parameter_dcls>
@@ -114,14 +114,14 @@ public class OperationVisitor extends VisitorBase {
         // <parameter_dcls> ::= "(" <param_dcl> {"," <param_dcl>}* ")"
         //                    | "(" ")"
         // <raises_expr> ::= "raises" "(" <scoped_name> {"," <scoped_name>}* ")"
-        // <context_expr> ::= "context" "(" <string_literal> {"," <string_literal>}* ")"     
+        // <context_expr> ::= "context" "(" <string_literal> {"," <string_literal>}* ")"
 
         QName operationQName = new QName(schema.getTargetNamespace(), node.toString());
         boolean isDuplicate = false;
-        if (schema.getElements().contains(operationQName)) {
+        if (schema.getElements().containsKey(operationQName)) {
             isDuplicate = true;
         }
-  
+
         Operation operation = generateOperation(operationQName.getLocalPart(), isDuplicate);
 
         BindingOperation bindingOperation = null;
@@ -130,7 +130,7 @@ public class OperationVisitor extends VisitorBase {
         } else {
             bindingOperation = generateBindingOperation(binding, operation, operation.getName());
         }
-        
+
         XmlSchemaSequence inputWrappingSequence = new XmlSchemaSequence();
         XmlSchemaElement inputElement = generateWrapper(new QName(schema.getTargetNamespace(),
                                                                   operation.getName()),
@@ -154,12 +154,12 @@ public class OperationVisitor extends VisitorBase {
                                                       operation.getName() + RESPONSE_SUFFIX),
                                             outputWrappingSequence);
             outputMsg = generateOutputMessage(operation, bindingOperation);
-            generateOutputPart(outputMsg, outputElement);           
+            generateOutputPart(outputMsg, outputElement);
         }
-        
+
         // <op_type_spec>
         visitOpTypeSpec(node, outputWrappingSequence);
-        
+
         // <parameter_dcls>
         node = TypesUtils.getCorbaTypeNameNode(node);
         while (ParamDclVisitor.accept(node)) {
@@ -177,30 +177,30 @@ public class OperationVisitor extends VisitorBase {
         }
 
         // <raises_expr>
-        if (node != null 
+        if (node != null
             && node.getType() == IDLTokenTypes.LITERAL_raises) {
             node = node.getFirstChild();
-            
-            while (node != null) {            
-                // 
+
+            while (node != null) {
+                //
                 ScopedNameVisitor visitor = new ScopedNameVisitor(getScope(),
                                                                   definition,
                                                                   schema,
-                                                                  wsdlVisitor);                
+                                                                  wsdlVisitor);
                 visitor.setExceptionMode(true);
-                visitor.visit(node);                
+                visitor.visit(node);
                 CorbaTypeImpl corbaType = visitor.getCorbaType();
                 XmlSchemaType schemaType = visitor.getSchemaType();
                 //REVISIT, schema type ends with Type for exceptions, so strip it to get the element name.
                 int pos = schemaType.getQName().getLocalPart().indexOf("Type");
                 QName elementQName = new QName(schemaType.getQName().getNamespaceURI(),
                                                schemaType.getQName().getLocalPart().substring(0, pos));
-                createFaultMessage(corbaType, operation, bindingOperation, elementQName);                
+                createFaultMessage(corbaType, operation, bindingOperation, elementQName);
                 node = node.getNextSibling();
                 visitor.setExceptionMode(false);
             }
         }
-        
+
     }
 
     private Operation generateOperation(String name, boolean isDuplicate) {
@@ -217,7 +217,7 @@ public class OperationVisitor extends VisitorBase {
         portType.addOperation(op);
         return op;
     }
-    
+
     private BindingOperation generateBindingOperation(Binding wsdlBinding, Operation op,
                                                       String corbaOpName) {
         BindingOperation bindingOperation = definition.createBindingOperation();
@@ -246,29 +246,29 @@ public class OperationVisitor extends VisitorBase {
             msgName = new QName(definition.getTargetNamespace(),
                                 getScope().tail() + "." + operation.getName());
         } else {
-            msgName = new QName(definition.getTargetNamespace(), operation.getName()); 
+            msgName = new QName(definition.getTargetNamespace(), operation.getName());
         }
         msg.setQName(msgName);
         msg.setUndefined(false);
-        
+
         String inputName = operation.getName() + REQUEST_SUFFIX;
         Input input = definition.createInput();
         input.setName(inputName);
         input.setMessage(msg);
-        
+
         BindingInput bindingInput = definition.createBindingInput();
-        bindingInput.setName(inputName);    
-        
+        bindingInput.setName(inputName);
+
         bindingOperation.setBindingInput(bindingInput);
         operation.setInput(input);
-        
+
         definition.addMessage(msg);
-        
+
         return msg;
     }
 
     public Message generateOutputMessage(Operation operation, BindingOperation bindingOperation) {
-        Message msg = definition.createMessage(); 
+        Message msg = definition.createMessage();
         QName msgName;
         if (!mapper.isDefaultMapping()) {
             //mangle the message name
@@ -277,34 +277,34 @@ public class OperationVisitor extends VisitorBase {
                                 getScope().tail() + "." + operation.getName() + RESPONSE_SUFFIX);
         } else {
             msgName = new QName(definition.getTargetNamespace(),
-                                operation.getName() + RESPONSE_SUFFIX); 
+                                operation.getName() + RESPONSE_SUFFIX);
         }
         msg.setQName(msgName);
         msg.setUndefined(false);
-        
+
         String outputName = operation.getName() + RESPONSE_SUFFIX;
         Output output = definition.createOutput();
         output.setName(outputName);
         output.setMessage(msg);
-        
+
         BindingOutput bindingOutput = definition.createBindingOutput();
-        bindingOutput.setName(outputName);    
-        
+        bindingOutput.setName(outputName);
+
         bindingOperation.setBindingOutput(bindingOutput);
         operation.setOutput(output);
-        
+
         definition.addMessage(msg);
-        
+
         return msg;
     }
-    
+
     private Part generateInputPart(Message inputMessage, XmlSchemaElement element) {
-        // message - part 
+        // message - part
         Part part = definition.createPart();
         part.setName(IN_PARAMETER);
         part.setElementName(element.getQName());
         inputMessage.addPart(part);
-        return part;        
+        return part;
     }
 
     private Part generateOutputPart(Message outputMessage, XmlSchemaElement element) {
@@ -315,7 +315,7 @@ public class OperationVisitor extends VisitorBase {
         outputMessage.addPart(part);
         return part;
     }
-    
+
     /*-
      * Build the Wrapped Document Style wrapping elements
      * i.e. <xs:element name="...">
@@ -327,17 +327,13 @@ public class OperationVisitor extends VisitorBase {
      *      </xs:element>
      */
     private XmlSchemaElement generateWrapper(QName el, XmlSchemaSequence wrappingSequence) {
-        XmlSchemaComplexType schemaComplexType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType schemaComplexType = new XmlSchemaComplexType(schema, false);
         schemaComplexType.setParticle(wrappingSequence);
-        
-        XmlSchemaElement wrappingSchemaElement = new XmlSchemaElement();
-        wrappingSchemaElement.setQName(el);
+
+        XmlSchemaElement wrappingSchemaElement = new XmlSchemaElement(schema, true);
         wrappingSchemaElement.setName(el.getLocalPart());
         wrappingSchemaElement.setSchemaType(schemaComplexType);
 
-        schema.getElements().add(el, wrappingSchemaElement);
-        schema.getItems().add(wrappingSchemaElement);
-        
         return wrappingSchemaElement;
     }
 
@@ -345,7 +341,7 @@ public class OperationVisitor extends VisitorBase {
                                         XmlSchemaType schemaType,
                                         Scope fqName,
                                         String name) {
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, true);
         element.setName(name);
         if (schemaType != null) {
             element.setSchemaTypeName(schemaType.getQName());
@@ -354,14 +350,12 @@ public class OperationVisitor extends VisitorBase {
             }
         } else {
             wsdlVisitor.getDeferredActions().
-                add(fqName, new OperationDeferredAction(element));  
+                add(fqName, new OperationDeferredAction(element));
         }
-        
-        schemaSequence.getItems().add(element);
-        
+
         return element;
     }
-    
+
     private void visitOpTypeSpec(AST node, XmlSchemaSequence outputWrappingSequence) {
         if (node.getType() == IDLTokenTypes.LITERAL_void) {
             // nothing to do here, move along
@@ -373,11 +367,11 @@ public class OperationVisitor extends VisitorBase {
                                                                     wsdlVisitor);
 
             visitor.visit(node);
-            
+
             XmlSchemaType schemaType = visitor.getSchemaType();
             CorbaTypeImpl corbaType = visitor.getCorbaType();
             Scope fqName = visitor.getFullyQualifiedName();
-            
+
             addElement(outputWrappingSequence, schemaType, fqName, RETURN_PARAMETER);
             addCorbaReturn(corbaType, fqName, RETURN_PARAMETER);
         }
@@ -396,10 +390,10 @@ public class OperationVisitor extends VisitorBase {
     }
 
     private void createFaultMessage(CorbaTypeImpl corbaType,
-                                    Operation operation, 
+                                    Operation operation,
                                     BindingOperation bindingOperation,
                                     QName elementQName) {
-        String exceptionName = corbaType.getQName().getLocalPart();        
+        String exceptionName = corbaType.getQName().getLocalPart();
 
         Definition faultDef = manager.getWSDLDefinition(elementQName.getNamespaceURI());
         if (faultDef == null) {
@@ -412,23 +406,23 @@ public class OperationVisitor extends VisitorBase {
 
         // porttype - operation - fault
         Fault fault = definition.createFault();
-        fault.setMessage(faultMsg);        
-        fault.setName(faultMsg.getQName().getLocalPart());        
+        fault.setMessage(faultMsg);
+        fault.setName(faultMsg.getQName().getLocalPart());
         operation.addFault(fault);
 
         // binding - operation - corba:operation - corba:raises
-        RaisesType raisesType = new RaisesType();        
+        RaisesType raisesType = new RaisesType();
         raisesType.setException(new QName(typeMap.getTargetNamespace(),
                                           exceptionName));
         corbaOperation.getRaises().add(raisesType);
 
         // binding - operation - fault
-        BindingFault bindingFault = definition.createBindingFault();        
-        bindingFault.setName(faultMsg.getQName().getLocalPart());        
-        bindingOperation.addBindingFault(bindingFault);    
+        BindingFault bindingFault = definition.createBindingFault();
+        bindingFault.setName(faultMsg.getQName().getLocalPart());
+        bindingOperation.addBindingFault(bindingFault);
 
         //add the fault element namespace to the definition
         String nsURI = elementQName.getNamespaceURI();
-        manager.addWSDLDefinitionNamespace(definition, mapper.mapNSToPrefix(nsURI), nsURI);    
+        manager.addWSDLDefinitionNamespace(definition, mapper.mapNSToPrefix(nsURI), nsURI);
     }
 }

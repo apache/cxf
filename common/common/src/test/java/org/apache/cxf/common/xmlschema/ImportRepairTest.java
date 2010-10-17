@@ -58,7 +58,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class ImportRepairTest extends Assert {
     private static final class ListLSInput implements LSInputList {
@@ -96,7 +96,7 @@ public class ImportRepairTest extends Assert {
             //and we cannot get a good version unless we endorse it
             return;
         }
-        
+
         collection = new SchemaCollection();
         XmlSchema importingSchema = newSchema(IMPORTING_SCHEMA);
         XmlSchema baseTypeSchema1 = newSchema(BASE_TYPE_SCHEMA1);
@@ -122,8 +122,8 @@ public class ImportRepairTest extends Assert {
 
         createImportedAttribute(attributeSchema);
 
-        XmlSchemaAttribute importingAttribute = new XmlSchemaAttribute();
-        importingAttribute.setRefName(new QName(ATTRIBUTE_SCHEMA, "imported"));
+        XmlSchemaAttribute importingAttribute = new XmlSchemaAttribute(importingSchema, false);
+        importingAttribute.getRef().setTargetQName(new QName(ATTRIBUTE_SCHEMA, "imported"));
         // borrow derivedType1 to make the reference.
         derivedType1Extension.getAttributes().add(importingAttribute);
 
@@ -188,10 +188,8 @@ public class ImportRepairTest extends Assert {
     }
 
     private void createTypeImportedByElement(XmlSchema elementTypeSchema) {
-        XmlSchemaComplexType elementImportedType = new XmlSchemaComplexType(elementTypeSchema);
+        XmlSchemaComplexType elementImportedType = new XmlSchemaComplexType(elementTypeSchema, true);
         elementImportedType.setName("importedElementType");
-        elementTypeSchema.addType(elementImportedType);
-        elementTypeSchema.getItems().add(elementImportedType);
         elementImportedType.setParticle(new XmlSchemaSequence());
     }
 
@@ -204,100 +202,78 @@ public class ImportRepairTest extends Assert {
     }
 
     private void createAttributeImportingType(XmlSchema importingSchema) {
-        XmlSchemaAttribute attributeImportingType = new XmlSchemaAttribute();
+        XmlSchemaAttribute attributeImportingType = new XmlSchemaAttribute(importingSchema, true);
         attributeImportingType.setName("importingType");
-        importingSchema.getAttributes().add(new QName(ELEMENT_SCHEMA, "importingTypeAttribute"),
-                                            attributeImportingType);
-        importingSchema.getItems().add(attributeImportingType);
         attributeImportingType.setSchemaTypeName(new QName(ATTRIBUTE_TYPE_SCHEMA, "importedAttributeType"));
     }
 
     private void createImportedAttributeType(XmlSchema attributeTypeSchema) {
-        XmlSchemaSimpleType attributeImportedType = new XmlSchemaSimpleType(attributeTypeSchema);
+        XmlSchemaSimpleType attributeImportedType = new XmlSchemaSimpleType(attributeTypeSchema, true);
         attributeImportedType.setName("importedAttributeType");
-        attributeTypeSchema.addType(attributeImportedType);
-        attributeTypeSchema.getItems().add(attributeImportedType);
         XmlSchemaSimpleTypeRestriction simpleContent = new XmlSchemaSimpleTypeRestriction();
         attributeImportedType.setContent(simpleContent);
         simpleContent.setBaseTypeName(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "string"));
     }
 
     private void createImportedAttribute(XmlSchema attributeSchema) {
-        XmlSchemaAttribute importedAttribute = new XmlSchemaAttribute();
+        XmlSchemaAttribute importedAttribute = new XmlSchemaAttribute(attributeSchema, true);
         importedAttribute.setName("imported");
         importedAttribute.setSchemaTypeName(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "string"));
-        attributeSchema.getAttributes().add(new QName(ATTRIBUTE_SCHEMA, "imported"), importedAttribute);
-        attributeSchema.getItems().add(importedAttribute);
     }
 
     private void createElementWithImportedType(XmlSchema importingSchema) {
-        XmlSchemaElement elementWithImportedType = new XmlSchemaElement();
+        XmlSchemaElement elementWithImportedType = new XmlSchemaElement(importingSchema, true);
         elementWithImportedType.setName("elementWithImportedType");
         elementWithImportedType.setSchemaTypeName(new QName(ELEMENT_TYPE_SCHEMA, "importedElementType"));
-        importingSchema.getItems().add(elementWithImportedType);
-        importingSchema.getElements().add(elementWithImportedType.getQName(), elementWithImportedType);
     }
 
     private void createTypeImportingElement(XmlSchema importingSchema) {
-        XmlSchemaComplexType typeWithElementRef = new XmlSchemaComplexType(importingSchema);
+        XmlSchemaComplexType typeWithElementRef = new XmlSchemaComplexType(importingSchema, true);
         typeWithElementRef.setName("typeWithRef");
-        importingSchema.addType(typeWithElementRef);
-        importingSchema.getItems().add(typeWithElementRef);
         XmlSchemaSequence sequence = new XmlSchemaSequence();
         typeWithElementRef.setParticle(sequence);
-        XmlSchemaElement refElement = new XmlSchemaElement();
-        sequence.getItems().add(refElement);
-        refElement.setRefName(new QName(ELEMENT_SCHEMA, "importedElement"));
+        XmlSchemaElement refElement = new XmlSchemaElement(importingSchema, false);
+        refElement.getRef().setTargetQName(new QName(ELEMENT_SCHEMA, "importedElement"));
     }
 
     private void createImportedElement(XmlSchema elementSchema) {
-        XmlSchemaElement importedElement = new XmlSchemaElement();
+        XmlSchemaElement importedElement = new XmlSchemaElement(elementSchema, true);
         importedElement.setName("importedElement");
         importedElement.setSchemaTypeName(new QName(XMLConstants.W3C_XML_SCHEMA_NS_URI, "string"));
-        elementSchema.getElements().add(new QName(ELEMENT_SCHEMA, "importedElement"), importedElement);
-        elementSchema.getItems().add(importedElement);
     }
 
     private void createDerivedType2(XmlSchema importingSchema) {
         XmlSchemaComplexContent complexContent;
-        XmlSchemaComplexType derivedType2 = new XmlSchemaComplexType(importingSchema);
+        XmlSchemaComplexType derivedType2 = new XmlSchemaComplexType(importingSchema, true);
         derivedType2.setName("derivedRestriction");
         XmlSchemaComplexContentRestriction restriction = new XmlSchemaComplexContentRestriction();
         restriction.setBaseTypeName(new QName(BASE_TYPE_SCHEMA2, "baseType2"));
         complexContent = new XmlSchemaComplexContent();
         complexContent.setContent(restriction);
         derivedType2.setContentModel(complexContent);
-        importingSchema.addType(derivedType2);
-        importingSchema.getItems().add(derivedType2);
     }
 
     private XmlSchemaComplexContentExtension createDerivedType1(XmlSchema importingSchema) {
-        XmlSchemaComplexType derivedType1 = new XmlSchemaComplexType(importingSchema);
+        XmlSchemaComplexType derivedType1 = new XmlSchemaComplexType(importingSchema, true);
         derivedType1.setName("derivedExtension");
         XmlSchemaComplexContentExtension extension = new XmlSchemaComplexContentExtension();
         extension.setBaseTypeName(new QName(BASE_TYPE_SCHEMA1, "baseType1"));
         XmlSchemaComplexContent complexContent = new XmlSchemaComplexContent();
         complexContent.setContent(extension);
         derivedType1.setContentModel(complexContent);
-        importingSchema.addType(derivedType1);
-        importingSchema.getItems().add(derivedType1);
         return extension;
     }
 
     private XmlSchemaComplexType createBaseType2(XmlSchema baseTypeSchema2) {
-        XmlSchemaComplexType baseType2 = new XmlSchemaComplexType(baseTypeSchema2);
+        XmlSchemaComplexType baseType2 = new XmlSchemaComplexType(baseTypeSchema2, true);
         baseType2.setName("baseType2");
-        baseTypeSchema2.addType(baseType2);
-        baseTypeSchema2.getItems().add(baseType2);
         baseType2.setParticle(new XmlSchemaSequence());
         return baseType2;
     }
 
     private void createBaseType1(XmlSchema baseTypeSchema1) {
-        XmlSchemaComplexType baseType1 = new XmlSchemaComplexType(baseTypeSchema1);
+        XmlSchemaComplexType baseType1 = new XmlSchemaComplexType(baseTypeSchema1, true);
         baseType1.setName("baseType1");
-        baseTypeSchema1.addType(baseType1);
-        baseTypeSchema1.getItems().add(baseType1);
         baseType1.setParticle(new XmlSchemaSequence());
     }
 

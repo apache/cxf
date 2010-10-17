@@ -58,13 +58,13 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 
 /**
  * Serializes JavaBeans.
- * 
+ *
  * There's a really dangerous coding convention in this class, maintainers beware.
  * There are two constructor. The no-args constructor defers, until later,
  * the construction of a BeanTypeInfo. The one-arg constructor gets the BeanTypeInfo passed as a parameter.
  * Aegis doesn't have any uniform discipline of 'construct, set properties, initialize'. Instead,
  * each piece of code that uses the type info needs to call getTypeInfo() instead of referencing the
- * 'info' field. 
+ * 'info' field.
  */
 public class BeanType extends AegisType {
     private BeanTypeInfo info;
@@ -74,7 +74,7 @@ public class BeanType extends AegisType {
     private boolean isException;
 
     /**
-     * Construct a type info. Caller must pass in the type class via 
+     * Construct a type info. Caller must pass in the type class via
      * setTypeClass later.
      */
     public BeanType() {
@@ -176,7 +176,7 @@ public class BeanType extends AegisType {
                         writeProperty(name, target, writeObj, clazz, propertyTypeInfo);
                     } else {
                         if (!alwaysAllowNillables() && !propertyTypeInfo.isNillable(name)) {
-                            throw new DatabindingException(name.getLocalPart() 
+                            throw new DatabindingException(name.getLocalPart()
                                                            + " is nil, but not nillable.");
 
                         }
@@ -200,12 +200,12 @@ public class BeanType extends AegisType {
             throw new DatabindingException("Could not create class: " + e.getMessage(), e);
         }
     }
-    
+
     protected boolean alwaysAllowNillables() {
         return false;
     }
 
-    protected AegisType getElementType(QName name, BeanTypeInfo beanTypeInfo, 
+    protected AegisType getElementType(QName name, BeanTypeInfo beanTypeInfo,
                                   MessageReader reader, Context context) {
 
         AegisType type = beanTypeInfo.getType(name);
@@ -323,13 +323,13 @@ public class BeanType extends AegisType {
 
     /**
      * To avoid double-writing xsi:type attributes, ObjectType uses this special entrypoint.
-     * 
+     *
      * @param object
      * @param writer
      * @param context
      * @param wroteXsiType
      */
-    void writeObjectFromObjectType(Object object, MessageWriter writer, 
+    void writeObjectFromObjectType(Object object, MessageWriter writer,
                                    Context context, boolean wroteXsiType) {
         writeObjectInternal(object, writer, context, wroteXsiType);
     }
@@ -338,7 +338,7 @@ public class BeanType extends AegisType {
      * {@inheritDoc}
      */
     @Override
-    public void writeObject(Object object, MessageWriter writer, 
+    public void writeObject(Object object, MessageWriter writer,
                             Context context) throws DatabindingException {
         writeObjectInternal(object, writer, context, false);
     }
@@ -373,7 +373,7 @@ public class BeanType extends AegisType {
                 cwriter.close();
             }
         }
-        
+
         if (inf.isExtension()) {
             AegisType t = getSuperType();
             if (t != null) {
@@ -412,7 +412,7 @@ public class BeanType extends AegisType {
         }
     }
 
-    protected void writeElement(QName name, Object value, 
+    protected void writeElement(QName name, Object value,
                                 AegisType type, MessageWriter writer, Context context) {
 
         if (!type.isFlatArray()) {
@@ -460,7 +460,7 @@ public class BeanType extends AegisType {
         return type;
     }
 
-    private void writeTypeReference(QName name, XmlSchemaElement element, AegisType type, 
+    private void writeTypeReference(QName name, XmlSchemaElement element, AegisType type,
                                     XmlSchema schemaRoot) {
         if (type.isAbstract()) {
             element.setName(name.getLocalPart());
@@ -470,9 +470,9 @@ public class BeanType extends AegisType {
             /*
              * Here we have a semi-giant mess. If a parameter has a minOccurs > 1, it ends
              * up in the type info. However, it really got used in the array type.
-             * All we really want to do here is manage 'optional' elements. If we 
+             * All we really want to do here is manage 'optional' elements. If we
              * ever implement flat arrays, this will change. For now, we ignore
-             * maxOccurs and we only look for 0's in the minOccurs. 
+             * maxOccurs and we only look for 0's in the minOccurs.
              */
             long minOccurs = getTypeInfo().getMinOccurs(name);
             /* If it is 1, that's the default, and if it's greater than one, it means
@@ -483,10 +483,10 @@ public class BeanType extends AegisType {
                 element.setMinOccurs(minOccurs);
             }
 
-            
+
             element.setNillable(getTypeInfo().isNillable(name));
         } else {
-            element.setRefName(type.getSchemaType());
+            element.getRef().setTargetQName(type.getSchemaType());
         }
     }
 
@@ -502,7 +502,7 @@ public class BeanType extends AegisType {
 
     /**
      * We need to write a complex type schema for Beans, so return true.
-     * 
+     *
      * @see org.apache.cxf.aegis.type.AegisType#isComplex()
      */
     @Override
@@ -666,14 +666,12 @@ public class BeanType extends AegisType {
             info.setTypeMapping(typeMapping);
         }
     }
-    
+
     @Override
     public void writeSchema(XmlSchema root) {
         BeanTypeInfo inf = getTypeInfo();
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
+        XmlSchemaComplexType complex = new XmlSchemaComplexType(root, true);
         complex.setName(getSchemaType().getLocalPart());
-        root.addType(complex);
-        root.getItems().add(complex);
 
         AegisType sooperType = getSuperType();
 
@@ -721,7 +719,7 @@ public class BeanType extends AegisType {
                 }
             }
 
-            XmlSchemaElement element = new XmlSchemaElement();
+            XmlSchemaElement element = new XmlSchemaElement(root, false);
             element.setName(name.getLocalPart());
             sequence.getItems().add(element);
 
@@ -766,7 +764,7 @@ public class BeanType extends AegisType {
 
         // Write out schema for attributes
         for (QName name : inf.getAttributes()) {
-            XmlSchemaAttribute attribute = new XmlSchemaAttribute();
+            XmlSchemaAttribute attribute = new XmlSchemaAttribute(root, false);
             complex.getAttributes().add(attribute);
             attribute.setName(name.getLocalPart());
             AegisType type = getType(inf, name);
@@ -781,7 +779,7 @@ public class BeanType extends AegisType {
          * If extensible attributes then add <xsd:anyAttribute/>
          */
         if (inf.isExtensibleAttributes()) {
-            sequence.getItems().add(new XmlSchemaAnyAttribute());
+            complex.setAnyAttribute(new XmlSchemaAnyAttribute());
         }
     }
 

@@ -44,7 +44,7 @@ import org.apache.ws.commons.schema.XmlSchemaSequence;
 
 /**
  * An ArrayType.
- * 
+ *
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class ArrayType extends AegisType {
@@ -56,9 +56,9 @@ public class ArrayType extends AegisType {
 
     public ArrayType() {
     }
-    
+
     public Object readObject(MessageReader reader, QName flatElementName,
-                             Context context, boolean asArray) 
+                             Context context, boolean asArray)
         throws DatabindingException {
         try {
             Collection values = readCollection(reader, flatElementName, context);
@@ -72,7 +72,7 @@ public class ArrayType extends AegisType {
     }
 
     /*
-     * This version is not called for the flat case. 
+     * This version is not called for the flat case.
      */
     @Override
     public Object readObject(MessageReader reader, Context context) throws DatabindingException {
@@ -202,16 +202,16 @@ public class ArrayType extends AegisType {
         return array == null ? values.toArray((Object[])Array.newInstance(getComponentType().getTypeClass(),
                                                                           values.size())) : array;
     }
-    
-    
+
+
 
     @Override
-    public void writeObject(Object values, MessageWriter writer, 
+    public void writeObject(Object values, MessageWriter writer,
                             Context context) throws DatabindingException {
         writeObject(values, writer, context, null);
     }
-    
-    
+
+
     /**
      * Write an array type, using the desired element name in the flattened case.
      * @param values values to write.
@@ -220,7 +220,7 @@ public class ArrayType extends AegisType {
      * @param flatElementName name to use for the element if flat.
      * @throws DatabindingException
      */
-    public void writeObject(Object values, MessageWriter writer, 
+    public void writeObject(Object values, MessageWriter writer,
                             Context context, QName flatElementName) throws DatabindingException {
         boolean forceXsiWrite = false;
         if (values == null) {
@@ -246,13 +246,13 @@ public class ArrayType extends AegisType {
             ns = type.getSchemaType().getNamespaceURI();
         }
 
-        /* 
+        /*
          * This is not the right name in the 'flat' case. In the flat case,
          * we need the element name that would have been attached
          * one level out.
          */
         String name;
-        
+
         if (isFlat()) {
             name = flatElementName.getLocalPart();
             ns = flatElementName.getNamespaceURI(); // override the namespace.
@@ -321,7 +321,7 @@ public class ArrayType extends AegisType {
         }
     }
 
-    protected void writeValue(Object value, MessageWriter writer, Context context, 
+    protected void writeValue(Object value, MessageWriter writer, Context context,
                               AegisType type, String name,
                               String ns) throws DatabindingException {
         type = TypeUtil.getWriteType(context.getGlobalContext(), value, type);
@@ -353,16 +353,14 @@ public class ArrayType extends AegisType {
             return;
         }
 
-        XmlSchemaComplexType complex = new XmlSchemaComplexType(root);
+        XmlSchemaComplexType complex = new XmlSchemaComplexType(root, true);
         complex.setName(getSchemaType().getLocalPart());
-        root.addType(complex);
-        root.getItems().add(complex);
 
         XmlSchemaSequence seq = new XmlSchemaSequence();
         complex.setParticle(seq);
 
         AegisType componentType = getComponentType();
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(root, false);
         element.setName(componentType.getSchemaType().getLocalPart());
         element.setSchemaTypeName(componentType.getSchemaType());
 
@@ -380,7 +378,7 @@ public class ArrayType extends AegisType {
     /**
      * Since both an Array and a List can have the same type definition, double check that there isn't already
      * a defined type already.
-     * 
+     *
      * @param root
      * @return
      */
@@ -390,7 +388,7 @@ public class ArrayType extends AegisType {
 
     /**
      * We need to write a complex type schema for Beans, so return true.
-     * 
+     *
      * @see org.apache.cxf.aegis.type.AegisType#isComplex()
      */
     @Override
@@ -420,7 +418,7 @@ public class ArrayType extends AegisType {
 
     /**
      * Get the <code>AegisType</code> of the elements in the array.
-     * 
+     *
      * @return
      */
     public AegisType getComponentType() {

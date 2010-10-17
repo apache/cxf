@@ -49,6 +49,8 @@ import org.apache.ws.commons.schema.XmlSchemaComplexType;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaObject;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
+import org.apache.ws.commons.schema.XmlSchemaSequenceMember;
+
 import org.junit.Test;
 
 public class BeanTest extends AbstractAegisTest {
@@ -57,7 +59,7 @@ public class BeanTest extends AbstractAegisTest {
 
     public void setUp() throws Exception {
         super.setUp();
-    
+
         addNamespace("b", "urn:Bean");
         addNamespace("bz", "urn:beanz");
         addNamespace("a", "urn:anotherns");
@@ -138,7 +140,7 @@ public class BeanTest extends AbstractAegisTest {
 
     @Test
     public void testUnmappedProperty() throws Exception {
-        
+
         defaultContext();
         String ns = "urn:Bean";
         BeanTypeInfo info = new BeanTypeInfo(SimpleBean.class, ns, false);
@@ -167,7 +169,7 @@ public class BeanTest extends AbstractAegisTest {
         assertInvalid("/b:root/b:bleh", element);
         assertValid("/b:root/b:howdycustom[text()='howdy']", element);
     }
-    
+
     @Test
     public void testAttributeMap() throws Exception {
         defaultContext();
@@ -193,15 +195,15 @@ public class BeanTest extends AbstractAegisTest {
         Element element = writeObjectToElement(type, bean, getContext());
         assertValid("/b:root[@b:bleh='bleh']", element);
         assertValid("/b:root[@b:howdy='howdy']", element);
-        
+
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType stype = (XmlSchemaComplexType)schema.getTypeByName("bean");
         boolean howdy = false;
         boolean bleh = false;
-        for (int x = 0; x < stype.getAttributes().getCount(); x++) {
-            XmlSchemaObject o = stype.getAttributes().getItem(x);
+        for (int x = 0; x < stype.getAttributes().size(); x++) {
+            XmlSchemaObject o = stype.getAttributes().get(x);
             if (o instanceof XmlSchemaAttribute) {
                 XmlSchemaAttribute a = (XmlSchemaAttribute)o;
                 if ("howdy".equals(a.getName())) {
@@ -246,7 +248,7 @@ public class BeanTest extends AbstractAegisTest {
         writer.flush();
 
         bos.close();
-        
+
         Document doc = DOMUtils.readXml(new ByteArrayInputStream(bos.toByteArray()));
         Element element = doc.getDocumentElement();
 
@@ -271,7 +273,7 @@ public class BeanTest extends AbstractAegisTest {
         SimpleBean bean = new SimpleBean();
 
         // Test writing
-        
+
         Element element = writeObjectToElement(type, bean, getContext());
 
         assertInvalid("/b:root[@b:howdy]", element);
@@ -279,14 +281,14 @@ public class BeanTest extends AbstractAegisTest {
 
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType stype = (XmlSchemaComplexType)schema.getTypeByName("bean");
         XmlSchemaSequence seq = (XmlSchemaSequence) stype.getParticle();
         boolean howdy = false;
         boolean bleh = false;
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement a = (XmlSchemaElement)o;
                 if ("bleh".equals(a.getName())) {
@@ -295,8 +297,8 @@ public class BeanTest extends AbstractAegisTest {
             }
         }
 
-        for (int x = 0; x < stype.getAttributes().getCount(); x++) {
-            XmlSchemaObject o = stype.getAttributes().getItem(x);
+        for (int x = 0; x < stype.getAttributes().size(); x++) {
+            XmlSchemaObject o = stype.getAttributes().get(x);
             if (o instanceof XmlSchemaAttribute) {
                 XmlSchemaAttribute a = (XmlSchemaAttribute)o;
                 if ("howdy".equals(a.getName())) {
@@ -308,7 +310,7 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(howdy);
         assertTrue(bleh);
     }
-    
+
     @Test
     public void testNillableInt() throws Exception {
         defaultContext();
@@ -322,13 +324,13 @@ public class BeanTest extends AbstractAegisTest {
 
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("bean");
         XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
         boolean int1ok = false;
         boolean int2ok = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement oe = (XmlSchemaElement) o;
                 if ("int1".equals(oe.getName())) {
@@ -345,7 +347,7 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(int1ok);
         assertTrue(int2ok);
     }
-    
+
     @Test
     public void testNillableAnnotation() throws Exception {
         context = new AegisContext();
@@ -362,13 +364,13 @@ public class BeanTest extends AbstractAegisTest {
 
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("BeanWithNillableItem");
         XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
         boolean itemFound = false;
         boolean itemNotNillableFound = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement oe = (XmlSchemaElement) o;
                 if ("item".equals(oe.getName())) {
@@ -384,8 +386,8 @@ public class BeanTest extends AbstractAegisTest {
         assertTrue(itemFound);
         assertTrue(itemNotNillableFound);
     }
-    
-    
+
+
     @Test
     public void testNillableIntMinOccurs1() throws Exception {
         context = new AegisContext();
@@ -402,24 +404,24 @@ public class BeanTest extends AbstractAegisTest {
 
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("IntBean");
         XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
         boolean int1ok = false;
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement oe = (XmlSchemaElement) o;
                 if ("int1".equals(oe.getName())) {
                     int1ok = true;
                     assertFalse(oe.isNillable());
                     assertEquals(1, oe.getMinOccurs());
-                } 
+                }
             }
         }
         assertTrue(int1ok);
     }
-    
+
     @Test
     public void testCharMappings() throws Exception {
         defaultContext();
@@ -427,30 +429,30 @@ public class BeanTest extends AbstractAegisTest {
         BeanType type = (BeanType)mapping.getTypeCreator().createType(SimpleBean.class);
         type.setTypeClass(SimpleBean.class);
         type.setTypeMapping(mapping);
-        
+
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("SimpleBean");
         XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
         boolean charok = false;
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement oe = (XmlSchemaElement) o;
                 if ("character".equals(oe.getName())) {
                     charok = true;
                     assertNotNull(oe.getSchemaTypeName());
                     assertTrue(oe.isNillable());
-                    assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME, 
+                    assertEquals(CharacterAsStringType.CHARACTER_AS_STRING_TYPE_QNAME,
                                  oe.getSchemaTypeName());
                 }
             }
         }
         assertTrue(charok);
     }
-    
+
     @Test
     public void testByteMappings() throws Exception {
         defaultContext();
@@ -461,14 +463,14 @@ public class BeanTest extends AbstractAegisTest {
 
         XmlSchema schema = newXmlSchema("urn:Bean");
         type.writeSchema(schema);
-        
+
         XmlSchemaComplexType btype = (XmlSchemaComplexType)schema.getTypeByName("SimpleBean");
         XmlSchemaSequence seq = (XmlSchemaSequence)btype.getParticle();
         boolean littleByteOk = false;
         boolean bigByteOk = false;
 
-        for (int x = 0; x < seq.getItems().getCount(); x++) {
-            XmlSchemaObject o = seq.getItems().getItem(x);
+        for (int x = 0; x < seq.getItems().size(); x++) {
+            XmlSchemaSequenceMember o = seq.getItems().get(x);
             if (o instanceof XmlSchemaElement) {
                 XmlSchemaElement oe = (XmlSchemaElement) o;
                 if ("littleByte".equals(oe.getName())) {
@@ -484,7 +486,7 @@ public class BeanTest extends AbstractAegisTest {
         }
         assertTrue(littleByteOk);
         assertTrue(bigByteOk);
-        
+
         SimpleBean bean = new SimpleBean();
         bean.setBigByte(new Byte((byte)0xfe));
         bean.setLittleByte((byte)0xfd);
@@ -492,7 +494,7 @@ public class BeanTest extends AbstractAegisTest {
         Byte bb = new Byte((byte)0xfe);
         String bbs = bb.toString();
         assertValid("/b:root/bz:bigByte[text()='" + bbs + "']", element);
-        
+
         // Test reading
         ElementReader reader = new ElementReader(getResourceAsStream("byteBeans.xml"));
         bean = (SimpleBean)type.readObject(reader, getContext());
@@ -502,7 +504,7 @@ public class BeanTest extends AbstractAegisTest {
         reader.getXMLStreamReader().close();
 
     }
-    
+
     @Test
     public void testNullNonNillableWithDate() throws Exception {
         defaultContext();
@@ -525,7 +527,7 @@ public class BeanTest extends AbstractAegisTest {
         assertInvalid("/b:root/b:date", element);
         assertValid("/b:root", element);
     }
-    
+
     @Test
     public void testExtendedBean() throws Exception {
         defaultContext();
@@ -546,7 +548,7 @@ public class BeanTest extends AbstractAegisTest {
         Element element = writeObjectToElement(type, bean, getContext());
         assertValid("/b:root/b:howdy[text()='howdy']", element);
     }
-    
+
     @Test
     public void testByteBean() throws Exception {
         defaultContext();
@@ -638,7 +640,7 @@ public class BeanTest extends AbstractAegisTest {
             this.int2 = int2;
         }
     }
-    
+
     public static class BeanWithNillableItem {
         private IntBean item;
         private Integer itemNotNillable;
@@ -660,7 +662,7 @@ public class BeanTest extends AbstractAegisTest {
             this.itemNotNillable = itemNotNillable;
         }
 
-        
+
     }
 
     public static class ByteBean {

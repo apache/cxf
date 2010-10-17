@@ -39,7 +39,7 @@ public class ArrayVisitor extends VisitorBase {
 
     private static final String ELEMENT_NAME = "item";
     private AST identifierNode;
-    
+
     public ArrayVisitor(Scope scope,
                         Definition defn,
                         XmlSchema schemaRef,
@@ -81,7 +81,7 @@ public class ArrayVisitor extends VisitorBase {
         AST firstSizeNode = node.getFirstChild();
         AST nextSizeNode = firstSizeNode.getNextSibling();
         Types result = null;
-        
+
         // process all anonarrays, skip first array as it might not be anonymous
         if (nextSizeNode != null) {
             result = doAnonarray(nextSizeNode, getSchemaType(), getCorbaType());
@@ -91,26 +91,26 @@ public class ArrayVisitor extends VisitorBase {
             result.setCorbaType(getCorbaType());
             result.setFullyQualifiedName(getFullyQualifiedName());
         }
-        
+
         // process first array
         Long size = new Long(firstSizeNode.toString());
         XmlSchemaType stype = null;
         CorbaTypeImpl ctype = null;
         if (identifierNode != null) {
-            Scope scopedName = getScope();            
+            Scope scopedName = getScope();
             if (result.getSchemaType() != null) {
-                stype = generateSchemaArray(scopedName, size, 
-                                            result.getSchemaType(), 
+                stype = generateSchemaArray(scopedName, size,
+                                            result.getSchemaType(),
                                             result.getFullyQualifiedName());
             } else {
-                stype = generateSchemaArray(scopedName, size, 
+                stype = generateSchemaArray(scopedName, size,
                                             null, result.getFullyQualifiedName());
             }
             if (result.getCorbaType() != null) {
                 ctype = generateCorbaArray(scopedName, size, result.getCorbaType(), stype,
                                            getFullyQualifiedName());
             } else {
-                ctype = generateCorbaArray(scopedName, size, null, stype, 
+                ctype = generateCorbaArray(scopedName, size, null, stype,
                                            getFullyQualifiedName());
             }
         } else {
@@ -136,29 +136,29 @@ public class ArrayVisitor extends VisitorBase {
                                                size, null, stype, getFullyQualifiedName());
             }
         }
-        
+
         // add schemaType
         schema.getItems().add(stype);
         schema.addType(stype);
 
         // add corbaType
         typeMap.getStructOrExceptionOrUnion().add(ctype);
-        
+
         setSchemaType(stype);
         setCorbaType(ctype);
     }
 
     private Types doAnonarray(AST node, XmlSchemaType stype, CorbaTypeImpl ctype) {
         Types result = new Types();
-        
+
         if (node != null) {
-            
+
             AST next = node.getNextSibling();
             result = doAnonarray(next, stype, ctype);
 
             Scope scopedName = TypesUtils.generateAnonymousScopedName(getScope(), schema);
             Long size = new Long(node.toString());
-            
+
             if (result.getSchemaType() == null) {
                 result.setSchemaType(generateSchemaArray(scopedName,
                                                          size,
@@ -170,7 +170,7 @@ public class ArrayVisitor extends VisitorBase {
                                                          result.getSchemaType(),
                                                          getFullyQualifiedName()));
             }
-            
+
             if (result.getCorbaType() == null) {
                 result.setCorbaType(generateCorbaAnonarray(scopedName.toString(),
                                                            size,
@@ -184,7 +184,7 @@ public class ArrayVisitor extends VisitorBase {
                                                            result.getSchemaType(),
                                                            getFullyQualifiedName()));
             }
-            
+
 
             // add schemaType
             schema.getItems().add(result.getSchemaType());
@@ -193,18 +193,18 @@ public class ArrayVisitor extends VisitorBase {
             // add corbaType
             typeMap.getStructOrExceptionOrUnion().add(result.getCorbaType());
         }
-        
+
         return result;
     }
-    
-    private XmlSchemaComplexType generateSchemaArray(Scope scopedName, Long size, 
+
+    private XmlSchemaComplexType generateSchemaArray(Scope scopedName, Long size,
                                                      XmlSchemaType type, Scope fQName) {
-        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema);
+        XmlSchemaComplexType complexType = new XmlSchemaComplexType(schema, false);
         complexType.setName(mapper.mapToQName(scopedName));
 
         XmlSchemaSequence sequence = new XmlSchemaSequence();
 
-        XmlSchemaElement element = new XmlSchemaElement();
+        XmlSchemaElement element = new XmlSchemaElement(schema, false);
         element.setMinOccurs(size);
         element.setMaxOccurs(size);
         element.setName(ELEMENT_NAME);
@@ -214,11 +214,11 @@ public class ArrayVisitor extends VisitorBase {
                 element.setNillable(true);
             }
         } else {
-            ArrayDeferredAction arrayAction = 
+            ArrayDeferredAction arrayAction =
                 new ArrayDeferredAction(element);
             wsdlVisitor.getDeferredActions().add(fQName, arrayAction);
         }
-        
+
         sequence.getItems().add(element);
 
         complexType.setParticle(sequence);
@@ -226,7 +226,7 @@ public class ArrayVisitor extends VisitorBase {
         return complexType;
     }
 
-    private Array generateCorbaArray(Scope scopedName, Long size, 
+    private Array generateCorbaArray(Scope scopedName, Long size,
                                      CorbaTypeImpl type, XmlSchemaType stype, Scope fQName) {
         Array array = new Array();
         array.setQName(new QName(typeMap.getTargetNamespace(), scopedName.toString()));
@@ -238,14 +238,14 @@ public class ArrayVisitor extends VisitorBase {
         if (type != null) {
             array.setElemtype(type.getQName());
         } else {
-            ArrayDeferredAction arrayAction = 
+            ArrayDeferredAction arrayAction =
                 new ArrayDeferredAction(array);
             wsdlVisitor.getDeferredActions().add(fQName, arrayAction);
         }
         return array;
     }
 
-    private Anonarray generateCorbaAnonarray(String name, Long size, 
+    private Anonarray generateCorbaAnonarray(String name, Long size,
                                              CorbaTypeImpl type, XmlSchemaType stype, Scope fQName) {
         Anonarray anonarray = new Anonarray();
         anonarray.setQName(new QName(typeMap.getTargetNamespace(), name));
@@ -256,50 +256,50 @@ public class ArrayVisitor extends VisitorBase {
         if (type != null) {
             anonarray.setElemtype(type.getQName());
         } else {
-            ArrayDeferredAction anonarrayAction = 
+            ArrayDeferredAction anonarrayAction =
                 new ArrayDeferredAction(anonarray);
             wsdlVisitor.getDeferredActions().add(fQName, anonarrayAction);
         }
         return anonarray;
     }
-    
+
     class Types {
         private XmlSchemaType schemaType;
         private CorbaTypeImpl corbaType;
         private Scope fullyQualifiedName;
-        
+
         public Types() {
             schemaType = null;
             corbaType = null;
         }
-        
+
         public Types(XmlSchemaType stype, CorbaTypeImpl ctype,
                      Scope fqName) {
             schemaType = stype;
             corbaType = ctype;
             fullyQualifiedName = fqName;
         }
-        
+
         public void setSchemaType(XmlSchemaType stype) {
             schemaType = stype;
         }
-        
+
         public void setCorbaType(CorbaTypeImpl ctype) {
             corbaType = ctype;
         }
-        
+
         public XmlSchemaType getSchemaType() {
             return schemaType;
         }
-        
+
         public CorbaTypeImpl getCorbaType() {
             return corbaType;
         }
-        
+
         public void setFullyQualifiedName(Scope fqName) {
             fullyQualifiedName = fqName;
         }
-        
+
         public Scope getFullyQualifiedName() {
             return fullyQualifiedName;
         }
