@@ -68,14 +68,6 @@ public final class XmlSchemaUtils {
     private XmlSchemaUtils() {
     }
 
-    private static void setNameFromQName(XmlSchemaElement element, QName name) {
-        if (name == null) {
-            element.setName(null);
-        } else {
-            element.setName(name.getLocalPart());
-        }
-    }
-
     /**
      * Wrapper around XmlSchemaElement.setName that checks for inconsistency with
      * refName.
@@ -112,7 +104,6 @@ public final class XmlSchemaUtils {
         }
         element.getRef().setTargetQName(name);
         // cxf conventionally keeps something in the name slot.
-        setNameFromQName(element, name);
     }
 
     /**
