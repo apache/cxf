@@ -57,13 +57,13 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.setContext(env);
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
-        
+
         Map services = def.getServices();
         assertNotNull(services);
         assertEquals(1, services.size());
         Service service = (Service)services.get(new QName(qname, "XMLService"));
         assertNotNull(service);
-        
+
         Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());
@@ -71,7 +71,7 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         assertNotNull(port);
 
         assertEquals(1, port.getExtensibilityElements().size());
-        assertTrue(port.getExtensibilityElements().get(0).getClass().getName(), 
+        assertTrue(port.getExtensibilityElements().get(0).getClass().getName() + " is an HTTPAddress",
                    port.getExtensibilityElements().get(0) instanceof HTTPAddress);
 
         Binding binding = port.getBinding();
@@ -97,13 +97,13 @@ public class JAXWSDefinitionBuilderTest extends Assert {
         builder.setContext(env);
         Definition def = builder.build(wsdlUrl);
         assertNotNull(def);
-        
+
         Map services = def.getServices();
         assertNotNull(services);
         assertEquals(8, services.size());
         Service service = (Service)services.get(new QName(qname, "HelloWorldQueueBinMsgService"));
         assertNotNull(service);
-        
+
         Map ports = service.getPorts();
         assertNotNull(ports);
         assertEquals(1, ports.size());

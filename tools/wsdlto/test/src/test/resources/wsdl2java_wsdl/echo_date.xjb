@@ -22,7 +22,7 @@
     * The reason we generate this file is that
     * we detected java.util.Date or java.util.Calendar classes in your SEI
     *
-    * Useage:
+    * Usage:
     *   wsdl2java [-b <the path of this file>] wsdl
     * To customize the generated date types
 -->
@@ -31,8 +31,8 @@
           xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
           xmlns:xs="http://www.w3.org/2001/XMLSchema"
           xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
-  <jaxws:bindings  node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://date.fortest.tools.cxf.apache.org/']">
-      <jxb:globalBindings  xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema[@targetNamespace='http://date.fortest.tools.cxf.apache.org/']">
+      <jxb:globalBindings xmlns:jxb="http://java.sun.com/xml/ns/jaxb" xmlns:xs="http://www.w3.org/2001/XMLSchema">
         <jxb:javaType name="java.util.Date" xmlType="xs:dateTime"
                       parseMethod="org.apache.cxf.tools.common.DataTypeAdapter.parseDateTime"
                       printMethod="org.apache.cxf.tools.common.DataTypeAdapter.printDateTime"/>

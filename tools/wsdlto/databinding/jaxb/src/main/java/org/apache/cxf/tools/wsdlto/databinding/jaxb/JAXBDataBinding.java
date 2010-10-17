@@ -128,7 +128,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         boolean isInclude;
         int locIdx = -1;
         OASISCatalogManager catalog;
-        
+
         LocationFilterReader(XMLStreamReader read, OASISCatalogManager catalog) {
             super(read);
             this.catalog = catalog;
@@ -192,11 +192,11 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
             return index;
         }
-        
+
         private String mapSchemaLocation(String target) {
             return JAXBDataBinding.mapSchemaLocation(target, this.getLocation().getSystemId(), catalog);
         }
-        
+
         public String getAttributeValue(String namespaceURI, String localName) {
             if (isInclude && "schemaLocation".equals(localName)) {
                 return mapSchemaLocation(super.getAttributeValue(namespaceURI, localName));
@@ -216,24 +216,24 @@ public class JAXBDataBinding implements DataBindingProfile {
         public QName getAttributeName(int index) {
             return super.getAttributeName(mapIdx(index));
         }
-    
+
         public String getAttributePrefix(int index) {
             return super.getAttributePrefix(mapIdx(index));
         }
-    
+
         public String getAttributeNamespace(int index) {
             return super.getAttributeNamespace(mapIdx(index));
         }
-    
+
         public String getAttributeLocalName(int index) {
             return super.getAttributeLocalName(mapIdx(index));
         }
-    
+
         public String getAttributeType(int index) {
             return super.getAttributeType(mapIdx(index));
         }
-    
-    
+
+
         public boolean isAttributeSpecified(int index) {
             return super.isAttributeSpecified(mapIdx(index));
         }
@@ -241,15 +241,15 @@ public class JAXBDataBinding implements DataBindingProfile {
 
 
     private static final Logger LOG = LogUtils.getL7dLogger(JAXBDataBinding.class);
-    
+
     private static final Set<String> DEFAULT_TYPE_MAP = new HashSet<String>();
     private static final Map<String, String> JLDEFAULT_TYPE_MAP = new HashMap<String, String>();
-    
+
     private S2JJAXBModel rawJaxbModelGenCode;
     private ToolContext context;
     private DefaultValueProvider defaultValues;
     private boolean initialized;
-    
+
     static {
         DEFAULT_TYPE_MAP.add("boolean");
         DEFAULT_TYPE_MAP.add("int");
@@ -266,7 +266,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         DEFAULT_TYPE_MAP.add("java.math.BigDecimal");
         DEFAULT_TYPE_MAP.add("javax.xml.datatype.XMLGregorianCalendar");
         DEFAULT_TYPE_MAP.add("javax.xml.datatype.Duration");
-        
+
         JLDEFAULT_TYPE_MAP.put("java.lang.Character", "char");
         JLDEFAULT_TYPE_MAP.put("java.lang.Boolean", "boolean");
         JLDEFAULT_TYPE_MAP.put("java.lang.Integer", "int");
@@ -276,35 +276,35 @@ public class JAXBDataBinding implements DataBindingProfile {
         JLDEFAULT_TYPE_MAP.put("java.lang.Float", "float");
         JLDEFAULT_TYPE_MAP.put("java.lang.Double", "double");
         DEFAULT_TYPE_MAP.addAll(JLDEFAULT_TYPE_MAP.keySet());
-    }   
-    
+    }
+
     public void initialize(ToolContext c) throws ToolException {
         this.context = c;
-        
+
         SchemaCompiler schemaCompiler = XJC.createSchemaCompiler();
         Bus bus = context.get(Bus.class);
         OASISCatalogManager catalog = bus.getExtension(OASISCatalogManager.class);
         hackInNewInternalizationLogic(schemaCompiler, catalog);
-        
+
         ClassCollector classCollector = context.get(ClassCollector.class);
-        
-        ClassNameAllocatorImpl allocator 
+
+        ClassNameAllocatorImpl allocator
             = new ClassNameAllocatorImpl(classCollector,
                                          c.optionSet(ToolConstants.CFG_AUTORESOLVE));
 
         schemaCompiler.setClassNameAllocator(allocator);
-           
+
         JAXBBindErrorListener listener = new JAXBBindErrorListener(context.isVerbose());
         schemaCompiler.setErrorListener(listener);
         // Collection<SchemaInfo> schemas = serviceInfo.getSchemas();
         List<InputSource> jaxbBindings = context.getJaxbBindingFile();
         SchemaCollection schemas = (SchemaCollection) context.get(ToolConstants.XML_SCHEMA_COLLECTION);
-        
+
         Options opts = null;
         opts = getOptions(schemaCompiler);
-        
+
         List<String> args = new ArrayList<String>();
-        
+
         if (context.get(ToolConstants.CFG_NO_ADDRESS_BINDING) == null) {
             //hard code to enable jaxb extensions
             args.add("-extension");
@@ -316,7 +316,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             InputSource ins = new InputSource(bindingFileUrl.toString());
             opts.addBindFile(ins);
         }
-        
+
         if (context.get(ToolConstants.CFG_XJC_ARGS) != null) {
             Object o = context.get(ToolConstants.CFG_XJC_ARGS);
             if (o instanceof String) {
@@ -359,25 +359,25 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(msg, e);
             }
         }
-        
+
         addSchemas(opts, schemaCompiler, schemas);
         addBindingFiles(opts, jaxbBindings, schemas);
 
-                       
+
         for (String ns : context.getNamespacePackageMap().keySet()) {
             File file = JAXBUtils.getPackageMappingSchemaBindingFile(ns, context.mapPackageName(ns));
             try {
                 InputSource ins = new InputSource(file.toURI().toString());
                 schemaCompiler.parseSchema(ins);
             } finally {
-                FileUtils.delete(file);                
+                FileUtils.delete(file);
             }
         }
-        
+
         if (context.getPackageName() != null) {
             schemaCompiler.setDefaultPackageName(context.getPackageName());
-        }  
-        
+        }
+
         rawJaxbModelGenCode = schemaCompiler.bind();
 
         addedEnumClassToCollector(schemas, allocator);
@@ -400,7 +400,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         initialized = true;
     }
-    
+
     private boolean isJAXB22() {
         Target t = XmlElement.class.getAnnotation(Target.class);
         //JAXB 2.2 allows XmlElement on params.
@@ -415,19 +415,19 @@ public class JAXBDataBinding implements DataBindingProfile {
     private static final class ReferenceFinder extends AbstractReferenceFinderImpl {
         private Locator locator;
         private OASISCatalogManager catalog;
-        
+
         ReferenceFinder(DOMForest parent, OASISCatalogManager cat) {
             super(parent);
             catalog = cat;
         }
-        
+
         public void setDocumentLocator(Locator loc) {
             super.setDocumentLocator(loc);
             this.locator = loc;
         }
         protected String findExternalResource(String nsURI, String localName, Attributes atts) {
-            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(nsURI) 
-                && ("import".equals(localName) 
+            if (XMLConstants.W3C_XML_SCHEMA_NS_URI.equals(nsURI)
+                && ("import".equals(localName)
                     || "include".equals(localName))) {
                 String s = atts.getValue("schemaLocation");
                 if (!StringUtils.isEmpty(s)) {
@@ -479,7 +479,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                             binding = null;
                         }
                     }
-                } 
+                }
             } catch (Exception ex) {
                 //ignore, just pass to jaxb
             } finally {
@@ -514,12 +514,12 @@ public class JAXBDataBinding implements DataBindingProfile {
         tmpFile.deleteOnExit();
         return result;
     }
-    
+
     @SuppressWarnings("unchecked")
-    private void addSchemas(Options opts, 
+    private void addSchemas(Options opts,
                             SchemaCompiler schemaCompiler,
                             SchemaCollection schemaCollection) {
-        
+
         Set<String> ids = new HashSet<String>();
         List<ServiceInfo> serviceList = (List<ServiceInfo>)context.get(ToolConstants.SERVICE_LIST);
         for (ServiceInfo si : serviceList) {
@@ -560,7 +560,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                         //ignore - DOM level 3
                     }
                     validateSchema(ele, uri, catalog);
-                }           
+                }
                 try {
                     docs[0].setDocumentURI(key);
                 } catch (Throwable t) {
@@ -594,7 +594,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                     } else {
                         in = new URL(key).openStream();
                     }
-                    
+
                     XMLStreamReader reader = StaxUtils.createXMLStreamReader(key, in);
                     reader = new LocationFilterReader(reader, catalog);
                     InputSource is = new InputSource(key);
@@ -628,7 +628,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 ele = removeImportElement(ele, key, catalog);
                 if (context.get(ToolConstants.CFG_VALIDATE_WSDL) != null) {
                     validateSchema(ele, sci.getSystemId(), catalog);
-                }           
+                }
                 InputSource is = new InputSource((InputStream)null);
                 //key = key.replaceFirst("#types[0-9]+$", "");
                 is.setSystemId(key);
@@ -637,8 +637,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 try {
                     schemaCompiler.parseSchema(key, StaxUtils.createXMLStreamReader(ele, key));
                 } catch (XMLStreamException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
+                    throw new RuntimeException(e);
                 }
             }
         }
@@ -663,7 +662,7 @@ public class JAXBDataBinding implements DataBindingProfile {
     // JAXB bug. JAXB ClassNameCollector may not be invoked when generated
     // class is an enum. We need to use this method to add the missed file
     // to classCollector.
-    private void addedEnumClassToCollector(SchemaCollection schemaCollection, 
+    private void addedEnumClassToCollector(SchemaCollection schemaCollection,
                                            ClassNameAllocatorImpl allocator) {
         //for (Element schemaElement : schemaList.values()) {
         for (XmlSchema schema : schemaCollection.getXmlSchemas()) {
@@ -768,11 +767,11 @@ public class JAXBDataBinding implements DataBindingProfile {
     }
 
     private Element removeImportElement(Element element, String sysId, OASISCatalogManager catalog) {
-        List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                                     ToolConstants.SCHEMA_URI, 
+        List<Element> impElemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                                     ToolConstants.SCHEMA_URI,
                                                                      "import");
-        List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                                     ToolConstants.SCHEMA_URI, 
+        List<Element> incElemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                                     ToolConstants.SCHEMA_URI,
                                                                      "include");
         boolean hasJAXB = DOMUtils.hasElementInNS(element, ToolConstants.NS_JAXB_BINDINGS);
         if (impElemList.size() == 0 && incElemList.size() == 0 && !hasJAXB) {
@@ -780,9 +779,9 @@ public class JAXBDataBinding implements DataBindingProfile {
         }
         element = (Element)cloneNode(element.getOwnerDocument(), element, true);
         List<Node> ns = new ArrayList<Node>();
-        
-        impElemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                       ToolConstants.SCHEMA_URI, 
+
+        impElemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                       ToolConstants.SCHEMA_URI,
                                                        "import");
         for (Element elem : impElemList) {
             Node importNode = elem;
@@ -792,15 +791,15 @@ public class JAXBDataBinding implements DataBindingProfile {
             Node schemaNode = item.getParentNode();
             schemaNode.removeChild(item);
         }
-        
-        incElemList = DOMUtils.findAllElementsByTagNameNS(element, 
-                                                       ToolConstants.SCHEMA_URI, 
+
+        incElemList = DOMUtils.findAllElementsByTagNameNS(element,
+                                                       ToolConstants.SCHEMA_URI,
                                                        "include");
         for (Element elem : incElemList) {
             Attr val = elem.getAttributeNode("schemaLocation");
             val.setNodeValue(mapSchemaLocation(val.getNodeValue(), sysId, catalog));
         }
-        
+
         if (hasJAXB) {
             //need to add ns and version
             String pfx = DOMUtils.getPrefix(element, ToolConstants.NS_JAXB_BINDINGS);
@@ -858,15 +857,15 @@ public class JAXBDataBinding implements DataBindingProfile {
         return clone;
     }
 
-    
-    public void validateSchema(Element ele, String uri, 
+
+    public void validateSchema(Element ele, String uri,
                                final OASISCatalogManager catalog) throws ToolException {
         SchemaFactory schemaFact = SchemaFactory.newInstance(XMLConstants.W3C_XML_SCHEMA_NS_URI);
         schemaFact.setResourceResolver(new LSResourceResolver() {
-            public LSInput resolveResource(String type,  
+            public LSInput resolveResource(String type,
                                            String namespaceURI,
                                            String publicId,
-                                           String systemId, 
+                                           String systemId,
                                            String baseURI) {
                 String s = JAXBDataBinding.mapSchemaLocation(systemId, baseURI, catalog);
                 return new LSInputSAXWrapper(new InputSource(s));
@@ -883,7 +882,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         }
     }
-    
+
     public DefaultValueWriter createDefaultValueWriter(QName qname, boolean element) {
         if (defaultValues == null) {
             return null;
@@ -905,10 +904,10 @@ public class JAXBDataBinding implements DataBindingProfile {
         if (typeAnno != null) {
             final JType type = typeAnno.getTypeClass();
             return new JAXBDefaultValueWriter(type);
-        } 
+        }
         return null;
     }
-    
+
     public DefaultValueWriter createDefaultValueWriterForWrappedElement(QName wrapperElement, QName item) {
         if (defaultValues != null) {
             Mapping mapping = rawJaxbModelGenCode.get(wrapperElement);
@@ -917,7 +916,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 for (Property pro : propList) {
                     if (pro.elementName().getNamespaceURI().equals(item.getNamespaceURI())
                         && pro.elementName().getLocalPart().equals(item.getLocalPart())) {
-                        
+
                         JType type = pro.type();
                         if (type instanceof JDefinedClass
                             && ((JDefinedClass)type).isAbstract()) {
@@ -943,7 +942,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             path = path + "/" + varName;
             writeDefaultValue(writer, indent, path, varName, type);
         }
-        
+
         public void writeDefaultValue(Writer writer, String indent,
                                       String path, String varName,
                                       JType tp) throws IOException {
@@ -961,17 +960,17 @@ public class JAXBDataBinding implements DataBindingProfile {
             } else if (tp instanceof JDefinedClass) {
                 JDefinedClass jdc = (JDefinedClass)tp;
                 if (jdc.getClassType() == ClassType.ENUM) {
-                    //no way to get the field list as it's private with 
+                    //no way to get the field list as it's private with
                     //no accessors :-(
                     try {
                         Field f = jdc.getClass().getDeclaredField("enumConstantsByName");
                         f.setAccessible(true);
                         Map map = (Map)f.get(jdc);
-                        Set<String> values = CastUtils.cast(map.keySet()); 
+                        Set<String> values = CastUtils.cast(map.keySet());
                         String first = defaultValues.chooseEnumValue(path, values);
                         writer.write(tp.fullName());
-                        writer.write(".");                        
-                        writer.write(first);                        
+                        writer.write(".");
+                        writer.write(first);
                         writer.write(";");
                     } catch (Exception e) {
                         IOException ex = new IOException(e.getMessage());
@@ -999,12 +998,12 @@ public class JAXBDataBinding implements DataBindingProfile {
                         writer.write("new ");
                         writer.write(tp.fullName().replace("java.util.List", "java.util.ArrayList"));
                         writer.write("();");
-                        
+
                         f = tp.getClass().getDeclaredField("args");
                         f.setAccessible(true);
                         List<JClass> lcl = CastUtils.cast((List)f.get(tp));
                         JClass cl = lcl.get(0);
-                        
+
                         int cnt = defaultValues.getListLength(path + "/" + varName);
                         for (int x = 0; x < cnt; x++) {
 
@@ -1023,7 +1022,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 } catch (Exception e) {
                     //ignore
                 }
-                
+
                 if (!found) {
                     //System.err.println("No idea what to do with " + tp.fullName());
                     //System.err.println("        class " + tp.getClass().getName());
@@ -1038,7 +1037,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             if (sp instanceof JDefinedClass) {
                 fillInFields(writer, indent, path, varName, (JDefinedClass)sp);
             }
-            
+
             Collection<JMethod> methods = tp.methods();
             for (JMethod m : methods) {
                 if (m.name().startsWith("set")) {
@@ -1090,15 +1089,15 @@ public class JAXBDataBinding implements DataBindingProfile {
                     writer.write(m.name());
                     writer.write("().addAll(");
                     writer.write(varName + m.name().substring(3));
-                    writer.write(");");                    
+                    writer.write(");");
                 }
             }
         }
         private void writeDefaultType(Writer writer, JType t, String path) throws IOException {
             String name = t.fullName();
             writeDefaultType(writer, name, path);
-            
-        }    
+
+        }
         private void writeDefaultType(Writer writer, String name, String path) throws IOException {
             if (JLDEFAULT_TYPE_MAP.containsKey(name)) {
                 writer.append(name.substring("java.lang.".length())).append(".valueOf(");
@@ -1158,7 +1157,7 @@ public class JAXBDataBinding implements DataBindingProfile {
         if (catalog != null) {
             try {
                 String resolvedLocation = catalog.resolveSystem(target);
-                
+
                 if (resolvedLocation == null) {
                     resolvedLocation = catalog.resolveURI(target);
                 }
@@ -1168,7 +1167,7 @@ public class JAXBDataBinding implements DataBindingProfile {
                 if (resolvedLocation != null) {
                     return resolvedLocation;
                 }
-                
+
             } catch (Exception ex) {
                 //ignore
             }
@@ -1181,7 +1180,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             }
         } catch (Exception ex) {
             //ignore
-        }        
+        }
         return target;
     }
 
