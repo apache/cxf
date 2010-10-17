@@ -19,10 +19,8 @@
 package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
-import java.io.FileInputStream;
 
 import org.apache.cxf.helpers.FileUtils;
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ProcessorTestBase;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
