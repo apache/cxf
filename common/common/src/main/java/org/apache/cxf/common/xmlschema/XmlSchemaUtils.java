@@ -190,7 +190,6 @@ public final class XmlSchemaUtils {
         }
         XmlSchemaImport imp = new XmlSchemaImport(schema);
         imp.setNamespace(namespaceUri);
-        schema.getItems().add(imp);
     }
 
     /**
