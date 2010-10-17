@@ -170,7 +170,7 @@ public class DeclaratorVisitor extends VisitorBase {
 
     private XmlSchemaSimpleType duplicateXmlSchemaSimpleType(Scope newScope) {
         XmlSchemaSimpleType oldSimpleType = (XmlSchemaSimpleType) getSchemaType();
-        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, false);
+        XmlSchemaSimpleType simpleType = new XmlSchemaSimpleType(schema, oldSimpleType.isTopLevel());
         simpleType.setContent(oldSimpleType.getContent());
         simpleType.setName(newScope.toString());
         return simpleType;

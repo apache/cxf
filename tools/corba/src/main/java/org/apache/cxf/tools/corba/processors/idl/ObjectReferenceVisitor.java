@@ -47,6 +47,7 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaExternal;
 import org.apache.ws.commons.schema.XmlSchemaImport;
 import org.apache.ws.commons.schema.XmlSchemaObject;
+import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaType;
 import org.apache.ws.commons.schema.utils.NamespaceMap;
 
@@ -112,10 +113,7 @@ public class ObjectReferenceVisitor extends VisitorBase {
         if (wsaSchema == null) {
             wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
         }
-        /*
-         * TODO: This anonymous type is ridiculous, but I don't understand this code.
-         */
-        XmlSchemaType objectType = new XmlSchemaType(wsaSchema, false) { };
+        XmlSchemaType objectType = new XmlSchemaSimpleType(wsaSchema, true);
         objectType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
         setSchemaType(objectType);
 
@@ -209,7 +207,7 @@ public class ObjectReferenceVisitor extends VisitorBase {
         if (wsaSchema == null) {
             wsaSchema = new XmlSchema(ReferenceConstants.WSADDRESSING_NAMESPACE, schemas);
         }
-        XmlSchemaType wsaType = new XmlSchemaType(wsaSchema, false) { };
+        XmlSchemaType wsaType = new XmlSchemaSimpleType(wsaSchema, true);
         wsaType.setName(ReferenceConstants.WSADDRESSING_LOCAL_NAME);
 
         // Check to see if we have already defined an element for this reference type.  If
