@@ -19,6 +19,7 @@
 
 package org.apache.cxf.service.invoker;
 
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.service.Service;
 
@@ -29,12 +30,22 @@ import org.apache.cxf.service.Service;
  * some session implementations require the beans to be Serializable
  */
 public class SessionFactory implements Factory {
+    
     Factory factory;
+    boolean createIfNotExist;
+    
     public SessionFactory(Class<?> svcClass) {
-        this(new PerRequestFactory(svcClass));
+        this(new PerRequestFactory(svcClass), true);
     }
     public SessionFactory(Factory f) {
+        this(f, true);
+    }
+    public SessionFactory(Class<?> svcClass, boolean createOnDemand) {
+        this(new PerRequestFactory(svcClass), createOnDemand);
+    }
+    public SessionFactory(Factory f, boolean createOnDemand) {
         factory = f;
+        createIfNotExist = createOnDemand;
     }
 
     /** {@inheritDoc}*/
@@ -44,8 +55,12 @@ public class SessionFactory implements Factory {
         synchronized (serv) {
             o = e.getSession().get(serv.getName().toString());
             if (o == null) {
-                o = factory.create(e);
-                e.getSession().put(serv.getName().toString(), o);
+                if (createIfNotExist) {
+                    o = factory.create(e);
+                    e.getSession().put(serv.getName().toString(), o);
+                } else {
+                    throw new Fault("COULD_NOT_INSTANTIATE", FactoryInvoker.BUNDLE);
+                }
             }
         }
         return o;
