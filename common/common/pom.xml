@@ -178,7 +178,7 @@
                     <scope>test</scope>
                 </dependency>
                 <dependency>
-                    <groupId>cxf.saaj.impl.groupId}</groupId>
+                    <groupId>${cxf.saaj.impl.groupId}</groupId>
                     <artifactId>${cxf.saaj.impl.artifactId}</artifactId>
                     <scope>test</scope>
                 </dependency>
