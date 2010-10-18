@@ -39,6 +39,7 @@ import javax.jws.WebService;
 import javax.jws.soap.SOAPBinding;
 import javax.jws.soap.SOAPBinding.ParameterStyle;
 import javax.jws.soap.SOAPBinding.Style;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Action;
 import javax.xml.ws.Holder;
@@ -63,6 +64,7 @@ import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
 public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
+
     private static final Logger LOG = LogUtils.getL7dLogger(JaxWsServiceConfiguration.class); 
 
     private JaxWsImplementorInfo implInfo;
@@ -839,5 +841,19 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         }
         return null;
     }
+    
+    public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
+        Annotation[] a = (Annotation[])mpi.getProperty(ReflectionServiceFactoryBean.PARAM_ANNOTATION);
+        for (Annotation a2 : a) {
+            if (a2 instanceof XmlElement) {
+                XmlElement e = (XmlElement)a2;
+                if (e.required()) {
+                    return 1L;
+                }
+            }
+        }
+        return null;
+    }
+
     
 }
