@@ -43,6 +43,9 @@ public class SpringBeanFactory implements Factory, ApplicationContextAware {
     
     /** {@inheritDoc}*/
     public Object create(Exchange e) throws Throwable {
+        if (ctx == null) {
+            ctx = e.getBus().getExtension(ApplicationContext.class);
+        }
         return ctx.getBean(beanName);
     }
 
