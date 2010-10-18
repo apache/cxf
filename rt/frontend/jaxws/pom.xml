@@ -299,7 +299,7 @@
                     <artifactId>geronimo-annotation_1.0_spec</artifactId>
                 </dependency>
                 <dependency>
-                    <groupId>cxf.stax.impl.groupId}</groupId>
+                    <groupId>${cxf.stax.impl.groupId}</groupId>
                     <artifactId>${cxf.stax.impl.artifactId}</artifactId>
                 </dependency>
                 <dependency>
