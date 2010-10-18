@@ -30,13 +30,14 @@ import org.springframework.context.ApplicationContextAware;
 public class JAXWS22SpringEndpointImpl extends org.apache.cxf.jaxws22.EndpointImpl
     implements ApplicationContextAware {
 
-    public JAXWS22SpringEndpointImpl(Object implementor) {
-        super((Bus)null, implementor);
+    public JAXWS22SpringEndpointImpl(Object o) {
+        super(o instanceof Bus ? (Bus)o : null,
+              o instanceof Bus ? null : o);
     }
+
     public JAXWS22SpringEndpointImpl(Bus bus, Object implementor) {
         super(bus, implementor);
     }
-    
     
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {
         if (getBus() == null) {
