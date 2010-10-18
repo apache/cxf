@@ -167,7 +167,11 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
                 if (scope.factoryClass() == FactoryType.DEFAULT.class) {
                     switch (scope.value()) {
                     case Session:
-                        f = new SessionFactory(cls);
+                        if (scope.args().length > 0) {
+                            f = new SessionFactory(cls, Boolean.parseBoolean(scope.args()[0]));
+                        } else {
+                            f = new SessionFactory(cls);
+                        }
                         break;
                     case PerRequest:
                         f = new PerRequestFactory(cls);
