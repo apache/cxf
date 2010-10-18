@@ -164,7 +164,7 @@
                             </file>
                             <file>
                                 <name>.ruleset</name>
-                                <location>/${pmd.eclipse.ruleset}</location>
+                                <location>/${cxf.pmd.eclipse.ruleset}</location>
                             </file>
                         </additionalConfig>
                     </configuration>
