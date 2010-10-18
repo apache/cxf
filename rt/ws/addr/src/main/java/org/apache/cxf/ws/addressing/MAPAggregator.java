@@ -545,6 +545,38 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 && !getWSAddressingFeature(message).isAddressingRequired()) {
                 assertAddressing(message);
             }
+            //CXF-3060 :If wsa policy is not enforced, AddressingProperties map is null and
+            // AddressingFeature.isRequired, requestor checks inbound message and throw exception
+            if (null == theMaps
+                && !ContextUtils.isOutbound(message) 
+                && ContextUtils.isRequestor(message)
+                && getWSAddressingFeature(message) != null
+                && getWSAddressingFeature(message).isAddressingRequired()) {
+                boolean missingWsaHeader = false;
+                AssertionInfoMap aim = message.get(AssertionInfoMap.class);
+                if (aim == null || aim.size() == 0) {
+                    missingWsaHeader = true;
+                }
+                if (aim != null && aim.size() > 0) {
+                    missingWsaHeader = true;
+                    QName[] types = new QName[] {
+                        MetadataConstants.ADDRESSING_ASSERTION_QNAME,
+                        MetadataConstants.USING_ADDRESSING_2004_QNAME,
+                        MetadataConstants.USING_ADDRESSING_2005_QNAME,
+                        MetadataConstants.USING_ADDRESSING_2006_QNAME
+                    };
+                    for (QName type : types) {
+                        if (aim.containsKey(type) && aim.get(type).size() > 0) {
+                            missingWsaHeader = false;
+                        }
+                    }
+                }
+                if (missingWsaHeader) {
+                    String reason = BUNDLE.getString("MISSING_ACTION_MESSAGE");
+                    throw new SoapFault(reason, new QName(Names.WSA_NAMESPACE_NAME,
+                                                          Names.HEADER_REQUIRED_NAME));
+                }
+            }
         }
         return continueProcessing;
     }

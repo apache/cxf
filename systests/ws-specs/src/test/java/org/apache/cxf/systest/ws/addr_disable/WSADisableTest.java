@@ -117,6 +117,25 @@ public class WSADisableTest extends AbstractWSATestBase {
             //expected
         }
     }
+    
+    //CXF-3060
+    @Test
+    public void testDisableServerEnableClientRequired() throws Exception {
+        AddNumbersPortType port = getService().getAddNumbersPort(new AddressingFeature(true, true));
+
+        ((BindingProvider)port).getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                                        "http://localhost:" + PORT + "/jaxws/add");
+        try {
+            port.addNumbers(1, 2);
+            fail("Expected missing WSA header exception");
+        } catch (Exception e) {
+            String expected = "A required header representing a Message Addressing"
+                              + " Property is not present";
+            assertTrue("Caught unexpected exception : " + e.getMessage(),
+                       e.getMessage().indexOf(expected) > -1);
+        }
+    }
+    
 
     private AddNumbersService getService() {
         URL wsdl = getClass().getResource("/wsdl_systest_wsspec/add_numbers.wsdl");
