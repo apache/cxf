@@ -41,6 +41,7 @@ import org.eclipse.jetty.server.AbstractConnector;
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.SessionManager;
 import org.eclipse.jetty.server.handler.ContextHandler;
 import org.eclipse.jetty.server.handler.ContextHandlerCollection;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -107,6 +108,7 @@ public class JettyHTTPServerEngine
     private JettyConnectorFactory connectorFactory;
     private ContextHandlerCollection contexts;
     
+    private SessionManager sessionManager;
     
     /**
      * This field holds the TLS ServerParameters that are programatically
@@ -398,10 +400,12 @@ public class JettyHTTPServerEngine
         // bind the jetty http handler with the context handler
         if (isSessionSupport) {         
             // If we have sessions, we need two handlers.
-            HashSessionManager sessionManager = new HashSessionManager();
+            if (sessionManager == null) {
+                sessionManager = new HashSessionManager();
+                HashSessionIdManager idManager = new HashSessionIdManager();
+                sessionManager.setIdManager(idManager);
+            }
             SessionHandler sessionHandler = new SessionHandler(sessionManager);
-            HashSessionIdManager idManager = new HashSessionIdManager();
-            sessionManager.setIdManager(idManager);
             HandlerCollection hc = new HandlerCollection();
             hc.addHandler(handler);
             hc.addHandler(sessionHandler);
