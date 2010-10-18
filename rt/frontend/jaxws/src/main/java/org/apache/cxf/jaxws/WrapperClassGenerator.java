@@ -104,6 +104,7 @@ public final class WrapperClassGenerator extends ASMHelper {
                     || anno.annotationType() == XmlAttachmentRef.class
                     || anno.annotationType() == XmlJavaTypeAdapter.class
                     || anno.annotationType() == XmlMimeType.class
+                    || anno.annotationType() == XmlElement.class
                     || anno.annotationType() == XmlElementWrapper.class) {
                     list.add(anno);
                 }
@@ -395,7 +396,9 @@ public final class WrapperClassGenerator extends ASMHelper {
                 av0.visit("required", el.required());
                 av0.visit("namespace", el.namespace());
                 av0.visit("defaultValue", el.defaultValue());
-                av0.visit("type", el.type());
+                if (el.type() != XmlElement.DEFAULT.class) {
+                    av0.visit("type", el.type());                    
+                }
                 av0.visitEnd(); 
             } else if (ann instanceof XmlElementWrapper) {
                 XmlElementWrapper el = (XmlElementWrapper)ann;
