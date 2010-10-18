@@ -31,7 +31,7 @@
     </parent>
 
     <properties>
-        <pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</pmd.eclipse.ruleset>
+        <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</cxf.pmd.eclipse.ruleset>
         <cxf.compile.flags>-Xlint:unchecked,fallthrough,finally</cxf.compile.flags>
         <cxf.compile.show.deprecation>false</cxf.compile.show.deprecation>
     </properties>
