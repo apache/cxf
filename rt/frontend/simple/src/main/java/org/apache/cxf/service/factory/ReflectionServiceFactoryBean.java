@@ -234,7 +234,7 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
     }
 
     @Override
-    public Service create() {
+    public synchronized Service create() {
         reset();
         sendEvent(Event.START_CREATE);
         initializeServiceConfigurations();
