@@ -110,22 +110,26 @@ public final class TLSParameterJaxBUtils {
                     ? KeyStore.getInstance(type)
                     : KeyStore.getInstance(type, kst.getProvider());
         
-        if (kst.isSetFile()) {
-            keyStore.load(new FileInputStream(kst.getFile()), password);
-        }
-        if (kst.isSetResource()) {
-            final java.io.InputStream is =
-                ClassLoaderUtils.getResourceAsStream(kst.getResource(), kst.getClass());
-            if (is == null) {
-                final String msg =
-                    "Could not load keystore resource " + kst.getResource();
-                LOG.severe(msg);
-                throw new java.io.IOException(msg);
+        if (!"PKCS11".equals(type)) {
+            if (kst.isSetFile()) {
+                keyStore.load(new FileInputStream(kst.getFile()), password);
             }
-            keyStore.load(is, password);
-        }
-        if (kst.isSetUrl()) {
-            keyStore.load(new URL(kst.getUrl()).openStream(), password);
+            if (kst.isSetResource()) {
+                final java.io.InputStream is =
+                    ClassLoaderUtils.getResourceAsStream(kst.getResource(), kst.getClass());
+                if (is == null) {
+                    final String msg =
+                        "Could not load keystore resource " + kst.getResource();
+                    LOG.severe(msg);
+                    throw new java.io.IOException(msg);
+                }
+                keyStore.load(is, password);
+            }
+            if (kst.isSetUrl()) {
+                keyStore.load(new URL(kst.getUrl()).openStream(), password);
+            }
+        } else {
+            keyStore.load(null, password);
         }
         return keyStore;
     }
