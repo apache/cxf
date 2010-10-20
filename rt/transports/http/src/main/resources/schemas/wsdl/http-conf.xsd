@@ -349,6 +349,17 @@
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
+                <xs:attribute name="NonProxyHosts" type="xs:string" use="optional">
+                    <xs:annotation>
+                        <xs:documentation>
+                        Specifies the list of hostnames that will not use the proxy configuration.
+                        Examples of value:
+                          * "localhost" -> A single hostname
+                          * "localhost|www.google.com" -> 2 hostnames that will not use the proxy configuration
+                          * "localhost|www.google.*|*.apache.org" -> It's also possible to use a pattern-like value
+                        </xs:documentation>
+                    </xs:annotation>
+                </xs:attribute>
                 <xs:attribute name="ProxyServerType" type="http-conf:proxyServerType" use="optional" default="HTTP">
                     <xs:annotation>
                         <xs:documentation>

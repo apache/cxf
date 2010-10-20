@@ -44,6 +44,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Pattern;
 
 import javax.xml.namespace.QName;
 
@@ -78,6 +79,7 @@ import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.transports.http.configuration.ProxyServerType;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -175,7 +177,23 @@ public class HTTPConduit
      * Endpoint Qname to give the configuration name of this conduit.
      */
     private static final String SC_HTTP_CONDUIT_SUFFIX = ".http-conduit";
-    
+
+    /**
+     * JVM/System property name holding the hostname of the http proxy.
+     */
+    private static final String HTTP_PROXY_HOST = "http.proxyHost";
+
+    /**
+     * JVM/System property name holding the port of the http proxy.
+     */
+    private static final String HTTP_PROXY_PORT = "http.proxyPort";
+
+    /**
+     * JVM/System property name holding the list of hosts/patterns that
+     * should not use the proxy configuration.
+     */
+    private static final String HTTP_NON_PROXY_HOSTS = "http.nonProxyHosts";
+
     /**
      * This field holds the connection factory, which primarily is used to 
      * factor out SSL specific code from this implementation.
@@ -212,11 +230,21 @@ public class HTTPConduit
     
     /**
      * This field holds the QoS configuration settings for this conduit.
-     * This field is injected via spring configuration based on the conduit 
+     * This field is injected via spring configuration based on the conduit
      * name.
      */
     private HTTPClientPolicy clientSidePolicy;
-    
+
+    /**
+     * This field holds ONLY the static System proxy configuration:
+     * + http.proxyHost
+     * + http.proxyPort (default 8080)
+     * + http.nonProxyHosts (default null)
+     * It is initialized at the instance creation (and may be null
+     * if there is no appropriate System properties)
+     */
+    private HTTPClientPolicy systemProxyConfiguration;
+
     /**
      * This field holds the password authorization configuration.
      * This field is injected via spring configuration based on the conduit 
@@ -419,6 +447,28 @@ public class HTTPConduit
             }
         }
 
+        // Retrieve system properties (if any)
+        String proxyHost = System.getProperty(HTTP_PROXY_HOST);
+        if (proxyHost != null) {
+            // System is configured with a proxy, use it
+
+            systemProxyConfiguration = new HTTPClientPolicy();
+            systemProxyConfiguration.setProxyServer(proxyHost);
+            systemProxyConfiguration.setProxyServerType(ProxyServerType.HTTP);
+
+            // 8080 is the default proxy port value as pert some documentation
+            String proxyPort = System.getProperty(HTTP_PROXY_PORT, "8080");
+            systemProxyConfiguration.setProxyServerPort(Integer.valueOf(proxyPort));
+
+            // Load non proxy hosts
+            String nonProxyHosts = System.getProperty(HTTP_NON_PROXY_HOSTS);
+            if (!StringUtils.isEmpty(nonProxyHosts)) {
+                Pattern pattern = PatternBuilder.build(nonProxyHosts);
+                systemProxyConfiguration.setNonProxyHosts(pattern);
+            }
+        }
+
+
         // Get the correct URLConnection factory based on the 
         // configuration.
         connectionFactory = retrieveConnectionFactory(getAddress());
@@ -502,7 +552,7 @@ public class HTTPConduit
         HTTPClientPolicy csPolicy = getClient(message);
 
         HttpURLConnectionFactory f = getConnectionFactory(currentURL);
-        HttpURLConnection connection = f.createConnection(getProxy(csPolicy), currentURL);
+        HttpURLConnection connection = f.createConnection(getProxy(csPolicy, currentURL), currentURL);
         connection.setDoOutput(true);       
         
         long timeout = csPolicy.getConnectionTimeout();
@@ -1045,25 +1095,67 @@ public class HTTPConduit
      * 
      * @return The proxy server or null, if not set.
      */
-    private Proxy getProxy(HTTPClientPolicy policy) {
-        Proxy proxy = null; 
-        if (policy != null 
-            && policy.isSetProxyServer()
-            && !StringUtils.isEmpty(policy.getProxyServer())) {
-            proxy = new Proxy(
-                    Proxy.Type.valueOf(policy.getProxyServerType().toString()),
-                    new InetSocketAddress(policy.getProxyServer(),
-                                          policy.getProxyServerPort()));
+    private Proxy getProxy(HTTPClientPolicy policy, URL currentUrl) {
+        if (policy != null) {
+            // Maybe the user has provided some proxy information
+            if (policy.isSetProxyServer()
+                && !StringUtils.isEmpty(policy.getProxyServer())) {
+                return getProxy(policy, currentUrl.getHost());
+            } else {
+                // There is a policy but no Proxy configuration,
+                // fallback on the system proxy configuration
+                return getSystemProxy(currentUrl.getHost());
+            }
+        } else {
+            // Use system proxy configuration
+            return getSystemProxy(currentUrl.getHost());
         }
-        return proxy;
+    }
+
+    /**
+     * Get the system proxy (if any) for the given URL's host.
+     */
+    private Proxy getSystemProxy(String hostname) {
+        if (systemProxyConfiguration != null) {
+            return getProxy(systemProxyConfiguration, hostname);
+        }
+
+        // No proxy configured
+        return null;
+    }
+
+    /**
+     * Honor the nonProxyHosts property value (if set).
+     */
+    private Proxy getProxy(final HTTPClientPolicy policy, final String hostname) {
+        if (policy.isSetNonProxyHosts()) {
+
+            // Try to match the URL hostname with the exclusion pattern
+            Pattern pattern = policy.getNonProxyHosts();
+            if (pattern.matcher(hostname).matches()) {
+                // Excluded hostname -> no proxy
+                return null;
+            }
+        }
+        // Either nonProxyHosts is not set or the pattern did not match
+        return createProxy(policy);
+    }
+
+    /**
+     * Construct a new {@code Proxy} instance from the given policy.
+     */
+    private Proxy createProxy(final HTTPClientPolicy policy) {
+        return new Proxy(Proxy.Type.valueOf(policy.getProxyServerType().toString()),
+                         new InetSocketAddress(policy.getProxyServer(),
+                                               policy.getProxyServerPort()));
     }
 
     /**
      * This call places HTTP Header strings into the headers that are relevant
-     * to the Authorization policies that are set on this conduit by 
+     * to the Authorization policies that are set on this conduit by
      * configuration.
      * <p> 
-     * An AuthorizationPolicy may also be set on the message. If so, those 
+     * An AuthorizationPolicy may also be set on the message. If so, those
      * policies are merged. A user name or password set on the messsage 
      * overrides settings in the AuthorizationPolicy is retrieved from the
      * configuration.
@@ -1351,7 +1443,7 @@ public class HTTPConduit
     
     /**
      * This method sets the Trust Decider for this HTTP Conduit.
-     * Using this method overrides any trust decider configured for this 
+     * Using this method overrides any trust decider configured for this
      * HTTPConduit.
      */
     public void setTrustDecider(MessageTrustDecider decider) {
@@ -1416,7 +1508,7 @@ public class HTTPConduit
     /**
      * This method performs a redirection retransmit in response to
      * a 302 or 305 response code.
-     * 
+     *
      * @param connection   The active URL connection
      * @param message      The outbound message.
      * @param cachedStream The cached request.
@@ -1620,7 +1712,7 @@ public class HTTPConduit
         connection.disconnect();
         
         HTTPClientPolicy cp = getClient(message);
-        connection = getConnectionFactory(newURL).createConnection(getProxy(cp), newURL);
+        connection = getConnectionFactory(newURL).createConnection(getProxy(cp, newURL), newURL);
         connection.setDoOutput(true);        
         // TODO: using Message context to deceided HTTP send properties
         connection.setConnectTimeout((int)cp.getConnectionTimeout());
