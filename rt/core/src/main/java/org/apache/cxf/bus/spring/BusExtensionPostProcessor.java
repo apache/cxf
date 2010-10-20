@@ -60,7 +60,7 @@ public class BusExtensionPostProcessor implements BeanPostProcessor, Application
     private Bus getBus() {
         if (bus == null) {
             bus = (Bus)context.getBean(Bus.DEFAULT_BUS_ID);
-            
+            bus.setExtension(context, ApplicationContext.class);
             final ApplicationContext ctx = context;
             if (bus instanceof CXFBusImpl) {
                 CXFBusImpl b = (CXFBusImpl)bus;
