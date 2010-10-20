@@ -40,19 +40,21 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     private static final char[] HEXADECIMAL = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
-    private static final MessageDigest MD5_HELPER;
-    static {
+
+    final MessageDigest md5Helper;
+    Map<URL, DigestInfo> authInfo = new ConcurrentHashMap<URL, DigestInfo>(); 
+
+    public DigestAuthSupplier() {
         MessageDigest md = null;
         try {
             md = MessageDigest.getInstance("MD5");
         } catch (NoSuchAlgorithmException e) {
             md = null;
         }
-        MD5_HELPER = md;
+        md5Helper = md;
     }
-
-    Map<URL, DigestInfo> authInfo = new ConcurrentHashMap<URL, DigestInfo>(); 
-
+    
+    
     /**
      * {@inheritDoc}
      * With digest, the nonce could expire and thus a rechallenge will be issued.
@@ -243,9 +245,13 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         
     }
 
-    public static String createCnonce() throws UnsupportedEncodingException {
+    public String createCnonce() throws UnsupportedEncodingException {
         String cnonce = Long.toString(System.currentTimeMillis());
-        return encode(MD5_HELPER.digest(cnonce.getBytes("US-ASCII")));
+        byte[] bytes = cnonce.getBytes("US-ASCII");
+        synchronized (md5Helper) {
+            bytes = md5Helper.digest(bytes);
+        }
+        return encode(bytes);
     }
 
     /**
