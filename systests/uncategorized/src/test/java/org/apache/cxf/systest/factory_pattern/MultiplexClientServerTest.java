@@ -31,6 +31,7 @@ import org.apache.cxf.factory_pattern.Number;
 import org.apache.cxf.factory_pattern.NumberFactory;
 import org.apache.cxf.factory_pattern.NumberFactoryService;
 import org.apache.cxf.factory_pattern.NumberService;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.ServiceImpl;
 import org.apache.cxf.jaxws.support.ServiceDelegateAccessor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -102,9 +103,14 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
         Number num =  (Number)serviceImpl.getPort(numberTwoRef, Number.class);
         assertTrue("20 is even", num.isEven().isEven());
         
+        ClientProxy.getClient(num).getConduit().close();
+        
         W3CEndpointReference numberTwentyThreeRef = factory.create("23");
         num =  (Number)serviceImpl.getPort(numberTwentyThreeRef, Number.class);
         assertTrue("23 is not even", !num.isEven().isEven());
+        
+        ClientProxy.getClient(num).getConduit().close();
+        ClientProxy.getClient(factory).getConduit().close();
     }
     
     @Test
@@ -133,10 +139,14 @@ public class MultiplexClientServerTest extends AbstractBusClientServerTestBase {
             assertTrue("match on exception message " + expected.getMessage(),
                        expected.getMessage().indexOf("999") != -1);
         }
+        ClientProxy.getClient(num).getConduit().close();
         
         ref = factory.create("37");
         assertNotNull("reference", ref);
         num =  (Number)serviceImpl.getPort(ref, Number.class);
         assertTrue("37 is not even", !num.isEven().isEven());
+        
+        ClientProxy.getClient(num).getConduit().close();
+        ClientProxy.getClient(factory).getConduit().close();
     }
 }
