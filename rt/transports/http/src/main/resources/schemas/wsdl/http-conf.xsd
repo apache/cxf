@@ -352,7 +352,7 @@
                 <xs:attribute name="ProxyServerType" type="http-conf:proxyServerType" use="optional" default="HTTP">
                     <xs:annotation>
                         <xs:documentation>
-                        Specifies the ype of the proxy server. Can be either HTTP or SOCKS.
+                        Specifies the type of the proxy server. Can be either HTTP or SOCKS.
                         </xs:documentation>
                     </xs:annotation>      
                 </xs:attribute>
