@@ -47,6 +47,10 @@
                                 <wsdlOption>
                                     <wsdl>${basedir}/src/test/resources/wsdl_systest/hello_world_corba.wsdl</wsdl>
                                 </wsdlOption>
+                                <wsdlOption>
+                                    <wsdl>${basedir}/src/test/resources/wsdl_systest/soap_fault.wsdl</wsdl>
+                                    <catalog>${basedir}/src/test/resources/wsdl_systest/catalog.xml</catalog>
+                                </wsdlOption>
                             </wsdlOptions>
                         </configuration>
                         <goals>
