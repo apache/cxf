@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0"?>
 <!--
     Licensed to the Apache Software Foundation (ASF) under one
     or more contributor license agreements.  See the NOTICE file
@@ -17,8 +17,11 @@
     specific language governing permissions and limitations
     under the License.
 -->
-<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
-    <rewriteSystem systemIdStartString="http://www.w3.org/2006/03/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
-    <rewriteSystem systemIdStartString="http://www.w3.org/2005/08/addressing" rewritePrefix="classpath:/schemas/wsdl"/>
-    <rewriteURI rewritePrefix="../wsdl_systest/envelope.xsd" uriStartString="http://schemas.xmlsoap.org/soap/envelope/"/>
+
+<!DOCTYPE catalog
+PUBLIC "-//OASIS/DTD Entity Resolution XML Catalog V1.0//EN"
+"http://www.oasis-open.org/committees/entity/release/1.0/catalog.dtd">
+
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <rewriteURI rewritePrefix="./envelope.xsd" uriStartString="http://schemas.xmlsoap.org/soap/envelope/"/>
 </catalog>
