@@ -22,6 +22,7 @@ import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
 import org.apache.cxf.transport.servlet.CXFNonSpringServlet;
 import org.apache.hello_world_soap_http.GreeterImpl;
@@ -62,6 +63,8 @@ public class NoSpringServletServer extends AbstractBusTestServerBase {
             Endpoint.publish("/Greeter", impl);
             HelloImpl helloImpl = new HelloImpl();
             Endpoint.publish("/Hello", helloImpl);
+            
+            ((EndpointImpl)Endpoint.create(helloImpl)).publish();
 
         } catch (Exception e) {
             throw new RuntimeException(e);

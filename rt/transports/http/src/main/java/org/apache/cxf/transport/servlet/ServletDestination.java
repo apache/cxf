@@ -102,6 +102,9 @@ public class ServletDestination extends AbstractHTTPDestination {
     protected String getBasePath(String contextPath) throws IOException {
         
         String address = getAddress().getAddress().getValue();
+        if (address == null) {
+            return contextPath;
+        }
         if (address.startsWith("http")) {
             return URI.create(address).getPath();
         }
