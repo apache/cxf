@@ -20,6 +20,9 @@ package org.apache.cxf.systest.servlet;
 
 import java.lang.reflect.UndeclaredThrowableException;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 import com.meterware.httpunit.WebConversation;
@@ -75,10 +78,16 @@ public class NoSpringServletClientTest extends AbstractBusClientServerTestBase {
     @Test
     public void testGetServiceList() throws Exception {
         WebConversation client = new WebConversation();
-        WebResponse res = client.getResponse(serviceURL);
+        WebResponse res = client.getResponse(serviceURL + "/services");
         WebLink[] links = res.getLinks();
-        assertEquals("There should get two links for the service", 2, links.length);
-        assertEquals(serviceURL + "Greeter?wsdl", links[0].getURLString());
+        Set<String> s = new HashSet<String>();
+        for (WebLink l : links) {
+            s.add(l.getURLString());
+        }
+        assertEquals("There should be 3 links for the service", 3, links.length);
+        assertTrue(s.contains(serviceURL + "Greeter?wsdl"));
+        assertTrue(s.contains(serviceURL + "Hello?wsdl"));
+        assertTrue(s.contains(serviceURL + "?wsdl"));
         assertEquals("text/html", res.getContentType());
     }
 }
