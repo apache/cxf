@@ -93,6 +93,9 @@ public class ServletController extends AbstractServletController {
                 && d2.getAddress() != null
                 && d2.getAddress().getAddress() != null) {
                 ad = d2.getAddress().getAddress().getValue();
+                if (ad == null) {
+                    ad = "/";
+                }
             }
             if (ad != null 
                 && (ad.equals(path)

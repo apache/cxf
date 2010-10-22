@@ -337,13 +337,12 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         return queries;
     }
     
-    private String getBasePath(Message message) {
-        return (String)message.get(Message.BASE_PATH);        
-    }
-    
     private String getRest(Message message) {
         String path = (String)message.get(Message.PATH_INFO);
-        String basePath = getBasePath(message);        
+        String basePath = (String)message.get(Message.BASE_PATH);
+        if (basePath == null) {
+            basePath = "/";
+        }
         return StringUtils.diff(path, basePath);        
     }
     
