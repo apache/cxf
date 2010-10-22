@@ -84,8 +84,8 @@
     </profiles>
     <dependencies>
         <dependency>
-            <groupId>${servlet-api.group}</groupId>
-            <artifactId>${servlet-api.artifact}</artifactId>
+            <groupId>${cxf.servlet-api.group}</groupId>
+            <artifactId>${cxf.servlet-api.artifact}</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
@@ -204,7 +204,7 @@
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
-            <artifactId>${spring.mock}</artifactId>
+            <artifactId>${cxf.spring.mock}</artifactId>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -236,7 +236,7 @@
         </dependency>
     </dependencies>
     <properties>
-        <surefire.fork.mode>pertest</surefire.fork.mode>
+        <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
     </properties>
 
 </project>

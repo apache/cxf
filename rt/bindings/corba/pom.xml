@@ -32,7 +32,7 @@
     </parent>
 
     <properties>
-        <checkstyle.extension>-corba</checkstyle.extension>
+        <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
     </properties>
 
     <dependencies>
