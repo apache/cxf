@@ -46,7 +46,7 @@
         <cxf.eclipse.outputDirectory>${basedir}/target/classes</cxf.eclipse.outputDirectory>
         <cxf.saaj.impl.groupId>com.sun.xml.messaging.saaj</cxf.saaj.impl.groupId>
         <cxf.saaj.impl.artifactId>saaj-impl</cxf.saaj.impl.artifactId>
-        <cxf.saaj.impl.version>1.3.2</cxf.saaj.impl.version>
+        <cxf.saaj.impl.version>1.3.4</cxf.saaj.impl.version>
 
         <!-- please maintain alphabetical order here -->
         <cxf.abdera.version>1.1</cxf.abdera.version>
@@ -59,9 +59,9 @@
         <cxf.jaxb22.impl.version>2.2.1.1</cxf.jaxb22.impl.version>
         <cxf.jaxb22.xjc.version>2.2.1.1</cxf.jaxb22.xjc.version>
         <cxf.jdom.version>1.0</cxf.jdom.version>
-        <cxf.jetty.version>7.1.6.v20100715</cxf.jetty.version>
+        <cxf.jetty.version>7.2.0.v20101020</cxf.jetty.version>
         <cxf.msv.version>2010.1</cxf.msv.version>
-        <cxf.rhino.version>1.7R1</cxf.rhino.version>
+        <cxf.rhino.version>1.7R2</cxf.rhino.version>
         <cxf.saaj.version>1.3</cxf.saaj.version>
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
@@ -443,6 +443,11 @@
                 <groupId>com.sun.xml.parsers</groupId>
                 <artifactId>jaxp-ri</artifactId>
                 <version>1.4.2</version>
+            </dependency>
+            <dependency>
+                <groupId>org.antlr</groupId>
+                <artifactId>antlr</artifactId>
+                <version>3.2</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.servicemix.specs</groupId>
@@ -905,6 +910,11 @@
               <version>1.4</version>
             </dependency>
             <dependency>
+                <groupId>commons-pool</groupId>
+                <artifactId>commons-pool</artifactId>
+                <version>1.5.5</version>
+            </dependency>
+            <dependency>
                 <groupId>commons-logging</groupId>
                 <artifactId>commons-logging</artifactId>
                 <version>1.1.1</version>
@@ -1057,7 +1067,7 @@
             <dependency>
                 <groupId>org.bouncycastle</groupId>
                 <artifactId>bcprov-jdk15</artifactId>
-                <version>1.43</version>
+                <version>1.45</version>
             </dependency>
 
             <dependency>
