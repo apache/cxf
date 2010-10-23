@@ -50,25 +50,24 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         svrFac.setServiceClass(Echo.class);
         svrFac.setBus(getBus());
         svrFac.create();
-        
+
         Endpoint endpoint = Endpoint.create(new EchoImpl());
         EndpointImpl impl = (EndpointImpl) endpoint;
         impl.setDataBinding(new AegisDatabinding());
         endpoint.publish("local://JaxWsEcho");
     }
-    
+
     @Test
     public void talkToJaxWsHolder() throws Exception {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(Echo.class);
         factory.setDataBinding(new AegisDatabinding());
         factory.setAddress("local://JaxWsEcho");
-        Echo client = (Echo) factory.create();
+        Echo client = (Echo) factory.create(Echo.class);
         Holder<String> sholder = new Holder<String>();
         client.echo("Channa Doll", sholder);
         assertEquals("Channa Doll", sholder.value);
     }
-    
+
     @Test
     public void ordinaryParamNameTest() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
@@ -77,12 +76,11 @@ public class ClientServiceConfigTest extends AbstractAegisTest {
         proxyFac.setDataBinding(new AegisDatabinding());
 
         proxyFac.setAddress("local://Echo");
-        proxyFac.setServiceClass(Echo.class);
         proxyFac.setBus(getBus());
 
-        Echo echo = (Echo)proxyFac.create();
+        Echo echo = proxyFac.create(Echo.class);
         String boing = echo.simpleEcho("reflection");
         assertEquals("reflection", boing);
     }
-    
+
 }

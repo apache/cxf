@@ -31,7 +31,6 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {
         ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(HelloWorld.class);
         String serviceURL;
         if (args != null && args.length > 0 && !"".equals(args[0])) {
             serviceURL = args[0];
@@ -42,7 +41,7 @@ public final class Client {
         factory.setAddress(serviceURL);
         factory.setWsdlURL(serviceURL + "?wsdl");
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        HelloWorld client = (HelloWorld)factory.create();
+        HelloWorld client = factory.create(HelloWorld.class);
         System.out.println("Invoke sayHi()....");
         System.out.println(client.sayHi(System.getProperty("user.name")));
         System.exit(0);

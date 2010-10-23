@@ -40,25 +40,24 @@ public class ProxyTest extends AbstractAegisTest {
     public void testProxy() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setAddress("local://HelloProxyService");
-        proxyFac.setServiceClass(HelloProxyService.class);
         proxyFac.setBus(getBus());
         AegisContext aegisContext = new AegisContext();
         aegisContext.getBeanImplementationMap().put(Hello.class, MyHello.class.getName());
         AegisDatabinding binding = new AegisDatabinding();
         binding.setAegisContext(aegisContext);
-        
+
         setupAegis(proxyFac.getClientFactoryBean(), binding);
-        HelloProxyService client = (HelloProxyService)proxyFac.create();
-        
+        HelloProxyService client = proxyFac.create(HelloProxyService.class);
+
         Hello h = client.sayHiWithProxy();
         assertTrue(h instanceof MyHello);
     }
-    
+
     public static class HelloProxyServiceImpl implements HelloProxyService {
 
         public Hello sayHiWithProxy() {
             return new MyHello();
         }
-        
+
     }
 }

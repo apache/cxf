@@ -71,10 +71,9 @@ public final class ClientJMS {
 
     private static HelloWorld createClientCxf() {
         JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
-        factory.setServiceClass(HelloWorld.class);
         factory.setTransportId(JMSSpecConstants.SOAP_JMS_SPECIFICATION_TRANSPORTID);
         factory.setAddress(JMS_ENDPOINT_URI);
-        HelloWorld client = (HelloWorld)factory.create();
+        HelloWorld client = factory.create(HelloWorld.class);
         return client;
     }
 }

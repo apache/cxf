@@ -34,7 +34,7 @@ import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.junit.Test;
 
 public class StudentTest extends AbstractAegisTest {
-    
+
     @Test
     public void testWSDL() throws Exception {
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -44,11 +44,11 @@ public class StudentTest extends AbstractAegisTest {
         setupAegis(sf);
         Server server = sf.create();
         Document wsdl = getWSDLDocument(server);
-        
+
         assertValid("//*[@name='string2stringMap']", wsdl);
     }
-    
-    @Test 
+
+    @Test
     public void testReturnMap() throws Exception {
 
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -58,25 +58,24 @@ public class StudentTest extends AbstractAegisTest {
         setupAegis(sf);
         Server server = sf.create();
         server.start();
-        
+
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://StudentService");
-        proxyFac.setServiceClass(StudentService.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
 
-        StudentService clientInterface = (StudentService)proxyFac.create();
+        StudentService clientInterface = proxyFac.create(StudentService.class);
         Map<Long, Student> fullMap = clientInterface.getStudentsMap();
         assertNotNull(fullMap);
         Student one = fullMap.get(Long.valueOf(1));
         assertNotNull(one);
         assertEquals("Student1", one.getName());
-        
+
         Map<String, ?> wildMap = clientInterface.getWildcardMap();
         assertEquals("valuestring", wildMap.get("keystring"));
     }
 
-    @Test 
+    @Test
     public void testMapMap() throws Exception {
 
         ServerFactoryBean sf = new ServerFactoryBean();
@@ -85,13 +84,10 @@ public class StudentTest extends AbstractAegisTest {
         sf.setAddress("local://StudentServiceDocLiteral");
         setupAegis(sf);
         Server server = sf.create();
-        server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
-        server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         server.start();
-        
+
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setAddress("local://StudentServiceDocLiteral");
-        proxyFac.setServiceClass(StudentServiceDocLiteral.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
         //CHECKSTYLE:OFF
@@ -99,13 +95,13 @@ public class StudentTest extends AbstractAegisTest {
         mss.put("Alice", new Student());
         HashMap<String, HashMap<String, Student>> mmss = new HashMap<String, HashMap<String, Student>>();
         mmss.put("Bob", mss);
-        
-        StudentServiceDocLiteral clientInterface = (StudentServiceDocLiteral)proxyFac.create();
+
+        StudentServiceDocLiteral clientInterface = proxyFac.create(StudentServiceDocLiteral.class);
         clientInterface.takeMapMap(mmss);
         //CHECKSTYLE:ON
     }
-    
-    @Test 
+
+    @Test
     public void testReturnMapDocLiteral() throws Exception {
 
         JaxWsServerFactoryBean sf = new JaxWsServerFactoryBean();
@@ -117,22 +113,21 @@ public class StudentTest extends AbstractAegisTest {
         server.getEndpoint().getInInterceptors().add(new LoggingInInterceptor());
         server.getEndpoint().getOutInterceptors().add(new LoggingOutInterceptor());
         server.start();
-        
+
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://StudentServiceDocLiteral");
-        proxyFac.setServiceClass(StudentServiceDocLiteral.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
-        
+
         proxyFac.getInInterceptors().add(new LoggingInInterceptor());
         proxyFac.getOutInterceptors().add(new LoggingOutInterceptor());
 
-        StudentServiceDocLiteral clientInterface = (StudentServiceDocLiteral)proxyFac.create();
+        StudentServiceDocLiteral clientInterface = proxyFac.create(StudentServiceDocLiteral.class);
         Map<Long, Student> fullMap = clientInterface.getStudentsMap();
         assertNotNull(fullMap);
         Student one = fullMap.get(Long.valueOf(1));
         assertNotNull(one);
         assertEquals("Student1", one.getName());
-        
+
     }
 }

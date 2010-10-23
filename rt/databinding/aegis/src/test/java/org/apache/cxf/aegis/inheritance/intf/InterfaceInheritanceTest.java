@@ -32,7 +32,7 @@ import org.junit.Test;
  * This test ensures that we're handling inheritance of interfaces correctly.
  * Since we can't do multiple parent inheritance in XML schema, which interfaces
  * require, we just don't allow interface inheritance period.
- * 
+ *
  * @author Dan Diephouse
  */
 public class InterfaceInheritanceTest extends AbstractAegisTest {
@@ -49,11 +49,10 @@ public class InterfaceInheritanceTest extends AbstractAegisTest {
     public void testClient() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setAddress("local://IInterfaceService");
-        proxyFac.setServiceClass(IInterfaceService.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
 
-        IInterfaceService client = (IInterfaceService)proxyFac.create();
+        IInterfaceService client = proxyFac.create(IInterfaceService.class);
 
         IChild child = client.getChild();
         assertNotNull(child);

@@ -36,14 +36,13 @@ public final class Client {
 
     public static void main(String args[]) throws Exception {
         ClientProxyFactoryBean factory = new ClientProxyFactoryBean();
-        factory.setServiceClass(HelloWorld.class);
         if (args != null && args.length > 0 && !"".equals(args[0])) {
             factory.setAddress(args[0]);
         } else {
             factory.setAddress("http://localhost:9000/Hello");
         }
         factory.getServiceFactory().setDataBinding(new AegisDatabinding());
-        HelloWorld client = (HelloWorld)factory.create();
+        HelloWorld client = factory.create(HelloWorld.class);
         System.out.println("Invoke sayHi()....");
         System.out.println(client.sayHi(System.getProperty("user.name")));
         Document doc = client.getADocument();

@@ -86,11 +86,9 @@ public class FlatArrayTest extends AbstractAegisTest {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setDataBinding(new AegisDatabinding());
         proxyFac.setAddress("local://FlatArray");
-        proxyFac.setServiceClass(FlatArrayServiceInterface.class);
         proxyFac.setBus(getBus());
 
-        Object proxyObj = proxyFac.create();
-        FlatArrayServiceInterface client = (FlatArrayServiceInterface)proxyObj;
+        FlatArrayServiceInterface client = proxyFac.create(FlatArrayServiceInterface.class);
         client.submitStringArray(STRING_ARRAY);
         assertArrayEquals(STRING_ARRAY, service.stringArrayValue);
     }
@@ -100,11 +98,9 @@ public class FlatArrayTest extends AbstractAegisTest {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setDataBinding(new AegisDatabinding());
         proxyFac.setAddress("local://FlatArray");
-        proxyFac.setServiceClass(FlatArrayServiceInterface.class);
         proxyFac.setBus(getBus());
 
-        Object proxyObj = proxyFac.create();
-        FlatArrayServiceInterface client = (FlatArrayServiceInterface)proxyObj;
+        FlatArrayServiceInterface client = proxyFac.create(FlatArrayServiceInterface.class);
         BeanWithFlatArray bwfa = new BeanWithFlatArray();
         bwfa.setValues(INT_ARRAY);
         client.takeBeanWithFlatArray(bwfa);
@@ -115,11 +111,9 @@ public class FlatArrayTest extends AbstractAegisTest {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setDataBinding(new AegisDatabinding());
         proxyFac.setAddress("local://FlatArray");
-        proxyFac.setServiceClass(FlatArrayServiceInterface.class);
         proxyFac.setBus(getBus());
 
-        Object proxyObj = proxyFac.create();
-        FlatArrayServiceInterface client = (FlatArrayServiceInterface)proxyObj;
+        FlatArrayServiceInterface client = proxyFac.create(FlatArrayServiceInterface.class);
         BeanWithFlatCollection bwfc = new BeanWithFlatCollection();
         bwfc.getValues().add(1);
         bwfc.getValues().add(2);

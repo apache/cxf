@@ -47,7 +47,7 @@ public class DOMMappingTest extends AbstractAegisTest {
 
     private IDocumentService docClient;
 
-    @Before 
+    @Before
     public void setUp() throws Exception {
         super.setUp();
         createService(DocumentService.class, "DocService");
@@ -59,29 +59,28 @@ public class DOMMappingTest extends AbstractAegisTest {
         proxyFac.setDataBinding(new AegisDatabinding());
 
         proxyFac.setAddress("local://DocService");
-        proxyFac.setServiceClass(IDocumentService.class);
         proxyFac.setBus(getBus());
 
-        Object proxyObj = proxyFac.create();
+        Object proxyObj = proxyFac.create(IDocumentService.class);
         docClient = (IDocumentService)proxyObj;
         Client client = ClientProxy.getClient(proxyObj);
         ClientImpl clientImpl = (ClientImpl)client;
         clientImpl.setSynchronousTimeout(1000000000);
     }
-    
+
     @Test
     public void testSimpleString() throws Exception {
         String s = docClient.simpleStringReturn();
         assertEquals("simple", s);
     }
-    
+
     @Test
     public void testDocService() throws Exception {
         Document doc = docClient.returnDocument();
         Element rootElement = doc.getDocumentElement();
         assertEquals("carrot", rootElement.getNodeName());
     }
-    
+
     @Test
     public void testBeanCases() throws Exception {
         BeanWithDOM bwd = docClient.getBeanWithDOM();
