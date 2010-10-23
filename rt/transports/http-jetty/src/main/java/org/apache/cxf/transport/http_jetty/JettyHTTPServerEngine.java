@@ -406,10 +406,8 @@ public class JettyHTTPServerEngine
                 sessionManager.setIdManager(idManager);
             }
             SessionHandler sessionHandler = new SessionHandler(sessionManager);
-            HandlerCollection hc = new HandlerCollection();
-            hc.addHandler(handler);
-            hc.addHandler(sessionHandler);
-            context.setHandler(hc);
+            sessionHandler.setHandler(handler);
+            context.setHandler(sessionHandler);
         } else {
             // otherwise, just the one.
             context.setHandler(handler);

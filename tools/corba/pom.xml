@@ -60,9 +60,8 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>antlr</groupId>
+            <groupId>org.antlr</groupId>
             <artifactId>antlr</artifactId>
-            <version>2.7.7</version>
         </dependency>
         <dependency>
             <groupId>org.apache.ws.commons.schema</groupId>
