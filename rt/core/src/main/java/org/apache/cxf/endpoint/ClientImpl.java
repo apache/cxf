@@ -411,7 +411,7 @@ public class ClientImpl
             Endpoint endpoint = getEndpoint();
             if (context == null) {
                 context = new HashMap<String, Object>();
-                Map<String, Object> resp = getResponseContext();
+                Map<String, Object> resp = new HashMap<String, Object>();
                 resp.clear();
                 Map<String, Object> reqContext = new HashMap<String, Object>(getRequestContext());
                 context.put(RESPONSE_CONTEXT, resp);
