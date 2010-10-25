@@ -20,8 +20,10 @@
 package org.apache.cxf.transport.http;
 
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLDecoder;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -122,12 +124,16 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
 
             String wsdl = params.get("wsdl");
             if (wsdl != null) {
-                wsdl = wsdl.replace("%20", " ");
+                // Always use the URL decoded version to ensure that we have a
+                // canonical representation of the import URL for lookup.
+                wsdl = URLDecoder.decode(wsdl, "utf-8");
             }
             
             String xsd =  params.get("xsd");
             if (xsd != null) {
-                xsd = xsd.replace("%20", " ");
+                // Always use the URL decoded version to ensure that we have a
+                // canonical representation of the import URL for lookup.
+                xsd = URLDecoder.decode(xsd, "utf-8");
             }
             
             Map<String, Definition> mp = CastUtils.cast((Map)endpointInfo.getService()
@@ -244,42 +250,51 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                            Map<String, Definition> mp,
                            Map<String, SchemaReference> smp,
                            EndpointInfo ei) {        
-        List<Element> elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                                       "http://www.w3.org/2001/XMLSchema",
-                                                                       "import");
-        for (Element el : elementList) {
-            String sl = el.getAttribute("schemaLocation");
-            if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
-            }
-        }
+        List<Element> elementList = null;
         
-        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                          "http://www.w3.org/2001/XMLSchema",
-                                                          "include");
-        for (Element el : elementList) {
-            String sl = el.getAttribute("schemaLocation");
-            if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+        
+        try {
+            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                                           "http://www.w3.org/2001/XMLSchema",
+                                                                           "import");
+            for (Element el : elementList) {
+                String sl = el.getAttribute("schemaLocation");
+                if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
+                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                }
             }
-        }
-        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                          "http://www.w3.org/2001/XMLSchema",
-                                                          "redefine");
-        for (Element el : elementList) {
-            String sl = el.getAttribute("schemaLocation");
-            if (smp.containsKey(sl)) {
-                el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+            
+            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                              "http://www.w3.org/2001/XMLSchema",
+                                                              "include");
+            for (Element el : elementList) {
+                String sl = el.getAttribute("schemaLocation");
+                if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
+                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                }
             }
-        }
-        elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
-                                                          "http://schemas.xmlsoap.org/wsdl/",
-                                                          "import");
-        for (Element el : elementList) {
-            String sl = el.getAttribute("location");
-            if (mp.containsKey(sl)) {
-                el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
+            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                              "http://www.w3.org/2001/XMLSchema",
+                                                              "redefine");
+            for (Element el : elementList) {
+                String sl = el.getAttribute("schemaLocation");
+                if (smp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
+                    el.setAttribute("schemaLocation", base + "?xsd=" + sl.replace(" ", "%20"));
+                }
             }
+            elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
+                                                              "http://schemas.xmlsoap.org/wsdl/",
+                                                              "import");
+            for (Element el : elementList) {
+                String sl = el.getAttribute("location");
+                if (mp.containsKey(URLDecoder.decode(sl, "utf-8"))) {
+                    el.setAttribute("location", base + "?wsdl=" + sl.replace(" ", "%20"));
+                }
+            }
+        } catch (UnsupportedEncodingException e) {
+            throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                    LOG,
+                    base), e);
         }
         
         Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
@@ -338,11 +353,23 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                   String base, EndpointInfo ei) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
         
-        Collection<List> imports = CastUtils.cast((Collection<?>)def.getImports().values());
-        for (List lst : imports) {
+        Collection<List<?>> imports = CastUtils.cast((Collection<?>)def.getImports().values());
+        for (List<?> lst : imports) {
             List<Import> impLst = CastUtils.cast(lst);
             for (Import imp : impLst) {
+                
                 String start = imp.getLocationURI();
+                String decodedStart = null;
+                // Always use the URL decoded version to ensure that we have a
+                // canonical representation of the import URL for lookup. 
+                try {
+                    decodedStart = URLDecoder.decode(start, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                            LOG,
+                            start), e);
+                }
+                
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 
                 if (resolvedSchemaLocation == null) {
@@ -350,12 +377,12 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                         //check to see if it's already in a URL format.  If so, leave it.
                         new URL(start);
                     } catch (MalformedURLException e) {
-                        if (done.put(start, imp.getDefinition()) == null) {
+                        if (done.put(decodedStart, imp.getDefinition()) == null) {
                             updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
                         }
                     }
                 } else {
-                    if (done.put(start, imp.getDefinition()) == null) {
+                    if (done.put(decodedStart, imp.getDefinition()) == null) {
                         done.put(resolvedSchemaLocation, imp.getDefinition());
                         updateDefinition(imp.getDefinition(), done, doneSchemas, base, ei);
                     }
@@ -401,7 +428,7 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
     }
     
     private void setSoapAddressLocationOn(Port port, String url) {
-        List extensions = port.getExtensibilityElements();
+        List<?> extensions = port.getExtensibilityElements();
         for (Object extension : extensions) {
             if (extension instanceof SOAP12Address) {
                 ((SOAP12Address)extension).setLocationURI(url);
@@ -415,51 +442,77 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                                            Map<String, SchemaReference> doneSchemas,
                                            String base) {
         OASISCatalogManager catalogs = OASISCatalogManager.getCatalogManager(bus);    
-        Collection<List>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
-        for (List lst : imports) {
+        Collection<List<?>>  imports = CastUtils.cast((Collection<?>)schema.getImports().values());
+        for (List<?> lst : imports) {
             List<SchemaImport> impLst = CastUtils.cast(lst);
             for (SchemaImport imp : impLst) {
                 String start = imp.getSchemaLocationURI();
-                if (start != null && !doneSchemas.containsKey(start)) {
-                    String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
-                    if (resolvedSchemaLocation == null) {
-                        try {
-                            //check to see if it's already in a URL format.  If so, leave it.
-                            new URL(start);
-                        } catch (MalformedURLException e) {
-                            if (doneSchemas.put(start, imp) == null) {
+                
+                if (start != null) {
+                    String decodedStart = null;
+                    // Always use the URL decoded version to ensure that we have a
+                    // canonical representation of the import URL for lookup. 
+                    try {
+                        decodedStart = URLDecoder.decode(start, "utf-8");
+                    } catch (UnsupportedEncodingException e) {
+                        throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                                LOG,
+                                start), e);
+                    }
+                    
+                    if (!doneSchemas.containsKey(decodedStart)) {
+                        String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
+                        if (resolvedSchemaLocation == null) {
+                            try {
+                                //check to see if it's already in a URL format.  If so, leave it.
+                                new URL(start);
+                            } catch (MalformedURLException e) {
+                                if (doneSchemas.put(decodedStart, imp) == null) {
+                                    updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
+                                }
+                            }
+                        } else {
+                            if (doneSchemas.put(decodedStart, imp) == null) {
+                                doneSchemas.put(resolvedSchemaLocation, imp);
                                 updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
                             }
-                        }
-                    } else {
-                        if (doneSchemas.put(start, imp) == null) {
-                            doneSchemas.put(resolvedSchemaLocation, imp);
-                            updateSchemaImports(imp.getReferencedSchema(), doneSchemas, base);
                         }
                     }
                 }
             }
         }
+        
         List<SchemaReference> includes = CastUtils.cast(schema.getIncludes());
         for (SchemaReference included : includes) {
             String start = included.getSchemaLocationURI();
 
             if (start != null) {
+                String decodedStart = null;
+                // Always use the URL decoded version to ensure that we have a
+                // canonical representation of the import URL for lookup. 
+                try {
+                    decodedStart = URLDecoder.decode(start, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                            LOG,
+                            start), e);
+                }
+                
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
-                    if (!doneSchemas.containsKey(start)) {
+                    if (!doneSchemas.containsKey(decodedStart)) {
                         try {
                             //check to see if it's aleady in a URL format.  If so, leave it.
                             new URL(start);
                         } catch (MalformedURLException e) {
-                            if (doneSchemas.put(start, included) == null) {
+                            if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
                             }
                         }
                     }
-                } else if (!doneSchemas.containsKey(start) 
+                } else if (!doneSchemas.containsKey(decodedStart) 
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
-                    doneSchemas.put(start, included);
+                    doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
                     updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
                 }
@@ -470,21 +523,32 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
             String start = included.getSchemaLocationURI();
 
             if (start != null) {
+                String decodedStart = null;
+                // Always use the URL decoded version to ensure that we have a
+                // canonical representation of the import URL for lookup. 
+                try {
+                    decodedStart = URLDecoder.decode(start, "utf-8");
+                } catch (UnsupportedEncodingException e) {
+                    throw new WSDLQueryException(new Message("COULD_NOT_PROVIDE_WSDL",
+                            LOG,
+                            start), e);
+                }
+                
                 String resolvedSchemaLocation = resolveWithCatalogs(catalogs, start, base);
                 if (resolvedSchemaLocation == null) {
-                    if (!doneSchemas.containsKey(start)) {
+                    if (!doneSchemas.containsKey(decodedStart)) {
                         try {
                             //check to see if it's aleady in a URL format.  If so, leave it.
                             new URL(start);
                         } catch (MalformedURLException e) {
-                            if (doneSchemas.put(start, included) == null) {
+                            if (doneSchemas.put(decodedStart, included) == null) {
                                 updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
                             }
                         }
                     }
-                } else if (!doneSchemas.containsKey(start) 
+                } else if (!doneSchemas.containsKey(decodedStart) 
                     || !doneSchemas.containsKey(resolvedSchemaLocation)) {
-                    doneSchemas.put(start, included);
+                    doneSchemas.put(decodedStart, included);
                     doneSchemas.put(resolvedSchemaLocation, included);
                     updateSchemaImports(included.getReferencedSchema(), doneSchemas, base);
                 }
