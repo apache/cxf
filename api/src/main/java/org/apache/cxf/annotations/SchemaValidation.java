@@ -26,7 +26,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Enables SchemaValidation
+ * Enables schema validation
  */
 @Documented
 @Retention(RetentionPolicy.RUNTIME)
