@@ -844,11 +844,13 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
     
     public Long getWrapperPartMinOccurs(MessagePartInfo mpi) {
         Annotation[] a = (Annotation[])mpi.getProperty(ReflectionServiceFactoryBean.PARAM_ANNOTATION);
-        for (Annotation a2 : a) {
-            if (a2 instanceof XmlElement) {
-                XmlElement e = (XmlElement)a2;
-                if (e.required()) {
-                    return 1L;
+        if (a != null) {
+            for (Annotation a2 : a) {
+                if (a2 instanceof XmlElement) {
+                    XmlElement e = (XmlElement)a2;
+                    if (e.required()) {
+                        return 1L;
+                    }
                 }
             }
         }
