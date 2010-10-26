@@ -300,7 +300,8 @@ public class UriBuilderImpl extends UriBuilder {
         builder.fragment = fragment;
         builder.query = new MetadataMap<String, String>(query);
         builder.matrix = new MetadataMap<String, String>(matrix);
-        builder.schemeSpecificPart = schemeSpecificPart; 
+        builder.schemeSpecificPart = schemeSpecificPart;
+        builder.leadingSlash = leadingSlash;
         return builder;
     }
 
