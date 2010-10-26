@@ -194,7 +194,7 @@
                 </dependency>
             </dependencies>
             <properties>
-                <spi-dir>spi-2.2</spi-dir>
+                <cxf.spi-dir>spi-2.2</cxf.spi-dir>
             </properties>
             <build>
                 <plugins>
