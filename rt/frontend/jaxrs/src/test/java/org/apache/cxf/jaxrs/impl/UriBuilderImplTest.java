@@ -153,6 +153,28 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
+    public void testCloneWithoutLeadingSlash() throws Exception {
+        URI uri = new URI("bar/foo");
+        URI newUri = new UriBuilderImpl(uri).clone().build();   
+        assertEquals("URI is not built correctly", "bar/foo", newUri.toString());
+    }
+    
+    @Test
+    public void testCloneWithLeadingSlash() throws Exception {
+        URI uri = new URI("/bar/foo");
+        URI newUri = new UriBuilderImpl(uri).clone().build();   
+        assertEquals("URI is not built correctly", "/bar/foo", newUri.toString());
+    }
+    
+    @Test
+    public void testBuildWithLeadingSlash() throws Exception {
+        URI uri = new URI("/bar/foo");
+        URI newUri = UriBuilder.fromUri(uri).build();   
+        assertEquals("URI is not built correctly", "/bar/foo", newUri.toString());
+    }
+    
+    
+    @Test
     public void testClonePctEncodedFromUri() throws Exception {
         URI uri = new URI("http://bar/foo%20");
         URI newUri = new UriBuilderImpl(uri).clone().buildFromEncoded();   
