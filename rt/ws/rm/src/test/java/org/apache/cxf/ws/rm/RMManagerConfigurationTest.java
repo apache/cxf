@@ -77,6 +77,8 @@ public class RMManagerConfigurationTest extends Assert {
         assertNotNull(manager);
         assertTrue(manager.getSourcePolicy().getSequenceTerminationPolicy().isTerminateOnShutdown());
         assertEquals(0L, manager.getDestinationPolicy().getAcksPolicy().getIntraMessageThreshold());
+        assertEquals(2000L, manager.getDestinationPolicy().getAcksPolicy().
+                getImmediaAcksTimeout().longValue());
         assertEquals(10000L, manager.getRMAssertion().getBaseRetransmissionInterval()
                      .getMilliseconds().longValue());
         assertEquals(10000L, manager.getRMAssertion().getAcknowledgementInterval()

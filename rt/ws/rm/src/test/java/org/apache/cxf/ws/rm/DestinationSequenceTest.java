@@ -140,7 +140,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgeBasic() throws SequenceFault {
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2");
         control.replay();
@@ -166,7 +167,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgeLastMessageNumberExceeded() throws SequenceFault {  
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message message1 = setUpMessage("1");
         Message message2 = setUpMessage("2");
         control.replay();
@@ -187,7 +189,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgeAppendRange() throws SequenceFault {
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message[] messages = new Message [] {
             setUpMessage("1"),
             setUpMessage("2"),
@@ -216,7 +219,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgeInsertRange() throws SequenceFault {
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message[] messages = new Message [] {
             setUpMessage("1"),
             setUpMessage("2"),
@@ -250,7 +254,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgePrependRange() throws SequenceFault { 
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message[] messages = new Message [] {
             setUpMessage("4"),
             setUpMessage("5"),
@@ -323,7 +328,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testMonitor() throws SequenceFault {
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message[] messages = new Message[15];
         for (int i = 0; i < messages.length; i++) {
             messages[i] = setUpMessage(Integer.toString(i + 1));
@@ -365,7 +371,8 @@ public class DestinationSequenceTest extends Assert {
     
     @Test
     public void testAcknowledgeImmediate() throws SequenceFault {
-        setUpDestination();
+        Timer timer = control.createMock(Timer.class);
+        setUpDestination(timer);
         Message message = setUpMessage("1");
         control.replay();
         
