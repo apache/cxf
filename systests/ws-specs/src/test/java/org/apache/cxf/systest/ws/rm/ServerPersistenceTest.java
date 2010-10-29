@@ -161,7 +161,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         awaitMessages(4, 6, 20000);
 
         // wait another while to prove that response to second request is indeed lost
-        Thread.sleep(1000);
+        Thread.sleep(4000);
         int nDone = 0;
         for (int i = 0; i < responses.length; i++) {
             if (responses[i].isDone()) {
@@ -175,12 +175,13 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         String[] expectedActions = new String[] {RMConstants.getCreateSequenceAction(),
                                                  GREETME_ACTION,
                                                  GREETME_ACTION,
-                                                 GREETME_ACTION};
+                                                 GREETME_ACTION,
+                                                 RMConstants.getSequenceAckAction()};
         mf.verifyActions(expectedActions, true);
         // mf.verifyMessageNumbers(new String[] {null, "1", "2", "3"}, true);
         // mf.verifyAcknowledgements(new boolean[] {false, false, true, false}, true);
         
-        mf.verifyPartialResponses(4);
+        mf.verifyPartialResponses(5);
         mf.purgePartialResponses();
         expectedActions = new String[] {RMConstants.getCreateSequenceResponseAction(),
                                         GREETME_RESPONSE_ACTION,
