@@ -292,6 +292,9 @@ public class DestinationSequence extends AbstractSequence {
         } else {
             LOG.fine("Schedule immediate acknowledgment");
             scheduleImmediateAcknowledgement();
+            destination.getManager().getTimer().schedule(
+                new ImmediateFallbackAcknowledgment(), ap.getImmediaAcksTimeout().longValue());
+           
         }
     }
 
@@ -366,6 +369,26 @@ public class DestinationSequence extends AbstractSequence {
                 }
                
             }
+
+        }
+    }
+    
+    final class ImmediateFallbackAcknowledgment extends TimerTask {
+       
+        public void run() {
+            LOG.fine("timer task: send acknowledgment.");
+            if (!sendAcknowledgement()) {
+                //Acknowledgment already get send out
+                return;
+            }
+
+            try {                
+                RMEndpoint rme = destination.getReliableEndpoint();
+                Proxy proxy = rme.getProxy();
+                proxy.acknowledge(DestinationSequence.this);
+            } catch (RMException ex) {
+                // already logged
+            } 
 
         }
     }

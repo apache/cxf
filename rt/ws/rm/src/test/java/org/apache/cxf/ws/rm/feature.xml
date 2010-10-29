@@ -43,7 +43,7 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
                     <wsrm-mgr:sequenceTerminationPolicy terminateOnShutdown="true"/>                    
                 </wsrm-mgr:sourcePolicy>
                 <wsrm-mgr:destinationPolicy>
-                    <wsrm-mgr:acksPolicy intraMessageThreshold="0"/>                    
+                    <wsrm-mgr:acksPolicy ImmediaAcksTimeout="2000" intraMessageThreshold="0"/>                    
                 </wsrm-mgr:destinationPolicy>
                 <wsrm-mgr:store>
                     <bean class="org.apache.cxf.ws.rm.RMManagerConfigurationTest$TestStore">
