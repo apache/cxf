@@ -20,6 +20,8 @@
 package org.apache.cxf.systest.mtom_feature;
 
 import java.awt.Image;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintWriter;
 import java.net.URL;
 import javax.imageio.ImageIO;
 import javax.xml.namespace.QName;
@@ -29,8 +31,11 @@ import javax.xml.ws.Holder;
 import javax.xml.ws.Service;
 import javax.xml.ws.soap.MTOMFeature;
 
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.local.LocalConduit;
+
+import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -43,6 +48,11 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(Server.class, true));
+    }
+    
+    @Before
+    public void setUp() throws Exception {
+        this.createBus();
     }
 
     @Test
@@ -112,19 +122,57 @@ public class MtomFeatureClientServerTest extends AbstractBusClientServerTestBase
         assertEquals("CXF", new String(photo.value));
         assertNotNull(image.value);
     }
+    
+    @Test
+    public void testEchoWithLowThreshold() throws Exception { 
+        ByteArrayOutputStream bout = this.setupOutLogging();
+        byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
+        Holder<byte[]> image = new Holder<byte[]>(bytes);
+        Hello hello = this.getPort(500);
+        hello.echoData(image);
+        assertTrue("MTOM should be enabled", bout.toString().indexOf("<xop:Include") > -1);
+    }
+    
+    @Test
+    public void testEchoWithHighThreshold() throws Exception { 
+        ByteArrayOutputStream bout = this.setupOutLogging();
+        byte[] bytes = ImageHelper.getImageBytes(getImage("/java.jpg"), "image/jpeg");
+        Holder<byte[]> image = new Holder<byte[]>(bytes);
+        Hello hello = this.getPort(2000);
+        hello.echoData(image);
+        assertTrue("MTOM should not be enabled", bout.toString().indexOf("<xop:Include") == -1);
+    }
+    
+    private ByteArrayOutputStream setupOutLogging() {
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        PrintWriter writer = new PrintWriter(bos, true);
+
+        LoggingOutInterceptor out = new LoggingOutInterceptor(writer);
+        this.bus.getOutInterceptors().add(out);
+
+        return bos;
+    }
 
     private Image getImage(String name) throws Exception {
         return ImageIO.read(getClass().getResource(name));
     }
 
     private Hello getPort() {
+        return getPort(0);
+    }
+    private Hello getPort(int threshold) {
         URL wsdl = getClass().getResource("/wsdl_systest/mtom.wsdl");
         assertNotNull("WSDL is null", wsdl);
 
         HelloService service = new HelloService(wsdl, serviceName);
         assertNotNull("Service is null ", service);
-        //return service.getHelloPort();        
-        Hello hello = service.getHelloPort(new MTOMFeature());
+        //return service.getHelloPort();
+        MTOMFeature mtomFeature = new MTOMFeature();
+        if (threshold > 0) {
+            mtomFeature = new MTOMFeature(true, threshold);
+        }
+        Hello hello = service.getHelloPort(mtomFeature);
+        
         try {
             updateAddressPort(hello, PORT);
         } catch (Exception e) {
