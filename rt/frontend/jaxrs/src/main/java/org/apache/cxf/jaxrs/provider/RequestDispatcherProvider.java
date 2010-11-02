@@ -200,7 +200,7 @@ public class RequestDispatcherProvider extends AbstractConfigurableProvider
         this.servletPath = path;
     }
 
-    private static class HttpServletRequestFilter extends HttpServletRequestWrapper {
+    protected static class HttpServletRequestFilter extends HttpServletRequestWrapper {
         
         private Map<String, String[]> params;
         private String path;
