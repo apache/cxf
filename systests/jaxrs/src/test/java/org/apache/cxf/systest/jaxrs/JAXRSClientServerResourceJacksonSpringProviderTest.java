@@ -24,7 +24,6 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
-import java.net.Socket;
 import java.net.URL;
 import java.net.URLConnection;
 
@@ -100,22 +99,7 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         httpUrlConnection.disconnect();
     }
     
-    @Test
-    public void testPostPetStatus2() throws Exception {
-        
-        
-        Socket s = new Socket("localhost", Integer.parseInt(PORT));
-        IOUtils.copyAndCloseInput(getClass().getResource("resources/formRequest.txt").openStream(), 
-                                  s.getOutputStream());
-
-        s.getOutputStream().flush();
-        try {
-            assertTrue("Wrong status returned", getStringFromInputStream(s.getInputStream())
-                       .contains("open"));  
-        } finally {
-            s.close();
-        }
-    }
+    
     
     private String getStringFromInputStream(InputStream in) throws Exception {
         return IOUtils.toString(in);

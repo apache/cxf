@@ -1,4 +1,4 @@
-POST /webapp/petstore/pets HTTP/1.1
+POST /webapp/resources/petstore/pets HTTP/1.1
 Accept: image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, application/x-shockwave-flash, application/vnd.ms-excel, application/vnd.ms-powerpoint, application/msword, */*
 Accept-Language: en-ie
 Content-Type: application/x-www-form-urlencoded

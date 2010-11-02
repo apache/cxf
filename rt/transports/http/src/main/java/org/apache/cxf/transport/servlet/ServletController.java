@@ -181,7 +181,7 @@ public class ServletController extends AbstractServletController {
                             return;
                         }   
                     }
-                } else if ("/".equals(address) || address.length() == 0) {
+                } else {
                     updateDests(request);
                 }
                 
