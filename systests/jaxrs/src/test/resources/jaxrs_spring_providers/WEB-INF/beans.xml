@@ -27,7 +27,7 @@ http://cxf.apache.org/jaxrs
 http://cxf.apache.org/schemas/jaxrs.xsd">
 
     <jaxrs:server id="bookservice"
-                  address="/">
+                  address="/resources">
         <jaxrs:serviceBeans>
             <ref bean="petstore"/>
             <ref bean="bookstore"/>
