@@ -158,7 +158,16 @@ public final class Names {
     public static final QName HEADER_REQUIRED_QNAME =
         new QName(WSA_NAMESPACE_NAME, HEADER_REQUIRED_NAME);
 
-
+    public static final String ONLY_ANONYMOUS_ADDRESS_SUPPORTED_NAME = 
+        "OnlyAnonymousAddressSupported";
+    public static final QName ONLY_ANONYMOUS_ADDRESS_SUPPORTED_QNAME =
+        new QName(WSA_NAMESPACE_NAME, ONLY_ANONYMOUS_ADDRESS_SUPPORTED_NAME);
+        
+    public static final String ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME = 
+        "OnlyNonAnonymousAddressSupported";
+    public static final QName ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME =
+        new QName(WSA_NAMESPACE_NAME, ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_NAME);
+    
     public static final String SOAP11HTTP_ADDRESSING_BINDING = 
         "http://schemas.xmlsoap.org/soap/envelope/?addressing=ms";
     public static final String SOAP12HTTP_ADDRESSING_BINDING = 

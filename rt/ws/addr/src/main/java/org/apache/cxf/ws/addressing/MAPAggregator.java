@@ -118,6 +118,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
 
     private boolean allowDuplicates = true;
     
+    private String addressingResponses = "ALL";
+    
     /**
      * Constructor.
      */
@@ -180,6 +182,14 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
      */
     public void setAddressingRequired(boolean required) {
         addressingRequired = required;
+    }
+    
+    /**
+     * Sets Addresing Response 
+     *
+     */
+    public void setAddressingResponses(String responses) {
+        addressingResponses = responses;
     }
     
     /**
@@ -510,10 +520,12 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                                  theMaps.getReplyTo(),
                                  theMaps.getFaultTo());
             }
-        } else if (!ContextUtils.isRequestor(message)) {            
+        } else if (!ContextUtils.isRequestor(message)) {
             //responder validates incoming MAPs
             AddressingPropertiesImpl maps = getMAPs(message, false, false);
+            //check responses          
             if (maps != null) {
+                checkAddressingResponses(maps.getReplyTo(), maps.getFaultTo());
                 assertAddressing(message, 
                                  maps.getReplyTo(),
                                  maps.getFaultTo());
@@ -610,6 +622,29 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         return continueProcessing;
     }
 
+    private void checkAddressingResponses(EndpointReferenceType replyTo, EndpointReferenceType faultTo) {
+        if (this.addressingResponses.equals("ALL")) {
+            return;
+        }
+        boolean passed = false;
+        boolean anonReply = ContextUtils.isGenericAddress(replyTo);
+        boolean anonFault = ContextUtils.isGenericAddress(faultTo);
+        boolean isAnonymous = anonReply && anonFault;
+        if ("ANONYMOUS".equals(addressingResponses) && isAnonymous) {
+            passed = true;
+        } else if ("NON_ANONYMOUS".equals(addressingResponses)
+                   && (!anonReply && (faultTo.getAddress() != null && !anonFault) 
+                       || !anonReply && faultTo.getAddress() == null)) {
+            passed = true;
+        }
+        if (!passed) {
+            String reason = BUNDLE.getString("INVALID_ADDRESSING_PROPERTY_MESSAGE");
+            QName detail = "ANONYMOUS".equals(addressingResponses)
+                ? Names.ONLY_ANONYMOUS_ADDRESS_SUPPORTED_QNAME
+                : Names.ONLY_NONANONYMOUS_ADDRESS_SUPPORTED_QNAME;
+            throw new SoapFault(reason, detail);
+        }            
+    }
     /**
      * Perform MAP aggregation.
      *
@@ -1141,7 +1176,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                     && !sa.equals(action)) {
                     //don't match, must send fault back....
                     String reason =
-                        BUNDLE.getString("INVALID_SOAPACTION_MESSAGE");
+                        BUNDLE.getString("INVALID_ADDRESSING_PROPERTY_MESSAGE");
     
                     ContextUtils.storeMAPFaultName(Names.ACTION_MISMATCH_NAME,
                                                    message);

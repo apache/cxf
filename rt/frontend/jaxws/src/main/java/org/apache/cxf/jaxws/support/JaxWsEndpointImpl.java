@@ -19,9 +19,11 @@
 
 package org.apache.cxf.jaxws.support;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.wsdl.extensions.ExtensibilityElement;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.extensions.UnknownExtensibilityElement;
@@ -43,6 +45,7 @@ import org.apache.cxf.binding.soap.SoapBinding;
 import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor;
 import org.apache.cxf.binding.xml.XMLBinding;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.endpoint.EndpointException;
 import org.apache.cxf.endpoint.EndpointImpl;
 import org.apache.cxf.feature.AbstractFeature;
@@ -67,6 +70,7 @@ import org.apache.cxf.jaxws.interceptors.SwAInInterceptor;
 import org.apache.cxf.jaxws.interceptors.SwAOutInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassInInterceptor;
 import org.apache.cxf.jaxws.interceptors.WrapperClassOutInterceptor;
+import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -382,6 +386,17 @@ public class JaxWsEndpointImpl extends EndpointImpl {
                 addAddressingFeature(feature);
             }
             feature.setAddressingRequired(addressing.isRequired());
+            if (ProviderImpl.isJaxWs22()) {
+                try {
+                    Class<?> addrClass = ClassLoaderUtils.loadClass("javax.xml.ws.soap.AddressingFeature",
+                                                                    ProviderImpl.class);
+                    Method responsesMethod = addrClass.getMethod("getResponses", new Class[] {});
+                    Object responses = responsesMethod.invoke(addressing, new Object[] {});
+                    feature.setResponses(responses.toString());
+                } catch (Exception e) {
+                    // ignore
+                }
+            }
         } else {
             removeAddressingFeature();
             getEndpointInfo().setProperty("org.apache.cxf.ws.addressing.MAPAggregator.addressingDisabled",

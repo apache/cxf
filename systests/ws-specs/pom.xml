@@ -197,5 +197,82 @@
     <properties>
         <cxf.surefire.fork.mode>pertest</cxf.surefire.fork.mode>
     </properties>
+    <profiles>
+        <profile>
+            <id>jaxws22</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.apache.geronimo.specs</groupId>
+                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+            <properties>
+                <cxf.spi-dir>spi-2.2</cxf.spi-dir>
+            </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>build-helper-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-jaxws22-test-source</id>
+                                <phase>generate-test-sources</phase>
+                                <goals>
+                                    <goal>add-test-source</goal>
+                                </goals>
+                                <configuration>
+                                    <sources>
+                                        <source>${basedir}/src/test/jaxws22</source>
+                                    </sources>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                             <execution>
+                                 <id>create-endorsed-dir</id>
+                                 <phase>validate</phase>
+                                 <goals>
+                                     <goal>copy</goal>
+                                 </goals>
+                                 <configuration>
+                                     <artifactItems>
+                                         <artifactItem>
+                                             <groupId>org.apache.geronimo.specs</groupId>
+                                             <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                             <outputDirectory>${basedir}/target/endorsed</outputDirectory>
+                                         </artifactItem>
+                                     </artifactItems>
+                                 </configuration>
+                             </execution>
+                         </executions>
+                    </plugin>
+                    
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-compiler-plugin</artifactId>
+                        <configuration>
+                            <compilerArguments>
+                                <endorseddirs>${basedir}/target/endorsed</endorseddirs>
+                            </compilerArguments>
+                        </configuration>
+                     </plugin>
+                     
+                     <plugin>
+                         <groupId>org.apache.maven.plugins</groupId>
+                         <artifactId>maven-surefire-plugin</artifactId>
+                         <configuration>
+                             <argLine>-Djava.endorsed.dirs=${basedir}/target/endorsed</argLine>
+                         </configuration>
+                     </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

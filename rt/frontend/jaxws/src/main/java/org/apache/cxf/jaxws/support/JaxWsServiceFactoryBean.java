@@ -67,6 +67,7 @@ import org.apache.cxf.jaxws.JAXWSMethodDispatcher;
 import org.apache.cxf.jaxws.JAXWSProviderMethodDispatcher;
 import org.apache.cxf.jaxws.WrapperClassGenerator;
 import org.apache.cxf.jaxws.interceptors.WebFaultOutInterceptor;
+import org.apache.cxf.jaxws.spi.ProviderImpl;
 import org.apache.cxf.service.factory.AbstractServiceConfiguration;
 import org.apache.cxf.service.factory.FactoryBeanListener;
 import org.apache.cxf.service.factory.FactoryBeanListener.Event;
@@ -166,7 +167,24 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
 
         if (addressing != null) {
-            features.add(new AddressingFeature(addressing.enabled(), addressing.required()));
+            if (ProviderImpl.isJaxWs22()) {
+                try {
+                    Method method = Addressing.class.getMethod("responses", new Class<?>[]{});
+                    Object responses = method.invoke(addressing, new Object[]{});
+                    java.lang.reflect.Constructor<?> constructor = 
+                        AddressingFeature.class.getConstructor(new Class[] {
+                            boolean.class, boolean.class, responses.getClass()
+                        });
+                    Object obj = constructor.newInstance(addressing.enabled(), addressing.required(),
+                                                         responses);
+                    features.add((WebServiceFeature)obj);
+                } catch (Exception e) {
+                    features.add(new AddressingFeature(addressing.enabled(), addressing.required()));
+                }
+            } else {
+                features.add(new AddressingFeature(addressing.enabled(), addressing.required()));
+            }
+            
         }
 
         if (features.size() > 0) {
