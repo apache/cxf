@@ -455,7 +455,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
     }
     
     protected void doResults(SoapMessage msg, String actor, 
-                             SOAPMessage doc, Vector results) 
+                             SOAPMessage doc, Vector results, boolean utWithCallbacks) 
         throws SOAPException, XMLStreamException, WSSecurityException {
         
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
@@ -502,12 +502,15 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                     for (AssertionInfo ai : ais) {
                         ai.setAsserted(true);
                     }
-                    WSUsernameTokenPrincipal princ 
-                        = (WSUsernameTokenPrincipal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
-                    for (AssertionInfo ai : ais) {
-                        UsernameToken tok = (UsernameToken)ai.getAssertion();
-                        if (tok.isHashPassword() != princ.isPasswordDigest()) {
-                            ai.setNotAsserted("Password hashing policy not enforced");
+                    
+                    if (utWithCallbacks) {
+                        WSUsernameTokenPrincipal princ 
+                            = (WSUsernameTokenPrincipal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                        for (AssertionInfo ai : ais) {
+                            UsernameToken tok = (UsernameToken)ai.getAssertion();
+                            if (tok.isHashPassword() != princ.isPasswordDigest()) {
+                                ai.setNotAsserted("Password hashing policy not enforced");
+                            }
                         }
                     }
                 }
@@ -557,7 +560,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             assertPolicy(aim, SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS);
         }
         
-        super.doResults(msg, actor, doc, results);
+        super.doResults(msg, actor, doc, results, utWithCallbacks);
     }
     private void assertHeadersExists(AssertionInfoMap aim, SoapMessage msg, SOAPMessage doc) 
         throws SOAPException {

@@ -22,33 +22,28 @@ import java.io.IOException;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Vector;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
 import javax.security.auth.callback.Callback;
 import javax.security.auth.callback.CallbackHandler;
-import javax.security.auth.callback.UnsupportedCallbackException;
 import javax.xml.namespace.QName;
 
-import org.w3c.dom.Element;
-
+import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.SecurityToken;
+import org.apache.cxf.common.security.UsernameToken;
+import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.security.DefaultSecurityContext;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.ws.security.WSConstants;
-import org.apache.ws.security.WSDocInfo;
 import org.apache.ws.security.WSPasswordCallback;
-import org.apache.ws.security.WSSConfig;
 import org.apache.ws.security.WSSecurityEngine;
-import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.WSUsernameTokenPrincipal;
-import org.apache.ws.security.components.crypto.Crypto;
 import org.apache.ws.security.handler.RequestData;
-import org.apache.ws.security.message.token.UsernameToken;
 import org.apache.ws.security.processor.Processor;
 
 
@@ -69,8 +64,7 @@ import org.apache.ws.security.processor.Processor;
  * an application is expected to provide a password callback handler for decrypting the token only.     
  *
  */
-public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS4JInInterceptor 
-    implements Processor {
+public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS4JInInterceptor {
     
     private static final Logger LOG = 
         LogUtils.getL7dLogger(AbstractUsernameTokenAuthenticatingInterceptor.class);
@@ -78,11 +72,12 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     private boolean supportDigestPasswords;
     
     public AbstractUsernameTokenAuthenticatingInterceptor() {
-        super();
+        this(new HashMap<String, Object>());
     }
     
     public AbstractUsernameTokenAuthenticatingInterceptor(Map<String, Object> properties) {
         super(properties);
+        getAfter().add(PolicyBasedWSS4JInInterceptor.class.getName());
     }
     
     public void setSupportDigestPasswords(boolean support) {
@@ -91,6 +86,23 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
     
     public boolean getSupportDigestPasswords() {
         return supportDigestPasswords;
+    }
+    
+    @Override
+    public void handleMessage(SoapMessage msg) throws Fault {
+        SecurityToken token = msg.get(SecurityToken.class);
+        SecurityContext context = msg.get(SecurityContext.class);
+        if (token == null || context == null || context.getUserPrincipal() == null) {
+            super.handleMessage(msg);
+            return;
+        }
+        UsernameToken ut = (UsernameToken)token;
+        
+        Subject subject = createSubject(ut.getName(), ut.getPassword(), ut.isHashed(),
+                                        ut.getNonce(), ut.getCreatedTime());
+        
+        SecurityContext sc = doCreateSecurityContext(context.getUserPrincipal(), subject);
+        msg.put(SecurityContext.class, sc);
     }
     
     @Override
@@ -130,11 +142,15 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         try {
             subject = createSubject(name, password, isDigest, nonce, created);
         } catch (Exception ex) {
-            throw new WSSecurityException("Failed Authentication : Subject has not been created", ex);
+            String errorMessage = "Failed Authentication : Subject has not been created";
+            LOG.severe(errorMessage);
+            throw new WSSecurityException(errorMessage, ex);
         }
         if (subject == null || subject.getPrincipals().size() == 0
             || !subject.getPrincipals().iterator().next().getName().equals(name)) {
-            throw new WSSecurityException("Failed Authentication : Invalid Subject");
+            String errorMessage = "Failed Authentication : Invalid Subject";
+            LOG.severe(errorMessage);
+            throw new WSSecurityException(errorMessage);
         }
         msg.put(Subject.class, subject);
     }
@@ -164,7 +180,7 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
      * 
      */
     @Override
-    protected CallbackHandler getCallback(RequestData reqData, int doAction) 
+    protected CallbackHandler getCallback(RequestData reqData, int doAction, boolean utNoCallbacks) 
         throws WSSecurityException {
         
         // Given that a custom UT processor is used for dealing with digests 
@@ -174,63 +190,46 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
         if ((doAction & WSConstants.UT) != 0) {
             CallbackHandler pwdCallback = null;
             try {
-                pwdCallback = super.getCallback(reqData, doAction);
+                pwdCallback = super.getCallback(reqData, doAction, false);
             } catch (Exception ex) {
                 // ignore
             }
-            return new DelegatingCallbackHandler(pwdCallback);
+            return new SubjectCreatingCallbackHandler(pwdCallback);
         }
         
-        return super.getCallback(reqData, doAction);
+        return super.getCallback(reqData, doAction, false);
     }
     
     @Override 
-    protected WSSecurityEngine getSecurityEngine() {
+    protected WSSecurityEngine getSecurityEngine(boolean utNoCallbacks) {
         if (!supportDigestPasswords) {
-            return super.getSecurityEngine();
+            return super.getSecurityEngine(true);
         }
         Map<QName, Object> profiles = new HashMap<QName, Object>(3);
-        profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), this);
-        profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), this);
+        
+        Processor processor = new CustomUsernameTokenProcessor();
+        profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), processor);
+        profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), processor);
         return createSecurityEngine(profiles);
     }
     
-    public void handleToken(Element elem, 
-                            Crypto crypto, 
-                            Crypto decCrypto, 
-                            CallbackHandler cb, 
-                            WSDocInfo wsDocInfo, 
-                            Vector returnResults, 
-                            WSSConfig config) throws WSSecurityException {
-        new CustomUsernameTokenProcessor().handleToken(elem, crypto, decCrypto, cb, wsDocInfo, 
-                                                       returnResults, config);
-    }
-    
-    
-    protected class DelegatingCallbackHandler implements CallbackHandler {
+    protected class SubjectCreatingCallbackHandler extends DelegatingCallbackHandler {
 
-        private CallbackHandler pwdHandler;
-        
-        public DelegatingCallbackHandler(CallbackHandler pwdHandler) {
-            this.pwdHandler = pwdHandler;
+        public SubjectCreatingCallbackHandler(CallbackHandler pwdHandler) {
+            super(pwdHandler);
         }
         
-        public void handle(Callback[] callbacks) throws IOException, UnsupportedCallbackException {
-            for (Callback c : callbacks) {
-                if (c instanceof WSPasswordCallback) {
-                    WSPasswordCallback pc = (WSPasswordCallback)c;
-                    if (WSConstants.PASSWORD_TEXT.equals(pc.getPasswordType()) 
-                        && pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {
-                        AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
-                            pc.getIdentifier(), pc.getPassword(), false, null, null);
-                    } else if (pwdHandler != null) {
-                        pwdHandler.handle(callbacks);
-                    }
-                }
+        @Override
+        protected void handleCallback(Callback c) throws IOException {
+            if (c instanceof WSPasswordCallback) {
+                WSPasswordCallback pc = (WSPasswordCallback)c;
+                if (WSConstants.PASSWORD_TEXT.equals(pc.getPasswordType()) 
+                    && pc.getUsage() == WSPasswordCallback.USERNAME_TOKEN_UNKNOWN) {
+                    AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
+                        pc.getIdentifier(), pc.getPassword(), false, null, null);
+                } 
             }
-            
         }
-        
     }
     
     /**
@@ -239,56 +238,18 @@ public abstract class AbstractUsernameTokenAuthenticatingInterceptor extends WSS
      * override its handleUsernameToken only. 
      *
      */
-    private class CustomUsernameTokenProcessor implements Processor {
+    protected class CustomUsernameTokenProcessor extends UsernameTokenProcessorWithoutCallbacks {
         
-        private String utId;
-        private UsernameToken ut;
-        
-        @SuppressWarnings("unchecked")
-        public void handleToken(Element elem, Crypto crypto, Crypto decCrypto, CallbackHandler cb, 
-            WSDocInfo wsDocInfo, Vector returnResults, WSSConfig wsc) throws WSSecurityException {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Found UsernameToken list element");
-            }
-            
-            Principal principal = handleUsernameToken((Element) elem, cb);
-            returnResults.add(
-                0, 
-                new WSSecurityEngineResult(WSConstants.UT, principal, null, null, null)
-            );
-            utId = ut.getID();
-        }
-        
-        private WSUsernameTokenPrincipal handleUsernameToken(
-            Element token, CallbackHandler cb) throws WSSecurityException {
-            //
-            // Parse the UsernameToken element
-            //
-            ut = new UsernameToken(token, false);
-            String user = ut.getName();
-            String password = ut.getPassword();
-            String nonce = ut.getNonce();
-            String createdTime = ut.getCreated();
-            String pwType = ut.getPasswordType();
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("UsernameToken user " + user);
-                LOG.fine("UsernameToken password " + password);
-            }
-            
+        @Override
+        protected WSUsernameTokenPrincipal createPrincipal(String user, 
+                                                           String password,
+                                                           boolean isHashed,
+                                                           String nonce,
+                                                           String createdTime,
+                                                           String pwType) throws WSSecurityException {
             AbstractUsernameTokenAuthenticatingInterceptor.this.setSubject(
-                user, password, ut.isHashed(), nonce, createdTime);    
-            
-            WSUsernameTokenPrincipal principal = new WSUsernameTokenPrincipal(user, ut.isHashed());
-            principal.setNonce(nonce);
-            principal.setPassword(password);
-            principal.setCreatedTime(createdTime);
-            principal.setPasswordType(pwType);
-
-            return principal;
-        }
-
-        public String getId() {
-            return utId;
+                 user, password, isHashed, nonce, createdTime);
+            return super.createPrincipal(user, password, isHashed, nonce, createdTime, pwType);
         }
     }
     

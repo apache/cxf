@@ -21,6 +21,7 @@ package org.apache.cxf.ws.security.wss4j;
 import java.io.IOException;
 import java.security.Principal;
 import java.security.cert.X509Certificate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
@@ -46,9 +47,11 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -149,13 +152,17 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             return;
         }
         msg.put(SECURITY_PROCESSED, Boolean.TRUE);
+        
+        boolean utWithCallbacks = 
+            !MessageUtils.getContextualBoolean(msg, SecurityConstants.USERNAME_TOKEN_NO_CALLBACKS, false);
+        
         WSSConfig config = (WSSConfig)msg.getContextualProperty(WSSConfig.class.getName()); 
         WSSecurityEngine engine;
         if (config != null) {
             engine = new WSSecurityEngine();
             engine.setWssConfig(config);
         } else {
-            engine = getSecurityEngine();
+            engine = getSecurityEngine(utWithCallbacks);
         }
         
         SOAPMessage doc = getSOAPMessage(msg);
@@ -192,7 +199,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
 
             String actor = (String)getOption(WSHandlerConstants.ACTOR);
 
-            CallbackHandler cbHandler = getCallback(reqData, doAction);
+            CallbackHandler cbHandler = getCallback(reqData, doAction, utWithCallbacks);
 
             /*
              * Get and check the Signature specific parameters first because
@@ -225,7 +232,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 checkSignatures(msg, reqData, wsResult);
                 checkTimestamps(msg, reqData, wsResult);
                 checkActions(msg, reqData, wsResult, actions);
-                doResults(msg, actor, doc, wsResult);
+                doResults(msg, actor, doc, wsResult, utWithCallbacks);
             } else { // no security header found
                 // Create an empty result vector to pass into the required validation
                 // methods.
@@ -360,8 +367,14 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
     protected void computeAction(SoapMessage msg, RequestData reqData) {
         
     }
+
     protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult)
         throws SOAPException, XMLStreamException, WSSecurityException {
+        doResults(msg, actor, doc, wsResult, false);
+    }
+
+    protected void doResults(SoapMessage msg, String actor, SOAPMessage doc, Vector wsResult, 
+        boolean utWithCallbacks) throws SOAPException, XMLStreamException, WSSecurityException {
         /*
          * All ok up to this point. Now construct and setup the security result
          * structure. The service may fetch this and check it.
@@ -405,7 +418,18 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         for (WSSecurityEngineResult o : CastUtils.cast(wsResult, WSSecurityEngineResult.class)) {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (p != null) {
-                msg.put(PRINCIPAL_RESULT, p);                   
+                msg.put(PRINCIPAL_RESULT, p);
+                if (!utWithCallbacks && p instanceof WSUsernameTokenPrincipal) {
+                    WSUsernameTokenPrincipal utp = (WSUsernameTokenPrincipal)p;
+                    msg.put(org.apache.cxf.common.security.SecurityToken.class, 
+                            new UsernameToken(utp.getName(),
+                                              utp.getPassword(),
+                                              utp.getPasswordType(),
+                                              utp.isPasswordDigest(),
+                                              utp.getNonce(),
+                                              utp.getCreatedTime()));
+                    
+                }
                 SecurityContext sc = msg.get(SecurityContext.class);
                 if (sc == null || sc.getUserPrincipal() == null) {
                     msg.put(SecurityContext.class, createSecurityContext(p));
@@ -477,6 +501,21 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         
     }
 
+    protected CallbackHandler getCallback(RequestData reqData, int doAction, boolean utWithCallbacks) 
+        throws WSSecurityException {
+        if (!utWithCallbacks && (doAction & WSConstants.UT) != 0) {
+            CallbackHandler pwdCallback = null;
+            try {
+                pwdCallback = getCallback(reqData, doAction);
+            } catch (Exception ex) {
+                // ignore
+            }
+            return new DelegatingCallbackHandler(pwdCallback);
+        } else {
+            return getCallback(reqData, doAction);
+        }
+    }
+    
     protected CallbackHandler getCallback(RequestData reqData, int doAction) throws WSSecurityException {
         /*
          * To check a UsernameToken or to decrypt an encrypted message we need a
@@ -535,11 +574,19 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
      * TODO the WSHandler base class defines secEngine to be static, which
      * is really bad, because the engine has mutable state on it.
      */
-    protected WSSecurityEngine
-    getSecurityEngine() {
+    protected WSSecurityEngine getSecurityEngine(boolean utWithCallbacks) {
         if (secEngineOverride != null) {
             return secEngineOverride;
         }
+        
+        if (!utWithCallbacks) {
+            Map<QName, Object> profiles = new HashMap<QName, Object>(3);
+            Processor processor = new UsernameTokenProcessorWithoutCallbacks();
+            profiles.put(new QName(WSConstants.WSSE_NS, WSConstants.USERNAME_TOKEN_LN), processor);
+            profiles.put(new QName(WSConstants.WSSE11_NS, WSConstants.USERNAME_TOKEN_LN), processor);
+            return createSecurityEngine(profiles);
+        }
+        
         return secEngine;
     }
 

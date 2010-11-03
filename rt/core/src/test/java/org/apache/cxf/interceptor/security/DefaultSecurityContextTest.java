@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.ws.security.wss4j;
+package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
 import java.security.acl.Group;
