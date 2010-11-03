@@ -26,7 +26,7 @@
     <url>http://cxf.apache.org</url>
 
     <properties>
-        <cxf.version>2.2.1-SNAPSHOT</cxf.version>
+        <cxf.version>2.4.0-SNAPSHOT</cxf.version>
     </properties>
     <dependencies>
         <dependency>
@@ -62,6 +62,7 @@
     </dependencies>
 
     <build>
+      <defaultGoal>install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.cxf</groupId>
