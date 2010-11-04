@@ -39,25 +39,21 @@ public class StreamDataSource implements DataSource {
     }
 
     /** {@inheritDoc}*/
-    @Override
     public String getContentType() {
         return contentType;
     }
 
     /** {@inheritDoc}*/
-    @Override
     public InputStream getInputStream() throws IOException {
         return stream;
     }
 
     /** {@inheritDoc}*/
-    @Override
     public String getName() {
         return null;
     }
 
     /** {@inheritDoc}*/
-    @Override
     public OutputStream getOutputStream() throws IOException {
         return null;
     }
