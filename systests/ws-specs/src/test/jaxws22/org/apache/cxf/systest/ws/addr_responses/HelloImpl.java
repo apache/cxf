@@ -16,13 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws;
+package org.apache.cxf.systest.ws.addr_responses;
 import javax.jws.WebService;
+import javax.xml.ws.soap.Addressing;
+import javax.xml.ws.soap.AddressingFeature.Responses;
 
 
 @WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort", 
             targetNamespace = "http://cxf.apache.org/systest/wsa/responses",
-            endpointInterface = "org.apache.cxf.systest.jaxws.Hello")
+            endpointInterface = "org.apache.cxf.systest.ws.addr_responses.Hello")
+@Addressing(responses = Responses.NON_ANONYMOUS)
 public class HelloImpl implements Hello {
     public String sayHi(String arg0) {
         return "get" + arg0;

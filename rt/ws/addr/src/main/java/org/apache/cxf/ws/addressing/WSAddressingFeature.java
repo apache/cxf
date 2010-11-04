@@ -26,7 +26,6 @@ import org.apache.cxf.ws.addressing.soap.MAPCodec;
 
 @NoJSR250Annotations
 public class WSAddressingFeature extends AbstractFeature {
-
     private MAPAggregator mapAggregator = new MAPAggregator();
     private MAPCodec mapCodec = new MAPCodec();
     
@@ -89,5 +88,9 @@ public class WSAddressingFeature extends AbstractFeature {
      */
     public void setMessageIdCache(MessageIdCache messageIdCache) {
         mapAggregator.setMessageIdCache(messageIdCache);
+    }
+    
+    public void setResponses(String responses) {
+        mapAggregator.setAddressingResponses(responses);
     }
 }

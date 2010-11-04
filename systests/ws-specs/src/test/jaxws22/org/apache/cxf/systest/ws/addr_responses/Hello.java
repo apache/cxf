@@ -16,16 +16,16 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxws;
+package org.apache.cxf.systest.ws.addr_responses;
+
+import javax.jws.WebMethod;
 import javax.jws.WebService;
+import javax.jws.soap.SOAPBinding;
 
-
-@WebService(name = "Hello", serviceName = "HelloService", portName = "HelloPort", 
-            targetNamespace = "http://cxf.apache.org/systest/wsa/responses",
-            endpointInterface = "org.apache.cxf.systest.jaxws.Hello")
-public class HelloImpl implements Hello {
-    public String sayHi(String arg0) {
-        return "get" + arg0;
-    }
-
+@SOAPBinding(use = SOAPBinding.Use.LITERAL)
+@WebService(name = "Hello", targetNamespace = "http://cxf.apache.org/systest/wsa/responses")
+public interface Hello {
+    @SOAPBinding(style = SOAPBinding.Style.RPC)
+    @WebMethod(operationName = "sayHi", exclude = false)
+    String sayHi(String value);
 }
