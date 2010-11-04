@@ -96,21 +96,21 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     // used to tag property on service.
     public static final  String WS_FEATURES = "JAXWS-WS-FEATURES";
     private static final Logger LOG = LogUtils.getLogger(JaxWsServiceFactoryBean.class);
-    
+
     private AbstractServiceConfiguration jaxWsConfiguration;
 
     private JaxWsImplementorInfo implInfo;
 
     private List<WebServiceFeature> setWsFeatures;
     private List<WebServiceFeature> wsFeatures;
-    
+
     private boolean wrapperBeanGenerated;
     private Set<Class<?>> wrapperClasses;
-    
-    
+
+
     public JaxWsServiceFactoryBean() {
         getIgnoredClasses().add(Service.class.getName());
-        
+
         //the JAXWS-RI doesn't qualify the schemas for the wrapper types
         //and thus won't work if we do.
         setQualifyWrapperSchema(false);
@@ -125,7 +125,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         this.serviceType = implInfo.getSEIType();
         loadWSFeatureAnnotation(implInfo.getSEIClass(), implInfo.getImplementorClass());
     }
-    
+
     @Override
     public void reset() {
         super.reset();
@@ -134,13 +134,13 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     private void initSchemaLocations() {
-        this.schemaLocationMapping.put(JAXWSAConstants.NS_WSA, 
+        this.schemaLocationMapping.put(JAXWSAConstants.NS_WSA,
                                        JAXWSAConstants.WSA_XSD);
     }
 
     private void loadWSFeatureAnnotation(Class<?> serviceClass, Class<?> implementorClass) {
         List<WebServiceFeature> features = new ArrayList<WebServiceFeature>();
-        MTOM mtom = implInfo.getImplementorClass().getAnnotation(MTOM.class);        
+        MTOM mtom = implInfo.getImplementorClass().getAnnotation(MTOM.class);
         if (mtom == null && serviceClass != null) {
             mtom = serviceClass.getAnnotation(MTOM.class);
         }
@@ -152,10 +152,10 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             if (bt != null
                 && (SOAPBinding.SOAP11HTTP_MTOM_BINDING.equals(bt.value())
                 || SOAPBinding.SOAP12HTTP_MTOM_BINDING.equals(bt.value()))) {
-                features.add(new MTOMFeature(true));                
+                features.add(new MTOMFeature(true));
             }
         }
-        
+
 
         Addressing addressing = null;
         if (implementorClass != null) {
@@ -171,7 +171,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 try {
                     Method method = Addressing.class.getMethod("responses", new Class<?>[]{});
                     Object responses = method.invoke(addressing, new Object[]{});
-                    java.lang.reflect.Constructor<?> constructor = 
+                    java.lang.reflect.Constructor<?> constructor =
                         AddressingFeature.class.getConstructor(new Class[] {
                             boolean.class, boolean.class, responses.getClass()
                         });
@@ -184,7 +184,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             } else {
                 features.add(new AddressingFeature(addressing.enabled(), addressing.required()));
             }
-            
+
         }
 
         if (features.size() > 0) {
@@ -200,11 +200,11 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     @Override
     public org.apache.cxf.service.Service create() {
         org.apache.cxf.service.Service s = super.create();
-        
+
         s.put(ENDPOINT_CLASS, implInfo.getEndpointClass());
-        
+
         if (s.getDataBinding() != null) {
-            setMTOMThreshold(s.getDataBinding());
+            setMTOMFeatures(s.getDataBinding());
         }
         return s;
     }
@@ -231,8 +231,8 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
     }
 
     @Override
-    public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {        
-        Endpoint ep = new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures, 
+    public Endpoint createEndpoint(EndpointInfo ei) throws EndpointException {
+        Endpoint ep = new JaxWsEndpointImpl(getBus(), getService(), ei, implInfo, wsFeatures,
                                      this.getFeatures(), this.isFromWsdl());
         sendEvent(FactoryBeanListener.Event.ENDPOINT_CREATED, ei, ep);
         return ep;
@@ -255,9 +255,9 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
 
         sendEvent(Event.INTERFACE_OPERATION_BOUND, o, method);
     }
-    
+
     protected void bindOperation(OperationInfo op, Method method) {
-        
+
         try {
             // Find the Async method which returns a Response
             Method responseMethod = method.getDeclaringClass().getDeclaredMethod(method.getName() + "Async",
@@ -295,12 +295,12 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         if (c == null) {
             throw new ServiceConstructionException(new Message("INVALID_PROVIDER_EXC", LOG));
         }
-        
+
         if (getEndpointInfo() == null
             && isFromWsdl()) {
             //most likely, they specified a WSDL, but for some reason
             //did not give a valid ServiceName/PortName.  For provider,
-            //we'll allow this since everything is bound directly to 
+            //we'll allow this since everything is bound directly to
             //the invoke method, however, this CAN cause other problems
             //such as addresses in the wsdl not getting updated and such
             //so we'll WARN about it.....
@@ -310,14 +310,14 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                     enames.add(ep.getName());
                 }
             }
-            LOG.log(Level.WARNING, "COULD_NOT_FIND_ENDPOINT", 
+            LOG.log(Level.WARNING, "COULD_NOT_FIND_ENDPOINT",
                     new Object[] {getEndpointName(), enames});
         }
-        
+
         try {
             Method invoke = getServiceClass().getMethod("invoke", c);
             QName catchAll = new QName("http://cxf.apache.org/jaxws/provider", "invoke");
-            
+
             // Bind every operation to the invoke method.
             for (ServiceInfo si : getService().getServiceInfos()) {
                 si.setProperty("soap.force.doclit.bare", Boolean.TRUE);
@@ -363,8 +363,8 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
                             mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
-                            
-                            mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(), 
+
+                            mInfo = op.createMessage(new QName(catchAll.getNamespaceURI(),
                                                                name + "Response"),
                                                                MessageInfo.Type.OUTPUT);
                             op.setOutput(name + "Response", mInfo);
@@ -372,7 +372,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                             mpi.setElement(true);
                             mpi.setTypeClass(c);
                             mpi.setTypeQName(XMLSchemaQNames.XSD_ANY);
-                        
+
                             BindingOperationInfo bo = new BindingOperationInfo(bind, op);
                             op.setProperty("operation.is.synthetic", Boolean.TRUE);
                             bo.setProperty("operation.is.synthetic", Boolean.TRUE);
@@ -387,7 +387,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             throw new ServiceConstructionException(e);
         }
 
-        
+
     }
 
     protected Class<?> getProviderParameterType(Class<?> cls) {
@@ -396,7 +396,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
         Type[] genericInterfaces = cls.getGenericInterfaces();
         for (Type type : genericInterfaces) {
-            if (type instanceof ParameterizedType) { 
+            if (type instanceof ParameterizedType) {
                 Class<?> rawCls = (Class<?>)((ParameterizedType)type).getRawType();
                 if (Provider.class == rawCls) {
                     return (Class<?>)((ParameterizedType)type).getActualTypeArguments()[0];
@@ -407,7 +407,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         }
         return getProviderParameterType(cls.getSuperclass());
     }
-    
+
     void initializeWrapping(OperationInfo o, Method selected) {
         Class responseWrapper = getResponseWrapper(selected);
         if (responseWrapper != null) {
@@ -454,7 +454,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
                 //ignore
             }
         }
-        
+
         return super.getBeanClass(exClass);
     }
 
@@ -484,7 +484,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             jaxWsConfiguration = new JaxWsServiceConfiguration();
             jaxWsConfiguration.setServiceFactory(this);
             getServiceConfigurations().add(0, jaxWsConfiguration);
-            
+
             Class<?> seiClass = ii.getEndpointClass();
             if (seiClass != null && seiClass.getPackage() != null) {
                 XmlSchema schema = seiClass.getPackage().getAnnotation(XmlSchema.class);
@@ -494,7 +494,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             }
             setMethodDispatcher(new JAXWSMethodDispatcher(implInfo));
         }
-        loadWSFeatureAnnotation(ii.getSEIClass(), ii.getImplementorClass());        
+        loadWSFeatureAnnotation(ii.getSEIClass(), ii.getImplementorClass());
     }
 
     public List<WebServiceFeature> getWsFeatures() {
@@ -534,7 +534,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
             inputAction = action.input();
         }
         if (wm != null && StringUtils.isEmpty(inputAction)) {
-            inputAction = wm.action(); 
+            inputAction = wm.action();
         }
         if (StringUtils.isEmpty(inputAction)) {
             inputAction = computeAction(operation, "Request");
@@ -590,17 +590,17 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         for (FaultInfo fi : operation.getFaults()) {
             if (fi.getExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME) == null) {
                 String f = "/Fault/" + fi.getName().getLocalPart();
-                fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
                                          computeAction(operation, f));
                 if (operation.isUnwrappedCapable()) {
                     fi = operation.getUnwrappedOperation().getFault(fi.getName());
-                    fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME, 
+                    fi.addExtensionAttribute(JAXWSAConstants.WSAM_ACTION_QNAME,
                                              computeAction(operation, f));
-                }                
+                }
             }
         }
     }
-    
+
     private String computeAction(OperationInfo op, String postFix) {
         StringBuilder s = new StringBuilder(op.getName().getNamespaceURI());
         if (s.charAt(s.length() - 1) != '/') {
@@ -620,7 +620,7 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         buildWSAActions(op, m);
         return op;
     }
-    
+
     @Override
     protected Set<Class<?>> getExtraClass() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
@@ -630,54 +630,57 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         if (wrapperClasses != null) {
             classes.addAll(wrapperClasses);
         }
-        
+
         XmlSeeAlso xmlSeeAlsoAnno = getServiceClass().getAnnotation(XmlSeeAlso.class);
-        
+
         if (xmlSeeAlsoAnno != null && xmlSeeAlsoAnno.value() != null) {
             for (int i = 0; i < xmlSeeAlsoAnno.value().length; i++) {
                 Class<?> value = xmlSeeAlsoAnno.value()[i];
                 if (value == null) {
-                    LOG.log(Level.WARNING, "XMLSEEALSO_NULL_CLASS", 
+                    LOG.log(Level.WARNING, "XMLSEEALSO_NULL_CLASS",
                             new Object[] {getServiceClass().getName(), i});
                 } else {
                     classes.add(value);
                 }
-                
+
             }
         }
         return classes;
     }
-    
+
     private Set<Class<?>> generatedWrapperBeanClass() {
         DataBinding b = getDataBinding();
-        if (b.getClass().getName().endsWith("JAXBDataBinding") 
+        if (b.getClass().getName().endsWith("JAXBDataBinding")
             && schemaLocations == null) {
             ServiceInfo serviceInfo = getService().getServiceInfos().get(0);
             WrapperClassGenerator wrapperGen = new WrapperClassGenerator(this,
                                                                          serviceInfo.getInterface(),
                                                                          getQualifyWrapperSchema());
-            return wrapperGen.generate();            
+            return wrapperGen.generate();
         }
         return Collections.emptySet();
     }
 
-    private void setMTOMThreshold(DataBinding databinding) {
+    private void setMTOMFeatures(DataBinding databinding) {
         if (this.wsFeatures != null) {
             for (WebServiceFeature wsf : this.wsFeatures) {
-                if (wsf instanceof MTOMFeature && ((MTOMFeature)wsf).getThreshold() > 0) {
-                    databinding.setMtomThreshold(((MTOMFeature)wsf).getThreshold());
+                if (wsf instanceof MTOMFeature) {
+                    databinding.setMtomEnabled(true);
+                    MTOMFeature f = (MTOMFeature) wsf;
+                    if (f.getThreshold() > 0) {
+                        databinding.setMtomThreshold(((MTOMFeature)wsf).getThreshold());
+                    }
                 }
-
             }
         }
     }
-    
+
     @Override
     protected void buildServiceFromClass() {
         super.buildServiceFromClass();
-        getService().put(WS_FEATURES, getWsFeatures()); 
+        getService().put(WS_FEATURES, getWsFeatures());
     }
-    
+
     protected void initializeParameter(MessagePartInfo part, Class rawClass, Type type) {
         if (implInfo.isWebServiceProvider()) {
             part.setTypeQName(XMLSchemaQNames.XSD_ANY);

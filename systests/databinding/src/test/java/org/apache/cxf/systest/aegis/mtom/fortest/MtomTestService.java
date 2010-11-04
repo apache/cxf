@@ -24,11 +24,11 @@ import javax.jws.WebService;
 import javax.xml.ws.soap.MTOM;
 
 /**
- * 
+ *
  */
 @WebService(name = "MtomTestService", serviceName = "MtomTestService")
 @MTOM
-public interface MtomTest {
+public interface MtomTestService {
     void acceptDataHandler(@WebParam(name = "inputDhBean") DataHandlerBean dhBean);
     DataHandlerBean produceDataHandlerBean();
 }

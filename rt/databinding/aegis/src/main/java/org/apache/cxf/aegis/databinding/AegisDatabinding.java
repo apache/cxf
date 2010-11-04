@@ -93,7 +93,6 @@ public class AegisDatabinding extends AbstractDataBinding {
     private boolean isInitialized;
     private Set<String> overrideTypes;
     private TypeCreationOptions configuration;
-    private boolean mtomEnabled;
     private boolean mtomUseXmime;
 
     public AegisDatabinding() {
@@ -186,6 +185,7 @@ public class AegisDatabinding extends AbstractDataBinding {
 
             Object val = s.get("mtom-enabled");
             if ("true".equals(val) || Boolean.TRUE.equals(val) || mtomEnabled) {
+                setMtomEnabled(true);
                 aegisContext.setMtomEnabled(true);
             }
 
@@ -688,14 +688,6 @@ public class AegisDatabinding extends AbstractDataBinding {
 
     public void setConfiguration(TypeCreationOptions configuration) {
         this.configuration = configuration;
-    }
-
-    public boolean isMtomEnabled() {
-        return mtomEnabled;
-    }
-
-    public void setMtomEnabled(boolean mtomEnabled) {
-        this.mtomEnabled = mtomEnabled;
     }
 
     public boolean isMtomUseXmime() {

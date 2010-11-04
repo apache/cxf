@@ -1,30 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
-	Licensed to the Apache Software Foundation (ASF) under one
-	or more contributor license agreements. See the NOTICE file
-	distributed with this work for additional information
-	regarding copyright ownership. The ASF licenses this file
-	to you under the Apache License, Version 2.0 (the
-	"License"); you may not use this file except in compliance
-	with the License. You may obtain a copy of the License at
-	
-	http://www.apache.org/licenses/LICENSE-2.0
-	
-	Unless required by applicable law or agreed to in writing,
-	software distributed under the License is distributed on an
-	"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
-	KIND, either express or implied. See the License for the
-	specific language governing permissions and limitations
-	under the License.
--->
+<!-- Licensed to the Apache Software Foundation (ASF) under one or more contributor
+	license agreements. See the NOTICE file distributed with this work for additional
+	information regarding copyright ownership. The ASF licenses this file to
+	you under the Apache License, Version 2.0 (the "License"); you may not use
+	this file except in compliance with the License. You may obtain a copy of
+	the License at http://www.apache.org/licenses/LICENSE-2.0 Unless required
+	by applicable law or agreed to in writing, software distributed under the
+	License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS
+	OF ANY KIND, either express or implied. See the License for the specific
+	language governing permissions and limitations under the License. -->
 
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:simple="http://cxf.apache.org/simple"
-	xmlns:jaxws="http://cxf.apache.org/jaxws"
-	xmlns:cxf="http://cxf.apache.org/core"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:simple="http://cxf.apache.org/simple"
+	xmlns:jaxws="http://cxf.apache.org/jaxws" xmlns:cxf="http://cxf.apache.org/core"
 	xsi:schemaLocation="
-http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans
 http://www.springframework.org/schema/beans/spring-beans.xsd
 http://cxf.apache.org/simple
 http://cxf.apache.org/schemas/simple.xsd
@@ -37,29 +27,40 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 	<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" />
 	<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" />
 
-    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
-	
-    <cxf:bus>
-      <cxf:features>
-          <cxf:logging/>
-      </cxf:features>
-    </cxf:bus> 
+	<bean
+		class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" />
 
-	<bean id="mtomImpl"
-		class="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl" />
+	<bean id="mtomImpl" class="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl" />
 
-	<simple:server id="mtom-server" address="http://localhost:${testutil.ports.MtomTest}/mtom"
-		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
+	<bean id="aegisBean"
+		class="org.apache.cxf.aegis.databinding.AegisDatabinding"
+		scope="prototype" />
+
+	<bean id="jaxws-and-aegis-service-factory" class="org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean"
+		scope="prototype">
+		<property name="dataBinding" ref="aegisBean" />
+	</bean>
+
+
+	<jaxws:endpoint id="mtom-jaxws-service" implementor="#mtomImpl"
+		address="http://localhost:${testutil.ports.MtomTest}/jaxWsMtom">
+		<jaxws:serviceFactory>
+			<ref bean='jaxws-and-aegis-service-factory' />
+		</jaxws:serviceFactory>
+	</jaxws:endpoint>
+
+
+	<simple:server id="mtom-server"
+		address="http://localhost:${testutil.ports.MtomTest}/mtom"
+		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService">
 		<simple:dataBinding>
-			<bean
-				class="org.apache.cxf.aegis.databinding.AegisDatabinding"/>
+			<bean class="org.apache.cxf.aegis.databinding.AegisDatabinding" />
 		</simple:dataBinding>
 		<simple:serviceBean>
 			<ref bean="mtomImpl" />
 		</simple:serviceBean>
 		<simple:serviceFactory>
-			<bean
-				class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+			<bean class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
 				<property name="properties">
 					<map>
 						<entry key="mtom-enabled">
@@ -70,22 +71,21 @@ http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd">
 			</bean>
 		</simple:serviceFactory>
 	</simple:server>
-	
-	<simple:server id="mtom-xmime-server" address="http://localhost:${testutil.ports.MtomTest}/mtomXmime"
-		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTest">
+
+	<simple:server id="mtom-xmime-server"
+		address="http://localhost:${testutil.ports.MtomTest}/mtomXmime"
+		serviceClass="org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService">
 		<simple:dataBinding>
-			<bean
-				class="org.apache.cxf.aegis.databinding.AegisDatabinding">
+			<bean class="org.apache.cxf.aegis.databinding.AegisDatabinding">
 				<property name="mtomEnabled" value="true" />
-				<property name="mtomUseXmime" value="true"/>
+				<property name="mtomUseXmime" value="true" />
 			</bean>
 		</simple:dataBinding>
 		<simple:serviceBean>
 			<ref bean="mtomImpl" />
 		</simple:serviceBean>
 		<simple:serviceFactory>
-			<bean
-				class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
+			<bean class='org.apache.cxf.service.factory.ReflectionServiceFactoryBean'>
 				<property name="properties">
 					<map>
 						<entry key="mtom-enabled">

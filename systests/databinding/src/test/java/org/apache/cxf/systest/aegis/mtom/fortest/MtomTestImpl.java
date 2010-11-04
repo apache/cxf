@@ -21,17 +21,18 @@ package org.apache.cxf.systest.aegis.mtom.fortest;
 
 import javax.activation.DataHandler;
 import javax.jws.WebService;
+import javax.xml.ws.soap.MTOM;
 
 /**
- * 
+ *
  */
 @WebService
-@javax.xml.ws.soap.MTOM
-public class MtomTestImpl implements MtomTest {
-    
+@MTOM
+public class MtomTestImpl implements MtomTestService {
+
     public static final String STRING_DATA = "What rough beast, its hour come at last,"
         + " slouches toward Bethlehem to be born?";
-            
+
     private DataHandlerBean lastDhBean;
 
     /** {@inheritDoc}*/
@@ -46,7 +47,7 @@ public class MtomTestImpl implements MtomTest {
     public DataHandlerBean produceDataHandlerBean() {
         DataHandlerBean dhBean = new DataHandlerBean();
         dhBean.setName("legion");
-        // since we know that the code has no lower threshold for using attachments, 
+        // since we know that the code has no lower threshold for using attachments,
         // we can just return a fairly short string.
         dhBean.setDataHandler(new DataHandler(STRING_DATA, "text/plain;charset=utf-8"));
         return dhBean;
