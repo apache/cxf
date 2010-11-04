@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.aegis.type.mtom;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,6 +31,9 @@ import org.apache.cxf.attachment.AttachmentImpl;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.message.Attachment;
 
+/**
+ * Binding for {@link javax.activation.DataSource}.
+ */
 public class DataSourceType extends AbstractXOPType {
     public DataSourceType(boolean useXmimeBinaryType, String expectedContentTypes) {
         super(useXmimeBinaryType, expectedContentTypes);
@@ -57,7 +61,7 @@ public class DataSourceType extends AbstractXOPType {
 
     @Override
     protected Object wrapBytes(byte[] bareBytes, String contentType) {
-        return new DataHandler(bareBytes, contentType).getDataSource();
+        return new StreamDataSource(contentType, new ByteArrayInputStream(bareBytes));
     }
 
     @Override
