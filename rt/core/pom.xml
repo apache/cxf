@@ -62,8 +62,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.ws.commons.schema</groupId>
-            <artifactId>XmlSchema</artifactId>
+	  <groupId>org.apache.ws.xmlschema</groupId>
+	  <artifactId>xmlschema-core</artifactId>
         </dependency>
 
         <dependency>

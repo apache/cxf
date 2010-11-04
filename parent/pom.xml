@@ -570,8 +570,8 @@
                 </exclusions>
             </dependency>
             <dependency>
-                <groupId>org.apache.ws.commons.schema</groupId>
-                <artifactId>XmlSchema</artifactId>
+                <groupId>org.apache.ws.xmlschema</groupId>
+                <artifactId>xmlschema-core</artifactId>
                 <version>${cxf.xmlschema.version}</version>
                 <exclusions>
                     <!-- on IBM jdk, XmlSchema pulls these in -->
