@@ -77,14 +77,22 @@ After installing Apache Ant, add the <AntInstallDir>/bin directory to your PATH.
 
 For more details, see the Installation Guide.
 
+3.  Integrating CXF Into You Application
 
-3. Building the Samples
+If you use Maven to build your application, you need merely add
+appropriate dependencies. See the pom.xml files in the samples.
+
+If you don't use Maven, you'll need to add one or more jars to your
+classpath. The file lib/WHICH_JARS should help you decide which 
+jars you need.
+
+4. Building the Samples
 
 Building the samples included in the binary distribution is easy. Change to
 the samples directory and follow the build instructions in the README.txt file 
 included with each sample.
 
-4. Reporting Problems
+5. Reporting Problems
 
 If you have any problems or want to send feedback of any kind, please e-mail the
 CXF dev list, dev@cxf.apache.org.  You can also file issues in JIRA at:
@@ -92,7 +100,7 @@ CXF dev list, dev@cxf.apache.org.  You can also file issues in JIRA at:
 http://issues.apache.org/jira/browse/CXF
 
 
-5. Migration notes:
+6. Migration notes:
 
 See the migration guide at:
 http://cxf.apache.org/docs/23-migration-guide.html

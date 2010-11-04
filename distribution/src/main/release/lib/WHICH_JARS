@@ -3,6 +3,9 @@ dependencies, and many optional dependencies. The "modules" directory
 contains the cxf.jar split up into smaller pieces if you wish to use only
 specific parts of CXF.
 
+The 'manifest jar' is a jar containing only a MANIFEST.MF with a classpath
+that calls in all the other jar.
+
 Jars marked with a [6] at the end are optional for Java 6 (update 4 or 
 later is supported) as the functionality provided by those jars are 
 provided in the JDK.
