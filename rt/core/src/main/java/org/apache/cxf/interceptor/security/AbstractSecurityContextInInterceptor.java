@@ -19,6 +19,7 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
+import java.security.acl.Group;
 import java.util.logging.Logger;
 
 import javax.security.auth.Subject;
@@ -62,8 +63,18 @@ public abstract class AbstractSecurityContextInInterceptor extends AbstractPhase
             reportSecurityException("Failed Authentication : Invalid Subject");
         }
         
-        SecurityContext sc = createSecurityContext(context.getUserPrincipal(), subject);
+        Principal principal = getPrincipal(context.getUserPrincipal(), subject);        
+        SecurityContext sc = createSecurityContext(principal, subject);
         message.put(SecurityContext.class, sc);
+    }
+    
+    protected Principal getPrincipal(Principal originalPrincipal, Subject subject) {
+        Principal[] ps = subject.getPrincipals().toArray(new Principal[]{});
+        if (ps != null && ps.length > 0 && !(ps[0] instanceof Group)) {
+            return ps[0];
+        } else {
+            return originalPrincipal;
+        }
     }
     
     protected SecurityContext createSecurityContext(Principal p, Subject subject) {
