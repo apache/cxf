@@ -18,18 +18,28 @@
  */
 package org.apache.cxf.systest.ws.wssec10.server;
 
+import java.security.Principal;
+
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.interceptor.security.AbstractUsernameTokenInInterceptor;
+import org.apache.cxf.security.SecurityContext;
 
 public class SimpleUsernameTokenInterceptor extends AbstractUsernameTokenInInterceptor {
     
     protected Subject createSubject(UsernameToken ut) {
         return createSubject(ut.getName(), ut.getPassword(), ut.isHashed(),
                              ut.getNonce(), ut.getCreatedTime());
+    }
+    
+    protected SecurityContext createSecurityContext(Principal p, Subject subject) {
+        if (p == null || p != subject.getPrincipals().toArray()[0]) {
+            throw new SecurityException();
+        }
+        return super.createSecurityContext(p, subject);
     }
     
     protected Subject createSubject(String name, 
