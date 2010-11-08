@@ -19,7 +19,6 @@
 
 package org.apache.cxf.systest.ws.addr_responses;
 
-import java.io.ByteArrayOutputStream;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
@@ -44,8 +43,8 @@ public class WSAResponsesClientServerTest extends AbstractWSATestBase {
 
     @Test
     public void testWSAResponses() throws Exception {
-        ByteArrayOutputStream bin = this.setupInLogging();
-        ByteArrayOutputStream bout = this.setupOutLogging();
+        this.setupInLogging();
+        this.setupOutLogging();
         URL wsdlURL = new URL("http://localhost:" + PORT + "/wsa/responses?wsdl");
         QName serviceQName = new QName("http://cxf.apache.org/systest/wsa/responses", "HelloService");
         HelloService service = new HelloService(wsdlURL, serviceQName);
