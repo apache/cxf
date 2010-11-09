@@ -66,7 +66,7 @@
         <cxf.servlet-api.group>org.apache.geronimo.specs</cxf.servlet-api.group>
         <cxf.servlet-api.artifact>geronimo-servlet_3.0_spec</cxf.servlet-api.artifact>
         <cxf.servlet-api.version>1.0</cxf.servlet-api.version>
-        <cxf.spring.version>3.0.4.RELEASE</cxf.spring.version>
+        <cxf.spring.version>3.0.5.RELEASE</cxf.spring.version>
         <cxf.spring.mock>spring-test</cxf.spring.mock>
         <cxf.stax.impl.groupId>org.codehaus.woodstox</cxf.stax.impl.groupId>
         <cxf.stax.impl.artifactId>woodstox-core-asl</cxf.stax.impl.artifactId>
