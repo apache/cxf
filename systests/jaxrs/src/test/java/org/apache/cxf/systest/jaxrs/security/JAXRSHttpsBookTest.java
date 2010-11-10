@@ -58,20 +58,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testGetBook123ProxyWithURLConduitId() throws Exception {
-        
-        BookStore bs = JAXRSClientFactory.create("https://localhost:" + PORT, BookStore.class, 
-                                                 CLIENT_CONFIG_FILE2);
-        // just to verify the interface call goes through CGLIB proxy too
-        assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
-        Book b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
-        b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
-    }
-    
-    
-    @Test
     public void testGetBook123ProxyToWebClient() throws Exception {
         
         BookStore bs = JAXRSClientFactory.create("https://localhost:" + PORT, BookStore.class, 
