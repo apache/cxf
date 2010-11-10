@@ -112,18 +112,6 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
         
-    }
-    
-    @Test
-    public void testGetBook123WebClientWithURLConduitId() throws Exception {
-        
-        WebClient client = WebClient.create("https://localhost:" + PORT, CLIENT_CONFIG_FILE2);
-        assertEquals("https://localhost:" + PORT, client.getBaseURI().toString());
-        
-        client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
-        Book b = client.get(Book.class);
-        assertEquals(123, b.getId());
-        
-    }
+    }  
     
 }
