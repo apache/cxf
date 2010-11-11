@@ -86,7 +86,7 @@ public final class AnnotationUtils {
             classes.add(HttpServletResponse.class);
             classes.add(ServletConfig.class);
             classes.add(ServletContext.class);
-        } catch (Exception ex) {
+        } catch (Throwable ex) {
             // it is not a problem on the client side and the exception will be
             // thrown later on if the injection of one of these contexts will be 
             // attempted on the server side
