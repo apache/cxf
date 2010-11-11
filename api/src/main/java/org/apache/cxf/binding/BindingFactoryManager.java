@@ -25,7 +25,7 @@ import org.apache.cxf.BusException;
  * The manager interface represents a repository for accessing 
  * <code>BindingFactory</code>s.
  *
- * Provides methods necessary for registering, deregistering or retrieving of
+ * Provides methods necessary for registering, unregistering or retrieving of
  * BindingFactorys.
  */
 public interface BindingFactoryManager {

@@ -28,7 +28,7 @@ import java.lang.annotation.Target;
 
 
 /**
- * Used to attache multiple WSDLDocumentation annotations 
+ * Used to attach multiple WSDLDocumentation annotations 
  * to a method or type if documentation needs to be added
  * to more than one place in the wsdl. 
  */
