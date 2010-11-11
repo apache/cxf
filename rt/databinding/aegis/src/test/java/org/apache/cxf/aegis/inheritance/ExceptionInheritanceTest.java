@@ -41,10 +41,10 @@ import org.junit.Test;
 public class ExceptionInheritanceTest extends AbstractAegisTest {
     private WS1 client;
     private Map<String, Object> props;
-    
+
     public void setUp() throws Exception {
         super.setUp();
-        
+
         AegisContext globalContext = new AegisContext();
         globalContext.setWriteXsiTypes(true);
 
@@ -57,12 +57,11 @@ public class ExceptionInheritanceTest extends AbstractAegisTest {
 
         ClientProxyFactoryBean pf = new ClientProxyFactoryBean();
         setupAegis(pf.getClientFactoryBean(), binding);
-        pf.setServiceClass(WS1.class);
         pf.getServiceFactory().setProperties(props);
         pf.setAddress("local://WS1");
         pf.setProperties(props);
-        
-        client = (WS1) pf.create();
+
+        client = pf.create(WS1.class);
 
         Server server = createService(WS1.class, new WS1Impl(), "WS1", binding);
         new LoggingFeature().initialize(server, null);
@@ -70,20 +69,20 @@ public class ExceptionInheritanceTest extends AbstractAegisTest {
     }
 
     @Override
-    protected ServerFactoryBean createServiceFactory(Class serviceClass, 
-                                                     Object serviceBean, 
-                                                     String address, 
+    protected ServerFactoryBean createServiceFactory(Class serviceClass,
+                                                     Object serviceBean,
+                                                     String address,
                                                      QName name,
                                                      AegisDatabinding b) {
-        ServerFactoryBean sf = super.createServiceFactory(serviceClass, 
-                                                          serviceBean, 
-                                                          address, 
+        ServerFactoryBean sf = super.createServiceFactory(serviceClass,
+                                                          serviceBean,
+                                                          address,
                                                           name,
                                                           b);
         sf.getServiceFactory().setProperties(props);
         return sf;
     }
-    
+
 
     @Test
     public void testClient() throws Exception {

@@ -45,12 +45,11 @@ public class ExceptionTest extends AbstractAegisTest {
     public void testHeaders() throws Exception {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setAddress("local://ExceptionService");
-        proxyFac.setServiceClass(ExceptionService.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
-        
-        ExceptionService client = (ExceptionService)proxyFac.create();
-        
+
+        ExceptionService client = proxyFac.create(ExceptionService.class);
+
         try {
             client.sayHiWithException();
             fail("Must throw exception!");
@@ -65,7 +64,7 @@ public class ExceptionTest extends AbstractAegisTest {
                     + "[@element='tns:String']",
                      wsdl);
     }
-    
+
     @Test(expected = HelloException.class)
     @Ignore("Not working yet due to namespace things")
     public void testJaxwsServerSimpleClient() throws Exception {
@@ -76,18 +75,17 @@ public class ExceptionTest extends AbstractAegisTest {
         Server server = sfbean.create();
         Service service = server.getEndpoint().getService();
         service.setInvoker(new BeanInvoker(new ExceptionServiceImpl()));
-        
+
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setAddress("local://ExceptionServiceJaxWs1");
-        proxyFac.setServiceClass(ExceptionService.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
-        
-        ExceptionService clientInterface = (ExceptionService)proxyFac.create();
-        
+
+        ExceptionService clientInterface = proxyFac.create(ExceptionService.class);
+
         clientInterface.sayHiWithException();
     }
-    
+
     @Test(expected = HelloException.class)
     public void testJaxwsNoXfireCompat() throws Exception {
         JaxWsServerFactoryBean sfbean = new JaxWsServerFactoryBean();
@@ -98,17 +96,17 @@ public class ExceptionTest extends AbstractAegisTest {
         Server server = sfbean.create();
         Service service = server.getEndpoint().getService();
         service.setInvoker(new BeanInvoker(new ExceptionServiceImpl()));
-        
+
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://ExceptionServiceJaxWs");
         proxyFac.setServiceClass(ExceptionService.class);
         proxyFac.setBus(getBus());
         proxyFac.getClientFactoryBean().getServiceFactory().setDataBinding(new AegisDatabinding());
         ExceptionService clientInterface = (ExceptionService)proxyFac.create();
-        
+
         clientInterface.sayHiWithException();
     }
-    
+
     @Test(expected = HelloException.class)
     public void testJaxws() throws Exception {
         JaxWsServerFactoryBean sfbean = new JaxWsServerFactoryBean();
@@ -118,17 +116,16 @@ public class ExceptionTest extends AbstractAegisTest {
         Server server = sfbean.create();
         Service service = server.getEndpoint().getService();
         service.setInvoker(new BeanInvoker(new ExceptionServiceImpl()));
-        
+
         JaxWsProxyFactoryBean proxyFac = new JaxWsProxyFactoryBean();
         proxyFac.setAddress("local://ExceptionService4");
-        proxyFac.setServiceClass(ExceptionService.class);
         proxyFac.setBus(getBus());
         setupAegis(proxyFac.getClientFactoryBean());
-        ExceptionService clientInterface = (ExceptionService)proxyFac.create();
-        
+        ExceptionService clientInterface = proxyFac.create(ExceptionService.class);
+
         clientInterface.sayHiWithException();
     }
-    
+
     public static class ExceptionServiceImpl implements ExceptionService {
 
         public String sayHiWithException() throws HelloException {
@@ -136,6 +133,6 @@ public class ExceptionTest extends AbstractAegisTest {
             ex.setFaultInfo("test");
             throw ex;
         }
-        
+
     }
 }

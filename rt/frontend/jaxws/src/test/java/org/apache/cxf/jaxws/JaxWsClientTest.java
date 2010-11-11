@@ -54,12 +54,12 @@ import org.junit.Test;
 public class JaxWsClientTest extends AbstractJaxWsTest {
 
     private final QName serviceName = new QName("http://apache.org/hello_world_soap_http",
-                    "SOAPService");    
+                    "SOAPService");
     private final QName portName = new QName("http://apache.org/hello_world_soap_http",
                     "SoapPort");
     private final String address = "http://localhost:9000/SoapContext/SoapPort";
     private Destination d;
-    
+
     @Before
     public void setUp() throws Exception {
         super.setUpBus();
@@ -75,7 +75,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         javax.xml.ws.Service s = javax.xml.ws.Service
             .create(new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
         assertNotNull(s);
-        
+
         try {
             s = javax.xml.ws.Service.create(new URL("file:/does/not/exist.wsdl"),
                                             new QName("http://apache.org/hello_world_soap_http", "SoapPort"));
@@ -84,7 +84,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             // ignore, this is expected
         }
     }
-    
+
     @Test
     public void testRequestContext() throws Exception {
         URL url = getClass().getResource("/wsdl/hello_world.wsdl");
@@ -93,12 +93,12 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         Greeter greeter = s.getPort(portName, Greeter.class);
         InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
         BindingProvider  bp = null;
-        
+
         if (handler instanceof BindingProvider) {
             bp = (BindingProvider)handler;
             //System.out.println(bp.toString());
             Map<String, Object> requestContext = bp.getRequestContext();
-            String reqAddr = 
+            String reqAddr =
                 (String)requestContext.get(BindingProvider.ENDPOINT_ADDRESS_PROPERTY);
             assertEquals("the address get from requestContext is not equal",
                          address, reqAddr);
@@ -114,17 +114,17 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             .create(url, serviceName);
         Greeter greeter = s.getPort(portName, Greeter.class);
         final InvocationHandler handler  = Proxy.getInvocationHandler(greeter);
-                
+
         Map<String, Object> requestContext = ((BindingProvider)handler).getRequestContext();
         requestContext.put(JaxWsClientProxy.THREAD_LOCAL_REQUEST_CONTEXT, Boolean.TRUE);
-        
+
         //re-get the context so it's not a thread safe variant
         requestContext = ((BindingProvider)handler).getRequestContext();
-        
+
         final String key = "Hi";
-    
+
         requestContext.put(key, "ho");
-        
+
         final Object[] result = new Object[2];
         Thread t = new Thread() {
             public void run() {
@@ -136,11 +136,11 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         };
         t.start();
         t.join();
-        
+
         assertEquals("thread sees the put", "ho", result[0]);
         assertNull("thread did not remove the put", result[1]);
-        
-        assertEquals("main thread does not see removal", 
+
+        assertEquals("main thread does not see removal",
                      "ho", requestContext.get(key));
     }
 
@@ -171,7 +171,7 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
         MessagePartInfo part = bop.getOutput().getMessageParts().get(0);
         assertEquals(0, part.getIndex());
-        
+
         d.setMessageObserver(new MessageReplayObserver("sayHiResponse.xml"));
         Object ret[] = client.invoke(bop, new Object[] {"hi"}, null);
         assertNotNull(ret);
@@ -196,13 +196,13 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
             fail("Should have returned a fault!");
         } catch (Fault fault) {
             assertEquals(true, fault.getMessage().indexOf("Foo") >= 0);
-        }         
-        
+        }
+
     }
 
-    
+
     public static class NestedFaultThrower extends AbstractPhaseInterceptor<Message> {
-        
+
         public NestedFaultThrower() {
             super(Phase.PRE_LOGICAL);
             addBefore(FaultThrower.class.getName());
@@ -219,13 +219,13 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
 
     @Test
     public void testClientProxyFactory() {
-        JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean(); 
+        JaxWsProxyFactoryBean cf = new JaxWsProxyFactoryBean();
         cf.setAddress("http://localhost:9000/test");
-        cf.setServiceClass(Greeter.class);
-        Greeter greeter = (Greeter) cf.create();
+        Greeter greeter = cf.create(Greeter.class);
+        /*  .n.b. don't call call create with an argument and change the SEI. */
         Greeter greeter2 = (Greeter) cf.create();
         Greeter greeter3 = (Greeter) cf.create();
-        
+
         Client c = ClientProxy.getClient(greeter);
         Client c2 = ClientProxy.getClient(greeter2);
         Client c3 = ClientProxy.getClient(greeter3);
@@ -235,19 +235,19 @@ public class JaxWsClientTest extends AbstractJaxWsTest {
         assertNotSame(c.getEndpoint(), c2.getEndpoint());
         assertNotSame(c.getEndpoint(), c3.getEndpoint());
         assertNotSame(c3.getEndpoint(), c2.getEndpoint());
-        
-        ((BindingProvider)greeter).getRequestContext().put("test", "manny"); 
-        ((BindingProvider)greeter2).getRequestContext().put("test", "moe"); 
+
+        ((BindingProvider)greeter).getRequestContext().put("test", "manny");
+        ((BindingProvider)greeter2).getRequestContext().put("test", "moe");
         ((BindingProvider)greeter3).getRequestContext().put("test", "jack");
-        
+
         assertEquals("manny", ((BindingProvider)greeter).getRequestContext().get("test"));
         assertEquals("moe", ((BindingProvider)greeter2).getRequestContext().get("test"));
         assertEquals("jack", ((BindingProvider)greeter3).getRequestContext().get("test"));
     }
-    
-    
+
+
     public static class FaultThrower extends AbstractPhaseInterceptor<Message> {
-        
+
         public FaultThrower() {
             super(Phase.PRE_LOGICAL);
         }

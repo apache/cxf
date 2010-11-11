@@ -37,10 +37,10 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * 
+ *
  */
 public class CollectionTestsWithService extends AbstractAegisTest {
-    
+
     private CollectionServiceInterface csi;
     private CollectionService impl;
 
@@ -48,18 +48,17 @@ public class CollectionTestsWithService extends AbstractAegisTest {
     public void before() {
         impl = new CollectionService();
         createService(CollectionServiceInterface.class, impl, null);
-        
+
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
-        proxyFac.getServiceFactory().getServiceConfigurations().add(0, 
+        proxyFac.getServiceFactory().getServiceConfigurations().add(0,
                                                               new XFireCompatibilityServiceConfiguration());
-        proxyFac.setServiceClass(CollectionServiceInterface.class);
         proxyFac.setDataBinding(new AegisDatabinding());
         proxyFac.setAddress("local://CollectionServiceInterface");
         proxyFac.setBus(getBus());
 
-        csi = (CollectionServiceInterface)proxyFac.create();
+        csi = proxyFac.create(CollectionServiceInterface.class);
     }
-    
+
     /**
      * CXF-2017
      * @throws Exception
@@ -75,15 +74,15 @@ public class CollectionTestsWithService extends AbstractAegisTest {
         innerMap.put("firstBean", bean);
         complexMap.put("firstKey", innerMap);
         csi.mapOfMapWithStringAndPojo(complexMap);
-        
+
         Map<String, Map<String, BeanWithGregorianDate>> gotMap = impl.getLastComplexMap();
         assertTrue(gotMap.containsKey("firstKey"));
         Map<String, BeanWithGregorianDate> v = gotMap.get("firstKey");
         BeanWithGregorianDate b = v.get("firstBean");
         assertNotNull(b);
-        
+
     }
-    
+
     @Test
     public void testListTypes() throws Exception {
         SortedSet<String> strings = new TreeSet<String>();
@@ -91,16 +90,16 @@ public class CollectionTestsWithService extends AbstractAegisTest {
         strings.add("Baker");
         String first = csi.takeSortedStrings(strings);
         assertEquals("Able", first);
-        
+
         //CHECKSTYLE:OFF
         HashSet<String> hashedSet = new HashSet<String>();
         hashedSet.addAll(strings);
         String countString = csi.takeUnsortedSet(hashedSet);
         assertEquals("2", countString);
         //CHECKSTYLE:ON
-        
+
     }
-    
+
     @Test
     public void returnValueIsCollectionOfArrays() {
         Collection<double[]> doubleDouble = csi.returnCollectionOfPrimitiveArrays();
@@ -123,7 +122,7 @@ public class CollectionTestsWithService extends AbstractAegisTest {
         assertEquals(3.14, data[1][1], .0001);
         assertEquals(2.0, data[1][2], .0001);
     }
-    
+
     @Test
     public void returnValueIsCollectionOfArraysOfAny() {
         Collection<Document[]> r = csi.returnCollectionOfDOMFragments();
