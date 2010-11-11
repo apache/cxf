@@ -36,8 +36,11 @@ import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.DataHandlerBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
+import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
 
@@ -54,8 +57,9 @@ import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 public class MtomTest extends AbstractJUnit4SpringContextTests {
     static final String PORT = TestUtil.getPortNumber(MtomTest.class);
 
-    private org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl impl;
-    private org.apache.cxf.systest.aegis.mtom.fortest.MtomTest client;
+    private MtomTestImpl impl;
+    private MtomTestService client;
+    private MtomTestService jaxwsClient;
     private TestUtilities testUtilities;
     
     public MtomTest() {
@@ -68,27 +72,43 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         ClientProxyFactoryBean proxyFac = new ClientProxyFactoryBean();
         proxyFac.setDataBinding(aegisBinding);
         proxyFac.setAddress("http://localhost:" + PORT + "/mtom");
-        proxyFac.setServiceClass(org.apache.cxf.systest.aegis.mtom.fortest.MtomTest.class);
+
+        JaxWsProxyFactoryBean jaxwsFac = new JaxWsProxyFactoryBean();
+        jaxwsFac.setDataBinding(new AegisDatabinding());
+        jaxwsFac.setAddress("http://localhost:" + PORT + "/jaxWsMtom");
+
         Map<String, Object> props = new HashMap<String, Object>();
         if (enableClientMTOM) {
             props.put("mtom-enabled", Boolean.TRUE);
         }
         proxyFac.setProperties(props);
 
-        client = (org.apache.cxf.systest.aegis.mtom.fortest.MtomTest)proxyFac.create();
+        client = (org.apache.cxf.systest.aegis.mtom.fortest.MtomTestService)
+            proxyFac.create(MtomTestService.class);
+        jaxwsClient = jaxwsFac.create(MtomTestService.class);
         impl = (MtomTestImpl)applicationContext.getBean("mtomImpl");
     }
-    
-    
-    @Test 
+
+    @Test
     public void testMtomReply() throws Exception {
         setupForTest(true);
         DataHandlerBean dhBean = client.produceDataHandlerBean();
         Assert.assertNotNull(dhBean);
-        Assert.assertEquals(MtomTestImpl.STRING_DATA, dhBean.getDataHandler().getContent());
+        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream(), "utf-8");
+        Assert.assertEquals(MtomTestImpl.STRING_DATA, result);
     }
 
-    @Test 
+    //TODO: how do we see if MTOM actually happened?
+    @Test
+    public void testJaxWsMtomReply() throws Exception {
+        setupForTest(true);
+        DataHandlerBean dhBean = jaxwsClient.produceDataHandlerBean();
+        Assert.assertNotNull(dhBean);
+        String result = IOUtils.toString(dhBean.getDataHandler().getInputStream(), "utf-8");
+        Assert.assertEquals(MtomTestImpl.STRING_DATA, result);
+    }
+
+    @Test
     public void testAcceptDataHandler() throws Exception {
         setupForTest(true);
         DataHandlerBean dhBean = new DataHandlerBean();
@@ -129,7 +149,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         testUtilities.addNamespace("xmime", "http://www.w3.org/2005/05/xmlmime");
         Server s = testUtilities.
             getServerForService(new QName("http://fortest.mtom.aegis.systest.cxf.apache.org/", 
-                                          "MtomTest"));
+                                          "MtomTestService"));
         Document wsdl = testUtilities.getWSDLDocument(s); 
         Assert.assertNotNull(wsdl);
         NodeList typeAttrList = 

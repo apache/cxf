@@ -54,7 +54,7 @@ public abstract class AbstractDataBinding implements DataBinding {
         BUILTIN_SCHEMA_LOCS.put("http://www.w3.org/2005/08/addressing",
                                 "http://www.w3.org/2006/03/addressing/ws-addr.xsd");
     }
-
+    protected boolean mtomEnabled;
     protected int mtomThreshold;
     private Bus bus;
     private Collection<DOMSource> schemas;
@@ -270,6 +270,14 @@ public abstract class AbstractDataBinding implements DataBinding {
                 prefixesSoFar.add(mapping.getValue());
             }
         }
+    }
+
+    public void setMtomEnabled(boolean enabled) {
+        mtomEnabled = enabled;
+    }
+
+    public boolean isMtomEnabled() {
+        return mtomEnabled;
     }
 
     public int getMtomThreshold() {

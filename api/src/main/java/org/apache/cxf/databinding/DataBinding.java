@@ -24,29 +24,32 @@ import java.util.Map;
 import org.apache.cxf.service.Service;
 
 public interface DataBinding {
-    
+
     <T> DataReader<T> createReader(Class<T> cls);
-    
+
     <T> DataWriter<T> createWriter(Class<T> cls);
-    
+
     Class<?>[] getSupportedReaderFormats();
-    
+
     Class<?>[] getSupportedWriterFormats();
-    
+
     /**
-     * Initialize the service info (i.e. type & element names, Schemas) with 
+     * Initialize the service info (i.e. type & element names, Schemas) with
      * information from the databinding.
      * @param service
      */
     void initialize(Service service);
-    
+
     /**
      * Return a set of mappings from namespace to prefix to allow bindings to control
      * the prefixes.
      * @return the map, or null if there are none.
      */
     Map<String, String> getDeclaredNamespaceMappings();
-    
+
+    void setMtomEnabled(boolean enabled);
+    boolean isMtomEnabled();
+
     /**
      * If the binding supports MTOM, set the size threshold for its use.
      * may be overridden by (e.g.) JAXWS configuration.

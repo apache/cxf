@@ -87,9 +87,9 @@ import org.apache.cxf.service.factory.ServiceConstructionException;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.ws.addressing.ObjectFactory;
 @NoJSR250Annotations
-public class JAXBDataBinding extends AbstractDataBinding 
+public class JAXBDataBinding extends AbstractDataBinding
     implements WrapperCapableDatabinding, InterceptorProvider {
-    
+
     public static final String SCHEMA_RESOURCE = "SCHEMRESOURCE";
     public static final String MTOM_THRESHOLD = "org.apache.cxf.jaxb.mtomThreshold";
 
@@ -128,13 +128,13 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
 
     }
-    
-    private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE 
+
+    private static final Map<Set<Class<?>>, CachedContextAndSchemas> JAXBCONTEXT_CACHE
         = new CacheMap<Set<Class<?>>, CachedContextAndSchemas>();
-    
+
     private static final Map<Package, CachedClass> OBJECT_FACTORY_CACHE
         = new CacheMap<Package, CachedClass>();
-    
+
     private static final Map<String, DOMResult> BUILT_IN_SCHEMAS = new HashMap<String, DOMResult>();
     static {
         URIResolver resolver = new URIResolver();
@@ -206,18 +206,18 @@ public class JAXBDataBinding extends AbstractDataBinding
     private Unmarshaller.Listener unmarshallerListener;
     private Marshaller.Listener marshallerListener;
     private ValidationEventHandler validationEventHandler;
-    
+
     private boolean unwrapJAXBElement = true;
 
     private boolean qualifiedSchemas;
-    
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> in 
+
+    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> in
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> out
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outFault 
+    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> outFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
-    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inFault 
+    private ModCountCopyOnWriteArrayList<Interceptor<? extends Message>> inFault
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
 
     public JAXBDataBinding() {
@@ -251,7 +251,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         Integer mtomThresholdInt = new Integer(getMtomThreshold());
         if (c == XMLStreamWriter.class) {
-            DataWriterImpl<XMLStreamWriter> r 
+            DataWriterImpl<XMLStreamWriter> r
                 = new DataWriterImpl<XMLStreamWriter>(this);
             r.setMtomThreshold(mtomThresholdInt);
             return (DataWriter<T>)r;
@@ -295,10 +295,10 @@ public class JAXBDataBinding extends AbstractDataBinding
 
     @SuppressWarnings("unchecked")
     public synchronized void initialize(Service service) {
-        
+
         in.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
         inFault.addIfAbsent(JAXBAttachmentSchemaValidationHack.INSTANCE);
-        
+
         // context is already set, don't redo it
         if (context != null) {
             return;
@@ -307,7 +307,7 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         contextClasses = new LinkedHashSet<Class<?>>();
         for (ServiceInfo serviceInfo : service.getServiceInfos()) {
-            JAXBContextInitializer initializer 
+            JAXBContextInitializer initializer
                 = new JAXBContextInitializer(serviceInfo, contextClasses, typeRefs);
             initializer.walk();
             if (serviceInfo.getProperty("extra.class") != null) {
@@ -342,7 +342,7 @@ public class JAXBDataBinding extends AbstractDataBinding
             } else {
                 synchronized (JAXBCONTEXT_CACHE) {
                     JAXBCONTEXT_CACHE.put(contextClasses, cachedContextAndSchemas);
-                } 
+                }
             }
         }
         ctx = cachedContextAndSchemas.getContext();
@@ -378,10 +378,10 @@ public class JAXBDataBinding extends AbstractDataBinding
                         if (BUILT_IN_SCHEMAS.containsValue(r)) {
                             bi.add(src);
                         } else {
-                            schemas.add(src);                            
+                            schemas.add(src);
                         }
                     }
-                    //put any builtins at the end.   Anything that DOES import them 
+                    //put any builtins at the end.   Anything that DOES import them
                     //will cause it to load automatically and we'll skip them later
                     schemas.addAll(bi);
                 } catch (IOException e) {
@@ -395,8 +395,8 @@ public class JAXBDataBinding extends AbstractDataBinding
                         continue;
                     }
                 }
-                addSchemaDocument(serviceInfo, 
-                                  col, 
+                addSchemaDocument(serviceInfo,
+                                  col,
                                  (Document)r.getNode(),
                                   r.getSystemId());
             }
@@ -422,10 +422,10 @@ public class JAXBDataBinding extends AbstractDataBinding
             }
         }
     }
-    
+
     private String getNamespaceToUse(Service service) {
         if ("true".equals(service.get("org.apache.cxf.databinding.namespace"))) {
-            return null;    
+            return null;
         }
         String tns = null;
         if (service.getServiceInfos().size() > 0) {
@@ -435,7 +435,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
         return tns;
     }
-    
+
     public void setExtraClass(Class[] userExtraClass) {
         extraClass = userExtraClass;
     }
@@ -456,11 +456,11 @@ public class JAXBDataBinding extends AbstractDataBinding
     public JAXBContext createJAXBContext(Set<Class<?>> classes, String defaultNs) throws JAXBException {
         return createJAXBContextAndSchemas(classes, defaultNs).getContext();
     }
-    
+
     public CachedContextAndSchemas createJAXBContextAndSchemas(Set<Class<?>> classes,
-                                                               String defaultNs) 
+                                                               String defaultNs)
         throws JAXBException {
-        
+
         // add user extra class into jaxb context
         if (extraClass != null && extraClass.length > 0) {
             for (Class clz : extraClass) {
@@ -512,8 +512,8 @@ public class JAXBDataBinding extends AbstractDataBinding
 
         return cachedContextAndSchemas;
     }
-    
-    private JAXBContext createContext(Set<Class<?>> classes, 
+
+    private JAXBContext createContext(Set<Class<?>> classes,
                                       Map<String, Object> map)
         throws JAXBException {
         JAXBContext ctx;
@@ -537,22 +537,22 @@ public class JAXBDataBinding extends AbstractDataBinding
                     if ("createContext".equals(m.getName())
                         && m.getParameterTypes().length == 9) {
                         try {
-                            return (JAXBContext)m.invoke(null, 
+                            return (JAXBContext)m.invoke(null,
                                      classes.toArray(new Class[classes.size()]),
                                      typeRefs,
                                      map.get(pfx + "subclassReplacements"),
                                      map.get(pfx + "defaultNamespaceRemap"),
                                      map.get(pfx + "c14n") == null
-                                         ? Boolean.FALSE 
+                                         ? Boolean.FALSE
                                              : map.get(pfx + "c14n"),
                                      map.get(pfx + "v2.model.annotation.RuntimeAnnotationReader"),
-                                     map.get(pfx + "XmlAccessorFactory") == null 
-                                         ? Boolean.FALSE 
+                                     map.get(pfx + "XmlAccessorFactory") == null
+                                         ? Boolean.FALSE
                                              : map.get(pfx + "XmlAccessorFactory"),
                                      map.get(pfx + "treatEverythingNillable") == null
                                          ? Boolean.FALSE : map.get(pfx + "treatEverythingNillable"),
-                                     map.get("retainReferenceToInfo") == null 
-                                         ? Boolean.FALSE : map.get("retainReferenceToInfo")); 
+                                     map.get("retainReferenceToInfo") == null
+                                         ? Boolean.FALSE : map.get("retainReferenceToInfo"));
                         } catch (Throwable e) {
                             //ignore
                         }
@@ -574,11 +574,11 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
         return ctx;
     }
-    
+
     private boolean checkObjectFactoryNamespaces(Class<?> clz) {
         for (Method meth : clz.getMethods()) {
             XmlElementDecl decl = meth.getAnnotation(XmlElementDecl.class);
-            if (decl != null 
+            if (decl != null
                 && XmlElementDecl.GLOBAL.class.equals(decl.scope())
                 && StringUtils.isEmpty(decl.namespace())) {
                 return true;
@@ -602,11 +602,11 @@ public class JAXBDataBinding extends AbstractDataBinding
             }
         }
     }
-    
+
     public Set<Class<?>> getContextClasses() {
         return Collections.unmodifiableSet(this.contextClasses);
     }
-    
+
     // Now we can not add all the classes that Jaxb needed into JaxbContext,
     // especially when
     // an ObjectFactory is pointed to by an jaxb @XmlElementDecl annotation
@@ -640,7 +640,7 @@ public class JAXBDataBinding extends AbstractDataBinding
     /**
      * Return a map of properties. These properties are passed to
      * JAXBContext.newInstance when this object creates a context.
-     * 
+     *
      * @return the map of JAXB context properties.
      */
     public Map<String, Object> getContextProperties() {
@@ -652,7 +652,7 @@ public class JAXBDataBinding extends AbstractDataBinding
      * JAXBContext.newInstance when this object creates a context. Note that if
      * you create a JAXB context elsewhere, you will not respect these
      * properties unless you handle it manually.
-     * 
+     *
      * @param contextProperties map of properties.
      */
     public void setContextProperties(Map<String, Object> contextProperties) {
@@ -663,7 +663,7 @@ public class JAXBDataBinding extends AbstractDataBinding
      * Return a map of properties. These properties are set into the JAXB
      * Marshaller (via Marshaller.setProperty(...) when the marshaller is
      * created.
-     * 
+     *
      * @return the map of JAXB marshaller properties.
      */
     public Map<String, Object> getMarshallerProperties() {
@@ -674,19 +674,19 @@ public class JAXBDataBinding extends AbstractDataBinding
      * Set a map of JAXB marshaller properties. These properties are set into
      * the JAXB Marshaller (via Marshaller.setProperty(...) when the marshaller
      * is created.
-     * 
+     *
      * @param marshallerProperties map of properties.
      */
     public void setMarshallerProperties(Map<String, Object> marshallerProperties) {
         this.marshallerProperties = marshallerProperties;
     }
-    
-    
+
+
     /**
      * Return a map of properties. These properties are set into the JAXB
      * Unmarshaller (via Unmarshaller.setProperty(...) when the unmarshaller is
      * created.
-     * 
+     *
      * @return the map of JAXB unmarshaller properties.
      */
     public Map<String, Object> getUnmarshallerProperties() {
@@ -697,13 +697,13 @@ public class JAXBDataBinding extends AbstractDataBinding
      * Set a map of JAXB unmarshaller properties. These properties are set into
      * the JAXB Unmarshaller (via Unmarshaller.setProperty(...) when the unmarshaller
      * is created.
-     * 
+     *
      * @param unmarshallerProperties map of properties.
      */
     public void setUnmarshallerProperties(Map<String, Object> unmarshallerProperties) {
         this.unmarshallerProperties = unmarshallerProperties;
     }
-    
+
     /**
      * Returns the Unmarshaller.Listener that will be registered on the Unmarshallers
      * @return
@@ -734,8 +734,8 @@ public class JAXBDataBinding extends AbstractDataBinding
     public void setMarshallerListener(Marshaller.Listener marshallerListener) {
         this.marshallerListener = marshallerListener;
     }
-    
-    
+
+
     public ValidationEventHandler getValidationEventHandler() {
         return validationEventHandler;
     }
@@ -744,7 +744,7 @@ public class JAXBDataBinding extends AbstractDataBinding
         this.validationEventHandler = validationEventHandler;
     }
 
-    
+
     public boolean isUnwrapJAXBElement() {
         return unwrapJAXBElement;
     }
@@ -768,15 +768,15 @@ public class JAXBDataBinding extends AbstractDataBinding
         List<Method> setMethods = new ArrayList<Method>(partNames.size());
         List<Method> jaxbMethods = new ArrayList<Method>(partNames.size());
         List<Field> fields = new ArrayList<Field>(partNames.size());
-        
+
         Method allMethods[] = wrapperType.getMethods();
         String packageName = PackageUtils.getPackageName(wrapperType);
-        
+
         //if wrappertype class is generated by ASM,getPackage() always return null
         if (wrapperType.getPackage() != null) {
             packageName = wrapperType.getPackage().getName();
         }
-        
+
         String objectFactoryClassName = packageName + ".ObjectFactory";
 
         Object objectFactory = null;
@@ -787,13 +787,13 @@ public class JAXBDataBinding extends AbstractDataBinding
         }
         Method allOFMethods[];
         if (objectFactory != null) {
-            allOFMethods = objectFactory.getClass().getMethods(); 
+            allOFMethods = objectFactory.getClass().getMethods();
         } else {
             allOFMethods = new Method[0];
         }
-        
+
         for (int x = 0; x < partNames.size(); x++) {
-            String partName = partNames.get(x);            
+            String partName = partNames.get(x);
             if (partName == null) {
                 getMethods.add(null);
                 setMethods.add(null);
@@ -801,21 +801,21 @@ public class JAXBDataBinding extends AbstractDataBinding
                 jaxbMethods.add(null);
                 continue;
             }
-            
+
             String elementType = elTypeNames.get(x);
-            
+
             String getAccessor = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.GETTER);
             String setAccessor = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.SETTER);
             Method getMethod = null;
             Method setMethod = null;
             Class<?> valueClass = wrapperType;
-            
-            try {               
-                getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES); 
+
+            try {
+                getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);
             } catch (NoSuchMethodException ex) {
                 //ignore for now
             }
-            
+
             Field elField = getElField(partName, valueClass);
             if (getMethod == null
                 && elementType != null
@@ -823,15 +823,15 @@ public class JAXBDataBinding extends AbstractDataBinding
                 && (elField == null
                     || (!Collection.class.isAssignableFrom(elField.getType())
                     && !elField.getType().isArray()))) {
-        
+
                 try {
                     String newAcc = getAccessor.replaceFirst("get", "is");
-                    getMethod = wrapperType.getMethod(newAcc, AbstractWrapperHelper.NO_CLASSES); 
+                    getMethod = wrapperType.getMethod(newAcc, AbstractWrapperHelper.NO_CLASSES);
                 } catch (NoSuchMethodException ex) {
                     //ignore for now
-                }            
-            }                        
-            if (getMethod == null 
+                }
+            }
+            if (getMethod == null
                 && "return".equals(partName)) {
                 //RI generated code uses this
                 try {
@@ -842,14 +842,14 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                           new Class[0]);
                     } catch (NoSuchMethodException ex2) {
                         //ignore for now
-                    } 
-                }                
+                    }
+                }
             }
             if (getMethod == null && elField != null) {
                 getAccessor = JAXBUtils.nameToIdentifier(elField.getName(), JAXBUtils.IdentifierType.GETTER);
                 setAccessor = JAXBUtils.nameToIdentifier(elField.getName(), JAXBUtils.IdentifierType.SETTER);
-                try {               
-                    getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES); 
+                try {
+                    getMethod = valueClass.getMethod(getAccessor, AbstractWrapperHelper.NO_CLASSES);
                 } catch (NoSuchMethodException ex) {
                     //ignore for now
                 }
@@ -868,12 +868,12 @@ public class JAXBDataBinding extends AbstractDataBinding
                     break;
                 }
             }
-            
+
             getMethods.add(getMethod);
             setMethods.add(setMethod);
             if (setMethod != null
                 && JAXBElement.class.isAssignableFrom(setMethod.getParameterTypes()[0])) {
-                
+
                 Type t = setMethod.getGenericParameterTypes()[0];
                 Class<?> pcls = null;
                 if (t instanceof ParameterizedType) {
@@ -882,7 +882,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                 if (t instanceof Class) {
                     pcls = (Class)t;
                 }
-                
+
                 String methodName = "create" + wrapperType.getSimpleName()
                     + setMethod.getName().substring(3);
 
@@ -897,7 +897,7 @@ public class JAXBDataBinding extends AbstractDataBinding
             } else {
                 jaxbMethods.add(null);
             }
-            
+
             if (elField != null) {
                 // JAXB Type get XmlElement Annotation
                 XmlElement el = elField.getAnnotation(XmlElement.class);
@@ -909,22 +909,22 @@ public class JAXBDataBinding extends AbstractDataBinding
                 } else {
                     if (getMethod == null && setMethod == null) {
                         if (el != null) {
-                            LOG.warning("Could not create accessor for property " + partName 
+                            LOG.warning("Could not create accessor for property " + partName
                                         + " of type " + wrapperType.getName() + " as the @XmlElement "
                                         + "defines the name as " + el.name());
                         } else {
-                            LOG.warning("Could not create accessor for property " + partName 
+                            LOG.warning("Could not create accessor for property " + partName
                                         + " of type " + wrapperType.getName());
                         }
                     }
                     fields.add(null);
-                } 
+                }
             } else {
                 fields.add(null);
             }
-            
+
         }
-        
+
         return createWrapperHelper(wrapperType,
                                  setMethods.toArray(new Method[setMethods.size()]),
                                  getMethods.toArray(new Method[getMethods.size()]),
@@ -932,7 +932,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                                  fields.toArray(new Field[fields.size()]),
                                  objectFactory);
     }
-    
+
     private static Field getElField(String partName, Class<?> wrapperType) {
         String fieldName = JAXBUtils.nameToIdentifier(partName, JAXBUtils.IdentifierType.VARIABLE);
         for (Field field : wrapperType.getDeclaredFields()) {
@@ -944,11 +944,11 @@ public class JAXBDataBinding extends AbstractDataBinding
             if (field.getName().equals(fieldName)) {
                 return field;
             }
-        }        
+        }
         return null;
     }
 
-    
+
     private static WrapperHelper createWrapperHelper(Class<?> wrapperType, Method setMethods[],
                                                      Method getMethods[], Method jaxbMethods[],
                                                      Field fields[], Object objectFactory) {
@@ -974,8 +974,8 @@ public class JAXBDataBinding extends AbstractDataBinding
             // ASM not found, just use reflection based stuff
         }
         return null;
-    }   
-    
+    }
+
     public List<Interceptor<? extends Message>> getOutFaultInterceptors() {
         return outFault;
     }
