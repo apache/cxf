@@ -47,10 +47,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -63,6 +59,7 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Providers;
 
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.PrimitiveUtils;
@@ -75,8 +72,6 @@ import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.impl.PathSegmentImpl;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalContextResolver;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpHeaders;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalMessageContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProtocolHeaders;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProviders;
@@ -84,8 +79,6 @@ import org.apache.cxf.jaxrs.impl.tl.ThreadLocalProxy;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalRequest;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSearchContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalSecurityContext;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig;
-import org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext;
 import org.apache.cxf.jaxrs.impl.tl.ThreadLocalUriInfo;
 import org.apache.cxf.jaxrs.model.AbstractResourceInfo;
 import org.apache.cxf.jaxrs.model.Parameter;
@@ -97,7 +90,12 @@ public final class InjectionUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(InjectionUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(InjectionUtils.class);
-    
+
+    private static final String SERVLET_CONFIG_CLASS_NAME = "javax.servlet.ServletConfig";
+    private static final String SERVLET_CONTEXT_CLASS_NAME = "javax.servlet.ServletContext";
+    private static final String HTTP_SERVLET_REQUEST_CLASS_NAME = "javax.servlet.http.HttpServletRequest";
+    private static final String HTTP_SERVLET_RESPONSE_CLASS_NAME = "javax.servlet.http.HttpServletResponse";
+        
     private InjectionUtils() {
         
     }
@@ -736,7 +734,7 @@ public final class InjectionUtils {
         }
         
         if (proxy == null && isServletApiContext(type.getName())) {
-            proxy = createThreadLocalServletApiContext(type);  
+            proxy = createThreadLocalServletApiContext(type.getName());  
         }
         
         return proxy;
@@ -746,18 +744,23 @@ public final class InjectionUtils {
         return name.startsWith("javax.servlet.");
     }
     
-    private static ThreadLocalProxy createThreadLocalServletApiContext(Class<?> type) {
-        ThreadLocalProxy proxy = null;
-        if (HttpServletRequest.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalHttpServletRequest();
-        } else if (ServletContext.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalServletContext();
-        } else if (HttpServletResponse.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalHttpServletResponse();
-        } else if (ServletConfig.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalServletConfig();
+    private static ThreadLocalProxy createThreadLocalServletApiContext(String name) {
+        String proxyClassName = null;
+        if (HTTP_SERVLET_REQUEST_CLASS_NAME.equals(name)) {
+            proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletRequest";
+        } else if (HTTP_SERVLET_RESPONSE_CLASS_NAME.equals(name)) {
+            proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalHttpServletResponse";
+        } else if (SERVLET_CONTEXT_CLASS_NAME.equals(name)) {
+            proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletContext";
+        } else if (SERVLET_CONFIG_CLASS_NAME.equals(name)) {
+            proxyClassName = "org.apache.cxf.jaxrs.impl.tl.ThreadLocalServletConfig";
         }
-        return proxy;
+        try {
+            return (ThreadLocalProxy)ClassLoaderUtils.loadClass(proxyClassName, InjectionUtils.class)
+                .newInstance();
+        } catch (Throwable t) {
+            throw new RuntimeException(t);
+        }
     }
     
     public static void injectContextProxies(AbstractResourceInfo cri, Object instance) {
