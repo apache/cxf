@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
@@ -161,34 +162,33 @@ public final class IOUtils {
     public static String toString(final InputStream input) throws IOException {
         return toString(input, DEFAULT_BUFFER_SIZE);
     }
-
+    public static String toString(final InputStream input, String charset) throws IOException {
+        return toString(input, DEFAULT_BUFFER_SIZE, charset);
+    }
     public static String toString(final InputStream input, int bufferSize)
         throws IOException {
+        return toString(input, bufferSize, null);
+    }
+    public static String toString(final InputStream input, int bufferSize, String charset)
+        throws IOException {
 
+        
         int avail = input.available();
         if (avail > bufferSize) {
             bufferSize = avail;
         }
-
-        StringBuilder buf = new StringBuilder();
-        final byte[] buffer = new byte[bufferSize];
-        int n = 0;
-        n = input.read(buffer);
-        while (-1 != n) {
-            if (n == 0) {
-                throw new IOException("0 bytes read in violation of InputStream.read(byte[])");
-            }
-            buf.append(newStringFromBytes(buffer, 0, n));
-            n = input.read(buffer);
-        }
-        input.close();
-        return buf.toString();
+        Reader reader = charset == null ? new InputStreamReader(input, UTF8_CHARSET) 
+            : new InputStreamReader(input, charset);
+        return toString(reader, bufferSize);
     }
 
     public static String toString(final Reader input) throws IOException {
+        return toString(input, DEFAULT_BUFFER_SIZE);
+    }
+    public static String toString(final Reader input, int bufSize) throws IOException {
 
         StringBuilder buf = new StringBuilder();
-        final char[] buffer = new char[DEFAULT_BUFFER_SIZE];
+        final char[] buffer = new char[bufSize];
         int n = 0;
         n = input.read(buffer);
         while (-1 != n) {
