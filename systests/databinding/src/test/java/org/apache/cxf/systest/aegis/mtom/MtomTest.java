@@ -19,6 +19,7 @@
 
 package org.apache.cxf.systest.aegis.mtom;
 
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,7 +52,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 
 /**
- * 
+ *
  */
 @ContextConfiguration(locations = { "classpath:mtomTestBeans.xml" })
 public class MtomTest extends AbstractJUnit4SpringContextTests {
@@ -61,11 +62,11 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
     private MtomTestService client;
     private MtomTestService jaxwsClient;
     private TestUtilities testUtilities;
-    
+
     public MtomTest() {
         testUtilities = new TestUtilities(getClass());
     }
-    
+
     private void setupForTest(boolean enableClientMTOM) throws Exception {
         AegisDatabinding aegisBinding = new AegisDatabinding();
         aegisBinding.setMtomEnabled(enableClientMTOM);
@@ -125,7 +126,7 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Assert.assertEquals("This is the cereal shot from guns.", data);
     }
 
-    @Test 
+    @Test
     public void testAcceptDataHandlerNoMTOM() throws Exception {
         setupForTest(false);
         DataHandlerBean dhBean = new DataHandlerBean();
@@ -137,9 +138,10 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         client.acceptDataHandler(dhBean);
         DataHandlerBean accepted = impl.getLastDhBean();
         Assert.assertNotNull(accepted);
-        Object data = accepted.getDataHandler().getContent();
+        InputStream data = accepted.getDataHandler().getInputStream();
         Assert.assertNotNull(data);
-        Assert.assertEquals("This is the cereal shot from guns.", data);
+        String dataString = org.apache.commons.io.IOUtils.toString(data, "utf-8");
+        Assert.assertEquals("This is the cereal shot from guns.", dataString);
     }
 
     @Test
@@ -148,14 +150,14 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         testUtilities.addDefaultNamespaces();
         testUtilities.addNamespace("xmime", "http://www.w3.org/2005/05/xmlmime");
         Server s = testUtilities.
-            getServerForService(new QName("http://fortest.mtom.aegis.systest.cxf.apache.org/", 
+            getServerForService(new QName("http://fortest.mtom.aegis.systest.cxf.apache.org/",
                                           "MtomTestService"));
-        Document wsdl = testUtilities.getWSDLDocument(s); 
+        Document wsdl = testUtilities.getWSDLDocument(s);
         Assert.assertNotNull(wsdl);
-        NodeList typeAttrList = 
+        NodeList typeAttrList =
             testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
                                       + "xsd:element[@name='dataHandler']/"
-                                      + "@type", 
+                                      + "@type",
                                       wsdl);
         Attr typeAttr = (Attr)typeAttrList.item(0);
         String typeAttrValue = typeAttr.getValue();
@@ -165,14 +167,14 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         Node elementNode = typeAttr.getOwnerElement();
         String url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
         Assert.assertEquals(SOAPConstants.XSD, url);
-        
+
         s = testUtilities.getServerForAddress("http://localhost:" + PORT + "/mtomXmime");
-        wsdl = testUtilities.getWSDLDocument(s); 
+        wsdl = testUtilities.getWSDLDocument(s);
         Assert.assertNotNull(wsdl);
-        typeAttrList = 
+        typeAttrList =
             testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
                                       + "xsd:element[@name='dataHandler']/"
-                                      + "@type", 
+                                      + "@type",
                                       wsdl);
         typeAttr = (Attr)typeAttrList.item(0);
         typeAttrValue = typeAttr.getValue();
@@ -182,11 +184,11 @@ public class MtomTest extends AbstractJUnit4SpringContextTests {
         elementNode = typeAttr.getOwnerElement();
         url = testUtilities.resolveNamespacePrefix(pieces[0], elementNode);
         Assert.assertEquals(AbstractXOPType.XML_MIME_NS, url);
-        
+
         /* when I add a test for a custom mapping.
         testUtilities.assertValid("//xsd:complexType[@name='inputDhBean']/xsd:sequence/"
                                   + "xsd:element[@name='dataHandler']/"
-                                  + "@xmime:expectedContentType/text()", 
+                                  + "@xmime:expectedContentType/text()",
                                   wsdl);
                                   */
     }
