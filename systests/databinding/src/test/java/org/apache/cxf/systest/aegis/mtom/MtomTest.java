@@ -31,13 +31,13 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.cxf.Bus;
 import org.apache.cxf.aegis.databinding.AegisDatabinding;
 import org.apache.cxf.aegis.type.mtom.AbstractXOPType;
 import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.DataHandlerBean;
 import org.apache.cxf.systest.aegis.mtom.fortest.MtomTestImpl;
