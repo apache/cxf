@@ -46,30 +46,24 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBook123Proxy() throws Exception {
-        
-        BookStore bs = JAXRSClientFactory.create("https://localhost:" + PORT, BookStore.class, 
-                                                 CLIENT_CONFIG_FILE);
-        // just to verify the interface call goes through CGLIB proxy too
-        assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
-        Book b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
-        b = bs.getSecureBook("123");
-        assertEquals(b.getId(), 123);
+        doTestGetBook123Proxy(CLIENT_CONFIG_FILE);
     }
     
     @Test
     public void testGetBook123ProxyWithURLConduitId() throws Exception {
-        
+        doTestGetBook123Proxy(CLIENT_CONFIG_FILE2);
+    }
+    
+    private void doTestGetBook123Proxy(String configFile) throws Exception {
         BookStore bs = JAXRSClientFactory.create("https://localhost:" + PORT, BookStore.class, 
-                                                 CLIENT_CONFIG_FILE2);
+                configFile);
         // just to verify the interface call goes through CGLIB proxy too
         assertEquals("https://localhost:" + PORT, WebClient.client(bs).getBaseURI().toString());
         Book b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
         b = bs.getSecureBook("123");
         assertEquals(b.getId(), 123);
-    }
-    
+    }  
     
     @Test
     public void testGetBook123ProxyToWebClient() throws Exception {
@@ -104,26 +98,21 @@ public class JAXRSHttpsBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testGetBook123WebClient() throws Exception {
-        
-        WebClient client = WebClient.create("https://localhost:" + PORT, CLIENT_CONFIG_FILE);
-        assertEquals("https://localhost:" + PORT, client.getBaseURI().toString());
-        
-        client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
-        Book b = client.get(Book.class);
-        assertEquals(123, b.getId());
-        
+        doTestGetBook123WebClient(CLIENT_CONFIG_FILE);
     }
     
     @Test
     public void testGetBook123WebClientWithURLConduitId() throws Exception {
-        
-        WebClient client = WebClient.create("https://localhost:" + PORT, CLIENT_CONFIG_FILE2);
+        doTestGetBook123WebClient(CLIENT_CONFIG_FILE2);
+    }
+    
+    private void doTestGetBook123WebClient(String configFile) throws Exception {
+        WebClient client = WebClient.create("https://localhost:" + PORT, configFile);
         assertEquals("https://localhost:" + PORT, client.getBaseURI().toString());
         
         client.path("/bookstore/securebooks/123").accept(MediaType.APPLICATION_XML_TYPE);
         Book b = client.get(Book.class);
         assertEquals(123, b.getId());
-        
-    }
+    }     
     
 }
