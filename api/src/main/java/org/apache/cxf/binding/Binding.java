@@ -36,7 +36,7 @@ public interface Binding extends InterceptorProvider {
     Message createMessage();
     
     /**
-     * Create a Message form the messge.
+     * Create a Message form the message.
      * 
      * @param m the message used for creating a binding message
      * @return the Binding message

@@ -47,7 +47,7 @@ public interface BindingFactory {
     BindingInfo createBindingInfo(Service service, String namespace, Object configObject);
     
     /**
-     * Set the destionation's message observer which is created by using the endpoint to
+     * Set the destination's message observer which is created by using the endpoint to
      * listen the incoming message
      * @param d the destination that will be set the MessageObserver 
      * @param e the endpoint to build up the MessageObserver      
