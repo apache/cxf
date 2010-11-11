@@ -30,6 +30,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 
@@ -46,8 +47,11 @@ public class HolderInInterceptor extends AbstractPhaseInterceptor<Message> {
         MessageContentsList inObjects = MessageContentsList.getContentsList(message);
 
         Exchange exchange = message.getExchange();
-        
-        OperationInfo op = exchange.getBindingOperationInfo().getOperationInfo();
+        BindingOperationInfo bop = exchange.getBindingOperationInfo();
+        if (bop == null) {
+            return;
+        }
+        OperationInfo op = bop.getOperationInfo();
         if (op == null || !op.hasOutput() || op.getOutput().size() == 0) {
             return;
         }
