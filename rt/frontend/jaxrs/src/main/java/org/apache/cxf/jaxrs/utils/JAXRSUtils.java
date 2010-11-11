@@ -803,8 +803,9 @@ public final class JAXRSUtils {
         } else if (MessageContext.class.isAssignableFrom(clazz)) {
             o = new MessageContextImpl(m);
         }
-        
-        o = o == null ? createServletResourceValue(contextMessage, clazz) : o;
+        if (o == null && contextMessage != null && !MessageUtils.isRequestor(contextMessage)) {
+            o = createServletResourceValue(contextMessage, clazz);
+        }
         return clazz.cast(o);
     }
     
