@@ -181,6 +181,9 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         
         s.put(ENDPOINT_CLASS, implInfo.getEndpointClass());
         
+        if (s.getDataBinding() != null) {
+            setMTOMThreshold(s.getDataBinding());
+        }
         return s;
     }
 
@@ -632,6 +635,17 @@ public class JaxWsServiceFactoryBean extends ReflectionServiceFactoryBean {
         return Collections.emptySet();
     }
 
+    private void setMTOMThreshold(DataBinding databinding) {
+        if (this.wsFeatures != null) {
+            for (WebServiceFeature wsf : this.wsFeatures) {
+                if (wsf instanceof MTOMFeature && ((MTOMFeature)wsf).getThreshold() > 0) {
+                    databinding.setMtomThreshold(((MTOMFeature)wsf).getThreshold());
+                }
+
+            }
+        }
+    }
+    
     @Override
     protected void buildServiceFromClass() {
         super.buildServiceFromClass();
