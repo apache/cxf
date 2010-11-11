@@ -60,18 +60,30 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     private Bus bus;
     private List<AbstractFeature> features = new ArrayList<AbstractFeature>();
     private DataBinding dataBinding;
-    
+
     public ClientProxyFactoryBean() {
         this(new ClientFactoryBean());
     }
     public ClientProxyFactoryBean(ClientFactoryBean fact) {
         super();
-        this.clientFactoryBean = fact;        
+        this.clientFactoryBean = fact;
     }
-    
+
     public void initFeatures() {
         this.clientFactoryBean.setFeatures(features);
         this.getServiceFactory().setFeatures(features);
+    }
+
+    /**
+     * Create a proxy object that implements a specified Service Endpoint Interface. This
+     * method is a combination of {@link #setServiceClass(Class)} and {@link #create()}.
+     * @param <ProxyServiceType> The type for the SEI.
+     * @param serviceClass The Java class object representing the interface you want.
+     * @return the proxy.
+     */
+    public <ProxyServiceType> ProxyServiceType create(Class<ProxyServiceType> serviceClass) {
+        setServiceClass(serviceClass);
+        return serviceClass.cast(create());
     }
 
     /**
@@ -83,17 +95,17 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         if (properties == null) {
             properties = new HashMap<String, Object>();
         }
-        
+
         if (username != null) {
             AuthorizationPolicy authPolicy = new AuthorizationPolicy();
             authPolicy.setUserName(username);
             authPolicy.setPassword(password);
             properties.put(AuthorizationPolicy.class.getName(), authPolicy);
         }
-        
-        initFeatures();                
+
+        initFeatures();
         clientFactoryBean.setProperties(properties);
-        
+
         if (bus != null) {
             clientFactoryBean.setBus(bus);
         }
@@ -101,7 +113,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         if (dataBinding != null) {
             clientFactoryBean.setDataBinding(dataBinding);
         }
-        
+
         Client c = clientFactoryBean.create();
         if (getInInterceptors() != null) {
             c.getInInterceptors().addAll(getInInterceptors());
@@ -119,8 +131,8 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         ClientProxy handler = clientClientProxy(c);
 
         Class classes[] = getImplementingClasses();
-        Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(), 
-                                            classes, 
+        Object obj = Proxy.newProxyInstance(clientFactoryBean.getServiceClass().getClassLoader(),
+                                            classes,
                                             handler);
 
         this.getServiceFactory().sendEvent(FactoryBeanListener.Event.PROXY_CREATED,
@@ -173,13 +185,13 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public void setUsername(String username) {
         this.username = username;
     }
-    
+
     public String getWsdlLocation() {
         return getWsdlURL();
     }
-    
+
     /**
-     * Specifies the URL where the proxy can find the WSDL defining the 
+     * Specifies the URL where the proxy can find the WSDL defining the
      * service the proxy implements.
      *
      * @param wsdlURL a string containing the WSDL's URL
@@ -193,7 +205,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-     * Specifies the URL where the proxy can find the WSDL defining the 
+     * Specifies the URL where the proxy can find the WSDL defining the
      * service the proxy implements.
      *
      * @param wsdlURL a string containing the WSDL's URL
@@ -212,7 +224,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
 
     /**
      * Returns the QName of the WSDL service the proxy implements
-     * 
+     *
      * @return the WSDL service's QName
      */
     public QName getServiceName() {
@@ -220,7 +232,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-     * Specifies the QName of the WSDL service the proxy implements. The 
+     * Specifies the QName of the WSDL service the proxy implements. The
      * service must exist or an error will result.
      *
      * @param serviceName the QName of the service for the proxy
@@ -244,19 +256,19 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public void setConduitSelector(ConduitSelector selector) {
         clientFactoryBean.setConduitSelector(selector);
     }
-            
+
     public void setBindingId(String bind) {
         clientFactoryBean.setBindingId(bind);
     }
-    
+
     public String getBindingId() {
         return clientFactoryBean.getBindingId();
     }
-    
+
     public void setTransportId(String transportId) {
         clientFactoryBean.setTransportId(transportId);
     }
-    
+
     public String getTransportId() {
         return clientFactoryBean.getTransportId();
     }
@@ -264,11 +276,11 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public ReflectionServiceFactoryBean getServiceFactory() {
         return clientFactoryBean.getServiceFactory();
     }
-    
+
     public void setServiceFactory(ReflectionServiceFactoryBean sf) {
         clientFactoryBean.setServiceFactory(sf);
     }
-    
+
     public Bus getBus() {
         return bus;
     }
@@ -288,8 +300,8 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     /**
-     * Specifies a set of properties used to configure the proxies 
-     * provided by the factory. These properties include things like 
+     * Specifies a set of properties used to configure the proxies
+     * provided by the factory. These properties include things like
      * adding a namespace map to the JAXB databinding.
      *
      * @param properties the property map
@@ -305,7 +317,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public void setFeatures(List<AbstractFeature> f) {
         this.features = f;
     }
-    
+
     public DataBinding getDataBinding() {
         return dataBinding;
     }
@@ -317,7 +329,7 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     public void setBindingConfig(BindingConfiguration config) {
         getClientFactoryBean().setBindingConfig(config);
     }
-    
+
     public BindingConfiguration getBindingConfig() {
         return getClientFactoryBean().getBindingConfig();
     }
