@@ -712,6 +712,7 @@ public final class InjectionUtils {
         return value;
     }
     
+    // TODO : investigate the possibility of using generic proxies only
     public static ThreadLocalProxy createThreadLocalProxy(Class<?> type) {
         ThreadLocalProxy proxy = null;
         if (UriInfo.class.isAssignableFrom(type)) {
@@ -728,18 +729,33 @@ public final class InjectionUtils {
             proxy = new ThreadLocalRequest();
         }  else if (Providers.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalProviders();
-        } else if (HttpServletRequest.class.isAssignableFrom(type)) {
+        } else if (SearchContext.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalSearchContext();
+        } else if (MessageContext.class.isAssignableFrom(type)) {
+            proxy = new ThreadLocalMessageContext();
+        }
+        
+        if (proxy == null && isServletApiContext(type.getName())) {
+            proxy = createThreadLocalServletApiContext(type);  
+        }
+        
+        return proxy;
+    }
+    
+    private static boolean isServletApiContext(String name) { 
+        return name.startsWith("javax.servlet.");
+    }
+    
+    private static ThreadLocalProxy createThreadLocalServletApiContext(Class<?> type) {
+        ThreadLocalProxy proxy = null;
+        if (HttpServletRequest.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletRequest();
         } else if (ServletContext.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalServletContext();
         } else if (HttpServletResponse.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalHttpServletResponse();
-        } else if (MessageContext.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalMessageContext();
         } else if (ServletConfig.class.isAssignableFrom(type)) {
             proxy = new ThreadLocalServletConfig();
-        } else if (SearchContext.class.isAssignableFrom(type)) {
-            proxy = new ThreadLocalSearchContext();
         }
         return proxy;
     }
