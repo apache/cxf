@@ -35,11 +35,11 @@
     <properties>
         <maven.test.skip>true</maven.test.skip>
         <cxf.version>${project.version}</cxf.version>
-        <checkstyle.extension>-corba</checkstyle.extension>
+        <cxf.checkstyle.extension>-corba</cxf.checkstyle.extension>
 
-        <jaxb.version>${jaxb22.version}</jaxb.version>
-        <jaxb.impl.version>${jaxb22.impl.version}</jaxb.impl.version>
-        <jaxb.xjc.version>${jaxb22.impl.version}</jaxb.xjc.version>
+        <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
+        <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
+        <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
     </properties>
 
     <modules>
