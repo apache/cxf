@@ -1,0 +1,187 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.apache.cxf.samples</groupId>
+    <artifactId>cxf-samples</artifactId>
+    <packaging>pom</packaging>
+    <version>2.2.12-SNAPSHOT</version>
+    <name>Apache CXF Samples</name>
+    <url>http://cxf.apache.org</url>
+
+    <properties>
+        <!-- don't deploy the samples, kind of pointless -->
+        <maven.deploy.skip>true</maven.deploy.skip>
+    </properties>
+
+    <modules>
+        <module>in_jvm_transport</module>
+        <module>js_browser_client_simple</module>
+        <module>js_browser_client_java_first</module>
+        <module>java_first_jaxws_factory_bean</module>
+        <module>jax_rs/content_negotiation</module>
+        <module>jax_rs/basic_https</module>
+        <module>jax_rs/basic</module>
+        <module>callback</module>
+        <module>wsdl_first_pure_xml</module>
+        <module>jaxws_dispatch_provider</module>
+        <module>wsdl_first_xmlbeans</module>
+        <module>wsdl_first_soap12</module>
+        <module>wsdl_first_dynamic_client</module>
+        <module>jms_queue</module>
+        <module>restful_dispatch</module>
+        <module>wsdl_first</module>
+        <module>aegis_standalone</module>
+        <module>java_first_jaxws</module>
+        <module>ws_rm</module>
+        <module>configuration_interceptor</module>
+        <module>java_first_spring_support</module>
+        <module>ws_security/ut</module>
+        <module>ws_security/ut_sign</module>
+        <module>ws_security/sign_enc</module>
+        <module>ws_security/ut_policy</module>
+        <module>mtom</module>
+        <module>jaxws_async</module>
+        <module>java_first_pojo</module>
+        <module>ws_policy</module>
+        <module>js_client</module>
+        <module>wsdl_first_https</module>
+        <module>ws_addressing</module>
+        <module>soap_header</module>
+        <module>wsdl_first_xml_wrapped</module>
+        <module>restful_http_binding</module>
+        <module>aegis</module>
+        <module>jax_server_aegis_client</module>
+        <module>jaxws_handlers</module>
+        <module>wsdl_first_rpclit</module>
+        <module>jms_pubsub</module>
+
+        <!--
+        these are a bit fragile as they need to go off to external sites to get stuff like
+        wsdl's and certs and such
+        -->
+        <module>ws_security/interopfest/wssc</module>
+        <module>ws_security/interopfest/wstrust10</module>
+        <module>ws_security/interopfest/wssec10</module>
+        <module>ws_security/interopfest/wssec11</module>
+        <!--module>ws_security/interopfest/wstrust13</module-->
+    </modules>
+    <dependencyManagement>
+        <dependencies>
+            <!-- 
+            Pull in the cxf-parents as import scope to re-use the dependenecyManagement 
+            sections of those poms.   Those sections define the versions of various third
+            party deps that CXF used to build with and test with and we would like
+            to make sure the same versions are used for the samples
+            -->
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-parent</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf</artifactId>
+                <version>${project.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.1</version>
+                    <configuration>
+                        <source>1.5</source>
+                        <target>1.5</target>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-antrun-plugin</artifactId>
+                    <version>1.4</version>
+                    <dependencies>
+                        <dependency>
+                            <groupId>org.apache.ant</groupId>
+                            <artifactId>ant-trax</artifactId>
+                            <version>1.8.0</version>
+                        </dependency>
+                    </dependencies>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    <profiles>
+        <profile>
+            <id>snapshots</id>
+            <repositories>
+                <repository>
+                    <id>apache-snapshots</id>
+                    <name>Apache SNAPSHOT Repository</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                </repository>
+            </repositories>
+            <pluginRepositories>
+                <pluginRepository>
+                    <id>apache-snapshots</id>
+                    <name>Apache Maven Plugin Snapshots</name>
+                    <url>https://repository.apache.org/content/groups/snapshots-group/</url>
+                    <releases>
+                        <enabled>false</enabled>
+                    </releases>
+                    <snapshots>
+                        <enabled>true</enabled>
+                    </snapshots>
+                </pluginRepository>
+            </pluginRepositories>
+        </profile>
+    </profiles>
+
+    <!--
+     we turn off the deploy in the properties above, but deploy plugin will
+     still barf without this section in the pom
+     -->
+    <distributionManagement>
+         <repository>
+             <id>apache.releases.https</id>
+             <name>Apache Release Distribution Repository</name>
+             <url>https://repository.apache.org/service/local/staging/deploy/maven2</url>
+         </repository>
+         <snapshotRepository>
+             <id>apache.snapshots.https</id>
+             <name>Apache Development Snapshot Repository</name>
+             <url>https://repository.apache.org/content/repositories/snapshots</url>
+             <uniqueVersion>false</uniqueVersion>
+         </snapshotRepository>
+     </distributionManagement>
+
+</project>
