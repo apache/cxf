@@ -74,6 +74,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     public static final String POLICY_XPATH_ADDRESS = "http://localhost:" + PORT + "/SecPolTestXPath";
     public static final String POLICY_SIGNONLY_ADDRESS = "http://localhost:" + PORT + "/SecPolTestSignedOnly";
 
+    public static final String POLICY_CXF3041_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF3041";
+    public static final String POLICY_CXF3042_ADDRESS = "http://localhost:" + PORT + "/SecPolTestCXF3042";
+
     
     public static class ServerPasswordCallback implements CallbackHandler {
         public void handle(Callback[] callbacks) throws IOException,
@@ -88,7 +91,8 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         }
     }
     
-    
+    private DoubleItService service = new DoubleItService();
+
     
     @BeforeClass 
     public static void init() throws Exception {
@@ -159,11 +163,30 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                        SecurityPolicyTest.class.getResource("bob.properties").toString());
         ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
                        SecurityPolicyTest.class.getResource("alice.properties").toString());
+        
+        
+        ep = (EndpointImpl)Endpoint.publish(POLICY_CXF3041_ADDRESS,
+                                            new DoubleItImplCXF3041());
+        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("bob.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        
+        ep = (EndpointImpl)Endpoint.publish(POLICY_CXF3042_ADDRESS,
+                                            new DoubleItImplCXF3042());
+        ei = ep.getServer().getEndpoint().getEndpointInfo(); 
+        ei.setProperty(SecurityConstants.CALLBACK_HANDLER, new KeystorePasswordCallback());
+        ei.setProperty(SecurityConstants.SIGNATURE_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        ei.setProperty(SecurityConstants.ENCRYPT_PROPERTIES, 
+                       SecurityPolicyTest.class.getResource("alice.properties").toString());
+        
     }
     
     @Test
     public void testPolicy() throws Exception {
-        DoubleItService service = new DoubleItService();
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortXPath();
@@ -246,7 +269,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     @Test
     public void testSignedOnlyWithUnsignedMessage() throws Exception {
         //CXF-2244
-        DoubleItService service = new DoubleItService();
         DoubleItPortType pt;
 
         pt = service.getDoubleItPortSignedOnly();
@@ -277,7 +299,6 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
     
     @Test
     public void testDispatchClient() throws Exception {
-        DoubleItService service = new DoubleItService();
         Dispatch<Source> disp = service.createDispatch(DoubleItService.DoubleItPortEncryptThenSign, 
                                                        Source.class,
                                                        Mode.PAYLOAD);
@@ -417,5 +438,59 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             return new StreamSource(new StringReader(req));
         }
         
+    }
+    
+    
+    
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortCXF3041",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+    public static class DoubleItImplCXF3041 implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
+                portName = "DoubleItPortCXF3042",
+                serviceName = "DoubleItService", 
+                endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
+                wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
+    public static class DoubleItImplCXF3042 implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) {
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
+    
+    @Test
+    public void testCXF3041() throws Exception {
+        DoubleItPortType pt;
+
+        pt = service.getDoubleItPortCXF3041();
+        updateAddressPort(pt, PORT);
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("bob.properties"));
+        assertEquals(BigInteger.valueOf(10), pt.doubleIt(BigInteger.valueOf(5)));
+    }
+
+    @Test
+    public void testCXF3042() throws Exception {
+        DoubleItPortType pt;
+        pt = service.getDoubleItPortCXF3042();
+        updateAddressPort(pt, PORT);
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
+                                                      new KeystorePasswordCallback());
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.SIGNATURE_PROPERTIES,
+                                                      getClass().getResource("alice.properties"));
+        ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
+                                                      getClass().getResource("alice.properties"));
+        assertEquals(BigInteger.valueOf(10), pt.doubleIt(BigInteger.valueOf(5)));
     }
 }
