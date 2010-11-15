@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wssec_ut</artifactId>
-    <name>WS-Security Demo</name>
+    <name>CXF WS-Security UT Demo</name>
     <version>2.4.0-SNAPSHOT</version>
 
     <parent>
