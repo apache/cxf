@@ -44,7 +44,7 @@
             <plugin>
                 <groupId>org.apache.cxf</groupId>
                 <artifactId>cxf-codegen-plugin</artifactId>
-                <version>${cxf.version}</version>
+                <version>2.4.0-SNAPSHOT</version>
                 <executions>
                     <execution>
                         <id>generate-sources</id>
@@ -145,23 +145,23 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>${cxf.version}</version>
+            <version>2.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>${cxf.version}</version>
+            <version>2.4.0-SNAPSHOT</version>
         </dependency>
         <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>${cxf.version}</version>
+            <version>2.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-jms</artifactId>
-            <version>${cxf.version}</version>
+            <version>2.4.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.apache.activemq</groupId>
