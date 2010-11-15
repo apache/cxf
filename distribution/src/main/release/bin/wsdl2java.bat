@@ -37,7 +37,7 @@ if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 set CXF_JAR=%CXF_HOME%\lib\cxf-manifest.jar
 
 
-"%JAVA_HOME%\bin\java" -Xmx128M -cp "%CXF_JAR%;%SUN_TOOL_PATH%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.WSDLToJava %*
+"%JAVA_HOME%\bin\java" -Xmx128M -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%SUN_TOOL_PATH%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.wsdlto.WSDLToJava %*
 
 @endlocal
 

@@ -403,6 +403,18 @@
                                     <version>1.0.1</version>
                                     <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
                                 </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.xml.bind</groupId>
+                                    <artifactId>jaxb-api</artifactId>
+                                    <version>${cxf.jaxb22.version}</version>
+                                    <outputDirectory>${project.build.directory}/libs/endorsed</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.geronimo.specs</groupId>
+                                    <artifactId>geronimo-jaxws_2.2_spec</artifactId>
+                                    <version>${cxf.specs.jaxws.api.version}</version>
+                                    <outputDirectory>${project.build.directory}/libs/endorsed</outputDirectory>
+                                </artifactItem>
                             </artifactItems>
                         </configuration>
                     </execution>
