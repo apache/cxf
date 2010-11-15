@@ -52,12 +52,21 @@
         <cxf.abdera.version>1.1</cxf.abdera.version>
         <cxf.activemq.version>5.4.1</cxf.activemq.version>
         <cxf.derby.version>10.2.2.0</cxf.derby.version>
-        <cxf.jaxb.version>2.1</cxf.jaxb.version>
-        <cxf.jaxb.impl.version>2.1.13</cxf.jaxb.impl.version>
-        <cxf.jaxb.xjc.version>2.1.13</cxf.jaxb.xjc.version>
+
+        <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
+        <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
+        <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
         <cxf.jaxb22.version>2.2.1</cxf.jaxb22.version>
         <cxf.jaxb22.impl.version>2.2.1.1</cxf.jaxb22.impl.version>
         <cxf.jaxb22.xjc.version>2.2.1.1</cxf.jaxb22.xjc.version>
+
+        <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
+        <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
+        <cxf.jaxb.impl.version>${cxf.jaxb21.impl.version}</cxf.jaxb.impl.version>
+        <cxf.jaxb.xjc.version>${cxf.jaxb21.xjc.version}</cxf.jaxb.xjc.version>
+
+        <cxf.specs.jaxws.api.version>1.0</cxf.specs.jaxws.api.version>
+
         <cxf.jdom.version>1.0</cxf.jdom.version>
         <cxf.jetty.version>7.2.0.v20101020</cxf.jetty.version>
         <cxf.msv.version>2010.1</cxf.msv.version>
@@ -266,7 +275,7 @@
                                 <java.util.logging.config.file>${basedir}/target/test-classes/logging.properties</java.util.logging.config.file>
                                 <org.apache.activemq.default.directory.prefix>${basedir}/target/ActiveMQ/</org.apache.activemq.default.directory.prefix>
                                 <derby.system.home>${basedir}/target/derby</derby.system.home>
-                                <spring.validation.mode>${spring.validation.mode}</spring.validation.mode>
+                                <spring.validation.mode>${cxf.spring.validation.mode}</spring.validation.mode>
                                 <server.launcher.vmargs>${cxf.server.launcher.vmargs}</server.launcher.vmargs>
                                 <!-- If we close the port after a client in the same JVM has opened a keep-alive
                                 connection, on some Linux's, the socket remains consumed until
@@ -1025,7 +1034,7 @@
             <dependency>
                 <groupId>org.apache.geronimo.specs</groupId>
                 <artifactId>geronimo-jaxws_2.2_spec</artifactId>
-                <version>1.0</version>
+                <version>${cxf.specs.jaxws.api.version}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.activemq</groupId>
@@ -1332,9 +1341,9 @@
                 <jdk>1.5</jdk>
             </activation>
             <properties>
-                <jaxb.version>${cxf.jaxb22.version}</jaxb.version>
-                <jaxb.impl.version>${cxf.jaxb22.impl.version}</jaxb.impl.version>
-                <jaxb.xjc.version>${cxf.jaxb22.impl.version}</jaxb.xjc.version>
+                <cxf.jaxb.version>${cxf.jaxb22.version}</cxf.jaxb.version>
+                <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
+                <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
                 <jdk.version>1.5</jdk.version>
             </properties>
         </profile>
@@ -1350,9 +1359,9 @@
             -->
             <id>sjsxp</id>
             <properties>
-                <stax.impl.groupId>com.sun.xml.stream</stax.impl.groupId>
-                <stax.impl.artifactId>sjsxp</stax.impl.artifactId>
-                <stax.impl.version>1.0.1</stax.impl.version>
+                <cxf.stax.impl.groupId>com.sun.xml.stream</cxf.stax.impl.groupId>
+                <cxf.stax.impl.artifactId>sjsxp</cxf.stax.impl.artifactId>
+                <cxf.stax.impl.version>1.0.1</cxf.stax.impl.version>
             </properties>
         </profile>
         <profile>
@@ -1360,17 +1369,17 @@
             and the Java 5 versions get picked up instead -->
             <id>jaxpri</id>
             <properties>
-                <stax.impl.groupId>com.sun.xml.parsers</stax.impl.groupId>
-                <stax.impl.artifactId>jaxp-ri</stax.impl.artifactId>
-                <stax.impl.version>1.4.2</stax.impl.version>
+                <cxf.stax.impl.groupId>com.sun.xml.parsers</cxf.stax.impl.groupId>
+                <cxf.stax.impl.artifactId>jaxp-ri</cxf.stax.impl.artifactId>
+                <cxf.stax.impl.version>1.4.2</cxf.stax.impl.version>
             </properties>
         </profile>
         <profile>
             <id>axis2-saaj</id>
             <properties>
-                <saaj.impl.groupId>org.apache.axis2</saaj.impl.groupId>
-                <saaj.impl.artifactId>axis2-saaj</saaj.impl.artifactId>
-                <saaj.impl.version>1.4.1</saaj.impl.version>
+                <cxf.saaj.impl.groupId>org.apache.axis2</cxf.saaj.impl.groupId>
+                <cxf.saaj.impl.artifactId>axis2-saaj</cxf.saaj.impl.artifactId>
+                <cxf.saaj.impl.version>1.4.1</cxf.saaj.impl.version>
             </properties>
         </profile>
 
@@ -1386,7 +1395,7 @@
         <profile>
             <id>nospringvalidation</id>
             <properties>
-                <spring.validation.mode>VALIDATION_NONE</spring.validation.mode>
+                <cxf.spring.validation.mode>VALIDATION_NONE</cxf.spring.validation.mode>
             </properties>
         </profile>
 
@@ -1525,7 +1534,7 @@
         <profile>
             <id>spring2</id>
             <properties>
-                <spring.version>2.5.6.SEC02</spring.version>
+                <cxf.spring.version>2.5.6.SEC02</cxf.spring.version>
             </properties>
         </profile> 
         <profile>

@@ -67,7 +67,7 @@ else
    cxf_classpath=${cxf_jar}:${CLASSPATH}
 fi
 
-$JAVA_HOME/bin/java -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.corba.WSDLToIDL "$@"
+$JAVA_HOME/bin/java -Djava.endorsed.dirs="${cxf_home}/lib/endorsed" -cp "${cxf_classpath}" -Djava.util.logging.config.file=$log_config org.apache.cxf.tools.corba.WSDLToIDL "$@"
 
 
 
