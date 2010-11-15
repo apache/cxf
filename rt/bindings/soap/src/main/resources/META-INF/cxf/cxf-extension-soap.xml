@@ -32,18 +32,6 @@ http://www.springframework.org/schema/beans http://www.springframework.org/schem
     <bean class="org.apache.cxf.binding.soap.SoapTransportFactory"
 	  id="org.apache.cxf.binding.soap.SoapTransportFactory"
 	  lazy-init="true">
-        <property name="transportIds">
-            <list>
-                <value>http://schemas.xmlsoap.org/soap/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/</value>
-		        <value>http://schemas.xmlsoap.org/wsdl/soap12/</value>
-		        <value>http://schemas.xmlsoap.org/soap/http/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
-            	<value>http://www.w3.org/2010/soapjms/</value>
-                <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
-            	<value>http://schemas.xmlsoap.org/soap/http</value>
-            </list>
-        </property>
         <property name="bus" ref="cxf"/>
     </bean>
         
