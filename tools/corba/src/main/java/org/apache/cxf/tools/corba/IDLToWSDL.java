@@ -43,7 +43,7 @@ import org.apache.cxf.tools.corba.processors.idl.IDLToWSDLProcessor;
 
 public class IDLToWSDL extends AbstractCXFToolContainer {
 
-    static final String TOOL_NAME = "idltowsdl";
+    static final String TOOL_NAME = "idl2wsdl";
     private static String[] args;
 
     public IDLToWSDL(ToolSpec toolspec) throws Exception {

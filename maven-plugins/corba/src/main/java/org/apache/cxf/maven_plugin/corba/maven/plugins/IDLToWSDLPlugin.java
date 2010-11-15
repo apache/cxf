@@ -52,7 +52,7 @@ public class IDLToWSDLPlugin extends AbstractMojo {
         outputDirFile.mkdirs();
         
         if (idltowsdlOptions == null) {
-            throw new MojoExecutionException("Please specify the idltowsdl options");
+            throw new MojoExecutionException("Please specify the idl2wsdl options");
         }
 
         for (int x = 0; x < idltowsdlOptions.length; x++) {
