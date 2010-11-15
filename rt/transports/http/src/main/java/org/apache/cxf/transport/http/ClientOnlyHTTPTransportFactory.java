@@ -22,7 +22,6 @@ import java.io.IOException;
 
 import javax.annotation.Resource;
 
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -60,9 +59,7 @@ public class ClientOnlyHTTPTransportFactory extends AbstractHTTPTransportFactory
             EndpointInfo endpointInfo,
             EndpointReferenceType target
     ) throws IOException {
-        HTTPConduit conduit = target == null
-            ? new HTTPConduit(bus, endpointInfo)
-            : new HTTPConduit(bus, endpointInfo, target);
+        HTTPConduit conduit = new HTTPConduit(bus, endpointInfo, target);
         // Spring configure the conduit.  
         String address = conduit.getAddress();
         if (address != null && address.indexOf('?') != -1) {
@@ -72,5 +69,5 @@ public class ClientOnlyHTTPTransportFactory extends AbstractHTTPTransportFactory
         conduit.finalizeConfig();
         return conduit;
     }
-    
+
 }

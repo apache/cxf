@@ -123,6 +123,7 @@ public abstract class AbstractHTTPTransportFactory
     protected void configure(Object bean) {
         configure(bean, null, null);
     }
+    
     protected void configure(Object bean, String name, String extraName) {
         Configurer configurer = bus.getExtension(Configurer.class);
         if (null != configurer) {

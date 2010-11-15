@@ -32,19 +32,4 @@
         <jaxb:class implClass="org.apache.cxf.wsdl.TExtensibilityElementImpl"/>
     </jaxb:bindings>
 
-    <!-- Map HTTPClientPolicy.nonProxyHosts to a Pattern using our own 'Adapter' -->
-    <jaxb:bindings schemaLocation="http-conf.xsd"
-                   node="xs:complexType[@name='HTTPClientPolicy']">
-        <jaxb:bindings node="xs:complexContent/xs:extension">
-            <jaxb:bindings node="xs:attribute[@name='NonProxyHosts']">
-                <jaxb:property>
-                    <jaxb:baseType>
-                        <jaxb:javaType name="java.util.regex.Pattern"
-                                       parseMethod="org.apache.cxf.transport.http.PatternBuilder.build" />
-                    </jaxb:baseType>
-                </jaxb:property>
-            </jaxb:bindings>
-        </jaxb:bindings>
-    </jaxb:bindings>
-
 </jaxb:bindings>

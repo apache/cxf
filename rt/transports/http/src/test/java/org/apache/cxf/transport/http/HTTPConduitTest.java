@@ -177,13 +177,13 @@ public class HTTPConduitTest extends Assert {
     }
 
     /**
-     * This test verifies the precidence of Authorization Information.
-     * Setting authorization information on the Message takes precidence
+     * This test verifies the precedence of Authorization Information.
+     * Setting authorization information on the Message takes precedence
      * over a Basic Auth Supplier with preemptive UserPass, and that
      * followed by setting it directly on the Conduit.
      */
     @Test
-    public void testAuthPolicyPrecidence() throws Exception {
+    public void testAuthPolicyPrecedence() throws Exception {
         Bus bus = new CXFBusImpl();
         EndpointInfo ei = new EndpointInfo();
         ei.setAddress("http://nowhere.com/bar/foo");
