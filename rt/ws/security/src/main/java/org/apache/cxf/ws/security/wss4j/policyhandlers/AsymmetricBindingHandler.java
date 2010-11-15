@@ -348,7 +348,10 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
             assertUnusedTokens(abinding.getInitiatorToken());
         }
         sigToken = wrapper.getToken();
-
+        sigParts.addAll(this.getSignedParts());
+        if (sigParts.isEmpty()) {
+            return;
+        }
         if (sigToken.isDerivedKeys()) {
             // Set up the encrypted key to use
             setupEncryptedKey(wrapper, sigToken);
@@ -388,6 +391,7 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
                 e.printStackTrace();
             }
         } else {
+            
             WSSecSignature sig = getSignatureBuider(wrapper, sigToken, false);
                       
             // This action must occur before sig.prependBSTElementToHeader
@@ -398,7 +402,6 @@ public class AsymmetricBindingHandler extends AbstractBindingBuilder {
 
             sig.prependBSTElementToHeader(secHeader);
             insertBeforeBottomUp(sig.getSignatureElement());
-            sigParts.addAll(this.getSignedParts());
             
             sig.addReferencesToSign(sigParts, secHeader);
             sig.computeSignature();

@@ -149,6 +149,39 @@
 			</wsdl:output>
 		</wsdl:operation>
 	</wsdl:binding>
+
+    <wsdl:binding name="DoubleItBindingCXF3041" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#CXF3041"/>
+        <soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="DoubleIt">
+			<soap:operation soapAction="" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+                <wsp:PolicyReference URI="#SignBody"/>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+    <wsdl:binding name="DoubleItBindingCXF3042" type="tns:DoubleItPortType">
+        <wsp:PolicyReference URI="#CXF3042"/>
+        <soap:binding style="document"
+            transport="http://schemas.xmlsoap.org/soap/http" />
+        <wsdl:operation name="DoubleIt">
+            <soap:operation soapAction="" />
+            <wsdl:input>
+                <wsp:PolicyReference URI="#EncrBody"/>
+                <soap:body use="literal" />
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal" />
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+
+
 	<wsdl:service name="DoubleItService">
 		<wsdl:port name="DoubleItPortHttps" binding="tns:DoubleItBinding">
 			<soap:address location="https://localhost:9009/SecPolTest" />
@@ -174,6 +207,12 @@
 		<wsdl:port name="DoubleItPortTimestampOnly" binding="tns:DoubleItBindingTimestampOnly">
 			<soap:address location="http://localhost:9010/SecPolTestTimestampOnly" />
 		</wsdl:port>
+        <wsdl:port name="DoubleItPortCXF3041" binding="tns:DoubleItBindingCXF3041">
+            <soap:address location="http://localhost:9010/SecPolTestCXF3041" />
+        </wsdl:port>
+        <wsdl:port name="DoubleItPortCXF3042" binding="tns:DoubleItBindingCXF3042">
+            <soap:address location="http://localhost:9010/SecPolTestCXF3042" />
+        </wsdl:port>
 	</wsdl:service>
 
 	<wsp:Policy wsu:Id="DoubleItBindingPolicy">
@@ -542,5 +581,133 @@
 		</wsp:ExactlyOne>
 	</wsp:Policy>
   
+
+
+  <!-- Policy for asymmetric binding with the certificate included in the message from
+   client to server but only a thumbprint on messages from the server to the client. -->
+  <wsp:Policy wsu:Id="AsymmBinding" xmlns:wsu=
+      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+      xmlns:wsp="http://www.w3.org/ns/ws-policy"
+      xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <sp:AsymmetricBinding>
+      <wsp:Policy>
+        <sp:InitiatorToken>
+          <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+              <wsp:Policy>
+                <sp:RequireThumbprintReference/>
+              </wsp:Policy>
+            </sp:X509Token>
+          </wsp:Policy>
+        </sp:InitiatorToken>
+        <sp:RecipientToken>
+          <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+              <wsp:Policy>
+                <sp:RequireThumbprintReference/>
+              </wsp:Policy>
+            </sp:X509Token>
+          </wsp:Policy>
+        </sp:RecipientToken>
+        <sp:AlgorithmSuite>
+          <wsp:Policy>
+            <sp:Basic128Rsa15/>
+          </wsp:Policy>
+        </sp:AlgorithmSuite>
+      </wsp:Policy>
+    </sp:AsymmetricBinding>
+  </wsp:Policy>
   
+  <!-- Policy for signing the message body. -->
+  <wsp:Policy wsu:Id="SignBody" xmlns:wsu=
+      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+      xmlns:wsp="http://www.w3.org/ns/ws-policy"
+      xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <sp:SignedParts>
+      <sp:Body/>
+    </sp:SignedParts>
+  </wsp:Policy>
+  <!-- Policy for encrypting the message body. -->
+  <wsp:Policy wsu:Id="EncrBody" xmlns:wsu=
+      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+      xmlns:wsp="http://www.w3.org/ns/ws-policy"
+      xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <sp:EncryptedParts>
+      <sp:Body/>
+    </sp:EncryptedParts>
+  </wsp:Policy>
+
+  <!-- Policy for asymmetric binding with the certificate included in the message from
+   client to server but only a thumbprint on messages from the server to the client. -->
+  <wsp:Policy wsu:Id="CXF3041" xmlns:wsu=
+      "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd"
+      xmlns:wsp="http://www.w3.org/ns/ws-policy"
+      xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <sp:AsymmetricBinding>
+      <wsp:Policy>
+        <sp:InitiatorToken>
+          <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/AlwaysToRecipient">
+              <wsp:Policy>
+                <sp:RequireThumbprintReference/>
+              </wsp:Policy>
+            </sp:X509Token>
+          </wsp:Policy>
+        </sp:InitiatorToken>
+        <sp:RecipientToken>
+          <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+              <wsp:Policy>
+                <sp:RequireThumbprintReference/>
+              </wsp:Policy>
+            </sp:X509Token>
+          </wsp:Policy>
+        </sp:RecipientToken>
+        <sp:AlgorithmSuite>
+          <wsp:Policy>
+            <sp:Basic128Rsa15/>
+          </wsp:Policy>
+        </sp:AlgorithmSuite>
+      </wsp:Policy>
+    </sp:AsymmetricBinding>
+  </wsp:Policy>
+
+
+
+    <!-- Policy for symmetric binding, using an ephemeral key generated by the client and
+   sent to the server as part of the request, using asymmetric encryption with the server
+   public key to secure the symmetric key. -->
+  <wsp:Policy wsu:Id="CXF3042"
+      xmlns:wsu="http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd" xmlns:wsp="http://schemas.xmlsoap.org/ws/2004/09/policy"
+      xmlns:wsaw="http://www.w3.org/2006/05/addressing/wsdl"
+      xmlns:sp="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702">
+    <sp:SymmetricBinding>
+      <wsp:Policy>
+        <sp:ProtectionToken>
+          <wsp:Policy>
+            <sp:X509Token sp:IncludeToken="http://docs.oasis-open.org/ws-sx/ws-securitypolicy/200702/IncludeToken/Never">
+              <wsp:Policy>
+                <sp:RequireDerivedKeys/>
+                <sp:RequireThumbprintReference/>
+                <sp:WssX509V3Token10/>
+              </wsp:Policy>
+            </sp:X509Token>
+          </wsp:Policy>
+        </sp:ProtectionToken>
+        <sp:AlgorithmSuite>
+          <wsp:Policy>
+            <sp:Basic128Rsa15/>
+          </wsp:Policy>
+        </sp:AlgorithmSuite>
+        <sp:OnlySignEntireHeadersAndBody/>
+      </wsp:Policy>
+    </sp:SymmetricBinding>
+    <sp:Wss11>
+      <wsp:Policy>
+        <sp:MustSupportRefKeyIdentifier/>
+        <sp:MustSupportRefThumbprint/>
+        <sp:MustSupportRefEncryptedKey/>
+      </wsp:Policy>
+    </sp:Wss11>
+  </wsp:Policy>
 </wsdl:definitions>

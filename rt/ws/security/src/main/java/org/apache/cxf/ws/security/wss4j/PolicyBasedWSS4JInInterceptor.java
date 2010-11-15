@@ -192,7 +192,11 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         }
         return false;
     }
-    private void assertPolicy(AssertionInfoMap aim, Token token, boolean derived) {
+    private void assertPolicy(AssertionInfoMap aim, Token token, Boolean derived) {
+        if (derived == null) {
+            //no keys were needed for anything
+            return;
+        }
         if (!derived && token instanceof X509Token && token.isDerivedKeys()) {
             notAssertPolicy(aim, token, "No derived keys found.");
         }
@@ -461,7 +465,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
         AssertionInfoMap aim = msg.get(AssertionInfoMap.class);
         Collection<WSDataRef> signed = new HashSet<WSDataRef>();
         Collection<WSDataRef> encrypted = new HashSet<WSDataRef>();
-        boolean hasDerivedKeys = false;
+        Boolean hasDerivedKeys = null;
         boolean hasEndorsement = false;
         Protections prots = Protections.NONE;
         
@@ -471,6 +475,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
             Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
             switch (actInt.intValue()) {                    
             case WSConstants.SIGN:
+                if (hasDerivedKeys == null) {
+                    hasDerivedKeys = Boolean.FALSE;
+                }
                 List<WSDataRef> sl = CastUtils.cast((List<?>)wser
                                                        .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 if (sl != null) {
@@ -487,6 +494,9 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 }
                 break;
             case WSConstants.ENCR:
+                if (hasDerivedKeys == null) {
+                    hasDerivedKeys = Boolean.FALSE;
+                }
                 List<WSDataRef> el = CastUtils.cast((List<?>)wser
                                                        .get(WSSecurityEngineResult.TAG_DATA_REF_URIS));
                 if (el != null) {
@@ -516,7 +526,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                 assertPolicy(aim, SP12Constants.INCLUDE_TIMESTAMP);
                 break;
             case WSConstants.DKT:
-                hasDerivedKeys = true;
+                hasDerivedKeys = Boolean.TRUE;
                 break;
             case WSConstants.SC:
                 assertPolicy(aim, SP12Constants.WSS11);
@@ -608,7 +618,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                            SoapMessage message,
                                            SOAPMessage doc,
                                            Protections prots,
-                                           boolean derived) {
+                                           Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.SYMMETRIC_BINDING);
         if (ais == null) {
             return true;
@@ -649,7 +659,7 @@ public class PolicyBasedWSS4JInInterceptor extends WSS4JInInterceptor {
                                            SoapMessage message,
                                            SOAPMessage doc,
                                            Protections prots,
-                                           boolean derived) {
+                                           Boolean derived) {
         Collection<AssertionInfo> ais = aim.get(SP12Constants.ASYMMETRIC_BINDING);
         if (ais == null) {                       
             return true;
