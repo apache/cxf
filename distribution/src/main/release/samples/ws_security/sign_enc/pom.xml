@@ -20,7 +20,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>org.apache.cxf.samples</groupId>
     <artifactId>wssec_sign_enc</artifactId>
-    <name>WS-Security Demo</name>
+    <name>CXF WS-Security Sign Encoding Demo</name>
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
