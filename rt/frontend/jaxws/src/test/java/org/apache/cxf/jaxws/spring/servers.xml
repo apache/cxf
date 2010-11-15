@@ -29,7 +29,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
   <import resource="classpath:META-INF/cxf/cxf.xml"/>
   <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>
 
-  <bean class="org.apache.cxf.transport.local.LocalTransportFactory" lazy-init="false">
+  <bean class="org.apache.cxf.transport.local.LocalTransportFactory"
+    lazy-init="false"
+    depends-on="org.apache.cxf.binding.soap.SoapTransportFactory">
       <property name="transportIds">
           <list>
               <value>http://cxf.apache.org/transports/local</value>

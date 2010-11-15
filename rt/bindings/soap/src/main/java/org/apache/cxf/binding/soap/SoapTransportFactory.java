@@ -21,13 +21,14 @@ package org.apache.cxf.binding.soap;
 
 import java.io.IOException;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.wsdl.Port;
 import javax.wsdl.WSDLException;
@@ -68,12 +69,20 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
     
     public static final String TRANSPORT_ID = "http://schemas.xmlsoap.org/soap/";
     
-    private Bus bus;
-    private Collection<String> activationNamespaces;
+    private static final List<String> TRANSPORT_IDS = Arrays.asList(
+            "http://schemas.xmlsoap.org/soap/",
+            "http://schemas.xmlsoap.org/wsdl/soap/",
+            "http://schemas.xmlsoap.org/wsdl/soap12/",
+            "http://schemas.xmlsoap.org/soap/http/",
+            "http://schemas.xmlsoap.org/wsdl/soap/http",
+            "http://www.w3.org/2010/soapjms/",
+            "http://www.w3.org/2003/05/soap/bindings/HTTP/",
+            "http://schemas.xmlsoap.org/soap/http");
     
     public SoapTransportFactory() {
-        super();
+        super(TRANSPORT_IDS, null);
     }
+    
     public Set<String> getUriPrefixes() {
         return Collections.singleton("soap.tcp");
     }
@@ -218,33 +227,15 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         }
     }
 
-    public Bus getBus() {
-        return bus;
-    }
-
     @Resource(name = "cxf")
     public void setBus(Bus bus) {
-        this.bus = bus;
+        super.setBus(bus);
     }
     
     public void setActivationNamespaces(Collection<String> ans) {
-        activationNamespaces = ans;
+        super.setTransportIds(new ArrayList<String>(ans));
     }
 
-    @PostConstruct
-    void registerWithBindingManager() {
-        if (null == bus) {
-            return;
-        }
-
-        DestinationFactoryManager dfm = bus.getExtension(DestinationFactoryManager.class);
-        if (null != dfm && activationNamespaces != null) {
-            for (String ns : activationNamespaces) {
-                dfm.registerDestinationFactory(ns, this);
-            }
-        }
-    }
-    
     private static class SoapEndpointInfo extends EndpointInfo {
         SoapAddress saddress;
         SoapEndpointInfo(ServiceInfo serv, String trans) {
