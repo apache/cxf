@@ -30,12 +30,19 @@
         <maven.deploy.skip>true</maven.deploy.skip>
     </properties>
 
+    <dependencies>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-jdk14</artifactId>
+        </dependency>
+    </dependencies>
+
     <modules>
         <module>in_jvm_transport</module>
         <module>js_browser_client_simple</module>
         <module>js_browser_client_java_first</module>
         <module>java_first_jaxws_factory_bean</module>
-	<module>java_first_jms</module>
+        <module>java_first_jms</module>
         <module>jax_rs/content_negotiation</module>
         <module>jax_rs/basic_https</module>
         <module>jax_rs/basic</module>
