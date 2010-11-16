@@ -27,10 +27,10 @@
     xmlns:ts="http://cxf.apache.org/Xutil/ToolSpecification">
 
     <annotation> Examples :
-        idltowsdl HelloWorld.idl
-        idltowsdl -o HelloWorld HelloWorld.idl
-        idltowsdl -w http://www.mycompany.com/schemas HelloWorld.idl
-        idltowsdl -f HelloWorld.ior -interface HelloWorld HellowWorld.idl
+        idl2wsdl HelloWorld.idl
+        idl2wsdl -o HelloWorld HelloWorld.idl
+        idl2wsdl -w http://www.mycompany.com/schemas HelloWorld.idl
+        idl2wsdl -f HelloWorld.ior -interface HelloWorld HellowWorld.idl
     </annotation>
 
     <usage>
