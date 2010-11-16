@@ -601,6 +601,9 @@ public class AbstractClient implements Client {
         exchange.put(MessageObserver.class, new ClientMessageObserver(cfg));
         exchange.put(Endpoint.class, cfg.getConduitSelector().getEndpoint());
         exchange.setOneWay("true".equals(headers.getFirst(Message.ONE_WAY_REQUEST)));
+        // no need for the underlying conduit to throw the IO exceptions in case of
+        // client requests returning error HTTP code, it can be overridden if really needed 
+        exchange.put("org.apache.cxf.http.no_io_exceptions", true);
         m.setExchange(exchange);
         
         PhaseInterceptorChain chain = setupOutInterceptorChain(cfg);
@@ -614,6 +617,7 @@ public class AbstractClient implements Client {
             m.put(Message.INVOCATION_CONTEXT, context);
             m.putAll(cfg.getRequestContext());
             exchange.putAll(cfg.getRequestContext());
+            exchange.putAll(cfg.getResponseContext());
         }
         
         //setup conduit selector
