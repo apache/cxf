@@ -183,8 +183,26 @@ public class JaxWsServiceConfiguration extends AbstractServiceConfiguration {
         if (Object.class.equals(method.getDeclaringClass())) {
             return false;
         }
+        
+        if (method.getDeclaringClass() == implInfo.getSEIClass()) {
+            WebMethod wm = method.getAnnotation(WebMethod.class);
+            if (wm != null && wm.exclude()) {
+                Message message = new Message("WEBMETHOD_EXCLUDE_NOT_ALLOWED", LOG,
+                                              method.getName());
+                throw new JaxWsConfigurationException(message);
+            }
+        }
+
+        
         Class implClz = implInfo.getImplementorClass();
-        if (isWebMethod(getDeclaredMethod(implClz, method))) {
+        Method m = getDeclaredMethod(implClz, method);
+        if (m != null) {
+            WebMethod wm = m.getAnnotation(WebMethod.class);
+            if (wm != null && wm.exclude()) {
+                return Boolean.FALSE;
+            }
+        }
+        if (isWebMethod(m)) {
             return true;
         }
         return isWebMethod(getDeclaredMethod(method));

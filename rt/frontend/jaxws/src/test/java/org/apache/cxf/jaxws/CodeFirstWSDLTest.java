@@ -27,6 +27,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.service.Hello2;
 import org.apache.cxf.jaxws.service.Hello3;
+import org.apache.cxf.jaxws.service.HelloExcludeImpl;
 import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 import org.apache.cxf.service.Service;
@@ -114,5 +115,20 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
         assertNotNull(portType);
         assertEquals(4, portType.getOperations().size());
     }
+    @Test
+    public void testExcludeOnInterface() throws Exception {
+        try {
+            JaxWsImplementorInfo info = new JaxWsImplementorInfo(HelloExcludeImpl.class);
+            ReflectionServiceFactoryBean bean = new JaxWsServiceFactoryBean(info);
 
+            Bus bus = getBus();
+            bean.setBus(bus);
+            
+            bean.create();
+            
+            fail("WebMethod(exclude=true) is not allowed");
+        } catch (JaxWsConfigurationException e) {
+            assertTrue(e.getMessage().contains("WebMethod"));
+        }
+    }
 }
