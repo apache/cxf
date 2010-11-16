@@ -21,10 +21,14 @@ package org.apache.cxf.aegis.type.java5;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Method;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.aegis.type.Type;
+import org.apache.cxf.common.logging.LogUtils;
 
 public class AnnotationReader {
+    private static final Logger LOG = LogUtils.getL7dLogger(AnnotationReader.class);
     private static final Class<? extends Annotation> WEB_PARAM = load("javax.jws.WebParam");
     private static final Class<? extends Annotation> WEB_RESULT = load("javax.jws.WebResult");
     private static final Class<? extends Annotation> XML_ATTRIBUTE =
@@ -37,21 +41,21 @@ public class AnnotationReader {
             load("javax.xml.bind.annotation.XmlType");
     private static final Class<? extends Annotation> XML_TRANSIENT =
             load("javax.xml.bind.annotation.XmlTransient");
-    
+
     private static final Class<? extends Annotation> XFIRE_IGNORE_PROPERTY =
-            load("org.codehaus.xfire.aegis.type.java5.IgnoreProperty");            
+            load("org.codehaus.xfire.aegis.type.java5.IgnoreProperty");
     private static final Class<? extends Annotation> XFIRE_XML_ATTRIBUTE =
-        load("org.codehaus.xfire.aegis.type.java5.XmlAttribute");            
+        load("org.codehaus.xfire.aegis.type.java5.XmlAttribute");
     private static final Class<? extends Annotation> XFIRE_XML_ELEMENT =
-        load("org.codehaus.xfire.aegis.type.java5.XmlElement");            
+        load("org.codehaus.xfire.aegis.type.java5.XmlElement");
     private static final Class<? extends Annotation> XFIRE_XML_TYPE =
         load("org.codehaus.xfire.aegis.type.java5.XmlType");
     private static final Class<? extends Annotation> XFIRE_XML_PARAM_TYPE =
         load("org.codehaus.xfire.aegis.type.java5.XmlParamType");
     private static final Class<? extends Annotation> XFIRE_XML_RETURN_TYPE =
         load("org.codehaus.xfire.aegis.type.java5.XmlReturnType");
-    
-    
+
+
     @SuppressWarnings("unchecked")
     public boolean isIgnored(AnnotatedElement element) {
         return isAnnotationPresent(element,
@@ -326,7 +330,7 @@ public class AnnotationReader {
             AnnotatedElement element,
             Object ignoredValue,
             Class<? extends Annotation>... annotations) {
-        
+
         for (Class<?> annotation : annotations) {
             if (annotation != null) {
                 try {
@@ -371,7 +375,7 @@ public class AnnotationReader {
             int index,
             Object ignoredValue,
             Class<? extends Annotation>... annotations) {
-        
+
         if (method.getParameterAnnotations() == null
             || method.getParameterAnnotations().length <= index
             || method.getParameterAnnotations()[index] == null) {
@@ -417,6 +421,10 @@ public class AnnotationReader {
         try {
             return AnnotationReader.class.getClassLoader().loadClass(name).asSubclass(Annotation.class);
         } catch (ClassNotFoundException e) {
+            LOG.log(Level.WARNING, "Class " + name + " not found.", e);
+            return null;
+        } catch (ExceptionInInitializerError e2) {
+            LOG.log(Level.WARNING, "Initialization error loading " + name + " not found.", e2);
             return null;
         }
     }
