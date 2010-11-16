@@ -74,7 +74,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerRestSoap.class, true));
+                   launchServer(BookServerRestSoap.class));
     }
     
     @Test
@@ -543,7 +543,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     @Test
     public void testServerFaultInInterceptor() throws Exception {
         //testing faults created by server handled correctly
-        serverFaultInInterceptorTest("321");
+        
         //999 causes error code of 404, 404 has a different code path so need to test too
         serverFaultInInterceptorTest("999");
         //322 causes a checked exception to be thrown so need to 
@@ -586,6 +586,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         features.add((AbstractFeature)testFeature);
         bean.setFeatures(features);
         BookStoreJaxrsJaxws proxy = (BookStoreJaxrsJaxws)bean.create();
+        WebClient.getConfig(proxy).getRequestContext().put("org.apache.cxf.http.no_io_exceptions", false);
         try {
             //321 is special case - causes error code of 525
             proxy.getBook(new Long(param));

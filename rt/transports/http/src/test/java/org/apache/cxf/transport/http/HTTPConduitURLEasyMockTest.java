@@ -55,7 +55,7 @@ import org.junit.Test;
  */
 public class HTTPConduitURLEasyMockTest extends Assert {
     
-    private enum ResponseStyle { NONE, BACK_CHANNEL, DECOUPLED };
+    private enum ResponseStyle { NONE, BACK_CHANNEL, BACK_CHANNEL_ERROR, DECOUPLED };
     private enum ResponseDelimiter { LENGTH, CHUNKED, EOF };
 
     private static final String NOWHERE = "http://nada.nothing.nowhere.null/";
@@ -136,7 +136,18 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         message.put("Content-Type", "text/xml;charset=utf8");
         setUpHeaders(message);
         conduit.prepare(message);
-        verifySentMessage(conduit, message, true, "POST");
+        verifySentMessage(conduit, message, true, "POST", false);
+        finalVerify();
+    }
+    
+    public void testSendWithHeadersCheckErrorStream() throws Exception {
+        control = EasyMock.createNiceControl();
+        HTTPConduit conduit = setUpConduit(true, false);
+        Message message = new MessageImpl();
+        message.put("Content-Type", "text/xml;charset=utf8");
+        setUpHeaders(message);
+        conduit.prepare(message);
+        verifySentMessage(conduit, message, true, "POST", true);
         finalVerify();
     }
     
@@ -308,18 +319,19 @@ public class HTTPConduitURLEasyMockTest extends Assert {
 
     private void verifySentMessage(HTTPConduit conduit, Message message, String method)
         throws IOException {
-        verifySentMessage(conduit, message, false, method);
+        verifySentMessage(conduit, message, false, method, false);
     }
 
     private void verifySentMessage(HTTPConduit conduit,
                                    Message message,
                                    boolean expectHeaders,
-                                   String method)
+                                   String method,
+                                   boolean errorExpected)
         throws IOException {
         verifySentMessage(conduit,
                           message,
                           expectHeaders, 
-                          ResponseStyle.BACK_CHANNEL,
+                          errorExpected ? ResponseStyle.BACK_CHANNEL_ERROR : ResponseStyle.BACK_CHANNEL,
                           method);
     }
 
@@ -396,9 +408,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         assertNotNull("expected in message", inMessage);
         Map<?, ?> headerMap = (Map<?, ?>) inMessage.get(Message.PROTOCOL_HEADERS);
         assertEquals("unexpected response headers", headerMap.size(), 0);
-        Integer expectedResponseCode = style == ResponseStyle.BACK_CHANNEL
-                                       ? HttpURLConnection.HTTP_OK
-                                       : HttpURLConnection.HTTP_ACCEPTED;
+        Integer expectedResponseCode = getResponseCode(style);
         assertEquals("unexpected response code",
                      expectedResponseCode,
                      inMessage.get(Message.RESPONSE_CODE));
@@ -472,9 +482,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
                                       HTTPConduit conduit) throws IOException {
         connection.getHeaderFields();
         EasyMock.expectLastCall().andReturn(Collections.EMPTY_MAP).anyTimes();
-        int responseCode = style == ResponseStyle.BACK_CHANNEL
-                           ? HttpURLConnection.HTTP_OK
-                           : HttpURLConnection.HTTP_ACCEPTED;
+        int responseCode = getResponseCode(style);
         if (conduit.getClient().isAutoRedirect()) {
             connection.getResponseCode();
             EasyMock.expectLastCall().andReturn(301).once().andReturn(responseCode).anyTimes();
@@ -513,9 +521,12 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             break;
             
         case BACK_CHANNEL:
+            break;
+            
+        case BACK_CHANNEL_ERROR:
             connection.getErrorStream();
             EasyMock.expectLastCall().andReturn(null);
-            break;
+            break;    
             
         default:
             break;
@@ -528,5 +539,16 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             control = null;
         }
     }
-    
+
+    private int getResponseCode(ResponseStyle style) {
+        int code;
+        if (style == ResponseStyle.BACK_CHANNEL) {
+            code = HttpURLConnection.HTTP_OK; 
+        } else if (style == ResponseStyle.BACK_CHANNEL_ERROR) {
+            code = HttpURLConnection.HTTP_BAD_REQUEST; 
+        } else {
+            code = HttpURLConnection.HTTP_ACCEPTED;
+        }
+        return code;
+    }
 }

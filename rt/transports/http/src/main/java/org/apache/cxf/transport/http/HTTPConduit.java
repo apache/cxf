@@ -2281,12 +2281,20 @@ public class HTTPConduit
                     }
                 }
             }
-            if (responseCode != HttpURLConnection.HTTP_NOT_FOUND) {
-                in = in == null
-                     ? connection.getErrorStream() == null
-                       ? connection.getInputStream()
-                       : connection.getErrorStream()
-                     : in;
+            if (in == null) {
+                if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
+                    in = connection.getErrorStream();
+                    if (in == null) {
+                        try {
+                            // just in case - but this will most likely cause an exception
+                            in = connection.getInputStream();
+                        } catch (IOException ex) {
+                            // ignore
+                        }
+                    }
+                } else {
+                    in = connection.getInputStream();
+                }
             }
             // if (in == null) : it's perfectly ok for non-soap http services
             // have no response body : those interceptors which do need it will check anyway        
