@@ -55,7 +55,17 @@ public class JAXRSClientServerSpringBookTest extends AbstractBusClientServerTest
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
-                   launchServer(BookServerSpring.class));
+                   launchServer(BookServerSpring.class, true));
+    }
+    
+    @Test
+    public void testGetGenericBook() throws Exception {
+        String baseAddress = "http://localhost:" + PORT + "/the/thebooks8/books"; 
+        WebClient wc = WebClient.create(baseAddress);
+        Long id = wc.type("application/xml").accept("text/plain").post(new Book("CXF", 1L), Long.class);
+        assertEquals(new Long(1), id);
+        Book book = wc.accept("application/xml").query("id", 1L).get(Book.class);
+        assertEquals("CXF", book.getName());
     }
     
     @Test

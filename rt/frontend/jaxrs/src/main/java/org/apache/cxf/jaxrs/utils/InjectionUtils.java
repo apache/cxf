@@ -113,8 +113,9 @@ public final class InjectionUtils {
         }
         
         Type[] bounds = var.getBounds();
-        if (bounds.length > pos && bounds[pos] != Object.class) {
-            return bounds[pos];
+        int boundPos = bounds.length > pos ? pos : 0; 
+        if (bounds.length > boundPos && bounds[boundPos] != Object.class) {
+            return bounds[boundPos];
         }
                 
         Type genericSubtype = serviceClass.getGenericSuperclass();
