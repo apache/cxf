@@ -131,25 +131,6 @@ public class DataReaderImpl<T> extends JAXBDataBase implements DataReader<T> {
                                                               getAttachmentUnmarshaller());
             }
         }
-        //The jaxb class contains XMLGregorianCalendar field also needs JAXB Bridge
-        if (part != null && part.getTypeClass() != null) {
-            boolean useJAXBBridge = false;
-            for (Field field : part.getTypeClass().getDeclaredFields()) {
-                if (field.getType().equals(XMLGregorianCalendar.class)) {
-                    useJAXBBridge = true;
-                    break;
-                }
-            }
-            if (useJAXBBridge) {
-                return JAXBEncoderDecoder.unmarshalWithBridge(part.getConcreteName(), 
-                                                              part.getTypeClass(),
-                                                              part.getTypeClass().getAnnotations(),
-                                                              databinding.getContextClasses(), 
-                                                              reader,
-                                                              getAttachmentUnmarshaller());
-            }
-        }
-        
         
         return JAXBEncoderDecoder.unmarshall(createUnmarshaller(), reader, part, 
                                              unwrapJAXBElement);
