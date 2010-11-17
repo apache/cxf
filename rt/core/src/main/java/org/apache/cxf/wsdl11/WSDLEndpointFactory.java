@@ -18,7 +18,7 @@
  */
 package org.apache.cxf.wsdl11;
 
-import javax.wsdl.Port;
+import java.util.List;
 
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
@@ -26,10 +26,10 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 
 /**
- * A factory to create an internal {@link EndpointInfo} from a WSDL4J {@link Port}.
+ * A factory to create an internal {@link EndpointInfo} from WSDL Port extensions.
  */
 public interface WSDLEndpointFactory {
-    EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, Port port);
+    EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, List<?> extensions);
     
     void createPortExtensors(EndpointInfo ei, Service service);
 }

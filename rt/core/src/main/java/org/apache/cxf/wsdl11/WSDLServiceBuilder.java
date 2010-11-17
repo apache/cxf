@@ -21,6 +21,7 @@ package org.apache.cxf.wsdl11;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -444,7 +445,9 @@ public class WSDLServiceBuilder {
         }
         if (factory instanceof WSDLEndpointFactory) {
             WSDLEndpointFactory wFactory = (WSDLEndpointFactory)factory;
-            ei = wFactory.createEndpointInfo(service, bi, port);
+            ei = wFactory.createEndpointInfo(service, bi, 
+                                    port == null ? Collections.emptyList() 
+                                                 : port.getExtensibilityElements());
         }
 
         if (ei == null) {

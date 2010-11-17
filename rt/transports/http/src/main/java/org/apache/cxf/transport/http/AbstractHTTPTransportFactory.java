@@ -26,7 +26,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import javax.wsdl.Port;
 import javax.wsdl.extensions.http.HTTPAddress;
 import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
@@ -71,10 +70,9 @@ public abstract class AbstractHTTPTransportFactory
     public EndpointInfo createEndpointInfo(
         ServiceInfo serviceInfo, 
         BindingInfo b, 
-        Port        port
+        List<?>     ees
     ) {
-        if (port != null) {
-            List ees = port.getExtensibilityElements();
+        if (ees != null) {
             for (Iterator itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
     
@@ -98,6 +96,7 @@ public abstract class AbstractHTTPTransportFactory
                 }
             }
         }
+        
         HttpEndpointInfo hei = new HttpEndpointInfo(serviceInfo, 
             "http://schemas.xmlsoap.org/wsdl/http/");
         AddressType at = new HttpAddressType();

@@ -20,7 +20,6 @@
 package org.apache.cxf.binding.soap;
 
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,7 +29,6 @@ import java.util.List;
 import java.util.Set;
 
 import javax.annotation.Resource;
-import javax.wsdl.Port;
 import javax.wsdl.WSDLException;
 import javax.wsdl.extensions.ExtensionRegistry;
 import javax.wsdl.factory.WSDLFactory;
@@ -165,15 +163,16 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
         }
     }
 
-    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, Port port) {
+    public EndpointInfo createEndpointInfo(ServiceInfo serviceInfo, BindingInfo b, 
+                                           List<?> ees) {
         String transportURI = "http://schemas.xmlsoap.org/wsdl/soap/";
         if (b instanceof SoapBindingInfo) {
             SoapBindingInfo sbi = (SoapBindingInfo)b;
             transportURI = sbi.getTransportURI();
         }
         EndpointInfo info = new SoapEndpointInfo(serviceInfo, transportURI);
-        if (port != null) {
-            List ees = port.getExtensibilityElements();
+        
+        if (ees != null) {
             for (Iterator itr = ees.iterator(); itr.hasNext();) {
                 Object extensor = itr.next();
     
@@ -190,6 +189,7 @@ public class SoapTransportFactory extends AbstractTransportFactory implements De
                 }
             }
         }
+        
         return info;
     }
 
