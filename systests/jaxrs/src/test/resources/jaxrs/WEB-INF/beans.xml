@@ -152,6 +152,12 @@ http://cxf.apache.org/schemas/core.xsd">
     </jaxrs:model>
   </jaxrs:server>  
 
+  <jaxrs:server id="bookservice8" address="/thebooks8">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.GenericRestServiceImpl"/>
+    </jaxrs:serviceBeans>
+  </jaxrs:server>
+
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="schemaHandler" ref="schemaHolder"/>
   </bean>

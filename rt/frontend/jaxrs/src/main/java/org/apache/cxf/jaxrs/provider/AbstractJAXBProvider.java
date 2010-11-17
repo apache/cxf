@@ -334,10 +334,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         
         JAXBContext context = getPackageContext(type);
-        if (context == null && type != genericType) {
-            context = getPackageContext(InjectionUtils.getActualType(genericType));
-        }
-        
+                
         return context != null ? context : getClassContext(type);
     }
     
