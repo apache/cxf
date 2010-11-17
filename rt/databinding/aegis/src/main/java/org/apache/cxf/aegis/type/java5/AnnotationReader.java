@@ -420,11 +420,8 @@ public class AnnotationReader {
     private static Class<? extends Annotation> load(String name) {
         try {
             return AnnotationReader.class.getClassLoader().loadClass(name).asSubclass(Annotation.class);
-        } catch (ClassNotFoundException e) {
-            LOG.log(Level.WARNING, "Class " + name + " not found.", e);
-            return null;
-        } catch (ExceptionInInitializerError e2) {
-            LOG.log(Level.WARNING, "Initialization error loading " + name + " not found.", e2);
+        } catch (Throwable e) {
+            LOG.log(Level.WARNING, "Error loading annotation class " + name + ".", e);
             return null;
         }
     }
