@@ -170,8 +170,8 @@ public class RequestPreprocessor {
     public Response checkMetadataRequest(Message m) {
         String query = (String)m.get(Message.QUERY_STRING);
         if (query != null && query.contains(WadlGenerator.WADL_QUERY)) {
-            String requestURI = (String)m.get(Message.REQUEST_URI);
-            String baseAddress = HttpUtils.getBaseAddress(m);
+            String requestURI = getValueWithoutSlash((String)m.get(Message.REQUEST_URI));
+            String baseAddress = getValueWithoutSlash(HttpUtils.getBaseAddress(m));
             if (baseAddress.equals(requestURI)) {
                 List<ProviderInfo<RequestHandler>> shs = ProviderFactory.getInstance(m).getRequestHandlers();
                 // this is actually being tested by ProviderFactory unit tests but just in case
@@ -182,6 +182,10 @@ public class RequestPreprocessor {
             }
         }
         return null;
+    }
+    
+    private static String getValueWithoutSlash(String value) {
+        return value.endsWith("/") ? value.substring(0, value.length() - 1) : value;
     }
     
     public Response checkCodeRequest(Message m) {
