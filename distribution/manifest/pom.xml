@@ -289,6 +289,22 @@
              <groupId>com.sun.xml.fastinfoset</groupId>
              <artifactId>FastInfoset</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-core</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-parser</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.abdera</groupId>
+            <artifactId>abdera-extensions-json</artifactId>
+            <optional>true</optional>
+        </dependency>
     </dependencies>
 
     <build>

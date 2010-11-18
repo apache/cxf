@@ -94,19 +94,16 @@
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-core</artifactId>
-            <version>${cxf.abdera.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-parser</artifactId>
-            <version>${cxf.abdera.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>org.apache.abdera</groupId>
             <artifactId>abdera-extensions-json</artifactId>
-            <version>${cxf.abdera.version}</version>
             <optional>true</optional>
         </dependency>
         <dependency>
