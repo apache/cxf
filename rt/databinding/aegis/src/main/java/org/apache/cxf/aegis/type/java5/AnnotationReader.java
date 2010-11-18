@@ -421,7 +421,7 @@ public class AnnotationReader {
         try {
             return AnnotationReader.class.getClassLoader().loadClass(name).asSubclass(Annotation.class);
         } catch (Throwable e) {
-            LOG.log(Level.WARNING, "Error loading annotation class " + name + ".", e);
+            LOG.log(Level.FINE, "Error loading annotation class " + name + ".", e);
             return null;
         }
     }
