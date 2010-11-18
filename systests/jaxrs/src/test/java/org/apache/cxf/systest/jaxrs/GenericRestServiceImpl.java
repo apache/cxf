@@ -26,12 +26,10 @@ public class GenericRestServiceImpl<T extends Book, PK extends Long> implements 
 
     private Map entities = new HashMap();
 
-    @Override
     public T getById(PK id) {
         return (T)entities.get((Long)id);
     }
 
-    @Override
     public PK postEntity(T instance) {
         entities.put(1L, instance);
         return (PK)entities.keySet().iterator().next();
