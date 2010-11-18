@@ -730,7 +730,31 @@ public class ClientImpl
             } else if (message.getContent(Exception.class) != null) {
                 outFaultObserver.onMessage(message);
             } else {
-                chain.doIntercept(message);
+                callback = message.getExchange().get(ClientCallback.class);
+
+                if (callback != null && !isPartialResponse(message)) {
+                    try {
+                        chain.doIntercept(message);
+                    } catch (Throwable error) {
+                        //so that asyn callback handler get chance to 
+                        //handle non-runtime exceptions
+                        message.getExchange().setInMessage(message);
+                        Map<String, Object> resCtx = CastUtils
+                                .cast((Map<?, ?>) message.getExchange()
+                                        .getOutMessage().get(
+                                                Message.INVOCATION_CONTEXT));
+                        resCtx = CastUtils.cast((Map<?, ?>) resCtx
+                                .get(RESPONSE_CONTEXT));
+                        if (resCtx != null) {
+                            responseContext.put(Thread.currentThread(), resCtx);
+                        }
+                        callback.handleException(resCtx, error);
+
+                    }
+                } else {
+                    chain.doIntercept(message);
+                }
+                 
             }
 
             callback = message.getExchange().get(ClientCallback.class);
