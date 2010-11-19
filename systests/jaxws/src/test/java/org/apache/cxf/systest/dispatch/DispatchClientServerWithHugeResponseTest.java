@@ -117,11 +117,12 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
         assertNotNull(soapReqMsg3);
         Response<SOAPMessage> response = disp.invokeAsync(soapReqMsg3);
         try {
-            response.get(10, TimeUnit.SECONDS);
+            response.get(300, TimeUnit.SECONDS);
         } catch (TimeoutException te) {
             fail("We should not have encountered a timeout, " 
                 + "should get some exception tell me stackoverflow");
         } catch (Throwable e) {
+            e.printStackTrace();
             assertTrue(e.getCause() instanceof StackOverflowError);
         }
         
