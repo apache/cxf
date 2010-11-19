@@ -38,9 +38,6 @@ import javax.net.ssl.SSLSocketFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ReflectionInvokationHandler;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
-import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.http.HttpURLConnectionFactory;
-import org.apache.cxf.transport.http.HttpURLConnectionInfo;
 
 /**
  * This HttpsURLConnectionFactory implements the HttpURLConnectionFactory
@@ -48,8 +45,7 @@ import org.apache.cxf.transport.http.HttpURLConnectionInfo;
  * URLs.
  * 
  */
-public final class HttpsURLConnectionFactory 
-    implements HttpURLConnectionFactory {
+public class HttpsURLConnectionFactory {
     
     /**
      * This constant holds the URL Protocol Identifier for HTTPS
@@ -63,19 +59,6 @@ public final class HttpsURLConnectionFactory
     private static boolean weblogicWarned;
     
     /**
-     * This field holds the conduit to which this connection factory
-     * is a slave.
-     */
-    HTTPConduit conduit;
-    
-    /**
-     * This field contains the TLS configuration for the URLs created by
-     * this factory.
-     */
-    TLSClientParameters tlsClientParameters;
-    
-    
-    /**
      * Cache the last SSLContext to avoid recreation
      */
     SSLSocketFactory socketFactory;
@@ -83,13 +66,8 @@ public final class HttpsURLConnectionFactory
     /**
      * This constructor initialized the factory with the configured TLS
      * Client Parameters for the HTTPConduit for which this factory is used.
-     * 
-     * @param params The TLS Client Parameters. This parameter is guaranteed 
-     *               to be non-null.
      */
-    public HttpsURLConnectionFactory(TLSClientParameters params) {
-        tlsClientParameters        = params;
-        assert tlsClientParameters != null;
+    public HttpsURLConnectionFactory() {
     }
     
     /**
@@ -105,24 +83,22 @@ public final class HttpsURLConnectionFactory
      *         is thrown. 
      *                     
      */
-    public HttpURLConnection createConnection(Proxy proxy, URL url)
-        throws IOException {
-
-        if (!url.getProtocol().equals(HTTPS_URL_PROTOCOL_ID)) {
-            throw new IOException("Illegal Protocol " 
-                    + url.getProtocol() 
-                    + " for HTTPS URLConnection Factory.");
-        }
+    public HttpURLConnection createConnection(TLSClientParameters tlsClientParameters, 
+            Proxy proxy, URL url) throws IOException {
         
         HttpURLConnection connection =
             (HttpURLConnection) (proxy != null 
                                    ? url.openConnection(proxy)
                                    : url.openConnection());
-                                   
-        if (tlsClientParameters != null) {
+        if (HTTPS_URL_PROTOCOL_ID.equals(url.getProtocol())) {
+            
+            if (tlsClientParameters == null) {
+                tlsClientParameters = new TLSClientParameters();
+            }
+
             Exception ex = null;
             try {
-                decorateWithTLS(connection);
+                decorateWithTLS(tlsClientParameters, connection);
             } catch (Exception e) {
                 ex = e;
             } finally {
@@ -146,8 +122,8 @@ public final class HttpsURLConnectionFactory
      * from the TLS Client Parameters. Connection parameter is of supertype HttpURLConnection, 
      * which allows internal cast to potentially divergent subtype (https) implementations.
      */
-    protected synchronized void decorateWithTLS(HttpURLConnection connection)
-        throws GeneralSecurityException {
+    protected synchronized void decorateWithTLS(TLSClientParameters tlsClientParameters, 
+            HttpURLConnection connection) throws GeneralSecurityException {
 
         // always reload socketFactory from HttpsURLConnection.defaultSSLSocketFactory and 
         // tlsClientParameters.sslSocketFactory to allow runtime configuration change
@@ -263,27 +239,6 @@ public final class HttpsURLConnectionFactory
      */
     protected void addLogHandler(Handler handler) {
         LOG.addHandler(handler);
-    }
-
-    /**
-     * This operation returns an HttpsURLConnectionInfo for the 
-     * given HttpsURLConnection. 
-     * 
-     * @param connection The HttpsURLConnection
-     * @return The HttpsURLConnectionInfo object for the given 
-     *         HttpsURLConnection.
-     * @throws IOException Normal IO Exceptions.
-     * @throws ClassCastException If "connection" is not an HttpsURLConnection 
-     *         (or a supported subtype of HttpURLConnection)
-     */
-    public HttpURLConnectionInfo getConnectionInfo(
-            HttpURLConnection connection
-    ) throws IOException {  
-        return new HttpsURLConnectionInfo(connection);
-    }
-    
-    public String getProtocol() {
-        return "https";
     }
 
 }

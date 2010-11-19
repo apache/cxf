@@ -72,7 +72,7 @@ public class HttpsURLConnectionInfo extends HttpURLConnectionInfo {
      * of supertype HttpURLConnection, which allows internal cast to 
      * potentially divergent subtype (Https) implementations.
      */
-    HttpsURLConnectionInfo(HttpURLConnection connection)
+    public HttpsURLConnectionInfo(HttpURLConnection connection)
         throws IOException {
         super(connection);
         if (connection instanceof HttpsURLConnection) {

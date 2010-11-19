@@ -28,6 +28,7 @@ import java.io.PushbackInputStream;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
@@ -74,6 +75,8 @@ import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
+import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
+import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
 import org.apache.cxf.version.Version;
 import org.apache.cxf.workqueue.WorkQueueManager;
@@ -181,7 +184,7 @@ public class HTTPConduit
      * that an extended class may alter its value with an EasyMock URLConnection
      * Factory. 
      */
-    protected HttpURLConnectionFactory connectionFactory;
+    protected HttpsURLConnectionFactory connectionFactory;
     
     /**
      *  This field holds a reference to the CXF bus associated this conduit.
@@ -247,14 +250,6 @@ public class HTTPConduit
     private HttpAuthSupplier authSupplier;
 
     /**
-     * This boolean signfies that that finalizeConfig is called, which is
-     * after the HTTPTransportFactory configures this object via spring.
-     * At this point, any change by a "setter" is dynamic, and any change
-     * should be handled as such.
-     */
-    private boolean configFinalized;
-
-    /**
      * Variables for holding session state if sessions are supposed to be maintained
      */
     private Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>();
@@ -295,7 +290,15 @@ public class HTTPConduit
             fromEndpointReferenceType = true;
         }
         proxyFactory = new ProxyFactory();
-        initializeConfig();
+        connectionFactory = new HttpsURLConnectionFactory();
+        
+        // wsdl extensors are superseded by policies which in        
+        // turn are superseded by injection                          
+        PolicyEngine pe = bus.getExtension(PolicyEngine.class);      
+        if (null != pe && pe.isEnabled() && endpointInfo.getService() != null) {                          
+            clientSidePolicy =                                       
+                PolicyUtils.getClient(pe, endpointInfo, this);              
+        }
         CXFAuthenticator.addAuthenticator();
     }
 
@@ -315,24 +318,6 @@ public class HTTPConduit
         return endpointInfo.getName() + SC_HTTP_CONDUIT_SUFFIX;
     }
 
-    /**
-     * This method is called from the constructor which initializes
-     * the configuration. The TransportFactory will call configureBean
-     * on this object after construction.
-     */    
-    private void initializeConfig() {
-    
-        // wsdl extensors are superseded by policies which in        
-        // turn are superseded by injection                          
-
-        PolicyEngine pe = bus.getExtension(PolicyEngine.class);      
-        if (null != pe && pe.isEnabled() && endpointInfo.getService() != null) {                          
-            clientSidePolicy =                                       
-                PolicyUtils.getClient(pe, endpointInfo, this);              
-        }                                                            
-
-    }
-    
     private static void configureConduitFromEndpointInfo(HTTPConduit conduit,
             EndpointInfo endpointInfo) {
         if (conduit.getClient() == null) {
@@ -419,14 +404,6 @@ public class HTTPConduit
         
         configureConduitFromEndpointInfo(this, endpointInfo);
         logConfig();
-
-        // Get the correct URLConnection factory based on the 
-        // configuration.
-        connectionFactory = retrieveConnectionFactory(getAddress());
-
-        // We have finalized the configuration. Any configurable entity
-        // set now, must make changes dynamically.
-        configFinalized = true;
         
         if (getClient().getDecoupledEndpoint() != null) {
             this.endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto",
@@ -445,29 +422,12 @@ public class HTTPConduit
         return sessionCookies;
     }
     
-    /**
-     * This method sets the connectionFactory field for this object. It is called
-     * after an SSL Client Policy is set or an HttpsHostnameVerifier
-     * because we need to reinitialize the connection factory.
-     * <p>
-     * This method is "protected" so that this class may be extended and override
-     * this method to put an EasyMock URL Connection factory for some contrived 
-     * UnitTest that will of course break, should the calls to the URL Connection
-     * Factory get altered.
-     */
-    protected synchronized HttpURLConnectionFactory retrieveConnectionFactory(String url) {
-        return AbstractHTTPTransportFactory.getConnectionFactory(this, url);
+    private HttpURLConnection createConnection(Message message, URL url) throws IOException {
+        HTTPClientPolicy csPolicy = getClient(message);
+        Proxy proxy = proxyFactory.createProxy(csPolicy , url);
+        return connectionFactory.createConnection(tlsClientParameters, proxy, url);
     }
-    
-    
-    protected synchronized HttpURLConnectionFactory getConnectionFactory(URL url) {
-        if (connectionFactory == null 
-            || !url.getProtocol().equals(connectionFactory.getProtocol())) {
-            connectionFactory = retrieveConnectionFactory(url.toString());
-        }
 
-        return connectionFactory;
-    }
     /**
      * Prepare to send an outbound HTTP message over this http conduit to a 
      * particular endpoint.
@@ -501,10 +461,7 @@ public class HTTPConduit
         boolean needToCacheRequest = false;
         
         HTTPClientPolicy csPolicy = getClient(message);
-
-        HttpURLConnectionFactory f = getConnectionFactory(currentURL);
-        HttpURLConnection connection = f.createConnection(proxyFactory.createProxy(csPolicy, currentURL), 
-                currentURL);
+        HttpURLConnection connection = createConnection(message, currentURL);
         connection.setDoOutput(true);       
         
         long timeout = csPolicy.getConnectionTimeout();
@@ -691,8 +648,7 @@ public class HTTPConduit
                 // The call is (said to be) ingored internally if
                 // already connected.
                 connection.connect();
-                URLConnectionInfo info = getConnectionFactory(connection.getURL())
-                    .getConnectionInfo(connection);
+                HttpsURLConnectionInfo info = new HttpsURLConnectionInfo(connection);
                 if (trustDecider != null) {
                     trustDecider.establishTrust(
                         getConduitName(), 
@@ -1316,11 +1272,6 @@ public class HTTPConduit
                     + "' has been (re)configured for plain http.");
             }
         }
-        // If this is called after the HTTPTransportFactory called 
-        // finalizeConfig, we need to update the connection factory.
-        if (configFinalized) {
-            connectionFactory = retrieveConnectionFactory(getAddress());
-        }
     }
 
     /**
@@ -1603,8 +1554,7 @@ public class HTTPConduit
         connection.disconnect();
         
         HTTPClientPolicy cp = getClient(message);
-        connection = getConnectionFactory(newURL).createConnection(proxyFactory.createProxy(cp, newURL), 
-                newURL);
+        connection = createConnection(message, newURL);
         connection.setDoOutput(true);        
         // TODO: using Message context to deceided HTTP send properties
         connection.setConnectTimeout((int)cp.getConnectionTimeout());

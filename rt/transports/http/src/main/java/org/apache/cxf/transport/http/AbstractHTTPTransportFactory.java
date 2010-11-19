@@ -31,13 +31,11 @@ import javax.wsdl.extensions.soap.SOAPAddress;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.configuration.Configurer;
-import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.AbstractTransportFactory;
-import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.wsdl.http.AddressType;
 import org.apache.cxf.wsdl11.WSDLEndpointFactory;
 
@@ -132,43 +130,6 @@ public abstract class AbstractHTTPTransportFactory
             }
         }
     }
-
-    /**
-     * This static call creates a connection factory based on
-     * the existence of the SSL (TLS) client side configuration. 
-     */
-    static HttpURLConnectionFactory getConnectionFactory(HTTPConduit configuredConduit) {
-        return getConnectionFactory(configuredConduit, null);
-    }
-    
-    static HttpURLConnectionFactory getConnectionFactory(
-        HTTPConduit configuredConduit,
-        String address
-    ) {
-        HttpURLConnectionFactory fac = null;
-        boolean useHttps = false;
-
-        if (address == null) {
-            address = configuredConduit.getAddress();
-        }
-        if (address != null 
-            && address.startsWith(HttpsURLConnectionFactory.HTTPS_URL_PROTOCOL_ID + ":/")) {
-            useHttps = true;
-        }
-        if (address == null) {
-            useHttps = configuredConduit.getTlsClientParameters() != null;
-        }
-        if (useHttps) {
-            TLSClientParameters params = configuredConduit.getTlsClientParameters();
-            if (params == null) {
-                params = new TLSClientParameters(); //use defaults
-            }
-            fac = new HttpsURLConnectionFactory(params);
-        } else {
-            fac = new HttpURLConnectionFactoryImpl();
-        }
-        return fac;
-    }   
     
     private static class HttpEndpointInfo extends EndpointInfo {
         AddressType saddress;

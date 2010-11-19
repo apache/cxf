@@ -34,6 +34,7 @@ import java.util.Map;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.bus.CXFBusImpl;
+import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.io.AbstractThresholdOutputStream;
@@ -42,6 +43,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -62,7 +64,7 @@ public class HTTPConduitURLEasyMockTest extends Assert {
     private static final String PAYLOAD = "message payload";
     private IMocksControl control;
     private EndpointInfo endpointInfo;
-    private HttpURLConnectionFactory connectionFactory;
+    private HttpsURLConnectionFactory connectionFactory;
     private HttpURLConnection connection;
     private Proxy proxy;
     private Message inMessage;
@@ -80,18 +82,12 @@ public class HTTPConduitURLEasyMockTest extends Assert {
             Bus                      associatedBus, 
             EndpointInfo             endpoint, 
             EndpointReferenceType    epr,
-            HttpURLConnectionFactory testFactory
+            HttpsURLConnectionFactory testFactory
         ) throws IOException {
             super(associatedBus, endpoint, epr);
             connectionFactory = testFactory;
         }
-        @Override
-        protected HttpURLConnectionFactory retrieveConnectionFactory(String s) {
-            // do nothing. i.e do not change the connectionFactory field.
-            return connectionFactory;
-        }
-        
-        
+
     }
     /**
      * @throws java.lang.Exception
@@ -251,14 +247,14 @@ public class HTTPConduitURLEasyMockTest extends Assert {
         endpointInfo = new EndpointInfo();
         endpointInfo.setAddress(NOWHERE + "bar/foo");
         connectionFactory = 
-            control.createMock(HttpURLConnectionFactory.class);
+            control.createMock(HttpsURLConnectionFactory.class);
         
         if (send) {
             //proxy = control.createMock(Proxy.class);
             proxy =  null;
             connection =
                 control.createMock(HttpURLConnection.class);
-            connectionFactory.createConnection(
+            connectionFactory.createConnection((TLSClientParameters)EasyMock.isNull(),
                                       EasyMock.eq(proxy), 
                                       EasyMock.eq(new URL(NOWHERE + "bar/foo")));
             EasyMock.expectLastCall().andReturn(connection);
