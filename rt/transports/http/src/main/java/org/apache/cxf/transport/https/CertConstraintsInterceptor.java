@@ -33,7 +33,6 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.security.transport.TLSSessionInfo;
 import org.apache.cxf.transport.http.MessageTrustDecider;
-import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException; 
 
 /**
@@ -62,31 +61,7 @@ public final class CertConstraintsInterceptor extends AbstractPhaseInterceptor<M
                 
                 if (connection instanceof HttpsURLConnection) {
                     final MessageTrustDecider orig = message.get(MessageTrustDecider.class);
-                    MessageTrustDecider trust = new MessageTrustDecider() {
-                        public void establishTrust(String conduitName,
-                                URLConnectionInfo connectionInfo,
-                                Message message)
-                            throws UntrustedURLConnectionIOException {
-                            if (orig != null) {
-                                orig.establishTrust(conduitName, connectionInfo, message);
-                            }
-                            HttpsURLConnectionInfo info = (HttpsURLConnectionInfo)connectionInfo;
-
-                            if (info.getServerCertificates() == null 
-                                    || info.getServerCertificates().length == 0) {
-                                throw new UntrustedURLConnectionIOException(
-                                    "No server certificates were found"
-                                );
-                            } else {
-                                X509Certificate[] certs = (X509Certificate[])info.getServerCertificates();
-                                if (!certConstraints.matches(certs[0])) {
-                                    throw new UntrustedURLConnectionIOException(
-                                        "The server certificate(s) do not match the defined cert constraints"
-                                    );
-                                }
-                            }
-                        }
-                    };
+                    MessageTrustDecider trust = new HttpsMessageTrustDecider(certConstraints, orig);
                     message.put(MessageTrustDecider.class, trust);
                 } else {
                     throw new UntrustedURLConnectionIOException(

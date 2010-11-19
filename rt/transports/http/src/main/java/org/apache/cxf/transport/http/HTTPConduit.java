@@ -364,6 +364,50 @@ public class HTTPConduit
         }
     }
     
+    private void logConfig() {
+        if (!LOG.isLoggable(Level.FINE)) {
+            return;
+        }
+        if (trustDecider == null) {
+            LOG.log(Level.FINE,
+                    "No Trust Decider configured for Conduit '"
+                    + getConduitName() + "'");
+        } else {
+            LOG.log(Level.FINE, "Message Trust Decider of class '" 
+                    + trustDecider.getClass().getName()
+                    + "' with logical name of '"
+                    + trustDecider.getLogicalName()
+                    + "' has been configured for Conduit '" 
+                    + getConduitName()
+                    + "'");
+        }
+        if (authSupplier == null) {
+            LOG.log(Level.FINE,
+                    "No Auth Supplier configured for Conduit '"
+                    + getConduitName() + "'");
+        } else {
+            LOG.log(Level.FINE, "HttpAuthSupplier of class '" 
+                    + authSupplier.getClass().getName()
+                    + "' with logical name of '"
+                    + authSupplier.getLogicalName()
+                    + "' has been configured for Conduit '" 
+                    + getConduitName()
+                    + "'");
+        }
+        if (this.tlsClientParameters != null) {
+            LOG.log(Level.FINE, "Conduit '" + getConduitName()
+                    + "' has been configured for TLS "
+                    + "keyManagers " + Arrays.toString(tlsClientParameters.getKeyManagers())
+                    + "trustManagers " + Arrays.toString(tlsClientParameters.getTrustManagers())
+                    + "secureRandom " + tlsClientParameters.getSecureRandom()
+                    + "Disable Common Name (CN) Check: " + tlsClientParameters.isDisableCNCheck());
+
+        } else {
+            LOG.log(Level.FINE, "Conduit '" + getConduitName()
+                    + "' has been configured for plain http.");
+        }
+    }
+    
     /**
      * This call gets called by the HTTPTransportFactory after it
      * causes an injection of the Spring configuration properties
@@ -374,56 +418,7 @@ public class HTTPConduit
         // in order from the Endpoint, Service, or Bus.
         
         configureConduitFromEndpointInfo(this, endpointInfo);
-
-        if (trustDecider == null) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE,
-                    "No Trust Decider configured for Conduit '"
-                    + getConduitName() + "'");
-            }
-        } else {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Message Trust Decider of class '" 
-                    + trustDecider.getClass().getName()
-                    + "' with logical name of '"
-                    + trustDecider.getLogicalName()
-                    + "' has been configured for Conduit '" 
-                    + getConduitName()
-                    + "'");
-            }
-        }
-        if (authSupplier == null) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE,
-                    "No Auth Supplier configured for Conduit '"
-                    + getConduitName() + "'");
-            }
-        } else {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "HttpAuthSupplier of class '" 
-                    + authSupplier.getClass().getName()
-                    + "' with logical name of '"
-                    + authSupplier.getLogicalName()
-                    + "' has been configured for Conduit '" 
-                    + getConduitName()
-                    + "'");
-            }
-        }
-        if (this.tlsClientParameters != null) {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Conduit '" + getConduitName()
-                    + "' has been configured for TLS "
-                    + "keyManagers " + Arrays.toString(tlsClientParameters.getKeyManagers())
-                    + "trustManagers " + Arrays.toString(tlsClientParameters.getTrustManagers())
-                    + "secureRandom " + tlsClientParameters.getSecureRandom()
-                    + "Disable Common Name (CN) Check: " + tlsClientParameters.isDisableCNCheck());
-            }
-        } else {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "Conduit '" + getConduitName()
-                    + "' has been configured for plain http.");
-            }
-        }
+        logConfig();
 
         // Get the correct URLConnection factory based on the 
         // configuration.
