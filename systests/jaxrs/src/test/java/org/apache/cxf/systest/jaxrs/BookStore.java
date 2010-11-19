@@ -133,6 +133,14 @@ public class BookStore {
                                     .build();
     }
     
+
+    @GET
+    @Path("settwocookies")
+    public Response setTwoCookies() {
+        return Response.ok().header("Set-Cookie", "JSESSIONID=0475F7F30A26E5B0C15D69; Path=/")
+            .header("Set-Cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/").build();
+    }
+    
     @GET
     @Path("propogateexception")
     public Book propogateException() throws BookNotFoundFault {

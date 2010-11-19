@@ -340,9 +340,9 @@ public class AbstractClient implements Client {
                     currentResponseBuilder.header(entry.getKey(), entry.getValue().get(0));
                     continue;                    
                 }
-                boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
-                                          && entry.getValue().get(0).contains(HttpHeaders.EXPIRES));
                 for (String val : entry.getValue()) {
+                    boolean splitPossible = !(HttpHeaders.SET_COOKIE.equalsIgnoreCase(entry.getKey())
+                        && val.contains(HttpHeaders.EXPIRES));
                     String[] values = splitPossible ? val.split(",") : new String[]{val};
                     for (String s : values) {
                         String theValue = s.trim();

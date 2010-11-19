@@ -94,6 +94,9 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     
+    
+    private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
@@ -255,12 +258,20 @@ public abstract class AbstractHTTPDestination extends AbstractMultiplexDestinati
                 String header = (String)iter.next();
                 List<?> headerList = (List<?>)headers.get(header);
                 StringBuilder sb = new StringBuilder();
-                for (int i = 0; i < headerList.size(); i++) {
-                    sb.append(headerList.get(i));
-                    if (i + 1 < headerList.size()) {
-                        sb.append(',');
+
+                if (HTTP_HEADERS_SETCOOKIE.equals(header)) {
+                    for (int i = 0; i < headerList.size(); i++) {
+                        response.addHeader(header, headerList.get(i).toString());
+                    }
+                } else {
+                    for (int i = 0; i < headerList.size(); i++) {
+                        sb.append(headerList.get(i));
+                        if (i + 1 < headerList.size()) {
+                            sb.append(',');
+                        }
                     }
                 }
+
                 response.addHeader(header, sb.toString());
             }
         } else {

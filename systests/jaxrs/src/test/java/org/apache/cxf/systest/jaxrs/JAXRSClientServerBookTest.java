@@ -92,6 +92,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(1, cookies.size());
     }
     
+    @Test
+    public void testSetTwoCookieWebClient() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/settwocookies");
+        Response r = client.type("*/*").get();
+        assertEquals(200, r.getStatus());
+        List<Object> cookies = r.getMetadata().get("Set-Cookie");
+        assertNotNull(cookies);
+        assertEquals(2, cookies.size());
+    }
+
     
     @Test
     public void testOnewayProxy() throws Exception {
