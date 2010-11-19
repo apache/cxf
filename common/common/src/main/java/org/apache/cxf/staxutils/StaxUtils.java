@@ -26,6 +26,7 @@ import java.io.StringWriter;
 import java.io.Writer;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Stack;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.logging.Logger;
@@ -872,74 +873,27 @@ public final class StaxUtils {
         return (parent instanceof Document) ? (Document)parent : parent.getOwnerDocument();
     }
 
-    /**
-     * @param parent
-     * @param reader
-     * @return
-     * @throws XMLStreamException
-     */
-    private static Element startElement(Document doc, 
-                                        Node parent, 
-                                        XMLStreamReader reader,
-                                        boolean repairing,
-                                        boolean recordLocation)
-        throws XMLStreamException {
-
-        Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
-        if (reader.getPrefix() != null) {
-            e.setPrefix(reader.getPrefix());
-        }       
-        e = (Element)parent.appendChild(e);
-        recordLocation = addLocation(doc, e, reader, recordLocation);
-
-        for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
-            String uri = reader.getNamespaceURI(ns);
-            String prefix = reader.getNamespacePrefix(ns);
-
-            declare(e, uri, prefix);
-        }
-
-        for (int att = 0; att < reader.getAttributeCount(); att++) {
-            String name = reader.getAttributeLocalName(att);
-            String prefix = reader.getAttributePrefix(att);
-            if (prefix != null && prefix.length() > 0) {
-                name = prefix + ":" + name;
-            }
-
-            Attr attr = doc.createAttributeNS(reader.getAttributeNamespace(att), name);
-            attr.setValue(reader.getAttributeValue(att));
-            e.setAttributeNode(attr);
-        }
-
-        if (repairing && !isDeclared(e, reader.getNamespaceURI(), reader.getPrefix())) {
-            declare(e, reader.getNamespaceURI(), reader.getPrefix());
-        }
-
-        reader.next();
-
-        readDocElements(doc, e, reader, repairing, recordLocation);
-
-        return e;
-    }
-
     private static boolean isDeclared(Element e, String namespaceURI, String prefix) {
-        Attr att;
-        if (prefix != null && prefix.length() > 0) {
-            att = e.getAttributeNodeNS(XML_NS, prefix);
-        } else {
-            att = e.getAttributeNode("xmlns");
-        }
-
-        if (att != null && att.getNodeValue().equals(namespaceURI)) {
-            return true;
-        }
-
-        if (e.getParentNode() instanceof Element) {
-            return isDeclared((Element)e.getParentNode(), namespaceURI, prefix);
-        }
-        if (StringUtils.isEmpty(prefix) && StringUtils.isEmpty(namespaceURI)) {
-            //A document that probably doesn't have any namespace qualifies elements
-            return true;
+        while (e != null) {
+            Attr att;
+            if (prefix != null && prefix.length() > 0) {
+                att = e.getAttributeNodeNS(XML_NS, prefix);
+            } else {
+                att = e.getAttributeNode("xmlns");
+            }
+    
+            if (att != null && att.getNodeValue().equals(namespaceURI)) {
+                return true;
+            }
+    
+            if (e.getParentNode() instanceof Element) {
+                e = (Element)e.getParentNode();
+            } else if (StringUtils.isEmpty(prefix) && StringUtils.isEmpty(namespaceURI)) {
+                //A document that probably doesn't have any namespace qualifies elements
+                return true;
+            } else {
+                e = null;
+            }
         }
         return false;
     }
@@ -957,19 +911,58 @@ public final class StaxUtils {
     public static void readDocElements(Document doc, Node parent,
                                        XMLStreamReader reader, boolean repairing, boolean recordLoc)
         throws XMLStreamException {
-
+        
+        Stack<Node> stack = new Stack<Node>();
         int event = reader.getEventType();
         while (reader.hasNext()) {
             switch (event) {
-            case XMLStreamConstants.START_ELEMENT:
-                startElement(doc, parent, reader, repairing, recordLoc);
+            case XMLStreamConstants.START_ELEMENT: {
+                Element e = doc.createElementNS(reader.getNamespaceURI(), reader.getLocalName());
+                if (reader.getPrefix() != null) {
+                    e.setPrefix(reader.getPrefix());
+                }       
+                e = (Element)parent.appendChild(e);
+                recordLoc = addLocation(doc, e, reader, recordLoc);
+
+                for (int ns = 0; ns < reader.getNamespaceCount(); ns++) {
+                    String uri = reader.getNamespaceURI(ns);
+                    String prefix = reader.getNamespacePrefix(ns);
+
+                    declare(e, uri, prefix);
+                }
+
+                for (int att = 0; att < reader.getAttributeCount(); att++) {
+                    String name = reader.getAttributeLocalName(att);
+                    String prefix = reader.getAttributePrefix(att);
+                    if (prefix != null && prefix.length() > 0) {
+                        name = prefix + ":" + name;
+                    }
+
+                    Attr attr = doc.createAttributeNS(reader.getAttributeNamespace(att), name);
+                    attr.setValue(reader.getAttributeValue(att));
+                    e.setAttributeNode(attr);
+                }
+
+                if (repairing && !isDeclared(e, reader.getNamespaceURI(), reader.getPrefix())) {
+                    declare(e, reader.getNamespaceURI(), reader.getPrefix());
+                }
+                stack.push(parent);
+                parent = e;
                 
+                //event = reader.next();
+                //readDocElements(doc, e, reader, repairing, recordLoc);
+                
+                break;
+            }
+            case XMLStreamConstants.END_ELEMENT:
+                if (stack.isEmpty()) {
+                    return;
+                }
+                parent = stack.pop();
                 if (parent instanceof Document) {
                     return;
                 }
                 break;
-            case XMLStreamConstants.END_ELEMENT:
-                return;
             case XMLStreamConstants.NAMESPACE:
                 break;
             case XMLStreamConstants.ATTRIBUTE:
