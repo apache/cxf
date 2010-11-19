@@ -105,6 +105,7 @@ public class JAXRSClientServerProxySpringBookTest extends AbstractBusClientServe
         URLConnection connect = url.openConnection();
         connect.addRequestProperty("Content-Type", "*/*");
         connect.addRequestProperty("Accept", "application/xml");
+        connect.addRequestProperty("SpringProxy", "true");
         InputStream in = connect.getInputStream();           
 
         InputStream expected = getClass()
