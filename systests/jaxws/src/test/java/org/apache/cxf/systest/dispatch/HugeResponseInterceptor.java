@@ -18,13 +18,9 @@
  */
 package org.apache.cxf.systest.dispatch;
 
-import java.io.IOException;
-import java.io.InputStream;
 
-import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
-import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
@@ -37,26 +33,7 @@ public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
     }
 
     public void handleMessage(Message message) throws Fault {
-        InputStream is = message.getContent(InputStream.class);
-        if (is != null) {
-            CachedOutputStream bos = new CachedOutputStream();
-            try {
-                //intend to change response as malformed message
-                is = getClass().getClassLoader().getResourceAsStream(
-                        "org/apache/cxf/systest/dispatch/resources/stack_overflow_rs.xml");
-                IOUtils.copy(is, bos);
-
-                bos.flush();
-                is.close();
-                message.setContent(InputStream.class, bos.getInputStream());
-                bos.close();
-                message.setContent(InputStream.class, bos.getInputStream());
-                
-            } catch (IOException e) {
-                throw new Fault(e);
-            }
-        }
-
+        throw new StackOverflowError();
     }
 
 }
