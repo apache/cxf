@@ -22,9 +22,16 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+
 public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
+    @Context 
+    private UriInfo ui;
     
     public BookStoreNoAnnotationsImpl() {
         Book b = new Book();
@@ -34,6 +41,9 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
     }
     
     public Book getBook(Long id) throws BookNotFoundFault {
+        if (ui == null) {
+            throw new WebApplicationException(Response.serverError().build());
+        }
         return books.get(id);
     }
     
