@@ -66,6 +66,7 @@ public abstract class AbstractResourceInfo {
         resourceClass = rClass;
         if (serviceClass.isInterface() && resourceClass != null && !resourceClass.isInterface()) {
             findContextFields(resourceClass);
+            findContextSetterMethods(resourceClass);
         }
     }
     

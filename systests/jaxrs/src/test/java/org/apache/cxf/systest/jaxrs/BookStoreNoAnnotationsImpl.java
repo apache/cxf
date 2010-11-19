@@ -24,14 +24,18 @@ import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
-public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface {
+public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterface,
+    HttpHeadersContext {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
     @Context 
     private UriInfo ui;
+
+    private HttpHeaders hs;
     
     public BookStoreNoAnnotationsImpl() {
         Book b = new Book();
@@ -40,8 +44,16 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
         books.put(b.getId(), b);
     }
     
+    public void setHttpHeaders(HttpHeaders headers) {
+        this.hs = headers;    
+    }
+    
     public Book getBook(Long id) throws BookNotFoundFault {
-        if (ui == null) {
+        if (hs == null) {
+            throw new WebApplicationException(Response.serverError().build());
+        }
+        boolean springProxy = hs.getRequestHeader("SpringProxy").contains("true");
+        if (!springProxy && ui == null) {
             throw new WebApplicationException(Response.serverError().build());
         }
         return books.get(id);
