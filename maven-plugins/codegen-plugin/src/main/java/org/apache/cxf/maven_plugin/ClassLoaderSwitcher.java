@@ -118,5 +118,6 @@ public class ClassLoaderSwitcher {
             }
         }
         System.getProperties().putAll(origProps);
+        origContextClassloader = null; // don't hold a reference.
     }
 }

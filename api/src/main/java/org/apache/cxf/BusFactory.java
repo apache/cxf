@@ -22,6 +22,7 @@ package org.apache.cxf;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.ref.WeakReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -36,7 +37,7 @@ public abstract class BusFactory {
     public static final String BUS_FACTORY_PROPERTY_NAME = "org.apache.cxf.bus.factory";
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
 
-    protected static Bus defaultBus;
+    protected static WeakReference<Bus> defaultBus;
     protected static Map<Thread, Bus> threadBusses = new WeakHashMap<Thread, Bus>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
@@ -67,11 +68,16 @@ public abstract class BusFactory {
      * @return the default bus.
      */
     public static synchronized Bus getDefaultBus(boolean createIfNeeded) {
-        if (defaultBus == null
+        if ((defaultBus == null || defaultBus.get() == null)
             && createIfNeeded) {
-            defaultBus = newInstance().createBus();
+            defaultBus = new WeakReference<Bus>(newInstance().createBus());
         }
-        return defaultBus;
+        if (defaultBus == null) {
+            // never set up.
+            return null;
+        } else {
+            return defaultBus.get();
+        }
     }
     
     /**
@@ -79,7 +85,11 @@ public abstract class BusFactory {
      * @param bus the default bus.
      */
     public static synchronized void setDefaultBus(Bus bus) {
-        defaultBus = bus;
+        if (bus == null) {
+            defaultBus = null;
+        } else {
+            defaultBus = new WeakReference<Bus>(bus);
+        }
         setThreadDefaultBus(bus);
     }
     
@@ -154,11 +164,12 @@ public abstract class BusFactory {
                 threadBusses.put(Thread.currentThread(), bus);
             }
         }
-        
-        if (defaultBus == null) {
-            defaultBus = bus;            
+        // The default bus may have gc-ed itself out of existence, in which case we 
+        // take over for it.
+        if (defaultBus == null || defaultBus.get() == null) {
+            defaultBus = new WeakReference<Bus>(bus);            
             return true;
-        }
+        } 
         return false;
     }
 

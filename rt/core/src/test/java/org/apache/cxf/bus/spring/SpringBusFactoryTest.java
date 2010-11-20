@@ -169,7 +169,7 @@ public class SpringBusFactoryTest extends Assert {
         assertTrue("@PostConstruct annotated method has not been called.", te.postConstructMethodCalled);
         assertTrue("@PreDestroy annoated method has been called already.", !te.preDestroyMethodCalled);
         bus.shutdown(true);
-        assertTrue("@PreDestroy annoated method has not been called.", te.preDestroyMethodCalled);
+        assertTrue("@PreDestroy annotated method has not been called.", te.preDestroyMethodCalled);
         
     }
 
