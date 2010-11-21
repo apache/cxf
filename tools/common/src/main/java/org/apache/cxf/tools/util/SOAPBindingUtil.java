@@ -81,7 +81,11 @@ public final class SOAPBindingUtil {
 
     public static <T> T getProxy(Class<T> cls, Object obj) {
         InvocationHandler ih = new ExtensionInvocationHandler(obj);
-        Object proxy = Proxy.newProxyInstance(cls.getClassLoader(), new Class[] {cls}, ih);
+        /*
+         * If we put proxies into the loader of the proxied class, they'll just pile up.
+         */
+        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+                                              new Class[] {cls}, ih);
         return cls.cast(proxy);
     }
 
