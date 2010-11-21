@@ -24,22 +24,17 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.PushbackInputStream;
 import java.net.HttpRetryException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.Proxy;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executor;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -55,7 +50,6 @@ import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.configuration.security.CertificateConstraintsType;
 import org.apache.cxf.configuration.security.ProxyAuthorizationPolicy;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.LoadingByteArrayOutputStream;
@@ -76,9 +70,7 @@ import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
 import org.apache.cxf.transport.https.HttpsURLConnectionFactory;
-import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
-import org.apache.cxf.version.Version;
 import org.apache.cxf.workqueue.WorkQueueManager;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
@@ -249,11 +241,7 @@ public class HTTPConduit
      */
     private HttpAuthSupplier authSupplier;
 
-    /**
-     * Variables for holding session state if sessions are supposed to be maintained
-     */
-    private Map<String, Cookie> sessionCookies = new ConcurrentHashMap<String, Cookie>();
-    private boolean maintainSession;
+    private Cookies cookies;
     
     private CertConstraints certConstraints;
 
@@ -291,6 +279,7 @@ public class HTTPConduit
         }
         proxyFactory = new ProxyFactory();
         connectionFactory = new HttpsURLConnectionFactory();
+        cookies = new Cookies();
         
         // wsdl extensors are superseded by policies which in        
         // turn are superseded by injection                          
@@ -419,7 +408,7 @@ public class HTTPConduit
      * @return the sessionCookies map
      */
     public Map<String, Cookie> getCookies() {
-        return sessionCookies;
+        return cookies.getSessionCookies();
     }
     
     private HttpURLConnection createConnection(Message message, URL url) throws IOException {
@@ -450,8 +439,6 @@ public class HTTPConduit
      * @param message The message to be sent.
      */
     public void prepare(Message message) throws IOException {
-        Map<String, List<String>> headers = getSetProtocolHeaders(message);
-
         // This call can possibly change the conduit endpoint address and 
         // protocol from the default set in EndpointInfo that is associated
         // with the Conduit.
@@ -464,38 +451,12 @@ public class HTTPConduit
         HttpURLConnection connection = createConnection(message, currentURL);
         connection.setDoOutput(true);       
         
-        long timeout = csPolicy.getConnectionTimeout();
-        if (message.get(Message.CONNECTION_TIMEOUT) != null) {
-            Object obj = message.get(Message.CONNECTION_TIMEOUT);
-            try {
-                timeout = Long.parseLong(obj.toString());
-            } catch (NumberFormatException e) {
-                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
-                    Message.CONNECTION_TIMEOUT, obj.toString()
-                });
-            }
-        }
-        if (timeout > Integer.MAX_VALUE) {
-            timeout = Integer.MAX_VALUE;
-        }
-
-        connection.setConnectTimeout((int)timeout);
+        int ctimeout = determineConnectionTimeout(message, csPolicy);
+        connection.setConnectTimeout(ctimeout);
         
-        timeout = csPolicy.getReceiveTimeout();
-        if (message.get(Message.RECEIVE_TIMEOUT) != null) {
-            Object obj = message.get(Message.RECEIVE_TIMEOUT);
-            try {
-                timeout = Long.parseLong(obj.toString());
-            } catch (NumberFormatException e) {
-                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
-                    Message.RECEIVE_TIMEOUT, obj.toString()
-                });
-            }
-        }
-        if (timeout > Integer.MAX_VALUE) {
-            timeout = Integer.MAX_VALUE;
-        }
-        connection.setReadTimeout((int)timeout);
+        int rtimeout = determineReceiveTimeout(message, csPolicy);
+        connection.setReadTimeout(rtimeout);
+        
         connection.setUseCaches(false);
         // We implement redirects in this conduit. We do not
         // rely on the underlying URLConnection implementation
@@ -505,12 +466,7 @@ public class HTTPConduit
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
         String httpRequestMethod = 
             (String)message.get(Message.HTTP_REQUEST_METHOD);        
-
-        if (null != httpRequestMethod) {
-            connection.setRequestMethod(httpRequestMethod);
-        } else {
-            connection.setRequestMethod("POST");
-        }
+        connection.setRequestMethod((null != httpRequestMethod) ? httpRequestMethod : "POST");
                 
         boolean isChunking = false;
         int chunkThreshold = 0;
@@ -552,54 +508,69 @@ public class HTTPConduit
             }
         }
 
-        //Do we need to maintain a session?
-        maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
-        
-        //If we have any cookies and we are maintaining sessions, then use them        
-        if (maintainSession && sessionCookies.size() > 0) {
-            List<String> cookies = null;
-            for (String s : headers.keySet()) {
-                if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(s)) {
-                    cookies = headers.remove(s);
-                    break;
-                }
-            }
-            if (cookies == null) {
-                cookies = new ArrayList<String>();
-            } else {
-                cookies = new ArrayList<String>(cookies);
-            }
-            headers.put(HttpHeaderHelper.COOKIE, cookies);
-            for (Cookie c : sessionCookies.values()) {
-                cookies.add(c.requestCookieHeader());
-            }
-        }
+        cookies.writeToMessageHeaders(message);
 
         // The trust decision is relegated to after the "flushing" of the
         // request headers.
         
         // We place the connection on the message to pick it up
         // in the WrappedOutputStream.
-        
         message.put(KEY_HTTP_CONNECTION, connection);
         
         if (certConstraints != null) {
             message.put(CertConstraints.class.getName(), certConstraints);
             message.getInterceptorChain().add(CertConstraintsInterceptor.INSTANCE);
         }
-        
-        // Set the headers on the message according to configured 
-        // client side policy.
-        setHeadersByPolicy(message, currentURL, headers);
-        
+
+        setHeadersByAuthorizationPolicy(message, currentURL);
+        new Headers(message).setHeadersByClientPolicy(getClient(message));
 
         message.setContent(OutputStream.class, 
                            new WrappedOutputStream(
                                    message, connection,
                                    needToCacheRequest, 
                                    isChunking,
-                                   chunkThreshold));
+                                   chunkThreshold,
+                                   getConduitName()));
         // We are now "ready" to "send" the message. 
+    }
+
+    private static int determineReceiveTimeout(Message message,
+            HTTPClientPolicy csPolicy) {
+        long rtimeout = csPolicy.getReceiveTimeout();
+        if (message.get(Message.RECEIVE_TIMEOUT) != null) {
+            Object obj = message.get(Message.RECEIVE_TIMEOUT);
+            try {
+                rtimeout = Long.parseLong(obj.toString());
+            } catch (NumberFormatException e) {
+                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
+                    Message.RECEIVE_TIMEOUT, obj.toString()
+                });
+            }
+        }
+        if (rtimeout > Integer.MAX_VALUE) {
+            rtimeout = Integer.MAX_VALUE;
+        }
+        return (int)rtimeout;
+    }
+
+    private static int determineConnectionTimeout(Message message,
+            HTTPClientPolicy csPolicy) {
+        long ctimeout = csPolicy.getConnectionTimeout();
+        if (message.get(Message.CONNECTION_TIMEOUT) != null) {
+            Object obj = message.get(Message.CONNECTION_TIMEOUT);
+            try {
+                ctimeout = Long.parseLong(obj.toString());
+            } catch (NumberFormatException e) {
+                LOG.log(Level.WARNING, "INVALID_TIMEOUT_FORMAT", new Object[] {
+                    Message.CONNECTION_TIMEOUT, obj.toString()
+                });
+            }
+        }
+        if (ctimeout > Integer.MAX_VALUE) {
+            ctimeout = Integer.MAX_VALUE;
+        }
+        return (int)ctimeout;
     }
     
     public void close(Message msg) throws IOException {
@@ -622,81 +593,6 @@ public class HTTPConduit
         }
     }
 
-    /**
-     * This call must take place before anything is written to the 
-     * URLConnection. The URLConnection.connect() will be called in order 
-     * to get the connection information. 
-     * 
-     * This method is invoked just after setURLRequestHeaders() from the 
-     * WrappedOutputStream before it writes data to the URLConnection.
-     * 
-     * If trust cannot be established the Trust Decider implemenation
-     * throws an IOException.
-     * 
-     * @param message      The message being sent.
-     * @throws IOException This exception is thrown if trust cannot be
-     *                     established by the configured MessageTrustDecider.
-     * @see MessageTrustDecider
-     */
-    private void makeTrustDecision(Message message, HttpURLConnection connection)
-        throws IOException {
-        
-        MessageTrustDecider decider2 = message.get(MessageTrustDecider.class);
-        if (trustDecider != null || decider2 != null) {
-            try {
-                // We must connect or we will not get the credentials.
-                // The call is (said to be) ingored internally if
-                // already connected.
-                connection.connect();
-                HttpsURLConnectionInfo info = new HttpsURLConnectionInfo(connection);
-                if (trustDecider != null) {
-                    trustDecider.establishTrust(
-                        getConduitName(), 
-                        info,
-                        message);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Trust Decider "
-                            + trustDecider.getLogicalName()
-                            + " considers Conduit "
-                            + getConduitName() 
-                            + " trusted.");
-                    }
-                }
-                if (decider2 != null) {
-                    decider2.establishTrust(getConduitName(), 
-                                            info,
-                                            message);
-                    if (LOG.isLoggable(Level.FINE)) {
-                        LOG.log(Level.FINE, "Trust Decider "
-                            + decider2.getLogicalName()
-                            + " considers Conduit "
-                            + getConduitName() 
-                            + " trusted.");
-                    }
-                }
-            } catch (UntrustedURLConnectionIOException untrustedEx) {
-                // This cast covers HttpsURLConnection as well.
-                ((HttpURLConnection)connection).disconnect();
-                if (LOG.isLoggable(Level.FINE)) {
-                    LOG.log(Level.FINE, "Trust Decider "
-                        + trustDecider.getLogicalName()
-                        + " considers Conduit "
-                        + getConduitName() 
-                        + " untrusted.", untrustedEx);
-                }
-                throw untrustedEx;
-            }
-        } else {
-            // This case, when there is no trust decider, a trust
-            // decision should be a matter of policy.
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.log(Level.FINE, "No Trust Decider for Conduit '"
-                    + getConduitName()
-                    + "'. An afirmative Trust Decision is assumed.");
-            }
-        }
-    }
-    
     /**
      * This function sets up a URL based on ENDPOINT_ADDRESS, PATH_INFO,
      * and QUERY_STRING properties in the Message. The QUERY_STRING gets
@@ -772,10 +668,7 @@ public class HTTPConduit
      * @return the default target URL
      */
     protected URL getURL() throws MalformedURLException {
-        if (defaultEndpointURL == null) {
-            return getURL(true);
-        } 
-        return defaultEndpointURL;
+        return getURL(true);
     }
 
     /**
@@ -797,204 +690,6 @@ public class HTTPConduit
             defaultEndpointURLString = defaultEndpointURL.toExternalForm();
         }
         return defaultEndpointURL;
-    }
-
-    /**
-     * While extracting the Message.PROTOCOL_HEADERS property from the Message,
-     * this call ensures that the Message.PROTOCOL_HEADERS property is
-     * set on the Message. If it is not set, an empty map is placed there, and
-     * then returned.
-     * 
-     * @param message The outbound message
-     * @return The PROTOCOL_HEADERS map
-     */
-    private Map<String, List<String>> getSetProtocolHeaders(Message message) {
-        Map<String, List<String>> headers =
-            CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));        
-        if (null == headers) {
-            headers = new LinkedHashMap<String, List<String>>();
-        } else if (headers instanceof HashMap) {
-            headers = new LinkedHashMap<String, List<String>>(headers);
-        }
-        message.put(Message.PROTOCOL_HEADERS, headers);
-        return headers;
-    }
-    
-    
-    /**
-     * This procedure sets the URLConnection request properties
-     * from the PROTOCOL_HEADERS in the message.
-     */
-    private void transferProtocolHeadersToURLConnection(
-        Message message,
-        URLConnection connection
-    ) {
-        Map<String, List<String>> headers = getSetProtocolHeaders(message);
-        for (String header : headers.keySet()) {
-            List<String> headerList = headers.get(header);
-            if (HttpHeaderHelper.CONTENT_TYPE.equalsIgnoreCase(header)) {
-                continue;
-            }
-            if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(header)) {
-                for (String s : headerList) {
-                    connection.addRequestProperty(HttpHeaderHelper.COOKIE, s);
-                }
-            } else {
-                StringBuilder b = new StringBuilder();
-                for (int i = 0; i < headerList.size(); i++) {
-                    b.append(headerList.get(i));
-                    if (i + 1 < headerList.size()) {
-                        b.append(',');
-                    }
-                }
-                connection.setRequestProperty(header, b.toString());
-            }
-        }
-        if (!connection.getRequestProperties().containsKey("User-Agent")) {
-            connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
-        }
-    }
-    
-    /**
-     * This procedure logs the PROTOCOL_HEADERS from the 
-     * Message at the specified logging level.
-     * 
-     * @param level   The Logging Level.
-     * @param headers The Message protocol headers.
-     */
-    private void logProtocolHeaders(
-        Level   level,
-        Message message
-    ) {
-        Map<String, List<String>> headers = getSetProtocolHeaders(message);
-        for (String header : headers.keySet()) {
-            List<String> headerList = headers.get(header);
-            for (String value : headerList) {
-                LOG.log(level, header + ": " + value);
-            }
-        }
-    }
-    
-    /**
-     * Put the headers from Message.PROTOCOL_HEADERS headers into the URL
-     * connection.
-     * Note, this does not mean they immediately get written to the output
-     * stream or the wire. They just just get set on the HTTP request.
-     * 
-     * @param message The outbound message.
-     * @throws IOException
-     */
-    private void setURLRequestHeaders(Message message) throws IOException {
-        HttpURLConnection connection = 
-            (HttpURLConnection)message.get(KEY_HTTP_CONNECTION);
-
-        String ct  = (String)message.get(Message.CONTENT_TYPE);
-        String enc = (String)message.get(Message.ENCODING);
-
-        if (null != ct) {
-            if (enc != null 
-                && ct.indexOf("charset=") == -1
-                && !ct.toLowerCase().contains("multipart/related")) {
-                ct = ct + "; charset=" + enc;
-            }
-        } else if (enc != null) {
-            ct = "text/xml; charset=" + enc;
-        } else {
-            ct = "text/xml";
-        }
-        connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Sending "
-                + connection.getRequestMethod() 
-                + " Message with Headers to " 
-                           + connection.getURL()
-                + " Conduit :"
-                + getConduitName()
-                + "\nContent-Type: " + ct + "\n");
-            logProtocolHeaders(Level.FINE, message);
-        }
-        
-        transferProtocolHeadersToURLConnection(message, connection);
-        
-    }
-    
-    
-    /**
-     * This predicate returns true iff the exchange indicates 
-     * a oneway MEP.
-     * 
-     * @param exchange The exchange in question
-     */
-    private boolean isOneway(Exchange exchange) {
-        return exchange != null && exchange.isOneWay();
-    }
-
-    /**
-     * Get an input stream containing the partial response if one is present.
-     * 
-     * @param connection the connection in question
-     * @param responseCode the response code
-     * @return an input stream if a partial response is pending on the connection 
-     */
-    protected static InputStream getPartialResponse(
-        HttpURLConnection connection,
-        int responseCode
-    ) throws IOException {
-        InputStream in = null;
-        if (responseCode == HttpURLConnection.HTTP_ACCEPTED
-            || responseCode == HttpURLConnection.HTTP_OK) {
-            if (connection.getContentLength() > 0) {
-                in = connection.getInputStream();
-            } else if (hasChunkedResponse(connection) 
-                       || hasEofTerminatedResponse(connection)) {
-                // ensure chunked or EOF-terminated response is non-empty
-                in = getNonEmptyContent(connection);        
-            }
-        }
-        return in;
-    }
-    
-    /**
-     * @param connection the given HttpURLConnection
-     * @return true iff the connection has a chunked response pending
-     */
-    private static boolean hasChunkedResponse(HttpURLConnection connection) {
-        return HttpHeaderHelper.CHUNKED.equalsIgnoreCase(
-                   connection.getHeaderField(HttpHeaderHelper.TRANSFER_ENCODING));
-    }
-    
-    /**
-     * @param connection the given HttpURLConnection
-     * @return true iff the connection has a chunked response pending
-     */
-    private static boolean hasEofTerminatedResponse(
-        HttpURLConnection connection
-    ) {
-        return HttpHeaderHelper.CLOSE.equalsIgnoreCase(
-                   connection.getHeaderField(HttpHeaderHelper.CONNECTION));
-    }
-
-    /**
-     * @param connection the given HttpURLConnection
-     * @return an input stream containing the response content if non-empty
-     */
-    private static InputStream getNonEmptyContent(
-        HttpURLConnection connection
-    ) {
-        InputStream in = null;
-        try {
-            PushbackInputStream pin = 
-                new PushbackInputStream(connection.getInputStream());
-            int c = pin.read();
-            if (c != -1) {
-                pin.unread((byte)c);
-                in = pin;
-            }
-        } catch (IOException ioe) {
-            // ignore
-        }    
-        return in;
     }
 
     /**
@@ -1021,9 +716,9 @@ public class HTTPConduit
      */
     private void setHeadersByAuthorizationPolicy(
             Message message,
-            URL url,
-            Map<String, List<String>> headers
+            URL url
     ) {
+        Headers headers = new Headers(message);
         AuthorizationPolicy authPolicy = getAuthorization();
         AuthorizationPolicy newPolicy = message.get(AuthorizationPolicy.class);
         
@@ -1040,8 +735,7 @@ public class HTTPConduit
                 message.remove("AUTH_VALUE");
             }
             if (authString != null) {
-                headers.put("Authorization",
-                            createMutableList(authString));
+                headers.setAuthorization(authString);
             }
             return;
         }
@@ -1061,15 +755,11 @@ public class HTTPConduit
                 && authPolicy != null && authPolicy.isSetPassword()) {
                 passwd = authPolicy.getPassword();
             }
-            setBasicAuthHeader(userName, passwd, headers);
+            headers.setAuthorization(getBasicAuthHeader(userName, passwd));
         } else if (authPolicy != null 
                 && authPolicy.isSetAuthorizationType() 
                 && authPolicy.isSetAuthorization()) {
-            String type = authPolicy.getAuthorizationType();
-            type += " ";
-            type += authPolicy.getAuthorization();
-            headers.put("Authorization",
-                        createMutableList(type));
+            headers.setAuthorization(authPolicy.getAuthorizationType() + " " + authPolicy.getAuthorization());
         }
         AuthorizationPolicy proxyAuthPolicy = getProxyAuthorization();
         if (proxyAuthPolicy != null && proxyAuthPolicy.isSetUserName()) {
@@ -1079,96 +769,15 @@ public class HTTPConduit
                 if (proxyAuthPolicy.isSetPassword()) {
                     passwd = proxyAuthPolicy.getPassword();
                 }
-                setProxyBasicAuthHeader(userName, passwd, headers);
+                headers.setProxyAuthorization(getBasicAuthHeader(userName, passwd));
             } else if (proxyAuthPolicy.isSetAuthorizationType() 
                        && proxyAuthPolicy.isSetAuthorization()) {
-                String type = proxyAuthPolicy.getAuthorizationType();
-                type += " ";
-                type += proxyAuthPolicy.getAuthorization();
-                headers.put("Proxy-Authorization",
-                            createMutableList(type));
+                headers.setProxyAuthorization(proxyAuthPolicy.getAuthorizationType() + " " 
+                        + proxyAuthPolicy.getAuthorization());
             }
         }
     }
-    private static List<String> createMutableList(String val) {
-        return new ArrayList<String>(Arrays.asList(new String[] {val}));
-    }
-    /**
-     * This call places HTTP Header strings into the headers that are relevant
-     * to the ClientPolicy that is set on this conduit by configuration.
-     * 
-     * REVISIT: A cookie is set statically from configuration? 
-     */
-    private void setHeadersByClientPolicy(
-        Message message,
-        Map<String, List<String>> headers
-    ) {
-        HTTPClientPolicy policy = getClient(message);
-        if (policy == null) {
-            return;
-        }
-        if (policy.isSetCacheControl()) {
-            headers.put("Cache-Control",
-                        createMutableList(policy.getCacheControl().value()));
-        }
-        if (policy.isSetHost()) {
-            headers.put("Host",
-                        createMutableList(policy.getHost()));
-        }
-        if (policy.isSetConnection()) {
-            headers.put("Connection",
-                        createMutableList(policy.getConnection().value()));
-        }
-        if (policy.isSetAccept()) {
-            headers.put("Accept",
-                        createMutableList(policy.getAccept()));
-        } else if (!headers.containsKey("Accept")) {
-            headers.put("Accept", createMutableList("*/*"));
-        }
-        if (policy.isSetAcceptEncoding()) {
-            headers.put("Accept-Encoding",
-                        createMutableList(policy.getAcceptEncoding()));
-        }
-        if (policy.isSetAcceptLanguage()) {
-            headers.put("Accept-Language",
-                        createMutableList(policy.getAcceptLanguage()));
-        }
-        if (policy.isSetContentType()) {
-            message.put(Message.CONTENT_TYPE, policy.getContentType());
-        }
-        if (policy.isSetCookie()) {
-            headers.put("Cookie",
-                        createMutableList(policy.getCookie()));
-        }
-        if (policy.isSetBrowserType()) {
-            headers.put("BrowserType",
-                        createMutableList(policy.getBrowserType()));
-        }
-        if (policy.isSetReferer()) {
-            headers.put("Referer",
-                        createMutableList(policy.getReferer()));
-        }
-    }
 
-    /**
-     * This call places HTTP Header strings into the headers that are relevant
-     * to the polices that are set on this conduit by configuration for the
-     * ClientPolicy and AuthorizationPolicy.
-     * 
-     * 
-     * @param message The outgoing message.
-     * @param url     The URL the message is going to.
-     * @param headers The headers in the outgoing message.
-     */
-    private void setHeadersByPolicy(
-        Message message,
-        URL     url,
-        Map<String, List<String>> headers
-    ) {
-        setHeadersByAuthorizationPolicy(message, url, headers);
-        setHeadersByClientPolicy(message, headers);
-    }
-    
     /**
      * This is part of the Configurable interface which retrieves the 
      * configuration from spring injection.
@@ -1320,26 +929,26 @@ public class HTTPConduit
      * @throws IOException
      */
     private HttpURLConnection processRetransmit(
-        HttpURLConnection connection,
+        final HttpURLConnection origConnection,
         Message message,
         CacheAndWriteOutputStream cachedStream
     ) throws IOException {
 
-        int responseCode = connection.getResponseCode();
+        int responseCode = origConnection.getResponseCode();
         if ((message != null) && (message.getExchange() != null)) {
             message.getExchange().put(Message.RESPONSE_CODE, responseCode);
         }
-        
+        HttpURLConnection connection = origConnection;
         // Process Redirects first.
         switch(responseCode) {
         case HttpURLConnection.HTTP_MOVED_PERM:
         case HttpURLConnection.HTTP_MOVED_TEMP:
             connection = 
-                redirectRetransmit(connection, message, cachedStream);
+                redirectRetransmit(origConnection, message, cachedStream);
             break;
         case HttpURLConnection.HTTP_UNAUTHORIZED:
             connection = 
-                authorizationRetransmit(connection, message, cachedStream);
+                authorizationRetransmit(origConnection, message, cachedStream);
             break;
         default:
             break;
@@ -1399,10 +1008,7 @@ public class HTTPConduit
             // We are going to redirect.
             // Remove any Server Authentication Information for the previous
             // URL.
-            Map<String, List<String>> headers = 
-                                getSetProtocolHeaders(message);
-            headers.remove("Authorization");
-            headers.remove("Proxy-Authorization");
+            new Headers(message).removeAuthorizationHeaders();
             
             URL url = new URL(newURL);
             
@@ -1411,7 +1017,7 @@ public class HTTPConduit
             // went to every URL along the way, but that's what the user 
             // wants!
             // TODO: Make this issue a security release note.
-            setHeadersByAuthorizationPolicy(message, url, headers);
+            setHeadersByAuthorizationPolicy(message, url);
             
             connection = retransmit(
                     connection, url, message, cachedStream);
@@ -1427,7 +1033,7 @@ public class HTTPConduit
      * @param message The message where the Set of URLs is stored.
      * @return The modifiable set of URLs that were visited.
      */
-    private Set<String> getSetAuthoriationURLs(Message message) {
+    private static Set<String> getSetAuthoriationURLs(Message message) {
         @SuppressWarnings("unchecked")
         Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
         if (authURLs == null) {
@@ -1445,7 +1051,7 @@ public class HTTPConduit
      * @param message The message where the Set is stored.
      * @return The modifiable set of URLs that were visited.
      */
-    private Set<String> getSetVisitedURLs(Message message) {
+    private static Set<String> getSetVisitedURLs(Message message) {
         @SuppressWarnings("unchecked")
         Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
         if (visitedURLs == null) {
@@ -1485,31 +1091,8 @@ public class HTTPConduit
         URL currentURL = connection.getURL();
         
         String realm = extractAuthorizationRealm(connection.getHeaderFields());
-        
-        Set<String> authURLs = getSetAuthoriationURLs(message);
-        
-        // If we have been here (URL & Realm) before for this particular message
-        // retransmit, it means we have already supplied information
-        // which must have been wrong, or we wouldn't be here again.
-        // Otherwise, the server may be 401 looping us around the realms.
-        if (authURLs.contains(currentURL.toString() + realm)) {
 
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, "Authorization loop detected on Conduit \""
-                    + getConduitName()
-                    + "\" on URL \""
-                    + "\" with realm \""
-                    + realm
-                    + "\"");
-            }
-                    
-            throw new IOException("Authorization loop detected on Conduit \"" 
-                                  + getConduitName() 
-                                  + "\" on URL \""
-                                  + "\" with realm \""
-                                  + realm
-                                  + "\"");
-        }
+        detectAuthorizationLoop(getConduitName(), message, currentURL, realm);
         
         String up = 
             authSupplier.getAuthorizationForRealm(
@@ -1519,15 +1102,35 @@ public class HTTPConduit
         if (up == null) {
             return connection;
         }
-        
-        // Register that we have been here before we go.
-        authURLs.add(currentURL.toString() + realm);
-        
-        Map<String, List<String>> headers = getSetProtocolHeaders(message);
-        headers.put("Authorization",
-                    createMutableList(up));
+
+        new Headers(message).setAuthorization(up);
         return retransmit(
                 connection, currentURL, message, cachedStream);
+    }
+
+    private static void detectAuthorizationLoop(String conduitName, Message message, 
+            URL currentURL, String realm) throws IOException {
+        Set<String> authURLs = getSetAuthoriationURLs(message);
+        // If we have been here (URL & Realm) before for this particular message
+        // retransmit, it means we have already supplied information
+        // which must have been wrong, or we wouldn't be here again.
+        // Otherwise, the server may be 401 looping us around the realms.
+        if (authURLs.contains(currentURL.toString() + realm)) {
+            String logMessage = "Authorization loop detected on Conduit \""
+                + conduitName
+                + "\" on URL \""
+                + currentURL
+                + "\" with realm \""
+                + realm
+                + "\"";
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.log(Level.INFO, logMessage);
+            }
+                    
+            throw new IOException(logMessage);
+        }
+        // Register that we have been here before we go.
+        authURLs.add(currentURL.toString() + realm);
     }
     
     /**
@@ -1566,11 +1169,8 @@ public class HTTPConduit
         String httpRequestMethod = 
             (String)message.get(Message.HTTP_REQUEST_METHOD);
 
-        if (null != httpRequestMethod) {
-            connection.setRequestMethod(httpRequestMethod);
-        } else {
-            connection.setRequestMethod("POST");
-        }
+        connection.setRequestMethod((null != httpRequestMethod) ? httpRequestMethod : "POST");
+
         message.put(KEY_HTTP_CONNECTION, connection);
 
         if (stream != null) {
@@ -1579,7 +1179,7 @@ public class HTTPConduit
         
         // Need to set the headers before the trust decision
         // because they are set before the connect().
-        setURLRequestHeaders(message);
+        new Headers(message).setURLRequestHeaders(getConduitName());
         
         //
         // This point is where the trust decision is made because the
@@ -1588,7 +1188,7 @@ public class HTTPConduit
         // makeTrustDecision needs to make a connect() call to
         // make sure the proper information is available.
         // 
-        makeTrustDecision(message, connection);
+        TrustDecisionUtil.makeTrustDecision(trustDecider, message, connection, getConduitName());
 
         // If this is a GET method we must not touch the output
         // stream as this automagically turns the request into a POST.
@@ -1670,10 +1270,9 @@ public class HTTPConduit
      * 
      * @param headers  The headers map that gets the "Authorization" header set.
      */
-    private void setBasicAuthHeader(
+    private String getBasicAuthHeader(
         String                    userid,
-        String                    password,
-        Map<String, List<String>> headers
+        String                    password
     ) {
         String userpass = userid;
 
@@ -1682,41 +1281,15 @@ public class HTTPConduit
             userpass += password;
         }
         String token = Base64Utility.encode(userpass.getBytes());
-        headers.put("Authorization",
-                    createMutableList("Basic " + token));
+        return "Basic " + token;
     }
 
-    /**
-     * This procedure sets the "ProxyAuthorization" header with the 
-     * BasicAuth token, which is Base64 encoded.
-     * 
-     * @param userid   The user's id, which cannot be null.
-     * @param password The password, it may be null.
-     * 
-     * @param headers The headers map that gets the "Proxy-Authorization" 
-     *                header set.
-     */
-    private void setProxyBasicAuthHeader(
-        String                    userid,
-        String                    password,
-        Map<String, List<String>> headers
-    ) {
-        String userpass = userid;
-
-        userpass += ":";
-        if (password != null) {
-            userpass += password;
-        }
-        String token = Base64Utility.encode(userpass.getBytes());
-        headers.put("Proxy-Authorization",
-                    createMutableList("Basic " + token));
-    }
-    
     /**
      * Wrapper output stream responsible for flushing headers and handling
      * the incoming HTTP-level response (not necessarily the MEP response).
      */
     protected class WrappedOutputStream extends AbstractThresholdOutputStream {
+        
         /**
          * This field contains the currently active connection.
          */
@@ -1740,18 +1313,23 @@ public class HTTPConduit
         protected CacheAndWriteOutputStream cachedStream;
 
         protected Message outMessage;
+
+        protected String conduitName;
+
         protected WrappedOutputStream(
-                Message m, 
-                HttpURLConnection c, 
+                Message outMessage, 
+                HttpURLConnection connection,
                 boolean possibleRetransmit,
                 boolean isChunking,
-                int chunkThreshold
+                int chunkThreshold,
+                String conduitName
         ) {
             super(chunkThreshold);
-            this.outMessage = m;
-            connection = c;
-            cachingForRetransmission = possibleRetransmit;
-            chunking = isChunking;
+            this.outMessage = outMessage;
+            this.connection = connection;
+            this.cachingForRetransmission = possibleRetransmit;
+            this.chunking = isChunking;
+            this.conduitName = conduitName;
         }
         
         
@@ -1792,7 +1370,7 @@ public class HTTPConduit
         protected void handleHeadersTrustCaching() throws IOException {
             // Need to set the headers before the trust decision
             // because they are set before the connect().
-            setURLRequestHeaders(outMessage);
+            new Headers(outMessage).setURLRequestHeaders(conduitName);
            
             //
             // This point is where the trust decision is made because the
@@ -1801,7 +1379,7 @@ public class HTTPConduit
             // makeTrustDecision needs to make a connect() call to
             // make sure the proper information is available.
             // 
-            makeTrustDecision(outMessage, connection);
+            TrustDecisionUtil.makeTrustDecision(trustDecider, outMessage, connection, conduitName);
             
             // Trust is okay, set up for writing the request.
             
@@ -1865,48 +1443,7 @@ public class HTTPConduit
                     }
                 }
             } catch (HttpRetryException e) {
-                String msg = "HTTP response '" + e.responseCode() + ": "
-                             + connection.getResponseMessage() + "' invoking " + connection.getURL();
-                switch (e.responseCode()) {
-                case HttpURLConnection.HTTP_MOVED_PERM: // 301
-                case HttpURLConnection.HTTP_MOVED_TEMP: // 302
-                    msg += " that returned location header '" + e.getLocation() + "'";
-                    break;
-                case HttpURLConnection.HTTP_UNAUTHORIZED: // 401
-                    if (authorizationPolicy == null || authorizationPolicy.getUserName() == null) {
-                        msg += " with NO authorization username configured in conduit " + getConduitName();
-                    } else {
-                        msg += " with authorization username '" + authorizationPolicy.getUserName() + "'";
-                    }
-                    break;
-                case HttpURLConnection.HTTP_PROXY_AUTH: // 407
-                    if (proxyAuthorizationPolicy == null || proxyAuthorizationPolicy.getUserName() == null) {
-                        msg += " with NO proxy authorization configured in conduit " + getConduitName();
-                    } else {
-                        msg += " with proxy authorization username '"
-                               + proxyAuthorizationPolicy.getUserName() + "'";
-                    }
-                    if (clientSidePolicy == null || clientSidePolicy.getProxyServer() == null) {
-                        if (connection.usingProxy()) {
-                            msg += " using a proxy even if NONE is configured in CXF conduit "
-                                   + getConduitName()
-                                   + " (maybe one is configured by java.net.ProxySelector)";
-                        } else {
-                            msg += " but NO proxy was used by the connection (none configured in cxf "
-                                   + "conduit and none selected by java.net.ProxySelector)";
-                        }
-                    } else {
-                        msg += " using " + clientSidePolicy.getProxyServerType() + " proxy "
-                               + clientSidePolicy.getProxyServer() + ":"
-                               + clientSidePolicy.getProxyServerPort();
-                    }
-                    break;
-                default:
-                    // No other type of HttpRetryException should be thrown
-                    break;
-                }
-                // pass cause with initCause() instead of constructor for jdk 1.5 compatibility
-                throw (IOException) new IOException(msg).initCause(e);
+                handleHttpRetryException(e, connection);
             } catch (IOException e) {
                 String url = connection.getURL().toString();
                 String origMessage = e.getMessage();
@@ -1973,8 +1510,7 @@ public class HTTPConduit
                 
                 int nretransmits = 0;
                 
-                connection = 
-                    processRetransmit(connection, outMessage, cachedStream);
+                connection = processRetransmit(connection, outMessage, cachedStream);
                 
                 while (connection != oldcon) {
                     nretransmits++;
@@ -1982,9 +1518,7 @@ public class HTTPConduit
 
                     // A negative max means unlimited.
                     if (maxRetransmits < 0 || nretransmits < maxRetransmits) {
-                        connection = 
-                            processRetransmit(
-                                    connection, outMessage, cachedStream);
+                        connection = processRetransmit(connection, outMessage, cachedStream);
                     }
                 }
             }
@@ -2034,6 +1568,17 @@ public class HTTPConduit
                 ex.execute(runnable);
             }
         }
+
+        /**
+         * This predicate returns true iff the exchange indicates 
+         * a oneway MEP.
+         * 
+         * @param exchange The exchange in question
+         */
+        private boolean isOneway(Exchange exchange) {
+            return exchange != null && exchange.isOneWay();
+        }
+        
         protected void handleResponseInternal() throws IOException {
             Exchange exchange = outMessage.getExchange();
             int responseCode = connection.getResponseCode();
@@ -2041,26 +1586,7 @@ public class HTTPConduit
                 exchange.put(Message.RESPONSE_CODE, responseCode);
             }
             
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Response Code: " 
-                        + responseCode
-                        + " Conduit: " + getConduitName());
-                LOG.fine("Content length: " + connection.getContentLength());
-                Map<String, List<String>> headerFields = connection.getHeaderFields();
-                if (null != headerFields) {
-                    StringBuilder buf = new StringBuilder();
-                    buf.append("Header fields: ");
-                    buf.append(System.getProperty("line.separator"));
-                    for (String h : headerFields.keySet()) {
-                        buf.append("    ");
-                        buf.append(h);
-                        buf.append(": ");
-                        buf.append(headerFields.get(h));
-                        buf.append(System.getProperty("line.separator"));
-                    }
-                    LOG.fine(buf.toString());
-                }
-            }
+            logResponseInfo(responseCode);
             
             if (responseCode == HttpURLConnection.HTTP_NOT_FOUND
                 && !MessageUtils.isTrue(outMessage.getContextualProperty(
@@ -2069,11 +1595,9 @@ public class HTTPConduit
                     + connection.getResponseMessage() + "'");
             }
 
-            
-
             InputStream in = null;
             if (isOneway(exchange)) {
-                in = getPartialResponse(connection, responseCode);
+                in = ChunkedUtil.getPartialResponse(connection, responseCode);
                 if (in == null) {
                     // oneway operation or decoupled MEP without 
                     // partial response
@@ -2092,17 +1616,7 @@ public class HTTPConduit
             
             Message inMessage = new MessageImpl();
             inMessage.setExchange(exchange);
-            Map<String, List<String>> origHeaders = connection.getHeaderFields();
-            Map<String, List<String>> headers = 
-                new HashMap<String, List<String>>();
-            for (String key : connection.getHeaderFields().keySet()) {
-                if (key != null) {
-                    headers.put(HttpHeaderHelper.getHeaderKey(key), 
-                        origHeaders.get(key));
-                }
-            }
-            
-            inMessage.put(Message.PROTOCOL_HEADERS, headers);
+            new Headers(inMessage).readFromConnection(connection);
             inMessage.put(Message.RESPONSE_CODE, responseCode);
             String ct = connection.getContentType();
             inMessage.put(Message.CONTENT_TYPE, ct);
@@ -2114,15 +1628,8 @@ public class HTTPConduit
                 LOG.log(Level.WARNING, m);
                 throw new IOException(m);   
             } 
-            inMessage.put(Message.ENCODING, normalizedEncoding);            
-                        
-            if (maintainSession) {
-                for (Map.Entry<String, List<String>> h : connection.getHeaderFields().entrySet()) {
-                    if ("Set-Cookie".equalsIgnoreCase(h.getKey())) {
-                        Cookie.handleSetCookie(sessionCookies, h.getValue());
-                    }
-                }
-            }
+            inMessage.put(Message.ENCODING, normalizedEncoding);
+            cookies.readFromConnection(connection);
             if (in == null) {
                 if (responseCode >= HttpURLConnection.HTTP_BAD_REQUEST) {
                     in = connection.getErrorStream();
@@ -2147,6 +1654,24 @@ public class HTTPConduit
             
         }
 
+
+        private void logResponseInfo(int responseCode) {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Response Code: " + responseCode + " Conduit: " + conduitName);
+                LOG.fine("Content length: " + connection.getContentLength());
+                Map<String, List<String>> headerFields = connection.getHeaderFields();
+                if (null != headerFields) {
+                    String newLine = System.getProperty("line.separator");
+                    StringBuilder buf = new StringBuilder();
+                    buf.append("Header fields: " + newLine);
+                    for (String headerKey : headerFields.keySet()) {
+                        buf.append("    " + headerKey + ": " + headerFields.get(headerKey) + newLine);
+                    }
+                    LOG.fine(buf.toString());
+                }
+            }
+        }
+
     }
     
     /**
@@ -2168,7 +1693,7 @@ public class HTTPConduit
             inMessage.put(DECOUPLED_CHANNEL_MESSAGE, Boolean.TRUE);
             // REVISIT: how to get response headers?
             //inMessage.put(Message.PROTOCOL_HEADERS, req.getXXX());
-            getSetProtocolHeaders(inMessage);
+            Headers.getSetProtocolHeaders(inMessage);
             inMessage.put(Message.RESPONSE_CODE, HttpURLConnection.HTTP_OK);
 
             // remove server-specific properties
@@ -2210,6 +1735,52 @@ public class HTTPConduit
             this.endpointInfo.setProperty("org.apache.cxf.ws.addressing.replyto",
                                           evt.getNewValue());
         }
+    }
+
+    private void handleHttpRetryException(HttpRetryException e, HttpURLConnection connection) 
+        throws IOException {
+        String msg = "HTTP response '" + e.responseCode() + ": "
+                     + connection.getResponseMessage() + "' invoking " + connection.getURL();
+        switch (e.responseCode()) {
+        case HttpURLConnection.HTTP_MOVED_PERM: // 301
+        case HttpURLConnection.HTTP_MOVED_TEMP: // 302
+            msg += " that returned location header '" + e.getLocation() + "'";
+            break;
+        case HttpURLConnection.HTTP_UNAUTHORIZED: // 401
+            if (authorizationPolicy == null || authorizationPolicy.getUserName() == null) {
+                msg += " with NO authorization username configured in conduit " + getConduitName();
+            } else {
+                msg += " with authorization username '" + authorizationPolicy.getUserName() + "'";
+            }
+            break;
+        case HttpURLConnection.HTTP_PROXY_AUTH: // 407
+            if (proxyAuthorizationPolicy == null || proxyAuthorizationPolicy.getUserName() == null) {
+                msg += " with NO proxy authorization configured in conduit " + getConduitName();
+            } else {
+                msg += " with proxy authorization username '"
+                       + proxyAuthorizationPolicy.getUserName() + "'";
+            }
+            if (clientSidePolicy == null || clientSidePolicy.getProxyServer() == null) {
+                if (connection.usingProxy()) {
+                    msg += " using a proxy even if NONE is configured in CXF conduit "
+                           + getConduitName()
+                           + " (maybe one is configured by java.net.ProxySelector)";
+                } else {
+                    msg += " but NO proxy was used by the connection (none configured in cxf "
+                           + "conduit and none selected by java.net.ProxySelector)";
+                }
+            } else {
+                msg += " using " + clientSidePolicy.getProxyServerType() + " proxy "
+                       + clientSidePolicy.getProxyServer() + ":"
+                       + clientSidePolicy.getProxyServerPort();
+            }
+            break;
+        default:
+            // No other type of HttpRetryException should be thrown
+            break;
+        }
+        // pass cause with initCause() instead of constructor for jdk 1.5 compatibility
+        throw (IOException) new IOException(msg).initCause(e);
     }
     
 }
