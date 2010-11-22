@@ -45,24 +45,35 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testContinuation() throws Exception {
+        
+        doTestContinuation("books");
+    }
+    
+    @Test
+    public void testContinuationSubresource() throws Exception {
+        
+        doTestContinuation("books/subresources");
+    }
+    
+    private void doTestContinuation(String pathSegment) throws Exception {
         ThreadPoolExecutor executor = new ThreadPoolExecutor(5, 5, 0, TimeUnit.SECONDS,
                                                              new ArrayBlockingQueue<Runnable>(10));
         CountDownLatch startSignal = new CountDownLatch(1);
         CountDownLatch doneSignal = new CountDownLatch(5);
         
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/1", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/1", 
                                         "1", 
                                         "CXF in Action1", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/2", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/2", 
                                         "2", 
                                         "CXF in Action2", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/3", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/3", 
                                         "3", 
                                         "CXF in Action3", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/4", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/4", 
                                         "4", 
                                         "CXF in Action4", startSignal, doneSignal));
-        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/books/5", 
+        executor.execute(new BookWorker("http://localhost:" + PORT + "/bookstore/" + pathSegment + "/5", 
                                         "5", 
                                         "CXF in Action5", startSignal, doneSignal));
         
@@ -70,7 +81,6 @@ public class JAXRSContinuationsTest extends AbstractBusClientServerTestBase {
         doneSignal.await(60, TimeUnit.SECONDS);
         executor.shutdownNow();
         assertEquals("Not all invocations have completed", 0, doneSignal.getCount());
-        
     }
     
     private void checkBook(String address, String id, String expected) throws Exception {

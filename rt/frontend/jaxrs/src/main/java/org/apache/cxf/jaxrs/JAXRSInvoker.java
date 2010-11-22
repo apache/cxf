@@ -37,6 +37,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.InterceptorChain.State;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
@@ -60,6 +61,8 @@ public class JAXRSInvoker extends AbstractInvoker {
     private static final String SERVICE_LOADER_AS_CONTEXT = "org.apache.cxf.serviceloader-context";
     private static final String SERVICE_OBJECT_SCOPE = "org.apache.cxf.service.scope";
     private static final String REQUEST_SCOPE = "request";    
+    private static final String LAST_SERVICE_OBJECT = "org.apache.cxf.service.object.last";
+    private static final String REQUEST_WAS_SUSPENDED = "org.apache.cxf.service.request.suspended";
     
     public JAXRSInvoker() {
     }
@@ -77,45 +80,62 @@ public class JAXRSInvoker extends AbstractInvoker {
             return new MessageContentsList(response);
         }
         ResourceProvider provider = getResourceProvider(exchange);
-        Object serviceObject = getServiceObject(exchange);
+        Object rootInstance = getServiceObject(exchange);
+        Object serviceObject = getActualServiceObject(exchange, rootInstance);
+        
         try {
             return invoke(exchange, request, serviceObject);
         } finally {
-            if (exchange.isOneWay()) {
-                ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
-            }
-            if (!isServiceObjectRequestScope(exchange.getInMessage())) {
-                provider.releaseInstance(exchange.getInMessage(), serviceObject);
+            boolean suspended = exchange.getInMessage().getInterceptorChain().getState() == State.SUSPENDED;
+            if (!suspended) {
+                if (exchange.isOneWay()) {
+                    ProviderFactory.getInstance(exchange.getInMessage()).clearThreadLocalProxies();
+                }
+                if (!isServiceObjectRequestScope(exchange.getInMessage())) {
+                    provider.releaseInstance(exchange.getInMessage(), rootInstance);
+                } else {
+                    persistRoots(exchange, rootInstance, provider);
+                }
             } else {
-                exchange.put(JAXRSUtils.ROOT_INSTANCE, serviceObject);
-                exchange.put(JAXRSUtils.ROOT_PROVIDER, provider);
+                persistRoots(exchange, rootInstance, provider);
+                exchange.put(REQUEST_WAS_SUSPENDED, true);
             }
         }
     }
 
+    private void persistRoots(Exchange exchange, Object rootInstance, Object provider) {
+        exchange.put(JAXRSUtils.ROOT_INSTANCE, rootInstance);
+        exchange.put(JAXRSUtils.ROOT_PROVIDER, provider);
+    }
+    
     @SuppressWarnings("unchecked")
     public Object invoke(Exchange exchange, Object request, Object resourceObject) {
 
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
+
+        boolean wasSuspended = exchange.remove(REQUEST_WAS_SUSPENDED) != null;
         
-        pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
-                
-        Method methodToInvoke = InjectionUtils.checkProxy(
-             cri.getMethodDispatcher().getMethod(ori), resourceObject);
-
-        if (cri.isRoot()) {
-            JAXRSUtils.handleSetters(ori, resourceObject,
-                                     exchange.getInMessage());
-
-            InjectionUtils.injectContextFields(resourceObject,
-                                               ori.getClassResourceInfo(),
-                                               exchange.getInMessage());
-            InjectionUtils.injectResourceFields(resourceObject,
-                                            ori.getClassResourceInfo(),
-                                            exchange.getInMessage());
+        if (!wasSuspended) {
+            pushOntoStack(ori, ClassHelper.getRealClass(resourceObject), exchange.getInMessage());
+                    
+            if (cri.isRoot()) {
+                JAXRSUtils.handleSetters(ori, resourceObject,
+                                         exchange.getInMessage());
+    
+                InjectionUtils.injectContextFields(resourceObject,
+                                                   ori.getClassResourceInfo(),
+                                                   exchange.getInMessage());
+                InjectionUtils.injectResourceFields(resourceObject,
+                                                ori.getClassResourceInfo(),
+                                                exchange.getInMessage());
+            }
         }
+        
 
+        Method methodToInvoke = InjectionUtils.checkProxy(
+            cri.getMethodDispatcher().getMethod(ori), resourceObject);
+        
         List<Object> params = null;
         if (request instanceof List) {
             params = CastUtils.cast((List<?>)request);
@@ -147,6 +167,7 @@ public class JAXRSInvoker extends AbstractInvoker {
             }
             return new MessageContentsList(excResponse);
         } finally {
+            exchange.put(LAST_SERVICE_OBJECT, resourceObject);
             if (contextLoader != null) {
                 Thread.currentThread().setContextClassLoader(contextLoader);
             }
@@ -230,18 +251,37 @@ public class JAXRSInvoker extends AbstractInvoker {
     }
     
     private ResourceProvider getResourceProvider(Exchange exchange) {
-        OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
-        ClassResourceInfo cri = ori.getClassResourceInfo();
-        return cri.getResourceProvider();
+        Object provider = exchange.remove(JAXRSUtils.ROOT_PROVIDER);
+        if (provider == null) {
+            OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
+            ClassResourceInfo cri = ori.getClassResourceInfo();
+            return cri.getResourceProvider();
+        } else {
+            return (ResourceProvider)provider;
+        }
     }
     
     public Object getServiceObject(Exchange exchange) {
+        
+        Object root = exchange.remove(JAXRSUtils.ROOT_INSTANCE);
+        if (root != null) {
+            return root;
+        }
+        
         OperationResourceInfo ori = exchange.get(OperationResourceInfo.class);
         ClassResourceInfo cri = ori.getClassResourceInfo();
 
         return cri.getResourceProvider().getInstance(exchange.getInMessage());
     }
-
+    
+    public Object getActualServiceObject(Exchange exchange, Object rootInstance) {
+        
+        Object last = exchange.get(LAST_SERVICE_OBJECT);
+        return last !=  null ? last : rootInstance;
+    }
+    
+    
+    
     private static Object checkResultObject(Object result, String subResourcePath) {
         
 

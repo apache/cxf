@@ -56,6 +56,20 @@ public class BookContinuationStore {
     @Path("/books/{id}")
     public String getBookDescription(@PathParam("id") String id) {
         
+        return handleContinuationRequest(id);
+        
+    }
+    
+    @Path("/books/subresources/")
+    public BookContinuationStore getBookStore() {
+        
+        return this;
+        
+    }
+    
+    @GET
+    @Path("{id}")
+    public String handleContinuationRequest(@PathParam("id") String id) {
         Continuation continuation = getContinuation(id);
         if (continuation == null) {
             throw new RuntimeException("Failed to get continuation");
@@ -75,7 +89,6 @@ public class BookContinuationStore {
         // unreachable
         return null;
     }
-    
     
     private void resumeRequest(final String name) {
         
