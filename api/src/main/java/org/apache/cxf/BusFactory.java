@@ -31,8 +31,29 @@ import java.util.logging.Logger;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 
+/**
+ * Factory to create CXF Bus objects. 
+ * <p>CXF includes a large number of components that provide services, such
+ * as WSDL parsing, and message processing. To avoid creating these objects over and over, and to 
+ * allow them to be shared easily, they are associated with a data structure called a bus.
+ * </p>
+ * <p>
+ * You don't ever have to explicitly create or manipulate bus objects. If you simply use the CXF
+ * or JAX-WS APIs to create clients or servers, CXF will create an default bus for you. You would create a bus
+ * explicitly if you need to customize components on the bus or maintain several independent buses 
+ * with independent configurations.
+ * </p>
+ * <p>
+ * This class maintains the default bus for the entire process and a set of thread-default buses. All CXF
+ * components that reference the bus, which is to say all CXF components, will obtain a default bus from this
+ * class if you do not set a specific bus.
+ * </p>
+ * <p>
+ * If you create a bus when there is no default bus in effect, that bus will become the default bus.
+ * </p>
+ */
 public abstract class BusFactory {
-    
+
     public static final String BUS_FACTORY_PROPERTY_NAME = "org.apache.cxf.bus.factory";
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
 
@@ -40,18 +61,15 @@ public abstract class BusFactory {
     protected static Map<Thread, Bus> threadBusses = new WeakHashMap<Thread, Bus>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
-    
 
-    /** 
-     * Creates a new bus. 
-     * While concrete <code>BusFactory</code> may offer differently
-     * parameterized methods for creating a bus, all factories support
-     * this no-arg factory method.
-     *
+    /**
+     * Creates a new bus. While concrete <code>BusFactory</code> may offer differently parameterized methods
+     * for creating a bus, all factories support this no-arg factory method.
+     * 
      * @return the newly created bus.
      */
     public abstract Bus createBus();
-    
+
     /**
      * Returns the default bus, creating it if necessary.
      * 
@@ -60,32 +78,33 @@ public abstract class BusFactory {
     public static synchronized Bus getDefaultBus() {
         return getDefaultBus(true);
     }
-    
+
     /**
      * Returns the default bus
+     * 
      * @param createIfNeeded Set to true to create a default bus if one doesn't exist
      * @return the default bus.
      */
     public static synchronized Bus getDefaultBus(boolean createIfNeeded) {
-        if (defaultBus == null
-            && createIfNeeded) {
+        if (defaultBus == null && createIfNeeded) {
             defaultBus = newInstance().createBus();
         }
         return defaultBus;
     }
-    
+
     /**
      * Sets the default bus.
+     * 
      * @param bus the default bus.
      */
     public static synchronized void setDefaultBus(Bus bus) {
         defaultBus = bus;
         setThreadDefaultBus(bus);
     }
-    
-    
+
     /**
      * Sets the default bus for the thread.
+     * 
      * @param bus the default bus.
      */
     public static void setThreadDefaultBus(Bus bus) {
@@ -93,16 +112,19 @@ public abstract class BusFactory {
             threadBusses.put(Thread.currentThread(), bus);
         }
     }
-    
+
     /**
      * Gets the default bus for the thread.
+     * 
      * @return the default bus.
      */
     public static Bus getThreadDefaultBus() {
         return getThreadDefaultBus(true);
     }
+
     /**
      * Gets the default bus for the thread, creating if needed
+     * 
      * @param createIfNeeded Set to true to create a default bus if one doesn't exist
      * @return the default bus.
      */
@@ -125,17 +147,15 @@ public abstract class BusFactory {
     /**
      * Removes a bus from being a thread default bus for any thread.
      * <p>
-     * This is tipically done when a bus has ended its lifecycle (i.e.: a call
-     * to {@link Bus#shutdown(boolean)} was invoked) and it wants to remove any
-     * reference to itself for any thread.
+     * This is tipically done when a bus has ended its lifecycle (i.e.: a call to
+     * {@link Bus#shutdown(boolean)} was invoked) and it wants to remove any reference to itself for any
+     * thread.
      * 
-     * @param bus
-     *            the bus to remove
+     * @param bus the bus to remove
      */
     public static void clearDefaultBusForAnyThread(final Bus bus) {
         synchronized (threadBusses) {
-            for (final Iterator<Bus> iterator = threadBusses.values().iterator(); 
-                iterator.hasNext();) {
+            for (final Iterator<Bus> iterator = threadBusses.values().iterator(); iterator.hasNext();) {
                 if (bus == null || bus.equals(iterator.next())) {
                     iterator.remove();
                 }
@@ -145,6 +165,7 @@ public abstract class BusFactory {
 
     /**
      * Sets the default bus if a default bus is not already set.
+     * 
      * @param bus the default bus.
      * @return true if the bus was not set and is now set
      */
@@ -163,11 +184,8 @@ public abstract class BusFactory {
     }
 
     /**
-     * Create a new BusFactory
-     * 
-     * The class of the BusFactory is determined by looking for the system propery: 
-     * org.apache.cxf.bus.factory
-     * or by searching the classpath for:
+     * Create a new BusFactory The class of the BusFactory is determined by looking for the system propery:
+     * org.apache.cxf.bus.factory or by searching the classpath for:
      * META-INF/services/org.apache.cxf.bus.factory
      * 
      * @return a new BusFactory to be used to create Bus objects
@@ -175,11 +193,11 @@ public abstract class BusFactory {
     public static BusFactory newInstance() {
         return newInstance(null);
     }
-    
+
     /**
      * Create a new BusFactory
-     * @param className The class of the BusFactory to create.  If null, uses the
-     * default search algorithm.
+     * 
+     * @param className The class of the BusFactory to create. If null, uses the default search algorithm.
      * @return a new BusFactory to be used to create Bus objects
      */
     public static BusFactory newInstance(String className) {
@@ -188,17 +206,17 @@ public abstract class BusFactory {
             ClassLoader loader = Thread.currentThread().getContextClassLoader();
             className = getBusFactoryClass(loader);
             if (className == null && loader != BusFactory.class.getClassLoader()) {
-                className = getBusFactoryClass(BusFactory.class.getClassLoader()); 
+                className = getBusFactoryClass(BusFactory.class.getClassLoader());
             }
         }
         if (className == null) {
             className = BusFactory.DEFAULT_BUS_FACTORY;
         }
-        
+
         Class<? extends BusFactory> busFactoryClass;
         try {
-            busFactoryClass = 
-                ClassLoaderUtils.loadClass(className, BusFactory.class).asSubclass(BusFactory.class);
+            busFactoryClass = ClassLoaderUtils.loadClass(className, BusFactory.class)
+                .asSubclass(BusFactory.class);
             instance = busFactoryClass.newInstance();
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "BUS_FACTORY_INSTANTIATION_EXC", ex);
@@ -209,47 +227,46 @@ public abstract class BusFactory {
 
     protected void initializeBus(Bus bus) {
     }
-    
+
     private static String getBusFactoryClass(ClassLoader classLoader) {
-        
+
         String busFactoryClass = null;
         String busFactoryCondition = null;
-        
+
         // next check system properties
         busFactoryClass = System.getProperty(BusFactory.BUS_FACTORY_PROPERTY_NAME);
         if (isValidBusFactoryClass(busFactoryClass)) {
             return busFactoryClass;
         }
-    
+
         try {
             // next, check for the services stuff in the jar file
             String serviceId = "META-INF/services/" + BusFactory.BUS_FACTORY_PROPERTY_NAME;
             InputStream is = null;
-        
+
             if (classLoader == null) {
                 classLoader = Thread.currentThread().getContextClassLoader();
             }
-        
+
             if (classLoader == null) {
                 is = ClassLoader.getSystemResourceAsStream(serviceId);
             } else {
-                is = classLoader.getResourceAsStream(serviceId);        
+                is = classLoader.getResourceAsStream(serviceId);
             }
             if (is == null) {
                 serviceId = "META-INF/cxf/" + BusFactory.BUS_FACTORY_PROPERTY_NAME;
-            
+
                 if (classLoader == null) {
                     classLoader = Thread.currentThread().getContextClassLoader();
                 }
-            
+
                 if (classLoader == null) {
                     is = ClassLoader.getSystemResourceAsStream(serviceId);
                 } else {
-                    is = classLoader.getResourceAsStream(serviceId);        
+                    is = classLoader.getResourceAsStream(serviceId);
                 }
             }
-            
-            
+
             if (is != null) {
                 BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 busFactoryClass = rd.readLine();
@@ -258,7 +275,7 @@ public abstract class BusFactory {
             }
             if (isValidBusFactoryClass(busFactoryClass)) {
                 if (busFactoryCondition != null) {
-                    try { 
+                    try {
                         classLoader.loadClass(busFactoryCondition);
                         return busFactoryClass;
                     } catch (ClassNotFoundException e) {
@@ -272,13 +289,12 @@ public abstract class BusFactory {
 
         } catch (Exception ex) {
             LogUtils.log(LOG, Level.SEVERE, "FAILED_TO_DETERMINE_BUS_FACTORY_EXC", ex);
-        } 
+        }
         return busFactoryClass;
     }
-    
-    private static boolean isValidBusFactoryClass(String busFactoryClassName) { 
+
+    private static boolean isValidBusFactoryClass(String busFactoryClassName) {
         return busFactoryClassName != null && !"".equals(busFactoryClassName);
     }
-    
+
 }
- 
