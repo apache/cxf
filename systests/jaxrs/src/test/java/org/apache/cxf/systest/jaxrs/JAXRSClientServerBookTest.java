@@ -50,7 +50,6 @@ import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
-import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -666,9 +665,6 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/adapter-list",
                                         Collections.singletonList(provider));
         
-        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
-        conduit.getClient().setReceiveTimeout(1000000);
-        conduit.getClient().setConnectionTimeout(1000000);
         Collection<? extends Book> books = wc.type("application/xml").accept("application/xml")
             .postAndGetCollection(new Books(new Book("CXF", 123L)), Book.class);
         assertEquals(1, books.size());
