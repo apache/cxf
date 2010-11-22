@@ -93,7 +93,8 @@ public class JMSConfiguration implements InitializingBean {
     private boolean jmsProviderTibcoEms;
 
     private ConnectionFactory wrappedConnectionFactory;
-    
+    private boolean autoWrappedConnectionFactory;
+
     private JNDIConfiguration jndiConfig;
     
     public void ensureProperlyConfigured(org.apache.cxf.common.i18n.Message msg) {
@@ -133,7 +134,6 @@ public class JMSConfiguration implements InitializingBean {
     public void setAutoResolveDestination(boolean autoResolveDestination) {
         this.autoResolveDestination = autoResolveDestination;
     }
-
 
     public boolean isUsingEndpointInfo() {
         return this.usingEndpointInfo;
@@ -372,6 +372,7 @@ public class JMSConfiguration implements InitializingBean {
         }
         return useConduitIdSelector;
     }
+
     public boolean isSetUseConduitIdSelector() {
         return useConduitIdSelector != null;
     }
@@ -429,6 +430,7 @@ public class JMSConfiguration implements InitializingBean {
                     } else {
                         scf = new SingleConnectionFactory(connectionFactory);
                     }
+                    autoWrappedConnectionFactory = true;
                 } else {
                     scf = new SingleConnectionFactory102(connectionFactory, pubSubDomain);
                 }
@@ -443,17 +445,21 @@ public class JMSConfiguration implements InitializingBean {
         }
         return wrappedConnectionFactory;
     }
+
     public ConnectionFactory getWrappedConnectionFactory() {
         return wrappedConnectionFactory;
     }
     
     public synchronized void destroyWrappedConnectionFactory() {
-        if (wrappedConnectionFactory instanceof SingleConnectionFactory) {
-            ((SingleConnectionFactory)wrappedConnectionFactory).destroy();
+        if (autoWrappedConnectionFactory
+            &&
+            wrappedConnectionFactory instanceof SingleConnectionFactory) {
+            ((SingleConnectionFactory) wrappedConnectionFactory).destroy();
             if (connectionFactory == wrappedConnectionFactory) {
                 connectionFactory = null;
             }
             wrappedConnectionFactory = null;
+            autoWrappedConnectionFactory = false;
         }
     }
     
