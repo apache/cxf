@@ -59,7 +59,6 @@ import org.apache.cxf.transport.jms.continuations.JMSContinuationProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.springframework.jms.connection.JmsResourceHolder;
-import org.springframework.jms.connection.SingleConnectionFactory;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 import org.springframework.jms.core.SessionCallback;
@@ -119,9 +118,7 @@ public class JMSDestination extends AbstractMultiplexDestination
             // CXF-2788: SingleConnectionFactory ignores the call to
             // javax.jms.Connection#close(),
             // use this to really close the target connection.
-            if (jmsListener.getConnectionFactory() instanceof SingleConnectionFactory) {
-                ((SingleConnectionFactory)jmsListener.getConnectionFactory()).destroy();
-            }
+            jmsConfig.destroyWrappedConnectionFactory();
         }
     }
 
