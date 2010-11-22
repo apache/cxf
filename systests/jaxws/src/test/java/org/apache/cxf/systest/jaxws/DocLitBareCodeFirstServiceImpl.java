@@ -65,4 +65,8 @@ public class DocLitBareCodeFirstServiceImpl implements DocLitBareCodeFirstServic
         };
     }
 
+    public GMonthTest echoGMonthTest(GMonthTest input) {
+        return input;
+    }
+
 }

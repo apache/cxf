@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.xml.datatype.DatatypeFactory;
+import javax.xml.datatype.XMLGregorianCalendar;
 import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.Holder;
@@ -63,6 +65,7 @@ import org.apache.cxf.jaxws.endpoint.dynamic.JaxWsDynamicClientFactory;
 import org.apache.cxf.ordered_param_holder.ComplexStruct;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolder_Service;
+import org.apache.cxf.systest.jaxws.DocLitBareCodeFirstService.GMonthTest;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411Result;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.CXF2411SubClass;
 import org.apache.cxf.systest.jaxws.DocLitWrappedCodeFirstService.Foo;
@@ -136,6 +139,14 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
         } catch (SOAPFaultException ex) {
             assertFalse(ex.getFault().hasDetail());
         }
+        
+        GMonthTest gm = new GMonthTest();
+        XMLGregorianCalendar dt = DatatypeFactory.newInstance().newXMLGregorianCalendarDate(2010, 11, 16, 0);
+        gm.setValue(dt);
+        GMonthTest gm2 = port.echoGMonthTest(gm);
+        
+        assertEquals(gm.getValue().getMonth(), gm2.getValue().getMonth());
+        
     } 
     
 

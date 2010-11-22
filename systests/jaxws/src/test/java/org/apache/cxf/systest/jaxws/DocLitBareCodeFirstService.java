@@ -26,9 +26,12 @@ import javax.jws.soap.SOAPBinding;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlList;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.XMLGregorianCalendar;
 
 
 @WebService(name = "DocLitBareCodeFirstService",
@@ -113,6 +116,29 @@ public interface DocLitBareCodeFirstService {
         }
         public String getName() {
             return name;
+        }
+    }
+    @WebResult(name = "GMonthResult",
+               targetNamespace = "http://namespace/result", partName = "parameter")
+    @WebMethod
+    GMonthTest echoGMonthTest(
+        @WebParam(name = "GMonthRequest", targetNamespace = "http://namespace/result", 
+                  partName = "parameter")                              
+        GMonthTest input);
+    
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "GMonthTest", propOrder = { "value" })
+    public class GMonthTest {
+        @XmlElement(required = true, nillable = true)
+        @XmlSchemaType(name = "gMonth")
+        protected XMLGregorianCalendar value;
+
+        public XMLGregorianCalendar getValue() { 
+            return value; 
+        }
+
+        public void setValue(XMLGregorianCalendar value) {
+            this.value = value;
         }
     }
 }
