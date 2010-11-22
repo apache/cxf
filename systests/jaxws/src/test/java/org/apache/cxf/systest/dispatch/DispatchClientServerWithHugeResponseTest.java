@@ -122,7 +122,6 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
             fail("We should not have encountered a timeout, " 
                 + "should get some exception tell me stackoverflow");
         } catch (Throwable e) {
-            e.printStackTrace();
             assertTrue(e.getCause() instanceof StackOverflowError);
         }
         
