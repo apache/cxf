@@ -26,7 +26,9 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
@@ -45,8 +47,10 @@ import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.jaxrs.provider.XSLTJaxbProvider;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.transport.http.HTTPConduit;
 
 import org.junit.BeforeClass;
 import org.junit.Ignore;
@@ -650,6 +654,25 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/adapter",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+    }
+    
+    @Test
+    public void testPostGetBookAdapterList() throws Exception {
+        JAXBElementProvider provider = new JAXBElementProvider();
+        Map<String, String> outMap = new HashMap<String, String>();
+        outMap.put("Books", "CollectionWrapper");
+        outMap.put("books", "Book");
+        provider.setOutTransformElements(outMap);
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/books/adapter-list",
+                                        Collections.singletonList(provider));
+        
+        HTTPConduit conduit = WebClient.getConfig(wc).getHttpConduit();
+        conduit.getClient().setReceiveTimeout(1000000);
+        conduit.getClient().setConnectionTimeout(1000000);
+        Collection<? extends Book> books = wc.type("application/xml").accept("application/xml")
+            .postAndGetCollection(new Books(new Book("CXF", 123L)), Book.class);
+        assertEquals(1, books.size());
+        assertEquals(123L, books.iterator().next().getId());
     }
     
     @Test

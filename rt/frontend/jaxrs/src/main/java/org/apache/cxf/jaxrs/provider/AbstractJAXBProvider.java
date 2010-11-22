@@ -358,8 +358,10 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    context = JAXBContext.newInstance(packageName, type.getClassLoader(), cProperties);
-                    packageContexts.put(packageName, context);
+                    if (type.getClassLoader() != null) { 
+                        context = JAXBContext.newInstance(packageName, type.getClassLoader(), cProperties);
+                        packageContexts.put(packageName, context);
+                    }
                 } catch (JAXBException ex) {
                     LOG.fine("Error creating a JAXBContext using ObjectFactory : " 
                                 + ex.getMessage());
@@ -447,7 +449,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             } else {
                 Type[] types = InjectionUtils.getActualTypes(adapter.value().getGenericSuperclass());
                 if (types != null && types.length == 2) {
-                    theType = (Class)types[0];
+                    theType = InjectionUtils.getActualType(types[0]);
                 }
             }
         }
