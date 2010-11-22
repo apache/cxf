@@ -29,14 +29,14 @@
          <xsd:element name="DoubleIt">
             <xsd:complexType>
                <xsd:sequence>
-                  <xsd:element name="numberToDouble" type="xsd:integer"/>
+                  <xsd:element name="numberToDouble" type="xsd:int"/>
                </xsd:sequence>
             </xsd:complexType>
          </xsd:element>
          <xsd:element name="DoubleItResponse">
             <xsd:complexType>
                <xsd:sequence>
-                  <xsd:element name="doubledNumber" type="xsd:integer" />
+                  <xsd:element name="doubledNumber" type="xsd:int" />
                </xsd:sequence>
             </xsd:complexType>
          </xsd:element>
