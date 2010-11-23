@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jaxws:bindings wsdlLocation="cxf3105.wsdl"
+          xmlns:jaxws="http://java.sun.com/xml/ns/jaxws"
+          xmlns:xs="http://www.w3.org/2001/XMLSchema"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns:jaxb="http://java.sun.com/xml/ns/jaxb"
+          xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+          xmlns:fc="http://cxf.apache.org/testcase/cxf3105"
+          xsi:schemaLocation="http://java.sun.com/xml/ns/jaxb http://java.sun.com/xml/ns/jaxb/bindingschema_2_0.xsd
+          	http://java.sun.com/xml/ns/jaxws http://java.sun.com/xml/ns/jaxws/wsdl_customizationschema_2_0.xsd">
+  <jaxws:bindings node="wsdl:definitions/wsdl:types/xs:schema">
+  	<jaxb:bindings node="xs:element//xs:element[@name='login' and @type='fc:loginrequest']">
+  		<jaxb:property name="LoginRequest"/>
+  	</jaxb:bindings>
+  	<jaxb:bindings node="xs:element//xs:element[@name='login' and @type='fc:loginresponse']">
+  		<jaxb:property name="LoginResponse"/>
+  	</jaxb:bindings>
+  	<jaxb:bindings node="xs:element[@name='login']">
+  		<jaxb:class name="LoginRequest"/>
+  	</jaxb:bindings>
+  </jaxws:bindings>
+  
+  
+  
+  <jaxws:bindings node="wsdl:definitions/wsdl:portType[@name='Login']/wsdl:operation[@name='login']">
+  	<jaxws:parameter part="wsdl:definitions/wsdl:message[@name='loginRequest']/wsdl:part[@name='parameters']" childElementName="login" name="loginRequest"/>
+  	<jaxws:parameter part="wsdl:definitions/wsdl:message[@name='loginResponse']/wsdl:part[@name='parameters']" childElementName="login" name="loginResponse"/>
+  </jaxws:bindings>
+  
+  <jaxws:enableWrapperStyle>true</jaxws:enableWrapperStyle>
+</jaxws:bindings>

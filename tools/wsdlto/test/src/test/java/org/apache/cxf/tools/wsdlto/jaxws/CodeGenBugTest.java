@@ -1134,4 +1134,21 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
                             "org/apache/cxf/w2j/hello_world_soap_http/TestServiceName1.java").exists());
     }
 
+    
+    @Test
+    public void testCXF3105() throws Exception {
+        String[] args = new String[] {"-d", output.getCanonicalPath(),
+            "-impl", "-server", "-client", 
+            "-b", getLocation("/wsdl2java_wsdl/cxf3105/ws-binding.xml"),
+            getLocation("/wsdl2java_wsdl/cxf3105/cxf3105.wsdl")};
+        WSDLToJava.main(args);
+
+        assertNotNull(output);
+        File f = new File(output, "org/apache/cxf/testcase/cxf3105/Login.java");
+        assertTrue(f.exists());
+        String contents = IOUtils.readStringFromStream(new FileInputStream(f));
+        assertTrue(contents.contains("Loginrequest loginRequest"));
+        assertTrue(contents.contains("<Loginresponse> loginResponse"));
+    }
+
 }

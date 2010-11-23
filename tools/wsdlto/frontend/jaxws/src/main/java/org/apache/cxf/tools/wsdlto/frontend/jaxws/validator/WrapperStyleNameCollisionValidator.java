@@ -28,6 +28,7 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -35,6 +36,7 @@ import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.common.ToolContext;
 import org.apache.cxf.tools.validator.ServiceValidator;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSBinding;
+import org.apache.cxf.tools.wsdlto.frontend.jaxws.customization.JAXWSParameter;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.ProcessorUtil;
 import org.apache.cxf.tools.wsdlto.frontend.jaxws.processor.internal.WrapperElement;
 
@@ -105,17 +107,21 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
             output = operation.getOutput().getMessageParts().iterator().next();
         }
         if (!c) {
-            Map<QName, QName> names = new HashMap<QName, QName>();
+            Map<String, QName> names = new HashMap<String, QName>();
             if (input != null) {
                 for (WrapperElement element : ProcessorUtil.getWrappedElement(context, 
                                                                               input.getElementQName())) {
-                    if (names.containsKey(element.getElementName())
-                        &&  (names.get(element.getElementName()) == element.getSchemaTypeName()
-                            || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
-                        handleErrors(names.get(element.getElementName()), element);
+                    
+                    String mappedName = mapElementName(operation,
+                                                      operation.getUnwrappedOperation().getInput(),
+                                                      element);
+                    if (names.containsKey(mappedName)
+                        &&  (names.get(mappedName) == element.getSchemaTypeName()
+                            || names.get(mappedName).equals(element.getSchemaTypeName()))) {
+                        handleErrors(names.get(mappedName), element);
                         return false;
                     } else {
-                        names.put(element.getElementName(), element.getSchemaTypeName());
+                        names.put(mappedName, element.getSchemaTypeName());
                     }
                 }
             }
@@ -124,19 +130,36 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
                 List<WrapperElement> els = ProcessorUtil.getWrappedElement(context, output.getElementQName());
                 if (els.size() > 1) {
                     for (WrapperElement element : els) {
-                        if (names.containsKey(element.getElementName())
-                            &&  !(names.get(element.getElementName()) == element.getSchemaTypeName()
-                                || names.get(element.getElementName()).equals(element.getSchemaTypeName()))) {
-                            handleErrors(names.get(element.getElementName()), element);
+                        String mappedName = mapElementName(operation,
+                                                           operation.getUnwrappedOperation().getOutput(),
+                                                           element);
+                        if (names.containsKey(mappedName)
+                            &&  !(names.get(mappedName) == element.getSchemaTypeName()
+                                || names.get(mappedName).equals(element.getSchemaTypeName()))) {
+                            handleErrors(names.get(mappedName), element);
                             return false;
                         } else {
-                            names.put(element.getElementName(), element.getSchemaTypeName());
+                            names.put(mappedName, element.getSchemaTypeName());
                         }
                     }
                 }
             }
         }
         return true;
+    }
+
+    private String mapElementName(OperationInfo op, MessageInfo mi, WrapperElement element) {
+        MessagePartInfo mpi = mi.getMessagePart(element.getElementName());
+        JAXWSBinding bind = op.getExtensor(JAXWSBinding.class);
+        if (bind != null && bind.getJaxwsParas() != null) {
+            for (JAXWSParameter par : bind.getJaxwsParas()) {
+                if (mi.getName().getLocalPart().equals(par.getMessageName())
+                    && mpi.getName().getLocalPart().equals(par.getElementName().getLocalPart())) {
+                    return par.getName();
+                }
+            }
+        }
+        return mpi.getElementQName().getLocalPart();
     }
 
     private void handleErrors(QName e1, WrapperElement e2) {

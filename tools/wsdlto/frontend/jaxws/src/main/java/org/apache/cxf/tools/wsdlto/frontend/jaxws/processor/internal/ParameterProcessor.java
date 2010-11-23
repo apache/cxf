@@ -239,17 +239,11 @@ public class ParameterProcessor extends AbstractProcessor {
             && countOutOfBandHeader(inputMessage) == 0) {
             return;
         }
-        JAXWSBinding mBinding = inputMessage.getOperation().getExtensor(JAXWSBinding.class);
         for (QName item : wrappedElements) {
             JavaParameter jp = getParameterFromQName(part.getElementQName(),
                                   item, JavaType.Style.IN, part);
-            if (mBinding != null && mBinding.getJaxwsParas() != null) {
-                for (JAXWSParameter jwsp : mBinding.getJaxwsParas()) {
-                    if (item.equals(jwsp.getElementName())) {
-                        jp.setName(jwsp.getName());
-                    }
-                }
-            }
+            
+            checkPartName(inputMessage, item, jp);
             
             if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) { 
                 jp.setTargetNamespace("");
@@ -479,7 +473,9 @@ public class ParameterProcessor extends AbstractProcessor {
                         }
                         if (!jpIn.getClassName().equals(jp.getClassName())) {
                             jp.setStyle(JavaType.Style.OUT);
+                            checkPartName(outputMessage, outElement, jp);
                         }
+
                         addParameter(method, jp);
                         sameWrapperChild = true;
                         break;
@@ -492,15 +488,7 @@ public class ParameterProcessor extends AbstractProcessor {
                 if (!qualified && !isRefElement(outputPart, outElement)) {
                     jp.setTargetNamespace("");
                 }
-                
-                JAXWSBinding mBinding = outputMessage.getOperation().getExtensor(JAXWSBinding.class);
-                if (mBinding != null && mBinding.getJaxwsParas() != null) {
-                    for (JAXWSParameter jwsp : mBinding.getJaxwsParas()) {
-                        if (outElement.equals(jwsp.getElementName())) {
-                            jp.setName(jwsp.getName());
-                        }
-                    }
-                }
+                checkPartName(outputMessage, outElement, jp);
     
                 addParameter(method, jp);
             }
@@ -509,7 +497,17 @@ public class ParameterProcessor extends AbstractProcessor {
             addVoidReturn(method);
         }
     }
-
+    private void checkPartName(MessageInfo message, QName element, JavaParameter jp) {
+        JAXWSBinding mBinding = message.getOperation().getExtensor(JAXWSBinding.class);
+        if (mBinding != null && mBinding.getJaxwsParas() != null) {
+            for (JAXWSParameter jwsp : mBinding.getJaxwsParas()) {
+                if (element.getLocalPart().equals(jwsp.getElementName().getLocalPart())
+                    && jwsp.getMessageName().equals(message.getName().getLocalPart())) {
+                    jp.setName(jwsp.getName());
+                }
+            }
+        }        
+    }
     private void addVoidReturn(JavaMethod method) {
         JavaReturn returnType = new JavaReturn("return", "void", null);
         method.setReturn(returnType);
