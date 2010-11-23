@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions xmlns:fc="http://cxf.apache.org/testcase/cxf3105" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="center" targetNamespace="http://cxf.apache.org/testcase/cxf3105">
+    <wsdl:types>
+        <xsd:schema targetNamespace="http://cxf.apache.org/testcase/cxf3105">
+            <xsd:complexType name="loginrequest">
+                <xsd:sequence>
+                    <xsd:element name="username" type="xsd:string"/>
+                    <xsd:element name="password" type="xsd:string"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            <xsd:complexType name="loginresponse">
+                <xsd:sequence>
+                    <xsd:element name="userid" type="xsd:int"/>
+                    <xsd:element name="groupid" type="xsd:int"/>
+                </xsd:sequence>
+            </xsd:complexType>
+            
+
+            <xsd:element name="login">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="login" type="fc:loginrequest"/>
+                        <xsd:element name="id" type="xsd:int" maxOccurs="1" minOccurs="0"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+            <xsd:element name="loginResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="login" type="fc:loginresponse"/>
+                        <xsd:element name="password_temp" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+        </xsd:schema>
+    </wsdl:types>
+
+    <wsdl:message name="loginRequest">
+        <wsdl:part name="parameters" element="fc:login"/>
+    </wsdl:message>
+    <wsdl:message name="loginResponse">
+        <wsdl:part name="parameters" element="fc:loginResponse"/>
+    </wsdl:message>
+    
+
+    <wsdl:portType name="Login">
+        <wsdl:operation name="login">
+            <wsdl:input message="fc:loginRequest"/>
+            <wsdl:output message="fc:loginResponse"/>
+        </wsdl:operation>
+    </wsdl:portType>
+    <wsdl:binding name="Login" type="fc:Login">
+        <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <wsdl:operation name="login">
+            <soap:operation soapAction="http://cxf.apache.org/testcase/cxf3105login"/>
+            <wsdl:input>
+                <soap:body use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+                <soap:body use="literal"/>
+            </wsdl:output>
+        </wsdl:operation>
+    </wsdl:binding>
+    <wsdl:service name="Login">
+        <wsdl:port binding="fc:Login" name="center">
+            <soap:address location="http://localhost:9000/"/>
+        </wsdl:port>
+    </wsdl:service>
+
+</wsdl:definitions>
