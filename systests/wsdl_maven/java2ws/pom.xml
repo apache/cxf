@@ -56,6 +56,7 @@
 							<genWsdl>true</genWsdl>
 							<verbose>true</verbose>
 							<attachWsdl>true</attachWsdl>
+                            <fork>true</fork>
 						</configuration>
 						<goals>
 							<goal>java2ws</goal>
