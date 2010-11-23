@@ -52,7 +52,7 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/staticContent/beverages.html" todir="${basedir}/target/classes/staticContent"/>
+                                <copy file="${basedir}/staticContent/Beverages.html" todir="${basedir}/target/classes/staticContent"/>
                                 <copy file="${basedir}/cxf.xml" todir="${basedir}/target/classes/"/>
                             </tasks>
                         </configuration>
