@@ -71,7 +71,8 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
 
     private OutMessageRecorder out;
     private InMessageRecorder in;
-
+    private Bus greeterBus;
+    
     @BeforeClass
     public static void startServers() throws Exception {
         RMTxStore.deleteDatabaseFiles();
@@ -104,7 +105,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         assertTrue("Failed to start greeter", control.startGreeter(SERVER_LOSS_CFG)); 
         LOG.fine("Started greeter server.");
         
-        Bus greeterBus = new SpringBusFactory().createBus(CFG);
+        greeterBus = new SpringBusFactory().createBus(CFG);
         LOG.fine("Created bus " + greeterBus + " with cfg : " + CFG);        
         BusFactory.setDefaultBus(greeterBus);
         
@@ -132,7 +133,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         LOG.fine("Configured greeter client.");
 
-        Response<GreetMeResponse> responses[] = cast(new Response[3]);
+        Response<GreetMeResponse> responses[] = cast(new Response[4]);
         
         responses[0] = greeter.greetMeAsync("one");
         responses[1] = greeter.greetMeAsync("two");
@@ -151,6 +152,12 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         verifyServerRecovery(responses);
         
+        out.getOutboundMessages().clear();
+        in.getInboundMessages().clear();
+        
+        responses[3] = greeter.greetMeAsync("four");
+        verifyRetransmissionQueue();
+        
         greeterBus.shutdown(true);
         
         control.stopGreeter(CFG);
@@ -163,7 +170,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         // wait another while to prove that response to second request is indeed lost
         Thread.sleep(4000);
         int nDone = 0;
-        for (int i = 0; i < responses.length; i++) {
+        for (int i = 0; i < 3; i++) {
             if (responses[i].isDone()) {
                 nDone++;
             }
@@ -197,7 +204,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         int nDone = 0;
         long waited = 0;
         while (waited < 5000) {
-            for (int i = 0; i < responses.length; i++) {
+            for (int i = 0; i < responses.length - 1; i++) {
                 if (responses[i].isDone()) {
                     nDone++;
                 }
@@ -228,6 +235,13 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
   
     
+    void verifyRetransmissionQueue() throws Exception {
+        awaitMessages(1, 3, 40000);
+        
+        boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
+        assertTrue("Retransmission Queue is not empty", empty);
+    }
+
     protected void awaitMessages(int nExpectedOut, int nExpectedIn) {
         awaitMessages(nExpectedOut, nExpectedIn, 10000);
     }

@@ -604,7 +604,7 @@ public class RMTxStore implements RMStore {
         }
         
         try {
-            connection.setAutoCommit(false);
+            connection.setAutoCommit(true);
             createTables();
         } catch (SQLException ex) {
             LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
@@ -614,7 +614,14 @@ public class RMTxStore implements RMStore {
                 LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", se);
             }
             throw new RMStoreException(ex);
-        }   
+        } finally {
+            try {
+                connection.setAutoCommit(false);                
+            } catch (SQLException ex) {
+                LogUtils.log(LOG, Level.SEVERE, "CONNECT_EXC", ex);
+                throw new RMStoreException(ex);
+            }
+        }
     }   
     
     Connection getConnection() {
