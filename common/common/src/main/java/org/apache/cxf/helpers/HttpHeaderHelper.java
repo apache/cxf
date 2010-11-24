@@ -64,7 +64,11 @@ public final class HttpHeaderHelper {
     }
     
     public static List<String> getHeader(Map<String, List<String>> headerMap, String key) {
-        return headerMap.get(getHeaderKey(key));
+        if (headerMap.get(getHeaderKey(key)) != null) {
+            return headerMap.get(getHeaderKey(key));
+        } else {
+            return headerMap.get(key);
+        }
     }
     
     public static String getHeaderKey(String key) {
