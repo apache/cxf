@@ -989,16 +989,27 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("bar foo", params.get(1));
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testFormParameters() throws Exception {
+        doTestFormParameters(true);
+    }
+    
+    @Test
+    public void testFormParametersWithoutMediaType() throws Exception {
+        doTestFormParameters(false);
+    }
+    
+    @SuppressWarnings("unchecked")
+    private void doTestFormParameters(boolean useMediaType) throws Exception {
         Class[] argType = {String.class, List.class};
         Method m = Customer.class.getMethod("testFormParam", argType);
         MessageImpl messageImpl = new MessageImpl();
         String body = "p1=1&p2=2&p2=3";
         messageImpl.put(Message.REQUEST_URI, "/foo");
         MultivaluedMap<String, String> headers = new MetadataMap<String, String>();
-        headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        if (useMediaType) {
+            headers.putSingle("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        }
         messageImpl.put(Message.PROTOCOL_HEADERS, headers);
         messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 

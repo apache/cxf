@@ -71,7 +71,7 @@ public final class FormUtils {
     }
     
     private static String getCharset(MediaType mt) {
-        String charset = mt.getParameters().get("charset");
+        String charset = mt == null ? "UTF-8" : mt.getParameters().get("charset");
         return charset == null ? "UTF-8" : charset;
     }
     
