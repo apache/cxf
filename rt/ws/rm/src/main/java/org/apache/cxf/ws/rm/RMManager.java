@@ -399,12 +399,18 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
         String id = RMUtils.getEndpointIdentifier(endpoint);
         
         Collection<SourceSequence> sss = store.getSourceSequences(id);
-        if (null == sss || 0 == sss.size()) {                        
+        Collection<DestinationSequence> dss = store.getDestinationSequences(id);
+        if ((null == sss || 0 == sss.size()) && (null == dss || 0 == dss.size())) {                        
             return;
         }
         LOG.log(Level.FINE, "Number of source sequences: {0}", sss.size());
+        LOG.log(Level.FINE, "Number of destination sequences: {0}", dss.size());
         
-        RMEndpoint rme = null;
+        LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
+                new Object[] {null == conduit ? "client" : "server", id});
+        RMEndpoint rme = createReliableEndpoint(endpoint);
+        rme.initialise(conduit, null, null);
+        reliableEndpoints.put(endpoint, rme);
         for (SourceSequence ss : sss) {            
  
             Collection<RMMessage> ms = store.getMessages(ss.getIdentifier(), true);
@@ -413,13 +419,6 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
             }
             LOG.log(Level.FINE, "Number of messages in sequence: {0}", ms.size());
             
-            if (null == rme) {
-                LOG.log(Level.FINE, "Recovering {0} endpoint with id: {1}",
-                        new Object[] {null == conduit ? "client" : "server", id});
-                rme = createReliableEndpoint(endpoint);
-                rme.initialise(conduit, null, null);
-                reliableEndpoints.put(endpoint, rme);
-            }
             rme.getSource().addSequence(ss, false);
             
             for (RMMessage m : ms) {                
@@ -461,6 +460,10 @@ public class RMManager implements ServerLifeCycleListener, ClientLifeCycleListen
                           
                 retransmissionQueue.addUnacknowledged(message);
             }            
+        }
+        
+        for (DestinationSequence ds : dss) {
+            rme.getDestination().addSequence(ds, false);        
         }
         retransmissionQueue.start();
         
