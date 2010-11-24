@@ -27,6 +27,7 @@ import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -256,11 +257,16 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                      Type genericType, String encoding, OutputStream os, MediaType m) 
         throws Exception {
         
-        Object[] arr = originalCls.isArray() ? (Object[])actualObject : ((Collection)actualObject).toArray();
+        Collection c = originalCls.isArray() ? Arrays.asList((Object[]) actualObject) 
+                                             : (Collection) actualObject;
+
+        Iterator it = c.iterator();
         
+        Object firstObj = it.hasNext() ? it.next() : null;
+
         QName qname = null;
-        if (arr.length > 0 && arr[0] instanceof JAXBElement) {
-            JAXBElement el = (JAXBElement)arr[0];
+        if (firstObj instanceof JAXBElement) {
+            JAXBElement el = (JAXBElement)firstObj;
             qname = el.getName();
             actualClass = el.getDeclaredType();
         } else {
@@ -284,9 +290,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             endTag = "</" + qname.getLocalPart() + ">";
         }
         os.write(startTag.getBytes());
-        for (Object o : arr) {
-            marshalCollectionMember(o instanceof JAXBElement ? ((JAXBElement)o).getValue() : o, 
-                                    actualClass, genericType, encoding, os, m, qname.getNamespaceURI());    
+        if (firstObj != null) {
+            marshalCollectionMember(firstObj instanceof JAXBElement 
+                ? ((JAXBElement) firstObj).getValue() : firstObj, actualClass, genericType, encoding, os, m, 
+                qname.getNamespaceURI());
+            while (it.hasNext()) {
+                Object o = it.next();
+                marshalCollectionMember(o instanceof JAXBElement ? ((JAXBElement)o).getValue() : o, 
+                                    actualClass, genericType, encoding, os, m, qname.getNamespaceURI());
+            }
         }
         os.write(endTag.getBytes());
     }
