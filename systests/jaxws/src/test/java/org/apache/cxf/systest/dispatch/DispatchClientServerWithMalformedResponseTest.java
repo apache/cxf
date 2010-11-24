@@ -147,7 +147,7 @@ public class DispatchClientServerWithMalformedResponseTest extends AbstractBusCl
                 SOAPMessage reply = response.get();
                 replyBuffer = reply.getSOAPBody().getTextContent();
             } catch (Exception e) {
-                e.printStackTrace();
+                //
             }
         }
 
