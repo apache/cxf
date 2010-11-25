@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.jaxws;
+package org.apache.cxf.systest.jaxrs;
 
 import java.net.URL;
 

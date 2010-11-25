@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.jaxws;
+package org.apache.cxf.systest.jaxrs;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -28,10 +28,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-
-import org.apache.cxf.systest.jaxrs.Book;
-import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
-import org.apache.cxf.systest.jaxrs.BookSubresource;
 
 @WebService
 @Path("/bookstore")
@@ -51,19 +47,23 @@ public interface BookStoreJaxrsJaxws {
     Book addBook(@WebParam(name = "book") Book book);
     
     @Path("/books/{id}")
+    @WebMethod(exclude = true)
     BookSubresource getBookSubresource(@PathParam("id") String id);
     
     @Path("/thestore/{id}")
+    @WebMethod(exclude = true)
     BookStoreJaxrsJaxws getBookStore(@PathParam("id") String id);
     
     @POST
     @Path("/fastinfoset")
     @Consumes({"text/xml" })
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })
+    @WebMethod(exclude = true)
     Book addFastinfoBook(Book book);
     
     @GET
     @Path("/fastinfoset2")
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })
+    @WebMethod(exclude = true)
     Book getFastinfoBook();
 }

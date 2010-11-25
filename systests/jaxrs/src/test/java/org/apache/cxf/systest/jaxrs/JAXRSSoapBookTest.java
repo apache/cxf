@@ -37,8 +37,6 @@ import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.namespace.QName;
-import javax.xml.ws.Service;
-import javax.xml.ws.soap.SOAPBinding;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.FileRequestEntity;
@@ -63,11 +61,6 @@ import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
-import org.apache.cxf.systest.jaxrs.jaxws.BookSoapService;
-import org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws;
-import org.apache.cxf.systest.jaxrs.jaxws.HelloWorld;
-import org.apache.cxf.systest.jaxrs.jaxws.User;
-import org.apache.cxf.systest.jaxrs.jaxws.UserImpl;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
 
@@ -82,41 +75,6 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerRestSoap.class));
-    }
-    
-    @Test
-    public void testHelloRest() throws Exception {
-        String address = "http://localhost:" + PORT + "/test/services/hello-rest";
-        
-        HelloWorld service = JAXRSClientFactory.create(address, HelloWorld.class);
-        useHelloService(service);
-    }
-    
-    @Test
-    public void testHelloSoap() throws Exception {
-        final QName serviceName = new QName("http://hello.com", "HelloWorld");
-        final QName portName = new QName("http://hello.com", "HelloWorldPort");
-        final String address = "http://localhost:" + PORT + "/test/services/hello-soap";
-        
-        Service service = Service.create(serviceName);
-        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
-    
-        HelloWorld hw = service.getPort(HelloWorld.class); 
-    
-        useHelloService(hw);
-    }
-    
-    private void useHelloService(HelloWorld service) {
-        assertEquals("Hello Barry", service.sayHi("Barry"));
-        assertEquals("Hello Fred", service.sayHiToUser(new UserImpl("Fred")));
-        
-        Map<Integer, User> users = service.getUsers();
-        assertEquals(1, users.size());
-        assertEquals("Fred", users.entrySet().iterator().next().getValue().getName());
-        
-        users = service.echoUsers(users);
-        assertEquals(1, users.size());
-        assertEquals("Fred", users.entrySet().iterator().next().getValue().getName());
     }
     
     @Test

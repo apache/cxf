@@ -16,22 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.jaxws;
+
+package org.apache.cxf.systest.jaxrs;
 
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+public class BookStoreSoapRestImpl2 implements BookStoreJaxws, BookStoreJaxrs  {
 
-
-public class UserAdapter extends XmlAdapter<UserImpl, User> {
-    public UserImpl marshal(User v) throws Exception {
-        if (v instanceof UserImpl) {
-            return (UserImpl)v;
-        }
-        return new UserImpl(v.getName());
+    public int getId() {
+        return 0;
     }
 
-    public User unmarshal(UserImpl v) throws Exception {
-        return v;
-    }
+        
 }
-

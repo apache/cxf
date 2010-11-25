@@ -29,7 +29,7 @@ public class BookApplication extends Application {
     public Set<Class<?>> getClasses() {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
-        classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
+        classes.add(org.apache.cxf.systest.jaxrs.BookStoreJaxrsJaxws.class);
         return classes;
     }
 

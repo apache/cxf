@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs.jaxws;
+package org.apache.cxf.systest.jaxrs;
 
 import javax.jws.WebMethod;
 import javax.jws.WebService;

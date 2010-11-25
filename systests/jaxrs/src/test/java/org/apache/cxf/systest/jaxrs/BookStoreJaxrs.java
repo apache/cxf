@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs.jaxws;
 
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+package org.apache.cxf.systest.jaxrs;
 
-@XmlJavaTypeAdapter(UserAdapter.class)
-public interface User {
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 
-    String getName();
-}
+@Path("/myRestService")
+public interface BookStoreJaxrs {
+
+    @GET
+    int getId();
+} 
