@@ -16,29 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.jaxws;
 
-import java.util.HashSet;
-import java.util.Set;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 
-import javax.ws.rs.core.Application;
 
-public class BookApplication extends Application {
+@XmlRootElement(name = "User")
+@XmlType(name = "User")
+public class UserImpl implements User {
+    String name;
 
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
-        classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
-        return classes;
+    public UserImpl() {
+    }
+    public UserImpl(String s) {
+        name = s;
     }
 
-    @Override 
-    public Set<Object> getSingletons() {
-        Set<Object> classes = new HashSet<Object>();
-        classes.add(new org.apache.cxf.systest.jaxrs.BookStore());
-        return classes;
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String s) {
+        name = s;
     }
     
+    public int hashCode() {
+        return name.hashCode();
+    }
     
+    public boolean equals(Object o) {
+        return o instanceof User && name.equals(((User)o).getName());
+    }
 }

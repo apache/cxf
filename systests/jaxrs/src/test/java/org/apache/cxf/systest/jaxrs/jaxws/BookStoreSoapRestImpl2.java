@@ -16,29 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.systest.jaxrs;
 
-import java.util.HashSet;
-import java.util.Set;
+package org.apache.cxf.systest.jaxrs.jaxws;
 
-import javax.ws.rs.core.Application;
 
-public class BookApplication extends Application {
+public class BookStoreSoapRestImpl2 implements BookStoreJaxws, BookStoreJaxrs  {
 
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<Class<?>>();
-        classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
-        classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
-        return classes;
+    public int getId() {
+        return 0;
     }
 
-    @Override 
-    public Set<Object> getSingletons() {
-        Set<Object> classes = new HashSet<Object>();
-        classes.add(new org.apache.cxf.systest.jaxrs.BookStore());
-        return classes;
-    }
-    
-    
+        
 }

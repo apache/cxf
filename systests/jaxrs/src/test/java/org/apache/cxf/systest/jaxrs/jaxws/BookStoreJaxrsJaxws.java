@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.jaxws;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -28,6 +28,10 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+
+import org.apache.cxf.systest.jaxrs.Book;
+import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
+import org.apache.cxf.systest.jaxrs.BookSubresource;
 
 @WebService
 @Path("/bookstore")

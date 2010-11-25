@@ -47,14 +47,14 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
 
   <jaxrs:client id="restClient"
          address="http://localhost:${testutil.ports.BookServerRestSoap}/test/services/rest"
-         serviceClass="org.apache.cxf.systest.jaxrs.BookStoreJaxrsJaxws"
+         serviceClass="org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws"
          inheritHeaders="true">
          <jaxrs:headers>
              <entry key="Accept" value="text/xml"/>
          </jaxrs:headers>
   </jaxrs:client>       
          
-  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl"/>
+  <bean id="bookstore" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl"/>
 
   <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
@@ -69,6 +69,19 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <ref bean="bookstore"/>
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
+
+  <jaxrs:server id="hello_rest" address="/hello-rest">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"/>
+    </jaxrs:serviceBeans>		   
+  </jaxrs:server>
+
+  <jaxws:endpoint xmlns:s="http://hello.com"
+      serviceName="s:HelloWorld"
+      endpointName="s:HelloWorldPort"
+      id="hello_soap"
+      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
+      address="/hello-soap"/>
 
   <jaxws:endpoint xmlns:s="http://books.com"
       serviceName="s:BookService"
@@ -87,7 +100,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <ref bean="bookstore2"/>
     </jaxrs:serviceBeans>		   
   </jaxrs:server>
-  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.BookStoreSoapRestImpl2"/>
+  <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl2"/>
 
   <util:list id="fastinfosetType">
     <value>application/fastinfoset</value>
