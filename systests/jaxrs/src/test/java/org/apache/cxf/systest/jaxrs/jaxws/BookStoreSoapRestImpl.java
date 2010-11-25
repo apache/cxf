@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.systest.jaxrs;
+package org.apache.cxf.systest.jaxrs.jaxws;
 
 import java.io.OutputStream;
 import java.util.HashMap;
@@ -36,6 +36,11 @@ import javax.xml.ws.WebServiceContext;
 
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.systest.jaxrs.Book;
+import org.apache.cxf.systest.jaxrs.BookNotFoundDetails;
+import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
+import org.apache.cxf.systest.jaxrs.BookSubresource;
+import org.apache.cxf.systest.jaxrs.BookSubresourceImpl;
 
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
