@@ -221,13 +221,20 @@ public class BookStore {
     
     @POST
     @Path("/collections")
-    @Produces("application/xml")
-    @Consumes("application/xml")
+    @Produces({"application/xml", "application/json" })
+    @Consumes({"application/xml", "application/json" })
     public List<Book> getBookCollection(List<Book> bs) throws Exception {
         if (bs == null || bs.size() != 2) {
             throw new RuntimeException();
         }
         return bs;
+    }
+    
+    @GET
+    @Path("/collections")
+    @Produces({"application/xml", "application/json" })
+    public List<Book> getBookCollection() throws Exception {
+        return new ArrayList<Book>(books.values());
     }
     
     @POST

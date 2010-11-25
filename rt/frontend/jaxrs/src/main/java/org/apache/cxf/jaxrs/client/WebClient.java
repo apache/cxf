@@ -53,6 +53,7 @@ import org.apache.cxf.jaxrs.model.ParameterType;
 import org.apache.cxf.jaxrs.model.URITemplate;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ParameterizedCollectionType;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.phase.Phase;
@@ -339,8 +340,8 @@ public class WebClient extends AbstractClient {
      */
     public <T> Collection<? extends T> invokeAndGetCollection(String httpMethod, Object body, 
                                                     Class<T> memberClass) {
-        
-        Response r = doInvoke(httpMethod, body, Collection.class, memberClass);
+        Response r = doInvoke(httpMethod, body, Collection.class,
+                              new ParameterizedCollectionType<T>(memberClass));
         
         if (r.getStatus() >= 400) {
             throw new WebApplicationException(r);

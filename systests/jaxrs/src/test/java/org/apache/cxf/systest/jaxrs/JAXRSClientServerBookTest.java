@@ -64,6 +64,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServer.class));
     }
     
+
+    @Test
+    public void testGetCollectionOfBooks() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        wc.accept("application/xml");
+        Collection<? extends Book> collection = wc.getCollection(Book.class);
+        assertEquals(1, collection.size());
+        Book book = collection.iterator().next();
+        assertEquals(123L, book.getId());
+    }
+    
     
     @Test
     public void testOnewayWebClient() throws Exception {
