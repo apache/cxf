@@ -26,8 +26,11 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
+import java.util.Collection;
+import java.util.Collections;
 
 import org.apache.cxf.helpers.IOUtils;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -56,6 +59,20 @@ public class JAXRSClientServerResourceJacksonSpringProviderTest extends Abstract
         assertEquals("Jackson output not correct", 
                      "{\"name\":\"CXF in Action\",\"id\":123}",
                      getStringFromInputStream(in).trim());
+    }
+    
+    @Test
+    public void testGetCollectionOfBooks() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/webapp/bookstore/collections"; 
+        WebClient wc = WebClient.create(endpointAddress,
+            Collections.singletonList(new org.codehaus.jackson.jaxrs.JacksonJsonProvider()));
+        wc.accept("application/json");
+        Collection<? extends Book> collection = wc.getCollection(Book.class);
+        assertEquals(1, collection.size());
+        Book book = collection.iterator().next();
+        assertEquals(123L, book.getId());
     }
     
     @Test
