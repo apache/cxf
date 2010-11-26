@@ -27,8 +27,11 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -462,7 +465,18 @@ public class AbstractClient implements Client {
                                                + "with matrix and query parameters only");
         }
         if (!"".equals(paramName)) {
-            addToBuilder(ub, paramName, pValue, pt);    
+            
+            if (InjectionUtils.isSupportedCollectionOrArray(pValue.getClass())) {
+                Collection<?> c = pValue.getClass().isArray() 
+                    ? Arrays.asList((Object[]) pValue) : (Collection) pValue;
+                for (Iterator<?> it = c.iterator(); it.hasNext();) {
+                    addToBuilder(ub, paramName, it.next(), pt);
+                }
+            } else { 
+                addToBuilder(ub, paramName, pValue, pt); 
+            }
+                
+                    
         } else {
             MultivaluedMap<String, Object> values = 
                 InjectionUtils.extractValuesFromBean(pValue, "");

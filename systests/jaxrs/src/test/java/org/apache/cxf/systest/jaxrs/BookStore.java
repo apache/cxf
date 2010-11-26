@@ -278,6 +278,15 @@ public class BookStore {
     }
     
     @GET
+    @Path("/segment/matrix-list")
+    public Book getBookByMatrixListParams(@MatrixParam("first") List<String> list) throws Exception {
+        if (list.size() != 2) {
+            throw new RuntimeException();
+        }
+        return doGetBook(list.get(0) + list.get(1));
+    }
+    
+    @GET
     @Path("/bookheaders/")
     public Book getBookByHeader(@HeaderParam("BOOK") List<String> ids) throws Exception {
         List<MediaType> types = httpHeaders.getAcceptableMediaTypes();

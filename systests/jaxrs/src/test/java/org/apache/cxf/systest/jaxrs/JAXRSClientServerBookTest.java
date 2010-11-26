@@ -128,6 +128,16 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testProxyWithCollectionMatrixParams() throws Exception {
+        BookStore proxy = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        List<String> params = new ArrayList<String>(); 
+        params.add("12");
+        params.add("3");
+        Book book = proxy.getBookByMatrixListParams(params);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
     public void testPropogateException() throws Exception {
         getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception",
                       "", "application/xml", 500);
