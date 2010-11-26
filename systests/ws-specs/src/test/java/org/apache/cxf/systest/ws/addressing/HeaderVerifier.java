@@ -129,7 +129,9 @@ public class HeaderVerifier extends AbstractSoapInterceptor {
                                       || outgoingPartialResponse;
             verificationCache.put(MAPTest.verifyHeaders(wsaHeaders, 
                                                         partialResponse,
-                                                        isRequestLeg(message)));
+                                                        isRequestLeg(message),
+                                                        !VersionTransformer.Names200408.WSA_NAMESPACE_NAME
+                                                        .equals(currentNamespaceURI)));
         } catch (SOAPException se) {
             verificationCache.put("SOAP header verification failed: " + se);
         }

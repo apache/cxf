@@ -371,7 +371,8 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
      */
     protected static String verifyHeaders(List<String> wsaHeaders,
                                           boolean partial,
-                                          boolean requestLeg) {
+                                          boolean requestLeg,
+                                          boolean replyToRequired) {
         //System.out.println("verifying headers: " + wsaHeaders);
         String ret = null;
         if (!wsaHeaders.contains(Names.WSA_MESSAGEID_NAME)) {
@@ -381,8 +382,9 @@ public abstract class MAPTestBase extends AbstractClientServerTestBase implement
             ret = "expected To header";
         }
        
-        if (!(wsaHeaders.contains(Names.WSA_REPLYTO_NAME)
-              || wsaHeaders.contains(Names.WSA_RELATESTO_NAME))) {
+        if (replyToRequired 
+            && !(wsaHeaders.contains(Names.WSA_REPLYTO_NAME)
+                || wsaHeaders.contains(Names.WSA_RELATESTO_NAME))) {
             ret = "expected ReplyTo or RelatesTo header";
         }
         /*

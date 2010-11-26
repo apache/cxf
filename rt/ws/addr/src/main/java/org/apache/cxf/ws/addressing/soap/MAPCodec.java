@@ -238,21 +238,23 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     hdr, 
                                     marshaller);
                 }
-                encodeAsExposed(maps,
-                                message,
-                                maps.getReplyTo(), 
-                                Names.WSA_REPLYTO_QNAME, 
-                                EndpointReferenceType.class,
-                                hdr,
-                                marshaller);
-                if (Names.WSA_REPLYTO_QNAME.equals(duplicate)) {
+                if (needsReplyTo(maps)) {
                     encodeAsExposed(maps,
-                                    message,
-                                    maps.getReplyTo(), 
-                                    Names.WSA_REPLYTO_QNAME, 
-                                    EndpointReferenceType.class,
-                                    hdr,
-                                    marshaller);
+                            message,
+                            maps.getReplyTo(), 
+                            Names.WSA_REPLYTO_QNAME, 
+                            EndpointReferenceType.class,
+                            hdr,
+                            marshaller);
+                    if (Names.WSA_REPLYTO_QNAME.equals(duplicate)) {
+                        encodeAsExposed(maps,
+                                        message,
+                                        maps.getReplyTo(), 
+                                        Names.WSA_REPLYTO_QNAME, 
+                                        EndpointReferenceType.class,
+                                        hdr,
+                                        marshaller);
+                    }
                 }
 
                 encodeAsExposed(maps,
@@ -287,11 +289,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                                     hdr, 
                                     marshaller);
                 }
-                if (maps.getFaultTo() != null
-                    && maps.getFaultTo().getAddress() != null
-                    && maps.getFaultTo().getAddress().getValue() != null
-                    && !maps.getFaultTo().getAddress().getValue()
-                        .equals(maps.getReplyTo().getAddress().getValue())) {
+                if (needsFaultTo(maps)) {
                     encodeAsExposed(maps,
                                     message,
                                     maps.getFaultTo(), 
@@ -329,6 +327,23 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 LOG.log(Level.WARNING, "SOAP_HEADER_ENCODE_FAILURE_MSG", je);
             }
         }
+    }
+
+    private boolean needsReplyTo(AddressingProperties maps) {
+        return maps.getReplyTo() != null 
+            && maps.getReplyTo().getAddress() != null
+            && maps.getReplyTo().getAddress().getValue() != null
+            && !(VersionTransformer.Names200408.WSA_NAMESPACE_NAME.equals(maps.getNamespaceURI()) 
+                && maps.getReplyTo().getAddress().getValue()
+                .equals(ContextUtils.getNoneEndpointReference().getAddress().getValue()));
+    }
+
+    private boolean needsFaultTo(AddressingProperties maps) {
+        return maps.getFaultTo() != null
+            && maps.getFaultTo().getAddress() != null
+            && maps.getFaultTo().getAddress().getValue() != null
+            && !maps.getFaultTo().getAddress().getValue()
+                .equals(maps.getReplyTo().getAddress().getValue());
     }
 
     private void encodeReferenceParameters(AddressingProperties maps, Element header, 

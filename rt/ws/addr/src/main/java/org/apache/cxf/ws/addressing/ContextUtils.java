@@ -379,7 +379,9 @@ public final class ContextUtils {
                 exchange.setOutMessage(partialResponse);
                 Conduit backChannel = target.getBackChannel(inMessage,
                                                             partialResponse,
-                                                            reference);
+                                                            reference == null
+                                                            ? ContextUtils.getNoneEndpointReference()
+                                                            : reference);
 
                 if (backChannel != null) {
                     // set up interceptor chains and send message
