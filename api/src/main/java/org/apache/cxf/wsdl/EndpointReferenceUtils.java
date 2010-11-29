@@ -195,17 +195,19 @@ public final class EndpointReferenceUtils {
             // handle case where given systemId is null (so that
             // direct key lookup fails) by scanning through map
             // searching for a namespace match
-            for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
-                if (ent.getKey().endsWith(namespaceURI)) {
-                    schemas.remove(ent.getKey());
-                    impl = new LSInputImpl();
-                    impl.setSystemId(newId);
-                    impl.setBaseURI(newId);
-                    impl.setCharacterStream(
-                        new InputStreamReader(
-                            new ByteArrayInputStream(ent.getValue())));
-                    done.add(newId + ":" + namespaceURI);
-                    return impl;
+            if (namespaceURI != null) {
+                for (Map.Entry<String, byte[]> ent : schemas.entrySet()) {
+                    if (ent.getKey().endsWith(namespaceURI)) {
+                        schemas.remove(ent.getKey());
+                        impl = new LSInputImpl();
+                        impl.setSystemId(newId);
+                        impl.setBaseURI(newId);
+                        impl.setCharacterStream(
+                            new InputStreamReader(
+                                new ByteArrayInputStream(ent.getValue())));
+                        done.add(newId + ":" + namespaceURI);
+                        return impl;
+                    }
                 }
             }
                 
