@@ -12,8 +12,7 @@
 #set( $issues = $jirarss.issues() )
 #set( $issues = $jirarss.fillAttachments() )
 #foreach( $issue in $issues )
-#set( $link = $issue.link.substring(4))
-#set( $link = "https$link")
+#set( $link = $issue.link)
 #set( $void = $issue.setLink($link))
 #end 
 #set( $issues = $jirarss.fillAttachments() )
