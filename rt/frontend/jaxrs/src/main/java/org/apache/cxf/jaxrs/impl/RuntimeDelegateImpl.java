@@ -33,6 +33,10 @@ import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.Variant.VariantListBuilder;
 import javax.ws.rs.ext.RuntimeDelegate;
 
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
+
 
 
 public class RuntimeDelegateImpl extends RuntimeDelegate {
@@ -93,9 +97,19 @@ public class RuntimeDelegateImpl extends RuntimeDelegate {
 
 
     @Override
-    public <T> T createEndpoint(Application applicationConfig, Class<T> endpointType) 
+    public <T> T createEndpoint(Application app, Class<T> endpointType) 
         throws IllegalArgumentException, UnsupportedOperationException {
-        throw new UnsupportedOperationException();
+        if (app == null || (!Server.class.isAssignableFrom(endpointType)
+            && !JAXRSServerFactoryBean.class.isAssignableFrom(endpointType))) {
+            throw new IllegalArgumentException();
+        }
+        JAXRSServerFactoryBean bean = ResourceUtils.createApplication(app, false);
+        if (JAXRSServerFactoryBean.class.isAssignableFrom(endpointType)) {
+            return endpointType.cast(bean);
+        }
+        bean.setStart(false);
+        Server server = bean.create();
+        return endpointType.cast(server);
     }
     
 

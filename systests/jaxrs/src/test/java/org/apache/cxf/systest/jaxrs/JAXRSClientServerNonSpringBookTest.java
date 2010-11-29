@@ -89,6 +89,14 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         
     }
     
+    @Test
+    public void testGetBook123Application11Singleton() throws Exception {
+        getAndCompareAsStrings("http://localhost:" + PORT + "/application11/thebooks/bookstore/books/123",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+        
+    }
+    
     private void getAndCompareAsStrings(String address, 
                                         String resourcePath,
                                         String acceptType,
