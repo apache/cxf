@@ -26,19 +26,23 @@ import java.io.InputStreamReader;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.CookieParam;
 import javax.ws.rs.Encoded;
 import javax.ws.rs.FormParam;
@@ -47,9 +51,11 @@ import javax.ws.rs.MatrixParam;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.ext.Provider;
 import javax.xml.bind.JAXBElement;
 
 import org.w3c.dom.Document;
@@ -62,6 +68,10 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
+import org.apache.cxf.jaxrs.lifecycle.SingletonResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
@@ -524,5 +534,89 @@ public final class ResourceUtils {
             }
         }
         return values;
+    }
+    
+    public static JAXRSServerFactoryBean createApplication(Application app, boolean ignoreAppPath) {
+        
+        Set<Object> singletons = app.getSingletons();
+        verifySingletons(singletons);
+        
+        List<Class> resourceClasses = new ArrayList<Class>();
+        List<Object> providers = new ArrayList<Object>();
+        Map<Class, ResourceProvider> map = new HashMap<Class, ResourceProvider>();
+        
+        // at the moment we don't support per-request providers, only resource classes
+        // Note, app.getClasse() returns a list of per-resource classes
+        for (Class<?> c : app.getClasses()) {
+            if (isValidPerRequestResourceClass(c, singletons)) {
+                resourceClasses.add(c);
+                map.put(c, new PerRequestResourceProvider(c));
+            }
+        }
+        
+        // we can get either a provider or resource class here        
+        for (Object o : singletons) {
+            boolean isProvider = o.getClass().getAnnotation(Provider.class) != null;
+            if (isProvider) {
+                providers.add(o);
+            } else {
+                resourceClasses.add(o.getClass());
+                map.put(o.getClass(), new SingletonResourceProvider(o));
+            }
+        }
+        
+        JAXRSServerFactoryBean bean = new JAXRSServerFactoryBean();
+        String address = "/";
+        if (!ignoreAppPath) {
+            ApplicationPath appPath = app.getClass().getAnnotation(ApplicationPath.class);
+            if (appPath != null) {
+                address = appPath.value().isEmpty() ? "/" : appPath.value();
+            }
+        }
+        bean.setAddress(address);
+        bean.setResourceClasses(resourceClasses);
+        bean.setProviders(providers);
+        for (Map.Entry<Class, ResourceProvider> entry : map.entrySet()) {
+            bean.setResourceProvider(entry.getKey(), entry.getValue());
+        }
+        
+        return bean;
+    }
+    
+    private static void verifySingletons(Set<Object> singletons) {
+        if (singletons.isEmpty()) {
+            return;
+        }
+        Set<String> map = new HashSet<String>(); 
+        for (Object s : singletons) {
+            if (map.contains(s.getClass().getName())) {
+                throw new RuntimeException("More than one instance of the same singleton class "
+                                           + s.getClass().getName() + " is available"); 
+            } else {
+                map.add(s.getClass().getName());
+            }
+        }
+    }
+    
+    public static boolean isValidResourceClass(Class<?> c) {
+        if (c.isInterface() || Modifier.isAbstract(c.getModifiers())) {
+            LOG.info("Ignoring invalid resource class " + c.getName());
+            return false;
+        }
+        return true;
+    }
+    
+    private static boolean isValidPerRequestResourceClass(Class<?> c, Set<Object> singletons) {
+        if (!isValidResourceClass(c)) {
+            return false;
+        }
+        for (Object s : singletons) {
+            if (c == s.getClass()) {
+                LOG.info("Ignoring per-request resource class " + c.getName() 
+                         + " as it is also registered as singleton");
+                return false;
+            }
+        }
+        return true;
     }
 }
