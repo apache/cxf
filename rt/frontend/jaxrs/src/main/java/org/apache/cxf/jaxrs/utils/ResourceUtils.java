@@ -570,7 +570,7 @@ public final class ResourceUtils {
         if (!ignoreAppPath) {
             ApplicationPath appPath = app.getClass().getAnnotation(ApplicationPath.class);
             if (appPath != null) {
-                address = appPath.value().isEmpty() ? "/" : appPath.value();
+                address = appPath.value().length() == 0 ? "/" : appPath.value();
             }
         }
         bean.setAddress(address);
