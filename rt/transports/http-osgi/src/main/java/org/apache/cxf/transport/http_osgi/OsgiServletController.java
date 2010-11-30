@@ -40,6 +40,7 @@ import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
@@ -110,39 +111,53 @@ public class OsgiServletController extends AbstractServletController {
             } else {
                 ei = d.getEndpointInfo();
                 Bus bus = d.getBus();
-                if (null != request.getQueryString()
-                    && request.getQueryString().length() > 0
-                    && bus.getExtension(QueryHandlerRegistry.class) != null) {
-
-                    String ctxUri = request.getPathInfo();
-                    String baseUri = request.getRequestURL().toString()
-                        + "?" + request.getQueryString();
-                    // update the EndPoint Address with request url
-                    if ("GET".equals(request.getMethod())) {
-                        updateDests(request);
-                    }
-
-                    for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers()) {
-                        if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
-
-                            res.setContentType(qh.getResponseContentType(baseUri, ctxUri));
-                            OutputStream out = res.getOutputStream();
-                            try {
-                                qh.writeResponse(baseUri, ctxUri, ei, out);
-                                out.flush();
-                                return;
-                            } catch (Exception e) {
-                                LOG.warning(qh.getClass().getName()
-                                    + " Exception caught writing response: "
-                                    + e.getMessage());
-                                throw new ServletException(e);
-                            }
+                ClassLoader orig = Thread.currentThread().getContextClassLoader();
+                try {
+                    ResourceManager manager = bus.getExtension(ResourceManager.class);
+                    if (manager != null) {
+                        ClassLoader loader = manager.resolveResource("", ClassLoader.class);
+                        if (loader != null) {
+                            //need to set the context classloader to the loader of the bundle
+                            Thread.currentThread().setContextClassLoader(loader);
                         }
                     }
-                } else if ("/".equals(address) || address.length() == 0) {
-                    updateDests(request);
+                    
+                    if (null != request.getQueryString()
+                        && request.getQueryString().length() > 0
+                        && bus.getExtension(QueryHandlerRegistry.class) != null) {
+    
+                        String ctxUri = request.getPathInfo();
+                        String baseUri = request.getRequestURL().toString()
+                            + "?" + request.getQueryString();
+                        // update the EndPoint Address with request url
+                        if ("GET".equals(request.getMethod())) {
+                            updateDests(request);
+                        }
+    
+                        for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers()) {
+                            if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
+    
+                                res.setContentType(qh.getResponseContentType(baseUri, ctxUri));
+                                OutputStream out = res.getOutputStream();
+                                try {
+                                    qh.writeResponse(baseUri, ctxUri, ei, out);
+                                    out.flush();
+                                    return;
+                                } catch (Exception e) {
+                                    LOG.warning(qh.getClass().getName()
+                                        + " Exception caught writing response: "
+                                        + e.getMessage());
+                                    throw new ServletException(e);
+                                }
+                            }
+                        }
+                    } else if ("/".equals(address) || address.length() == 0) {
+                        updateDests(request);
+                    }
+                    invokeDestination(request, res, d);
+                } finally {
+                    Thread.currentThread().setContextClassLoader(orig);
                 }
-                invokeDestination(request, res, d);
                 
             }
         } catch (IOException e) {
