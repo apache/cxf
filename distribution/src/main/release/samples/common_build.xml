@@ -90,7 +90,15 @@
     </condition>
     <property name="cxf.home" location="../.."/>
     <property name="cxf.etc.dir" location="${cxf.home}/etc"/>
-    <property name="cxf.endorsed.dir" location="${cxf.home}/lib/endorsed"/>
+
+    <condition property="cxf.endorsed.dir" value="${cxf.home}/lib/endorsed">
+        <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+    </condition>
+    <condition property="cxf.endorsed.flag" value="-Djava.endorsed.dirs=${cxf.endorsed.dir}">
+        <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+    </condition>
+    <property name="cxf.endorsed.dir" location="${cxf.home}"/>
+    <property name="cxf.endorsed.flag" value="-Dnone=none"/>
 
     <path id="cxf.classpath">
         <pathelement location="${basedir}"/>
@@ -101,7 +109,7 @@
             <include name="**/*.jar"/>
         </fileset>
         <fileset dir="${cxf.endorsed.dir}">
-            <include name="**/*.jar"/>
+            <include name="*.jar"/>
         </fileset>
     </path>
     <condition property="thirdparty.classpath" value="">
@@ -120,7 +128,7 @@
         <mkdir dir="${build.src.dir}"/>
 
         <javac destdir="${build.classes.dir}" debug="true" fork="true">
-            <compilerarg line="-J-Djava.endorsed.dirs=${cxf.endorsed.dir}"/>
+            <compilerarg line="-J${cxf.endorsed.flag}"/>
             <src path="${src.dir}"/>
             <src path="${build.src.dir}"/>
             <classpath>
@@ -192,7 +200,7 @@
                 <arg value="@{param4}"/>
                 <arg value="@{param5}"/>
                 <jvmarg value="-Dcxf.home=${cxf.home}"/>
-                <jvmarg value="-Djava.endorsed.dirs=${cxf.endorsed.dir}"/>
+                <jvmarg value="${cxf.endorsed.flag}"/>
                 <jvmarg value="@{jvmarg1}"/>
                 <jvmarg value="@{jvmarg2}"/>
                 <jvmarg value="@{jvmarg3}"/>
@@ -240,9 +248,9 @@
                 <classpath>
                     <path refid="cxf.classpath" />
                 </classpath>
+                <jvmarg value="${cxf.endorsed.flag}"/>
                 <sysproperty key="java.util.logging.config.file" value="${cxf.etc.dir}/logging.properties"/>
                 <sysproperty key="exitOnFinish" value="true"/>
-                <sysproperty key="java.endorsed.dirs" value="${cxf.endorsed.dir}"/>
                 <arg line="@{servicename.arg}"/>
                 <arg line="${package.arg.@{file}}"/>
                 <arg line="${databinding.arg}"/>
