@@ -647,24 +647,7 @@ public class HTTPConduit
         maintainSession = Boolean.TRUE.equals((Boolean)message.get(Message.MAINTAIN_SESSION));
         
         //If we have any cookies and we are maintaining sessions, then use them        
-        if (maintainSession && sessionCookies.size() > 0) {
-            List<String> cookies = null;
-            for (String s : headers.keySet()) {
-                if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(s)) {
-                    cookies = headers.remove(s);
-                    break;
-                }
-            }
-            if (cookies == null) {
-                cookies = new ArrayList<String>();
-            } else {
-                cookies = new ArrayList<String>(cookies);
-            }
-            headers.put(HttpHeaderHelper.COOKIE, cookies);
-            for (Cookie c : sessionCookies.values()) {
-                cookies.add(c.requestCookieHeader());
-            }
-        }
+        addCookieHeadersToRequest(headers);
 
         // The trust decision is relegated to after the "flushing" of the
         // request headers.
@@ -694,6 +677,7 @@ public class HTTPConduit
     }
     
     public void close(Message msg) throws IOException {
+
         InputStream in = msg.getContent(InputStream.class);
         try {
             if (in != null) {
@@ -806,6 +790,7 @@ public class HTTPConduit
      * @throws MalformedURLException
      */
     private URL setupURL(Message message) throws MalformedURLException {
+
         String result = (String)message.get(Message.ENDPOINT_ADDRESS);
         String pathInfo = (String)message.get(Message.PATH_INFO);
         String queryString = (String)message.get(Message.QUERY_STRING);
@@ -1651,7 +1636,6 @@ public class HTTPConduit
         // which must have been wrong, or we wouldn't be here again.
         // Otherwise, the server may be 401 looping us around the realms.
         if (authURLs.contains(currentURL.toString() + realm)) {
-
             if (LOG.isLoggable(Level.INFO)) {
                 LOG.log(Level.INFO, "Authorization loop detected on Conduit \""
                     + getConduitName()
@@ -1684,6 +1668,10 @@ public class HTTPConduit
         Map<String, List<String>> headers = getSetProtocolHeaders(message);
         headers.put("Authorization",
                     createMutableList(up));
+
+        // also adding cookie headers when retransmitting in case of a "401 Unauthorized" response
+        addCookieHeadersToRequest(headers);
+
         return retransmit(
                 connection, currentURL, message, cachedStream);
     }
@@ -1869,6 +1857,34 @@ public class HTTPConduit
         headers.put("Proxy-Authorization",
                     createMutableList("Basic " + token));
     }
+
+    /**
+     * This method adds the cookie-headers to the request.
+     *  
+     * @param headers die Header des Requests
+     */
+    private void addCookieHeadersToRequest(Map<String, List<String>> headers) {
+        //If we have any cookies and we are maintaining sessions, then use them        
+        if (maintainSession && sessionCookies.size() > 0) {
+            List<String> cookies = null;
+            for (String s : headers.keySet()) {
+                if (HttpHeaderHelper.COOKIE.equalsIgnoreCase(s)) {
+                    cookies = headers.remove(s);
+                    break;
+                }
+            }
+            if (cookies == null) {
+                cookies = new ArrayList<String>();
+            } else {
+                cookies = new ArrayList<String>(cookies);
+            }
+            headers.put(HttpHeaderHelper.COOKIE, cookies);
+            for (Cookie c : sessionCookies.values()) {
+                cookies.add(c.requestCookieHeader());
+            }
+        }
+    }
+
     
     /**
      * Wrapper output stream responsible for flushing headers and handling
@@ -1891,6 +1907,7 @@ public class HTTPConduit
          */
         protected final boolean chunking;
         
+    
         /**
          * This field contains the output stream with which we cache
          * the request. It maybe null if we are not caching.
@@ -2123,6 +2140,15 @@ public class HTTPConduit
                 int maxRetransmits = (policy == null)
                                      ? -1
                                      : policy.getMaxRetransmits();
+
+                // evaluate "Set-Cookie" headers before handling retransmits
+                if (maintainSession) {
+                    for (Map.Entry<String, List<String>> h : connection.getHeaderFields().entrySet()) {
+                        if ("Set-Cookie".equalsIgnoreCase(h.getKey())) {
+                            Cookie.handleSetCookie(sessionCookies, h.getValue());
+                        }
+                    }
+                }
                 
                 // MaxRetransmits of zero means zero.
                 if (maxRetransmits == 0) {
