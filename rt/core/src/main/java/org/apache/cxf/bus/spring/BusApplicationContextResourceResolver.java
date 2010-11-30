@@ -66,7 +66,9 @@ public class BusApplicationContextResourceResolver
             //ignore
         }
         try {
-            if (URL.class.isAssignableFrom(resourceType)) {
+            if (ClassLoader.class.isAssignableFrom(resourceType)) {
+                return resourceType.cast(context.getClassLoader());
+            } else if (URL.class.isAssignableFrom(resourceType)) {
                 Resource r = context.getResource(resourceName);
                 if (r != null && r.exists()) {
                     return resourceType.cast(r.getURL());

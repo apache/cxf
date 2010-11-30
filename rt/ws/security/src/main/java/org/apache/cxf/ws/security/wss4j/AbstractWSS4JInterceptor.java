@@ -18,7 +18,9 @@
  */
 package org.apache.cxf.ws.security.wss4j;
 
+import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -30,10 +32,12 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.SoapInterceptor;
+import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.PhaseInterceptor;
+import org.apache.cxf.resource.ResourceManager;
 import org.apache.ws.security.WSConstants;
 import org.apache.ws.security.WSSecurityException;
 import org.apache.ws.security.components.crypto.Crypto;
@@ -175,8 +179,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (sigPropFile != null) {
             crypto = cryptoTable.get(sigPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(sigPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = loadCryptoFromPropertiesFile(sigPropFile, reqData);
                 cryptoTable.put(sigPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.SIG_PROP_REF_ID, reqData
@@ -200,6 +203,37 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         } 
         return crypto;
     }
+    
+    protected Crypto loadCryptoFromPropertiesFile(String propFilename, RequestData reqData) {
+        ClassLoader orig = Thread.currentThread().getContextClassLoader();
+        try {
+            try {
+                URL url = ClassLoaderUtils.getResource(propFilename, this.getClass());
+                if (url == null) {
+                    ResourceManager manager = ((Message)reqData.getMsgContext()).getExchange()
+                            .getBus().getExtension(ResourceManager.class);
+                    ClassLoader loader = manager.resolveResource("", ClassLoader.class);
+                    if (loader != null) {
+                        Thread.currentThread().setContextClassLoader(loader);
+                    }
+                    url = manager.resolveResource(propFilename, URL.class);
+                }
+                if (url != null) {
+                    Properties props = new Properties();
+                    InputStream in = url.openStream(); 
+                    props.load(in);
+                    in.close();
+                    return CryptoFactory.getInstance(props,
+                                                     this.getClassLoader(reqData.getMsgContext()));
+                }
+            } catch (Exception e) {
+                //ignore
+            } 
+            return CryptoFactory.getInstance(propFilename, this.getClassLoader(reqData.getMsgContext()));
+        } finally {
+            Thread.currentThread().setContextClassLoader(orig);
+        }
+    }
 
     protected Crypto loadDecryptionCrypto(RequestData reqData) 
         throws WSSecurityException {
@@ -210,8 +244,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (decPropFile != null) {
             crypto = cryptoTable.get(decPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(decPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = loadCryptoFromPropertiesFile(decPropFile, reqData);
                 cryptoTable.put(decPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.DEC_PROP_REF_ID, reqData
@@ -249,8 +282,7 @@ public abstract class AbstractWSS4JInterceptor extends WSHandler implements Soap
         if (encPropFile != null) {
             crypto = cryptoTable.get(encPropFile);
             if (crypto == null) {
-                crypto = CryptoFactory.getInstance(encPropFile, this
-                        .getClassLoader(reqData.getMsgContext()));
+                crypto = loadCryptoFromPropertiesFile(encPropFile, reqData);
                 cryptoTable.put(encPropFile, crypto);
             }
         } else if (getString(WSHandlerConstants.ENC_PROP_REF_ID, reqData
