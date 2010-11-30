@@ -20,26 +20,19 @@
 <project name="Spring HTTP Servlet demo" default="build" basedir=".">
 
     <property name="maven.repo" value="http://repo1.maven.org/maven2"/>
-    <property name="spring.version" value="2.0.6"/>
-    
-    <property name="spring-aop.jar" value="spring-aop-${spring.version}.jar"/>
-    <property name="spring-support.jar" value="spring-support-${spring.version}.jar"/>
-    <property name="spring-repo" value="${maven.repo}/org/springframework"/>
 
-    <property name="jruby.jar" value="jruby-0.9.8.jar"/>
+    <property name="jruby.jar" value="jruby-1.5.5.jar"/>
     <property name="cglib.jar" value="cglib-nodep-2.1_3.jar"/>
 
     <property name="thirdparty.classpath" 
-	      value="../../lib/${spring-aop.jar}${path.separator}../../lib/${spring-support.jar}${path.separator}lib/${jruby.jar}${path.separator}lib/${cglib.jar}"/>
+	      value="${path.separator}lib/${jruby.jar}${path.separator}lib/${cglib.jar}"/>
 
     <import file="../common_build.xml"/>
 
     <target name="get.dep" description="Get the thirdpaty jars">
-	<get src="${spring-repo}/spring-aop/${spring.version}/${spring-aop.jar}" dest="${cxf.home}/lib/${spring-aop.jar}" usetimestamp="true"/>
-	<get src="${spring-repo}/spring-support/${spring.version}/${spring-support.jar}" dest="${cxf.home}/lib/${spring-support.jar}" usetimestamp="true"/>
 
 	<mkdir dir="lib"/>
-	<get src="${maven.repo}/jruby/jruby/0.9.8/${jruby.jar}" dest="lib/${jruby.jar}" usetimestamp="true"/>
+	<get src="${maven.repo}/org/jruby/jruby/1.5.5/${jruby.jar}" dest="lib/${jruby.jar}" usetimestamp="true"/>
 	<get src="${maven.repo}/cglib/cglib-nodep/2.1_3/${cglib.jar}" dest="lib/${cglib.jar}" usetimestamp="true"/>
     </target>
 

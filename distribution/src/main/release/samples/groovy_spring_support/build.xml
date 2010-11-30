@@ -21,19 +21,18 @@
 
     <property name="maven.repo" value="http://repo1.maven.org/maven2"/>
     <property name="spring.version" value="2.0.6"/>
-    <property name="groovy.version" value="1.0"/>
+    <property name="groovy.version" value="1.7.5"/>
     
     <property name="spring-aop.jar" value="spring-aop-${spring.version}.jar"/>
     <property name="spring-support.jar" value="spring-support-${spring.version}.jar"/>
     <property name="spring-repo" value="${maven.repo}/org/springframework"/>
 
-    <property name="groovy-core.jar" value="groovy-${groovy.version}.jar" />
+    <property name="groovy.jar" value="groovy-${groovy.version}.jar" />
     <property name="antlr.jar" value="antlr-2.7.6.jar" />
-    <property name="asm.jar" value="asm-2.2.3.jar" />
-    <property name="groovy-repo" value="${maven.repo}/groovy/groovy/1.0"/>
+    <property name="groovy-repo" value="${maven.repo}/org/codehaus/groovy/groovy/${groovy.version}"/>
 
     <property name="thirdparty.classpath" 
-	      value="../../lib/${spring-aop.jar}${path.separator}../../lib/${spring-support.jar}${path.separator}lib/${groovy-core.jar}${path.separator}lib/${antlr.jar}${path.separator}lib/${asm.jar}"/>
+	      value="../../lib/${spring-aop.jar}${path.separator}../../lib/${spring-support.jar}${path.separator}lib/${groovy.jar}${path.separator}lib/${antlr.jar}"/>
 
     <import file="../common_build.xml"/>
 
@@ -42,9 +41,8 @@
 	<get src="${spring-repo}/spring-support/${spring.version}/${spring-support.jar}" dest="${cxf.home}/lib/${spring-support.jar}" usetimestamp="true"/>
 
 	<mkdir dir="lib"/>
-	<get src="${groovy-repo}/${groovy-core.jar}" dest="lib/${groovy-core.jar}" usetimestamp="true"/>
+	<get src="${groovy-repo}/${groovy.jar}" dest="lib/${groovy.jar}" usetimestamp="true"/>
 	<get src="${maven.repo}/antlr/antlr/2.7.6/${antlr.jar}" dest="lib/${antlr.jar}" usetimestamp="true"/>
-	<get src="${maven.repo}/asm/asm/2.2.3/${asm.jar}" dest="lib/${asm.jar}" usetimestamp="true"/>
     </target>
 
     <target name="client" description="run demo client" depends="build">
