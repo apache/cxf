@@ -91,7 +91,7 @@
         <dependency>
             <groupId>org.apache.ws.security</groupId>
             <artifactId>wss4j</artifactId>
-            <version>1.5.9</version>
+            <version>1.5.10</version>
             <exclusions>
                 <exclusion>
                     <groupId>axis</groupId>

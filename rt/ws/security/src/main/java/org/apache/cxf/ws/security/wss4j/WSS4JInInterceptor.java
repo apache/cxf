@@ -315,10 +315,20 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
                 WSSecurityEngineResult result = 
                     (WSSecurityEngineResult) signatureResults.get(i);
                 
+                //
+                // Verify the certificate chain associated with signature verification if
+                // it exists. If it does not, then try to verify the (single) certificate
+                // used for signature verification
+                //
                 X509Certificate returnCert = (X509Certificate)result
                     .get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-
-                if (returnCert != null && !verifyTrust(returnCert, reqData)) {
+                X509Certificate[] returnCertChain = (X509Certificate[])result
+                .get(WSSecurityEngineResult.TAG_X509_CERTIFICATES);
+                
+                if (returnCertChain != null && !verifyTrust(returnCertChain, reqData)) {
+                    LOG.warning("The certificate chain used for the signature is not trusted");
+                    throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
+                } else if (returnCert != null && !verifyTrust(returnCert, reqData)) {
                     LOG.warning("The certificate used for the signature is not trusted");
                     throw new WSSecurityException(WSSecurityException.FAILED_CHECK);
                 }
