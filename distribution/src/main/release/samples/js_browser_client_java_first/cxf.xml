@@ -34,14 +34,14 @@ http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/
 		<httpj:engine port="9000">
 			<httpj:handlers>
 				<bean
-					class="org.mortbay.jetty.handler.ContextHandler">
+					class="org.eclipse.jetty.server.handler.ContextHandler">
 					<property name="contextPath" value="/" />
 					<property name="handler">
 						<bean
-							class="org.mortbay.jetty.handler.ResourceHandler">
+							class="org.eclipse.jetty.server.handler.ResourceHandler">
 							<property name="baseResource">
 								<bean
-									class="org.mortbay.resource.FileResource">
+									class="org.eclipse.jetty.util.resource.FileResource">
 									<constructor-arg
 										value="file:staticContent" />
 								</bean>
@@ -49,7 +49,7 @@ http://cxf.apache.org/transports/http-jetty/configuration http://cxf.apache.org/
 						</bean>
 					</property>
 				</bean>
-				<bean class="org.mortbay.jetty.handler.DefaultHandler" />
+				<bean class="org.eclipse.jetty.server.handler.DefaultHandler" />
 			</httpj:handlers>
 		</httpj:engine>
 	</httpj:engine-factory>

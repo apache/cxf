@@ -386,6 +386,30 @@
                                     <outputDirectory>${project.build.directory}/additional-libs</outputDirectory>
                                 </artifactItem>
                                 <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-webapp</artifactId>
+                                    <version>${cxf.jetty.version}</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-servlet</artifactId>
+                                    <version>${cxf.jetty.version}</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-security</artifactId>
+                                    <version>${cxf.jetty.version}</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.eclipse.jetty</groupId>
+                                    <artifactId>jetty-xml</artifactId>
+                                    <version>${cxf.jetty.version}</version>
+                                    <outputDirectory>${project.build.directory}/sample-libs</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
                                     <groupId>junit</groupId>
                                     <artifactId>junit</artifactId>
                                     <version>4.4</version>
