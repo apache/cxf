@@ -542,7 +542,6 @@ public class WSS4JInOutTest extends AbstractSecurityTest {
     }
     
     @Test
-    @org.junit.Ignore
     public void testPKIPath() throws Exception {
         Document doc = readDocument("wsse-request-clean.xml");
 
