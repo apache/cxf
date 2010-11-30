@@ -86,6 +86,10 @@ public class Jsr250BeanPostProcessor
     }
     public Object postProcessAfterInitialization(Object bean, String beanId) throws BeansException {
         if (!isProcessing) {
+            if (resourceManager == null && bean instanceof ResourceManager) {
+                resourceManager = (ResourceManager)bean;
+                resourceManager.addResourceResolver(new BusApplicationContextResourceResolver(context));
+            }
             return bean;
         }
         if (bean != null 
