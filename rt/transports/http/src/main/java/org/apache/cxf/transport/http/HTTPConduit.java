@@ -1104,6 +1104,10 @@ public class HTTPConduit
         }
 
         new Headers(message).setAuthorization(up);
+        
+        // also adding cookie headers when retransmitting in case of a "401 Unauthorized" response
+        cookies.writeToMessageHeaders(message);
+        
         return retransmit(
                 connection, currentURL, message, cachedStream);
     }
@@ -1155,6 +1159,7 @@ public class HTTPConduit
         
         // Disconnect the old, and in with the new.
         connection.disconnect();
+        
         
         HTTPClientPolicy cp = getClient(message);
         connection = createConnection(message, newURL);
@@ -1502,6 +1507,8 @@ public class HTTPConduit
                 int maxRetransmits = (policy == null)
                                      ? -1
                                      : policy.getMaxRetransmits();
+                
+                cookies.readFromConnection(oldcon);
                 
                 // MaxRetransmits of zero means zero.
                 if (maxRetransmits == 0) {
