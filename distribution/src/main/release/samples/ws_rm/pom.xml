@@ -24,7 +24,7 @@
     <parent>
         <groupId>org.apache.cxf.samples</groupId>
         <artifactId>cxf-samples</artifactId>
-        <version>2.2.12-SNAPSHOT</version>
+        <version>2.2.12</version>
     </parent>
 
     <properties>
@@ -73,8 +73,8 @@
                         </goals>
                         <configuration>
                             <tasks>
-                                <copy file="${basedir}/src/demo/ws_rm/client/ws_rm.xml" todir="${basedir}/target/classes/demo/ws_rm/client"/>
-                                <copy file="${basedir}/src/demo/ws_rm/server/ws_rm.xml" todir="${basedir}/target/classes/demo/ws_rm/server"/>
+                                <copy file="${basedir}/src/demo/ws_rm/client/ws_rm.xml" todir="${basedir}/target/classes/demo/ws_rm/client" />
+                                <copy file="${basedir}/src/demo/ws_rm/server/ws_rm.xml" todir="${basedir}/target/classes/demo/ws_rm/server" />
                             </tasks>
                         </configuration>
                     </execution>
@@ -134,38 +134,38 @@
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-frontend-jaxws</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <!-- Jetty is needed if you're using the CXFServlet -->
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-transports-http-jetty</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-rm</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-addr</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-rt-ws-policy</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
         <dependency>
             <groupId>org.apache.cxf</groupId>
             <artifactId>cxf-common-utilities</artifactId>
-            <version>2.2.12-SNAPSHOT</version>
+            <version>2.2.12</version>
         </dependency>
     </dependencies>
 </project>
