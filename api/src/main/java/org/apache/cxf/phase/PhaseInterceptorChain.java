@@ -19,6 +19,7 @@
 
 package org.apache.cxf.phase;
 
+import java.lang.ref.WeakReference;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -238,8 +239,11 @@ public class PhaseInterceptorChain implements InterceptorChain {
         Message oldMessage = CURRENT_MESSAGE.get();
         try {
             CURRENT_MESSAGE.set(message);
-            if (oldMessage != null && !message.containsKey(PREVIOUS_MESSAGE)) {
-                message.put(PREVIOUS_MESSAGE, oldMessage);
+            if (oldMessage != null 
+                && !message.containsKey(PREVIOUS_MESSAGE)
+                && message != oldMessage
+                && message.getExchange() != oldMessage.getExchange()) {
+                message.put(PREVIOUS_MESSAGE, new WeakReference<Message>(oldMessage));
             }
             while (state == State.EXECUTING && iterator.hasNext()) {
                 try {
