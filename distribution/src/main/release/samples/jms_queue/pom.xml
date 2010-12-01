@@ -29,7 +29,7 @@
 
     <properties>
         <cxf.version>${project.version}</cxf.version>
-        <activemq.version>[5,)</activemq.version>
+        <activemq.version>5.4.1</activemq.version>
     </properties>
 
     <build>
