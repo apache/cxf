@@ -59,9 +59,9 @@ public final class ProviderFactory {
     private static final ProviderFactory SHARED_FACTORY = new ProviderFactory();
     
     static {
-        SHARED_FACTORY.setProviders(createProvider("org.apache.cxf.jaxrs.provider.JAXBElementProvider"),
-                                    createProvider("org.apache.cxf.jaxrs.provider.JSONProvider"),
-                                    new BinaryDataProvider(),
+        setDefaultProvider(SHARED_FACTORY, "org.apache.cxf.jaxrs.provider.JAXBElementProvider");
+        setDefaultProvider(SHARED_FACTORY, "org.apache.cxf.jaxrs.provider.JSONProvider");        
+        SHARED_FACTORY.setProviders(new BinaryDataProvider(),
                                     new SourceProvider(),
                                     new FormEncodingProvider(),
                                     new PrimitiveTextProvider(),
@@ -91,11 +91,14 @@ public final class ProviderFactory {
     private ProviderFactory() {
     }
     
-    private static Object createProvider(String className) {
+    
+    private static void setDefaultProvider(ProviderFactory factory, String className) {
+        
         try {
-            return ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
+            Object provider = ClassLoaderUtils.loadClass(className, ProviderFactory.class).newInstance();
+            factory.setProviders(provider);
         } catch (Throwable ex) {
-            String message = "Problem with instantiating the default provider " + className;
+            String message = "Problem with setting the default provider " + className;
             if (ex.getMessage() != null) {
                 message += ex.getMessage();
             } else {
@@ -103,7 +106,6 @@ public final class ProviderFactory {
             }
             LOG.info(message);
         }
-        return  null;
     }
     
     public static ProviderFactory getInstance() {
