@@ -184,6 +184,11 @@
                     <version>2.6</version>
                     <dependencies>
                         <dependency>
+                            <groupId>com.puppycrawl.tools</groupId>
+                            <artifactId>checkstyle</artifactId>
+                            <version>5.2</version>
+                        </dependency>
+                        <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
                             <artifactId>cxf-buildtools</artifactId>
                             <version>${cxf.build-utils.version}</version>

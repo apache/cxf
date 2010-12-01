@@ -59,7 +59,8 @@ import org.apache.cxf.transport.MessageObserver;
  *  
  */
 public class PhaseInterceptorChain implements InterceptorChain {
-
+    public static final String PREVIOUS_MESSAGE = PhaseInterceptorChain.class.getName() + ".PREVIOUS_MESSAGE";
+    
     private static final Logger LOG = LogUtils.getL7dLogger(PhaseInterceptorChain.class); 
 
     private static final ThreadLocal<Message> CURRENT_MESSAGE = new ThreadLocal<Message>();
@@ -237,6 +238,9 @@ public class PhaseInterceptorChain implements InterceptorChain {
         Message oldMessage = CURRENT_MESSAGE.get();
         try {
             CURRENT_MESSAGE.set(message);
+            if (oldMessage != null && !message.containsKey(PREVIOUS_MESSAGE)) {
+                message.put(PREVIOUS_MESSAGE, oldMessage);
+            }
             while (state == State.EXECUTING && iterator.hasNext()) {
                 try {
                     Interceptor currentInterceptor = iterator.next();

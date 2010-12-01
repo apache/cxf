@@ -26,21 +26,23 @@ import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
 
-//CHECKSTYLE:OFF
 @WebServiceClient(name = "AddNumbersService", 
                   wsdlLocation = "/wsdl/addNumbers.wsdl",
                   targetNamespace = "http://apache.org/handlers") 
 public class AddNumbersServiceUnwrap extends Service {
 
-    public final static URL WSDL_LOCATION;
-    public final static QName SERVICE = new QName("http://apache.org/handlers", "AddNumbersService");
-    public final static QName AddNumbersPort = new QName("http://apache.org/handlers", "AddNumbersPort");
+    public static final URL WSDL_LOCATION;
+    public static final QName SERVICE = new QName("http://apache.org/handlers",
+                                                  "AddNumbersService");
+    public static final QName ADD_NUMBERS_PORT = new QName("http://apache.org/handlers",
+                                                         "AddNumbersPort");
     static {
         URL url = null;
         try {
             url = new URL("/wsdl/addNumbers.wsdl");
         } catch (MalformedURLException e) {
-            System.err.println("Can not initialize the default wsdl from file:/home/sberyozkin/work/cxf/trunk/testutils/src/main/resources/wsdl/addNumbers.wsdl");
+            System.err.println("Can not initialize the default wsdl "
+                               + "from file:testutils/src/main/resources/wsdl/addNumbers.wsdl");
             // e.printStackTrace();
         }
         WSDL_LOCATION = url;
@@ -66,20 +68,21 @@ public class AddNumbersServiceUnwrap extends Service {
      */
     @WebEndpoint(name = "AddNumbersPort")
     public AddNumbersUnwrap getAddNumbersPort() {
-        return super.getPort(AddNumbersPort, AddNumbersUnwrap.class);
+        return super.getPort(ADD_NUMBERS_PORT, AddNumbersUnwrap.class);
     }
 
     /**
      * 
      * @param features
-     *     A list of {@link javax.xml.ws.WebServiceFeature} to configure on the proxy.  Supported features not in the <code>features</code> parameter will have their default values.
+     *     A list of {@link javax.xml.ws.WebServiceFeature} to configure on the 
+     *     proxy.  Supported features not in the <code>features</code> parameter 
+     *     will have their default values.
      * @return
      *     returns AddNumbers
      */
     @WebEndpoint(name = "AddNumbersPort")
     public AddNumbersUnwrap getAddNumbersPort(WebServiceFeature... features) {
-        return super.getPort(AddNumbersPort, AddNumbersUnwrap.class, features);
+        return super.getPort(ADD_NUMBERS_PORT, AddNumbersUnwrap.class, features);
     }
 
 }
-//CHECKSTYLE:ON
