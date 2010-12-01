@@ -182,4 +182,3 @@ public class SdoFactoryImpl extends FactoryBase implements SdoFactory {
     
     
 } //SdoFactoryImpl
-//CHECKSTYLE:ON
