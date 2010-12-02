@@ -1,9 +1,10 @@
-Apache CXF 2.3.0 Release Notes
+
+Apache CXF 2.3.1 Release Notes
 
 1. Overview
 
-Apache CXF 2.3.0 is a significant new version of CXF that provides several 
-new features and enhancements.  
+The 2.3.x versions of Apache CXF are significant new versions of CXF 
+that provides several new features and enhancements.  
 
 New features include: 
  * JAX-WS 2.2 Support
@@ -32,13 +33,9 @@ New features include:
  * Schema Validation support for Aegis Databinding if Woodstox 4 is used 
    for the Stax parser
 
-In addition to the above, CXF 2.3.0 was enhanced to reduce it's memory 
-footprint and reduce it's startup time by delaying creation of many
-objects until/unless they are really needed.
 
-Users are encourage to review the migration guide at:
-http://cxf.apache.org/docs/23-migration-guide.html
-for further information and requirements for upgrading to 2.3.0.
+2.3.1 fixes over 55 JIRA issues reported by users and the community.
+
 
 
 2. Installation Prerequisites 
@@ -105,4 +102,78 @@ http://issues.apache.org/jira/browse/CXF
 See the migration guide at:
 http://cxf.apache.org/docs/23-migration-guide.html
 for caveats when upgrading from CXF 2.2.x to 2.3.x.
+
+
+7. Specific issues, features, and improvements fixed in this version
+
+Release Notes - CXF - Version 2.3.1
+
+
+** Bug
+    * [CXF-2839] - CXF HttpConduit doesn't read VM proxy settings
+    * [CXF-2958] - CXF JAXRS Proxies can not handle explicilt collections of query and matrix parameters
+    * [CXF-2992] - response context concurrent issue
+    * [CXF-3022] - Integrating Spring 3 + GenericDAO (Don't repeat the DAO!) + CXF JAX-RS (JAXB Databinding) with a Generic Service Interface 
+    * [CXF-3041] - AsymmetricBinding used only for response causes error
+    * [CXF-3042] - SymmetricBinding used only for request causes error
+    * [CXF-3057] - Only JAX-B sees @MTOM
+    * [CXF-3058] - Aegis ignores MTOM threshold
+    * [CXF-3059] -  idl2wsdl fails when constant is used to define boundary of sequence.
+    * [CXF-3060] - AddressingFeature(true, true) does not work in client side when the wsa policy is not enforced
+    * [CXF-3061] - Resolving a DTD from Schema fails when Endpoint definition uses wsdlLocation
+    * [CXF-3065] - HTTPConduit does not respect HTTP 301 redirects responses to GET requests
+    * [CXF-3068] - MimeBodyPartInputStream illegally returns "0" from a read call with chunked InputStream
+    * [CXF-3069] - XmlElement(required=true) on @WebParam not honored in WSDL
+    * [CXF-3073] - org/apache/cxf/transport/http/DigestAuthSupplier is not thread safe
+    * [CXF-3075] - ConcurrentModificationException under load
+    * [CXF-3076] - add catalog to avoid download schema files remotely
+    * [CXF-3082] - EndpointImpl.publish() with no address throws NPE for service list
+    * [CXF-3088] - UriBuilderImpl#clone does not clone leadingSlash
+    * [CXF-3090] - JAX-RS Trailing slashes required for first access
+    * [CXF-3091] - WSDLQueryHandler does not support URL encoded WSDL requests from clients
+    * [CXF-3096] - Closing JMS endpoint always destroys SingleConnectionFactory
+    * [CXF-3097] - ws-rm ImmediateAcknowledgement doesn't work for ws-rm client side
+    * [CXF-3099] - Some samples still using Jetty 6
+    * [CXF-3100] - HTTPConduit doesn't handle cookies when retransmitting in case of "401 Unauthorized" response
+    * [CXF-3104] - @Mtom and  @MTOMFeature threshold configuration does not work
+    * [CXF-3105] - jaxws customization parameter renaming not working
+    * [CXF-3106] - JAXWS2.2: responses in @Addressing and @AddressingFeature does not work
+    * [CXF-3107] - keep net.sf.cglib optional import version range same as it used in spring-beans 3.0.x
+    * [CXF-3110] - jaxrs: ParameterizedTypeImpl cannot be cast to java.lang.Class
+    * [CXF-3112] - Further problem with cookies in Jax-RS (similar to closed issue 3035)
+    * [CXF-3114] - WS-RM's RMTxStore's does not recover stored sequences after restart
+    * [CXF-3116] - NPE in HolderInInterceptor
+    * [CXF-3122] - Async Handler for dispatch client is called twice in case of bad response message
+    * [CXF-3126] - CXF example mvn -Pserver complain about the can't find right version of exec-maven-plugin
+    * [CXF-3128] - @WebMethod(exclude=true) is not being honoured when generating WSDL
+    * [CXF-3132] - asynchronous client can't get correct error if non-runtimeexcpetion happen
+    * [CXF-3136] - context:annotation-config causes wsdl defined in jaxws:endpoint not to be found
+    * [CXF-3147] - FormParam parsing fails when no content-type is provided
+    * [CXF-3148] - CXF converts collections to arrays during serialization
+    * [CXF-3149] - WebClient getCollection() doesn't work with Jackson's JSON Provider because it passes the wrong types to readFrom()
+    * [CXF-3151] - Invalid WS-A ReplyTo constant value used by WS-RM
+    * [CXF-3159] - JSONProvider has hard dependency on Jettison in Websphere
+
+** Improvement
+    * [CXF-3052] - Provide an optional support for decoupled fault destinations in case of one way requests
+    * [CXF-3063] - Make it possible to use WSSE tokens for authorization decisions without extending WSS4JInInterceptor
+    * [CXF-3067] - Remove duplicate code for handling WS-SP AlgorithmSuite assertions.
+    * [CXF-3108] - Subclasses of RequestDispatcherProvider cannot add request parameters because RequestDispatcherProvider.HttpServletRequestFilter has private access
+    * [CXF-3118] - CXF JAXRS client runtime should not require a servlet api dependency
+    * [CXF-3127] - HttpConduit should not report IO exceptions in case of JAX-RS requests returning errors   
+    * [CXF-3133] - Refactoring JAXRSInvoker to support CXF continuation better 
+    * [CXF-3152] - Add support for processing a PKI Certificate Chain
+
+** New Feature
+    * [CXF-3072] - Support PKCS11 Provider for HTTP Transport
+    * [CXF-3074] - Add a fork parameter in the cxf-java2ws-plugin
+
+** Task
+    * [CXF-3115] - Upgrade Spring version to 3.0.5.RELEASE
+    * [CXF-3155] - Support ApplicationPath annotation
+
+
+
+
+
 
