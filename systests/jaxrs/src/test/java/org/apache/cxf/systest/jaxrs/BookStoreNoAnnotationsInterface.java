@@ -19,11 +19,15 @@
 
 package org.apache.cxf.systest.jaxrs;
 
+import java.util.List;
+
 
 public interface BookStoreNoAnnotationsInterface {
 
     Book getBook(Long id) throws BookNotFoundFault;
     
+    List<Book> getBooks(List<Book> thebooks);
+        
     ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault;
     
 }

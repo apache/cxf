@@ -200,7 +200,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
         Class<?> targetType = getRawResponseClass(responseObj);
         Type genericType = 
-            getGenericResponseType(ori == null ? null : ori.getAnnotatedMethod(), responseObj);
+            getGenericResponseType(ori == null ? null : invoked, responseObj);
         if (genericType instanceof TypeVariable) {
             genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
                                                        (TypeVariable)genericType);

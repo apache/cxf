@@ -20,12 +20,16 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.httpclient.Header;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.junit.BeforeClass;
@@ -70,6 +74,23 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel2/bookstore2/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+        
+    }
+    
+    @Test
+    public void testGetBooksUserModelInterface() throws Exception {
+        BookStoreNoAnnotationsInterface proxy = 
+            JAXRSClientFactory.createFromModel("http://localhost:" + PORT + "/usermodel2", 
+                                              BookStoreNoAnnotationsInterface.class,
+                              "classpath:org/apache/cxf/systest/jaxrs/resources/resources2.xml", null);
+        WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(10000000);
+        Book book = new Book("From Model", 1L);
+        List<Book> books = new ArrayList<Book>();
+        books.add(book);
+        books = proxy.getBooks(books);
+        assertEquals(1, books.size());
+        assertNotSame(book, books.get(0));
+        assertEquals("From Model", books.get(0).getName());
         
     }
     
