@@ -20,6 +20,7 @@
 package org.apache.cxf.systest.jaxrs;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
@@ -67,6 +68,10 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
         ch2.setId(ch.getId());
         ch2.setTitle(ch.getTitle());
         return ch2;
+    }
+
+    public List<Book> getBooks(List<Book> thebooks) {
+        return thebooks;
     }
     
 }
