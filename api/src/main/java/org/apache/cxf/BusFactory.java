@@ -22,7 +22,8 @@ package org.apache.cxf;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.lang.ref.WeakReference;
+import java.lang.ref.Reference;
+import java.lang.ref.SoftReference;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -33,15 +34,15 @@ import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.logging.LogUtils;
 
 /**
- * Factory to create CXF Bus objects. 
+ * Factory to create CXF Bus objects.
  * <p>CXF includes a large number of components that provide services, such
- * as WSDL parsing, and message processing. To avoid creating these objects over and over, and to 
+ * as WSDL parsing, and message processing. To avoid creating these objects over and over, and to
  * allow them to be shared easily, they are associated with a data structure called a bus.
  * </p>
  * <p>
  * You don't ever have to explicitly create or manipulate bus objects. If you simply use the CXF
- * or JAX-WS APIs to create clients or servers, CXF will create an default bus for you. You would create a bus
- * explicitly if you need to customize components on the bus or maintain several independent buses 
+ * or JAX-WS APIs to create clients or servers, CXF will create a default bus for you. You can create a bus
+ * explicitly if you need to customize components on the bus or maintain several independent buses
  * with independent configurations.
  * </p>
  * <p>
@@ -53,8 +54,8 @@ import org.apache.cxf.common.logging.LogUtils;
  * If you create a bus when there is no default bus in effect, that bus will become the default bus.
  * </p>
  * <p>
- * This class holds <strong>weak</strong> references to the global default bus and the per-thread default
- * busses. Thus, if you create and customize a bus, you must retain a reference to it if you want it to be
+ * This class holds <strong>soft</strong> references to the global default bus.
+ * Thus, if you create and customize a bus, you must retain a reference to it if you want it to be
  * protected from garbage collection. If you do not, you might experience the following unexpected chain of
  * events, especially in a client:
  * <ol>
@@ -64,6 +65,11 @@ import org.apache.cxf.common.logging.LogUtils;
  * <li>Create a new CXF object.</li>
  * <li>Implicitly create a new, default, bus.</li>
  * </ol>
+ * Note that the per-thread default busses are maintained in a WeakHashMap from threads to busses.
+ * Thus, so long as the thread remains alive
+ * there will be a strong reference to the bus, and it will not get garbage-collected.
+ * If you want to recover memory used CXF, you can set
+ * the per-thread default bus to null, explicitly.
  * </p>
  */
 public abstract class BusFactory {
@@ -71,22 +77,22 @@ public abstract class BusFactory {
     public static final String BUS_FACTORY_PROPERTY_NAME = "org.apache.cxf.bus.factory";
     public static final String DEFAULT_BUS_FACTORY = "org.apache.cxf.bus.CXFBusFactory";
 
-    protected static WeakReference<Bus> defaultBus;
-    protected static Map<Thread, Bus> threadBusses = new WeakHashMap<Thread, Bus>();
+    protected static Reference<Bus> defaultBus;
+    protected static Map<Thread, Reference<Bus>> threadBusses = new WeakHashMap<Thread, Reference<Bus>>();
 
     private static final Logger LOG = LogUtils.getL7dLogger(BusFactory.class, "APIMessages");
 
     /**
      * Creates a new bus. While concrete <code>BusFactory</code> may offer differently parameterized methods
      * for creating a bus, all factories support this no-arg factory method.
-     * 
+     *
      * @return the newly created bus.
      */
     public abstract Bus createBus();
 
     /**
      * Returns the default bus, creating it if necessary.
-     * 
+     *
      * @return the default bus.
      */
     public static synchronized Bus getDefaultBus() {
@@ -95,13 +101,13 @@ public abstract class BusFactory {
 
     /**
      * Returns the default bus
-     * 
+     *
      * @param createIfNeeded Set to true to create a default bus if one doesn't exist
      * @return the default bus.
      */
     public static synchronized Bus getDefaultBus(boolean createIfNeeded) {
         if ((defaultBus == null || defaultBus.get() == null) && createIfNeeded) {
-            defaultBus = new WeakReference<Bus>(newInstance().createBus());
+            defaultBus = new SoftReference<Bus>(newInstance().createBus());
         }
         if (defaultBus == null) {
             // never set up.
@@ -113,32 +119,32 @@ public abstract class BusFactory {
 
     /**
      * Sets the default bus.
-     * 
+     *
      * @param bus the default bus.
      */
     public static synchronized void setDefaultBus(Bus bus) {
         if (bus == null) {
             defaultBus = null;
         } else {
-            defaultBus = new WeakReference<Bus>(bus);
+            defaultBus = new SoftReference<Bus>(bus);
         }
         setThreadDefaultBus(bus);
     }
 
     /**
      * Sets the default bus for the thread.
-     * 
+     *
      * @param bus the default bus.
      */
     public static void setThreadDefaultBus(Bus bus) {
         synchronized (threadBusses) {
-            threadBusses.put(Thread.currentThread(), bus);
+            threadBusses.put(Thread.currentThread(), new SoftReference<Bus>(bus));
         }
     }
 
     /**
      * Gets the default bus for the thread.
-     * 
+     *
      * @return the default bus.
      */
     public static Bus getThreadDefaultBus() {
@@ -147,39 +153,45 @@ public abstract class BusFactory {
 
     /**
      * Gets the default bus for the thread, creating if needed
-     * 
+     *
      * @param createIfNeeded Set to true to create a default bus if one doesn't exist
      * @return the default bus.
      */
     public static Bus getThreadDefaultBus(boolean createIfNeeded) {
-        Bus threadBus;
+        Reference<Bus> threadBus;
         synchronized (threadBusses) {
             if (createIfNeeded) {
                 threadBus = threadBusses.get(Thread.currentThread());
-                if (createIfNeeded && threadBus == null) {
-                    threadBus = getDefaultBus(createIfNeeded);
+                if (createIfNeeded && (threadBus == null || threadBus.get() == null)) {
+                    threadBus = new SoftReference<Bus>(getDefaultBus(true));
                     threadBusses.put(Thread.currentThread(), threadBus);
                 }
             } else {
                 threadBus = threadBusses.get(Thread.currentThread());
             }
         }
-        return threadBus;
+        if (threadBus == null) {
+            return null;
+        } else {
+            return threadBus.get();
+        }
     }
 
     /**
      * Removes a bus from being a thread default bus for any thread.
      * <p>
-     * This is tipically done when a bus has ended its lifecycle (i.e.: a call to
+     * This is typically done when a bus has ended its lifecycle (i.e.: a call to
      * {@link Bus#shutdown(boolean)} was invoked) and it wants to remove any reference to itself for any
      * thread.
-     * 
+     *
      * @param bus the bus to remove
      */
     public static void clearDefaultBusForAnyThread(final Bus bus) {
         synchronized (threadBusses) {
-            for (final Iterator<Bus> iterator = threadBusses.values().iterator(); iterator.hasNext();) {
-                if (bus == null || bus.equals(iterator.next())) {
+            for (final Iterator<Reference<Bus>> iterator = threadBusses.values().iterator();
+                iterator.hasNext();) {
+                Bus itBus = iterator.next().get();
+                if (bus == null || itBus == null || bus.equals(itBus)) {
                     iterator.remove();
                 }
             }
@@ -188,20 +200,20 @@ public abstract class BusFactory {
 
     /**
      * Sets the default bus if a default bus is not already set.
-     * 
+     *
      * @param bus the default bus.
      * @return true if the bus was not set and is now set
      */
     public static synchronized boolean possiblySetDefaultBus(Bus bus) {
         synchronized (threadBusses) {
             if (threadBusses.get(Thread.currentThread()) == null) {
-                threadBusses.put(Thread.currentThread(), bus);
+                threadBusses.put(Thread.currentThread(), new SoftReference<Bus>(bus));
             }
         }
         // The default bus may have gc-ed itself out of existence, in which case we
         // take over for it.
         if (defaultBus == null || defaultBus.get() == null) {
-            defaultBus = new WeakReference<Bus>(bus);
+            defaultBus = new SoftReference<Bus>(bus);
             return true;
         }
         return false;
@@ -211,7 +223,7 @@ public abstract class BusFactory {
      * Create a new BusFactory The class of the BusFactory is determined by looking for the system propery:
      * org.apache.cxf.bus.factory or by searching the classpath for:
      * META-INF/services/org.apache.cxf.bus.factory
-     * 
+     *
      * @return a new BusFactory to be used to create Bus objects
      */
     public static BusFactory newInstance() {
@@ -220,7 +232,7 @@ public abstract class BusFactory {
 
     /**
      * Create a new BusFactory
-     * 
+     *
      * @param className The class of the BusFactory to create. If null, uses the default search algorithm.
      * @return a new BusFactory to be used to create Bus objects
      */
