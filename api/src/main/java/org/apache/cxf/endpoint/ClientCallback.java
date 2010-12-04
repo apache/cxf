@@ -28,36 +28,45 @@ import java.util.concurrent.TimeoutException;
 import org.apache.cxf.message.Message;
 
 /**
- * 
+ * Asynchronous callback object for calls to {@link Client#invoke(ClientCallback, String, Object...)}
+ * and related functions.
+ *
+ * The default behavior of this expects the following pattern:
+ * <ol>
+ * <li>ClientCallback cb = new ClientCallback();</li>
+ * <li>client.invoke(cb, "someMethod", ....);</li>
+ * <li>cb.wait();</li>
+ * <li>// CXF calls notify on the callback object when the operation is complete.</li>
+ * </ol>
  */
 public class ClientCallback implements Future<Object[]> {
-    
+
     protected Map<String, Object> context;
     protected Object[] result;
     protected Throwable exception;
     protected volatile boolean done;
     protected boolean cancelled;
     protected boolean started;
-    
+
     public ClientCallback() {
     }
-    
+
     /**
-     * Called when a message is first received prior to any actions 
-     * being applied to the message.   The InterceptorChain is setup so 
+     * Called when a message is first received prior to any actions
+     * being applied to the message.   The InterceptorChain is setup so
      * modifications to that can be done.
      */
     public void start(Message msg) {
         started = true;
     }
-    
+
     /**
      * If the processing of the incoming message proceeds normally, this
      * method is called with the response context values and the resulting objects.
-     * 
+     *
      * The default behavior just stores the objects and calls notifyAll to wake
      * up threads waiting for the response.
-     * 
+     *
      * @param ctx
      * @param res
      */
@@ -69,14 +78,14 @@ public class ClientCallback implements Future<Object[]> {
             notifyAll();
         }
     }
-    
+
     /**
      * If processing of the incoming message results in an exception, this
      * method is called with the resulting exception.
-     * 
+     *
      * The default behavior just stores the objects and calls notifyAll to wake
      * up threads waiting for the response.
-     * 
+     *
      * @param ctx
      * @param ex
      */
@@ -88,8 +97,8 @@ public class ClientCallback implements Future<Object[]> {
             notifyAll();
         }
     }
-    
-    
+
+
     public boolean cancel(boolean mayInterruptIfRunning) {
         if (!started) {
             cancelled = true;
@@ -101,6 +110,12 @@ public class ClientCallback implements Future<Object[]> {
         return false;
     }
 
+    /**
+     * return the map of items returned from an operation.
+     * @return
+     * @throws InterruptedException if the operation was cancelled.
+     * @throws ExecutionException if the operation resulted in a fault.
+     */
     public Map<String, Object> getResponseContext() throws InterruptedException, ExecutionException {
         synchronized (this) {
             if (!done) {
@@ -115,7 +130,10 @@ public class ClientCallback implements Future<Object[]> {
         }
         return context;
     }
-    
+
+    /**
+     * {@inheritDoc}
+     */
     public Object[] get() throws InterruptedException, ExecutionException {
         synchronized (this) {
             if (!done) {
@@ -131,7 +149,10 @@ public class ClientCallback implements Future<Object[]> {
         return result;
     }
 
-    public Object[] get(long timeout, TimeUnit unit) 
+    /**
+     * {@inheritDoc}
+     */
+    public Object[] get(long timeout, TimeUnit unit)
         throws InterruptedException, ExecutionException, TimeoutException {
         synchronized (this) {
             if (!done) {
@@ -157,4 +178,12 @@ public class ClientCallback implements Future<Object[]> {
     public boolean isDone() {
         return done;
     }
+
+    /*
+     * If the operation completes with a fault, the resulting exception object ends up here.
+     */
+    public Throwable getException() {
+        return exception;
+    }
+
 }
