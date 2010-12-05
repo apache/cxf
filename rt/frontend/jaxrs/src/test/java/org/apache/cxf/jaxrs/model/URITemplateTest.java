@@ -271,6 +271,58 @@ public class URITemplateTest extends Assert {
     }
 
     @Test
+    public void testExpressionWithNestedGroupAndTwoVars() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/foo/{bar}/{resource:.+\\.(js|css|gif|png)}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/foo/1/script.js", values));
+        assertEquals("1", values.getFirst("bar"));
+        assertEquals("script.js", values.getFirst("resource"));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+    }
+    
+    @Test
+    public void testExpressionWithNestedGroupAndTwoVars2() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/foo/{bar}{resource:(/format/[^/]+?)?}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/foo/1/format", values));
+        assertEquals("1", values.getFirst("bar"));
+        assertEquals("/format", values.getFirst("resource"));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+        values.clear();
+        
+        assertTrue(uriTemplate.match("/foo/1/format/2", values));
+        assertEquals("1", values.getFirst("bar"));
+        assertEquals("/format/2", values.getFirst("resource"));
+        finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+        values.clear();
+        
+        assertTrue(uriTemplate.match("/foo/1", values));
+        assertEquals("1", values.getFirst("bar"));
+        assertNull(values.getFirst("resource"));
+        finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/", finalPath);
+    }
+    
+    
+    @Test
+    public void testExpressionWithNestedGroupAndManySegments() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/foo/{bar}{resource:(/format/[^/]+?)?}/baz");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/foo/1/format/2/baz/3", values));
+        assertEquals("1", values.getFirst("bar"));
+        assertEquals("/format/2", values.getFirst("resource"));
+        String finalPath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
+        assertEquals("/3", finalPath);
+        values.clear();
+    }
+    
+    @Test
     public void testExpressionWithNestedGroup2() throws Exception {
         URITemplate uriTemplate = 
             new URITemplate("/{resource:.+\\.(js|css|gif|png)}/bar");

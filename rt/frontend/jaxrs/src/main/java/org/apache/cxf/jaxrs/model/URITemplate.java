@@ -168,16 +168,23 @@ public final class URITemplate {
         }
 
         // Assign the matched template values to template variables
+        int groupCount = m.groupCount();
+        
         int i = 1;
         for (String name : variables) {
-            String value = m.group(i++);
-            templateVariableToValue.add(name, value);
+            while (i <= groupCount) {
+                String value = m.group(i++);
+                if (value == null || value.length() == 0) {
+                    continue;
+                }
+                templateVariableToValue.add(name, value);
+                break;
+            }
         }
         // The right hand side value, might be used to further resolve
         // sub-resources.
-        int groupCount = m.groupCount();
         
-        String finalGroup = m.group(groupCount);
+        String finalGroup = i > groupCount ? "/" : m.group(groupCount);
         templateVariableToValue.putSingle(FINAL_MATCH_GROUP, finalGroup == null ? "/" : finalGroup);
 
         return true;
