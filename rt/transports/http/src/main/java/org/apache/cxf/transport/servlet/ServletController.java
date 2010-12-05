@@ -54,8 +54,6 @@ public class ServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
     
     private ServletTransportFactory transport;
-    private ServletContext servletContext;
-    private ServletConfig servletConfig;
     private Bus bus;
     private volatile String lastBase = "";
     
@@ -65,10 +63,8 @@ public class ServletController extends AbstractServletController {
                              Bus b) {
         super(config);
         this.transport = df;
-        this.servletConfig = config;
-        this.servletContext = context;
         this.bus = b;
-        init();
+        this.transport.setServletController(this);
     }
     
     ServletController() {
@@ -451,26 +447,4 @@ public class ServletController extends AbstractServletController {
         res.getWriter().write("<html><body>No service was found.</body></html>");
     }
 
-    public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
-                                  ServletDestination d) throws ServletException {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Service http request on thread: " + Thread.currentThread());
-        }
-
-        try {
-            d.invoke(servletConfig, servletContext, request, response);
-        } catch (IOException e) {
-            throw new ServletException(e);
-        } finally {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
-            }
-        }
-
-    }
-    
-    private void init() {
-        transport.setServletController(this);
-    }
-    
 }

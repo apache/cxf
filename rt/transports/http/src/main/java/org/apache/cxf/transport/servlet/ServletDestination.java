@@ -23,18 +23,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.logging.Logger;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.cxf.transport.http.HTTPSession;
 
 
 public class ServletDestination extends AbstractHTTPDestination {
@@ -71,32 +63,6 @@ public class ServletDestination extends AbstractHTTPDestination {
         return LOG;
     }
 
-    public void invoke(final ServletContext context, 
-                       final HttpServletRequest req, 
-                       final HttpServletResponse resp) throws IOException {
-        invoke(null, context, req, resp);
-    }
-    
-    public void invoke(final ServletConfig config,
-                       final ServletContext context, 
-                       final HttpServletRequest req, 
-                       final HttpServletResponse resp) throws IOException {
-        
-        MessageImpl inMessage = new MessageImpl();
-        setupMessage(inMessage,
-                     config,
-                     context,
-                     req,
-                     resp);
-
-        ExchangeImpl exchange = new ExchangeImpl();
-        exchange.setInMessage(inMessage);
-        exchange.setSession(new HTTPSession(req));
-        inMessage.setDestination(this);
-
-        incomingObserver.onMessage(inMessage);
- 
-    }
     protected String getBasePath(String contextPath) throws IOException {
         
         String address = getAddress().getAddress().getValue();

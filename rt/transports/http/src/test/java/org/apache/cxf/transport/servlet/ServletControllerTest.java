@@ -25,6 +25,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.easymock.classextension.EasyMock;
 
 import org.junit.Assert;
@@ -215,7 +216,7 @@ public class ServletControllerTest extends Assert {
         
         @Override
         public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
-                                      ServletDestination d) throws ServletException {
+                                      AbstractHTTPDestination d) throws ServletException {
             invokeDestinationCalled = true;
         }
         

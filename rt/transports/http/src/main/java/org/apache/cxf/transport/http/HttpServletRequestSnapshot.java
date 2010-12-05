@@ -37,6 +37,7 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
     private Cookie[] cookies;
     private String localAddr;
     private Locale local;
+    @SuppressWarnings("rawtypes")
     private Enumeration locals;
     private String localName;
     private int localPort = -1;
@@ -125,13 +126,17 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         return null;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     @Override
     public Enumeration getHeaderNames() {
         return this.requestHeaderNames;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     @Override
     public Enumeration getHeaders(String name) {
         return headersMap.get(name);
@@ -227,7 +232,9 @@ public class HttpServletRequestSnapshot extends HttpServletRequestWrapper {
         return this.local;
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({
+        "unchecked", "rawtypes"
+    })
     @Override
     public Enumeration getLocales() {
         return this.locals;

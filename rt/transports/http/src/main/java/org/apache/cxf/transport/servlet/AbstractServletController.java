@@ -19,27 +19,38 @@
 
 package org.apache.cxf.transport.servlet;
 
-import javax.servlet.ServletConfig;
-import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.UrlUtils;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
 public abstract class AbstractServletController {
-    
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
+    private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
+    
     protected boolean isHideServiceList;
     protected boolean disableAddressUpdates;
     protected String forcedBaseAddress;
     protected String serviceListStyleSheet;
     protected String title;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
+    protected ServletConfig servletConfig;
     
     protected AbstractServletController() {
         
     }
     
     protected AbstractServletController(ServletConfig config) {
-        init(config);
+        this.servletConfig = config;
+        init();
     }
     
     public void setHideServiceList(boolean generate) {
@@ -63,7 +74,7 @@ public abstract class AbstractServletController {
         title = t;
     }
     
-    private void init(ServletConfig servletConfig) {
+    private void init() {
         if (servletConfig == null) {
             return;
         }
@@ -127,5 +138,23 @@ public abstract class AbstractServletController {
         }
         return lastIndex;
     }
-   
+    
+    public void invokeDestination(final HttpServletRequest request, HttpServletResponse response,
+                                  AbstractHTTPDestination d) throws ServletException {
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.fine("Service http request on thread: " + Thread.currentThread());
+        }
+
+        try {
+            d.invoke(servletConfig, servletConfig.getServletContext(), request, response);
+        } catch (IOException e) {
+            throw new ServletException(e);
+        } finally {
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
+            }
+        }
+
+    }
+
 }

@@ -26,14 +26,8 @@ import java.net.HttpURLConnection;
 import java.net.ServerSocket;
 import java.net.URL;
 import java.security.Principal;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,7 +48,6 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.continuations.ContinuationProvider;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
@@ -62,7 +55,9 @@ import org.apache.cxf.io.AbstractWrappedOutputStream;
 import org.apache.cxf.io.DelegatingInputStream;
 import org.apache.cxf.message.Attachment;
 import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -90,14 +85,11 @@ public abstract class AbstractHTTPDestination
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
-    public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
         
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
-    
-    private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
-    
+
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractHTTPDestination.class);
     
     private static final long serialVersionUID = 1L;
@@ -138,58 +130,29 @@ public abstract class AbstractHTTPDestination
         initConfig();
     }
     
-    
-
-    /**
-     * Cache HTTP headers in message.
-     * 
-     * @param message the current message
-     */
-    protected void setHeaders(Message message) {
-        Map<String, List<String>> requestHeaders = new HashMap<String, List<String>>();
-        copyRequestHeaders(message, requestHeaders);
-        message.put(Message.PROTOCOL_HEADERS, requestHeaders);
-
-        if (requestHeaders.containsKey("Authorization")) {
-            List<String> authorizationLines = requestHeaders.get("Authorization"); 
-            String credentials = authorizationLines.get(0);
-            if (credentials != null && !StringUtils.isEmpty(credentials.trim())) {
-                String authType = credentials.split(" ")[0];
-                if ("Basic".equals(authType)) {
-                    String authEncoded = credentials.split(" ")[1];
-                    try {
-                        String authDecoded = new String(Base64Utility.decode(authEncoded));
-                        String authInfo[] = authDecoded.split(":");
-                        String username = (authInfo.length > 0) ? authInfo[0] : "";
-                        // Below line for systems that blank out password after authentication;
-                        // see CXF-1495 for more info
-                        String password = (authInfo.length > 1) ? authInfo[1] : "";
-                        AuthorizationPolicy policy = new AuthorizationPolicy();
-                        policy.setUserName(username);
-                        policy.setPassword(password);
-                        
-                        message.put(AuthorizationPolicy.class, policy);
-                    } catch (Base64Exception ex) {
-                        //ignore, we'll leave things alone.  They can try decoding it themselves
-                    }
-                }
+    private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials) {
+        if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
+            return null;
+        }
+        String authType = credentials.split(" ")[0];
+        if ("Basic".equals(authType)) {
+            String authEncoded = credentials.split(" ")[1];
+            try {
+                String authDecoded = new String(Base64Utility.decode(authEncoded));
+                String authInfo[] = authDecoded.split(":");
+                String username = (authInfo.length > 0) ? authInfo[0] : "";
+                // Below line for systems that blank out password after authentication;
+                // see CXF-1495 for more info
+                String password = (authInfo.length > 1) ? authInfo[1] : "";
+                AuthorizationPolicy policy = new AuthorizationPolicy();
+                policy.setUserName(username);
+                policy.setPassword(password);
+                return policy;
+            } catch (Base64Exception ex) {
+                // Invalid authentication => treat as not authenticated
             }
         }
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.log(Level.FINE, "Request Headers: " + requestHeaders.toString());
-        }
-           
-    }
-    
-    protected void updateResponseHeaders(Message message) {
-        Map<String, List<String>> responseHeaders =
-            CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
-        if (responseHeaders == null) {
-            responseHeaders = new HashMap<String, List<String>>();
-            message.put(Message.PROTOCOL_HEADERS, responseHeaders);         
-        }
-        setPolicies(responseHeaders);
+        return null;
     }
     
     /** 
@@ -201,83 +164,33 @@ public abstract class AbstractHTTPDestination
         return ex == null ? false : ex.isOneWay();
     }
     
-    /**
-     * Copy the request headers into the message.
-     * 
-     * @param message the current message
-     * @param headers the current set of headers
-     */
-    protected void copyRequestHeaders(Message message, Map<String, List<String>> headers) {
-        HttpServletRequest req = (HttpServletRequest)message.get(HTTP_REQUEST);
-        
-        //TODO how to deal with the fields        
-        for (Enumeration e = req.getHeaderNames(); e.hasMoreElements();) {
-            String fname = (String)e.nextElement();
-            String mappedName = HttpHeaderHelper.getHeaderKey(fname);
-            List<String> values;
-            if (headers.containsKey(mappedName)) {
-                values = headers.get(mappedName);
-            } else {
-                values = new ArrayList<String>();
-                headers.put(mappedName, values);
-            }
-            for (Enumeration e2 = req.getHeaders(fname); e2.hasMoreElements();) {
-                String val = (String)e2.nextElement();
-                values.add(val);
-            }
-        }
-        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
-    }
-
-    /**
-     * Copy the response headers into the response.
-     * 
-     * @param message the current message
-     * @param headers the current set of headers
-     */
-    protected void copyResponseHeaders(Message message, HttpServletResponse response) {
-        String ct  = (String)message.get(Message.CONTENT_TYPE);
-        String enc = (String)message.get(Message.ENCODING);
-        
-        if (null != ct 
-            && null != enc
-            && ct.indexOf("charset=") == -1
-            && !ct.toLowerCase().contains("multipart/related")) {
-            ct = ct + "; charset=" + enc;
-        }
-
-        Map<?, ?> headers = (Map<?, ?>)message.get(Message.PROTOCOL_HEADERS);
-        if (null != headers) {
-            
-            if (!headers.containsKey(Message.CONTENT_TYPE)) {
-                response.setContentType(ct);
-            }
-            
-            for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
-                String header = (String)iter.next();
-                List<?> headerList = (List<?>)headers.get(header);
-                StringBuilder sb = new StringBuilder();
-
-                if (HTTP_HEADERS_SETCOOKIE.equals(header)) {
-                    for (int i = 0; i < headerList.size(); i++) {
-                        response.addHeader(header, headerList.get(i).toString());
-                    }
-                } else {
-                    for (int i = 0; i < headerList.size(); i++) {
-                        sb.append(headerList.get(i));
-                        if (i + 1 < headerList.size()) {
-                            sb.append(',');
-                        }
-                    }
-                }
-
-                response.addHeader(header, sb.toString());
-            }
-        } else {
-            response.setContentType(ct);
-        }
+    public void invoke(final ServletContext context, 
+                       final HttpServletRequest req, 
+                       final HttpServletResponse resp) throws IOException {
+        invoke(null, context, req, resp);
     }
     
+    public void invoke(final ServletConfig config,
+                       final ServletContext context, 
+                       final HttpServletRequest req, 
+                       final HttpServletResponse resp) throws IOException {
+        
+        MessageImpl inMessage = new MessageImpl();
+        setupMessage(inMessage,
+                     config,
+                     context,
+                     req,
+                     resp);
+
+        ExchangeImpl exchange = new ExchangeImpl();
+        exchange.setInMessage(inMessage);
+        exchange.setSession(new HTTPSession(req));
+        inMessage.setDestination(this);
+
+        incomingObserver.onMessage(inMessage);
+ 
+    }
+
     protected void setupMessage(Message inMessage,
                                 final ServletContext context, 
                                 final HttpServletRequest req, 
@@ -319,8 +232,46 @@ public abstract class AbstractHTTPDestination
             contextPath = "";
         }
         inMessage.put(Message.PATH_INFO, contextPath + req.getPathInfo());
-        
         String contentType = req.getContentType();
+        inMessage.put(Message.CONTENT_TYPE, contentType);
+        setEncoding(inMessage, req, contentType);
+
+        inMessage.put(Message.QUERY_STRING, req.getQueryString());
+
+        inMessage.put(Message.ACCEPT_CONTENT_TYPE, req.getHeader("Accept"));
+        String basePath = getBasePath(contextPath);
+        if (!StringUtils.isEmpty(basePath)) {
+            inMessage.put(Message.BASE_PATH, basePath);
+        }
+        inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
+        inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
+        inMessage.put(SecurityContext.class, new SecurityContext() {
+            public Principal getUserPrincipal() {
+                return req.getUserPrincipal();
+            }
+            public boolean isUserInRole(String role) {
+                return req.isUserInRole(role);
+            }
+        });
+        
+        Headers headers = new Headers(inMessage);
+        headers.copyFromRequest(req);
+        String credentials = headers.getAuthorization();
+        AuthorizationPolicy authPolicy = getAuthorizationPolicyFromMessage(credentials);
+        inMessage.put(AuthorizationPolicy.class, authPolicy);
+        
+        SSLUtils.propogateSecureSession(req, inMessage);
+
+        inMessage.put(CertConstraints.class.getName(), certConstraints);
+        inMessage.put(Message.IN_INTERCEPTORS,
+                Arrays.asList(new Interceptor[] {CertConstraintsInterceptor.INSTANCE}));
+
+    }
+
+    private String setEncoding(final Message inMessage, 
+                               final HttpServletRequest req, 
+                               final String contentType) throws IOException {
+        
         String enc = HttpHeaderHelper.findCharset(contentType);
         if (enc == null) {
             enc = req.getCharacterEncoding();
@@ -341,33 +292,7 @@ public abstract class AbstractHTTPDestination
             }
             inMessage.put(Message.ENCODING, normalizedEncoding);
         }
-        
-        inMessage.put(Message.QUERY_STRING, req.getQueryString());
-        inMessage.put(Message.CONTENT_TYPE, contentType);
-        inMessage.put(Message.ACCEPT_CONTENT_TYPE, req.getHeader("Accept"));
-        String basePath = getBasePath(contextPath);
-        if (!StringUtils.isEmpty(basePath)) {
-            inMessage.put(Message.BASE_PATH, basePath);
-        }
-        inMessage.put(Message.FIXED_PARAMETER_ORDER, isFixedParameterOrder());
-        inMessage.put(Message.ASYNC_POST_RESPONSE_DISPATCH, Boolean.TRUE);
-        inMessage.put(SecurityContext.class, new SecurityContext() {
-            public Principal getUserPrincipal() {
-                return req.getUserPrincipal();
-            }
-            public boolean isUserInRole(String role) {
-                return req.isUserInRole(role);
-            }
-        });
-        
-        setHeaders(inMessage);
-        
-        SSLUtils.propogateSecureSession(req, inMessage);
-
-        inMessage.put(CertConstraints.class.getName(), certConstraints);
-        inMessage.put(Message.IN_INTERCEPTORS,
-                Arrays.asList(new Interceptor[] {CertConstraintsInterceptor.INSTANCE}));
-
+        return contentType;
     }
     protected Message retrieveFromContinuation(HttpServletRequest req) {
         if (!isServlet3) {
@@ -445,48 +370,7 @@ public abstract class AbstractHTTPDestination
                     new HTTPServerPolicy(), HTTPServerPolicy.class);
         }
     }
-    private static List<String> createMutableList(String val) {
-        return new ArrayList<String>(Arrays.asList(new String[] {val}));
-    }
-    void setPolicies(Map<String, List<String>> headers) {
-        HTTPServerPolicy policy = server; 
-        if (policy.isSetCacheControl()) {
-            headers.put("Cache-Control",
-                        createMutableList(policy.getCacheControl().value()));
-        }
-        if (policy.isSetContentLocation()) {
-            headers.put("Content-Location",
-                        createMutableList(policy.getContentLocation()));
-        }
-        if (policy.isSetContentEncoding()) {
-            headers.put("Content-Encoding",
-                        createMutableList(policy.getContentEncoding()));
-        }
-        if (policy.isSetContentType()) {
-            headers.put(HttpHeaderHelper.CONTENT_TYPE,
-                        createMutableList(policy.getContentType()));
-        }
-        if (policy.isSetServerType()) {
-            headers.put("Server",
-                        createMutableList(policy.getServerType()));
-        }
-        if (policy.isSetHonorKeepAlive() && !policy.isHonorKeepAlive()) {
-            headers.put("Connection",
-                        createMutableList("close"));
-        } else if (policy.isSetKeepAliveParameters()) {
-            headers.put("Keep-Alive", createMutableList(policy.getKeepAliveParameters()));
-        }
-        
-    
-        
-    /*
-     * TODO - hook up these policies
-    <xs:attribute name="SuppressClientSendErrors" type="xs:boolean" use="optional" default="false">
-    <xs:attribute name="SuppressClientReceiveErrors" type="xs:boolean" use="optional" default="false">
-    */
-    }
-  
-   
+
     /**
      * On first write, we need to make sure any attachments and such that are still on the incoming stream 
      * are read in.  Otherwise we can get into a deadlock where the client is still trying to send the 
@@ -527,53 +411,31 @@ public abstract class AbstractHTTPDestination
         if (isResponseRedirected(outMessage)) {
             return null;
         }
-        
+
         cacheInput(outMessage);
-        
-        updateResponseHeaders(outMessage);
-        Object responseObj = outMessage.get(HTTP_RESPONSE);
+
+        new Headers(outMessage).setFromServerPolicy(server);
+
         OutputStream responseStream = null;
         boolean oneWay = isOneWay(outMessage);
-        if (responseObj instanceof HttpServletResponse) {
-            HttpServletResponse response = (HttpServletResponse)responseObj;
 
-            Integer i = (Integer)outMessage.get(Message.RESPONSE_CODE);
-            if (i != null) {
-                int status = i.intValue();  
-                if (HttpURLConnection.HTTP_INTERNAL_ERROR == i) {
-                    Map<Object, Object> pHeaders = 
-                        CastUtils.cast((Map)outMessage.get(Message.PROTOCOL_HEADERS));
-                    if (null != pHeaders && pHeaders.containsKey(PROTOCOL_HEADERS_CONTENT_TYPE)) {
-                        pHeaders.remove(PROTOCOL_HEADERS_CONTENT_TYPE);
-                    }
-                }
-                response.setStatus(status);
-            } else if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
-                response.setStatus(HttpURLConnection.HTTP_ACCEPTED);
-            } else {
-                response.setStatus(HttpURLConnection.HTTP_OK);
-            }
+        HttpServletResponse response = getHttpResponseFromMessage(outMessage);
 
-            copyResponseHeaders(outMessage, response);
+        int responseCode = getReponseCodeFromMessage(outMessage);
+        response.setStatus(responseCode);
+        if (HttpURLConnection.HTTP_INTERNAL_ERROR == responseCode) {
+            new Headers(outMessage).removeContentType();
+        }
+        new Headers(outMessage).copyToResponse(response);
 
-            if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
-                response.setContentLength(0);
-                response.flushBuffer();
-                response.getOutputStream().close();
-            } else if (!getStream) {
-                response.getOutputStream().close();
-            } else {
-                responseStream = response.getOutputStream();                
-            }
-        } else if (null != responseObj) {
-            String m = (new org.apache.cxf.common.i18n.Message("UNEXPECTED_RESPONSE_TYPE_MSG",
-                LOG, responseObj.getClass())).toString();
-            LOG.log(Level.WARNING, m);
-            throw new IOException(m);   
+        if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
+            response.setContentLength(0);
+            response.flushBuffer();
+            response.getOutputStream().close();
+        } else if (!getStream) {
+            response.getOutputStream().close();
         } else {
-            String m = (new org.apache.cxf.common.i18n.Message("NULL_RESPONSE_MSG", LOG)).toString();
-            LOG.log(Level.WARNING, m);
-            throw new IOException(m);
+            responseStream = response.getOutputStream();                
         }
 
         if (oneWay) {
@@ -581,11 +443,39 @@ public abstract class AbstractHTTPDestination
         }
         return responseStream;
     }
+
+    private int getReponseCodeFromMessage(Message message) {
+        Integer i = (Integer)message.get(Message.RESPONSE_CODE);
+        if (i != null) {
+            return i.intValue();  
+        } else if (isOneWay(message) && !MessageUtils.isPartialResponse(message)) {
+            return HttpURLConnection.HTTP_ACCEPTED;
+        } else {
+            return HttpURLConnection.HTTP_OK;
+        }
+    }
+
     
+    private HttpServletResponse getHttpResponseFromMessage(Message message) throws IOException {
+        Object responseObj = message.get(HTTP_RESPONSE);
+        if (responseObj instanceof HttpServletResponse) {
+            return (HttpServletResponse)responseObj;
+        } else if (null != responseObj) {
+            String m = (new org.apache.cxf.common.i18n.Message("UNEXPECTED_RESPONSE_TYPE_MSG",
+                    LOG, responseObj.getClass())).toString();
+            LOG.log(Level.WARNING, m);
+            throw new IOException(m);   
+        } else {
+            String m = (new org.apache.cxf.common.i18n.Message("NULL_RESPONSE_MSG", LOG)).toString();
+            LOG.log(Level.WARNING, m);
+            throw new IOException(m);
+        }
+    }
+
     private boolean isResponseRedirected(Message outMessage) {
         return Boolean.TRUE.equals(outMessage.get(REQUEST_REDIRECTED));
     }
-    
+
     /**
      * Backchannel conduit.
      */
@@ -738,6 +628,7 @@ public abstract class AbstractHTTPDestination
      * 
      * @see org.apache.cxf.transport.AbstractMultiplexDestination#getId(java.util.Map)
      */
+    @SuppressWarnings("rawtypes")
     public String getId(Map context) {
         String id = null;
 
@@ -799,5 +690,5 @@ public abstract class AbstractHTTPDestination
     public boolean canAssert(QName type) {
         return PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME.equals(type); 
     }
-    
+
 }

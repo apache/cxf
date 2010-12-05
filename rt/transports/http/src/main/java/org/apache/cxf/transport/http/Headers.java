@@ -23,7 +23,10 @@ import java.net.HttpURLConnection;
 import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,11 +34,15 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transports.http.configuration.HTTPClientPolicy;
+import org.apache.cxf.transports.http.configuration.HTTPServerPolicy;
 import org.apache.cxf.version.Version;
 
 public class Headers {
@@ -44,6 +51,9 @@ public class Headers {
      *  is used to get the response.
      */
     public static final String KEY_HTTP_CONNECTION = "http.connection";
+    public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
+    private static final String HTTP_HEADERS_SETCOOKIE = "Set-Cookie";
+
     private static final Logger LOG = LogUtils.getL7dLogger(Headers.class);
     private final Message message;
     private final Map<String, List<String>> headers;
@@ -78,7 +88,7 @@ public class Headers {
      * 
      * REVISIT: A cookie is set statically from configuration? 
      */
-    void setHeadersByClientPolicy(HTTPClientPolicy policy) {
+    void setFromClientPolicy(HTTPClientPolicy policy) {
         if (policy == null) {
             return;
         }
@@ -124,6 +134,43 @@ public class Headers {
                     createMutableList(policy.getReferer()));
         }
     }
+    
+    void setFromServerPolicy(HTTPServerPolicy policy) {
+        if (policy.isSetCacheControl()) {
+            headers.put("Cache-Control",
+                        createMutableList(policy.getCacheControl().value()));
+        }
+        if (policy.isSetContentLocation()) {
+            headers.put("Content-Location",
+                        createMutableList(policy.getContentLocation()));
+        }
+        if (policy.isSetContentEncoding()) {
+            headers.put("Content-Encoding",
+                        createMutableList(policy.getContentEncoding()));
+        }
+        if (policy.isSetContentType()) {
+            headers.put(HttpHeaderHelper.CONTENT_TYPE,
+                        createMutableList(policy.getContentType()));
+        }
+        if (policy.isSetServerType()) {
+            headers.put("Server",
+                        createMutableList(policy.getServerType()));
+        }
+        if (policy.isSetHonorKeepAlive() && !policy.isHonorKeepAlive()) {
+            headers.put("Connection",
+                        createMutableList("close"));
+        } else if (policy.isSetKeepAliveParameters()) {
+            headers.put("Keep-Alive", createMutableList(policy.getKeepAliveParameters()));
+        }
+        
+    
+        
+    /*
+     * TODO - hook up these policies
+    <xs:attribute name="SuppressClientSendErrors" type="xs:boolean" use="optional" default="false">
+    <xs:attribute name="SuppressClientReceiveErrors" type="xs:boolean" use="optional" default="false">
+    */
+    }
 
     public void removeAuthorizationHeaders() {
         headers.remove("Authorization");
@@ -161,7 +208,7 @@ public class Headers {
         message.put(Message.PROTOCOL_HEADERS, headers);
         return headers;
     }
-    
+
     public void readFromConnection(HttpURLConnection connection) {
         Map<String, List<String>> origHeaders = connection.getHeaderFields();
         headers.clear();
@@ -263,6 +310,100 @@ public class Headers {
         }
         if (!connection.getRequestProperties().containsKey("User-Agent")) {
             connection.addRequestProperty("User-Agent", Version.getCompleteVersionString());
+        }
+    }
+    
+    /**
+     * Copy the request headers into the message.
+     * 
+     * @param message the current message
+     * @param headers the current set of headers
+     */
+    protected void copyFromRequest(HttpServletRequest req) {
+
+        //TODO how to deal with the fields        
+        for (Enumeration<String> e = req.getHeaderNames(); e.hasMoreElements();) {
+            String fname = (String)e.nextElement();
+            String mappedName = HttpHeaderHelper.getHeaderKey(fname);
+            List<String> values;
+            if (headers.containsKey(mappedName)) {
+                values = headers.get(mappedName);
+            } else {
+                values = new ArrayList<String>();
+                headers.put(mappedName, values);
+            }
+            for (Enumeration<String> e2 = req.getHeaders(fname); e2.hasMoreElements();) {
+                String val = (String)e2.nextElement();
+                values.add(val);
+            }
+        }
+        headers.put(Message.CONTENT_TYPE, Collections.singletonList(req.getContentType()));
+        if (LOG.isLoggable(Level.FINE)) {
+            LOG.log(Level.FINE, "Request Headers: " + headers.toString());
+        }
+    }
+
+    private String getContentTypeFromMessage() {
+        final String ct  = (String)message.get(Message.CONTENT_TYPE);
+        final String enc = (String)message.get(Message.ENCODING);
+        
+        if (null != ct 
+            && null != enc
+            && ct.indexOf("charset=") == -1
+            && !ct.toLowerCase().contains("multipart/related")) {
+            return ct + "; charset=" + enc;
+        } else {
+            return ct;
+        }
+    }
+    
+    /**
+     * Copy the response headers into the response.
+     * 
+     * @param message the current message
+     * @param headers the current set of headers
+     */
+    protected void copyToResponse(HttpServletResponse response) {
+        String contentType = getContentTypeFromMessage();
+ 
+        if (!headers.containsKey(Message.CONTENT_TYPE)) {
+            response.setContentType(contentType);
+        }
+
+        for (Iterator<?> iter = headers.keySet().iterator(); iter.hasNext();) {
+            String header = (String)iter.next();
+            List<?> headerList = (List<?>)headers.get(header);
+            StringBuilder sb = new StringBuilder();
+
+            if (HTTP_HEADERS_SETCOOKIE.equals(header)) {
+                for (int i = 0; i < headerList.size(); i++) {
+                    response.addHeader(header, headerList.get(i).toString());
+                }
+            } else {
+                for (int i = 0; i < headerList.size(); i++) {
+                    sb.append(headerList.get(i));
+                    if (i + 1 < headerList.size()) {
+                        sb.append(',');
+                    }
+                }
+            }
+
+            response.addHeader(header, sb.toString());
+        }
+    }
+    
+    void removeContentType() {
+        if (headers.containsKey(PROTOCOL_HEADERS_CONTENT_TYPE)) {
+            headers.remove(PROTOCOL_HEADERS_CONTENT_TYPE);
+        }
+    }
+
+    public String getAuthorization() {
+        if (headers.containsKey("Authorization")) {
+            List<String> authorizationLines = headers.get("Authorization"); 
+            return authorizationLines.get(0);
+        } else {
+            return null;
         }
     }
 

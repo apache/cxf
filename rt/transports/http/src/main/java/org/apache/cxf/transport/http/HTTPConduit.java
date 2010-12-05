@@ -523,7 +523,7 @@ public class HTTPConduit
         }
 
         setHeadersByAuthorizationPolicy(message, currentURL);
-        new Headers(message).setHeadersByClientPolicy(getClient(message));
+        new Headers(message).setFromClientPolicy(getClient(message));
 
         message.setContent(OutputStream.class, 
                            new WrappedOutputStream(
