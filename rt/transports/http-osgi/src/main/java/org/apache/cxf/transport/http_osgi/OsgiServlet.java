@@ -38,7 +38,7 @@ public class OsgiServlet extends AbstractHTTPServlet {
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-        controller = new OsgiServletController(this);
+        controller = new OsgiServletController(this.getTransport(), this.getServletConfig());
     }
     
     @Override

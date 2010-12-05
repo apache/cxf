@@ -21,14 +21,18 @@ package org.apache.cxf.transport.http_osgi;
 import java.util.Collection;
 import java.util.Set;
 
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
 public interface OsgiDestinationRegistryIntf {
-    void addDestination(String path, OsgiDestination destination);
+    void addDestination(String path, AbstractHTTPDestination destination);
 
     void removeDestination(String path);
 
-    OsgiDestination getDestinationForPath(String path);
+    AbstractHTTPDestination getDestinationForPath(String path);
     
-    Collection<OsgiDestination> getDestinations();
+    AbstractHTTPDestination checkRestfulRequest(String address);
+    
+    Collection<AbstractHTTPDestination> getDestinations();
 
     Set<String> getDestinationsPaths();
 }

@@ -19,12 +19,10 @@
 package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 
@@ -66,23 +64,6 @@ public class OsgiDestination extends AbstractHTTPDestination {
 
     protected Bus getBus() {
         return bus;
-    }
-
-
-    protected void doMessage(MessageImpl inMessage) throws IOException {
-        try {
-
-            setHeaders(inMessage);
-
-            inMessage.setDestination(this);
-
-            incomingObserver.onMessage(inMessage);
-
-        } finally {
-            if (LOG.isLoggable(Level.FINE)) {
-                LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
-            }
-        }
     }
 
     @Override

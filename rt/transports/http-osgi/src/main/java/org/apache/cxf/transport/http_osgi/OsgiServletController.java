@@ -19,16 +19,14 @@
 package org.apache.cxf.transport.http_osgi;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
-import java.security.Principal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -36,17 +34,10 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.StringUtils;
-import org.apache.cxf.helpers.HttpHeaderHelper;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.resource.ResourceManager;
-import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
-import org.apache.cxf.transport.http.HTTPSession;
-import org.apache.cxf.transport.https.SSLUtils;
 import org.apache.cxf.transport.servlet.AbstractServletController;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -55,10 +46,10 @@ import org.apache.cxf.wsdl.http.AddressType;
 public class OsgiServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
       
-    private OsgiServlet servlet;
-    public OsgiServletController(OsgiServlet servlet) {
-        super(servlet.getServletConfig());
-        this.servlet = servlet;
+    private OsgiDestinationRegistryIntf destinationRegistry;
+    public OsgiServletController(OsgiDestinationRegistryIntf destinationRegistry, ServletConfig config) {
+        super(config);
+        this.destinationRegistry = destinationRegistry;
     }
 
     private synchronized void updateDests(HttpServletRequest request) {
@@ -68,9 +59,9 @@ public class OsgiServletController extends AbstractServletController {
         String base = forcedBaseAddress == null ? getBaseURL(request) : forcedBaseAddress;
 
                
-        Set<String> paths = servlet.getTransport().getDestinationsPaths();
+        Set<String> paths = destinationRegistry.getDestinationsPaths();
         for (String path : paths) {
-            OsgiDestination d2 = servlet.getTransport().getDestinationForPath(path);
+            AbstractHTTPDestination d2 = destinationRegistry.getDestinationForPath(path);
             String ad = d2.getEndpointInfo().getAddress();
             if (ad.equals(path)) {
                 d2.getEndpointInfo().setAddress(base + path);
@@ -83,12 +74,8 @@ public class OsgiServletController extends AbstractServletController {
 
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         try {
-            EndpointInfo ei = new EndpointInfo();
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-
-            ei.setAddress(address);
-            OsgiDestination d = 
-                (OsgiDestination)servlet.getTransport().getDestinationForPath(ei.getAddress());
+            AbstractHTTPDestination d = destinationRegistry.getDestinationForPath(address);
 
             if (d == null) {
                 if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
@@ -98,7 +85,7 @@ public class OsgiServletController extends AbstractServletController {
                     updateDests(request);
                     generateServiceList(request, res);
                 } else {
-                    d = checkRestfulRequest(request);
+                    d = destinationRegistry.checkRestfulRequest(address);
                     if (d == null || d.getMessageObserver() == null) {
                         LOG.warning("Can't find the the request for "
                                     + request.getRequestURL() + "'s Observer ");
@@ -109,8 +96,8 @@ public class OsgiServletController extends AbstractServletController {
                     }
                 }
             } else {
-                ei = d.getEndpointInfo();
-                Bus bus = d.getBus();
+                EndpointInfo ei = d.getEndpointInfo();
+                Bus bus = ((OsgiDestination)d).getBus();
                 ClassLoader orig = Thread.currentThread().getContextClassLoader();
                 try {
                     ResourceManager manager = bus.getExtension(ResourceManager.class);
@@ -121,35 +108,24 @@ public class OsgiServletController extends AbstractServletController {
                             Thread.currentThread().setContextClassLoader(loader);
                         }
                     }
-                    
-                    if (null != request.getQueryString()
-                        && request.getQueryString().length() > 0
-                        && bus.getExtension(QueryHandlerRegistry.class) != null) {
-    
-                        String ctxUri = request.getPathInfo();
-                        String baseUri = request.getRequestURL().toString()
-                            + "?" + request.getQueryString();
+                    Iterable<QueryHandler> queryHandlers = bus.getExtension(QueryHandlerRegistry.class)
+                        .getHandlers();
+                    if (!StringUtils.isEmpty(request.getQueryString()) && queryHandlers != null) {
+                        
                         // update the EndPoint Address with request url
                         if ("GET".equals(request.getMethod())) {
                             updateDests(request);
                         }
-    
-                        for (QueryHandler qh : bus.getExtension(QueryHandlerRegistry.class).getHandlers()) {
-                            if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
-    
-                                res.setContentType(qh.getResponseContentType(baseUri, ctxUri));
-                                OutputStream out = res.getOutputStream();
-                                try {
-                                    qh.writeResponse(baseUri, ctxUri, ei, out);
-                                    out.flush();
-                                    return;
-                                } catch (Exception e) {
-                                    LOG.warning(qh.getClass().getName()
-                                        + " Exception caught writing response: "
-                                        + e.getMessage());
-                                    throw new ServletException(e);
-                                }
-                            }
+                        
+                        String ctxUri = request.getPathInfo();
+                        String baseUri = request.getRequestURL().toString()
+                            + "?" + request.getQueryString();
+
+                        QueryHandler selectedHandler = findQueryHandler(queryHandlers, ei, ctxUri, baseUri);
+                        
+                        if (selectedHandler != null) {
+                            respondUsingQueryHandler(selectedHandler, res, ei, ctxUri, baseUri);
+                            return;
                         }
                     } else if ("/".equals(address) || address.length() == 0) {
                         updateDests(request);
@@ -165,16 +141,30 @@ public class OsgiServletController extends AbstractServletController {
         }
     }
 
-    private OsgiDestination checkRestfulRequest(HttpServletRequest request) throws IOException {
-
-        String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-
-        for (String path : servlet.getTransport().getDestinationsPaths()) {
-            if (address.startsWith(path)) {
-                return servlet.getTransport().getDestinationForPath(path);
+    private QueryHandler findQueryHandler(Iterable<QueryHandler> handlers, EndpointInfo ei, String ctxUri,
+                                          String baseUri) {
+        for (QueryHandler qh : handlers) {
+            if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
+                return qh;
             }
         }
         return null;
+    }
+
+    private void respondUsingQueryHandler(QueryHandler selectedHandler, HttpServletResponse res,
+                                          EndpointInfo ei, String ctxUri, String baseUri) throws IOException,
+        ServletException {
+        res.setContentType(selectedHandler.getResponseContentType(baseUri, ctxUri));
+        OutputStream out = res.getOutputStream();
+        try {
+            selectedHandler.writeResponse(baseUri, ctxUri, ei, out);
+            out.flush();
+        } catch (Exception e) {
+            LOG.warning(selectedHandler.getClass().getName()
+                + " Exception caught writing response: "
+                + e.getMessage());
+            throw new ServletException(e);
+        }
     }
 
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
@@ -197,7 +187,7 @@ public class OsgiServletController extends AbstractServletController {
         response.getWriter().write("<title>CXF - Service list</title>");
         response.getWriter().write("</head><body>");
         
-        Collection<OsgiDestination> destinations = servlet.getTransport().getDestinations();
+        Collection<AbstractHTTPDestination> destinations = destinationRegistry.getDestinations();
             
         if (destinations.size() > 0) {
             writeSOAPEndpoints(response, destinations);
@@ -209,12 +199,13 @@ public class OsgiServletController extends AbstractServletController {
         response.getWriter().write("</body></html>");
     }
 
-    private void writeSOAPEndpoints(HttpServletResponse response, Collection<OsgiDestination> destinations)
+    private void writeSOAPEndpoints(HttpServletResponse response, 
+                                    Collection<AbstractHTTPDestination> destinations)
         throws IOException {
         response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (OsgiDestination sd : destinations) {
+        for (AbstractHTTPDestination sd : destinations) {
             if (null != sd.getEndpointInfo().getName() 
                 && null != sd.getEndpointInfo().getInterface()) {
                 response.getWriter().write("<tr><td>");
@@ -243,11 +234,12 @@ public class OsgiServletController extends AbstractServletController {
     }
     
     
-    private void writeRESTfulEndpoints(HttpServletResponse response, Collection<OsgiDestination> destinations)
+    private void writeRESTfulEndpoints(HttpServletResponse response, 
+                                       Collection<AbstractHTTPDestination> destinations)
         throws IOException {
         
-        List<OsgiDestination> restfulDests = new ArrayList<OsgiDestination>();
-        for (OsgiDestination sd : destinations) {
+        List<AbstractHTTPDestination> restfulDests = new ArrayList<AbstractHTTPDestination>();
+        for (AbstractHTTPDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
             if (null == sd.getEndpointInfo().getInterface()) {
                 restfulDests.add(sd);
@@ -260,7 +252,7 @@ public class OsgiServletController extends AbstractServletController {
         response.getWriter().write("<span class=\"heading\">Available RESTful services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (OsgiDestination sd : destinations) {
+        for (AbstractHTTPDestination sd : destinations) {
             if (null == sd.getEndpointInfo().getInterface()) {
                 response.getWriter().write("<tr><td>");
                 String address = sd.getEndpointInfo().getAddress();
@@ -281,64 +273,4 @@ public class OsgiServletController extends AbstractServletController {
         res.getWriter().write("<html><body>No service was found.</body></html>");
     }
 
-    public void invokeDestination(final HttpServletRequest request, 
-                                  HttpServletResponse response, 
-                                  OsgiDestination d) throws ServletException {
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Service http request on thread: " + Thread.currentThread());
-        }
-
-        try {
-            MessageImpl inMessage = servlet.createInMessage();
-            inMessage.setContent(InputStream.class, request.getInputStream());
-            inMessage.put(AbstractHTTPDestination.HTTP_REQUEST, request);
-            inMessage.put(AbstractHTTPDestination.HTTP_RESPONSE, response);
-            inMessage.put(AbstractHTTPDestination.HTTP_CONTEXT, servlet.getServletContext());
-            inMessage.put(AbstractHTTPDestination.HTTP_CONFIG, servlet.getServletConfig());
-            inMessage.put(Message.HTTP_REQUEST_METHOD, request.getMethod());
-            inMessage.put(Message.REQUEST_URI, request.getRequestURI());
-            inMessage.put(Message.PATH_INFO, request.getPathInfo());
-            inMessage.put(Message.QUERY_STRING, request.getQueryString());
-            inMessage.put(Message.CONTENT_TYPE, request.getContentType());
-            inMessage.put(Message.ACCEPT_CONTENT_TYPE, request.getHeader("Accept"));
-            inMessage.put(Message.BASE_PATH, d.getAddress().getAddress().getValue());
-            inMessage.put(SecurityContext.class, new SecurityContext() {
-                public Principal getUserPrincipal() {
-                    return request.getUserPrincipal();
-                }
-                public boolean isUserInRole(String role) {
-                    return request.isUserInRole(role);
-                }
-            });
-
-            // work around a bug with Jetty which results in the character
-            // encoding not being trimmed correctly.
-            String enc = request.getCharacterEncoding();
-            if (enc != null && enc.endsWith("\"")) {
-                enc = enc.substring(0, enc.length() - 1);
-            }
-
-            String normalizedEncoding = HttpHeaderHelper.mapCharset(enc);
-            if (normalizedEncoding == null) {
-                String m = new org.apache.cxf.common.i18n.Message("INVALID_ENCODING_MSG",
-                                                                  LOG, enc).toString();
-                LOG.log(Level.WARNING, m);
-                throw new IOException(m);
-            }
-
-            inMessage.put(Message.ENCODING, normalizedEncoding);
-            SSLUtils.propogateSecureSession(request, inMessage);
-
-            ExchangeImpl exchange = servlet.createExchange();
-            exchange.setInMessage(inMessage);
-            exchange.setSession(new HTTPSession(request));
-
-            d.doMessage(inMessage);
-        } catch (IOException e) {
-            throw new ServletException(e);
-        }
-
-    }
-
-    
 }

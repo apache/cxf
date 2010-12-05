@@ -24,15 +24,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+
 public class OsgiDestinationRegistry implements OsgiDestinationRegistryIntf {
 
-    private ConcurrentMap<String, OsgiDestination> destinations 
-        = new ConcurrentHashMap<String, OsgiDestination>();
+    private ConcurrentMap<String, AbstractHTTPDestination> destinations 
+        = new ConcurrentHashMap<String, AbstractHTTPDestination>();
 
     public OsgiDestinationRegistry() {
     }
 
-    public void addDestination(String path, OsgiDestination destination) {
+    public void addDestination(String path, AbstractHTTPDestination destination) {
         String p = getTrimmedPath(path);
         destinations.putIfAbsent(p, destination);
     }
@@ -41,12 +43,21 @@ public class OsgiDestinationRegistry implements OsgiDestinationRegistryIntf {
         destinations.remove(path);
     }
 
-    public OsgiDestination getDestinationForPath(String path) {
+    public AbstractHTTPDestination getDestinationForPath(String path) {
         // to use the url context match
         return destinations.get(getTrimmedPath(path));
     }
+    
+    public AbstractHTTPDestination checkRestfulRequest(String address) {
+        for (String path : getDestinationsPaths()) {
+            if (address.startsWith(path)) {
+                return getDestinationForPath(path);
+            }
+        }
+        return null;
+    }
 
-    public Collection<OsgiDestination> getDestinations() {
+    public Collection<AbstractHTTPDestination> getDestinations() {
         return Collections.unmodifiableCollection(destinations.values());
     }
 
@@ -54,6 +65,12 @@ public class OsgiDestinationRegistry implements OsgiDestinationRegistryIntf {
         return Collections.unmodifiableSet(destinations.keySet());
     }
 
+    /**
+     * Remove the transport protocol from the path and make 
+     * it starts with /
+     * @param path 
+     * @return trimmed path
+     */
     static String getTrimmedPath(String path) {
         if (path == null) {
             return "/";

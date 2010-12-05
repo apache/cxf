@@ -19,18 +19,10 @@
 
 package org.apache.cxf.transport.http_osgi;
 
-import java.util.StringTokenizer;
-
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.cxf.Bus;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.MessageObserver;
-
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -43,7 +35,6 @@ public class OsgiDestinationTest extends Assert {
     private IMocksControl control; 
     private Bus bus;
     private OsgiDestinationRegistryIntf registry;
-    private MessageObserver observer;
     private EndpointInfo endpoint;
 
     @Before
@@ -51,7 +42,6 @@ public class OsgiDestinationTest extends Assert {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         registry = control.createMock(OsgiDestinationRegistryIntf.class);
-        observer = control.createMock(MessageObserver.class);
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }
@@ -60,7 +50,6 @@ public class OsgiDestinationTest extends Assert {
     public void tearDown() {
         bus = null;
         registry = null;
-        observer = null;
     }
 
     @Test
@@ -73,21 +62,6 @@ public class OsgiDestinationTest extends Assert {
         assertNotNull(destination.getAddress().getAddress());
         assertEquals(ADDRESS, 
                      destination.getAddress().getAddress().getValue());
-    }
-
-    @Test
-    public void testMessage() throws Exception {
-        MessageImpl message = setUpMessage();
-
-        control.replay();
-
-        OsgiDestination destination = 
-            new OsgiDestination(bus, endpoint, registry, "snafu");
-        destination.setMessageObserver(observer);
-
-        destination.doMessage(message);
-
-        control.verify();
     }
 
     @Test
@@ -104,20 +78,4 @@ public class OsgiDestinationTest extends Assert {
         control.verify();
     }
 
-    private MessageImpl setUpMessage() {
-        MessageImpl message = control.createMock(MessageImpl.class);
-        HttpServletRequest request =
-            control.createMock(HttpServletRequest.class);
-        message.get("HTTP.REQUEST");
-        EasyMock.expectLastCall().andReturn(request);
-        request.getHeaderNames();
-        EasyMock.expectLastCall().andReturn(new StringTokenizer("content-type content-length"));
-        request.getHeaders("content-type");
-        EasyMock.expectLastCall().andReturn(new StringTokenizer("text/xml"));
-        request.getHeaders("content-length");
-        EasyMock.expectLastCall().andReturn(new StringTokenizer("1234"));
-        observer.onMessage(message);
-        EasyMock.expectLastCall();
-        return message;
-    }
 }

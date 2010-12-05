@@ -24,6 +24,7 @@ import java.net.URI;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 
 public class OsgiTransportFactory extends AbstractHTTPTransportFactory implements DestinationFactory {
@@ -39,7 +40,7 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
             throw new IllegalStateException("Endpoint address should be a relative URI "
                                              + "wrt to the servlet address (use '/xxx' for example)");
         }
-        OsgiDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
+        AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
             String path = OsgiDestinationRegistry.getTrimmedPath(endpointInfo.getAddress());
             d = new OsgiDestination(getBus(), endpointInfo, registry, path);
