@@ -63,6 +63,11 @@ public class Headers {
         this.headers = getSetProtocolHeaders(message);
     }
 
+    /**
+     * Write cookie header from given session cookies
+     * 
+     * @param sessionCookies
+     */
     public void writeSessionCookies(Map<String, Cookie> sessionCookies) {
         List<String> cookies = null;
         for (String s : headers.keySet()) {
