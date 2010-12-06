@@ -150,7 +150,7 @@ public class RMTxStore implements RMStore {
         driverClassName = dcn;
     }
     
-    String getDriverClassName() {
+    public String getDriverClassName() {
         return driverClassName;
     }
 
@@ -158,7 +158,7 @@ public class RMTxStore implements RMStore {
         password = p;
     }
     
-    String getPassword() {
+    public String getPassword() {
         return password;
     }
     
@@ -166,7 +166,7 @@ public class RMTxStore implements RMStore {
         url = u;
     }
     
-    String getUrl() {
+    public String getUrl() {
         return url;
     }
 
@@ -174,7 +174,7 @@ public class RMTxStore implements RMStore {
         userName = un;
     }
     
-    String getUserName() {
+    public String getUserName() {
         return userName;
     }    
    
@@ -581,7 +581,7 @@ public class RMTxStore implements RMStore {
     }
     
     @PostConstruct     
-    synchronized void init() {
+    public synchronized void init() {
         
         if (null == connection) {
             LOG.log(Level.FINE, "Using derby.system.home: {0}", System.getProperty("derby.system.home"));
