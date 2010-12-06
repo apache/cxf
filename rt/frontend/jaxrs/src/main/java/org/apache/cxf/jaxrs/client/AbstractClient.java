@@ -425,7 +425,7 @@ public class AbstractClient implements Client {
                 Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
                 if (length == null || Integer.parseInt(length.toString()) == 0
                     || status >= 400) {
-                    return cls == Response.class ? r : inputStream;
+                    return cls == Response.class ? r : status >= 400 ? inputStream : null;
                 }
             }
         } catch (IOException ex) {
