@@ -386,7 +386,7 @@ public final class URITemplate {
      * Variable of URITemplate. Variable has either "{varname:pattern}" syntax or "{varname}".
      */
     private static final class Variable extends UriChunk {
-        private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\w[-\\w\\.]*)(\\:(.+))?");
+        private static final Pattern VARIABLE_PATTERN = Pattern.compile("(\\w[-\\w\\.]*[ ]*)(\\:(.+))?");
         private String name;
         private Pattern pattern;
 
@@ -402,12 +402,13 @@ public final class URITemplate {
                 throw new IllegalArgumentException("uriChunk is empty");
             }
             if (CurlyBraceTokenizer.insideBraces(uriChunk)) {
-                uriChunk = CurlyBraceTokenizer.stripBraces(uriChunk);
+                uriChunk = CurlyBraceTokenizer.stripBraces(uriChunk).trim();
                 Matcher matcher = VARIABLE_PATTERN.matcher(uriChunk);
                 if (matcher.matches()) {
                     name = matcher.group(1).trim();
                     if (matcher.group(2) != null && matcher.group(3) != null) {
-                        pattern = Pattern.compile(matcher.group(3).trim());
+                        String patternExpression = matcher.group(3).trim();
+                        pattern = Pattern.compile(patternExpression);
                     }
                     return;
                 }

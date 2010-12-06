@@ -191,15 +191,30 @@ public class URITemplateTest extends Assert {
 
     @Test
     public void testBasicCustomExpression() throws Exception {
-        URITemplate uriTemplate = new URITemplate("/books/{bookId:[^/]+?}");
+        doTestBasicCustomExpression("/books/{bookId:[^/]+?}");
+    }
+    
+    @Test
+    public void testBasicCustomExpressionWithSpaces() throws Exception {
+        doTestBasicCustomExpression("/books/{ bookId : [^/]+? }");
+    }
+    
+    @Test
+    public void testBasicCustomExpressionWithSpaces2() throws Exception {
+        doTestBasicCustomExpression("/books/{ bookId }/");
+    }
+    
+    private void doTestBasicCustomExpression(String expression) {
+        URITemplate uriTemplate = new URITemplate(expression);
         MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
         boolean match = uriTemplate.match("/books/123/chapter/1", values);
         assertTrue(match);
         assertEquals("123", values.getFirst("bookId"));
         String subResourcePath = values.getFirst(URITemplate.FINAL_MATCH_GROUP);
-        assertEquals("/chapter/1", subResourcePath);
+        assertEquals("/chapter/1", subResourcePath);    
     }
+    
 
     @Test
     public void testBasicCustomExpression2() throws Exception {
