@@ -174,7 +174,7 @@ public final class URITemplate {
         for (String name : variables) {
             while (i <= groupCount) {
                 String value = m.group(i++);
-                if (value == null || value.length() == 0) {
+                if (value == null || value.length() == 0 && i < groupCount) {
                     continue;
                 }
                 templateVariableToValue.add(name, value);
