@@ -45,6 +45,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
 import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
@@ -165,6 +166,33 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         String data = "<nobook/>";
         getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception4",
                       data, "application/xml", 500);
+    }
+    
+    @Test
+    public void testServerWebApplicationException() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT + "/bookstore/webappexception");
+        wc.accept("application/xml");
+        try {
+            wc.get(Book.class);
+            fail("Exception expected");
+        } catch (ServerWebApplicationException ex) {
+            assertEquals(500, ex.getStatus());
+            assertEquals("This is a WebApplicationException", ex.getMessage());
+            assertTrue(ex.toString().contains("This is a WebApplicationException"));
+        }
+    }
+    
+    @Test
+    public void testServerWebApplicationExceptionWithProxy() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        try {
+            store.throwException();
+            fail("Exception expected");
+        } catch (ServerWebApplicationException ex) {
+            assertEquals(500, ex.getStatus());
+            assertEquals("This is a WebApplicationException", ex.getMessage());
+            assertTrue(ex.toString().contains("This is a WebApplicationException"));
+        }
     }
     
     @Test

@@ -37,7 +37,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -315,7 +314,8 @@ public class AbstractClient implements Client {
     protected ResponseBuilder setResponseBuilder(HttpURLConnection conn, Exchange exchange) throws Throwable {
         Message inMessage = exchange.getInMessage();
         if (conn == null) {
-            throw new WebApplicationException(); 
+            // unlikely to occur
+            throw new ClientWebApplicationException("HTTP Connection is null"); 
         }
         Integer responseCode = (Integer)exchange.get(Message.RESPONSE_CODE);
         if (responseCode == null) {
@@ -403,11 +403,10 @@ public class AbstractClient implements Client {
                     os.flush();
                 }
             } catch (Exception ex) {
-                throw new WebApplicationException(ex);
+                reportMessageHandlerProblem("MSG_WRITER_PROBLEM", cls, contentType, ex, null);
             }
-             
         } else {
-            reportNoMessageHandler("NO_MSG_WRITER", cls, contentType);
+            reportMessageHandlerProblem("NO_MSG_WRITER", cls, contentType, null, null);
         }
                                                                                  
     }
@@ -426,7 +425,7 @@ public class AbstractClient implements Client {
                 Object length = r.getMetadata().getFirst(HttpHeaders.CONTENT_LENGTH);
                 if (length == null || Integer.parseInt(length.toString()) == 0
                     || status >= 400) {
-                    return cls == Response.class ? r : cls == InputStream.class ? inputStream : null;
+                    return cls == Response.class ? r : inputStream;
                 }
             }
         } catch (IOException ex) {
@@ -446,13 +445,12 @@ public class AbstractClient implements Client {
                 return mbr.readFrom(cls, type, anns, contentType, 
                        new MetadataMap<String, Object>(r.getMetadata(), true, true), inputStream);
             } catch (Exception ex) {
-                throw new WebApplicationException(ex);
+                reportMessageHandlerProblem("MSG_READER_PROBLEM", cls, contentType, ex, r);
             }
-             
         } else if (cls == Response.class) {
             return r;
         } else {
-            reportNoMessageHandler("NO_MSG_READER", cls, contentType);
+            reportMessageHandlerProblem("NO_MSG_READER", cls, contentType, null, null);
         }
         return null;                                                
     }
@@ -497,14 +495,15 @@ public class AbstractClient implements Client {
         }
     }
     
-    protected static void reportNoMessageHandler(String name, Class<?> cls, MediaType ct) {
+    protected static void reportMessageHandlerProblem(String name, Class<?> cls, MediaType ct, 
+                                                      Throwable cause, Response response) {
         org.apache.cxf.common.i18n.Message errorMsg = 
             new org.apache.cxf.common.i18n.Message(name, 
                                                    BUNDLE,
                                                    cls,
                                                    ct.toString());
         LOG.severe(errorMsg.toString());
-        throw new WebApplicationException(415);
+        throw new ClientWebApplicationException(errorMsg.toString(), cause, response);
     }
     
     private static MediaType getResponseContentType(Response r) {
@@ -523,7 +522,7 @@ public class AbstractClient implements Client {
             connect.setRequestMethod(methodName);
             return connect;
         } catch (Exception ex) {
-            throw new WebApplicationException(ex);
+            throw new ClientWebApplicationException("REMOTE_CONNECTION_PROBLEM", ex, null);
         }
     }
     

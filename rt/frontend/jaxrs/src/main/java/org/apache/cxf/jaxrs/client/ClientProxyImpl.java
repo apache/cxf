@@ -35,7 +35,6 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -230,7 +229,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             } 
                         
             if (t == null) {
-                t = new WebApplicationException(r);
+                t = new ServerWebApplicationException(r);
             }
 
             
@@ -475,7 +474,7 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                                                    m.getDeclaringClass().getName(), 
                                                    m.getName());
         LOG.severe(errorMsg.toString());
-        throw new WebApplicationException(405);
+        throw new ClientWebApplicationException(errorMsg.toString());
     }
     
     // TODO : what we really need to do is to refactor JAXRSOutInterceptor so that
