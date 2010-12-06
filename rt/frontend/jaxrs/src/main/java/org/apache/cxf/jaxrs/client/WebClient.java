@@ -31,7 +31,6 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.HttpHeaders;
@@ -325,7 +324,7 @@ public class WebClient extends AbstractClient {
         Response r = doInvoke(httpMethod, body, responseClass, responseClass);
         
         if (r.getStatus() >= 400 && responseClass != null) {
-            throw new WebApplicationException(r);
+            throw new ServerWebApplicationException(r);
         }
         
         return responseClass.cast(r.getEntity());
@@ -344,7 +343,7 @@ public class WebClient extends AbstractClient {
                               new ParameterizedCollectionType<T>(memberClass));
         
         if (r.getStatus() >= 400) {
-            throw new WebApplicationException(r);
+            throw new ServerWebApplicationException(r);
         }
         
         return CastUtils.cast((Collection)r.getEntity(), memberClass);
@@ -625,7 +624,7 @@ public class WebClient extends AbstractClient {
         HttpURLConnection connect = (HttpURLConnection)m.get(HTTPConduit.KEY_HTTP_CONNECTION);
         if (connect == null && primaryError != null) {
             /** do we have a pre-connect error ? */
-            throw new WebApplicationException(primaryError);
+            throw new ClientWebApplicationException(primaryError);
         }
         return handleResponse(connect, m, responseClass, genericType);
     }
@@ -642,7 +641,7 @@ public class WebClient extends AbstractClient {
             
             return rb.build();
         } catch (Throwable ex) {
-            throw new WebApplicationException(ex);
+            throw new ClientWebApplicationException(ex);
         }
     }
     
