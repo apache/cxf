@@ -55,11 +55,18 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         throw new AccessDeniedException("Unauthorized");
     }
     
-    private Method getTargetMethod(Message m) {
+    protected Method getTargetMethod(Message m) {
         BindingOperationInfo bop = m.getExchange().get(BindingOperationInfo.class);
-        MethodDispatcher md = (MethodDispatcher) 
-            m.getExchange().get(Service.class).get(MethodDispatcher.class.getName());
-        return md.getMethod(bop);
+        if (bop != null) {
+            MethodDispatcher md = (MethodDispatcher) 
+                m.getExchange().get(Service.class).get(MethodDispatcher.class.getName());
+            return md.getMethod(bop);
+        } 
+        Method method = (Method)m.get("org.apache.cxf.resource.method");
+        if (method != null) {
+            return method;
+        }
+        throw new AccessDeniedException("Method is not available : Unauthorized");
     }
 
     protected boolean authorize(SecurityContext sc, Method method) {
