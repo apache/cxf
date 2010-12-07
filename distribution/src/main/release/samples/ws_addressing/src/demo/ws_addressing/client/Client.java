@@ -120,6 +120,19 @@ public final class Client {
         }
     }
 
+
+    private static AddressingProperties createMaps() {
+        // get Message Addressing Properties instance
+        AddressingBuilder builder = AddressingBuilder.getAddressingBuilder();
+        AddressingProperties maps = builder.newAddressingProperties();
+
+        // set MessageID property
+        AttributedURIType messageID = WSA_OBJECT_FACTORY.createAttributedURIType();
+        messageID.setValue("urn:uuid:" + System.currentTimeMillis());
+        maps.setMessageID(messageID);
+        return maps;
+    }
+
     /**
      * A series of invocations with explicitly propogated
      * Message Addressing Properties.
@@ -129,28 +142,16 @@ public final class Client {
         System.out.println("Explicit MessageAddressingProperties propagation");
         System.out.println("------------------------------------------------");
 
-        // get Message Addressing Properties instance
-        AddressingBuilder builder = AddressingBuilder.getAddressingBuilder();
-        AddressingProperties maps = builder.newAddressingProperties();
 
-        // set MessageID property
-        AttributedURIType messageID =
-            WSA_OBJECT_FACTORY.createAttributedURIType();
-        messageID.setValue("urn:uuid:" + System.currentTimeMillis());
-        maps.setMessageID(messageID);
 
         // associate MAPs with request context
         Map<String, Object> requestContext =
             ((BindingProvider)port).getRequestContext();
-        requestContext.put(CLIENT_ADDRESSING_PROPERTIES, maps);
+        requestContext.put(CLIENT_ADDRESSING_PROPERTIES, createMaps());
 
         System.out.println("Invoking sayHi...");
         String resp = port.sayHi();
         System.out.println("Server responded with: " + resp + "\n");
-
-        // clear the message ID to ensure a duplicate is not sent on the
-        // next invocation
-        maps.setMessageID(null);
 
         // set the RelatesTo property to the initial message ID, so that
         // the series of invocations are explicitly related
@@ -159,10 +160,12 @@ public final class Client {
         //maps.setRelatesTo(relatesTo);
 
         System.out.println("Invoking greetMe...");
+        requestContext.put(CLIENT_ADDRESSING_PROPERTIES, createMaps());
         resp = port.greetMe(USER_NAME);
         System.out.println("Server responded with: " + resp + "\n");
 
         System.out.println("Invoking greetMeOneWay...");
+        requestContext.put(CLIENT_ADDRESSING_PROPERTIES, createMaps());
         port.greetMeOneWay(USER_NAME);
         System.out.println("No response from server as method is OneWay\n");
 
