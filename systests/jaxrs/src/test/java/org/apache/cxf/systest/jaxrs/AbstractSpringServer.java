@@ -22,7 +22,6 @@ package org.apache.cxf.systest.jaxrs;
 import java.net.URISyntaxException;
 
 import org.apache.cxf.testutil.common.AbstractBusTestServerBase;
-
 import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.handler.DefaultHandler;
@@ -80,12 +79,17 @@ public abstract class AbstractSpringServer extends AbstractBusTestServerBase {
         handlers.setHandlers(new Handler[] {webappcontext, new DefaultHandler()});
 
         server.setHandler(handlers);
+        
         try {
+            configureServer(server);
             server.start();
-                       
         } catch (Exception e) {
             e.printStackTrace();
         }     
+    }
+    
+    protected void configureServer(org.eclipse.jetty.server.Server theserver) throws Exception {
+        
     }
     
     public void tearDown() throws Exception {

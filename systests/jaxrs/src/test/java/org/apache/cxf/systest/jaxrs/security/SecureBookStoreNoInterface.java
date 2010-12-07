@@ -98,4 +98,12 @@ public class SecureBookStoreNoInterface {
     public SecureBook getSecureBook() throws BookNotFoundFault {
         return new SecureBook("CXF in Action", 123L);
     }
+    
+    @GET
+    @Path("/thebook/{bookId}")
+    @Produces("application/xml")
+    @RolesAllowed({"ROLE_BOOK_OWNER" })
+    public Book getBook(@PathParam("bookId") Long id) {
+        return books.get(id);
+    }
 }

@@ -235,6 +235,7 @@ public class JAXRSInInterceptor extends AbstractPhaseInterceptor<Message> {
                                       MultivaluedMap<String, String> values,
                                       int numberOfResources) {
         message.getExchange().put(OperationResourceInfo.class, ori);
+        message.put("org.apache.cxf.resource.method", ori.getMethodToInvoke());
         message.put(URITemplate.TEMPLATE_PARAMETERS, values);
         
         String plainOperationName = ori.getMethodToInvoke().getName();
