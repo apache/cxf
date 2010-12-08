@@ -95,6 +95,8 @@ public abstract class AbstractHTTPDestination
     private static final long serialVersionUID = 1L;
 
     protected final Bus bus;
+    protected final DestinationRegistry registry;
+    protected final String path;
 
     // Configuration values
     protected HTTPServerPolicy server;
@@ -114,12 +116,15 @@ public abstract class AbstractHTTPDestination
      * @throws IOException
      */    
     public AbstractHTTPDestination(Bus b,
+                                   DestinationRegistry registry,
                                    EndpointInfo ei,
+                                   String path,
                                    boolean dp)
         throws IOException {
         super(b, getTargetReference(getAddressValue(ei, dp), b), ei);  
-        bus = b;
-        
+        this.bus = b;
+        this.registry = registry;
+        this.path = path;
         try {
             ServletRequest.class.getMethod("isAsyncSupported");
             isServlet3 = true;
@@ -691,4 +696,9 @@ public abstract class AbstractHTTPDestination
         return PolicyUtils.HTTPSERVERPOLICY_ASSERTION_QNAME.equals(type); 
     }
 
+    @Override
+    public void shutdown() {
+        registry.removeDestination(path);
+        super.shutdown();
+    }
 }

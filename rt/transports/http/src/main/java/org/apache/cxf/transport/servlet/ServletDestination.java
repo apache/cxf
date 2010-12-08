@@ -27,16 +27,14 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 
 
 public class ServletDestination extends AbstractHTTPDestination {
     
     static final Logger LOG = LogUtils.getL7dLogger(ServletDestination.class);
         
-    private static final long serialVersionUID = 1L;        
-    
-    final ServletTransportFactory factory;
-    final String path;
+    private static final long serialVersionUID = 1L;
     
     /**
      * Constructor, allowing subsititution of configuration.
@@ -48,14 +46,12 @@ public class ServletDestination extends AbstractHTTPDestination {
      * @throws IOException
      */    
     public ServletDestination(Bus b,
+                              DestinationRegistry registry,
                               EndpointInfo ei,
-                              ServletTransportFactory fact,
-                              String p)
+                              String path)
         throws IOException {
         // would add the default port to the address
-        super(b, ei, false);
-        factory = fact;
-        path = p;
+        super(b, registry, ei, path, false);
     }
     
     
@@ -75,16 +71,5 @@ public class ServletDestination extends AbstractHTTPDestination {
         
         return contextPath + address;
     }
-    
-    @Override
-    public void shutdown() {
-        try {
-            factory.removeDestination(path);
-        } catch (IOException ex) {
-            //ignore
-        }
-        
-        super.shutdown();
-    }
-    
+  
 }

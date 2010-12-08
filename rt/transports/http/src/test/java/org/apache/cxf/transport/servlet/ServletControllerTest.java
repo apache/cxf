@@ -24,8 +24,8 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.easymock.classextension.EasyMock;
 
 import org.junit.Assert;
@@ -36,11 +36,13 @@ public class ServletControllerTest extends Assert {
 
     private HttpServletRequest req;
     private HttpServletResponse res;
+    private DestinationRegistry registry;
     
     @Before
     public void setUp() {
         req = EasyMock.createMock(HttpServletRequest.class);
         res = EasyMock.createMock(HttpServletResponse.class);
+        registry = EasyMock.createMock(DestinationRegistry.class);
     }
     
     @Test
@@ -54,7 +56,7 @@ public class ServletControllerTest extends Assert {
         req.getParameter("formatted");
         EasyMock.expectLastCall().andReturn("true");
         EasyMock.replay(req);
-        TestServletController sc = new TestServletController();
+        TestServletController sc = new TestServletController(registry);
         sc.invoke(req, res);
         assertTrue(sc.generateListCalled());
         assertFalse(sc.generateUnformattedCalled());
@@ -72,7 +74,7 @@ public class ServletControllerTest extends Assert {
         req.getParameter("formatted");
         EasyMock.expectLastCall().andReturn("false");
         EasyMock.replay(req);
-        TestServletController sc = new TestServletController();
+        TestServletController sc = new TestServletController(registry);
         sc.invoke(req, res);
         assertFalse(sc.generateListCalled());
         assertTrue(sc.generateUnformattedCalled());
@@ -83,8 +85,14 @@ public class ServletControllerTest extends Assert {
     public void testHideServiceListing() throws Exception {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn(null);
+        registry.getDestinationForPath("", true);
+        EasyMock.expectLastCall().andReturn(null).atLeastOnce();
+        AbstractHTTPDestination dest = EasyMock.createMock(AbstractHTTPDestination.class);
+        registry.checkRestfulRequest("");
+        EasyMock.expectLastCall().andReturn(dest).atLeastOnce();
         EasyMock.replay(req);
-        TestServletController sc = new TestServletController();
+        EasyMock.replay(registry);
+        TestServletController sc = new TestServletController(registry);
         sc.setHideServiceList(true);
         sc.invoke(req, res);
         assertFalse(sc.generateListCalled());
@@ -103,7 +111,7 @@ public class ServletControllerTest extends Assert {
         req.getParameter("formatted");
         EasyMock.expectLastCall().andReturn("true");
         EasyMock.replay(req);
-        TestServletController sc = new TestServletController();
+        TestServletController sc = new TestServletController(registry);
         sc.setServiceListRelativePath("/listing");
         sc.invoke(req, res);
         assertTrue(sc.generateListCalled());
@@ -119,7 +127,7 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
@@ -132,7 +140,7 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
@@ -145,7 +153,7 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
@@ -158,7 +166,7 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b;c=d").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
@@ -171,7 +179,7 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
@@ -184,34 +192,23 @@ public class ServletControllerTest extends Assert {
         req.getPathInfo();
         EasyMock.expectLastCall().andReturn("/bar;a=b").anyTimes();
         EasyMock.replay(req);
-        String url = new ServletController().getBaseURL(req);
+        String url = new ServletController(null, null, null).getBaseURL(req);
         assertEquals("http://localhost:8080/services", url);
         
     }
     
     public static class TestServletController extends ServletController {
-        
+
         private boolean generateListCalled;
         private boolean generateUnformattedCalled;
         private boolean invokeDestinationCalled;
-        
-        @Override
-        protected ServletDestination getDestination(String address) {
-            return null;
+
+        public TestServletController(DestinationRegistry destinationRegistry) {
+            super(destinationRegistry, null, null);
         }
         
         @Override
         protected void updateDests(HttpServletRequest request) { 
-        }
-
-        @Override
-        protected ServletDestination checkRestfulRequest(HttpServletRequest request) 
-            throws IOException {
-            ServletDestination sd = EasyMock.createMock(ServletDestination.class);
-            sd.getMessageObserver();
-            EasyMock.expectLastCall().andReturn(EasyMock.createMock(MessageObserver.class));
-            EasyMock.replay(sd);
-            return sd;
         }
         
         @Override

@@ -23,9 +23,6 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,7 +30,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -45,6 +41,8 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
@@ -53,21 +51,17 @@ public class ServletController extends AbstractServletController {
     
     private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
     
-    private ServletTransportFactory transport;
     private Bus bus;
     private volatile String lastBase = "";
+
+    private final DestinationRegistry destinationRegistry;
     
-    public ServletController(ServletTransportFactory df,
+    public ServletController(DestinationRegistry destinationRegistry,
                              ServletConfig config,
-                             ServletContext context, 
                              Bus b) {
         super(config);
-        this.transport = df;
+        this.destinationRegistry = destinationRegistry;
         this.bus = b;
-        this.transport.setServletController(this);
-    }
-    
-    ServletController() {
     }
         
     String getLastBaseURL() {
@@ -81,9 +75,9 @@ public class ServletController extends AbstractServletController {
         if (base.equals(lastBase)) {
             return;
         }
-        Set<String> paths = transport.getDestinationsPaths();
+        Set<String> paths = destinationRegistry.getDestinationsPaths();
         for (String path : paths) {
-            ServletDestination d2 = transport.getDestinationForPath(path);
+            AbstractHTTPDestination d2 = destinationRegistry.getDestinationForPath(path);
             String ad = d2.getEndpointInfo().getAddress();
             if (ad == null 
                 && d2.getAddress() != null
@@ -112,14 +106,15 @@ public class ServletController extends AbstractServletController {
         lastBase = base;
     }
 
-    public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
+    public void invoke(HttpServletRequest request, HttpServletResponse res) 
+        throws ServletException {
         try {
             EndpointInfo ei = new EndpointInfo();
             
             String address = request.getPathInfo() == null ? "" : request.getPathInfo();
             ei.setAddress(address);
             
-            ServletDestination d = getDestination(ei.getAddress());
+            AbstractHTTPDestination d = destinationRegistry.getDestinationForPath(ei.getAddress(), true);
             if (d == null) {
                 if (!isHideServiceList && (request.getRequestURI().endsWith(serviceListRelativePath)
                     || request.getRequestURI().endsWith(serviceListRelativePath + "/")
@@ -135,8 +130,8 @@ public class ServletController extends AbstractServletController {
                         generateServiceList(request, res);
                     }
                 } else {
-                    d = checkRestfulRequest(request);
-                    if (d == null || d.getMessageObserver() == null) {                        
+                    d = destinationRegistry.checkRestfulRequest(address);
+                    if (d == null) {                        
                         LOG.warning("Can't find the request for " 
                                     + request.getRequestURL() + "'s Observer ");
                         generateNotFound(request, res);
@@ -193,26 +188,8 @@ public class ServletController extends AbstractServletController {
             throw new ServletException(e);
         } 
     }
-    
-    protected ServletDestination getDestination(String address) {
-        return (ServletDestination)transport.getDestinationForPath(address, true);
-    }
-    
-    protected ServletDestination checkRestfulRequest(HttpServletRequest request) throws IOException {        
-        
-        String address = request.getPathInfo() == null ? "" : request.getPathInfo();
-        
-        int len = -1;
-        ServletDestination ret = null;
-        for (String path : transport.getDestinationsPaths()) {           
-            if (address.startsWith(path)
-                && path.length() > len) {
-                ret = transport.getDestinationForPath(path);
-                len = path.length();
-            }
-        }
-        return ret; 
-    }
+
+
     
     @SuppressWarnings("unchecked")
     protected void generateServiceList(HttpServletRequest request, HttpServletResponse response)
@@ -239,7 +216,7 @@ public class ServletController extends AbstractServletController {
         }
         response.getWriter().write("</head><body>");
         
-        List<ServletDestination> destinations = getServletDestinations();
+        List<AbstractHTTPDestination> destinations = destinationRegistry.getSortedDestinations();
             
         if (destinations.size() > 0) {
             List<String> privateEndpoints = 
@@ -256,13 +233,13 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("</body></html>");
     }
 
-    private void writeSOAPEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
+    private void writeSOAPEndpoints(HttpServletResponse response, List<AbstractHTTPDestination> destinations,
                                     List<String> privateEndpoints, Map<String, String> atomMap)
         throws IOException {
         response.getWriter().write("<span class=\"heading\">Available SOAP services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (ServletDestination sd : destinations) {
+        for (AbstractHTTPDestination sd : destinations) {
             
             if (null != sd.getEndpointInfo().getName() 
                 && null != sd.getEndpointInfo().getInterface()
@@ -296,12 +273,14 @@ public class ServletController extends AbstractServletController {
     }
     
     
-    private void writeRESTfulEndpoints(HttpServletResponse response, List<ServletDestination> destinations,
-                                       List<String> privateEndpoints, Map<String, String> atomMap)
+    private void writeRESTfulEndpoints(HttpServletResponse response, 
+                                       List<AbstractHTTPDestination> destinations,
+                                       List<String> privateEndpoints, 
+                                       Map<String, String> atomMap)
         throws IOException {
         
-        List<ServletDestination> restfulDests = new ArrayList<ServletDestination>();
-        for (ServletDestination sd : destinations) {
+        List<AbstractHTTPDestination> restfulDests = new ArrayList<AbstractHTTPDestination>();
+        for (AbstractHTTPDestination sd : destinations) {
             // use some more reasonable check - though this one seems to be the only option at the moment
             if (null == sd.getEndpointInfo().getInterface() 
                 && !isPrivate(sd.getEndpointInfo(), privateEndpoints)) {
@@ -315,7 +294,7 @@ public class ServletController extends AbstractServletController {
         response.getWriter().write("<span class=\"heading\">Available RESTful services:</span><br/>");
         response.getWriter().write("<table " + (serviceListStyleSheet == null
                 ? "cellpadding=\"1\" cellspacing=\"1\" border=\"1\" width=\"100%\"" : "") + ">");
-        for (ServletDestination sd : restfulDests) {
+        for (AbstractHTTPDestination sd : restfulDests) {
             response.getWriter().write("<tr><td>");
             String address = sd.getEndpointInfo().getAddress();
             response.getWriter().write("<span class=\"field\">Endpoint address:</span> "
@@ -373,32 +352,12 @@ public class ServletController extends AbstractServletController {
         }
     }
 
-    private List<ServletDestination> getServletDestinations() {
-        List<ServletDestination> destinations = new LinkedList<ServletDestination>(
-                transport.getDestinations());
-        Collections.sort(destinations, new Comparator<ServletDestination>() {
-            public int compare(ServletDestination o1, ServletDestination o2) {
-                if (o1.getEndpointInfo().getInterface() == null) {
-                    return -1;
-                }
-                if (o2.getEndpointInfo().getInterface() == null) {
-                    return 1;
-                }
-                return o1.getEndpointInfo().getInterface().getName()
-                        .getLocalPart().compareTo(
-                                o2.getEndpointInfo().getInterface().getName()
-                                        .getLocalPart());
-            }
-        });
-
-        return destinations;
-    }
 
     protected void generateUnformattedServiceList(HttpServletRequest request,
             HttpServletResponse response) throws IOException {
         response.setContentType("text/plain; charset=UTF-8");
 
-        List<ServletDestination> destinations = getServletDestinations();
+        List<AbstractHTTPDestination> destinations = destinationRegistry.getSortedDestinations();
         if (destinations.size() > 0) {
             writeUnformattedSOAPEndpoints(response, destinations, request.getParameter("wsdlList"));
             writeUnformattedRESTfulEndpoints(response, destinations);
@@ -408,12 +367,12 @@ public class ServletController extends AbstractServletController {
     }
     
     private void writeUnformattedSOAPEndpoints(HttpServletResponse response,
-                                               List<ServletDestination> destinations,
+                                               List<AbstractHTTPDestination> destinations,
                                                Object renderParam) 
         throws IOException {
         boolean renderWsdlList = "true".equals(renderParam);
         
-        for (ServletDestination sd : destinations) {
+        for (AbstractHTTPDestination sd : destinations) {
             
             if (null != sd.getEndpointInfo().getInterface()) {
             
@@ -430,9 +389,9 @@ public class ServletController extends AbstractServletController {
     }
     
     private void writeUnformattedRESTfulEndpoints(HttpServletResponse response,
-                                                  List<ServletDestination> destinations) 
+                                                  List<AbstractHTTPDestination> destinations) 
         throws IOException {
-        for (ServletDestination sd : destinations) {
+        for (AbstractHTTPDestination sd : destinations) {
             if (null == sd.getEndpointInfo().getInterface()) {
                 String address = sd.getEndpointInfo().getAddress();
                 response.getWriter().write(address + "?_wadl&_type=xml");

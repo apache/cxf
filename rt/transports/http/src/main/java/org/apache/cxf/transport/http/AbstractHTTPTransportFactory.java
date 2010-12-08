@@ -56,11 +56,24 @@ public abstract class AbstractHTTPTransportFactory
         URI_PREFIXES.add("https://");
     }
 
+    protected final DestinationRegistry registry;
+    
+    public AbstractHTTPTransportFactory() {
+        this(new DestinationRegistryImpl());
+    }
+    
+    public AbstractHTTPTransportFactory(DestinationRegistry registry) {
+        this.registry = registry;
+    }
+
+    public DestinationRegistry getRegistry() {
+        return registry;
+    }
+    
     /**
      * This call is used by CXF ExtensionManager to inject the activationNamespaces
      * @param ans The transport ids.
      */
-    
     public void setActivationNamespaces(Collection<String> ans) {
         setTransportIds(new ArrayList<String>(ans));
     }

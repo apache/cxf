@@ -21,14 +21,8 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
-import java.net.URLDecoder;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.Resource;
 
@@ -37,17 +31,13 @@ import org.apache.cxf.common.util.StringUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 import org.apache.cxf.wsdl.http.AddressType;
 
 public class ServletTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
-    
-    private Map<String, ServletDestination> destinations = 
-        new ConcurrentHashMap<String, ServletDestination>();
-    private Map<String, ServletDestination> decodedDestinations = 
-        new ConcurrentHashMap<String, ServletDestination>();
-    
+   
     private ServletController controller;
     
     public ServletTransportFactory(Bus b) {
@@ -72,21 +62,15 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
     public void setBus(Bus b) {
         super.setBus(b);
     }
-    
-    public void removeDestination(String path) throws IOException {
-        destinations.remove(path);
-        decodedDestinations.remove(URLDecoder.decode(path, "ISO-8859-1"));
-    }
-    
+
     public Destination getDestination(EndpointInfo endpointInfo)
         throws IOException {
-        ServletDestination d = getDestinationForPath(endpointInfo.getAddress());
+        AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) { 
-            String path = getTrimmedPath(endpointInfo.getAddress());
-            d = new ServletDestination(getBus(), endpointInfo, this, path);
-            destinations.put(path, d);
-            decodedDestinations.put(URLDecoder.decode(path, "ISO-8859-1"), d);
-            
+            String path = registry.getTrimmedPath(endpointInfo.getAddress());
+            d = new ServletDestination(getBus(), registry, endpointInfo, path);
+            registry.addDestination(path, d);
+
             if (controller != null
                 && !StringUtils.isEmpty(controller.getLastBaseURL())) {
                 String ad = d.getEndpointInfo().getAddress();
@@ -103,45 +87,5 @@ public class ServletTransportFactory extends AbstractHTTPTransportFactory
         }
         return d;
     }
-    
-    public ServletDestination getDestinationForPath(String path) {
-        return getDestinationForPath(path, false);
-    }
-    public ServletDestination getDestinationForPath(String path, boolean tryDecoding) {
-        // to use the url context match  
-        String m = getTrimmedPath(path);
-        ServletDestination s = destinations.get(m);
-        if (s == null) {
-            s = decodedDestinations.get(m);
-        }
-        return s;
-    }
-
-    static String getTrimmedPath(String path) {
-        if (path == null) {
-            return "/";
-        }
-        final String lh = "http://localhost/";
-        final String lhs = "https://localhost/";
-        
-        if (path.startsWith(lh)) {
-            path = path.substring(lh.length());
-        } else if (path.startsWith(lhs)) {
-            path = path.substring(lhs.length());
-        }
-        if (!path.startsWith("/")) {
-            path = "/" + path;
-            
-        }
-        return path;
-    }
-    
-    public Collection<ServletDestination> getDestinations() {
-        return Collections.unmodifiableCollection(destinations.values());        
-    }
-    public Set<String> getDestinationsPaths() {
-        return Collections.unmodifiableSet(destinations.keySet());        
-    }
-
-    
+  
 }

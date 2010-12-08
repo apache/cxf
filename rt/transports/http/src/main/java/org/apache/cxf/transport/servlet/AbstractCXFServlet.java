@@ -54,11 +54,10 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
     
     public ServletController createServletController(ServletConfig servletConfig) {
         ServletController newController =
-            new ServletController(servletTransportFactory,
+            new ServletController(servletTransportFactory.getRegistry(),
                                   servletConfig,
-                                  this.getServletContext(), 
                                   bus);
-    
+        servletTransportFactory.setServletController(newController);
         if (servletConfig.getInitParameter("disable-address-updates") == null) {
             newController.setDisableAddressUpdates(disableAddressUpdates);
         }
