@@ -59,6 +59,7 @@ import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -116,13 +117,12 @@ public class JettyHTTPDestinationTest extends Assert {
     private class EasyMockJettyHTTPDestination
         extends JettyHTTPDestination {
 
-        public EasyMockJettyHTTPDestination(
-                Bus                       b,
-                JettyHTTPTransportFactory ci, 
-                EndpointInfo              endpointInfo,
-                JettyHTTPServerEngine     easyMockEngine
-        ) throws IOException {
-            super(b, ci, endpointInfo);
+        public EasyMockJettyHTTPDestination(Bus bus,
+                                            DestinationRegistry registry,
+                                            EndpointInfo endpointInfo,
+                                            JettyHTTPServerEngineFactory serverEngineFactory,
+                                            JettyHTTPServerEngine easyMockEngine) throws IOException {
+            super(bus, registry, endpointInfo, serverEngineFactory);
             engine = easyMockEngine;
         }
         
@@ -228,7 +228,9 @@ public class JettyHTTPDestinationTest extends Assert {
         
         TestJettyDestination testDestination = 
             new TestJettyDestination(transportFactory.getBus(), 
-                                     transportFactory, ei);
+                                     transportFactory.getRegistry(), 
+                                     ei, 
+                                     transportFactory.getJettyHTTPServerEngineFactory());
         testDestination.finalizeConfig();
         Message mi = testDestination.retrieveFromContinuation(httpRequest);
         assertNull("Continuations must be ignored", mi);
@@ -247,11 +249,14 @@ public class JettyHTTPDestinationTest extends Assert {
         Destination d1 = transportFactory.getDestination(ei);
         
         Destination d2 = transportFactory.getDestination(ei);
+        
+        // Second get should not generate a new destination. It should just retrieve the existing one
         assertEquals(d1, d2);
         
         d2.shutdown();
         
         Destination d3 = transportFactory.getDestination(ei);
+        // Now a new destination should have been created
         assertNotSame(d1, d3);
     }
     
@@ -441,7 +446,7 @@ public class JettyHTTPDestinationTest extends Assert {
         
         JettyHTTPDestination dest = 
             new EasyMockJettyHTTPDestination(
-                    bus, transportFactory, endpointInfo, engine);
+                    bus, transportFactory.getRegistry(), endpointInfo, null, engine);
         assertEquals(policy, dest.getServer());
     }
         
@@ -596,8 +601,9 @@ public class JettyHTTPDestinationTest extends Assert {
         EasyMock.replay(engine);
         
         JettyHTTPDestination dest = new EasyMockJettyHTTPDestination(bus,
-                                                             transportFactory,
+                                                             transportFactory.getRegistry(),
                                                              endpointInfo,
+                                                             null,
                                                              engine);
         dest.retrieveEngine();
         policy = dest.getServer();
@@ -954,10 +960,11 @@ public class JettyHTTPDestinationTest extends Assert {
     }
     
     private static class TestJettyDestination extends JettyHTTPDestination {
-        public TestJettyDestination(Bus b,
-                                    JettyHTTPTransportFactory ci, 
-                                    EndpointInfo endpointInfo) throws IOException {
-            super(b, ci, endpointInfo);
+        public TestJettyDestination(Bus bus,
+                                    DestinationRegistry registry,
+                                    EndpointInfo endpointInfo,
+                                    JettyHTTPServerEngineFactory serverEngineFactory) throws IOException {
+            super(bus, registry, endpointInfo, serverEngineFactory);
         }
         
         @Override

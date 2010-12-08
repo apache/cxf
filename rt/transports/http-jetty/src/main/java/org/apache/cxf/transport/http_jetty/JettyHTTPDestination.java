@@ -43,6 +43,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transport.http_jetty.continuations.JettyContinuationProvider;
 import org.apache.cxf.transport.https.CertConstraintsJaxBUtils;
@@ -58,7 +59,6 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
         LogUtils.getL7dLogger(JettyHTTPDestination.class);
 
     protected JettyHTTPServerEngine engine;
-    protected JettyHTTPTransportFactory transportFactory;
     protected JettyHTTPServerEngineFactory serverEngineFactory;
     protected ServletContext servletContext;
     protected URL nurl;
@@ -77,18 +77,18 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
      * @param b the associated Bus
      * @param ci the associated conduit initiator
      * @param endpointInfo the endpoint info of the destination
+     * @param serverEngineFactory 
      * @throws IOException
      */
     public JettyHTTPDestination(
-            Bus                       b,
-            JettyHTTPTransportFactory ci, 
-            EndpointInfo              endpointInfo
+            Bus bus,
+            DestinationRegistry registry, 
+            EndpointInfo ei, 
+            JettyHTTPServerEngineFactory serverEngineFactory
     ) throws IOException {
-        
         //Add the defualt port if the address is missing it
-        super(b, endpointInfo, true);
-        this.transportFactory = ci;
-        this.serverEngineFactory = ci.getJettyHTTPServerEngineFactory();
+        super(bus, registry, ei, getAddressValue(ei, true).getAddress(), true);
+        this.serverEngineFactory = serverEngineFactory;
         nurl = new URL(endpointInfo.getAddress());
     }
 
@@ -331,14 +331,7 @@ public class JettyHTTPDestination extends AbstractHTTPDestination {
             }
         }
     }
-
-    @Override
-    public void shutdown() {
-        transportFactory.removeDestination(endpointInfo);
-        
-        super.shutdown();
-    }
-    
+ 
     public ServerEngine getEngine() {
         return engine;
     }

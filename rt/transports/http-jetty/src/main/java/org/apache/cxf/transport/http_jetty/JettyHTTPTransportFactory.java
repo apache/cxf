@@ -20,8 +20,6 @@ package org.apache.cxf.transport.http_jetty;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -31,14 +29,12 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 
 public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
     implements DestinationFactory {
 
-    private Map<String, JettyHTTPDestination> destinations = 
-        new ConcurrentHashMap<String, JettyHTTPDestination>();
-    
     public JettyHTTPTransportFactory() {
         super();
     }
@@ -77,11 +73,11 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         return serverEngineFactory;
     }
     
-    public Destination getDestination(EndpointInfo endpointInfo) 
+    public synchronized Destination getDestination(EndpointInfo endpointInfo) 
         throws IOException {
         
         String addr = endpointInfo.getAddress();
-        JettyHTTPDestination destination = addr == null ? null : destinations.get(addr);
+        AbstractHTTPDestination destination = registry.getDestinationForPath(addr);
         if (destination == null) {
             destination = createDestination(endpointInfo);
         }
@@ -89,32 +85,23 @@ public class JettyHTTPTransportFactory extends AbstractHTTPTransportFactory
         return destination;
     }
     
-    private synchronized JettyHTTPDestination createDestination(
+    private synchronized AbstractHTTPDestination createDestination(
         EndpointInfo endpointInfo
     ) throws IOException {
-        
-        String addr = endpointInfo.getAddress();
-        JettyHTTPDestination destination = addr == null ? null : destinations.get(addr);
-        if (destination == null) {
-            destination = 
-                new JettyHTTPDestination(getBus(), this, endpointInfo);
-            
-            destinations.put(endpointInfo.getAddress(), destination);
-            
-            configure(destination);
-            try {
-                destination.finalizeConfig();
-            } catch (GeneralSecurityException ex) {
-                throw new IIOException("JSSE Security Exception ", ex);
-            }
+        JettyHTTPDestination destination = 
+            new JettyHTTPDestination(getBus(), 
+                                     registry,  
+                                     endpointInfo, 
+                                     this.getJettyHTTPServerEngineFactory());
+
+        registry.addDestination(endpointInfo.getAddress(), destination);
+        configure(destination);
+        try {
+            destination.finalizeConfig();
+        } catch (GeneralSecurityException ex) {
+            throw new IIOException("JSSE Security Exception ", ex);
         }
         return destination;
     }
-    
-    /**
-     * This function removes the destination for a particular endpoint.
-     */
-    void removeDestination(EndpointInfo ei) {
-        destinations.remove(ei.getAddress());
-    }
+
 }
