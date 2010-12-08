@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http_osgi;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 import org.junit.After;
@@ -34,14 +35,14 @@ public class OsgiDestinationTest extends Assert {
     private static final String ADDRESS = "http://bar/snafu";
     private IMocksControl control; 
     private Bus bus;
-    private OsgiDestinationRegistryIntf registry;
+    private DestinationRegistry registry;
     private EndpointInfo endpoint;
 
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
-        registry = control.createMock(OsgiDestinationRegistryIntf.class);
+        registry = control.createMock(DestinationRegistry.class);
         endpoint = new EndpointInfo();
         endpoint.setAddress(ADDRESS);
     }

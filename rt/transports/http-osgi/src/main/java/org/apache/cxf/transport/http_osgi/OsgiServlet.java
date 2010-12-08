@@ -25,14 +25,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.AbstractHTTPServlet;
 
 public class OsgiServlet extends AbstractHTTPServlet {
     
-    private OsgiDestinationRegistryIntf transport;
+    private DestinationRegistry transport;
     private OsgiServletController controller;
     
-    public OsgiServlet(OsgiDestinationRegistryIntf transport) {
+    public OsgiServlet(DestinationRegistry transport) {
         this.transport = transport;
     }
 
@@ -45,7 +46,7 @@ public class OsgiServlet extends AbstractHTTPServlet {
     public void destroy() {
     }
 
-    public OsgiDestinationRegistryIntf getTransport() {
+    public DestinationRegistry getTransport() {
         return transport;
     }
 

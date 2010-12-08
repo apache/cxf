@@ -25,6 +25,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 
 
 public class OsgiDestination extends AbstractHTTPDestination {
@@ -32,9 +33,6 @@ public class OsgiDestination extends AbstractHTTPDestination {
     static final Logger LOG = LogUtils.getL7dLogger(OsgiDestination.class);
 
     private static final long serialVersionUID = 1L;
-
-    final OsgiDestinationRegistryIntf factory;
-    final String path;
 
     /**
      * Constructor, allowing substitution of configuration.
@@ -48,13 +46,11 @@ public class OsgiDestination extends AbstractHTTPDestination {
      */
     public OsgiDestination(Bus b,
                            EndpointInfo ei,
-                           OsgiDestinationRegistryIntf fact,
-                           String p)
+                           DestinationRegistry registry,
+                           String path)
         throws IOException {
         // would add the default port to the address
-        super(b, ei, false);
-        factory = fact;
-        path = p;
+        super(b, registry, ei, path, false);
     }
 
 
@@ -64,12 +60,6 @@ public class OsgiDestination extends AbstractHTTPDestination {
 
     protected Bus getBus() {
         return bus;
-    }
-
-    @Override
-    public void shutdown() {
-        factory.removeDestination(path);
-        super.shutdown();
     }
 
 }

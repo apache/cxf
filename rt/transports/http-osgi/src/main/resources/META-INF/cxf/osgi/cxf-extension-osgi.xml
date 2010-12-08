@@ -27,9 +27,10 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
     <bean id="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
           class="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
           init-method="init">
+          
+        <constructor-arg ref="osgiDestinationRegistry"/>
 
         <property name="bus" ref="cxf"/>
-        <property name="registry" ref="osgiDestinationRegistry" />
         <property name="transportIds">
             <set>
                 <value>http://cxf.apache.org/bindings/xformat</value>

@@ -35,7 +35,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
 
     <ctx:property-placeholder properties-ref="cxfOsgiProperties"/>
 
-    <bean id="destinationRegistry" class="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistry" />
+    <bean id="destinationRegistry" class="org.apache.cxf.transport.http.DestinationRegistryImpl" />
 
     <bean id="osgiServlet" class="org.apache.cxf.transport.http_osgi.SpringOsgiServlet">
         <constructor-arg ref="destinationRegistry"/>
@@ -48,7 +48,7 @@ http://www.springframework.org/schema/context http://www.springframework.org/sch
         </osgi:service-properties>
     </osgi:service>
 
-    <osgi:service ref="destinationRegistry" interface="org.apache.cxf.transport.http_osgi.OsgiDestinationRegistryIntf">
+    <osgi:service ref="destinationRegistry" interface="org.apache.cxf.transport.http.DestinationRegistry">
     </osgi:service>
 
 </beans>

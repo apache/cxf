@@ -38,6 +38,7 @@ import org.apache.cxf.resource.ResourceManager;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.AbstractServletController;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -46,8 +47,8 @@ import org.apache.cxf.wsdl.http.AddressType;
 public class OsgiServletController extends AbstractServletController {
     private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
       
-    private OsgiDestinationRegistryIntf destinationRegistry;
-    public OsgiServletController(OsgiDestinationRegistryIntf destinationRegistry, ServletConfig config) {
+    private DestinationRegistry destinationRegistry;
+    public OsgiServletController(DestinationRegistry destinationRegistry, ServletConfig config) {
         super(config);
         this.destinationRegistry = destinationRegistry;
     }

@@ -24,6 +24,8 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -38,13 +40,13 @@ public class OsgiTransportFactoryTest extends Assert {
     private IMocksControl control; 
     private OsgiTransportFactory factory;
     private Bus bus;
-    private OsgiDestinationRegistryIntf registry;
+    private DestinationRegistry registry;
 
     @Before
     public void setUp() {
         control = EasyMock.createNiceControl();
-        factory = new OsgiTransportFactory();
-        registry = control.createMock(OsgiDestinationRegistryIntf.class);
+        registry = control.createMock(DestinationRegistry.class);
+        factory = new OsgiTransportFactory(registry);
         bus = control.createMock(Bus.class);
         bus.getExtension(DestinationFactoryManager.class);
         EasyMock.expectLastCall().andReturn(null).anyTimes();
@@ -60,10 +62,13 @@ public class OsgiTransportFactoryTest extends Assert {
     
     @Test
     public void testGetDestination() throws Exception {
-        registry.addDestination(EasyMock.eq("/snafu"), EasyMock.isA(OsgiDestination.class));
+        registry.getDestinationForPath(EasyMock.eq("snafu"));
+        EasyMock.expectLastCall().andReturn(null);
+        registry.addDestination(EasyMock.eq("/snafu"), EasyMock.isA(AbstractHTTPDestination.class));
+        registry.getTrimmedPath(EasyMock.eq("snafu"));
+        EasyMock.expectLastCall().andReturn("/snafu").anyTimes();
         control.replay();
-        
-        factory.setRegistry(registry);
+
         factory.setBus(bus);
 
         EndpointInfo endpoint = new EndpointInfo();

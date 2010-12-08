@@ -22,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 
@@ -29,7 +30,7 @@ public class SpringOsgiServlet extends OsgiServlet implements ApplicationContext
 
     private ApplicationContext applicationContext;
 
-    public SpringOsgiServlet(OsgiDestinationRegistryIntf transport) {
+    public SpringOsgiServlet(DestinationRegistry transport) {
         super(transport);
     }
 

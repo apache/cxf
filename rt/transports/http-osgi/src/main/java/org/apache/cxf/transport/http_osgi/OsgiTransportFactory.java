@@ -26,13 +26,12 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
+import org.apache.cxf.transport.http.DestinationRegistry;
 
 public class OsgiTransportFactory extends AbstractHTTPTransportFactory implements DestinationFactory {
-
-    private OsgiDestinationRegistryIntf registry;
-
-    public void setRegistry(OsgiDestinationRegistryIntf registry) {
-        this.registry = registry;
+    
+    public OsgiTransportFactory(DestinationRegistry registry) {
+        super(registry);
     }
 
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
@@ -42,7 +41,7 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         }
         AbstractHTTPDestination d = registry.getDestinationForPath(endpointInfo.getAddress());
         if (d == null) {
-            String path = OsgiDestinationRegistry.getTrimmedPath(endpointInfo.getAddress());
+            String path = registry.getTrimmedPath(endpointInfo.getAddress());
             d = new OsgiDestination(getBus(), endpointInfo, registry, path);
             registry.addDestination(path, d);
         }

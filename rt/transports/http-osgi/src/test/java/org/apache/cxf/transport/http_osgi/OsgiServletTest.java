@@ -45,6 +45,7 @@ import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -78,7 +79,7 @@ public class OsgiServletTest extends Assert {
         "<html><body>No service was found.</body></html>";
     private IMocksControl control; 
     private Bus bus;
-    private OsgiDestinationRegistryIntf registry;
+    private DestinationRegistry registry;
     private OsgiDestination destination;
     private ServletConfig config;
     private ServletContext context;
@@ -95,7 +96,7 @@ public class OsgiServletTest extends Assert {
     public void setUp() {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
-        registry = control.createMock(OsgiDestinationRegistryIntf.class);
+        registry = control.createMock(DestinationRegistry.class);
         destination = control.createMock(OsgiDestination.class);
         context = control.createMock(ServletContext.class);
         config = control.createMock(ServletConfig.class);
