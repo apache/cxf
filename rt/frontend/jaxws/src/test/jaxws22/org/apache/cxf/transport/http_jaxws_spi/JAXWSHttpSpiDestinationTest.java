@@ -32,6 +32,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.DestinationRegistryImpl;
 import org.apache.cxf.transport.http.WSDLQueryHandler;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -77,7 +78,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
     @Test
     public void testCtor() throws Exception {
         JAXWSHttpSpiDestination destination = 
-            new JAXWSHttpSpiDestination(bus, endpoint);
+            new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
 
         assertNull(destination.getMessageObserver());
         assertNotNull(destination.getAddress());
@@ -93,7 +94,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         control.replay();
 
         JAXWSHttpSpiDestination destination = 
-            new JAXWSHttpSpiDestination(bus, endpoint);
+            new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
         destination.setMessageObserver(observer);
 
         destination.doService(new HttpServletRequestAdapter(exchange),
@@ -117,7 +118,7 @@ public class JAXWSHttpSpiDestinationTest extends Assert {
         control.replay();
 
         JAXWSHttpSpiDestination destination = 
-            new JAXWSHttpSpiDestination(bus, endpoint);
+            new JAXWSHttpSpiDestination(bus, new DestinationRegistryImpl(), endpoint);
         destination.setMessageObserver(observer);
 
         destination.doService(new HttpServletRequestAdapter(exchange),

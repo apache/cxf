@@ -41,7 +41,7 @@ public class JAXWSHttpSpiTransportFactory extends AbstractHTTPTransportFactory i
 
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         if (destination == null) { 
-            destination = new JAXWSHttpSpiDestination(getBus(), endpointInfo);
+            destination = new JAXWSHttpSpiDestination(getBus(), registry, endpointInfo);
             // set handler into the provided HttpContext, our Destination hook into the server container
             HttpHandlerImpl handler = new HttpHandlerImpl(destination);
             context.setHandler(handler);

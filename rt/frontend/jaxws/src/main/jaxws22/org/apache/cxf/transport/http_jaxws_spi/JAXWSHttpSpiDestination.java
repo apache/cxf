@@ -36,6 +36,7 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
@@ -47,9 +48,10 @@ public class JAXWSHttpSpiDestination extends AbstractHTTPDestination {
 
     private static final long serialVersionUID = 1L;
 
-    public JAXWSHttpSpiDestination(Bus b, EndpointInfo ei)
-        throws IOException {
-        super(b, ei, false);
+    public JAXWSHttpSpiDestination(Bus b, 
+                                   DestinationRegistry registry,
+                                   EndpointInfo ei) throws IOException {
+        super(b, registry, ei, ei.getAddress(), false);
     }
 
     @Override
