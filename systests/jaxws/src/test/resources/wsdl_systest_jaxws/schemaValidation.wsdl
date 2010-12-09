@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!--
+                * Licensed to the Apache Software Foundation (ASF) under one * or more
+                contributor license agreements. See the NOTICE file * distributed with
+                this work for additional information * regarding copyright ownership.
+                The ASF licenses this file * to you under the Apache License, Version
+                2.0 (the * "License"); you may not use this file except in compliance
+                * with the License. You may obtain a copy of the License at * *
+                http://www.apache.org/licenses/LICENSE-2.0 * * Unless required by
+                applicable law or agreed to in writing, * software distributed under
+                the License is distributed on an * "AS IS" BASIS, WITHOUT WARRANTIES
+                OR CONDITIONS OF ANY * KIND, either express or implied. See the
+                License for the * specific language governing permissions and
+                limitations * under the License.
+        -->
+
+<wsdl:definitions targetNamespace="http://cxf.apache.org/jaxws/schemavalidation" xmlns:tns="http://cxf.apache.org/jaxws/schemavalidation" name="schemavalidation" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsoap12="http://schemas.xmlsoap.org/wsdl/soap12/" >
+	<wsdl:documentation>shemavalidation</wsdl:documentation>
+
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://cxf.apache.org/jaxws/schemavalidation">
+                        <xsd:include schemaLocation="response.xsd"/>
+                        <xsd:include schemaLocation="request.xsd"/>                         
+		</xsd:schema>
+	</wsdl:types>
+	
+	
+	<wsdl:message name="ckRIn">
+		<wsdl:part name="ckRIn" element="tns:ckRequete"/>
+	</wsdl:message>
+	<wsdl:message name="ckROut">
+		<wsdl:part name="ckROut" element="tns:ckReponse"/>
+	</wsdl:message>
+
+	
+	<wsdl:portType name="servicePortType">
+		<wsdl:operation name="ckR">
+			<wsdl:input name="ckRIn"  message="tns:ckRIn"/>
+			<wsdl:output name="ckROut" message="tns:ckROut"/>
+		</wsdl:operation>
+	</wsdl:portType>
+	
+	<wsdl:binding name="serviceBinding" type="tns:servicePortType">
+		<wsoap12:binding transport="http://schemas.xmlsoap.org/soap/http" style="document"/>
+		<wsdl:operation name="ckR">
+		   <wsoap12:operation soapAction="ckR"/>
+		   <wsdl:input>
+				<wsoap12:body parts="ckRIn" use="literal"/>
+            </wsdl:input>
+            <wsdl:output>
+				<wsoap12:body parts="ckROut" use="literal"/>
+            </wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	
+	<wsdl:service name="service">
+		<wsdl:port name="servicePort" binding="tns:serviceBinding">
+			<wsoap12:address location="http://localhost:9001/schemavalidation"/>
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>
