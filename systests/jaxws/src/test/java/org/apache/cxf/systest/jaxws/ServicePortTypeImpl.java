@@ -26,7 +26,7 @@ import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
 
 @javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
 public class ServicePortTypeImpl implements ServicePortType {
-    @Override
+    
     public CkReponseType ckR(CkRequeteType ckRIn) {
         CkReponseType result = new CkReponseType();
         ActionCheckMajType action = new ActionCheckMajType();
