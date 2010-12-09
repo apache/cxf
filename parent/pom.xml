@@ -92,7 +92,7 @@
         <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</cxf.pmd.eclipse.ruleset>
 
         <cxf.resources.base.path />
-
+        <jdk.tools>${java.home}/../lib/tools.jar</jdk.tools>
     </properties>
 
 
@@ -187,6 +187,19 @@
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>5.2</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
+                        </dependency>
+                        <dependency>
+                            <groupId>com.sun</groupId>
+                            <artifactId>tools</artifactId>
+                            <version>1.5.0</version>
+                            <scope>system</scope>
+                            <systemPath>${jdk.tools}</systemPath>
                         </dependency>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
@@ -1350,6 +1363,17 @@
                 <cxf.jaxb.impl.version>${cxf.jaxb22.impl.version}</cxf.jaxb.impl.version>
                 <cxf.jaxb.xjc.version>${cxf.jaxb22.impl.version}</cxf.jaxb.xjc.version>
                 <jdk.version>1.5</jdk.version>
+            </properties>
+        </profile>
+        <profile>
+            <id>default-mac</id>
+            <activation>
+                <os>
+                    <family>mac</family>
+                </os>
+            </activation>
+            <properties>
+                <jdk.tools>${java.home}/../Classes/classes.jar</jdk.tools>
             </properties>
         </profile>
         <profile>
