@@ -268,6 +268,46 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, false, false, false /*check*/);
     }
+    
+    @Test(expected = SoapFault.class)
+    public void testResponderInboundInvalidMAPsNoMessageIdReqResp() throws Exception {
+        SetupMessageArgs args = new SetupMessageArgs();
+        args.requestor = false;
+        args.outbound = false;
+        args.oneway = false;
+        args.usingAddressing = false;
+        args.mapsInContext = false;
+        args.decoupled = false;
+        args.zeroLengthAction = true;
+        args.fault = false;
+        args.noMessageId = true;
+        
+        Message message = setUpMessage(args);
+        aggregator.setAllowDuplicates(false);
+        aggregator.mediate(message, true);
+        control.verify();
+        verifyMessage(message, false, false, false /*check*/);
+    }
+    
+    @Test()
+    public void testResponderInboundNoMessageIdOneWay() throws Exception {
+        SetupMessageArgs args = new SetupMessageArgs();
+        args.requestor = false;
+        args.outbound = false;
+        args.oneway = true;
+        args.usingAddressing = false;
+        args.mapsInContext = false;
+        args.decoupled = false;
+        args.zeroLengthAction = true;
+        args.fault = false;
+        args.noMessageId = true;
+        
+        Message message = setUpMessage(args);
+        aggregator.setAllowDuplicates(false);
+        aggregator.mediate(message, true);
+        control.verify();
+        verifyMessage(message, false, false, false /*check*/);
+    }
 
     @Test
     public void testResponderOutbound() throws Exception {
@@ -285,18 +325,42 @@ public class MAPAggregatorTest extends Assert {
         control.verify();
         verifyMessage(message, false, true, true);
     }
+    
+    @Test
+    public void testResponderOutboundNoMessageId() throws Exception {
+        SetupMessageArgs args = new SetupMessageArgs();
+        args.requestor = false;
+        args.outbound = true;
+        args.oneway = false;
+        args.usingAddressing = false;
+        args.mapsInContext = false;
+        args.decoupled = false;
+        args.zeroLengthAction = false;
+        args.fault = false;
+        args.noMessageId = true;
+        
+        Message message = 
+            setUpMessage(args);
+        aggregator.mediate(message, false);
+        control.verify();
+        verifyMessage(message, false, true, true);
+    }
 
     @Test
     public void testResponderOutboundFault() throws Exception {
-        Message message = setUpMessage(new boolean[] {false,
-                                                      true,
-                                                      false,
-                                                      false,
-                                                      false,
-                                                      true,
-                                                      false,
-                                                      true});
+        SetupMessageArgs args = new SetupMessageArgs();
+        args.requestor = false;
+        args.outbound = true;
+        args.oneway = false;
+        args.usingAddressing = false;
+        args.mapsInContext = false;
+        args.decoupled = true;
+        args.zeroLengthAction = false;
+        args.fault = true;
+        args.noMessageId = false;
         
+        Message message = setUpMessage(args);
+                
         aggregator.mediate(message, true);
         control.verify();
         verifyMessage(message, false, true, true);
@@ -439,59 +503,55 @@ public class MAPAggregatorTest extends Assert {
                                  boolean decoupled,
                                  boolean zeroLengthAction) 
         throws Exception {
-        boolean[] params = {requestor, 
-                            outbound,
-                            oneway,
-                            usingAddressing,
-                            mapsInContext,
-                            decoupled,
-                            zeroLengthAction,
-                            false};  
-        return setUpMessage(params);
+        
+        SetupMessageArgs args = new SetupMessageArgs();
+        args.requestor = requestor;
+        args.outbound = outbound;
+        args.oneway = oneway;
+        args.usingAddressing = usingAddressing;
+        args.mapsInContext = mapsInContext;
+        args.decoupled = decoupled;
+        args.zeroLengthAction = zeroLengthAction;
+        args.fault = false;
+        args.noMessageId = false;
+        
+        return setUpMessage(args);
     }
 
-    /**
-     * Boolean array is used to work around checkstyle rule limiting
-     * parameter cardinality to 7. 
-     */
-    private Message setUpMessage(boolean[] params)
+    private Message setUpMessage(SetupMessageArgs args)
         throws Exception {
-        boolean requestor = params[0]; 
-        boolean outbound = params[1];
-        boolean oneway = params[2];
-        boolean usingAddressing = params[3];
-        boolean mapsInContext = params[4];
-        boolean decoupled = params[5];
-        boolean zeroLengthAction = params[6];
-        boolean fault = params[7];
         
         Message message = getMessage();        
         Exchange exchange = getExchange();
-        setUpOutbound(message, exchange, outbound, fault);
+        setUpOutbound(message, exchange, args.outbound, args.fault);
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
-                             Boolean.valueOf(requestor));
-        if (outbound && requestor) {
-            if (usingAddressing) {
+                             Boolean.valueOf(args.requestor));
+        if (args.outbound && args.requestor) {
+            if (args.usingAddressing) {
                 setUpConduit(message, exchange);
             }
-            setUpUsingAddressing(message, exchange, usingAddressing);
-            if (usingAddressing) {
+            setUpUsingAddressing(message, exchange, args.usingAddressing);
+            if (args.usingAddressing) {
                 setUpRequestor(message,
                                exchange,
-                               oneway, 
-                               mapsInContext,
-                               decoupled,
-                               zeroLengthAction);
+                               args.oneway, 
+                               args.mapsInContext,
+                               args.decoupled,
+                               args.zeroLengthAction);
             } 
-        } else if (!requestor) {
+        } else if (!args.requestor) {
+            SetupResponderArgs srArgs = new SetupResponderArgs();
+            srArgs.oneway = args.oneway;
+            srArgs.outbound = args.outbound;
+            srArgs.decoupled = args.decoupled;
+            srArgs.zeroLengthAction = args.zeroLengthAction;
+            srArgs.fault = args.fault;
+            srArgs.noMessageId = args.noMessageId;
+            
             setUpResponder(message,
                            exchange,
-                           oneway,
-                           outbound,
-                           decoupled,
-                           zeroLengthAction,
-                           fault);
+                           srArgs);
             
             Endpoint endpoint = control.createMock(Endpoint.class);
             endpoint.getOutInterceptors();
@@ -593,52 +653,54 @@ public class MAPAggregatorTest extends Assert {
 
     private void setUpResponder(Message message,
                                 Exchange exchange,
-                                boolean oneway,
-                                boolean outbound,
-                                boolean decoupled,
-                                boolean zeroLengthAction,
-                                boolean fault) throws Exception {
+                                SetupResponderArgs args) throws Exception {
+
         setUpMessageProperty(message,
                              REQUESTOR_ROLE,
                              Boolean.FALSE);
         AddressingPropertiesImpl maps = new AddressingPropertiesImpl();
         EndpointReferenceType replyTo = new EndpointReferenceType();
         replyTo.setAddress(
-            ContextUtils.getAttributedURI(decoupled
+            ContextUtils.getAttributedURI(args.decoupled
                                           ? "http://localhost:9999/decoupled"
                                           : Names.WSA_ANONYMOUS_ADDRESS));
         maps.setReplyTo(replyTo);
         EndpointReferenceType faultTo = new EndpointReferenceType();
         faultTo.setAddress(
-            ContextUtils.getAttributedURI(decoupled
+            ContextUtils.getAttributedURI(args.decoupled
                                           ? "http://localhost:9999/fault"
                                           : Names.WSA_ANONYMOUS_ADDRESS));
         maps.setFaultTo(faultTo);
-        AttributedURIType id = 
-            ContextUtils.getAttributedURI("urn:uuid:12345");
-        maps.setMessageID(id);
-        if (zeroLengthAction) {
+        
+        if (!args.noMessageId) {
+            AttributedURIType id = 
+                ContextUtils.getAttributedURI("urn:uuid:12345");
+            maps.setMessageID(id);
+        }
+        
+        if (args.zeroLengthAction) {
             maps.setAction(ContextUtils.getAttributedURI(""));
         }
         setUpMessageProperty(message,
                              SERVER_ADDRESSING_PROPERTIES_INBOUND,
                              maps);
-        if (!outbound) {
-            setUpOneway(message, exchange, oneway);
-            if (oneway || decoupled) {
+        if (!args.outbound) {
+            setUpOneway(message, exchange, args.oneway);
+            if (args.oneway || args.decoupled) {
                 setUpRebase(message, exchange);
             }
         }
-        if (outbound || ((DefaultMessageIdCache) aggregator.getMessageIdCache())
+        
+        if (args.outbound || ((DefaultMessageIdCache) aggregator.getMessageIdCache())
             .getMessageIdSet().size() > 0) {
-            if (!zeroLengthAction) {
+            if (!args.zeroLengthAction) {
                 Method method = SEI.class.getMethod("op", new Class[0]);
                 setUpMethod(message, exchange, method);
                 setUpMessageProperty(message,
                                      REQUESTOR_ROLE,
                                      Boolean.FALSE);
                 
-                if (fault) {
+                if (args.fault) {
                     message.setContent(Exception.class, new SoapFault("blah",
                             (Throwable) new Exception(), Fault.FAULT_CODE_SERVER));
                     expectedAction = "http://foo/bar/SEI/op/Fault/Exception";
@@ -652,16 +714,21 @@ public class MAPAggregatorTest extends Assert {
             setUpMessageProperty(message,
                                  SERVER_ADDRESSING_PROPERTIES_INBOUND,
                                  maps);            
-            if (fault) {
+            if (args.fault) {
                 // REVISIT test double rebase does not occur
                 setUpRebase(message, exchange);
             }
-            expectedTo = decoupled
-                         ? fault
+            expectedTo = args.decoupled
+                         ? args.fault
                            ? "http://localhost:9999/fault"
                            : "http://localhost:9999/decoupled"
                          : Names.WSA_ANONYMOUS_ADDRESS;
-            expectedRelatesTo = maps.getMessageID().getValue();
+            
+            if (maps.getMessageID() != null && maps.getMessageID().getValue() != null) {
+                expectedRelatesTo = maps.getMessageID().getValue();
+            } else {
+                expectedRelatesTo = Names.WSA_UNSPECIFIED_RELATIONSHIP;
+            }
             // Now verified via verifyMessage()
             //EasyMock.eq(SERVER_ADDRESSING_PROPERTIES_OUTBOUND);
             //EasyMock.reportMatcher(new MAPMatcher());
@@ -786,7 +853,7 @@ public class MAPAggregatorTest extends Assert {
 
     private void setUpExchangeOneway(Exchange exchange, boolean oneway) {
         exchange.isOneWay();
-        EasyMock.expectLastCall().andReturn(oneway);
+        EasyMock.expectLastCall().andReturn(oneway).anyTimes();
         //exchange.setOneWay(oneway);
     }
 
@@ -902,5 +969,26 @@ public class MAPAggregatorTest extends Assert {
         public Collection<BindingFaultInfo> getFaults() {
             return Collections.unmodifiableCollection(this.faults.values());
         }        
+    }
+    
+    private static class SetupMessageArgs {
+        boolean requestor; 
+        boolean outbound;
+        boolean oneway;
+        boolean usingAddressing;
+        boolean mapsInContext;
+        boolean decoupled;
+        boolean zeroLengthAction;
+        boolean fault;
+        boolean noMessageId; 
+    }
+    
+    private static class SetupResponderArgs {
+        boolean outbound; 
+        boolean oneway;
+        boolean decoupled;
+        boolean zeroLengthAction;
+        boolean fault;
+        boolean noMessageId;
     }
 }
