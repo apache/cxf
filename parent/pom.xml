@@ -91,7 +91,6 @@
         <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset.xml</cxf.pmd.eclipse.ruleset>
 
         <cxf.resources.base.path />
-
     </properties>
 
 
@@ -186,6 +185,12 @@
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
                             <version>5.2</version>
+                            <exclusions>
+                                <exclusion>
+                                    <groupId>com.sun</groupId>
+                                    <artifactId>tools</artifactId>
+                                </exclusion>
+                            </exclusions>
                         </dependency>
                         <dependency>
                             <groupId>org.apache.cxf.build-utils</groupId>
