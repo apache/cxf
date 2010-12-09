@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+        <!--
+                * Licensed to the Apache Software Foundation (ASF) under one * or more
+                contributor license agreements. See the NOTICE file * distributed with
+                this work for additional information * regarding copyright ownership.
+                The ASF licenses this file * to you under the Apache License, Version
+                2.0 (the * "License"); you may not use this file except in compliance
+                * with the License. You may obtain a copy of the License at * *
+                http://www.apache.org/licenses/LICENSE-2.0 * * Unless required by
+                applicable law or agreed to in writing, * software distributed under
+                the License is distributed on an * "AS IS" BASIS, WITHOUT WARRANTIES
+                OR CONDITIONS OF ANY * KIND, either express or implied. See the
+                License for the * specific language governing permissions and
+                limitations * under the License.
+        -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/jaxws/schemavalidation" targetNamespace="http://cxf.apache.org/jaxws/schemavalidation" elementFormDefault="qualified">
+	
+	<xsd:complexType name="ckReponseType">
+		<xsd:sequence>
+			<xsd:element name="produit" type="produitPosteActionType" minOccurs="0" maxOccurs="unbounded"/>
+		</xsd:sequence>
+	</xsd:complexType>
+	<xsd:complexType name="produitPosteActionType">
+		<xsd:sequence>
+			<xsd:element name="action" type="actionCheckMajType"/>
+		</xsd:sequence>
+	</xsd:complexType>
+
+	<xsd:complexType name="actionCheckMajType">
+		<xsd:attribute name="status" type="statusType" use="required"/>
+	</xsd:complexType>
+	<xsd:simpleType name="statusType">
+		<xsd:restriction base="xsd:int">
+			<xsd:enumeration value="0">
+				<xsd:annotation>
+					<xsd:documentation>Aucune</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="1">
+				<xsd:annotation>
+					<xsd:documentation>Installation</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="2">
+				<xsd:annotation>
+					<xsd:documentation>mis a jour</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="3">
+				<xsd:annotation>
+					<xsd:documentation>inconnu</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+			<xsd:enumeration value="4">
+				<xsd:annotation>
+					<xsd:documentation>Erreur</xsd:documentation>
+				</xsd:annotation>
+			</xsd:enumeration>
+		</xsd:restriction>
+	</xsd:simpleType>
+</xsd:schema>
