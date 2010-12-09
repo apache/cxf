@@ -103,6 +103,9 @@ public final class Names {
         WSA_NAMESPACE_NAME + "/anonymous";
     public static final String WSA_NONE_ADDRESS =
         WSA_NAMESPACE_NAME + "/none";
+    
+    public static final String WSA_UNSPECIFIED_RELATIONSHIP =
+        WSA_NAMESPACE_NAME + "/unspecified";
 
     public static final String WSA_FAULT_DELIMITER =
         "/fault";

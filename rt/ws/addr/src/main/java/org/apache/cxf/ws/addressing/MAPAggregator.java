@@ -945,6 +945,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 && !Boolean.TRUE.equals(message.get(Message.PARTIAL_RESPONSE_MESSAGE))) {
                 String inMessageID = inMAPs.getMessageID().getValue();
                 maps.setRelatesTo(ContextUtils.getRelatesTo(inMessageID));
+            } else {
+                maps.setRelatesTo(ContextUtils
+                                  .getRelatesTo(Names.WSA_UNSPECIFIED_RELATIONSHIP));
             }
 
             // fallback fault action
@@ -1164,9 +1167,10 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 ContextUtils.storeMAPFaultName(Names.HEADER_REQUIRED_NAME,
                                                message);
                 ContextUtils.storeMAPFaultReason(reason, message);
-                return false;
+                valid = false;
             }
-            if (s != null && s.size() > 0) {
+            
+            if (s != null && s.size() > 0 && valid) {
                 String sa = s.get(0);
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
@@ -1181,7 +1185,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                     ContextUtils.storeMAPFaultName(Names.ACTION_MISMATCH_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(reason, message);
-                    return false;
+                    valid = false;
                 } else if (!StringUtils.isEmpty(s1)
                     && !action.equals(s1)
                     && !action.equals(s1 + "Request")
@@ -1198,19 +1202,37 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                     ContextUtils.storeMAPFaultName(Names.ACTION_NOT_SUPPORTED_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(reason, message);
-                    return false;
+                    valid = false;
                 }
-                
             }
             
+            AttributedURIType messageID = maps.getMessageID();
+            
+            if (!message.getExchange().isOneWay() 
+                    && (messageID == null || messageID.getValue() == null)
+                    && valid) {
+                String reason =
+                    BUNDLE.getString("MISSING_ACTION_MESSAGE");
+
+                ContextUtils.storeMAPFaultName(Names.HEADER_REQUIRED_NAME,
+                                               message);
+                ContextUtils.storeMAPFaultReason(reason, message);
+                
+                valid = false;
+            }
         
-            if (!allowDuplicates) {
-                AttributedURIType messageID = maps.getMessageID();
-                if (messageID != null
-                    && !messageIdCache.checkUniquenessAndCacheId(messageID.getValue())) {
-                    LOG.log(Level.WARNING,
-                            "DUPLICATE_MESSAGE_ID_MSG",
-                            messageID.getValue());
+            // Always cache message IDs, even when the message is not valid for some
+            // other reason.
+            if (!allowDuplicates && messageID != null && messageID.getValue() != null
+                && !messageIdCache.checkUniquenessAndCacheId(messageID.getValue())) {
+
+                LOG.log(Level.WARNING,
+                        "DUPLICATE_MESSAGE_ID_MSG",
+                        messageID.getValue());
+                
+                // Only throw the fault if something else has not already marked the
+                // message as invalid.
+                if (valid) {
                     String reason =
                         BUNDLE.getString("DUPLICATE_MESSAGE_ID_MSG");
                     String l7dReason = 
@@ -1218,8 +1240,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                     ContextUtils.storeMAPFaultName(Names.DUPLICATE_MESSAGE_ID_NAME,
                                                    message);
                     ContextUtils.storeMAPFaultReason(l7dReason, message);
-                    valid = false;
                 }
+                
+                valid = false;
             }
         } else if (usingAddressingAdvisory) {
             String reason =
@@ -1228,8 +1251,9 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             ContextUtils.storeMAPFaultName(Names.HEADER_REQUIRED_NAME,
                                            message);
             ContextUtils.storeMAPFaultReason(reason, message);
-            return false;
+            valid = false;
         }
+        
         return valid;
     }
 }

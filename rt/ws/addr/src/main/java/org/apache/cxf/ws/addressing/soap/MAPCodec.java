@@ -788,6 +788,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
     private void restoreExchange(SoapMessage message, AddressingProperties maps) {
         if (maps != null
             && maps.getRelatesTo() != null
+            && !Names.WSA_UNSPECIFIED_RELATIONSHIP.equals(maps.getRelatesTo().getValue())
             && isRelationshipReply(maps.getRelatesTo())) { 
             Exchange correlatedExchange =
                 uncorrelatedExchanges.remove(maps.getRelatesTo().getValue());
@@ -834,7 +835,10 @@ public class MAPCodec extends AbstractSoapInterceptor {
      * @param message the current message
      */
     private void markPartialResponse(SoapMessage message, AddressingProperties maps) {
-        if (ContextUtils.isRequestor(message) && null != maps && null == maps.getRelatesTo()) {
+        if (ContextUtils.isRequestor(message) && null != maps
+            && (null == maps.getRelatesTo() 
+                || (null != maps.getRelatesTo()
+                    && Names.WSA_UNSPECIFIED_RELATIONSHIP.equals(maps.getRelatesTo().getValue())))) {
             message.put(Message.PARTIAL_RESPONSE_MESSAGE, Boolean.TRUE);
         } 
     }
