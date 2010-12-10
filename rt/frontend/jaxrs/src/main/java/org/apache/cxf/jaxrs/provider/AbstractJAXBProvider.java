@@ -24,6 +24,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.annotation.Annotation;
+import java.lang.ref.SoftReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
@@ -91,7 +92,6 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     private static Map<String, JAXBContext> packageContexts = new HashMap<String, JAXBContext>();
     private static Map<Class<?>, JAXBContext> classContexts = new HashMap<Class<?>, JAXBContext>();
-
    
     protected Set<Class<?>> collectionContextClasses = new HashSet<Class<?>>();
     protected JAXBContext collectionContext; 
@@ -106,6 +106,8 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     protected List<String> inDropElements;
     protected Map<String, String> inElementsMap;
     protected Map<String, String> inAppendMap;
+    protected Map<Long, SoftReference<JAXBMarshallerUnmarshallerCache>> threadMarshallerCaches 
+        = new HashMap<Long, SoftReference<JAXBMarshallerUnmarshallerCache>>();
     private boolean attributesToElements;
     
     private MessageContext mc;
@@ -349,6 +351,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
     }
     
+    
     public JAXBContext getPackageContext(Class<?> type) {
         if (type == null || type == JAXBElement.class) {
             return null;
@@ -369,6 +372,24 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                 }
             }
             return context;
+        }
+    }
+    
+    public JAXBMarshallerUnmarshallerCache getThreadMarshallerCache(Thread thread) {
+        JAXBMarshallerUnmarshallerCache marshallerUnMarshallerCache = null;
+        synchronized (threadMarshallerCaches) {
+            SoftReference<JAXBMarshallerUnmarshallerCache> marshallerUnMarshallerCacheRef = 
+                threadMarshallerCaches.get(thread.getId());
+            if (marshallerUnMarshallerCacheRef != null) {
+                marshallerUnMarshallerCache = marshallerUnMarshallerCacheRef.get();
+            }
+            if (marshallerUnMarshallerCache == null) {
+                marshallerUnMarshallerCache = new JAXBMarshallerUnmarshallerCache();
+                threadMarshallerCaches
+                    .put(thread.getId(),
+                         new SoftReference<JAXBMarshallerUnmarshallerCache>(marshallerUnMarshallerCache));
+            }
+            return marshallerUnMarshallerCache;
         }
     }
     
@@ -408,7 +429,10 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         throws JAXBException {
         JAXBContext context = isCollection ? getCollectionContext(cls) 
                                            : getJAXBContext(cls, genericType);
-        Unmarshaller unmarshaller = context.createUnmarshaller();
+        
+        JAXBMarshallerUnmarshallerCache marshallerUnmarshallerCache = 
+            getThreadMarshallerCache(Thread.currentThread());
+        Unmarshaller unmarshaller = marshallerUnmarshallerCache.getUnmarshall(context);
         if (schema != null) {
             unmarshaller.setSchema(schema);
         }
@@ -427,9 +451,16 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
                             ? ((JAXBElement)obj).getDeclaredType() : cls;
                             
         JAXBContext context = getJAXBContext(objClazz, genericType);
-        Marshaller marshaller = context.createMarshaller();
+        JAXBMarshallerUnmarshallerCache marshallerUnmarshallerCache = 
+            getThreadMarshallerCache(Thread.currentThread());
+        Marshaller marshaller = marshallerUnmarshallerCache.getMarshall(context);
+        // need to set this value to make JAXRSClientServerBookTest passed
+        marshaller.setProperty(Marshaller.JAXB_FRAGMENT, Boolean.FALSE);
         if (enc != null) {
             marshaller.setProperty(Marshaller.JAXB_ENCODING, enc);
+        } else {
+            // set the default the value to the marshaller
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
         }
         return marshaller;
     }
@@ -671,6 +702,42 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             } else {
                 return theList;
             }
+        }
+        
+    }
+    
+    protected static class JAXBMarshallerUnmarshallerCache {
+        private Map<JAXBContext, Marshaller> marshallers = new HashMap<JAXBContext, Marshaller>();
+        private Map<JAXBContext, Unmarshaller> unmarshallers = new HashMap<JAXBContext, Unmarshaller>();
+        
+        public Marshaller getMarshall(JAXBContext jaxbContext) throws JAXBException {
+            if (jaxbContext == null) {
+                return null;
+            }
+            synchronized (marshallers) {
+                Marshaller marshaller = marshallers.get(jaxbContext);
+                if (marshaller == null) {
+                    marshaller = jaxbContext.createMarshaller();
+                    marshallers.put(jaxbContext, marshaller);
+                }
+                return marshaller;
+            }
+            
+        }
+        
+        public Unmarshaller getUnmarshall(JAXBContext jaxbContext) throws JAXBException {
+            if (jaxbContext == null) {
+                return null;
+            }
+            synchronized (unmarshallers) {
+                Unmarshaller unmarshaller = unmarshallers.get(jaxbContext);
+                if (unmarshaller == null) {
+                    unmarshaller = jaxbContext.createUnmarshaller();
+                    unmarshallers.put(jaxbContext, unmarshaller);
+                }
+                return unmarshaller;
+            }
+            
         }
         
     }
