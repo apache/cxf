@@ -51,7 +51,6 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stream.StreamSource;
 
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.jaxb.NamespaceMapper;
@@ -162,7 +161,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (JAXBElement.class.isAssignableFrom(type) 
                 || unmarshalAsJaxbElement 
                 || jaxbElementClassMap != null && jaxbElementClassMap.containsKey(theType.getName())) {
-                response = unmarshaller.unmarshal(new StreamSource(is), theType);
+                response = unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is), theType);
             } else {
                 response = doUnmarshal(unmarshaller, type, is, mt);
             }
@@ -222,7 +221,8 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     protected Object unmarshalFromInputStream(Unmarshaller unmarshaller, InputStream is, MediaType mt) 
         throws JAXBException {
-        return unmarshaller.unmarshal(is);
+        // Try to create the read before unmarshalling the stream
+        return unmarshaller.unmarshal(StaxUtils.createXMLStreamReader(is));
     }
 
     protected Object unmarshalFromReader(Unmarshaller unmarshaller, XMLStreamReader reader, MediaType mt) 
