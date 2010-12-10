@@ -714,30 +714,28 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             if (jaxbContext == null) {
                 return null;
             }
-            synchronized (marshallers) {
-                Marshaller marshaller = marshallers.get(jaxbContext);
-                if (marshaller == null) {
-                    marshaller = jaxbContext.createMarshaller();
-                    marshallers.put(jaxbContext, marshaller);
-                }
-                return marshaller;
+            // don't need the synchronized statement, as this ojbect is used per thread
+            Marshaller marshaller = marshallers.get(jaxbContext);
+            if (marshaller == null) {
+                marshaller = jaxbContext.createMarshaller();
+                marshallers.put(jaxbContext, marshaller);
             }
-            
+            return marshaller;
+
         }
-        
+
         public Unmarshaller getUnmarshall(JAXBContext jaxbContext) throws JAXBException {
             if (jaxbContext == null) {
                 return null;
             }
-            synchronized (unmarshallers) {
-                Unmarshaller unmarshaller = unmarshallers.get(jaxbContext);
-                if (unmarshaller == null) {
-                    unmarshaller = jaxbContext.createUnmarshaller();
-                    unmarshallers.put(jaxbContext, unmarshaller);
-                }
-                return unmarshaller;
+            // don't need the synchronized statement, as this ojbect is used per thread
+            Unmarshaller unmarshaller = unmarshallers.get(jaxbContext);
+            if (unmarshaller == null) {
+                unmarshaller = jaxbContext.createUnmarshaller();
+                unmarshallers.put(jaxbContext, unmarshaller);
             }
-            
+            return unmarshaller;
+
         }
         
     }
