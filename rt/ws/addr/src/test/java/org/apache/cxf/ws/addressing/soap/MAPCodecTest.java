@@ -190,6 +190,19 @@ public class MAPCodecTest extends Assert {
     }
 
     @Test
+    public void testResponderInboundWithRelatesTo() throws Exception {
+        SoapMessage message = setUpMessage(false, false, false, false, Boolean.TRUE,
+                                           Names.WSA_NAMESPACE_NAME);
+        //empty the uncorrelatedExchanges in responder
+        for (String key : codec.uncorrelatedExchanges.keySet()) {
+            codec.uncorrelatedExchanges.remove(key);
+        }
+        codec.handleMessage(message);
+        control.verify();
+        verifyMessage(message, false, false, false);
+    }
+
+    @Test
     public void testResponderInboundNonNative() throws Exception {
         String uri = VersionTransformer.Names200408.WSA_NAMESPACE_NAME;
         SoapMessage message = setUpMessage(false, false, false, false, uri);
@@ -281,9 +294,16 @@ public class MAPCodecTest extends Assert {
 
     private SoapMessage setUpMessage(boolean requestor, boolean outbound, boolean invalidMAP,
                                      boolean preExistingSOAPAction, String exposeAs) throws Exception {
+        return setUpMessage(requestor, outbound, invalidMAP, preExistingSOAPAction, null, exposeAs);
+    }
+    
+    private SoapMessage setUpMessage(boolean requestor, boolean outbound, boolean invalidMAP,
+                                     boolean preExistingSOAPAction, Boolean generateRelatesTo, 
+                                     String exposeAs) throws Exception {
         SoapMessage message = new SoapMessage(new MessageImpl());
         setUpOutbound(message, outbound);
-        expectRelatesTo = (requestor && !outbound) || (!requestor && outbound);
+        expectRelatesTo = generateRelatesTo != null ? generateRelatesTo 
+            : (requestor && !outbound) || (!requestor && outbound);
         message.put(REQUESTOR_ROLE, Boolean.valueOf(requestor));
         String mapProperty = getMAPProperty(requestor, outbound);
         AddressingPropertiesImpl maps = getMAPs(requestor, outbound, exposeAs);

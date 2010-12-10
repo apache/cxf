@@ -796,7 +796,7 @@ public class MAPCodec extends AbstractSoapInterceptor {
                 synchronized (correlatedExchange) {
                     message.setExchange(correlatedExchange);
                 }
-            } else {
+            } else if (ContextUtils.isRequestor(message) && !message.getExchange().isOneWay()) {
                 if (ContextUtils.retrieveDeferUncorrelatedMessageAbort(message)) {
                     LOG.fine("deferring uncorrelated message abort");
                     ContextUtils.storeDeferredUncorrelatedMessageAbort(message);
