@@ -30,6 +30,8 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
+import org.apache.cxf.transport.AbstractDestination;
+
 public class DestinationRegistryImpl implements DestinationRegistry {
 
     private ConcurrentMap<String, AbstractHTTPDestination> destinations 
@@ -94,7 +96,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
     }
     
 
-    public List<AbstractHTTPDestination> getSortedDestinations() {
+    public AbstractDestination[] getSortedDestinations() {
         List<AbstractHTTPDestination> dest2 = new LinkedList<AbstractHTTPDestination>(
                 getDestinations());
         Collections.sort(dest2, new Comparator<AbstractHTTPDestination>() {
@@ -112,7 +114,7 @@ public class DestinationRegistryImpl implements DestinationRegistry {
             }
         });
 
-        return dest2;
+        return dest2.toArray(new AbstractDestination[]{});
     }
 
     public Set<String> getDestinationsPaths() {

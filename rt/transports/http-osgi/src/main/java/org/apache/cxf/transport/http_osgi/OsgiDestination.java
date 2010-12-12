@@ -58,8 +58,4 @@ public class OsgiDestination extends AbstractHTTPDestination {
         return LOG;
     }
 
-    protected Bus getBus() {
-        return bus;
-    }
-
 }

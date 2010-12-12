@@ -19,7 +19,6 @@
 
 package org.apache.cxf.transport.http_osgi;
 
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,29 +26,25 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.security.SecurityContext;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
 import org.apache.cxf.service.model.ServiceInfo;
+import org.apache.cxf.transport.AbstractDestination;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
-import org.apache.cxf.transport.http.HTTPSession;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.apache.cxf.wsdl.http.AddressType;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
@@ -57,11 +52,28 @@ import org.easymock.classextension.IMocksControl;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 
 public class OsgiServletTest extends Assert {
+
+    private final class TestOsgiServletController extends OsgiServletController {
+        private boolean invokeDestinationCalled;
+
+
+        private TestOsgiServletController(ServletConfig config, 
+                                          DestinationRegistry destinationRegistry,
+                                          HttpServlet serviceListGenerator) {
+            super(config, destinationRegistry, serviceListGenerator);
+        }
+
+        @Override
+        public void invokeDestination(HttpServletRequest req,
+                                      HttpServletResponse res,
+                                      AbstractHTTPDestination d) throws ServletException {
+            invokeDestinationCalled = true;
+        }
+    }
 
     private static final String ADDRESS = "http://bar/snafu";
     private static final String ROOT = "http://localhost:8080/";
@@ -70,25 +82,20 @@ public class OsgiServletTest extends Assert {
     private static final String URI = "/cxf" + PATH;
     private static final String SERVICES = "/cxf/services";
     private static final String QUERY = "wsdl";
-    private static final String VERB = "POST";
     private static final String TEXT = "text/html";
     private static final String TEXT_LIST = "text/html; charset=UTF-8";
     private static final String XML = "text/xml";
-    private static final String ENCODING = "UTF-8";
     private static final String NO_SERVICE = 
         "<html><body>No service was found.</body></html>";
     private IMocksControl control; 
     private Bus bus;
     private DestinationRegistry registry;
-    private OsgiDestination destination;
+    private AbstractHTTPDestination destination;
     private ServletConfig config;
-    private ServletContext context;
     private HttpServletRequest request;
     private HttpServletResponse response;
-    private MessageImpl message;
     private MessageObserver observer;
     private AddressType extensor;
-    private ExchangeImpl exchange;
     private EndpointInfo endpoint;
     private Set<String> paths;
 
@@ -97,13 +104,10 @@ public class OsgiServletTest extends Assert {
         control = EasyMock.createNiceControl();
         bus = control.createMock(Bus.class);
         registry = control.createMock(DestinationRegistry.class);
-        destination = control.createMock(OsgiDestination.class);
-        context = control.createMock(ServletContext.class);
+        destination = control.createMock(AbstractHTTPDestination.class);
         config = control.createMock(ServletConfig.class);
         request = control.createMock(HttpServletRequest.class);
         response = control.createMock(HttpServletResponse.class);
-        message = control.createMock(MessageImpl.class);
-        exchange = control.createMock(ExchangeImpl.class);
         observer = control.createMock(MessageObserver.class);
         extensor = control.createMock(AddressType.class);
         endpoint = new EndpointInfo();
@@ -121,14 +125,9 @@ public class OsgiServletTest extends Assert {
         bus = null;
         registry = null;
         destination = null;
-        context = null;
         config = null;
         request = null;
         response = null;
-        message = null;
-        exchange = null;
-        destination = null;
-        exchange = null;
         observer = null;
         extensor = null;
     }
@@ -139,27 +138,24 @@ public class OsgiServletTest extends Assert {
         setUpResponse(404, TEXT, NO_SERVICE);
 
         control.replay();
-
-        OsgiServlet servlet = setUpServlet();
-
+        OsgiServlet servlet = new OsgiServlet(registry);
+        servlet.init(config);
         servlet.invoke(request, response);
-
         control.verify();
     }
 
     @Test
     public void testInvokeGetServices() throws Exception {
         setUpRequest(SERVICES, null, 1);
-        setUpResponse(0, TEXT_LIST, 
-                      "<span class=\"field\">Endpoint address:</span> "
-                      + "<span class=\"value\">" + ADDRESS + "</span>");
 
+        HttpServlet serviceListGenerator = control.createMock(HttpServlet.class);
+        serviceListGenerator.service(EasyMock.isA(ServletRequest.class), EasyMock.isA(ServletResponse.class));
+        EasyMock.expectLastCall();
+        
         control.replay();
-
-        OsgiServlet servlet = setUpServlet();
-
+        OsgiServlet servlet = new OsgiServlet(registry, serviceListGenerator);
+        servlet.init(config);
         servlet.invoke(request, response);
-
         control.verify();
     }
 
@@ -170,11 +166,9 @@ public class OsgiServletTest extends Assert {
                       "<span class=\"heading\">No services have been found.</span>");
 
         control.replay();
-
-        OsgiServlet servlet = setUpServlet();
-
+        OsgiServlet servlet = new OsgiServlet(registry);
+        servlet.init(config);
         servlet.invoke(request, response);
-
         control.verify();
     }
 
@@ -184,42 +178,42 @@ public class OsgiServletTest extends Assert {
         setUpQuery();
 
         control.replay();
-
-        OsgiServlet servlet = setUpServlet();
-        
+        OsgiServlet servlet = new OsgiServlet(registry);
+        servlet.init(config);
         servlet.invoke(request, response);
-
         control.verify();
     }
 
     @Test
-    @Ignore
     public void testInvokeDestination() throws Exception {
         setUpRequest(URI, PATH, -2);
-        setUpMessage();
-
-        control.replay();
-
-        OsgiServlet servlet = setUpServlet();
+        HttpServlet serviceListGenerator = control.createMock(HttpServlet.class);
         
-        servlet.invoke(request, response);
-
+        control.replay();
+        TestOsgiServletController controller = 
+            new TestOsgiServletController(config, registry, serviceListGenerator);
+        controller.invoke(request, response);
         control.verify();
+        Assert.assertTrue(controller.invokeDestinationCalled);
     }
 
     @Test
-    @Ignore
     public void testInvokeRestful() throws Exception {
         setUpRequest(URI, null, -1);
-        setUpRestful();
-        setUpMessage();
+        paths.add(ADDRESS);
+        // TODO How can the registry first return null then destination for the same path?
+        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
+        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination);
+        EasyMock.expect(registry.checkRestfulRequest(EasyMock.isA(String.class))).andReturn(destination);
+        EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
+        endpoint.addExtensor(extensor);
+        extensor.setLocation(EasyMock.eq(ROOT + "/cxf/Soap" + ADDRESS));
+        EasyMock.expectLastCall();
 
         control.replay();
-
-        OsgiServlet servlet = setUpServlet();
-
+        OsgiServlet servlet = new OsgiServlet(registry);
+        servlet.init(config);
         servlet.invoke(request, response);
-
         control.verify();
     }
 
@@ -249,40 +243,10 @@ public class OsgiServletTest extends Assert {
             for (int i = 0; i < destinationCount; i++) {
                 destinations.add(destination);
             }
-            EasyMock.expect(registry.getDestinations()).andReturn(destinations);
+            EasyMock.expect(registry.getDestinations()).andReturn(destinations).anyTimes();
+            EasyMock.expect(registry.getSortedDestinations()).
+                andReturn(destinations.toArray(new AbstractDestination[]{})).anyTimes();
         }
-    }
-
-    private void setUpMessage() throws Exception {
-        ServletInputStream sis = control.createMock(ServletInputStream.class);
-        EasyMock.expect(request.getInputStream()).andReturn(sis);
-        message.setContent(EasyMock.eq(InputStream.class), EasyMock.same(sis));
-        EasyMock.expectLastCall();
-        setUpProperty(AbstractHTTPDestination.HTTP_REQUEST, request);
-        setUpProperty(AbstractHTTPDestination.HTTP_RESPONSE, response);
-        setUpProperty(AbstractHTTPDestination.HTTP_CONTEXT, context);
-        setUpProperty(AbstractHTTPDestination.HTTP_CONFIG, config);
-        EasyMock.expect(request.getMethod()).andReturn(VERB);
-        setUpProperty(Message.HTTP_REQUEST_METHOD, VERB);
-        setUpProperty(Message.REQUEST_URI, URI);
-        setUpProperty(Message.QUERY_STRING, QUERY);
-        EasyMock.expect(request.getContentType()).andReturn(XML);
-        setUpProperty(Message.CONTENT_TYPE, XML);
-        EasyMock.expect(request.getHeader("Accept")).andReturn(XML);
-        setUpProperty(Message.ACCEPT_CONTENT_TYPE, XML);
-        destination.getAddress();
-        EasyMock.expectLastCall().andReturn(EndpointReferenceUtils.getEndpointReference(PATH));
-        setUpProperty(Message.BASE_PATH, PATH);
-        message.put(EasyMock.eq(SecurityContext.class), EasyMock.isA(SecurityContext.class));
-        EasyMock.expect(request.getCharacterEncoding()).andReturn(ENCODING);
-        setUpProperty(Message.ENCODING, ENCODING);
-        exchange.setSession(EasyMock.isA(HTTPSession.class));
-        EasyMock.expectLastCall();
-    }
-
-    private void setUpProperty(String name, Object value) {
-        message.put(EasyMock.eq(name), EasyMock.same(value));
-        EasyMock.expectLastCall().andReturn(null).anyTimes();
     }
 
     private void setUpResponse(int status, 
@@ -328,23 +292,4 @@ public class OsgiServletTest extends Assert {
         EasyMock.expectLastCall();
     }
 
-    private void setUpRestful() {
-        paths.add(ADDRESS);
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(null);
-        EasyMock.expect(registry.getDestinationForPath(ADDRESS)).andReturn(destination).times(2);
-        EasyMock.expect(destination.getMessageObserver()).andReturn(observer);
-        endpoint.addExtensor(extensor);
-        extensor.setLocation(EasyMock.eq(ROOT + "/cxf/Soap" + ADDRESS));
-        EasyMock.expectLastCall();
-    }
-
-    private OsgiServlet setUpServlet() { 
-        OsgiServlet servlet = new OsgiServlet(registry);
-        try {
-            servlet.init(config);
-        } catch (ServletException ex) {
-            // ignore
-        }
-        return servlet;
-    }
 }

@@ -19,8 +19,9 @@
 package org.apache.cxf.transport.http;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
+
+import org.apache.cxf.transport.AbstractDestination;
 
 
 public interface DestinationRegistry {
@@ -36,7 +37,7 @@ public interface DestinationRegistry {
     
     Collection<AbstractHTTPDestination> getDestinations();
     
-    List<AbstractHTTPDestination> getSortedDestinations();
+    AbstractDestination[] getSortedDestinations();
 
     Set<String> getDestinationsPaths();
 

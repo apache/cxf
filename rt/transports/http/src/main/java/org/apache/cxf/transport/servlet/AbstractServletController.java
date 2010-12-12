@@ -20,17 +20,23 @@
 package org.apache.cxf.transport.servlet;
 
 import java.io.IOException;
+import java.io.OutputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.UrlUtils;
+import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.http.AbstractHTTPDestination;
+import org.apache.cxf.transport.http.DestinationRegistry;
+import org.apache.cxf.transports.http.QueryHandler;
+import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
 public abstract class AbstractServletController {
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
@@ -43,13 +49,15 @@ public abstract class AbstractServletController {
     protected String title;
     protected String serviceListRelativePath = DEFAULT_LISTINGS_CLASSIFIER;
     protected ServletConfig servletConfig;
-    
-    protected AbstractServletController() {
-        
-    }
-    
-    protected AbstractServletController(ServletConfig config) {
+    protected DestinationRegistry destinationRegistry;
+    protected HttpServlet serviceListGenerator;
+
+    protected AbstractServletController(ServletConfig config, 
+                                        DestinationRegistry destinationRegistry,
+                                        HttpServlet serviceListGenerator) {
         this.servletConfig = config;
+        this.destinationRegistry = destinationRegistry;
+        this.serviceListGenerator = serviceListGenerator;
         init();
     }
     
@@ -81,27 +89,24 @@ public abstract class AbstractServletController {
         
         String hideServiceList = servletConfig.getInitParameter("hide-service-list-page");
         if (hideServiceList != null) {
-            isHideServiceList = Boolean.valueOf(hideServiceList);
+            this.isHideServiceList = Boolean.valueOf(hideServiceList);
         }
         String isDisableAddressUpdates = servletConfig.getInitParameter("disable-address-updates");
         if (isDisableAddressUpdates != null) {
-            disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
+            this.disableAddressUpdates = Boolean.valueOf(isDisableAddressUpdates);
         }
         String isForcedBaseAddress = servletConfig.getInitParameter("base-address");
         if (isForcedBaseAddress != null) {
-            forcedBaseAddress = isForcedBaseAddress;
+            this.forcedBaseAddress = isForcedBaseAddress;
         }
-        String serviceListTransform = servletConfig.getInitParameter("service-list-stylesheet");
-        if (serviceListTransform != null) {
-            serviceListStyleSheet = serviceListTransform;
+        try {
+            serviceListGenerator.init(servletConfig);
+        } catch (ServletException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
         String serviceListPath = servletConfig.getInitParameter("service-list-path");
         if (serviceListPath != null) {
-            serviceListRelativePath = serviceListPath;
-        }
-        String configTitle = servletConfig.getInitParameter("service-list-title");
-        if (configTitle != null) {
-            title = configTitle;
+            this.serviceListRelativePath = serviceListPath;
         }
     }
     
@@ -154,7 +159,44 @@ public abstract class AbstractServletController {
                 LOG.fine("Finished servicing http request on thread: " + Thread.currentThread());
             }
         }
-
+    }
+    
+    protected QueryHandler findQueryHandler(QueryHandlerRegistry queryHandlerRegistry, 
+                                            EndpointInfo ei, 
+                                            String ctxUri,
+                                            String baseUri) {
+        if (queryHandlerRegistry == null) {
+            return null;
+        }
+        Iterable<QueryHandler> handlers = queryHandlerRegistry.getHandlers();
+        for (QueryHandler qh : handlers) {
+            if (qh.isRecognizedQuery(baseUri, ctxUri, ei)) {
+                return qh;
+            }
+        }
+        return null;
     }
 
+    protected void respondUsingQueryHandler(QueryHandler selectedHandler, HttpServletResponse res,
+                                          EndpointInfo ei, String ctxUri, String baseUri) throws IOException,
+        ServletException {
+        res.setContentType(selectedHandler.getResponseContentType(baseUri, ctxUri));
+        OutputStream out = res.getOutputStream();
+        try {
+            selectedHandler.writeResponse(baseUri, ctxUri, ei, out);
+            out.flush();
+        } catch (Exception e) {
+            LOG.warning(selectedHandler.getClass().getName()
+                + " Exception caught writing response: "
+                + e.getMessage());
+            throw new ServletException(e);
+        }
+    }
+
+    protected void generateNotFound(HttpServletRequest request, HttpServletResponse res) throws IOException {
+        res.setStatus(404);
+        res.setContentType("text/html");
+        res.getWriter().write("<html><body>No service was found.</body></html>");
+    }
+    
 }

@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -34,6 +35,7 @@ import org.apache.cxf.BusFactory;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.DestinationFactoryManager;
+import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 
 
@@ -53,10 +55,12 @@ public abstract class AbstractCXFServlet extends AbstractHTTPServlet {
     }
     
     public ServletController createServletController(ServletConfig servletConfig) {
+        HttpServlet serviceListGeneratorServlet = 
+            new ServiceListGeneratorServlet(servletTransportFactory.getRegistry(), bus);
         ServletController newController =
             new ServletController(servletTransportFactory.getRegistry(),
                                   servletConfig,
-                                  bus);
+                                  serviceListGeneratorServlet);
         servletTransportFactory.setServletController(newController);
         if (servletConfig.getInitParameter("disable-address-updates") == null) {
             newController.setDisableAddressUpdates(disableAddressUpdates);

@@ -135,6 +135,10 @@ public abstract class AbstractHTTPDestination
         initConfig();
     }
     
+    public Bus getBus() {
+        return bus;
+    }
+
     private AuthorizationPolicy getAuthorizationPolicyFromMessage(String credentials) {
         if (credentials == null || StringUtils.isEmpty(credentials.trim())) {
             return null;
@@ -167,12 +171,6 @@ public abstract class AbstractHTTPDestination
     protected final boolean isOneWay(Message message) {
         Exchange ex = message.getExchange();
         return ex == null ? false : ex.isOneWay();
-    }
-    
-    public void invoke(final ServletContext context, 
-                       final HttpServletRequest req, 
-                       final HttpServletResponse resp) throws IOException {
-        invoke(null, context, req, resp);
     }
     
     public void invoke(final ServletConfig config,

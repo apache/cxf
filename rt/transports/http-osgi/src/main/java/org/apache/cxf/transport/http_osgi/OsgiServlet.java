@@ -20,45 +20,42 @@ package org.apache.cxf.transport.http_osgi;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.cxf.message.ExchangeImpl;
-import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transport.servlet.AbstractHTTPServlet;
+import org.apache.cxf.transport.servlet.servicelist.ServiceListGeneratorServlet;
 
 public class OsgiServlet extends AbstractHTTPServlet {
     
-    private DestinationRegistry transport;
+    private DestinationRegistry destinationRegistry;
     private OsgiServletController controller;
+    private HttpServlet serviceListGenerator;
     
-    public OsgiServlet(DestinationRegistry transport) {
-        this.transport = transport;
+    public OsgiServlet(DestinationRegistry destinationRegistry) {
+        this(destinationRegistry, new ServiceListGeneratorServlet(destinationRegistry, null));
+    }
+    
+    public OsgiServlet(DestinationRegistry destinationRegistry, HttpServlet serviceListGenerator) {
+        this.destinationRegistry = destinationRegistry;
+        this.serviceListGenerator = serviceListGenerator;
     }
 
     public void init(ServletConfig servletConfig) throws ServletException {
         super.init(servletConfig);
-        controller = new OsgiServletController(this.getTransport(), this.getServletConfig());
+        controller = new OsgiServletController(servletConfig,
+                                               this.destinationRegistry, 
+                                               serviceListGenerator);
     }
     
     @Override
     public void destroy() {
     }
 
-    public DestinationRegistry getTransport() {
-        return transport;
-    }
-
     public void invoke(HttpServletRequest request, HttpServletResponse res) throws ServletException {
         controller.invoke(request, res);
     }
-    
-    protected MessageImpl createInMessage() {
-        return new MessageImpl();
-    }
 
-    protected ExchangeImpl createExchange() {
-        return new ExchangeImpl();
-    }
 }
