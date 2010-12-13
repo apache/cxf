@@ -35,6 +35,8 @@ import org.apache.cxf.greeter_control.ControlService;
 import org.apache.cxf.greeter_control.Greeter;
 import org.apache.cxf.greeter_control.GreeterService;
 import org.apache.cxf.greeter_control.types.GreetMeResponse;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.systest.ws.util.ConnectionHelper;
 import org.apache.cxf.systest.ws.util.InMessageRecorder;
 import org.apache.cxf.systest.ws.util.MessageFlow;
@@ -156,6 +158,8 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
+        greeterBus.getOutInterceptors().add(new LoggingOutInterceptor());
+        greeterBus.getInInterceptors().add(new LoggingInInterceptor());
         
         responses[3] = greeter.greetMeAsync("four");
         verifyRetransmissionQueue();
@@ -239,7 +243,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
   
     
     void verifyRetransmissionQueue() throws Exception {
-        awaitMessages(1, 3, 40000);
+        awaitMessages(3, 5, 40000);
         
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
         assertTrue("Retransmission Queue is not empty", empty);
