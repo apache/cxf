@@ -76,17 +76,6 @@
                  <enabled>false</enabled>
              </releases>
          </repository> 
-         <repository>
-              <id>java.net</id>
-              <url>http://download.java.net/maven/2/</url>
-              <name>Java Net Maven Repo</name>
-             <snapshots>
-                 <enabled>false</enabled>
-             </snapshots>
-             <releases>
-                 <enabled>true</enabled>
-             </releases>
-         </repository>
      </repositories>
     <pluginRepositories>
          <pluginRepository>
@@ -97,17 +86,6 @@
              </snapshots>
              <releases>
                  <enabled>false</enabled>
-             </releases>
-         </pluginRepository>
-         <pluginRepository>
-              <id>java.net</id>
-              <url>http://download.java.net/maven/2/</url>
-              <name>Java Net Maven Repo</name>
-             <snapshots>
-                 <enabled>false</enabled>
-             </snapshots>
-             <releases>
-                 <enabled>true</enabled>
              </releases>
          </pluginRepository>
      </pluginRepositories>
