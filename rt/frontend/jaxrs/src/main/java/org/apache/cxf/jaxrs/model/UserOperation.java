@@ -31,6 +31,7 @@ public class UserOperation {
     private String consumesTypes;
     private String producesTypes;
     private List<Parameter> params; 
+    private boolean oneway;
     
     public UserOperation() {
         
@@ -107,5 +108,13 @@ public class UserOperation {
     public List<Parameter> getParameters() {
         return params == null ? CastUtils.cast(Collections.emptyList(), Parameter.class)
             : Collections.unmodifiableList(params);
+    }
+
+    public void setOneway(boolean oneway) {
+        this.oneway = oneway;
+    }
+
+    public boolean isOneway() {
+        return oneway;
     }
 }

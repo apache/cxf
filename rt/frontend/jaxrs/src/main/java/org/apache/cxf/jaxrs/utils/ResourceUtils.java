@@ -166,7 +166,8 @@ public final class ResourceUtils {
             OperationResourceInfo ori = 
                 new OperationResourceInfo(m, cri, URITemplate.createTemplate(op.getPath()),
                                           op.getVerb(), op.getConsumes(), op.getProduces(),
-                                          op.getParameters());
+                                          op.getParameters(),
+                                          op.isOneway());
             String rClassName = m.getReturnType().getName();
             if (op.getVerb() == null) {
                 if (resources.containsKey(rClassName)) {
@@ -499,6 +500,7 @@ public final class ResourceUtils {
         op.setName(e.getAttribute("name"));
         op.setVerb(e.getAttribute("verb"));
         op.setPath(e.getAttribute("path"));
+        op.setOneway(Boolean.parseBoolean(e.getAttribute("oneway")));
         op.setConsumes(e.getAttribute("consumes"));
         op.setProduces(e.getAttribute("produces"));
         List<Element> paramEls = 

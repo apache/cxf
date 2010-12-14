@@ -41,7 +41,7 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
     @BeforeClass
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly",
-                   launchServer(BookNonSpringServer.class));
+                   launchServer(BookNonSpringServer.class, true));
     }
     
     
@@ -83,7 +83,6 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
             JAXRSClientFactory.createFromModel("http://localhost:" + PORT + "/usermodel2", 
                                               BookStoreNoAnnotationsInterface.class,
                               "classpath:org/apache/cxf/systest/jaxrs/resources/resources2.xml", null);
-        WebClient.getConfig(proxy).getHttpConduit().getClient().setReceiveTimeout(10000000);
         Book book = new Book("From Model", 1L);
         List<Book> books = new ArrayList<Book>();
         books.add(book);
@@ -92,6 +91,17 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         assertNotSame(book, books.get(0));
         assertEquals("From Model", books.get(0).getName());
         
+    }
+    
+    @Test
+    public void testUserModelInterfaceOneWay() throws Exception {
+        BookStoreNoAnnotationsInterface proxy = 
+            JAXRSClientFactory.createFromModel("http://localhost:" + PORT + "/usermodel2", 
+                                              BookStoreNoAnnotationsInterface.class,
+                              "classpath:org/apache/cxf/systest/jaxrs/resources/resources2.xml", null);
+        
+        proxy.pingBookStore();
+        assertEquals(202, WebClient.client(proxy).getResponse().getStatus());
     }
     
     @Test

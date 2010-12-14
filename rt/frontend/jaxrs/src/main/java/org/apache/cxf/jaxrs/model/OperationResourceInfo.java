@@ -77,13 +77,16 @@ public class OperationResourceInfo {
         checkOneway();
     }
     
+    //CHECKSTYLE:OFF
     public OperationResourceInfo(Method m, 
                                  ClassResourceInfo cri,
                                  URITemplate template,
                                  String httpVerb,
                                  String consumeMediaTypes,
                                  String produceMediaTypes,
-                                 List<Parameter> params) {
+                                 List<Parameter> params,
+                                 boolean oneway) {
+    //CHECKSTYLE:ON    
         methodToInvoke = m;
         annotatedMethod = null;
         classResourceInfo = cri;
@@ -91,8 +94,9 @@ public class OperationResourceInfo {
         httpMethod = httpVerb;
         checkMediaTypes(consumeMediaTypes, produceMediaTypes);
         parameters = params;
+        this.oneway = oneway;
     }
-
+    
     private void checkOneway() {
         if (annotatedMethod != null) {
             oneway = AnnotationUtils.getAnnotation(annotatedMethod.getAnnotations(), Oneway.class) != null;
