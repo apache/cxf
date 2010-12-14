@@ -1186,6 +1186,20 @@ public class HandlerInvocationTest extends AbstractBusClientServerTestBase {
             assertEquals(expected, iter.next());
         }
     }
+    
+    @Test
+    public void testMustUnderstandSoapFaultOneWay() {
+        TestMustUnderstandHandler<SOAPMessageContext> handler = 
+            new TestMustUnderstandHandler<SOAPMessageContext>();
+        addHandlersToChain((BindingProvider)handlerTest, handler);
+        try {
+            handlerTest.pingOneWay();
+        } catch (Exception e) {
+            fail("Catch unexpected exception: soap faule message " 
+                 + "should not be returned for one way operation");
+        }
+
+    }
 
     void addHandlersToChain(BindingProvider bp, Handler... handlers) {
         List<Handler> handlerChain = bp.getBinding().getHandlerChain();
