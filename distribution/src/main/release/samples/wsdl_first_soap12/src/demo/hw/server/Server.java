@@ -21,18 +21,25 @@ package demo.hw.server;
 
 import javax.xml.ws.Endpoint;
 
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
+
 public class Server {
 
-    protected Server() throws Exception {
+    protected Server(String wsdl) throws Exception {
         System.out.println("Starting Server");
-
-        Object implementor = new GreeterImpl();
         String address = "http://localhost:9000/SoapContext/SoapPort";
-        Endpoint.publish(address, implementor);
+
+        System.out.println("Starting Server");
+        JaxWsServerFactoryBean svrFactory = new JaxWsServerFactoryBean();
+        //svrFactory.setServiceClass(Greeter.class);
+        svrFactory.setWsdlLocation(wsdl);
+        svrFactory.setAddress(address);
+        svrFactory.setServiceBean(new GreeterImpl());
+        svrFactory.create();
     }
 
     public static void main(String args[]) throws Exception {
-        new Server();
+        new Server(args[0]);
         System.out.println("Server ready...");
 
         Thread.sleep(5 * 60 * 1000);
