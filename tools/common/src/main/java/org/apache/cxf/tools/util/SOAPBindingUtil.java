@@ -84,8 +84,20 @@ public final class SOAPBindingUtil {
         /*
          * If we put proxies into the loader of the proxied class, they'll just pile up.
          */
-        Object proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
+        Object proxy = null;
+        try {
+            proxy = Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(),
                                               new Class[] {cls}, ih);
+        } catch (IllegalArgumentException ex) {
+            // Using cls classloader as a fallback to make it work within OSGi  
+            ClassLoader contextLoader = Thread.currentThread().getContextClassLoader();
+            if (contextLoader != cls.getClassLoader()) {
+                proxy = Proxy.newProxyInstance(cls.getClassLoader(),
+                                              new Class[] {cls}, ih);
+            } else {
+                throw ex;
+            }
+        }
         return cls.cast(proxy);
     }
 
