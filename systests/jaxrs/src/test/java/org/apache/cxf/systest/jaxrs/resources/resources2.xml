@@ -8,7 +8,8 @@
     </operation> 
     <operation name="getBookChapter" path="/books/{id}/chapter">
         <param name="id" type="PATH"/>
-    </operation> 
+    </operation>
+    <operation name="pingBookStore" path="/oneway" verb="POST" oneway="true"/>
  </resource>
  <resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
     <operation name="getItself" verb="GET"/>

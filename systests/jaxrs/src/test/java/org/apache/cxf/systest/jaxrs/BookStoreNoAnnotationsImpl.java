@@ -73,5 +73,9 @@ public class BookStoreNoAnnotationsImpl implements BookStoreNoAnnotationsInterfa
     public List<Book> getBooks(List<Book> thebooks) {
         return thebooks;
     }
+
+    public void pingBookStore() {
+        // complete
+    }
     
 }

@@ -65,7 +65,7 @@
     </login-config>
 <!--
 <security-role>
-<role-name>JBossAdmin</role-name>
+<role-name>ROLE_BOOK_OWNER</role-name>
 </security-role>
 -->	
 </web-app>

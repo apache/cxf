@@ -28,6 +28,8 @@ public interface BookStoreNoAnnotationsInterface {
     
     List<Book> getBooks(List<Book> thebooks);
         
+    void pingBookStore();
+    
     ChapterNoAnnotations getBookChapter(Long id) throws BookNotFoundFault;
     
 }
