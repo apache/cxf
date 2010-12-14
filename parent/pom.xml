@@ -56,9 +56,9 @@
         <cxf.jaxb21.version>2.1</cxf.jaxb21.version>
         <cxf.jaxb21.impl.version>2.1.13</cxf.jaxb21.impl.version>
         <cxf.jaxb21.xjc.version>2.1.13</cxf.jaxb21.xjc.version>
-        <cxf.jaxb22.version>2.2.2</cxf.jaxb22.version>
-        <cxf.jaxb22.impl.version>2.2.2</cxf.jaxb22.impl.version>
-        <cxf.jaxb22.xjc.version>2.2.2</cxf.jaxb22.xjc.version>
+        <cxf.jaxb22.version>2.2.1</cxf.jaxb22.version>
+        <cxf.jaxb22.impl.version>2.2.1.1</cxf.jaxb22.impl.version>
+        <cxf.jaxb22.xjc.version>2.2.1.1</cxf.jaxb22.xjc.version>
 
         <!-- by default, we use jaxb 2.1, but java5 profile will override to 2.2 -->
         <cxf.jaxb.version>${cxf.jaxb21.version}</cxf.jaxb.version>
