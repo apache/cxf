@@ -823,7 +823,7 @@ public class MAPAggregatorTest extends Assert {
         Exchange exchange = control.createMock(Exchange.class);
         exchange.get(Bus.class);
         EasyMock.expectLastCall().andReturn(bus).anyTimes();
-        //Exchange exchange = new ExchangeImpl();
+        EasyMock.expect(exchange.isEmpty()).andReturn(true).anyTimes();
         return exchange;
     }
     

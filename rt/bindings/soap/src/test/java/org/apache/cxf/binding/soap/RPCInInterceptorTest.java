@@ -68,6 +68,7 @@ public class RPCInInterceptorTest extends TestBase {
         service.getServiceInfos();
         List<ServiceInfo> list = Arrays.asList(si);
         EasyMock.expectLastCall().andReturn(list).anyTimes();
+        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
         
         soapMessage.getExchange().put(Service.class, service);
         soapMessage.getExchange().put(Message.SCHEMA_VALIDATION_ENABLED, Boolean.FALSE);

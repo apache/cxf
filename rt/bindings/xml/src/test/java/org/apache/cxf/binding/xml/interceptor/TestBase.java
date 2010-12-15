@@ -148,6 +148,8 @@ public class TestBase extends Assert {
         EasyMock.expect(endpoint.getEndpointInfo()).andStubReturn(epi);
         EasyMock.expect(endpoint.getBinding()).andStubReturn(xmlBinding);
         EasyMock.expect(endpoint.getService()).andStubReturn(service);
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
+        
 
         control.replay();
 
