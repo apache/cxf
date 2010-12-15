@@ -94,7 +94,9 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
-        soapMessage.getInterceptorChain().add(ending);
+        if (!isRequestor(soapMessage)) {
+            soapMessage.getInterceptorChain().add(ending);
+        }
     }
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
@@ -252,8 +254,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         public MustUnderstandEndingInterceptor(String phase) {
             super(phase);
         }
-
-        @Override
+        
         public void handleMessage(SoapMessage message) throws Fault {
             // throws soapFault after the response code 202 is set in OneWayProcessorInterceptor
             if (message.get(MustUnderstandInterceptor.FAULT) != null) {
