@@ -64,11 +64,17 @@ public final class FileUtils {
             int x = (int)(Math.random() * 1000000);
             s = System.getProperty("java.io.tmpdir");
             File checkExists = new File(s);
-            if (!checkExists.exists()) {
+            if (!checkExists.exists() || !checkExists.isDirectory()) {
                 throw new RuntimeException("The directory " 
                                        + checkExists.getAbsolutePath() 
                                        + " does not exist, please set java.io.tempdir"
                                        + " to an existing directory");
+            }
+            if (!checkExists.canWrite()) {
+                throw new RuntimeException("The directory " 
+                                       + checkExists.getAbsolutePath() 
+                                       + " is now writable, please set java.io.tempdir"
+                                       + " to an writable directory");
             }
             File f = new File(s, "cxf-tmp-" + x);
             while (!f.mkdir()) {
