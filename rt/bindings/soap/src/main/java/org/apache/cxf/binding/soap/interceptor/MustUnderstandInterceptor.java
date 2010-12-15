@@ -43,15 +43,18 @@ import org.apache.cxf.headers.Header;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
+import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
-
+    public static final String FAULT = "MustUnderstand.Fault";
 
     private static final Logger LOG = LogUtils.getL7dLogger(MustUnderstandInterceptor.class);
 
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
-
+    
+    private MustUnderstandEndingInterceptor ending = new MustUnderstandEndingInterceptor();
+        
     public MustUnderstandInterceptor() {
         super(Phase.PRE_PROTOCOL);
     }
@@ -80,12 +83,18 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         checkUnderstand(mustUnderstandHeaders, mustUnderstandQNames, notUnderstandHeaders);
         
         if (!notUnderstandHeaders.isEmpty()) {
-            throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
-                            soapVersion.getMustUnderstand());
+            SoapFault soapFault = new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notUnderstandHeaders),
+                                                soapVersion.getMustUnderstand());
+            if (!isRequestor(soapMessage)) {
+                soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
+            } else {
+                throw soapFault;
+            }
         }
         if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
+        soapMessage.getInterceptorChain().add(ending);
     }
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
@@ -126,8 +135,11 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                 }
             }
             if (!notFound.isEmpty()) {
-                throw new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
-                                soapMessage.getVersion().getMustUnderstand());
+                // Defer throwing soap fault exception in SOAPHeaderInterceptor once the isOneway can
+                // be detected
+                SoapFault soapFault = new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
+                                                    soapMessage.getVersion().getMustUnderstand());
+                soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
             }
         }
     }
@@ -230,4 +242,25 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
         }
 
     }
+    
+    public class MustUnderstandEndingInterceptor extends AbstractSoapInterceptor {
+        public MustUnderstandEndingInterceptor() {
+            super(Phase.PRE_LOGICAL);
+            addAfter(OneWayProcessorInterceptor.class.getName());
+        }
+
+        public MustUnderstandEndingInterceptor(String phase) {
+            super(phase);
+        }
+
+        @Override
+        public void handleMessage(SoapMessage message) throws Fault {
+            // throws soapFault after the response code 202 is set in OneWayProcessorInterceptor
+            if (message.get(MustUnderstandInterceptor.FAULT) != null) {
+                SoapFault soapFault = (SoapFault)message.get(MustUnderstandInterceptor.FAULT);
+                throw soapFault;
+            }
+        }
+    }
+
 }
