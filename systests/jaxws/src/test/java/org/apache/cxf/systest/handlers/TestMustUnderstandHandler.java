@@ -74,22 +74,18 @@ public class TestMustUnderstandHandler<T extends SOAPMessageContext> extends Tes
         }
         return continueProcessing;
     }
-
-    @Override
+    
     public String getHandlerId() {
         return "TestMustUnderstandHandler";
     }
-
-    @Override
+    
     public Set<QName> getHeaders() {
         return null;
     }
-
-    @Override
+    
     public void close(MessageContext messagecontext) {
     }
-
-    @Override
+   
     public boolean handleFault(T messagecontext) {
         return true;
     }
