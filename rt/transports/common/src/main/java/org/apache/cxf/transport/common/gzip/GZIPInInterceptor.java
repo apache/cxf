@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http.gzip;
+package org.apache.cxf.transport.common.gzip;
 
 import java.io.IOException;
 import java.io.InputStream;

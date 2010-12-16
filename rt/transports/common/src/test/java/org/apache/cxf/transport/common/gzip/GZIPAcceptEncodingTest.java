@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http.gzip;
+package org.apache.cxf.transport.common.gzip;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -39,7 +39,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.apache.cxf.transport.http.gzip.GZIPOutInterceptor.UseGzip.*;
+import static org.apache.cxf.transport.common.gzip.GZIPOutInterceptor.UseGzip.*;
 
 /**
  * Test for the parsing of Accept-Encoding by the GZIPOutInterceptor. For
