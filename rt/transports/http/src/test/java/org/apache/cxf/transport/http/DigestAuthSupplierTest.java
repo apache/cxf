@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -81,11 +82,19 @@ public class DigestAuthSupplierTest {
         control.replay();
         String authToken = authSupplier
             .getAuthorizationForRealm(conduit, url, message, "myRealm", fullHeader);
-        assertEquals("Digest response=\"28e616b6868f60aaf9b19bb5b172f076\", " 
-                     + "cnonce=\"27db039b76362f3d55da10652baee38c\", " 
-                     + "username=\"testUser\", nc=\"00000001\", " 
-                     + "nonce=\"MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==\", "
-                     + "realm=\"MyCompany realm.\", qop=\"auth\", uri=\"\"", authToken);
+        HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
+        assertEquals("Digest", authHeader.getAuthType());
+        Map<String, String> params = authHeader.getParams();
+        Map<String, String> expectedParams = new HashMap<String, String>();
+        expectedParams.put("response", "28e616b6868f60aaf9b19bb5b172f076");
+        expectedParams.put("cnonce", "27db039b76362f3d55da10652baee38c");
+        expectedParams.put("username", "testUser");
+        expectedParams.put("nc", "00000001");
+        expectedParams.put("nonce", "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==");
+        expectedParams.put("realm", "MyCompany realm.");
+        expectedParams.put("qop", "auth");
+        expectedParams.put("uri", "");
+        assertEquals(expectedParams, params);
         control.verify();
     }
 }

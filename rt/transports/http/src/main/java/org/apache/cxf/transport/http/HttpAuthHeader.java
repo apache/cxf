@@ -85,9 +85,6 @@ public final class HttpAuthHeader {
                     return map;
                 }
                 String value = tok.sval;
-                if (value.charAt(0) == '"') {
-                    value = value.substring(1, value.length() - 1);
-                }
                 map.put(key, value);
             }
         } catch (IOException ex) {
