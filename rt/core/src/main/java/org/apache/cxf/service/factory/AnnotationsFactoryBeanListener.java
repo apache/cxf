@@ -242,7 +242,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         if (annotation != null) {
             try {
                 Class<?> cls = ClassLoaderUtils
-                    .loadClass("org.apache.cxf.transport.http.gzip.GZIPFeature",
+                    .loadClass("org.apache.cxf.transport.common.gzip.GZIPFeature",
                                this.getClass());
                 
                 AbstractFeature feature = (AbstractFeature)cls.newInstance();
