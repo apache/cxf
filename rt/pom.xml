@@ -44,6 +44,7 @@
         <module>frontend/jaxws</module>
         <module>frontend/jaxrs</module>
         <module>frontend/js</module>
+        <module>transports/common</module>
         <module>transports/http</module>
         <module>transports/http-jetty</module>
         <module>transports/http-osgi</module>
