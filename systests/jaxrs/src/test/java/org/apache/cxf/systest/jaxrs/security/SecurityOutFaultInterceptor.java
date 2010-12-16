@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
+import java.io.IOException;
+
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.cxf.interceptor.Fault;
@@ -35,14 +37,22 @@ public class SecurityOutFaultInterceptor extends AbstractPhaseInterceptor<Messag
     }
 
     public void handleMessage(Message message) throws Fault {
-        Exception ex = message.getContent(Exception.class);
-        if (!(((Fault)ex).getCause() instanceof AccessDeniedException)) {
-            throw new RuntimeException("Security Exception is expected is expected");
+        Fault fault = (Fault)message.getContent(Exception.class);
+        Throwable ex = fault.getCause();
+        if (!(ex instanceof SecurityException)) {
+            throw new RuntimeException("Security Exception is expected");
         }
         
         HttpServletResponse response = (HttpServletResponse)message.getExchange().getInMessage()
             .get(AbstractHTTPDestination.HTTP_RESPONSE);
-        response.setStatus(403);
+        int status = ex instanceof AccessDeniedException ? 403 : 401; 
+        response.setStatus(status);
+        try {
+            response.getOutputStream().write(ex.getMessage().getBytes());
+            response.getOutputStream().flush();
+        } catch (IOException iex) {
+            // ignore
+        }
         
         message.getInterceptorChain().abort();
     }

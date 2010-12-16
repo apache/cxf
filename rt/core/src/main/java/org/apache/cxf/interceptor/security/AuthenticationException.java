@@ -18,8 +18,8 @@
  */
 package org.apache.cxf.interceptor.security;
 
-public class AccessDeniedException extends SecurityException {
-    public AccessDeniedException(String reason) {
+public class AuthenticationException extends SecurityException {
+    public AuthenticationException(String reason) {
         super(reason);
     }
 }

@@ -39,7 +39,7 @@ public abstract class AbstractSpringSecurityTest extends AbstractBusClientServer
         return bos.getOut().toString();        
     }
     
-    private String base64Encode(String value) {
+    protected String base64Encode(String value) {
         return Base64Utility.encode(value.getBytes());
     }
     

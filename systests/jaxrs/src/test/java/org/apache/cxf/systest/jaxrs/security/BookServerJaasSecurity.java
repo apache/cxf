@@ -16,10 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.interceptor.security;
 
-public class AccessDeniedException extends SecurityException {
-    public AccessDeniedException(String reason) {
-        super(reason);
+package org.apache.cxf.systest.jaxrs.security;
+
+import org.apache.cxf.systest.jaxrs.AbstractSpringServer;
+
+
+
+public class BookServerJaasSecurity extends AbstractSpringServer {
+
+    public BookServerJaasSecurity() {
+        super("/jaxrs_jaas_security");
     }
+    
+    public BookServerJaasSecurity(String[] args) {
+        super("/jaxrs_jaas_security");
+    }
+    
+    public static void main(String args[]) {
+        try {
+            BookServerJaasSecurity s = new BookServerJaasSecurity();
+            s.start();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            System.exit(-1);
+        } finally {
+            System.out.println("done!");
+        }
+    }
+
 }

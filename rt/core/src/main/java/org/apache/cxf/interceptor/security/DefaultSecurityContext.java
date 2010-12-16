@@ -31,28 +31,44 @@ import org.apache.cxf.security.SecurityContext;
  * following approach : skip the first Subject principal, and then checks
  * Groups the principal is a member of
  * 
- * TODO : consider moving this class into common/security
+ * TODO : consider moving this class into a rt-core-security module
  */
 public class DefaultSecurityContext implements SecurityContext {
 
     private Principal p;
     private Subject subject; 
     
+    public DefaultSecurityContext(Subject subject) {
+        this.p = findPrincipal(subject);
+        this.subject = subject;
+    }
+    
     public DefaultSecurityContext(Principal p, Subject subject) {
         this.p = p;
         this.subject = subject;
     }
     
+    private static Principal findPrincipal(Subject subject) {
+        if (subject != null) {
+            for (Principal principal : subject.getPrincipals()) {
+                if (!(principal instanceof Group)) { 
+                    return principal;
+                }
+            }
+        }
+        return null;
+    }
+    
     public Principal getUserPrincipal() {
         return p;
     }
+    
     public boolean isUserInRole(String role) {
-        if (subject == null || subject.getPrincipals().size() <= 1) {
-            return false;
-        }
-        for (Principal principal : subject.getPrincipals()) {
-            if (principal instanceof Group && checkGroup((Group)principal, role)) { 
-                return true;
+        if (subject != null) {
+            for (Principal principal : subject.getPrincipals()) {
+                if (principal instanceof Group && checkGroup((Group)principal, role)) { 
+                    return true;
+                }
             }
         }
         return false;
