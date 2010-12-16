@@ -87,15 +87,13 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                                                 soapVersion.getMustUnderstand());
             if (!isRequestor(soapMessage)) {
                 soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
+                soapMessage.getInterceptorChain().add(ending);
             } else {
                 throw soapFault;
             }
         }
         if (!ultimateReceiverHeaders.isEmpty() && !isRequestor(soapMessage)) {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
-        }
-        if (!isRequestor(soapMessage)) {
-            soapMessage.getInterceptorChain().add(ending);
         }
     }
 
