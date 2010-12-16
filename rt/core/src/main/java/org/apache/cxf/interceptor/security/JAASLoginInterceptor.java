@@ -66,7 +66,6 @@ public class JAASLoginInterceptor extends AbstractPhaseInterceptor<Message> {
         return rolePrefix;
     }
     
-    @Override
     public void handleMessage(Message message) throws Fault {
 
         String name = null;
