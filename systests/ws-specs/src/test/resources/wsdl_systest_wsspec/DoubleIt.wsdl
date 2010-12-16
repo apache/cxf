@@ -25,7 +25,13 @@
 			<xsd:element name="DoubleIt">
 				<xsd:complexType>
 					<xsd:sequence>
-						<xsd:element name="numberToDouble" type="xsd:integer" />
+						<xsd:element name="numberToDouble">
+                            <xsd:simpleType>
+								<xsd:restriction base="xsd:integer">
+									<xsd:minInclusive value="0"/>
+								</xsd:restriction>
+							</xsd:simpleType>
+                        </xsd:element>
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>

@@ -754,8 +754,8 @@ public class WSDLServiceBuilder {
                     MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
                     mpi.setTypeQName(el.getSchemaTypeName());
                     mpi.setElement(true);
-                    mpi.setConcreteName(el.getWireName());
                     mpi.setElementQName(el.getWireName());
+                    mpi.setConcreteName(el.getWireName());
                     mpi.setXmlSchema(el);
                 } else if (el.getRef().getTargetQName() != null) {
                     MessagePartInfo mpi = wrapper.addMessagePart(el.getRef().getTargetQName());
@@ -771,8 +771,8 @@ public class WSDLServiceBuilder {
                 } else {
                     // anonymous type
                     MessagePartInfo mpi = wrapper.addMessagePart(new QName(namespaceURI, el.getName()));
-                    mpi.setConcreteName(el.getWireName());
                     mpi.setElementQName(mpi.getName());
+                    mpi.setConcreteName(el.getWireName());
                     mpi.setElement(true);
                     mpi.setXmlSchema(el);
                 }
