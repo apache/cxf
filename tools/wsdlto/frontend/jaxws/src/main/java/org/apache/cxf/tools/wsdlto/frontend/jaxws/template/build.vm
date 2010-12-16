@@ -88,10 +88,24 @@
 
     <property name="cxf.etc.dir" location="${cxf.home}/etc"/>
 
+    <condition property="cxf.endorsed.dir" value="${cxf.home}/lib/endorsed">
+        <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+    </condition>
+    <condition property="cxf.endorsed.flag" value="-Djava.endorsed.dirs=${cxf.endorsed.dir}">
+        <available file="${cxf.home}/lib/endorsed" type="dir" property=""/>
+    </condition>
+    <property name="cxf.endorsed.dir" location="${cxf.home}"/>
+    <property name="cxf.endorsed.flag" value="-Dnone=none"/>
+
+
+
     <path id="cxf.classpath">
         <pathelement location="${home.dir}" /> 
         <pathelement location="${build.classes.dir}"/>
         <pathelement location="${cxf-manifest.jar.file}"/>
+        <fileset dir="${cxf.endorsed.dir}">
+            <include name="*.jar"/>
+        </fileset>
     </path>
 
 #foreach ($targetName in $clientClassNamesMap.keySet())
@@ -115,7 +129,8 @@
 
     <target name="compile">
         <mkdir dir="${build.classes.dir}"/>
-        <javac srcdir="${build.src.dir}" destdir="${build.classes.dir}" debug="true">
+        <javac srcdir="${build.src.dir}" destdir="${build.classes.dir}" debug="true" fork="true">
+            <compilerarg line="-J${cxf.endorsed.flag}"/>
             <classpath refid="cxf.classpath" />
         </javac>
     </target>
@@ -159,6 +174,7 @@
                 <arg value="@{param3}"/>
                 <arg value="@{param4}"/>
                 <arg value="@{param5}"/>
+                <jvmarg value="${cxf.endorsed.flag}"/>
                 <jvmarg value="@{jvmarg1}"/>
                 <jvmarg value="@{jvmarg2}"/>
                 <jvmarg value="@{jvmarg3}"/>
