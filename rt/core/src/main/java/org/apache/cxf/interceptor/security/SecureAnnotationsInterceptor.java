@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.util.ClassHelper;
 
 
 public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
@@ -54,10 +55,17 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
     }
     
     public void setSecuredObject(Object object) {
-        Class<?> cls = object.getClass();
-        String classRolesAllowed = getRoles(cls.getAnnotations(), annotationClassName);
-        
+        Class<?> cls = ClassHelper.getRealClass(object);
         Map<String, String> rolesMap = new HashMap<String, String>();
+        findRoles(cls, rolesMap);
+        super.setMethodRolesMap(rolesMap);
+    }
+
+    protected void findRoles(Class<?> cls, Map<String, String> rolesMap) {
+        if (cls == null || cls == Object.class) {
+            return;
+        }
+        String classRolesAllowed = getRoles(cls.getAnnotations(), annotationClassName);
         for (Method m : cls.getMethods()) {
             if (SKIP_METHODS.contains(m.getName())) {
                 continue;
@@ -68,10 +76,21 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
                 rolesMap.put(m.getName(), theRoles);
             }
         }
-        super.setMethodRolesMap(rolesMap);
+        if (!rolesMap.isEmpty()) {
+            return;
+        }
         
+        findRoles(cls.getSuperclass(), rolesMap);
+        
+        if (!rolesMap.isEmpty()) {
+            return;
+        }
+        
+        for (Class<?> interfaceCls : cls.getInterfaces()) {
+            findRoles(interfaceCls, rolesMap);
+        }
     }
-
+    
     private String getRoles(Annotation[] anns, String annName) {
         for (Annotation ann : anns) {
             if (ann.annotationType().getName().equals(annName)) {

@@ -66,7 +66,8 @@ public class SecureBookStore implements SecureBookInterface, Injectable {
     }
     
     public Book getThatBook() throws BookNotFoundFault {
-        if (securityContext.isUserInRole("ROLE_ADMIN")
+        if ((securityContext.isUserInRole("ROLE_ADMIN")
+            || securityContext.isUserInRole("ROLE_BOOK_OWNER"))
             && !securityContext.isUserInRole("ROLE_BAZ")) {
             return books.get(123L);
         }
