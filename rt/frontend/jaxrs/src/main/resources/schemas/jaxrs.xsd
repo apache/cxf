@@ -150,6 +150,7 @@
                       <xsd:attribute name="verb" type="xsd:string"/>
                       <xsd:attribute name="consumes" type="xsd:string"/>
                       <xsd:attribute name="produces" type="xsd:string"/>
+                      <xsd:attribute name="oneway" type="xsd:boolean"/>
                     </xsd:complexType>
                  </xsd:element>
              </xsd:sequence>
