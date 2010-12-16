@@ -19,13 +19,18 @@
 
 package org.apache.cxf.cxf1332;
 
+import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.test.AbstractCXFSpringTest;
+import org.apache.cxf.testutil.common.TestUtil;
+
 import org.junit.Test;
 
 /**
  * 
  */
 public class Cxf1332Test extends AbstractCXFSpringTest {
+    public static final String PORT = TestUtil.getPortNumber(Cxf1332Test.class);
+    public static final String PORT2 = TestUtil.getPortNumber(Cxf1332Test.class, 2);
 
     /**
      * @throws Exception
@@ -35,6 +40,9 @@ public class Cxf1332Test extends AbstractCXFSpringTest {
 
     @Test
     public void tryToSendStringArray() throws Exception {
+        JaxWsServerFactoryBean server = getBean(JaxWsServerFactoryBean.class, "ServiceFactory");
+        server.create();
+        
         Cxf1332 client = getBean(Cxf1332.class, "client");
         String[] a = new String[] {"a", "b", "c"};
         client.hostSendData(a);
