@@ -246,18 +246,22 @@ public class Headers {
     }
     
     /**
-     * Put the headers from Message.PROTOCOL_HEADERS headers into the URL
-     * connection.
+     * Set content type and protocol headers (Message.PROTOCOL_HEADERS) headers into the URL
+     * connection. 
      * Note, this does not mean they immediately get written to the output
      * stream or the wire. They just just get set on the HTTP request.
      * 
-     * @param message The outbound message.
+     * @param connection 
      * @throws IOException
      */
-    public void setURLRequestHeaders(String conduitName) throws IOException {
-        HttpURLConnection connection = 
-            (HttpURLConnection)message.get(KEY_HTTP_CONNECTION);
+    public void setProtocolHeadersInConnection(HttpURLConnection connection) throws IOException {
+        String ct = determineContentType();
+        connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
+        transferProtocolHeadersToURLConnection(connection);
+        logProtocolHeaders(Level.FINE);
+    }
 
+    private String determineContentType() {
         String ct  = (String)message.get(Message.CONTENT_TYPE);
         String enc = (String)message.get(Message.ENCODING);
 
@@ -272,20 +276,7 @@ public class Headers {
         } else {
             ct = "text/xml";
         }
-        connection.setRequestProperty(HttpHeaderHelper.CONTENT_TYPE, ct);
-        
-        if (LOG.isLoggable(Level.FINE)) {
-            LOG.fine("Sending "
-                + connection.getRequestMethod() 
-                + " Message with Headers to " 
-                + connection.getURL()
-                + " Conduit :"
-                + conduitName
-                + "\nContent-Type: " + ct + "\n");
-            new Headers(message).logProtocolHeaders(Level.FINE);
-        }
-        
-        transferProtocolHeadersToURLConnection(connection);
+        return ct;
     }
     
     /**

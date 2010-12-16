@@ -40,7 +40,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
 
 public abstract class AbstractServletController {
     protected static final String DEFAULT_LISTINGS_CLASSIFIER = "/services";
-    private static final Logger LOG = LogUtils.getL7dLogger(ServletController.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractServletController.class);
     
     protected boolean isHideServiceList;
     protected boolean disableAddressUpdates;

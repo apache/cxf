@@ -44,7 +44,6 @@ import javax.xml.namespace.QName;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.Configurable;
 import org.apache.cxf.configuration.jsse.TLSClientParameters;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
@@ -755,7 +754,7 @@ public class HTTPConduit
                 && authPolicy != null && authPolicy.isSetPassword()) {
                 passwd = authPolicy.getPassword();
             }
-            headers.setAuthorization(getBasicAuthHeader(userName, passwd));
+            headers.setAuthorization(HttpBasicAuthSupplier.getBasicAuthHeader(userName, passwd));
         } else if (authPolicy != null 
                 && authPolicy.isSetAuthorizationType() 
                 && authPolicy.isSetAuthorization()) {
@@ -769,7 +768,7 @@ public class HTTPConduit
                 if (proxyAuthPolicy.isSetPassword()) {
                     passwd = proxyAuthPolicy.getPassword();
                 }
-                headers.setProxyAuthorization(getBasicAuthHeader(userName, passwd));
+                headers.setProxyAuthorization(HttpBasicAuthSupplier.getBasicAuthHeader(userName, passwd));
             } else if (proxyAuthPolicy.isSetAuthorizationType() 
                        && proxyAuthPolicy.isSetAuthorization()) {
                 headers.setProxyAuthorization(proxyAuthPolicy.getAuthorizationType() + " " 
@@ -943,12 +942,10 @@ public class HTTPConduit
         switch(responseCode) {
         case HttpURLConnection.HTTP_MOVED_PERM:
         case HttpURLConnection.HTTP_MOVED_TEMP:
-            connection = 
-                redirectRetransmit(origConnection, message, cachedStream);
+            connection = redirectRetransmit(origConnection, message, cachedStream);
             break;
         case HttpURLConnection.HTTP_UNAUTHORIZED:
-            connection = 
-                authorizationRetransmit(origConnection, message, cachedStream);
+            connection = authorizationRetransmit(origConnection, message, cachedStream);
             break;
         default:
             break;
@@ -979,88 +976,23 @@ public class HTTPConduit
         if (!getClient(message).isAutoRedirect()) {
             return connection;
         }
-
-        // We keep track of the redirections for redirect loop protection.
-        Set<String> visitedURLs = getSetVisitedURLs(message);
-        
-        String lastURL = connection.getURL().toString();
-        visitedURLs.add(lastURL);
-        
-        String newURL = extractLocation(connection.getHeaderFields());
+        URL newURL = extractLocation(connection.getHeaderFields());
+        detectRedirectLoop(getConduitName(), connection.getURL(), newURL, message);
         if (newURL != null) {
-            // See if we are being redirected in a loop as best we can,
-            // using string equality on URL.
-            if (visitedURLs.contains(newURL)) {
-                // We are in a redirect loop; -- bail
-                if (LOG.isLoggable(Level.INFO)) {
-                    LOG.log(Level.INFO, "Redirect loop detected on Conduit \"" 
-                        + getConduitName() 
-                        + "\" on '" 
-                        + newURL
-                        + "'");
-                }
-                throw new IOException("Redirect loop detected on Conduit \"" 
-                                      + getConduitName() 
-                                      + "\" on '" 
-                                      + newURL
-                                      + "'");
-            }
-            // We are going to redirect.
-            // Remove any Server Authentication Information for the previous
-            // URL.
             new Headers(message).removeAuthorizationHeaders();
-            
-            URL url = new URL(newURL);
             
             // If user configured this Conduit with preemptive authorization
             // it is meant to make it to the end. (Too bad that information
             // went to every URL along the way, but that's what the user 
             // wants!
             // TODO: Make this issue a security release note.
-            setHeadersByAuthorizationPolicy(message, url);
-            
-            connection = retransmit(
-                    connection, url, message, cachedStream);
+            setHeadersByAuthorizationPolicy(message, newURL);
+            connection.disconnect();
+            return retransmit(newURL, message, cachedStream);
         }
         return connection;
     }
 
-    /**
-     * This function gets the Set of URLs on the message that is used to 
-     * keep track of the URLs that were used in getting authorization 
-     * information.
-     *
-     * @param message The message where the Set of URLs is stored.
-     * @return The modifiable set of URLs that were visited.
-     */
-    private static Set<String> getSetAuthoriationURLs(Message message) {
-        @SuppressWarnings("unchecked")
-        Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
-        if (authURLs == null) {
-            authURLs = new HashSet<String>();
-            message.put(KEY_AUTH_URLS, authURLs);
-        }
-        return authURLs;
-    }
-
-    /**
-     * This function get the set of URLs on the message that is used to keep
-     * track of the URLs that were visited in redirects.
-     * 
-     * If it is not set on the message, an new empty set is stored.
-     * @param message The message where the Set is stored.
-     * @return The modifiable set of URLs that were visited.
-     */
-    private static Set<String> getSetVisitedURLs(Message message) {
-        @SuppressWarnings("unchecked")
-        Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
-        if (visitedURLs == null) {
-            visitedURLs = new HashSet<String>();
-            message.put(KEY_VISITED_URLS, visitedURLs);
-        }
-        return visitedURLs;
-    }
-    
     /**
      * This method performs a retransmit for authorization information.
      * 
@@ -1076,12 +1008,11 @@ public class HTTPConduit
         Message message, 
         CacheAndWriteOutputStream cachedStream
     ) throws IOException {
-
+        HttpAuthHeader authHeader = new HttpAuthHeader(connection.getHeaderField("WWW-Authenticate"));
         // If we don't have a dynamic supply of user pass, then
         // we don't retransmit. We just die with a Http 401 response.
         if (authSupplier == null) {
-            String auth = connection.getHeaderField("WWW-Authenticate");
-            if (auth.startsWith("Digest ")) {
+            if (authHeader.authTypeIsDigest()) {
                 authSupplier = new DigestAuthSupplier();
             } else {
                 return connection;
@@ -1089,54 +1020,22 @@ public class HTTPConduit
         }
         
         URL currentURL = connection.getURL();
-        
-        String realm = extractAuthorizationRealm(connection.getHeaderFields());
-
+        String realm = authHeader.getRealm();
         detectAuthorizationLoop(getConduitName(), message, currentURL, realm);
-        
-        String up = 
+        String authorizationToken = 
             authSupplier.getAuthorizationForRealm(
-                this, currentURL, message, realm, connection.getHeaderField("WWW-Authenticate"));
-        
-        // No user pass combination. We give up.
-        if (up == null) {
+                this, currentURL, message, realm, authHeader.getFullHeader());
+        if (authorizationToken == null) {
+            // authentication not possible => we give up
             return connection;
         }
 
-        new Headers(message).setAuthorization(up);
-        
-        // also adding cookie headers when retransmitting in case of a "401 Unauthorized" response
+        new Headers(message).setAuthorization(authorizationToken);
         cookies.writeToMessageHeaders(message);
-        
-        return retransmit(
-                connection, currentURL, message, cachedStream);
+        connection.disconnect();
+        return retransmit(currentURL, message, cachedStream);
     }
 
-    private static void detectAuthorizationLoop(String conduitName, Message message, 
-            URL currentURL, String realm) throws IOException {
-        Set<String> authURLs = getSetAuthoriationURLs(message);
-        // If we have been here (URL & Realm) before for this particular message
-        // retransmit, it means we have already supplied information
-        // which must have been wrong, or we wouldn't be here again.
-        // Otherwise, the server may be 401 looping us around the realms.
-        if (authURLs.contains(currentURL.toString() + realm)) {
-            String logMessage = "Authorization loop detected on Conduit \""
-                + conduitName
-                + "\" on URL \""
-                + currentURL
-                + "\" with realm \""
-                + realm
-                + "\"";
-            if (LOG.isLoggable(Level.INFO)) {
-                LOG.log(Level.INFO, logMessage);
-            }
-                    
-            throw new IOException(logMessage);
-        }
-        // Register that we have been here before we go.
-        authURLs.add(currentURL.toString() + realm);
-    }
-    
     /**
      * This method retransmits the request.
      * 
@@ -1151,29 +1050,21 @@ public class HTTPConduit
      * @throws IOException
      */
     private HttpURLConnection retransmit(
-            HttpURLConnection  connection,
             URL                newURL,
             Message            message, 
             CacheAndWriteOutputStream stream
     ) throws IOException {
-        
-        // Disconnect the old, and in with the new.
-        connection.disconnect();
-        
-        
         HTTPClientPolicy cp = getClient(message);
-        connection = createConnection(message, newURL);
+        HttpURLConnection  connection = createConnection(message, newURL);
         connection.setDoOutput(true);        
-        // TODO: using Message context to deceided HTTP send properties
+        // TODO: using Message context to decided HTTP send properties
         connection.setConnectTimeout((int)cp.getConnectionTimeout());
         connection.setReadTimeout((int)cp.getReceiveTimeout());
         connection.setUseCaches(false);
         connection.setInstanceFollowRedirects(false);
 
         // If the HTTP_REQUEST_METHOD is not set, the default is "POST".
-        String httpRequestMethod = 
-            (String)message.get(Message.HTTP_REQUEST_METHOD);
-
+        String httpRequestMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
         connection.setRequestMethod((null != httpRequestMethod) ? httpRequestMethod : "POST");
 
         message.put(KEY_HTTP_CONNECTION, connection);
@@ -1181,10 +1072,10 @@ public class HTTPConduit
         if (stream != null) {
             connection.setFixedLengthStreamingMode(stream.size());
         }
-        
+
         // Need to set the headers before the trust decision
         // because they are set before the connect().
-        new Headers(message).setURLRequestHeaders(getConduitName());
+        new Headers(message).setProtocolHeadersInConnection(connection);
         
         //
         // This point is where the trust decision is made because the
@@ -1216,33 +1107,67 @@ public class HTTPConduit
         return connection;
     }
 
-    /**
-     * This function extracts the authorization realm from the 
-     * "WWW-Authenticate" Http response header.
-     * 
-     * @param headers The Http Response Headers
-     * @return The realm, or null if it is non-existent.
-     */
-    private String extractAuthorizationRealm(
-            Map<String, List<String>> headers
-    ) {
-        List<String> auth = headers.get("WWW-Authenticate");
-        if (auth != null) {
-            for (String a : auth) {
-                int idx = a.indexOf("realm=");
-                if (idx != -1) {
-                    a = a.substring(idx + 6);
-                    if (a.charAt(0) == '"') {
-                        a = a.substring(1, a.indexOf('"', 1));
-                    } else if (a.contains(",")) {
-                        a = a.substring(0, a.indexOf(','));
-                    }
-                    return a;
-                }
-            }
+    private static void detectAuthorizationLoop(String conduitName, Message message, 
+                                                URL currentURL, String realm) throws IOException {
+        @SuppressWarnings("unchecked")
+        Set<String> authURLs = (Set<String>) message.get(KEY_AUTH_URLS);
+        if (authURLs == null) {
+            authURLs = new HashSet<String>();
+            message.put(KEY_AUTH_URLS, authURLs);
         }
-        return null;
+        // If we have been here (URL & Realm) before for this particular message
+        // retransmit, it means we have already supplied information
+        // which must have been wrong, or we wouldn't be here again.
+        // Otherwise, the server may be 401 looping us around the realms.
+        if (authURLs.contains(currentURL.toString() + realm)) {
+            String logMessage = "Authorization loop detected on Conduit \""
+                + conduitName
+                + "\" on URL \""
+                + currentURL
+                + "\" with realm \""
+                + realm
+                + "\"";
+            if (LOG.isLoggable(Level.INFO)) {
+                LOG.log(Level.INFO, logMessage);
+            }
+
+            throw new IOException(logMessage);
+        }
+        // Register that we have been here before we go.
+        authURLs.add(currentURL.toString() + realm);
     }
+
+    /**
+     * Tracks the visited urls in the message header KEY_VISITED_URLS.
+     * If a URL is to be visited twice an exception is thrown
+     * 
+     * @param conduitName
+     * @param lastURL
+     * @param newURL
+     * @param message
+     * @throws IOException
+     */
+    private static void detectRedirectLoop(String conduitName, 
+                                           URL lastURL, 
+                                           URL newURL,
+                                           Message message) throws IOException {
+        @SuppressWarnings("unchecked")
+        Set<String> visitedURLs = (Set<String>) message.get(KEY_VISITED_URLS);
+        if (visitedURLs == null) {
+            visitedURLs = new HashSet<String>();
+            message.put(KEY_VISITED_URLS, visitedURLs);
+        }
+        visitedURLs.add(lastURL.toString());
+        if (newURL != null && visitedURLs.contains(newURL.toString())) {
+            // See if we are being redirected in a loop as best we can,
+            // using string equality on URL.
+            // We are in a redirect loop; -- bail
+            String msg = "Redirect loop detected on Conduit '" 
+                + conduitName + "' on '" + newURL + "'";
+            LOG.log(Level.INFO, msg);
+            throw new IOException(msg);
+        }
+    }    
     
     /**
      * This method extracts the value of the "Location" Http
@@ -1250,43 +1175,25 @@ public class HTTPConduit
      * 
      * @param headers The Http response headers.
      * @return The value of the "Location" header, null if non-existent.
+     * @throws MalformedURLException 
      */
-    private String extractLocation(
-            Map<String, List<String>> headers
-    ) {
+    private URL extractLocation(Map<String, List<String>> headers
+                                ) throws MalformedURLException {
         
         for (Map.Entry<String, List<String>> head : headers.entrySet()) {
             if ("Location".equalsIgnoreCase(head.getKey())) {
                 List<String> locs = head.getValue();
                 if (locs != null && locs.size() > 0) {
-                    return locs.get(0);
+                    String location = locs.get(0);
+                    if (location != null) {
+                        return new URL(location);
+                    } else {
+                        return null;
+                    }
                 }                
             }
         }
         return null;
-    }
-
-    /**
-     * This procedure sets the "Authorization" header with the 
-     * BasicAuth token, which is Base64 encoded.
-     * 
-     * @param userid   The user's id, which cannot be null.
-     * @param password The password, it may be null.
-     * 
-     * @param headers  The headers map that gets the "Authorization" header set.
-     */
-    private String getBasicAuthHeader(
-        String                    userid,
-        String                    password
-    ) {
-        String userpass = userid;
-
-        userpass += ":";
-        if (password != null) {
-            userpass += password;
-        }
-        String token = Base64Utility.encode(userpass.getBytes());
-        return "Basic " + token;
     }
 
     /**
@@ -1370,13 +1277,23 @@ public class HTTPConduit
                     throw e;
                 }
             }
+            
+            if (LOG.isLoggable(Level.FINE)) {
+                LOG.fine("Sending "
+                    + connection.getRequestMethod() 
+                    + " Message with Headers to " 
+                    + connection.getURL()
+                    + " Conduit :"
+                    + conduitName
+                    + "\nContent-Type: " + connection.getContentType() + "\n");
+            }
         }
         
         protected void handleHeadersTrustCaching() throws IOException {
             // Need to set the headers before the trust decision
             // because they are set before the connect().
-            new Headers(outMessage).setURLRequestHeaders(conduitName);
-           
+            new Headers(outMessage).setProtocolHeadersInConnection(connection);
+
             //
             // This point is where the trust decision is made because the
             // Sun implementation of URLConnection will not let us 
@@ -1499,36 +1416,23 @@ public class HTTPConduit
                              + new String(cachedStream.getBytes()));
                 }
 
-                HttpURLConnection oldcon = connection;
-                
-                HTTPClientPolicy policy = getClient(outMessage);
-                
-                // Default MaxRetransmits is -1 which means unlimited.
-                int maxRetransmits = (policy == null)
-                                     ? -1
-                                     : policy.getMaxRetransmits();
-                
-                cookies.readFromConnection(oldcon);
-                
-                // MaxRetransmits of zero means zero.
-                if (maxRetransmits == 0) {
-                    return;
-                }
-                
+
+                int maxRetransmits = getMaxRetransmits();
+                cookies.readFromConnection(connection);
                 int nretransmits = 0;
-                
-                connection = processRetransmit(connection, outMessage, cachedStream);
-                
-                while (connection != oldcon) {
+                HttpURLConnection oldcon = null;
+                while (connection != oldcon && (maxRetransmits < 0 || nretransmits < maxRetransmits)) {
                     nretransmits++;
                     oldcon = connection;
-
-                    // A negative max means unlimited.
-                    if (maxRetransmits < 0 || nretransmits < maxRetransmits) {
-                        connection = processRetransmit(connection, outMessage, cachedStream);
-                    }
+                    connection = processRetransmit(connection, outMessage, cachedStream);
                 }
             }
+        }
+
+        private int getMaxRetransmits() {
+            HTTPClientPolicy policy = getClient(outMessage);
+            // Default MaxRetransmits is -1 which means unlimited.
+            return (policy == null) ? -1 : policy.getMaxRetransmits();
         }
         
         /**

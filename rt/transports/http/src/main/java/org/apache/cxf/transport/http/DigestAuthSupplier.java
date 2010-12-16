@@ -19,9 +19,6 @@
 
 package org.apache.cxf.transport.http;
 
-import java.io.IOException;
-import java.io.StreamTokenizer;
-import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -53,8 +50,7 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         }
         md5Helper = md;
     }
-    
-    
+
     /**
      * {@inheritDoc}
      * With digest, the nonce could expire and thus a rechallenge will be issued.
@@ -63,42 +59,14 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     public boolean requiresRequestCaching() {
         return true;
     }
-    
-    static Map<String, String> parseHeader(String fullHeader) {
-        
-        Map<String, String> map = new HashMap<String, String>();
-        fullHeader = fullHeader.substring(7);
-        try {
-            StreamTokenizer tok = new StreamTokenizer(new StringReader(fullHeader));
-            tok.quoteChar('"');
-            tok.quoteChar('\'');
-            tok.whitespaceChars('=', '=');
-            tok.whitespaceChars(',', ',');
-            
-            while (tok.nextToken() != StreamTokenizer.TT_EOF) {
-                String key = tok.sval;
-                if (tok.nextToken() == StreamTokenizer.TT_EOF) {
-                    map.put(key, null);
-                    return map;
-                }
-                String value = tok.sval;
-                if (value.charAt(0) == '"') {
-                    value = value.substring(1, value.length() - 1);
-                }
-                map.put(key, value);
-            }
-        } catch (IOException ex) {
-            //ignore
-        }
-        return map;
-    }
-    
+
     @Override
     public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
                                            Message message,
                                            String realm, String fullHeader) {
-        if (fullHeader.startsWith("Digest ")) {
-            Map<String, String> map = parseHeader(fullHeader);
+        HttpAuthHeader authHeader = new HttpAuthHeader(fullHeader);
+        if (authHeader.authTypeIsDigest()) {
+            Map<String, String> map = authHeader.getParams();
             if ("auth".equals(map.get("qop"))
                 || !map.containsKey("qop")) {
                 DigestInfo di = new DigestInfo();
@@ -160,6 +128,15 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         return null;
     }
 
+    public String createCnonce() throws UnsupportedEncodingException {
+        String cnonce = Long.toString(System.currentTimeMillis());
+        byte[] bytes = cnonce.getBytes("US-ASCII");
+        synchronized (md5Helper) {
+            bytes = md5Helper.digest(bytes);
+        }
+        return encode(bytes);
+    }
+
     class DigestInfo {
         String qop;
         String realm;
@@ -173,10 +150,7 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         synchronized String generateAuth(String uri, String username, String password) {
             try {
                 nc++;
-                String ncstring = Integer.toString(nc);
-                while (ncstring.length() < 8) {
-                    ncstring = "0" + ncstring;
-                }
+                String ncstring = String.format("%08d", nc);
                 String cnonce = createCnonce();
                 
                 String digAlg = algorithm;
@@ -188,14 +162,7 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                 if ("MD5-sess".equalsIgnoreCase(algorithm)) {
                     algorithm = "MD5";
                     String tmp2 = encode(digester.digest(a1.getBytes(charset)));
-                    StringBuilder tmp3 = new StringBuilder(
-                            tmp2.length() + nonce.length() + cnonce.length() + 2);
-                    tmp3.append(tmp2);
-                    tmp3.append(':');
-                    tmp3.append(nonce);
-                    tmp3.append(':');
-                    tmp3.append(cnonce);
-                    a1 = tmp3.toString();
+                    a1 = tmp2 + ':' + nonce + ':' + cnonce;
                 }
                 String hasha1 = encode(digester.digest(a1.getBytes(charset)));
                 String a2 = method + ":" + uri;
@@ -207,51 +174,26 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                     serverDigestValue = hasha1 + ":" + nonce + ":" + ncstring + ":" + cnonce + ":" 
                         + qop + ":" + hasha2;
                 }
-                serverDigestValue = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
-                StringBuilder builder = new StringBuilder("Digest ");
+                String response = encode(digester.digest(serverDigestValue.getBytes("US-ASCII")));
+                Map<String, String> outParams = new HashMap<String, String>();
                 if (qop != null) {
-                    builder.append("qop=\"auth\", ");
-                }  
-                builder.append("realm=\"")
-                    .append(realm);
-
-                if (opaque != null) {
-                    builder.append("\", opaque=\"")
-                        .append(opaque);
+                    outParams.put("qop", "auth");
                 }
-
-                builder.append("\", nonce=\"")
-                    .append(nonce)
-                    .append("\", uri=\"")
-                    .append(uri)
-                    .append("\", username=\"")
-                    .append(username)
-                    .append("\", nc=")
-                    .append(ncstring)
-                    .append(", cnonce=\"")
-                    .append(cnonce)        
-                    .append("\", response=\"")
-                    .append(serverDigestValue)
-                    .append("\"");
-                
-                return builder.toString();
-            } catch (RuntimeException ex) {
-                throw ex;
+                outParams.put("realm", realm);
+                outParams.put("opaque", opaque);
+                outParams.put("nonce", nonce);
+                outParams.put("uri", uri);
+                outParams.put("username", username);
+                outParams.put("nc", ncstring);
+                outParams.put("cnonce", cnonce);
+                outParams.put("response", response);
+                return new HttpAuthHeader(HttpAuthHeader.AUTH_TYPE_DIGEST, outParams).getFullHeader();
             } catch (Exception ex) {
                 throw new RuntimeException(ex);
             }
         }
 
         
-    }
-
-    public String createCnonce() throws UnsupportedEncodingException {
-        String cnonce = Long.toString(System.currentTimeMillis());
-        byte[] bytes = cnonce.getBytes("US-ASCII");
-        synchronized (md5Helper) {
-            bytes = md5Helper.digest(bytes);
-        }
-        return encode(bytes);
     }
 
     /**

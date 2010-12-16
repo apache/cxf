@@ -62,6 +62,11 @@ public abstract class HttpBasicAuthSupplier extends HttpAuthSupplier {
     protected HttpBasicAuthSupplier(String name) {
         super(name);
     }
+
+    public static String getBasicAuthHeader(String userName, String passwd) {
+        String userAndPass = userName + ":" + passwd;
+        return "Basic " + Base64Utility.encode(userAndPass.getBytes());
+    }
     
     @Override
     public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL, Message message,
@@ -72,19 +77,18 @@ public abstract class HttpBasicAuthSupplier extends HttpAuthSupplier {
                                           message,
                                           realm);
         if (up != null) {
-            String key = up.getUserid() + ":" + up.getPassword();
-            return "Basic " + Base64Utility.encode(key.getBytes());
+            return HttpBasicAuthSupplier.getBasicAuthHeader(up.getUserid(), up.getPassword());
         }
         return null;
     }
+
     @Override
     public String getPreemptiveAuthorization(HTTPConduit conduit, URL currentURL, Message message) {
         UserPass up = getPreemptiveUserPass(conduit.getConduitName(),
                                             currentURL,
                                             message);
         if (up != null) {
-            String key = up.getUserid() + ":" + up.getPassword();
-            return "Basic " + Base64Utility.encode(key.getBytes());
+            return HttpBasicAuthSupplier.getBasicAuthHeader(up.getUserid(), up.getPassword());
         }
         return null;
     }

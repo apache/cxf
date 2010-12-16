@@ -41,7 +41,7 @@ import org.apache.cxf.transports.http.QueryHandlerRegistry;
 import org.apache.cxf.wsdl.http.AddressType;
 
 public class OsgiServletController extends AbstractServletController {
-    private static final Logger LOG = LogUtils.getL7dLogger(OsgiServlet.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(OsgiServletController.class);
 
     public OsgiServletController(ServletConfig config, 
                                  DestinationRegistry destinationRegistry, 

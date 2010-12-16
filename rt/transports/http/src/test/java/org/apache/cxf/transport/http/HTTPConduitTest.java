@@ -37,6 +37,7 @@ import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
+
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -117,16 +118,7 @@ public class HTTPConduitTest extends Assert {
                      "/bar/foo");
     }
     
-    @Test
-    public void testCXF2370() throws Exception {
-        String origNonce = "MTI0ODg3OTc5NzE2OTplZGUyYTg0Yzk2NTFkY2YyNjc1Y2JjZjU2MTUzZmQyYw==";
-        String fullHeader = "Digest realm=\"MyCompany realm.\", qop=\"auth\","
-            + "nonce=\"" + origNonce + "\"";
-        Map<String, String> map = DigestAuthSupplier.parseHeader(fullHeader);
-        assertEquals(origNonce, map.get("nonce"));
-        assertEquals("auth", map.get("qop"));
-        assertEquals("MyCompany realm.", map.get("realm"));
-    }
+
 
     /**
      * Verfies one of the tenents of our interface -- the Conduit sets up
