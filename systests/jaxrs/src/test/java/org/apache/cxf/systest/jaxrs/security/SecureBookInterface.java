@@ -46,7 +46,7 @@ public interface SecureBookInterface {
     @GET
     @Path("/thosebooks")
     @Produces("application/xml")
-    @Secured("ROLE_ADMIN")
+    @Secured({"ROLE_ADMIN", "ROLE_BOOK_OWNER" })
     Book getThatBook() throws BookNotFoundFault;
     
     @Path("/subresource")

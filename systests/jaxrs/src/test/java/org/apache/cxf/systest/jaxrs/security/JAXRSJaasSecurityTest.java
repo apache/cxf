@@ -47,14 +47,14 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     @Test
     public void testJaasInterceptorAuthenticationFailure() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/jaas/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaas/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar1", 401);
     }
     
     @Test
     public void testGetBookUserAdminJaasInterceptor() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/jaas/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaas/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }
@@ -62,7 +62,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     @Test
     public void testJaasFilterAuthenticationFailure() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/jaas2/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("text/xml");
         wc.header(HttpHeaders.AUTHORIZATION, 
@@ -77,7 +77,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     @Test
     public void testJaasFilterAuthenticationFailureWithRedirection() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/jaas2/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
         WebClient wc = WebClient.create(endpointAddress);
         wc.accept("text/xml,text/html");
         wc.header(HttpHeaders.AUTHORIZATION, 
@@ -86,14 +86,14 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
         assertEquals(307, r.getStatus());
         Object locationHeader = r.getMetadata().getFirst(HttpHeaders.LOCATION);
         assertNotNull(locationHeader);
-        assertEquals("http://localhost:" + PORT + "/jaas2/login.jsp",
+        assertEquals("http://localhost:" + PORT + "/service/login.jsp",
                      locationHeader.toString());
     }
     
     @Test
     public void testGetBookUserAdminJaasFilter() throws Exception {
         String endpointAddress =
-            "http://localhost:" + PORT + "/jaas2/bookstorestorage/thosebooks/123"; 
+            "http://localhost:" + PORT + "/service/jaas2/bookstorestorage/thosebooks/123"; 
         getBook(endpointAddress, "foo", "bar", 403);
         getBook(endpointAddress, "bob", "bobspassword", 200);
     }

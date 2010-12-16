@@ -56,6 +56,14 @@ public class JAXRSSimpleSecurityTest extends AbstractSpringSecurityTest {
     }
     
     @Test
+    public void testGetBookUserAdminWithAnnotationsInterface() throws Exception {
+        String endpointAddress =
+            "http://localhost:" + PORT + "/security5/bookstorestorage/thosebooks"; 
+        getBook(endpointAddress, "foo", "bar", 403);
+        getBook(endpointAddress, "bob", "bobspassword", 200);
+    }
+    
+    @Test
     public void testGetBookUserAdminWithAnnotationsFilter() throws Exception {
         String endpointAddress =
             "http://localhost:" + PORT + "/security4/bookstorestorage/thebook/123"; 
