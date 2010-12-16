@@ -25,11 +25,13 @@ xsi:schemaLocation="
 http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd 
 http://cxf.apache.org/core http://cxf.apache.org/schemas/core.xsd 
 http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"> 
-<import resource="classpath:META-INF/cxf/cxf.xml" /> 
-<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
-<import resource="classpath:META-INF/cxf/cxf-extension-http.xml" /> 
-<import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf-extension-soap.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf-extension-http.xml" /> 
+    <import resource="classpath:META-INF/cxf/cxf-extension-http-jetty.xml" /> 
 
+    <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer"/>
+    
     <bean id="logInbound" class="org.apache.cxf.interceptor.LoggingInInterceptor"/> 
     <bean id="logOutbound" class="org.apache.cxf.interceptor.LoggingOutInterceptor"/> 
     
@@ -38,16 +40,24 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
         <cxf:outInterceptors> <ref bean="logOutbound"/> </cxf:outInterceptors> 
         <cxf:inFaultInterceptors> <ref bean="logOutbound"/> </cxf:inFaultInterceptors> 
     </cxf:bus> 
-    <jaxws:endpoint id="cxf1332" implementor="org.apache.cxf.cxf1332.Cxf1332Impl" 
-                    address="http://localhost:8088/Cxf1332" /> 
+    
+    <bean id="ServiceImpl" class="org.apache.cxf.cxf1332.Cxf1332Impl"/>
+    <jaxws:endpoint id="cxf1332" implementor="#ServiceImpl" 
+                    address="http://localhost:${testutil.ports.Cxf1332Test}/Cxf1332" />
+                     
+    <bean id="ServiceFactory" class="org.apache.cxf.jaxws.JaxWsServerFactoryBean">
+        <property name="serviceBean" ref="ServiceImpl" />
+        <property name="start" value="true" />
+        <property name="address" value="http://localhost:${testutil.ports.Cxf1332Test.2}/Cxf1332"/>
+    </bean>
+    
     
     <bean id="proxyFactory" class="org.apache.cxf.jaxws.JaxWsProxyFactoryBean">
        <property name="serviceClass" value="org.apache.cxf.cxf1332.Cxf1332"/>
-       <property name="address" value="http://localhost:8088/Cxf1332"/>
-  </bean>
+       <property name="address" value="http://localhost:${testutil.ports.Cxf1332Test}/Cxf1332"/>
+    </bean>
 
-  <bean id="client" class="org.apache.cxf.cxf1332.Cxf1332"
-    factory-bean="proxyFactory" factory-method="create"/>
-    
+    <bean id="client" class="org.apache.cxf.cxf1332.Cxf1332"
+        factory-bean="proxyFactory" factory-method="create"/>
     
 </beans> 
