@@ -48,6 +48,7 @@ import org.apache.cxf.common.util.SOAPConstants;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.HttpHeaderHelper;
 import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.transport.common.gzip.GZIPOutInterceptor;
 import org.apache.cxf.transport.jms.spec.JMSSpecConstants;
 import org.apache.cxf.transport.jms.uri.JMSEndpoint;
 import org.apache.cxf.transport.jms.uri.JMSEndpointParser;
@@ -245,6 +246,10 @@ public final class JMSUtils {
                 messageProperties.setSOAPJMSContentType(jmsMessage
                     .getStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD));
             }
+            if (jmsMessage.propertyExists(JMSSpecConstants.CONTENTENCODING_FIELD)) {
+                messageProperties.setSOAPJMSContentEncoding(jmsMessage
+                    .getStringProperty(JMSSpecConstants.CONTENTENCODING_FIELD));
+            }
             if (jmsMessage.propertyExists(JMSSpecConstants.SOAPACTION_FIELD)) {
                 messageProperties.setSOAPJMSSOAPAction(jmsMessage
                     .getStringProperty(JMSSpecConstants.SOAPACTION_FIELD));
@@ -281,6 +286,8 @@ public final class JMSUtils {
                 // set the message encoding
                 inMessage.put(org.apache.cxf.message.Message.ENCODING, getEncoding(contentType));
             }
+            
+            
         } catch (JMSException ex) {
             throw JmsUtils.convertJmsAccessException(ex);
         }
@@ -437,6 +444,10 @@ public final class JMSUtils {
         }
         return contentType;
     }
+    
+    public static String getContentEncoding(org.apache.cxf.message.Message message) {
+        return (String)message.get(GZIPOutInterceptor.GZIP_ENCODING_KEY);
+    }
 
     public static Message buildJMSMessageFromCXFMessage(JMSConfiguration jmsConfig,
                                                         org.apache.cxf.message.Message outMessage,
@@ -509,6 +520,11 @@ public final class JMSUtils {
         if (messageProperties.isSetSOAPJMSContentType()) {
             jmsMessage.setStringProperty(JMSSpecConstants.CONTENTTYPE_FIELD, messageProperties
                 .getSOAPJMSContentType());
+        }
+        
+        if (messageProperties.isSetSOAPJMSContentEncoding()) {
+            jmsMessage.setStringProperty(JMSSpecConstants.CONTENTENCODING_FIELD, messageProperties
+                .getSOAPJMSContentEncoding());
         }
 
         if (messageProperties.isSetSOAPJMSSOAPAction()) {
@@ -583,6 +599,9 @@ public final class JMSUtils {
             messageProperties.setSOAPJMSBindingVersion("1.0");
         }
         messageProperties.setSOAPJMSContentType(getContentType(outMessage));
+        if (getContentEncoding(outMessage) != null) {
+            messageProperties.setSOAPJMSContentEncoding(getContentEncoding(outMessage));
+        }
         String soapAction = null;
         // Retrieve or create protocol headers
         Map<String, List<String>> headers = CastUtils.cast((Map<?, ?>)outMessage

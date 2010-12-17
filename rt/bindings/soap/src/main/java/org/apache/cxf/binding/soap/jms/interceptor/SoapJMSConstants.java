@@ -37,6 +37,7 @@ public final class SoapJMSConstants {
     public static final String SOAPACTION_PARAMETER_NAME = "soapAction";
     public static final String TARGETSERVICE_PARAMETER_NAME = "targetService";
     public static final String CONTENTTYPE_PARAMETER_NAME = "contentType";
+    public static final String CONTENTENCODING_PARAMETER_NAME = "contentEncoding";
     public static final String ISFAULT_PARAMETER_NAME = "isFault";
     
     // JMS Field name
@@ -46,6 +47,7 @@ public final class SoapJMSConstants {
     public static final String SOAPACTION_FIELD = SOAP_JMS_PREFIX + SOAPACTION_PARAMETER_NAME;
     public static final String TARGETSERVICE_FIELD = SOAP_JMS_PREFIX + TARGETSERVICE_PARAMETER_NAME;
     public static final String CONTENTTYPE_FIELD = SOAP_JMS_PREFIX + CONTENTTYPE_PARAMETER_NAME;
+    public static final String CONTENTENCODING_FIELD = SOAP_JMS_PREFIX + CONTENTENCODING_PARAMETER_NAME;
     public static final String ISFAULT_FIELD = SOAP_JMS_PREFIX + ISFAULT_PARAMETER_NAME;
 
     public static final String SOAP_JMS_SPECIFICIATION_TRANSPORTID = "http://www.w3.org/2010/soapjms/";
@@ -53,6 +55,7 @@ public final class SoapJMSConstants {
     
     // fault codes
     private static final String JMS_CONTENTTYPEMISMATCH_FAULT_CODE = "contentTypeMismatch";
+    private static final String JMS_CONTENTENCODINGNOTSUPPORTED_FAULT_CODE = "contentEncodingNotSupported";
     private static final String JMS_MALFORMEDREQUESTURI_FAULT_CODE = "malformedRequestURI";
     private static final String JMS_MISMATCHEDSOAPACTION_FAULT_CODE = "mismatchedSoapAction";
     private static final String JMS_MISSINGCONTENTTYPE_FAULT_CODE = "missingContentType";
@@ -67,6 +70,10 @@ public final class SoapJMSConstants {
     
     public static QName getContentTypeMismatchQName() {
         return new QName(SOAP_JMS_NAMESPACE, JMS_CONTENTTYPEMISMATCH_FAULT_CODE);
+    }
+    
+    public static QName getContentEncodingNotSupportedQName() {
+        return new QName(SOAP_JMS_NAMESPACE, JMS_CONTENTENCODINGNOTSUPPORTED_FAULT_CODE);
     }
 
     public static QName getMalformedRequestURIQName() {

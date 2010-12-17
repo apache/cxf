@@ -55,6 +55,7 @@ public final class JMSSpecConstants {
     public static final String SOAPACTION_PARAMETER_NAME = "soapAction";
     public static final String TARGETSERVICE_PARAMETER_NAME = "targetService";
     public static final String CONTENTTYPE_PARAMETER_NAME = "contentType";
+    public static final String CONTENTENCODING_PARAMETER_NAME = "contentEncoding";
     public static final String ISFAULT_PARAMETER_NAME = "isFault";
 
     // JMS Field name
@@ -64,6 +65,7 @@ public final class JMSSpecConstants {
     public static final String SOAPACTION_FIELD = SOAP_JMS_PREFIX + SOAPACTION_PARAMETER_NAME;
     public static final String TARGETSERVICE_FIELD = SOAP_JMS_PREFIX + TARGETSERVICE_PARAMETER_NAME;
     public static final String CONTENTTYPE_FIELD = SOAP_JMS_PREFIX + CONTENTTYPE_PARAMETER_NAME;
+    public static final String CONTENTENCODING_FIELD = SOAP_JMS_PREFIX + CONTENTENCODING_PARAMETER_NAME;
     public static final String ISFAULT_FIELD = SOAP_JMS_PREFIX + ISFAULT_PARAMETER_NAME;
     
     //

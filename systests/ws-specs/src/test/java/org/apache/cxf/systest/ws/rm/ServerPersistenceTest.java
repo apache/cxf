@@ -156,8 +156,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
         
         out.getOutboundMessages().clear();
         in.getInboundMessages().clear();
-        
-        
+            
         responses[3] = greeter.greetMeAsync("four");
         verifyRetransmissionQueue();
         
@@ -240,7 +239,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
   
     
     void verifyRetransmissionQueue() throws Exception {
-        awaitMessages(3, 5, 40000);
+        awaitMessages(3, 5, 60000);
         
         boolean empty = greeterBus.getExtension(RMManager.class).getRetransmissionQueue().isEmpty();
         assertTrue("Retransmission Queue is not empty", empty);

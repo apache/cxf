@@ -43,6 +43,14 @@ public final class JMSFaultFactory {
         return createFault(SoapJMSConstants.getContentTypeMismatchQName(), m);
     }
 
+    public static JMSFault createContentEncodingNotSupported(String contentEncoding) {
+        String m = new org.apache.cxf.common.i18n.Message("CONTENT_ENCODING_NOT_SUPPORTED", LOG,
+                                                          new Object[] {
+                                                              contentEncoding
+                                                          }).toString();
+        return createFault(SoapJMSConstants.getContentTypeMismatchQName(), m);
+    }
+    
     public static JMSFault createMalformedRequestURIFault(String requestURI) {
         String m = new org.apache.cxf.common.i18n.Message("MALFORMED_REQUESTURI", LOG,
                                                           new Object[] {

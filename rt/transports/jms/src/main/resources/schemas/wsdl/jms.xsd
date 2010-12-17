@@ -104,6 +104,7 @@
         <xs:attribute name="SOAPJMSTargetService" type="xs:string"/>
     	<xs:attribute name="SOAPJMSBindingVersion" type="xs:string"/>
     	<xs:attribute name="SOAPJMSContentType" type="xs:string"/>
+        <xs:attribute name="SOAPJMSContentEncoding" type="xs:string"/>
     	<xs:attribute name="SOAPJMSSOAPAction" type="xs:anyURI"/>
     	<xs:attribute name="SOAPJMSIsFault" type="pt:ParameterizedBoolean"/>
     	<xs:attribute name="SOAPJMSRequestURI" type="xs:string"/>
