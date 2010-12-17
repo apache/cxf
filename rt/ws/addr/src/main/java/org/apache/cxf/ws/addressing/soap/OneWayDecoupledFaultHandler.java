@@ -19,8 +19,11 @@
 
 package org.apache.cxf.ws.addressing.soap;
 
+import java.util.Iterator;
+
 import org.apache.cxf.binding.soap.SoapMessage;
 import org.apache.cxf.binding.soap.interceptor.AbstractSoapInterceptor;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.Phase;
@@ -28,6 +31,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.apache.cxf.ws.addressing.Names;
 
 /**
  * Utility interceptor for dealing with faults occurred during processing 
@@ -38,6 +42,8 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
  * annotations or explicitly added to the list of interceptors. 
  */
 public class OneWayDecoupledFaultHandler extends AbstractSoapInterceptor {
+    
+    public static final String WSA_ACTION = "http://schemas.xmlsoap.org/wsdl/soap/envelope/fault";
 
     public OneWayDecoupledFaultHandler() {
         super(Phase.PRE_PROTOCOL);
@@ -61,9 +67,18 @@ public class OneWayDecoupledFaultHandler extends AbstractSoapInterceptor {
                 ContextUtils.retrieveMAPs(inMessage, false, false, true);
             
             if (maps != null && !ContextUtils.isGenericAddress(maps.getFaultTo())) {
+                //Just keep the wsa headers to remove the not understand headers
+                Iterator<Header> iterator = message.getHeaders().iterator();
+                while (iterator.hasNext()) {
+                    Header header = iterator.next();
+                    if (!isWSAHeader(header)) {
+                        iterator.remove();
+                    }
+                }
                 exchange.setOneWay(false);
                 exchange.setOutMessage(message);
-                
+                //manually set the action
+                message.put(ContextUtils.ACTION, WSA_ACTION);
                 Destination destination = createDecoupledDestination(
                                                exchange, maps.getFaultTo());
                 exchange.setDestination(destination);
@@ -74,5 +89,12 @@ public class OneWayDecoupledFaultHandler extends AbstractSoapInterceptor {
     
     protected Destination createDecoupledDestination(Exchange exchange, EndpointReferenceType epr) {
         return ContextUtils.createDecoupledDestination(exchange, epr);
+    }
+    
+    private boolean isWSAHeader(Header header) {
+        if (header.getName().getNamespaceURI().startsWith(Names.WSA_NAMESPACE_NAME)) {
+            return true;
+        }
+        return false;
     }
 }
