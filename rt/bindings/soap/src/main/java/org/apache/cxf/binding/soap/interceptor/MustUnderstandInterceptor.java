@@ -140,6 +140,7 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
                 SoapFault soapFault = new SoapFault(new Message("MUST_UNDERSTAND", BUNDLE, notFound),
                                                     soapMessage.getVersion().getMustUnderstand());
                 soapMessage.put(MustUnderstandInterceptor.FAULT, soapFault);
+                soapMessage.getInterceptorChain().add(ending);
             }
         }
     }
