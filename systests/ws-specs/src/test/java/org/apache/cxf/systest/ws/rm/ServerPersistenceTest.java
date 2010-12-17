@@ -167,7 +167,7 @@ public class ServerPersistenceTest extends AbstractBusClientServerTestBase {
     }
     
     void verifyMissingResponse(Response<GreetMeResponse> responses[]) throws Exception {
-        awaitMessages(5, 8, 20000);
+        awaitMessages(5, 8, 60000);
 
         // wait another while to prove that response to second request is indeed lost
         Thread.sleep(4000);
