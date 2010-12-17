@@ -47,12 +47,35 @@ public class SoapJMSInInterceptor extends AbstractSoapInterceptor {
             .get(Message.PROTOCOL_HEADERS));
         if (headers != null) {
             checkContentType(message, headers);
+            checkContentEncoding(message, headers);
             checkRequestURI(message, headers);
             checkSoapAction(message, headers);
             checkBindingVersion(message, headers);
             checkJMSMessageFormat(message, headers);
         }
     }
+
+    /**
+     * @param message
+     * @param headers
+     */
+    private void checkContentEncoding(SoapMessage message, Map<String, List<String>> headers) {
+        List<String> contentEncodingList = headers.get(SoapJMSConstants.CONTENTENCODING_FIELD);
+        JMSFault jmsFault = null;
+        if (contentEncodingList != null && contentEncodingList.size() > 0) {
+            String contentEncoding = contentEncodingList.get(0);
+            if (!"gzip".equals(contentEncoding)) {
+                jmsFault = JMSFaultFactory.createContentEncodingNotSupported(contentEncoding);
+            }
+        } 
+        if (jmsFault != null) {
+            Fault f = createFault(message, jmsFault);
+            if (f != null) {
+                throw f;
+            }
+        }
+    }
+
 
     /**
      * @param message

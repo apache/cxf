@@ -68,6 +68,9 @@ public class GZIPInInterceptor extends AbstractPhaseInterceptor<Message> {
         if (protocolHeaders != null) {
             List<String> contentEncoding = HttpHeaderHelper.getHeader(protocolHeaders, 
                                                                       HttpHeaderHelper.CONTENT_ENCODING);
+            if (contentEncoding == null) {
+                contentEncoding = protocolHeaders.get(GZIPOutInterceptor.SOAP_JMS_CONTENTENCODING);
+            }
             if (contentEncoding != null
                 && (contentEncoding.contains("gzip") || contentEncoding.contains("x-gzip"))) {
                 try {

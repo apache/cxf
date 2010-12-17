@@ -68,7 +68,6 @@ public class GZIPFeature extends AbstractFeature {
     @Override
     protected void initializeProvider(InterceptorProvider provider, Bus bus) {
         provider.getInInterceptors().add(IN);
-        provider.getInFaultInterceptors().add(IN);
         if (threshold == -1) {
             provider.getOutInterceptors().add(OUT);
             provider.getOutFaultInterceptors().add(OUT);

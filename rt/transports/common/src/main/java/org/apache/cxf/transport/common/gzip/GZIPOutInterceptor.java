@@ -89,6 +89,8 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
      * given by the client in Accept-Encoding.
      */
     public static final String GZIP_ENCODING_KEY = GZIPOutInterceptor.class.getName() + ".gzipEncoding";
+    
+    public static final String SOAP_JMS_CONTENTENCODING = "SOAPJMS_contentEncoding";
 
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(GZIPOutInterceptor.class);
     private static final Logger LOG = LogUtils.getL7dLogger(GZIPOutInterceptor.class);
@@ -165,6 +167,11 @@ public class GZIPOutInterceptor extends AbstractPhaseInterceptor<Message> {
             if (requestHeaders != null) {
                 List<String> acceptEncodingHeader = CastUtils.cast(HttpHeaderHelper
                     .getHeader(requestHeaders, HttpHeaderHelper.ACCEPT_ENCODING));
+                List<String> jmsEncodingHeader = CastUtils.cast(requestHeaders.get(SOAP_JMS_CONTENTENCODING));
+                if (jmsEncodingHeader != null && jmsEncodingHeader.contains("gzip")) {
+                    permitted = UseGzip.YES;
+                    message.put(GZIP_ENCODING_KEY, "gzip");
+                }
                 if (acceptEncodingHeader != null) {
                     if (LOG.isLoggable(Level.FINE)) {
                         LOG.fine("Accept-Encoding header: " + acceptEncodingHeader);
