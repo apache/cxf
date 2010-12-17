@@ -18,7 +18,10 @@
  */
 package org.apache.cxf.ws.addressing.soap;
 
+import javax.xml.namespace.QName;
+
 import org.apache.cxf.binding.soap.SoapMessage;
+import org.apache.cxf.headers.Header;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.MessageImpl;
@@ -29,7 +32,6 @@ import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.ContextUtils;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.easymock.EasyMock;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -45,7 +47,8 @@ public class OneWayDecoupledFaultHandlerTest extends Assert {
         };
         
         SoapMessage message = new SoapMessage(new MessageImpl());
-        
+        QName qname = new QName("http://cxf.apache.org/mustunderstand", "TestMU");
+        message.getHeaders().add(new Header(qname, new Object()));
         AddressingProperties maps = new AddressingPropertiesImpl();
         
         EndpointReferenceType faultTo = new EndpointReferenceType();
@@ -61,7 +64,7 @@ public class OneWayDecoupledFaultHandlerTest extends Assert {
         exchange.setOneWay(true);
         
         handler.handleFault(message);
-        
+        assertTrue(message.getHeaders().isEmpty());
         assertFalse(exchange.isOneWay());
         assertSame(message, exchange.getOutMessage());
         assertNotNull(exchange.getDestination());
