@@ -45,6 +45,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ResponseReader;
 import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
@@ -557,6 +558,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Response r = bs.createBook(777L);
         assertEquals(200, r.getStatus());
+    }
+    
+    @Test
+    public void testGetBookFromResponseWithProxy() throws Exception {
+        ResponseReader reader = new ResponseReader();
+        reader.setEntityClass(Book.class);
+        
+        BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, 
+                                                 BookStore.class,
+                                                 Collections.singletonList(reader));
+        Response r = bs.getGenericResponseBook("123");
+        assertEquals(200, r.getStatus());
+        Book book = (Book)r.getEntity();
+        assertEquals(123L, book.getId());
     }
     
     @Test
