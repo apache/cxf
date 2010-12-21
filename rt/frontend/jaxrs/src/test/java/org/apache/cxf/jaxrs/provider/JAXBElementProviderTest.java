@@ -836,10 +836,11 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test
-    public void testSetSchemasFromDisk() {
+    public void testSetSchemasFromDisk() throws Exception {
         JAXBElementProvider provider = new JAXBElementProvider();
         List<String> locations = new ArrayList<String>();
-        String loc = getClass().getClassLoader().getResource("test.xsd").getFile();
+        String loc = getClass().getClassLoader().getResource("test.xsd").toURI().getPath();
+        
         locations.add(loc);
         provider.setSchemas(locations);
         Schema s = provider.getSchema();

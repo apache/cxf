@@ -121,7 +121,7 @@ public class ProcessorTestBase extends Assert {
     }
 
     protected String getLocation(String wsdlFile) throws URISyntaxException {
-        return getClass().getResource(wsdlFile).toString();
+        return getClass().getResource(wsdlFile).toURI().toString();
     }
 
     protected File getResource(String wsdlFile) throws URISyntaxException {
