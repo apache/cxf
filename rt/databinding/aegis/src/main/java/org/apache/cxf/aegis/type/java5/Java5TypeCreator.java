@@ -250,7 +250,11 @@ public class Java5TypeCreator extends AbstractTypeCreator {
         if (name == null || name.length() == 0) {
             name = ServiceUtils.makeServiceNameFromClassName(typeClass);
         }
-
+        
+        //check from aegis type annotation
+        if (ns == null || ns.length() == 0) {
+            ns = annotationReader.getNamespace(typeClass);
+        }
         // check jaxb package annotation
         if (ns == null || ns.length() == 0) {
             ns = annotationReader.getNamespace(typeClass.getPackage());
