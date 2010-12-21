@@ -456,7 +456,8 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     @Test
     public void testUploadImageFromForm2() throws Exception {
         File file = 
-            new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg").getFile());
+            new File(getClass().getResource("/org/apache/cxf/systest/jaxrs/resources/java.jpg")
+                               .toURI().getPath());
         String address = "http://localhost:" + PORT + "/bookstore/books/formimage2";
         WebClient client = WebClient.create(address);
         HTTPConduit conduit = WebClient.getConfig(client).getHttpConduit();
