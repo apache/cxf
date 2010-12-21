@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.systest.aegis;
 
+import java.util.List;
+
 import javax.jws.WebService;
 
 import org.apache.cxf.annotations.Logging;
@@ -29,8 +31,17 @@ public class AegisJaxWsWsdlNsImpl implements AegisJaxWsWsdlNs {
     
 
     public void updateVO(VO vo) {
-
         System.out.println(vo.getStr());
+    }
+
+    
+    public Integer updateInteger(Integer idInteger) {
+        return idInteger;
+    }
+
+    
+    public void updateIntegerList(List<Integer> idIntegerList) {
+        //
     }
 
 }
