@@ -95,6 +95,10 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
 
     @Resource
     public final void setBus(Bus b) {
+        if (this.bus == b) {
+            //avoid bus init twice through injection
+            return;
+        }
         bus = b;
         addBusInterceptors();
         FactoryBeanListenerManager fblm = bus.getExtension(FactoryBeanListenerManager.class);
