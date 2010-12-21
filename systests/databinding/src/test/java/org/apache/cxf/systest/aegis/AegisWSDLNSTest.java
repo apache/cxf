@@ -31,6 +31,7 @@ import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
 import org.apache.cxf.test.TestUtilities;
 import org.apache.cxf.testutil.common.TestUtil;
 
+import org.junit.Assert;
 import org.junit.Test;
 
 import org.springframework.test.context.ContextConfiguration;
@@ -93,6 +94,13 @@ public class AegisWSDLNSTest extends AbstractJUnit4SpringContextTests {
         util.assertValid("//wsdl:definitions/wsdl:types/xsd:schema[@targetNamespace"
                          + "='http://wo.rtf2pdf.doc.ws.daisy.marbes.cz']",
                          dom);
+    }
+    
+    @Test
+    public void testUsingCorrectMethod() throws Exception {
+        setupForTest(false);
+        Integer result = client.updateInteger(new Integer(20));
+        Assert.assertEquals(result.intValue(), 20);
     }
    
 }

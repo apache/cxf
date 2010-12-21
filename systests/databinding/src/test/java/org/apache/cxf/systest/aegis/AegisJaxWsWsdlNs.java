@@ -19,6 +19,8 @@
 
 package org.apache.cxf.systest.aegis;
 
+import java.util.List;
+
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import org.apache.cxf.aegis.type.java5.XmlType;
@@ -31,6 +33,12 @@ import org.apache.cxf.aegis.type.java5.XmlType;
 public interface AegisJaxWsWsdlNs {
 
     void updateVO(@WebParam(name = "VO")VO vo);
+    
+    Integer updateInteger(@WebParam(name = "idInteger") Integer idInteger);
+
+
+    void updateIntegerList(@WebParam(name = "idIntegerList") List<Integer> idIntegerList);
+
 
     @XmlType(name = "VOX", namespace = "http://wo.rtf2pdf.doc.ws.daisy.marbes.cz")
     public class VO {
