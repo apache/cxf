@@ -78,9 +78,11 @@ public class CXFBusLifeCycleManager implements BusLifeCycleManager {
     
     public void preShutdown() {
         // TODO inverse order of registration?
-        preShutdownCalled = true;
-        for (BusLifeCycleListener listener : listeners) {
-            listener.preShutdown();
+        if (!preShutdownCalled) { 
+            preShutdownCalled = true;
+            for (BusLifeCycleListener listener : listeners) {
+                listener.preShutdown();
+            }
         }
     }
     
