@@ -64,8 +64,9 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
                                            Message message,
                                            String realm, String fullHeader) {
+        AuthorizationPolicy authPolicy = conduit.getEffectiveAuthPolicy(message);
         HttpAuthHeader authHeader = new HttpAuthHeader(fullHeader);
-        if (authHeader.authTypeIsDigest()) {
+        if (authHeader.authTypeIsDigest() && authPolicy != null) {
             Map<String, String> map = authHeader.getParams();
             if ("auth".equals(map.get("qop"))
                 || !map.containsKey("qop")) {
@@ -85,9 +86,10 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                     di.method = "POST";
                 }
                 authInfo.put(currentURL, di);
+                
                 return di.generateAuth(currentURL.getFile(), 
-                                       getUsername(conduit, message),
-                                       getPassword(conduit, message));
+                                       authPolicy.getUserName(),
+                                       authPolicy.getPassword());
             }
             
         }
@@ -96,34 +98,11 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
     @Override
     public String getPreemptiveAuthorization(HTTPConduit conduit, URL currentURL, Message message) {
         DigestInfo di = authInfo.get(currentURL);
+        AuthorizationPolicy authPolicy = conduit.getEffectiveAuthPolicy(message);
         if (di != null) {
             return di.generateAuth(currentURL.getFile(), 
-                                   getUsername(conduit, message),
-                                   getPassword(conduit, message));            
-        }
-        return null;
-    }
-
-    private String getPassword(HTTPConduit conduit, Message message) {
-        AuthorizationPolicy policy = getPolicy(conduit, message);
-        return policy != null ? policy.getPassword() : null;
-    }
-
-    private String getUsername(HTTPConduit conduit, Message message) {
-        AuthorizationPolicy policy = getPolicy(conduit, message);
-        return policy != null ? policy.getUserName() : null;
-    }
-
-    private AuthorizationPolicy getPolicy(HTTPConduit conduit, Message message) {
-        AuthorizationPolicy policy 
-            = (AuthorizationPolicy)message.getContextualProperty(AuthorizationPolicy.class.getName());
-        if (policy == null) {
-            policy = conduit.getAuthorization();
-        }
-        if (policy != null
-            && (!policy.isSetAuthorizationType()
-                || "Digest".equals(policy.getAuthorizationType()))) {
-            return policy;
+                                   authPolicy.getUserName(),
+                                   authPolicy.getPassword());            
         }
         return null;
     }

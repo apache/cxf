@@ -76,7 +76,8 @@ public class DigestAuthSupplierTest {
         authorizationPolicy.setUserName("testUser");
         authorizationPolicy.setPassword("testPassword");
         
-        EasyMock.expect(conduit.getAuthorization()).andReturn(authorizationPolicy).atLeastOnce();
+        EasyMock.expect(conduit.getEffectiveAuthPolicy(EasyMock.isA(Message.class)))
+            .andReturn(authorizationPolicy).atLeastOnce();
         URL url = new URL("http://myserver");
         Message message = new MessageImpl();
         control.replay();

@@ -52,6 +52,7 @@ public abstract class HttpBasicAuthSupplier extends HttpAuthSupplier {
      *
      */
     protected HttpBasicAuthSupplier() {
+        super();
     }
     
     /**

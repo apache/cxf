@@ -213,7 +213,9 @@ public class HTTPConduitTest extends Assert {
                 "Basic " + Base64Utility.encode("Gandalf:staff".getBytes()),
                 headers.get("Authorization").get(0));
 
-        // Setting authorization policy on the message should override all.
+        conduit.setAuthSupplier(null);
+        // Setting authorization policy on the message should override 
+        // conduit setting
         AuthorizationPolicy authPolicy = new AuthorizationPolicy();
         authPolicy.setUserName("Hello");
         authPolicy.setPassword("world");

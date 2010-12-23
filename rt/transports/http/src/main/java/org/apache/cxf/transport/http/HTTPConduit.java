@@ -469,19 +469,18 @@ public class HTTPConduit
                 
         boolean isChunking = false;
         int chunkThreshold = 0;
-        // We must cache the request if we have basic auth supplier
-        // without preemptive basic auth.
-        if (authSupplier != null) {
-            String auth = authSupplier.getPreemptiveAuthorization(
-                    this, currentURL, message);
-            if (auth == null || authSupplier.requiresRequestCaching()) {
-                needToCacheRequest = true;
-                isChunking = false;
-                LOG.log(Level.FINE,
-                        "Auth Supplier, but no Premeptive User Pass or Digest auth (nonce may be stale)"
-                        + " We must cache request.");
-            }
-            message.put("AUTH_VALUE", auth);
+        final AuthorizationPolicy effectiveAuthPolicy = getEffectiveAuthPolicy(message);
+        if (this.authSupplier == null) {
+            String authType = effectiveAuthPolicy.getAuthorizationType();
+            this.authSupplier = createAuthSupplier(authType);
+        }
+
+        if (this.authSupplier.requiresRequestCaching()) {
+            needToCacheRequest = true;
+            isChunking = false;
+            LOG.log(Level.FINE,
+                    "Auth Supplier, but no Premeptive User Pass or Digest auth (nonce may be stale)"
+                    + " We must cache request.");
         }
         if (csPolicy.isAutoRedirect()) {
             needToCacheRequest = true;
@@ -532,6 +531,16 @@ public class HTTPConduit
                                    chunkThreshold,
                                    getConduitName()));
         // We are now "ready" to "send" the message. 
+    }
+
+    private HttpAuthSupplier createAuthSupplier(String authType) {
+        if (HttpAuthHeader.AUTH_TYPE_NEGOTIATE.equals(authType)) {
+            return new SpnegoAuthSupplier();
+        } else if (HttpAuthHeader.AUTH_TYPE_DIGEST.equals(authType)) {
+            return new DigestAuthSupplier();
+        } else {
+            return new DefaultBasicAuthSupplier();
+        }
     }
 
     private static int determineReceiveTimeout(Message message,
@@ -718,53 +727,17 @@ public class HTTPConduit
             URL url
     ) {
         Headers headers = new Headers(message);
-        AuthorizationPolicy authPolicy = getAuthorization();
-        AuthorizationPolicy newPolicy = message.get(AuthorizationPolicy.class);
+        String authString = authSupplier.getPreemptiveAuthorization(this, url, message);
+        if (authString != null) {
+            headers.setAuthorization(authString);
+        }
         
-        String authString = null;
-        if (authSupplier != null 
-            && (newPolicy == null
-                || (!"Basic".equals(newPolicy.getAuthorizationType())
-                    && newPolicy.getAuthorization() == null))) {
-            authString = (String)message.get("AUTH_VALUE");
-            if (authString == null) {
-                authString = authSupplier.getPreemptiveAuthorization(
-                    this, url, message);
-            } else {
-                message.remove("AUTH_VALUE");
-            }
-            if (authString != null) {
-                headers.setAuthorization(authString);
-            }
-            return;
-        }
-        String userName = null;
-        String passwd = null;
-        if (null != newPolicy) {
-            userName = newPolicy.getUserName();
-            passwd = newPolicy.getPassword();
-        }
-
-        if (userName == null 
-            && authPolicy != null && authPolicy.isSetUserName()) {
-            userName = authPolicy.getUserName();
-        }
-        if (userName != null) {
-            if (passwd == null 
-                && authPolicy != null && authPolicy.isSetPassword()) {
-                passwd = authPolicy.getPassword();
-            }
-            headers.setAuthorization(HttpBasicAuthSupplier.getBasicAuthHeader(userName, passwd));
-        } else if (authPolicy != null 
-                && authPolicy.isSetAuthorizationType() 
-                && authPolicy.isSetAuthorization()) {
-            headers.setAuthorization(authPolicy.getAuthorizationType() + " " + authPolicy.getAuthorization());
-        }
+        // TODO Also use an authSupplier for proxy auth
         AuthorizationPolicy proxyAuthPolicy = getProxyAuthorization();
         if (proxyAuthPolicy != null && proxyAuthPolicy.isSetUserName()) {
-            userName = proxyAuthPolicy.getUserName();
+            String userName = proxyAuthPolicy.getUserName();
             if (userName != null) {
-                passwd = "";
+                String passwd = "";
                 if (proxyAuthPolicy.isSetPassword()) {
                     passwd = proxyAuthPolicy.getPassword();
                 }
@@ -787,6 +760,26 @@ public class HTTPConduit
             return endpointInfo.getName().toString() + ".http-conduit";
         }
         return null;
+    }
+    
+    /**
+     * Determines effective auth policy from message, conduit and empty default
+     * with priority from first to last
+     * 
+     * @param message
+     * @return effective AthorizationPolicy
+     */
+    public AuthorizationPolicy getEffectiveAuthPolicy(Message message) {
+        AuthorizationPolicy authPolicy = getAuthorization();
+        AuthorizationPolicy newPolicy = message.get(AuthorizationPolicy.class);
+        AuthorizationPolicy effectivePolicy = newPolicy;
+        if (effectivePolicy == null) {
+            effectivePolicy = authPolicy;
+        }
+        if (effectivePolicy == null) {
+            effectivePolicy = new AuthorizationPolicy();
+        }
+        return effectivePolicy;
     }
 
     /**

@@ -35,13 +35,14 @@ public final class HttpAuthHeader {
     private Map<String, String> params;
 
     public HttpAuthHeader(String fullHeader) {
-        this.fullHeader = fullHeader;
-        int spacePos = fullHeader.indexOf(' ');
+        this.fullHeader = (fullHeader == null) ? "" : fullHeader;
+        int spacePos = this.fullHeader.indexOf(' ');
         if (spacePos == -1) {
-            this.authType = fullHeader;
+            this.authType = this.fullHeader;
+            this.fullContent = "";
         } else {
-            this.authType = fullHeader.substring(0, spacePos);
-            this.fullContent = fullHeader.substring(spacePos + 1);
+            this.authType = this.fullHeader.substring(0, spacePos);
+            this.fullContent = this.fullHeader.substring(spacePos + 1);
         }
         this.params = parseHeader();
     }
