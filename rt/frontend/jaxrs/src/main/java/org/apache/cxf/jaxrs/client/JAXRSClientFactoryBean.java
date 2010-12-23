@@ -214,7 +214,9 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         client.getConfiguration().setConduitSelector(getConduitSelector(ep));
         client.getConfiguration().setBus(getBus());
         client.getConfiguration().getOutInterceptors().addAll(getOutInterceptors());
+        client.getConfiguration().getOutInterceptors().addAll(ep.getOutInterceptors());
         client.getConfiguration().getInInterceptors().addAll(getInInterceptors());
+        client.getConfiguration().getInInterceptors().addAll(ep.getInInterceptors());
 
         if (headers != null && addHeaders) {
             client.headers(headers);

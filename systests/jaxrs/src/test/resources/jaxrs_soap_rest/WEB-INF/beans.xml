@@ -102,41 +102,55 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   </jaxrs:server>
   <bean id="bookstore2" class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestImpl2"/>
 
-  <util:list id="fastinfosetType">
-    <value>application/fastinfoset</value>
-  </util:list> 
-
-
   <jaxrs:server id="restservice3"
 		        address="/rest3">
     <jaxrs:serviceBeans>
-      <ref bean="bookstore"/>
+      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset"/>
     </jaxrs:serviceBeans>
     
     <jaxrs:providers>
        <ref bean="jaxbProvider" />
     </jaxrs:providers>
-        
-    <jaxrs:outInterceptors>
-      <ref bean="fastInfosetOutInterceptor" />
-    </jaxrs:outInterceptors>
-    <jaxrs:inInterceptors>
-      <ref bean="fastInfosetInInterceptor" />
-    </jaxrs:inInterceptors>
+
     <jaxrs:properties>
       <entry key="org.apache.cxf.endpoint.private" value="true"/>
     </jaxrs:properties>    		   
   </jaxrs:server> 
+
+  <jaxrs:server id="restservice4"
+		        address="/rest4">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset2"/>
+    </jaxrs:serviceBeans>
+    
+    <jaxrs:providers>
+       <ref bean="jaxbProvider" />
+    </jaxrs:providers>
+  </jaxrs:server>
+
+  <jaxrs:server id="restservice5"
+		        address="/rest5">
+    <jaxrs:serviceBeans>
+      <bean class="org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset3"/>
+    </jaxrs:serviceBeans>
+    
+    <jaxrs:providers>
+       <ref bean="jaxbProvider" />
+    </jaxrs:providers>
+    
+    <jaxrs:properties>
+      <entry key="org.apache.cxf.fastinfoset.enabled" value="true"/>
+    </jaxrs:properties>
+  </jaxrs:server>
 
   <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="produceMediaTypes" ref="fastinfosetType"/>
       <property name="consumeMediaTypes" ref="fastinfosetType"/>
   </bean>
 
-   <bean id="fastInfosetOutInterceptor"
-         class="org.apache.cxf.interceptor.FIStaxOutInterceptor" />
-   <bean id="fastInfosetInInterceptor"
-         class="org.apache.cxf.interceptor.FIStaxInInterceptor" />
-
+  <util:list id="fastinfosetType">
+    <value>application/fastinfoset</value>
+  </util:list>
+   
 </beans>
 <!-- END SNIPPET: beans -->

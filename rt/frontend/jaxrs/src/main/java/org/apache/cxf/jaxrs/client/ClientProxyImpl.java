@@ -40,6 +40,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriBuilder;
+import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -493,7 +494,8 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
             
             OperationResourceInfo ori = outMessage.getContent(OperationResourceInfo.class);
             OutputStream os = outMessage.getContent(OutputStream.class);
-            if (os == null || ori == null) {
+            if ((os == null && outMessage.getContent(XMLStreamWriter.class) == null)
+                || ori == null) {
                 return;
             }
             MessageContentsList objs = MessageContentsList.getContentsList(outMessage);
@@ -517,7 +519,6 @@ public class ClientProxyImpl extends AbstractClient implements InvocationHandler
                     writeBody(body, outMessage, body.getClass(), body.getClass(), 
                               anns, headers, os);
                 }
-                os.flush();
             } catch (Exception ex) {
                 throw new Fault(ex);
             }
