@@ -50,8 +50,10 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.FIStaxInInterceptor;
 import org.apache.cxf.interceptor.FIStaxOutInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.io.CachedOutputStream;
+import org.apache.cxf.jaxrs.client.ClientConfiguration;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.ResponseExceptionMapper;
@@ -65,6 +67,8 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.systest.jaxrs.jaxws.BookSoapService;
 import org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws;
+import org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset2;
+import org.apache.cxf.systest.jaxrs.jaxws.BookStoreSoapRestFastInfoset3;
 import org.apache.cxf.systest.jaxrs.jaxws.HelloWorld;
 import org.apache.cxf.systest.jaxrs.jaxws.User;
 import org.apache.cxf.systest.jaxrs.jaxws.UserImpl;
@@ -170,6 +174,72 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
             .post(b, Book.class);
         assertEquals(b2.getName(), b.getName());
         assertEquals(b2.getId(), b.getId());
+    }
+    
+    @Test
+    public void testPostGetBookFastinfosetProxy() throws Exception {
+        
+        JAXBElementProvider p = new JAXBElementProvider();
+        p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
+        p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
+        
+        BookStoreJaxrsJaxws client = JAXRSClientFactory.create(
+                                  "http://localhost:" + PORT + "/test/services/rest4",
+                                  BookStoreSoapRestFastInfoset2.class,
+                                  Collections.singletonList(p));
+        
+        Book b = new Book("CXF", 1L);
+        
+        Book b2 = client.addFastinfoBook(b);
+        
+        assertEquals(b2.getName(), b.getName());
+        assertEquals(b2.getId(), b.getId());
+        
+        checkFiInterceptors(WebClient.getConfig(client));
+    }
+    
+    @Test
+    public void testPostGetBookFastinfosetProxyInterceptors() throws Exception {
+        
+        JAXBElementProvider p = new JAXBElementProvider();
+        p.setConsumeMediaTypes(Collections.singletonList("application/fastinfoset"));
+        p.setProduceMediaTypes(Collections.singletonList("application/fastinfoset"));
+        
+        BookStoreJaxrsJaxws client = JAXRSClientFactory.create(
+                                  "http://localhost:" + PORT + "/test/services/rest5",
+                                  BookStoreSoapRestFastInfoset3.class,
+                                  Collections.singletonList(p));
+        
+        Book b = new Book("CXF", 1L);
+        
+        // Just to make sure it is enforced
+        Map<String, Object> props = WebClient.getConfig(client).getResponseContext();
+        props.put(FIStaxOutInterceptor.FI_ENABLED, Boolean.TRUE);
+        
+        Book b2 = client.addFastinfoBook(b);
+        
+        assertEquals(b2.getName(), b.getName());
+        assertEquals(b2.getId(), b.getId());
+        
+        checkFiInterceptors(WebClient.getConfig(client));
+        
+    }
+    
+    private void checkFiInterceptors(ClientConfiguration cfg) {
+        int count = 0;
+        for (Interceptor<?> in : cfg.getInInterceptors()) {
+            if (in instanceof FIStaxInInterceptor) {
+                count++;
+                break;
+            }
+        }
+        for (Interceptor<?> in : cfg.getOutInterceptors()) {
+            if (in instanceof FIStaxOutInterceptor) {
+                count++;
+                break;
+            }
+        }
+        assertEquals("In and Out FastInfoset interceptors are expected", 2, count);
     }
     
     @Test
@@ -561,7 +631,7 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         
          
         
-        assertFalse(listings.contains("Atom Log Feed"));
+        //assertFalse(listings.contains("Atom Log Feed"));
     }
     
     @Test

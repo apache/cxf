@@ -364,7 +364,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
                                                    BUNDLE,
                                                    parameter);
             LOG.warning(message.toString());
-            out.write(message.toString().getBytes("UTF-8"));
+            if (out != null) {
+                out.write(message.toString().getBytes("UTF-8"));
+            }
         } catch (IOException another) {
             // ignore
         }

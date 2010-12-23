@@ -42,6 +42,7 @@ import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
 import org.apache.cxf.systest.jaxrs.BookSubresource;
 import org.apache.cxf.systest.jaxrs.BookSubresourceImpl;
 
+
 public class BookStoreSoapRestImpl implements BookStoreJaxrsJaxws {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();

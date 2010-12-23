@@ -58,7 +58,7 @@ public interface BookStoreJaxrsJaxws {
     
     @POST
     @Path("/fastinfoset")
-    @Consumes({"text/xml" })
+    @Consumes({"application/fastinfoset", "text/xml" })
     @Produces({"application/fastinfoset", "text/xml", "application/xml" })
     Book addFastinfoBook(Book book);
     
