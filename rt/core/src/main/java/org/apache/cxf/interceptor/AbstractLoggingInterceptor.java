@@ -44,7 +44,7 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
  */
 public abstract class AbstractLoggingInterceptor extends AbstractPhaseInterceptor<Message> {
 
-    protected static final Logger LOG = LogUtils.getL7dLogger(LoggingInInterceptor.class);
+    protected static final Logger LOG = LogUtils.getL7dLogger(AbstractLoggingInterceptor.class);
 
     protected int limit = 100 * 1024;
     protected PrintWriter writer;
