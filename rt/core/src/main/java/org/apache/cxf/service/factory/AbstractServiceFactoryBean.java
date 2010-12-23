@@ -49,6 +49,7 @@ public abstract class AbstractServiceFactoryBean {
     private static final Logger LOG = LogUtils.getL7dLogger(AbstractServiceFactoryBean.class);
     
     protected boolean dataBindingSet;
+    protected boolean needReset = true;
     protected List<String> schemaLocations;
 
     private Bus bus;
@@ -119,6 +120,10 @@ public abstract class AbstractServiceFactoryBean {
         this.dataBindingSet = dataBinding != null;
     }
 
+    public void setNeedReset(boolean reset) {
+        needReset = reset;
+    }
+    
     public Service getService() {
         return service;
     }
