@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Logger;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -59,6 +60,7 @@ import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.staxutils.CachingXmlEventWriter;
 import org.apache.cxf.staxutils.StaxUtils;
@@ -161,7 +163,9 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             status = isResponseNull(responseObj) ? 204 : 200;
         }
         
-        message.put(Message.RESPONSE_CODE, status);
+        boolean responseHeadersCopied = isResponseHeadersCopied(message);
+        setResponseStatus(message, status, responseHeadersCopied);
+        
         Map<String, List<String>> theHeaders = 
             (Map<String, List<String>>)message.get(Message.PROTOCOL_HEADERS);
         if (firstTry && theHeaders != null) {
@@ -453,5 +457,26 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             ex.printStackTrace();
             throw new RuntimeException(ex);
         }
+    }
+   
+    private void setResponseStatus(Message message, int status, boolean responseHeadersCopied) {
+        message.put(Message.RESPONSE_CODE, status);   
+        if (responseHeadersCopied) {
+            HttpServletResponse response = 
+                (HttpServletResponse)message.get(AbstractHTTPDestination.HTTP_RESPONSE);
+            response.setStatus(status);
+        }
+    }
+    
+    // Some CXF interceptors such as FIStaxOutInterceptor will indirectly initiate
+    // an early copying of response code and headers into the HttpServletResponse
+    // TODO : Pushing the filter processing and copying response headers into say
+    // PRE-LOGICAl and PREPARE_SEND interceptors will most likely be a good thing
+    // however JAX-RS MessageBodyWriters are also allowed to add response headers
+    // which is reason why a MultipartMap parameter in MessageBodyWriter.writeTo 
+    // method is modifiable. Thus we do need to know if the initial copy has already
+    // occurred: for now we will just use to ensure the correct status is set
+    private boolean isResponseHeadersCopied(Message message) {
+        return MessageUtils.isTrue(message.get(AbstractHTTPDestination.RESPONSE_HEADERS_COPIED));
     }
 }

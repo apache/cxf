@@ -626,12 +626,12 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         assertEquals(200, WebClient.create(
             "http://localhost:" + PORT + "/test/services/rest2?_wadl&type=xml").get().getStatus());
         assertFalse(listings.contains("http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml"));
-        assertEquals(401, WebClient.create(
-            "http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml").get().getStatus());
-        
-         
-        
-        //assertFalse(listings.contains("Atom Log Feed"));
+        assertFalse(listings.contains("Atom Log Feed"));
+    
+        WebClient webClient = 
+            WebClient.create("http://localhost:" + PORT + "/test/services/rest3?_wadl&type=xml");
+        WebClient.getConfig(webClient).getHttpConduit().getClient().setReceiveTimeout(1000000);
+        assertEquals(401, webClient.get().getStatus());
     }
     
     @Test

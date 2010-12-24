@@ -19,12 +19,14 @@
 
 package org.apache.cxf.systest.jaxrs.jaxws;
 
+import org.apache.cxf.annotations.EndpointProperty;
 import org.apache.cxf.interceptor.InInterceptors;
 import org.apache.cxf.interceptor.OutInterceptors;
 import org.apache.cxf.systest.jaxrs.Book;
 
 @InInterceptors(interceptors = "org.apache.cxf.interceptor.FIStaxInInterceptor")
 @OutInterceptors(interceptors = "org.apache.cxf.interceptor.FIStaxOutInterceptor")
+@EndpointProperty(key = "org.apache.cxf.fastinfoset.enabled", value = "true")
 public class BookStoreSoapRestFastInfoset extends BookStoreSoapRestImpl {
 
     @Override

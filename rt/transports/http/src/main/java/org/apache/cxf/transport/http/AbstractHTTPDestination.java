@@ -85,7 +85,8 @@ public abstract class AbstractHTTPDestination
     public static final String HTTP_RESPONSE = "HTTP.RESPONSE";
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
-        
+    
+    public static final String RESPONSE_HEADERS_COPIED = "http.response.done";
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
@@ -431,6 +432,8 @@ public abstract class AbstractHTTPDestination
         }
         new Headers(outMessage).copyToResponse(response);
 
+        outMessage.put(RESPONSE_HEADERS_COPIED, "true");
+        
         if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
             response.setContentLength(0);
             response.flushBuffer();
