@@ -276,9 +276,8 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (entityProviders != null) {
             factory.setUserProviders(entityProviders); 
         }
-        if (getDataBinding() != null) {
-            setDataBindingProvider(factory, ep.getService());
-        }
+        setDataBindingProvider(factory, ep.getService());
+        
         factory.setBus(getBus());
         if (schemaLocations != null) {
             factory.setSchemaLocations(schemaLocations);
@@ -288,10 +287,25 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
     }
 
     protected void setDataBindingProvider(ProviderFactory factory, Service s) {
+        
+        List<ClassResourceInfo> cris = serviceFactory.getRealClassResourceInfo();
+        if (getDataBinding() == null && cris.size() > 0) {
+            org.apache.cxf.annotations.DataBinding ann = 
+                cris.get(0).getServiceClass().getAnnotation(org.apache.cxf.annotations.DataBinding.class);
+            if (ann != null) {
+                try {
+                    setDataBinding(ann.value().newInstance());
+                } catch (Exception ex) {
+                    LOG.warning("DataBinding " + ann.value() + " can not be loaded");
+                }
+            }
+        }
         DataBinding db = getDataBinding();
+        if (db == null) {
+            return;
+        }
         if (db instanceof PropertiesAwareDataBinding) {
-            Map<Class<?>, Type> allClasses = ResourceUtils.getAllRequestResponseTypes(
-                                                 serviceFactory.getRealClassResourceInfo(), false);
+            Map<Class<?>, Type> allClasses = ResourceUtils.getAllRequestResponseTypes(cris, false);
             Map<String, Object> props = new HashMap<String, Object>();
             props.put(PropertiesAwareDataBinding.TYPES_PROPERTY, allClasses);
             ((PropertiesAwareDataBinding)db).initialize(props);

@@ -71,9 +71,18 @@ public class JAXRSDataBindingTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testSDOStructure() throws Exception {
+        doTestSDOStructure("http://localhost:" + PORT + "/databinding/sdo");
+    }
+    
+    @Test
+    public void testSDOStructureWithAnnotation() throws Exception {
+        doTestSDOStructure("http://localhost:" + PORT + "/databinding/sdo2");
+    }
+    
+    private void doTestSDOStructure(String address) throws Exception {
         JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
         bean.setDataBinding(new SDODataBinding());
-        bean.setAddress("http://localhost:" + PORT + "/databinding/sdo");
+        bean.setAddress(address);
         bean.setResourceClass(SDOResource.class);
         SDOResource client = bean.create(SDOResource.class);
         Structure struct = client.getStructure();
