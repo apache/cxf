@@ -91,7 +91,7 @@ public abstract class AbstractHTTPDestination
     public static final String HTTP_CONTEXT = "HTTP.CONTEXT";
     public static final String HTTP_CONFIG = "HTTP.CONFIG";
     public static final String PROTOCOL_HEADERS_CONTENT_TYPE = Message.CONTENT_TYPE.toLowerCase();
-        
+    public static final String RESPONSE_HEADERS_COPIED = "http.headers.copied";        
     public static final String RESPONSE_COMMITED = "http.response.done";
     public static final String REQUEST_REDIRECTED = "http.request.redirected";
     public static final String CXF_CONTINUATION_MESSAGE = "cxf.continuation.message";
