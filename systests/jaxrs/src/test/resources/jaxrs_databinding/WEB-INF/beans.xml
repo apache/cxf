@@ -46,6 +46,7 @@ http://cxf.apache.org/schemas/core.xsd">
   <bean class="org.apache.cxf.systest.jaxrs.BookStoreSpring" id="serviceBean"/>
   
   <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource" id="sdoBean"/>
+  <bean class="org.apache.cxf.systest.jaxrs.sdo.SDOResource2" id="sdoBean2"/>
   
   <jaxrs:server id="jaxbbook" address="/jaxb">
     <jaxrs:serviceBeans>
@@ -81,6 +82,12 @@ http://cxf.apache.org/schemas/core.xsd">
     <jaxrs:providers>
       <ref bean="jsonSdoBean" />
     </jaxrs:providers>
+  </jaxrs:server>
+
+  <jaxrs:server id="sdo2" address="/sdo2">
+    <jaxrs:serviceBeans>
+      <ref bean="sdoBean2" />
+    </jaxrs:serviceBeans>		   
   </jaxrs:server>
 
   <bean id="sdoDatabinding" class="org.apache.cxf.sdo.SDODataBinding"/>
