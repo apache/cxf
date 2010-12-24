@@ -555,7 +555,8 @@ public abstract class AbstractHTTPDestination
             }
 
             copyResponseHeaders(outMessage, response);
-
+            outMessage.put(RESPONSE_HEADERS_COPIED, "true");
+            
             if (oneWay && !MessageUtils.isPartialResponse(outMessage)) {
                 response.setContentLength(0);
                 response.flushBuffer();
