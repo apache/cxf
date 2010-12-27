@@ -53,6 +53,8 @@ public class PolicyAnnotationTest extends Assert {
 
     @org.junit.Test
     public void testAnnotations() throws Exception {
+        // Need to clean up the Default Bus instance frist
+        BusFactory.setDefaultBus(null);
         Bus bus = BusFactory.getDefaultBus();
         JaxWsServerFactoryBean factory = new JaxWsServerFactoryBean();
         factory.setBus(bus);
