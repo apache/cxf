@@ -51,7 +51,7 @@ public final class Client {
 
         File wsdl = new File(args[0]);
 
-        JMSGreeterService service = new JMSGreeterService(wsdl.toURL(), SERVICE_NAME);
+        JMSGreeterService service = new JMSGreeterService(wsdl.toURI().toURL(), SERVICE_NAME);
         JMSGreeterPortType greeter = (JMSGreeterPortType)service.getPort(PORT_NAME, JMSGreeterPortType.class);
 
         System.out.println("Invoking sayHi...");
