@@ -44,10 +44,11 @@ import org.apache.xmlbeans.XmlObject;
 /**
  * Provider for XMLBeans data objects.
  */
-@Produces("application/xml")
-@Consumes("application/xml")
+@Produces({"application/xml", "application/*+xml", "text/xml" })
+@Consumes({"application/xml", "application/*+xml", "text/xml" })
 @Provider
-public class XMLBeansElementProvider implements MessageBodyReader<XmlObject>, MessageBodyWriter<XmlObject> {
+public class XMLBeansElementProvider extends AbstractConfigurableProvider 
+    implements MessageBodyReader<XmlObject>, MessageBodyWriter<XmlObject> {
 
     /** {@inheritDoc} */
     public XmlObject readFrom(Class<XmlObject> type, Type genericType, 
