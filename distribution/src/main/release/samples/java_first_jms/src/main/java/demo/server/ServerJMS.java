@@ -48,12 +48,10 @@ public final class ServerJMS {
         for (String arg : args) {
             if ("-activemqbroker".equals(arg)) {
                 launchAmqBroker = true;
-            } else if ("-jaxws".equals(arg)) {
+            } 
+            if ("-jaxws".equals(arg)) {
                 jaxws = true;
-            } else {
-                System.err.println("Invalid argument " + arg);
-                return;
-            }
+            } 
         }
 
         if (launchAmqBroker) {
@@ -70,6 +68,8 @@ public final class ServerJMS {
             Object broker = brokerClass.newInstance();
             Method addConnectorMethod = brokerClass.getMethod("addConnector", String.class);
             addConnectorMethod.invoke(broker, "tcp://localhost:61616");
+            Method setDataDirectory = brokerClass.getMethod("setDataDirectory", String.class);
+            setDataDirectory.invoke(broker, "target/activemq-data");
             Method startMethod = brokerClass.getMethod("start");
             startMethod.invoke(broker);
         }
