@@ -39,6 +39,7 @@ public class JMSEndpointTest extends Assert {
     public void testQueueParameters() throws Exception {
         JMSEndpoint endpoint = resolveEndpoint("jms:queue:Foo.Bar?foo=bar&foo2=bar2");
         assertTrue(endpoint instanceof JMSQueueEndpoint);
+        System.out.println("The Request URI is " + endpoint.getRequestURI());
         assertEquals(endpoint.getDestinationName(), "Foo.Bar");
         assertEquals(endpoint.getJmsVariant(), JMSURIConstants.QUEUE);
         assertEquals(endpoint.getParameters().size(), 2);
@@ -122,14 +123,24 @@ public class JMSEndpointTest extends Assert {
     public void testRequestUri() throws Exception {
         JMSEndpoint endpoint = resolveEndpoint("jms:jndi:Foo.Bar?" + "jndiInitialContextFactory"
                                                + "=org.apache.activemq.jndi.ActiveMQInitialContextFactory"
+                                               + "&targetService=greetMe"
+                                               + "&replyToName=replyQueue"
+                                               + "&timeToLive=1000"
+                                               + "&priority=3"
                                                + "&foo=bar"
                                                + "&foo2=bar2");
         assertTrue(endpoint instanceof JMSJNDIEndpoint);
-        assertEquals(endpoint.getParameters().size(), 2);
+        assertEquals(endpoint.getParameters().size(), 3);
         String requestUri = endpoint.getRequestURI();
+        // Checking what's the request uri should have
         assertTrue(requestUri.startsWith("jms:jndi:Foo.Bar?"));
         assertTrue(requestUri.contains("foo=bar"));
         assertTrue(requestUri.contains("foo2=bar2"));
+        // Cheching what's the request uri should not have
+        assertFalse(requestUri.contains("jndiInitialContextFactory"));
+        assertFalse(requestUri.contains("targetService"));
+        assertFalse(requestUri.contains("replyToName"));
+        assertFalse(requestUri.contains("priority=3"));
     }
     
     private JMSEndpoint resolveEndpoint(String uri) {
