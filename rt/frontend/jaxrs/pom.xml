@@ -161,9 +161,38 @@
             <artifactId>xmlbeans</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-databinding-xmlbeans</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>org.easymock</groupId>
             <artifactId>easymockclassextension</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>xmlbeans-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>xmlbeans-test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <schemaDirectory>src/test/xsd/xmlbeans</schemaDirectory>
+                    <sourceGenerationDirectory>${project.build.directory}/generated/src/test/java</sourceGenerationDirectory>
+                    <classGenerationDirectory>${project.build.directory}/generated/src/test/resources</classGenerationDirectory>
+                    <!--noJavac>true</noJavac-->
+                    <javaSource>1.5</javaSource>
+                </configuration>
+            </plugin>
+            
+        </plugins>
+    </build>
 </project>
