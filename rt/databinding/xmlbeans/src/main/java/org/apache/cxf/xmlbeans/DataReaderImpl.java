@@ -19,7 +19,9 @@
 
 package org.apache.cxf.xmlbeans;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.logging.Logger;
 
@@ -58,6 +60,34 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
             typeClass = (Class<?>)part.getProperty(XmlAnySimpleType.class.getName());
             unwrap = true;
         }
+        return doRead(reader,
+                      part.getTypeClass(), 
+                      typeClass, 
+                      (SchemaType)part.getProperty(SchemaType.class.getName()), 
+                      unwrap);
+    }
+
+    public Object read(QName name, XMLStreamReader reader, Class typeClass) {
+        SchemaType st = null;
+        try {
+            Field f = typeClass.getField("type");
+            if (Modifier.isStatic(f.getModifiers())) {
+                st = (SchemaType)f.get(null);
+            }
+        } catch (Exception es) {
+            es.printStackTrace();
+            return null;
+        }
+        
+        return doRead(reader,
+                      typeClass, 
+                      typeClass, 
+                      st, 
+                      false);
+    }
+
+    private Object doRead(XMLStreamReader reader, Class<?> partTypeClass, 
+                          Class<?> typeClass, SchemaType st, boolean unwrap) {
         boolean isOutClass = false;
         Class<?> encClass = typeClass.getEnclosingClass();
         if (encClass != null) {
@@ -69,8 +99,6 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
         for (Class<?> c : cls) {
             if ("Factory".equals(c.getSimpleName())) {
                 try {
-                    
-                    SchemaType st = (SchemaType)part.getProperty(SchemaType.class.getName());
                     XmlOptions options = new XmlOptions();
                     if (validate) {
                         options.setValidateOnSet();
@@ -82,13 +110,13 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
                     obj = meth.invoke(null, reader, options);                    
                     break;
                 } catch (Exception e) {
-                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, part.getTypeClass()), e);
+                    throw new Fault(new Message("UNMARSHAL_ERROR", LOG, partTypeClass, e));
                 }
             }
         }
         if (unwrap && obj != null) {
             try {
-                Class<?> tc = part.getTypeClass(); 
+                Class<?> tc = partTypeClass; 
                 String methName;
                 if (tc.equals(Integer.TYPE) || tc.equals(Integer.class)) {
                     methName = "getIntValue";
@@ -108,7 +136,7 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
             for (Method m : encClass.getDeclaredMethods()) {
                 if (m.getName().startsWith("get")
                     && m.getParameterTypes().length == 0
-                    && m.getReturnType().equals(part.getTypeClass())) {
+                    && m.getReturnType().equals(partTypeClass)) {
                     try {
                         obj = m.invoke(obj);
                     } catch (Exception e) {
@@ -126,11 +154,6 @@ public class DataReaderImpl implements DataReader<XMLStreamReader> {
         }
         return obj;
     }
-
-    public Object read(QName name, XMLStreamReader input, Class type) {        
-        return null;
-    }
-
     
     public void setAttachments(Collection<Attachment> attachments) {
     }

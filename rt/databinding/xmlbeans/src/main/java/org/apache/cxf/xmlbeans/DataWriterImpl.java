@@ -26,6 +26,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collection;
 import java.util.logging.Logger;
 
+import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
@@ -70,7 +71,7 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
     
     public void write(Object obj, MessagePartInfo part, XMLStreamWriter output) {
         try {
-            Class<?> typeClass = part.getTypeClass();
+            Class<?> typeClass = part != null ? part.getTypeClass() : null;
             if (typeClass == null) {
                 typeClass = obj.getClass();
             }
@@ -158,7 +159,9 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                         Field f = typeClass.getField("type");
                         if (Modifier.isStatic(f.getModifiers())) {
                             st = (SchemaType)f.get(null);
-                            part.setProperty(SchemaType.class.getName(), st);
+                            if (part != null) {
+                                part.setProperty(SchemaType.class.getName(), st);
+                            }
                         }
                     } catch (Exception es) {
                         //ignore
@@ -172,20 +175,23 @@ public class DataWriterImpl implements DataWriter<XMLStreamWriter> {
                 
                 if (st != null && !st.isDocumentType()
                     || reader.getEventType() == XMLStreamReader.CHARACTERS) {
-                    if (StringUtils.isEmpty(part.getConcreteName().getNamespaceURI())) {
-                        output.writeStartElement(part.getConcreteName().getLocalPart());
+                    
+                    QName elementName = part != null ? part.getConcreteName() : st.getName();
+                    
+                    if (StringUtils.isEmpty(elementName.getNamespaceURI())) {
+                        output.writeStartElement(elementName.getLocalPart());
                         
                     } else {
-                        String pfx = output.getPrefix(part.getConcreteName().getNamespaceURI());
+                        String pfx = output.getPrefix(elementName.getNamespaceURI());
                         if (StringUtils.isEmpty(pfx)) {
                             output.writeStartElement("tns",
-                                             part.getConcreteName().getLocalPart(),
-                                             part.getConcreteName().getNamespaceURI());
-                            output.writeNamespace("tns", part.getConcreteName().getNamespaceURI());
+                                                     elementName.getLocalPart(),
+                                                     elementName.getNamespaceURI());
+                            output.writeNamespace("tns", elementName.getNamespaceURI());
                         } else {
                             output.writeStartElement(pfx,
-                                                     part.getConcreteName().getLocalPart(),
-                                                     part.getConcreteName().getNamespaceURI());
+                                                     elementName.getLocalPart(),
+                                                     elementName.getNamespaceURI());
                         }
                     }
                     StaxUtils.copy(reader, output, true);

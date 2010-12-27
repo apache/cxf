@@ -40,12 +40,14 @@ import org.apache.cxf.jaxb.JAXBDataBinding;
 import org.apache.cxf.jaxrs.JAXRSServiceImpl;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
+import org.apache.cxf.jaxrs.providers.xmlbeans.types.Address;
 import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.sdo.Structure;
 import org.apache.cxf.jaxrs.resources.sdo.impl.StructureImpl;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.sdo.SDODataBinding;
 import org.apache.cxf.service.Service;
+import org.apache.cxf.xmlbeans.XmlBeansDataBinding;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -56,12 +58,14 @@ public class DataBindingProviderTest extends Assert {
 
     private ClassResourceInfo c;
     private ClassResourceInfo c2;
+    private ClassResourceInfo c3;
     private Properties properties;
     
     @Before
     public void setUp() throws InvalidPropertiesFormatException, IOException {
         c = ResourceUtils.createClassResourceInfo(TheBooks.class, TheBooks.class, true, true);
         c2 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
+        c3 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
         properties = new Properties();
         properties.loadFromXML(getClass().getResourceAsStream("jsonCases.xml"));
     }
@@ -176,6 +180,40 @@ public class DataBindingProviderTest extends Assert {
         assertEquals(3, struct.getInt());
     }
     
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testXmlBeansWrite() throws Exception {
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c3), true);
+        DataBinding binding = new XmlBeansDataBinding();
+        binding.initialize(s);
+        DataBindingProvider p = new DataBindingProvider(binding);
+        Address address = Address.Factory.newInstance();
+        address.setAddressLine1("Street 1");
+        
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        p.writeTo(address, Address.class, Address.class,
+            new Annotation[0], MediaType.TEXT_XML_TYPE, new MetadataMap<String, Object>(), bos);
+        String data = "<tns:Address xmlns:tns=\"http://cxf.apache.org/jaxrs/providers/xmlbeans/types\">"
+            + "<addressLine1>Street 1</addressLine1></tns:Address>";
+        assertEquals(bos.toString(), data);
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testXmlBeansRead() throws Exception {
+        String data = "<tns:Address xmlns:tns=\"http://cxf.apache.org/jaxrs/providers/xmlbeans/types\">"
+            + "<addressLine1>Street 1</addressLine1></tns:Address>";
+        Service s = new JAXRSServiceImpl(Collections.singletonList(c3), true);
+        DataBinding binding = new XmlBeansDataBinding();
+        binding.initialize(s);
+        DataBindingProvider p = new DataBindingProvider(binding);
+        ByteArrayInputStream is = new ByteArrayInputStream(data.getBytes());
+        Address address = (Address)p.readFrom((Class)Address.class, Address.class,
+                                      new Annotation[0], MediaType.APPLICATION_XML_TYPE, 
+                                      new MetadataMap<String, String>(), is);
+        assertEquals("Street 1", address.getAddressLine1());
+    }
+    
     @Path("/")
     @Ignore
     public static class TheBooks {
@@ -207,6 +245,18 @@ public class DataBindingProviderTest extends Assert {
         @GET
         @Path("/books/{bookId}/{new}")
         public Structure getStructure() {
+            return null;
+        }
+        
+    }
+    
+    @Path("/")
+    @Ignore
+    public static class TheXmlBeansBooks {
+
+        @GET
+        @Path("/books/{bookId}/{new}")
+        public Address getStructure() {
             return null;
         }
         
