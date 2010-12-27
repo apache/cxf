@@ -65,7 +65,8 @@ public class DataBindingProviderTest extends Assert {
     public void setUp() throws InvalidPropertiesFormatException, IOException {
         c = ResourceUtils.createClassResourceInfo(TheBooks.class, TheBooks.class, true, true);
         c2 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
-        c3 = ResourceUtils.createClassResourceInfo(TheSDOBooks.class, TheSDOBooks.class, true, true);
+        c3 = ResourceUtils.createClassResourceInfo(TheXmlBeansBooks.class, 
+                                                   TheXmlBeansBooks.class, true, true);
         properties = new Properties();
         properties.loadFromXML(getClass().getResourceAsStream("jsonCases.xml"));
     }
@@ -256,7 +257,7 @@ public class DataBindingProviderTest extends Assert {
 
         @GET
         @Path("/books/{bookId}/{new}")
-        public Address getStructure() {
+        public Address getAddress() {
             return null;
         }
         
