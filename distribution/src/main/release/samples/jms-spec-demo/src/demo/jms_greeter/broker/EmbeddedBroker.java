@@ -28,6 +28,7 @@ public final class EmbeddedBroker {
     public static void main(String[] args) throws Exception {
         BrokerService broker = new BrokerService();
         broker.setPersistenceAdapter(new MemoryPersistenceAdapter());
+        broker.setDataDirectory("target/activemq-data");
         broker.addConnector("tcp://localhost:61616");
         broker.start();
         System.out.println("JMS broker ready ...");
