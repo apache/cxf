@@ -22,6 +22,9 @@ package org.apache.cxf.systest.jaxrs;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
+
 public class BookStoreNoAnnotations {
 
     private Map<Long, Book> books = new HashMap<Long, Book>();
@@ -47,4 +50,12 @@ public class BookStoreNoAnnotations {
         return ch2;
     }
     
+    public Book getBookWithAuthorization(Long id, String authorizationHeader) throws BookNotFoundFault {
+        
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Basic")) {
+            throw new WebApplicationException(Response.Status.FORBIDDEN);
+        }
+        
+        return books.get(id);
+    }
 }

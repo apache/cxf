@@ -29,6 +29,7 @@ import org.apache.commons.httpclient.methods.GetMethod;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
+import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -58,6 +59,23 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         getAndCompareAsStrings("http://localhost:" + PORT + "/usermodel/bookstore/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+        
+    }
+    
+    @Test
+    public void testGetBook123UserModelAuthorize() throws Exception {
+        JAXRSClientFactoryBean bean = new JAXRSClientFactoryBean();
+        bean.setAddress("http://localhost:" + PORT + "/usermodel/bookstore/books");
+        bean.setUsername("Barry");
+        bean.setPassword("password");
+        bean.setModelRef("classpath:org/apache/cxf/systest/jaxrs/resources/resources.xml");
+        WebClient proxy = bean.createWebClient();
+        proxy.path("{id}/authorize", 123);
+        
+        Book book = proxy.get(Book.class);
+        assertEquals(123L, book.getId());
+        
+        
         
     }
     

@@ -7,6 +7,10 @@
     <operation name="getBookChapter" path="/books/{id}/chapter">
         <param name="id" type="PATH"/>
     </operation> 
+    <operation name="getBookWithAuthorization" verb="GET" path="/books/{id}/authorize">
+        <param name="id" type="PATH"/>
+        <param name="authorization" type="HEADER"/>
+    </operation>
  </resource>
  <resource name="org.apache.cxf.systest.jaxrs.ChapterNoAnnotations">
     <operation name="getItself" verb="GET"/>
