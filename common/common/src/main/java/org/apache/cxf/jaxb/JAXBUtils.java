@@ -789,8 +789,17 @@ public final class JAXBUtils {
         return null;
     }
     
-    public static void scanPackages(Set<Class<?>> classes, 
+    public static void scanPackages(Set<Class<?>> classes,
+                                    Class[] extraClass,
                                     Map<Package, CachedClass> objectFactoryCache) {
+        
+        // add user extra class into jaxb context
+        if (extraClass != null && extraClass.length > 0) {
+            for (Class clz : extraClass) {
+                classes.add(clz);
+            }
+        }
+        
         // try and read any jaxb.index files that are with the other classes.
         // This should
         // allow loading of extra classes (such as subclasses for inheritance

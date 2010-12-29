@@ -38,6 +38,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.MediaType;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
@@ -61,20 +63,50 @@ import org.w3c.dom.Node;
 import org.xml.sax.ContentHandler;
 
 import org.apache.cxf.jaxrs.impl.MetadataMap;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.provider.index.TestBean;
 import org.apache.cxf.jaxrs.resources.Book;
+import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.CollectionsResource;
 import org.apache.cxf.jaxrs.resources.ManyTags;
 import org.apache.cxf.jaxrs.resources.SuperBook;
 import org.apache.cxf.jaxrs.resources.TagVO;
 import org.apache.cxf.jaxrs.resources.TagVO2;
 import org.apache.cxf.jaxrs.resources.Tags;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 public class JAXBElementProviderTest extends Assert {
 
+    @Test
+    public void testSingleJAXBContext() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(JAXBResource.class, JAXBResource.class, true, true);
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setSingleJaxbContext(true);
+        provider.init(Collections.singletonList(cri));
+        JAXBContext bookContext = provider.getJAXBContext(Book.class, Book.class);
+        assertNotNull(bookContext);
+        JAXBContext superBookContext = provider.getJAXBContext(SuperBook.class, SuperBook.class);
+        assertSame(bookContext, superBookContext);
+    }
+    
+    @Test
+    public void testExtraClass() throws Exception {
+        ClassResourceInfo cri = 
+            ResourceUtils.createClassResourceInfo(BookStore.class, BookStore.class, true, true);
+        JAXBElementProvider provider = new JAXBElementProvider();
+        provider.setSingleJaxbContext(true);
+        provider.setExtraClass(new Class[]{SuperBook.class});
+        provider.init(Collections.singletonList(cri));
+        JAXBContext bookContext = provider.getJAXBContext(Book.class, Book.class);
+        assertNotNull(bookContext);
+        JAXBContext superBookContext = provider.getJAXBContext(SuperBook.class, SuperBook.class);
+        assertSame(bookContext, superBookContext);
+    }
+    
     @Test
     public void testIsWriteableList() throws Exception {
         testIsWriteableCollection("getBooks");
@@ -1028,5 +1060,19 @@ public class JAXBElementProviderTest extends Assert {
             return attr;
         }
         
+    }
+    
+    @Path("/")
+    public static class JAXBResource {
+        
+        @GET
+        public Book getBook() {
+            return null;
+        }
+        
+        @GET
+        public SuperBook getSuperBook() {
+            return null;
+        }
     }
 }

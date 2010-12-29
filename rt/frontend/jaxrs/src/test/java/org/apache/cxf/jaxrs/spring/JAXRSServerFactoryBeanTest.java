@@ -18,13 +18,19 @@
  */
 package org.apache.cxf.jaxrs.spring;
 
+import java.util.List;
+
+import javax.xml.bind.JAXBContext;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.provider.JAXBElementProvider;
+import org.apache.cxf.jaxrs.resources.Book;
 import org.apache.cxf.jaxrs.resources.BookStore;
 import org.apache.cxf.jaxrs.resources.BookStoreNoAnnotations;
 import org.apache.cxf.jaxrs.resources.BookStoreSubresourcesOnly;
+import org.apache.cxf.jaxrs.resources.SuperBook;
 
 import org.junit.After;
 import org.junit.Assert;
@@ -62,13 +68,29 @@ public class JAXRSServerFactoryBeanTest extends Assert {
         
         sfb = (JAXRSServerFactoryBean)ctx.getBean("inlineProvider");
         assertNotNull("The provider should not be null", sfb.getProviders());
-        assertEquals("Get a wrong provider size", sfb.getProviders().size(), 2);
-        
+        assertEquals("Get a wrong provider size", sfb.getProviders().size(), 3);
+        verifyJaxbProvider(sfb.getProviders());
         sfb = (JAXRSServerFactoryBean)ctx.getBean("moduleServer");
         assertNotNull("The resource classes should not be null", sfb.getResourceClasses());
         assertEquals("Get a wrong ResourceClasses size", 1, sfb.getResourceClasses().size());
         assertEquals("Get a wrong resource class", BookStoreNoAnnotations.class, 
                      sfb.getResourceClasses().get(0));
         
+    }
+    
+    private void verifyJaxbProvider(List<?> providers) throws Exception {
+        JAXBElementProvider provider = null;
+        for (Object o : providers) {
+            if (o instanceof JAXBElementProvider) {
+                provider = (JAXBElementProvider)o;
+                
+            }
+        }
+        assertNotNull(provider);
+        JAXBContext c1 = provider.getClassContext(Book.class);
+        assertNotNull(c1);
+        JAXBContext c2 = provider.getClassContext(SuperBook.class);
+        assertSame(c1, c2);
+        JAXBElementProvider.clearContexts();
     }
 }

@@ -27,8 +27,10 @@ import java.lang.reflect.TypeVariable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -48,6 +50,7 @@ import org.apache.cxf.jaxrs.ext.RequestHandler;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
 import org.apache.cxf.jaxrs.impl.RequestPreprocessor;
 import org.apache.cxf.jaxrs.impl.WebApplicationExceptionMapper;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
 import org.apache.cxf.jaxrs.model.wadl.WadlGenerator;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -647,6 +650,21 @@ public final class ProviderFactory {
                     // ignore
                 }
             }
+        }
+    }
+
+    public void initProviders(List<ClassResourceInfo> cris) {
+        Set<Object> set = new HashSet<Object>();
+        set.addAll(messageReaders);
+        set.addAll(messageWriters);
+        for (Object o : set) {
+            Object provider = ((ProviderInfo)o).getProvider();
+            if (provider instanceof AbstractConfigurableProvider) {
+                ((AbstractConfigurableProvider)provider).init(cris);
+            }
+        }
+        if (this != SHARED_FACTORY) {
+            SHARED_FACTORY.initProviders(cris);
         }
     }
     

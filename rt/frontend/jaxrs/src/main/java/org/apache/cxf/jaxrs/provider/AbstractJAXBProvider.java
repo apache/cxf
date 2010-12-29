@@ -71,9 +71,11 @@ import org.apache.cxf.jaxb.JAXBBeanInfo;
 import org.apache.cxf.jaxb.JAXBContextProxy;
 import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.ext.MessageContext;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
+import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
@@ -117,6 +119,31 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     private Map<String, Object> uProperties;
     
     private boolean skipJaxbChecks;
+    private boolean singleJaxbContext;
+    private Class[] extraClass;
+    
+    public void setSingleJaxbContext(boolean useSingleContext) {
+        singleJaxbContext = useSingleContext;
+    }
+    
+    public void setExtraClass(Class[] userExtraClass) {
+        extraClass = userExtraClass;
+    }
+    
+    @Override
+    public void init(List<ClassResourceInfo> cris) {
+        if (singleJaxbContext) {
+            Set<Class<?>> allTypes = 
+                new HashSet<Class<?>>(ResourceUtils.getAllRequestResponseTypes(cris, true).keySet());
+            JAXBContext context = 
+                ResourceUtils.createJaxbContext(allTypes, extraClass, cProperties);
+            if (context != null) {
+                for (Class<?> cls : allTypes) {
+                    classContexts.put(cls, context);
+                }
+            }
+        }
+    }
     
     public void setContextProperties(Map<String, Object> contextProperties) {
         cProperties = contextProperties;
@@ -496,7 +523,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     }
 
     
-    static void clearContexts() {
+    public static void clearContexts() {
         classContexts.clear();
         packageContexts.clear();
     }

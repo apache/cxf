@@ -57,6 +57,7 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
     <jaxrs:providers>
         <ref bean="feed"/>
         <ref bean="entry"/>
+        <ref bean="jaxb"/>
     </jaxrs:providers>	
     <jaxrs:extensionMappings>
       <entry key="json" value="application/json"/>
@@ -65,6 +66,14 @@ http://cxf.apache.org/jaxrs http://cxf.apache.org/schemas/jaxrs.xsd">
   
   <bean id="feed" class="org.apache.cxf.jaxrs.provider.AtomFeedProvider"/>
   <bean id="entry" class="org.apache.cxf.jaxrs.provider.AtomEntryProvider"/>
+  <bean id="jaxb" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+      <property name="singleJaxbContext" value="true"/>
+      <property name="extraClass">
+         <list>
+           <value>org.apache.cxf.jaxrs.resources.SuperBook</value>
+         </list>
+      </property>
+  </bean>
   
   <jaxrs:server id="moduleServer"
     modelRef="classpath:/org/apache/cxf/jaxrs/spring/resources.xml"
