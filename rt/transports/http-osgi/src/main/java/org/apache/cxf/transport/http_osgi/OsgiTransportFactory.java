@@ -21,6 +21,9 @@ package org.apache.cxf.transport.http_osgi;
 import java.io.IOException;
 import java.net.URI;
 
+import javax.annotation.Resource;
+
+import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
@@ -29,6 +32,10 @@ import org.apache.cxf.transport.http.AbstractHTTPTransportFactory;
 public class OsgiTransportFactory extends AbstractHTTPTransportFactory implements DestinationFactory {
 
     private OsgiDestinationRegistryIntf registry;
+    
+    public OsgiTransportFactory() {
+        super();
+    }
 
     public void setRegistry(OsgiDestinationRegistryIntf registry) {
         this.registry = registry;
@@ -48,8 +55,10 @@ public class OsgiTransportFactory extends AbstractHTTPTransportFactory implement
         return d;
     }
     
-    public void init() {
-        
+      
+    @Resource(name = "cxf")
+    public void setBus(Bus bus) {
+        super.setBus(bus);
     }
 
 }
