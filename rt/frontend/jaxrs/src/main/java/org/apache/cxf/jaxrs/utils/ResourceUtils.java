@@ -56,7 +56,9 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.ext.Provider;
+import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
+import javax.xml.bind.JAXBException;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -68,6 +70,7 @@ import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
+import org.apache.cxf.jaxb.JAXBUtils;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.lifecycle.PerRequestResourceProvider;
 import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
@@ -621,4 +624,24 @@ public final class ResourceUtils {
         }
         return true;
     }
+    
+    //TODO : consider moving JAXBDataBinding.createContext to JAXBUtils
+    public static JAXBContext createJaxbContext(Set<Class<?>> classes, Class[] extraClass, 
+                                          Map<String, Object> contextProperties) {
+        if (classes == null || classes.isEmpty()) {
+            return null;
+        }
+        JAXBUtils.scanPackages(classes, extraClass, null);
+
+        JAXBContext ctx;
+        try {
+            ctx = JAXBContext.newInstance(classes.toArray(new Class[classes.size()]),
+                                          contextProperties);
+            return ctx;
+        } catch (JAXBException ex) {
+            LOG.fine("No JAXB context can be created");
+        }
+        return null;
+    }
+                                         
 }

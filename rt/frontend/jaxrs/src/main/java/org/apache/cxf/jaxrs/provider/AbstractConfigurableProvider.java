@@ -23,6 +23,7 @@ import java.util.List;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.BusFactory;
+import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 
 public abstract class AbstractConfigurableProvider {
 
@@ -63,5 +64,9 @@ public abstract class AbstractConfigurableProvider {
     
     public boolean getEnableBuffering() {
         return enableBuffering;
+    }
+    
+    public void init(List<ClassResourceInfo> resources) {
+        // complete
     }
 }

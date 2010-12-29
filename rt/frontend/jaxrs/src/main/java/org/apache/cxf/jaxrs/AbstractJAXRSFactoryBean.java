@@ -282,6 +282,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         if (schemaLocations != null) {
             factory.setSchemaLocations(schemaLocations);
         }
+        factory.initProviders(serviceFactory.getRealClassResourceInfo());
         ep.put(ProviderFactory.class.getName(), factory);
         return factory;
     }

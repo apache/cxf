@@ -47,7 +47,6 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
 import javax.xml.parsers.ParserConfigurationException;
@@ -172,8 +171,9 @@ public class WadlGenerator implements RequestHandler {
 
         Set<Class<?>> allTypes =
             ResourceUtils.getAllRequestResponseTypes(cris, useJaxbContextForQnames).keySet();
-
-        JAXBContext context = createJaxbContext(allTypes);
+        JAXBContext context = useJaxbContextForQnames 
+            ? ResourceUtils.createJaxbContext(new HashSet<Class<?>>(allTypes), null, null) : null;
+        
         SchemaWriter schemaWriter = createSchemaWriter(context, ui);
         ElementQNameResolver qnameResolver =
             schemaWriter == null ? null : createElementQNameResolver(context);
@@ -648,23 +648,6 @@ public class WadlGenerator implements RequestHandler {
             prefix = "prefix" + (size + 1);
         }
         return prefix;
-    }
-
-    private JAXBContext createJaxbContext(Set<Class<?>> classes) {
-        if (!useJaxbContextForQnames || classes.isEmpty()) {
-            return null;
-        }
-        Set<Class<?>> classesToBeBound = new HashSet<Class<?>>(classes);
-        JAXBUtils.scanPackages(classesToBeBound, null);
-
-        JAXBContext ctx;
-        try {
-            ctx = JAXBContext.newInstance(classesToBeBound.toArray(new Class[classes.size()]));
-            return ctx;
-        } catch (JAXBException ex) {
-            LOG.fine("No JAXB context can be created");
-        }
-        return null;
     }
 
     private boolean isFormRequest(OperationResourceInfo ori) {

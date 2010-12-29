@@ -461,14 +461,7 @@ public class JAXBDataBinding extends AbstractDataBinding
                                                                String defaultNs)
         throws JAXBException {
 
-        // add user extra class into jaxb context
-        if (extraClass != null && extraClass.length > 0) {
-            for (Class clz : extraClass) {
-                classes.add(clz);
-            }
-        }
-
-        JAXBUtils.scanPackages(classes, OBJECT_FACTORY_CACHE);
+        JAXBUtils.scanPackages(classes, extraClass, OBJECT_FACTORY_CACHE);
         //JAXBUtils.scanPackages(classes, new HashMap<Package, CachedClass>());
         addWsAddressingTypes(classes);
 
