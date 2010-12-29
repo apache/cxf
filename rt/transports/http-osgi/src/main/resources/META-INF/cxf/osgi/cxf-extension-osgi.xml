@@ -26,21 +26,18 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
 
     <bean id="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
           class="org.apache.cxf.transport.http_osgi.OsgiTransportFactory"
-          init-method="init">
+          lazy-init="true">
           
         <constructor-arg ref="osgiDestinationRegistry"/>
 
         <property name="bus" ref="cxf"/>
         <property name="transportIds">
-            <set>
-                <value>http://cxf.apache.org/bindings/xformat</value>
-                <value>http://schemas.xmlsoap.org/soap/http</value>
-                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
-                <value>http://schemas.xmlsoap.org/wsdl/soap/http</value>
- 	            <value>http://www.w3.org/2003/05/soap/bindings/HTTP/</value>
- 	            <value>http://cxf.apache.org/transports/http</value>
+            <list>
+                <value>http://cxf.apache.org/transports/http</value>
                 <value>http://cxf.apache.org/transports/http/configuration</value>
-            </set>
+                <value>http://schemas.xmlsoap.org/wsdl/http</value>
+                <value>http://schemas.xmlsoap.org/wsdl/http/</value>
+            </list>
         </property>
     </bean>
 
