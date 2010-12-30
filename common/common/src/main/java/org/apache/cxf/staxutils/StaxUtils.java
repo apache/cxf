@@ -94,6 +94,8 @@ public final class StaxUtils {
         "ns7".intern(), "ns8".intern(), "ns9".intern()
     };
     
+    private static int innerElementLevelThreshold = -1;
+    
     static {
         int i = 20;
     
@@ -110,6 +112,17 @@ public final class StaxUtils {
         }
         NS_AWARE_INPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLInputFactory>(i);
         OUTPUT_FACTORY_POOL = new LinkedBlockingQueue<XMLOutputFactory>(i);
+        try {
+            String s =  System.getProperty("org.apache.cxf.staxutils.innerElementLevelThreshold",
+                                    "-1");
+            innerElementLevelThreshold = Integer.parseInt(s);
+        } catch (Throwable t) {
+            innerElementLevelThreshold = -1;
+        }
+        if (innerElementLevelThreshold <= 0) {
+            innerElementLevelThreshold = -1;
+        }
+        
     }
     
     private StaxUtils() {
@@ -501,8 +514,6 @@ public final class StaxUtils {
             prefix = "";
         }
 
-        
-//        System.out.println("STAXUTILS:writeStartElement : node name : " + local +  " namespace URI" + uri);
         boolean writeElementNS = false;
         
         if (uri != null) {
@@ -655,8 +666,6 @@ public final class StaxUtils {
         String ns = e.getNamespaceURI();
         String localName = e.getLocalName();
 
-       
-//        System.out.println("local name : " + localName + " URI: " + ns + " Prefix :" + prefix);
         if (prefix == null) {
             prefix = "";
         }
@@ -677,8 +686,6 @@ public final class StaxUtils {
                 declareNamespace = false;
             }
         } else {
-//            System.out.println("Calling writeStartElement for local name : " 
-//            + localName + " URI: " + ns + " Prefix :" + prefix);
             writer.writeStartElement(prefix, localName, ns);
         }
 
@@ -696,8 +703,6 @@ public final class StaxUtils {
             }
      
             if ("xmlns".equals(attrPrefix)) {
-//                System.out.println("WriteNamespace is called for prefix : " 
-//                + name + " namespace :" + attr.getNodeValue());
                 writer.writeNamespace(name, attr.getNodeValue());
                 writer.setPrefix(name, attr.getNodeValue());
                 if (name.equals(prefix) && attr.getNodeValue().equals(ns)) {
@@ -897,12 +902,20 @@ public final class StaxUtils {
         }
         return false;
     }
+    
     public static void readDocElements(Node parent, XMLStreamReader reader, boolean repairing) 
         throws XMLStreamException {
         Document doc = getDocument(parent);
         readDocElements(doc, parent, reader, repairing, false);
     }
 
+    public static void readDocElements(Node parent, XMLStreamReader reader, boolean repairing, 
+                                       boolean isThreshold) 
+        throws XMLStreamException {
+        Document doc = getDocument(parent);
+        readDocElements(doc, parent, reader, repairing, false, isThreshold);
+    }
+    
     /**
      * @param parent
      * @param reader
@@ -911,7 +924,18 @@ public final class StaxUtils {
     public static void readDocElements(Document doc, Node parent,
                                        XMLStreamReader reader, boolean repairing, boolean recordLoc)
         throws XMLStreamException {
-        
+        readDocElements(doc, parent, reader, repairing, recordLoc, false);
+    }
+    
+    /**
+     * @param parent
+     * @param reader
+     * @throws XMLStreamException
+     */
+    public static void readDocElements(Document doc, Node parent,
+                                       XMLStreamReader reader, boolean repairing, boolean recordLoc, 
+                                       boolean isThreshold)
+        throws XMLStreamException {
         Stack<Node> stack = new Stack<Node>();
         int event = reader.getEventType();
         while (reader.hasNext()) {
@@ -947,11 +971,12 @@ public final class StaxUtils {
                     declare(e, reader.getNamespaceURI(), reader.getPrefix());
                 }
                 stack.push(parent);
+                if (isThreshold && innerElementLevelThreshold != -1 
+                    && stack.size() >= innerElementLevelThreshold) {
+                    throw new RuntimeException("reach the innerElementLevelThreshold:" 
+                                               + innerElementLevelThreshold);
+                }
                 parent = e;
-                
-                //event = reader.next();
-                //readDocElements(doc, e, reader, repairing, recordLoc);
-                
                 break;
             }
             case XMLStreamConstants.END_ELEMENT:

@@ -87,16 +87,17 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
     
     @org.junit.Before
     public void setUp() {
+        System.setProperty("org.apache.cxf.staxutils.innerElementLevelThreshold", "12");
         BusFactory.getDefaultBus().getOutInterceptors().add(new LoggingOutInterceptor());
         BusFactory.getDefaultBus().getInInterceptors().add(new LoggingInInterceptor());
-        BusFactory.getDefaultBus().getInInterceptors().add(new HugeResponseInterceptor());
     }
     
     
    
     @Test
-    public void testSOAPMessageWithHugeResponse() throws Exception {
-
+    public void testStackOverflowErrorForSOAPMessageWithHugeResponse() throws Exception {
+        HugeResponseInterceptor hugeResponseInterceptor = new HugeResponseInterceptor(true);
+        BusFactory.getDefaultBus().getInInterceptors().add(hugeResponseInterceptor);
         URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
         assertNotNull(wsdl);
 
@@ -123,9 +124,46 @@ public class DispatchClientServerWithHugeResponseTest extends AbstractBusClientS
                 + "should get some exception tell me stackoverflow");
         } catch (Throwable e) {
             assertTrue(e.getCause() instanceof StackOverflowError);
+        } finally {
+            BusFactory.getDefaultBus().getInInterceptors().remove(hugeResponseInterceptor);
         }
         
     }
      
+    @Test
+    public void testThresholdfForSOAPMessageWithHugeResponse() throws Exception {
+        HugeResponseInterceptor hugeResponseInterceptor = new HugeResponseInterceptor(false);
+        BusFactory.getDefaultBus().getInInterceptors().add(hugeResponseInterceptor);
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        assertNotNull(service);
+
+        Dispatch<SOAPMessage> disp = service
+            .createDispatch(PORT_NAME, SOAPMessage.class, Service.Mode.MESSAGE);
+        disp.getRequestContext().put(BindingProvider.ENDPOINT_ADDRESS_PROPERTY,
+                                     "http://localhost:" 
+                                     + greeterPort
+                                     + "/SOAPDispatchService/SoapDispatchPort");
+        
+        
+
+        InputStream is3 = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq3.xml");
+        SOAPMessage soapReqMsg3 = MessageFactory.newInstance().createMessage(null, is3);
+        assertNotNull(soapReqMsg3);
+        Response<SOAPMessage> response = disp.invokeAsync(soapReqMsg3);
+        try {
+            response.get(300, TimeUnit.SECONDS);
+        } catch (TimeoutException te) {
+            fail("We should not have encountered a timeout, " 
+                + "should get some exception tell me stackoverflow");
+        } catch (Throwable e) {
+            assertTrue(e.getCause().getMessage().startsWith("reach the innerElementLevelThreshold"));
+        } finally {
+            BusFactory.getDefaultBus().getInInterceptors().remove(hugeResponseInterceptor);
+        }
+        
+    }
 
 }

@@ -19,21 +19,47 @@
 package org.apache.cxf.systest.dispatch;
 
 
+import java.io.IOException;
+import java.io.InputStream;
+
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 
 public class HugeResponseInterceptor extends AbstractPhaseInterceptor<Message> {
+    private boolean isStackOverFlow;
 
-    public HugeResponseInterceptor() {
+    public HugeResponseInterceptor(boolean isStackOverFlow) {
         super(Phase.RECEIVE);
         addAfter(LoggingInInterceptor.class.getName());
+        this.isStackOverFlow = isStackOverFlow;
     }
 
     public void handleMessage(Message message) throws Fault {
-        throw new StackOverflowError();
+        if (isStackOverFlow) {
+            throw new StackOverflowError();
+        } else {
+            InputStream is = message.getContent(InputStream.class);
+            if (is != null) {
+                CachedOutputStream bos = new CachedOutputStream();
+                try {
+                    is = getClass().getClassLoader().getResourceAsStream(
+                        "org/apache/cxf/systest/dispatch/resources/GreetMeDocLiteralRespBreakThreshold.xml");
+                    IOUtils.copy(is, bos);
+                    bos.flush();
+                    is.close();
+                    message.setContent(InputStream.class, bos.getInputStream());
+                    bos.close();
+                    message.setContent(InputStream.class, bos.getInputStream());
+                } catch (IOException e) {
+                    throw new Fault(e);
+                }
+            }
+        }
     }
 
 }
