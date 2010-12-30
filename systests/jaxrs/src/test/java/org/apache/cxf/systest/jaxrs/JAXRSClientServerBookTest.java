@@ -141,7 +141,7 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     
     @Test
     public void testPropogateException() throws Exception {
-        getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/propagate-exception",
                       "", "application/xml", 500);
     }
     
@@ -151,14 +151,14 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
             + "<ns1:faultstring xmlns:ns1=\"http://cxf.apache.org/bindings/xformat\">"
             + "org.apache.cxf.systest.jaxrs.BookNotFoundFault: Book Exception</ns1:faultstring>"
             + "</ns1:XMLFault>";
-        getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception2",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/propagate-exception2",
                       data, "application/xml", 500);
     }
     
     @Test
     public void testPropogateException3() throws Exception {
         String data = "<nobook/>";
-        getAndCompare("http://localhost:" + PORT + "/bookstore/propogateexception3",
+        getAndCompare("http://localhost:" + PORT + "/bookstore/propagate-exception3",
                       data, "application/xml", 500);
     }
     
