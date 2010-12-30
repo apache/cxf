@@ -880,8 +880,19 @@ public class JAXBElementProviderTest extends Assert {
     }
     
     @Test 
-    public void testPackageContext() {
+    public void testIsReadableWithJaxbIndex() {
         JAXBElementProvider p = new JAXBElementProvider();
+        assertTrue(p.isReadable(TestBean.class, 
+                                TestBean.class, 
+                                new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
+    }
+    
+    @Test 
+    public void testPackageContextObjectFactory() {
+        JAXBElementProvider p = new JAXBElementProvider();
+        assertTrue(p.isReadable(org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
+                                org.apache.cxf.jaxrs.fortest.jaxb.Book.class, 
+                                new Annotation[]{}, MediaType.APPLICATION_XML_TYPE));
         try {
             JAXBContext context = p.getPackageContext(org.apache.cxf.jaxrs.fortest.jaxb.Book.class);
             JAXBContext context2 = p.getPackageContext(org.apache.cxf.jaxrs.fortest.jaxb.Book.class);

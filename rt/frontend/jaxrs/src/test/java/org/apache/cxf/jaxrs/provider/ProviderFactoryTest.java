@@ -306,10 +306,10 @@ public class ProviderFactoryTest extends Assert {
         
         MediaType mType = MediaType.valueOf(mediaType);
         
-        MessageBodyReader reader = pf.createMessageBodyReader(type, null, null, mType, new MessageImpl());
+        MessageBodyReader reader = pf.createMessageBodyReader(type, type, null, mType, new MessageImpl());
         assertSame("Unexpected provider found", provider, reader.getClass());
     
-        MessageBodyWriter writer = pf.createMessageBodyWriter(type, null, null, mType, new MessageImpl());
+        MessageBodyWriter writer = pf.createMessageBodyWriter(type, type, null, mType, new MessageImpl());
         assertTrue("Unexpected provider found", provider == writer.getClass());
     }
     
