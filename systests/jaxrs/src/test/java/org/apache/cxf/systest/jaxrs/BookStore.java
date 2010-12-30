@@ -150,20 +150,20 @@ public class BookStore {
     }
     
     @GET
-    @Path("propogateexception")
+    @Path("propagate-exception")
     public Book propogateException() throws BookNotFoundFault {
         throw new BookNotFoundFault("Book Exception");
     }
     
     @GET
-    @Path("propogateexception2")
+    @Path("propagate-exception2")
     public Book propogateException2() throws BookNotFoundFault {
-        PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propogate.exception", Boolean.FALSE);
+        PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propagate.exception", Boolean.FALSE);
         throw new BookNotFoundFault("Book Exception");
     }
     
     @GET
-    @Path("propogateexception3")
+    @Path("propagate-exception3")
     public Book propogateException3() throws BookNotFoundFault {
         PhaseInterceptorChain.getCurrentMessage().getExchange()
             .put("org.apache.cxf.systest.for-out-fault-interceptor", Boolean.TRUE);

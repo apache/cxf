@@ -109,7 +109,7 @@ public final class JAXRSUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
-    private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propogate.exception";
+    private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     private static final String FORM_PARAM_MAP = JAXRSUtils.class.getName() + ".FORM_DATA";
 
     private JAXRSUtils() {        
