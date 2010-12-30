@@ -385,7 +385,7 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
             JAXBContext context = packageContexts.get(packageName);
             if (context == null) {
                 try {
-                    if (type.getClassLoader() != null) { 
+                    if (type.getClassLoader() != null && objectFactoryOrIndexAvailable(type)) { 
                         context = JAXBContext.newInstance(packageName, type.getClassLoader(), cProperties);
                         packageContexts.put(packageName, context);
                     }
@@ -406,24 +406,19 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
         }
         return type.getAnnotation(XmlRootElement.class) != null
             || JAXBElement.class.isAssignableFrom(type)
-            || objectFactoryForClass(type)
+            || objectFactoryOrIndexAvailable(type)
             || (type != genericType && objectFactoryForType(genericType))
-            || getAdapter(type, anns) != null
-            || type.getResource("jaxb.index") != null;
+            || getAdapter(type, anns) != null;
     
     }
     
-    protected boolean objectFactoryForClass(Class<?> type) {
-        try {
-            return type.getClassLoader().loadClass(PackageUtils.getPackageName(type) 
-                                        + ".ObjectFactory") != null;
-        } catch (Exception ex) {
-            return false;
-        }
+    protected boolean objectFactoryOrIndexAvailable(Class<?> type) {
+        return type.getResource("ObjectFactory.class") != null
+               || type.getResource("jaxb.index") != null; 
     }
     
     private boolean objectFactoryForType(Type genericType) {
-        return objectFactoryForClass(InjectionUtils.getActualType(genericType));
+        return objectFactoryOrIndexAvailable(InjectionUtils.getActualType(genericType));
     }
     
     protected Unmarshaller createUnmarshaller(Class<?> cls, Type genericType) 
