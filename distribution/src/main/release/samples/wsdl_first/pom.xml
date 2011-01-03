@@ -34,6 +34,7 @@
         <cxf.release.base>${basedir}/../..</cxf.release.base>
     </properties>
     <build>
+        <defaultGoal>install</defaultGoal>
         <resources>
             <resource>
                 <directory>wsdl</directory>
@@ -144,7 +145,7 @@
                                 <configuration>
                                     <mainClass>com.example.customerservice.client.CustomerServiceClient</mainClass>
                                     <arguments>
-                                        <argument>${basedir}/wsdl/hello_world.wsdl</argument>
+                                        <argument>${basedir}/wsdl/CustomerService.wsdl</argument>
                                     </arguments>
                                 </configuration>
                             </execution>
