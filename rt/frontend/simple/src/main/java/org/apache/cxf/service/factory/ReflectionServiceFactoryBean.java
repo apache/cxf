@@ -227,6 +227,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
         return retVal;
     }
     public void reset() {
+        if (!needReset) {
+            return;
+        }
         if (!dataBindingSet) {
             setDataBinding(null);
         }

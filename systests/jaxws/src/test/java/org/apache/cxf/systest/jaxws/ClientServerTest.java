@@ -1003,4 +1003,21 @@ public class ClientServerTest extends AbstractBusClientServerTestBase {
         ins.close();
     }
     
+    @Test
+    public void testGetPortWithoutPortName() throws Exception {
+        SOAPService service = new SOAPService();
+        assertNotNull(service);
+        Greeter greeter = service.getPort(Greeter.class);
+        updateAddressPort(greeter, PORT);
+        try {
+            greeter.greetMe("test");           
+            String reply = greeter.sayHi();
+            assertNotNull("no response received from service", reply);
+            assertEquals("Bonjour", reply);
+        } catch (UndeclaredThrowableException ex) {
+            throw (Exception)ex.getCause();
+        }
+    }
+    
+    
 }
