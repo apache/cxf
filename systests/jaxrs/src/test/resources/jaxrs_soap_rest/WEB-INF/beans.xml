@@ -73,7 +73,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
   <jaxrs:server id="hello_rest" address="/hello-rest">
     <jaxrs:serviceBeans>
       <bean class="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"/>
-    </jaxrs:serviceBeans>		   
+    </jaxrs:serviceBeans>
   </jaxrs:server>
 
   <jaxws:endpoint xmlns:s="http://hello.com"
@@ -92,7 +92,26 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
       <jaxws:properties>
           <entry key="org.apache.cxf.endpoint.private" value="true"/>
       </jaxws:properties>
-  </jaxws:endpoint>    
+  </jaxws:endpoint>
+  
+  <jaxws:endpoint xmlns:s="http://hello.com"
+      serviceName="s:HelloWorld"
+      endpointName="s:HelloWorldPort"
+      id="hello_soap-databinding"
+      implementor="org.apache.cxf.systest.jaxrs.jaxws.HelloWorldImpl"
+      address="/hello-soap-databinding">
+      
+      <jaxws:dataBinding>
+          <ref bean="jaxrs-data-binding"/>
+      </jaxws:dataBinding>
+      
+  </jaxws:endpoint>        
+
+  <bean id="jaxrs-data-binding" class="org.apache.cxf.jaxrs.provider.JAXRSDataBinding">
+      <property name="provider" ref="jaxbProviderSoap"/>
+  </bean>
+
+  <bean id="jaxbProviderSoap" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider"/>
 
   <jaxrs:server id="restservice2"
 		        address="/rest2">
@@ -109,7 +128,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:serviceBeans>
     
     <jaxrs:providers>
-       <ref bean="jaxbProvider" />
+       <ref bean="jaxbProviderFI" />
     </jaxrs:providers>
 
     <jaxrs:properties>
@@ -124,7 +143,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:serviceBeans>
     
     <jaxrs:providers>
-       <ref bean="jaxbProvider" />
+       <ref bean="jaxbProviderFI" />
     </jaxrs:providers>
   </jaxrs:server>
 
@@ -135,7 +154,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:serviceBeans>
     
     <jaxrs:providers>
-       <ref bean="jaxbProvider" />
+       <ref bean="jaxbProviderFI" />
     </jaxrs:providers>
     
     <jaxrs:properties>
@@ -143,7 +162,7 @@ http://cxf.apache.org/schemas/jaxrs.xsd">
     </jaxrs:properties>
   </jaxrs:server>
 
-  <bean id="jaxbProvider" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
+  <bean id="jaxbProviderFI" class="org.apache.cxf.jaxrs.provider.JAXBElementProvider">
       <property name="produceMediaTypes" ref="fastinfosetType"/>
       <property name="consumeMediaTypes" ref="fastinfosetType"/>
   </bean>

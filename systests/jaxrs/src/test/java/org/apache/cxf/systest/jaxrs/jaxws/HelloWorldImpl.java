@@ -50,5 +50,9 @@ public class HelloWorldImpl implements HelloWorld {
         return us;
     }
 
+    public User echoUser(User user) {
+        return user;
+    }
+
 }
 // END SNIPPET: service

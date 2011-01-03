@@ -205,9 +205,13 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                     reader = factory.createXMLStreamReader(is);
                 } catch (XMLStreamException e) {
                     throw new WebApplicationException(
-                        new RuntimeException("Cant' create XMLStreamReader", e));
+                        new RuntimeException("Can not create XMLStreamReader", e));
                 }
             }
+        }
+        
+        if (reader == null && is == null) {
+            reader = getStaxHandlerFromCurrentMessage(XMLStreamReader.class);
         }
         
         reader = createTransformReaderIfNeeded(reader, is);
@@ -235,7 +239,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         throws IOException {
         try {
             Object actualObject = checkAdapter(obj, cls, anns, true);
-            Class<?> actualClass = obj != actualObject ? actualObject.getClass() : cls;
+            Class<?> actualClass = obj != actualObject || cls.isInterface() ? actualObject.getClass() : cls;
             String encoding = HttpUtils.getSetEncoding(m, headers, null);
             if (InjectionUtils.isSupportedCollectionOrArray(actualClass)) {
                 actualClass = InjectionUtils.getActualType(genericType);
@@ -385,12 +389,15 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
         }
         XMLStreamWriter writer = getStreamWriter(obj, os, mt);
         if (writer != null) {
-            if (mc != null) {
+            if (os == null) {
+                ms.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            } else if (mc != null) {
                 if (mc.getContent(XMLStreamWriter.class) != null) {
                     ms.setProperty(Marshaller.JAXB_FRAGMENT, true);
                 }
-                mc.put(XMLStreamWriter.class.getName(), writer);
-            }    
+                mc.put(XMLStreamWriter.class.getName(), writer);    
+            }
+                
             marshalToWriter(ms, obj, writer, mt);
             if (mc != null && mc.getContent(XMLStreamWriter.class) != null) {
                 writer.writeEndDocument();
@@ -421,6 +428,10 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
             if (writer == null && enableStreaming) {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }
+        } 
+        
+        if (writer == null && os == null) {
+            writer = getStaxHandlerFromCurrentMessage(XMLStreamWriter.class);
         }
         return createTransformWriterIfNeeded(writer, os);
     }
