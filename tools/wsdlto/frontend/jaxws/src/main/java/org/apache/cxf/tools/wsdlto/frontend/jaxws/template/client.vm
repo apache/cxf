@@ -25,6 +25,9 @@ package $intf.PackageName;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+#if ($mark-generated == "true")
+import javax.annotation.Generated;
+#end
 import javax.xml.namespace.QName;
 #if ($service.PackageName != $intf.PackageName) 
 import ${service.PackageName}.${service.Name};
@@ -39,14 +42,25 @@ import ${import};
  * Generated source version: $version
  * 
  */
-
+#if ($mark-generated == "true")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+#end
 public final class ${clientClassName} {
 
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     private static final QName SERVICE_NAME = new QName("$service.Namespace", "$service.ServiceName");
 
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     private ${clientClassName}() {
     }
 
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     public static void main(String args[]) throws Exception {
         URL wsdlURL = ${service.Name}.WSDL_LOCATION;
         if (args.length > 0) { 

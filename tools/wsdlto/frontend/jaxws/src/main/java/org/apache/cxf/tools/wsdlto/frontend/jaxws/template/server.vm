@@ -17,6 +17,9 @@
 
 package $intf.PackageName;
 
+#if ($mark-generated == "true")
+import javax.annotation.Generated;
+#end
 import javax.xml.ws.Endpoint;
 
 /**
@@ -26,8 +29,14 @@ import javax.xml.ws.Endpoint;
  * 
  */
  
+#if ($mark-generated == "true")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+#end
 public class ${serverClassName}{
 
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     protected ${serverClassName}() throws Exception {
         System.out.println("Starting Server");
         Object implementor = new ${impl}();
@@ -35,6 +44,9 @@ public class ${serverClassName}{
         Endpoint.publish(address, implementor);
     }
     
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     public static void main(String args[]) throws Exception { 
         new ${serverClassName}();
         System.out.println("Server ready..."); 

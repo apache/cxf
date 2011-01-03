@@ -21,6 +21,9 @@
 #end
 package $intf.PackageName;
 
+#if ($mark-generated == "true")
+import javax.annotation.Generated;
+#end
 #foreach ($import in $intf.Imports)
 import ${import};
 #end
@@ -40,6 +43,9 @@ import ${import};
 #foreach ($annotation in $intf.Annotations)
 $annotation
 #end
+#if ($mark-generated == "true")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+#end
 public interface $intf.Name {
 #foreach ($method in $intf.Methods)
 
@@ -50,6 +56,9 @@ public interface $intf.Name {
 #end
 #foreach ($annotation in $method.Annotations)
     $annotation
+#end
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
     public $method.returnValue ${method.Name}(#if($method.ParameterList.size() == 0))#end
 #if($method.ParameterList.size() != 0)

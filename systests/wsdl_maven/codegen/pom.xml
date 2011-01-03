@@ -49,6 +49,11 @@
                         <goals>
                             <goal>wsdl2java</goal>
                         </goals>
+                        <configuration>
+                            <defaultOptions>
+                                <markGenerated>true</markGenerated>
+                            </defaultOptions>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>

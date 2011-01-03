@@ -19,7 +19,9 @@
 package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
+import java.io.FileInputStream;
 
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ToolConstants;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
 import org.junit.Test;
@@ -114,5 +116,49 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
 
         processor.setContext(env);
         processor.execute();
+    }
+
+    /**
+     * Tests that, when 'mark-generated' option is set, @Generated annotations are inserted in all generated
+     * java classes.
+     */
+    @Test
+    public void testMarkGeneratedOption() throws Exception {
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/hello_world.wsdl"));
+        env.put(ToolConstants.CFG_MARK_GENERATED, "true");
+        env.put(ToolConstants.CFG_COMPILE, null);
+        env.put(ToolConstants.CFG_CLASSDIR, null);
+        processor.setContext(env);
+        processor.execute();
+
+        File dir = new File(output, "org");
+        assertTrue("org directory is not found", dir.exists());
+        dir = new File(dir, "apache");
+        assertTrue("apache directory is not found", dir.exists());
+        dir = new File(dir, "cxf");
+        assertTrue("cxf directory is not found", dir.exists());
+        dir = new File(dir, "w2j");
+        assertTrue("w2j directory is not found", dir.exists());
+        dir = new File(dir, "hello_world_soap_http");
+        assertTrue("hello_world_soap_http directory is not found", dir.exists());
+        File types = new File(dir, "types");
+        assertTrue("types directory is not found", dir.exists());
+
+        String str = IOUtils.readStringFromStream(new FileInputStream(new File(dir, "Greeter.java")));
+        assertEquals(7, countGeneratedAnnotations(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHi.java")));
+        assertEquals(1, countGeneratedAnnotations(str));
+        str = IOUtils.readStringFromStream(new FileInputStream(new File(types, "SayHiResponse.java")));
+        assertEquals(4, countGeneratedAnnotations(str));
+    }
+
+    private int countGeneratedAnnotations(String str) {
+        int count = 0;
+        int idx = str.indexOf("@Generated");
+        while (idx != -1) {
+            count++;
+            idx = str.indexOf("@Generated", idx + 1);
+        }
+        return count;
     }
 }

@@ -359,7 +359,17 @@ public class JAXBDataBinding implements DataBindingProfile {
                 throw new ToolException(msg, e);
             }
         }
-
+        
+        if (context.optionSet(ToolConstants.CFG_MARK_GENERATED)) {
+            // Add the @Generated annotation in the Java files generated. This is done by passing
+            // '-mark-generated' attribute to jaxb xjc.
+            try {
+                opts.parseArgument(new String[] {"-mark-generated" }, 0);
+            } catch (BadCommandLineException e) {
+                LOG.log(Level.SEVERE, e.getMessage());
+                throw new ToolException(e);
+            }
+        }
         addSchemas(opts, schemaCompiler, schemas);
         addBindingFiles(opts, jaxbBindings, schemas);
 
@@ -378,6 +388,7 @@ public class JAXBDataBinding implements DataBindingProfile {
             schemaCompiler.setDefaultPackageName(context.getPackageName());
         }
 
+        
         rawJaxbModelGenCode = schemaCompiler.bind();
 
         addedEnumClassToCollector(schemas, allocator);
