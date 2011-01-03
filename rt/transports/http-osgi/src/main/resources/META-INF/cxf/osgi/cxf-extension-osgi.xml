@@ -33,6 +33,7 @@ http://www.springframework.org/schema/osgi  http://www.springframework.org/schem
         <property name="transportIds">
              <list>
                 <value>http://cxf.apache.org/transports/http</value>
+ 	            <value>http://cxf.apache.org/transports/http</value>
                 <value>http://cxf.apache.org/transports/http/configuration</value>
                 <value>http://schemas.xmlsoap.org/wsdl/http</value>
                 <value>http://schemas.xmlsoap.org/wsdl/http/</value>
