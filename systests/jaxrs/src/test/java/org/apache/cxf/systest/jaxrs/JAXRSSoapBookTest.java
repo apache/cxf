@@ -110,6 +110,24 @@ public class JAXRSSoapBookTest extends AbstractBusClientServerTestBase {
         useHelloService(hw);
     }
     
+    @Test
+    public void testHelloSoapCustomDataBinding() throws Exception {
+        final QName serviceName = new QName("http://hello.com", "HelloWorld");
+        final QName portName = new QName("http://hello.com", "HelloWorldPort");
+        final String address = "http://localhost:" + PORT + "/test/services/hello-soap-databinding";
+        
+        Service service = Service.create(serviceName);
+        service.addPort(portName, SOAPBinding.SOAP11HTTP_BINDING, address);
+    
+        HelloWorld hw = service.getPort(HelloWorld.class); 
+    
+        User user = new UserImpl("Barry");
+        User user2 = hw.echoUser(user);
+        
+        assertNotSame(user, user2);
+        assertEquals("Barry", user.getName());
+    }
+    
     private void useHelloService(HelloWorld service) {
         assertEquals("Hello Barry", service.sayHi("Barry"));
         assertEquals("Hello Fred", service.sayHiToUser(new UserImpl("Fred")));

@@ -77,6 +77,8 @@ import org.apache.cxf.jaxrs.utils.InjectionUtils;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.jaxrs.utils.ResourceUtils;
 import org.apache.cxf.jaxrs.utils.schemas.SchemaHandler;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.staxutils.DelegatingXMLStreamWriter;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxStreamFilter;
@@ -171,13 +173,24 @@ public abstract class AbstractJAXBProvider extends AbstractConfigurableProvider
     
     protected void checkContentLength() {
         if (mc != null) {
-            List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
-            if (values.size() == 1 && "0".equals(values.get(0))) {
-                String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
-                LOG.warning(message);
-                throw new WebApplicationException(400);
+            HttpHeaders headers = mc.getHttpHeaders();
+            if (headers != null) {
+                List<String> values = mc.getHttpHeaders().getRequestHeader(HttpHeaders.CONTENT_LENGTH);
+                if (values.size() == 1 && "0".equals(values.get(0))) {
+                    String message = new org.apache.cxf.common.i18n.Message("EMPTY_BODY", BUNDLE).toString();
+                    LOG.warning(message);
+                    throw new WebApplicationException(400);
+                }
             }
         }
+    }
+    
+    protected <T> T getStaxHandlerFromCurrentMessage(Class<T> staxCls) {
+        Message m = PhaseInterceptorChain.getCurrentMessage();
+        if (m != null) {
+            return staxCls.cast(m.getContent(staxCls));
+        }
+        return null;
     }
     
     @SuppressWarnings("unchecked")

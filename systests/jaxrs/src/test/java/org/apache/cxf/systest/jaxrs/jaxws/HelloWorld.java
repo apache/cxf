@@ -20,6 +20,8 @@ package org.apache.cxf.systest.jaxrs.jaxws;
 
 import java.util.Map;
 
+import javax.jws.WebParam;
+import javax.jws.WebResult;
 import javax.jws.WebService;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -54,4 +56,11 @@ public interface HelloWorld {
     @Consumes("text/xml")
     @XmlJavaTypeAdapter(IntegerUserMapAdapter.class)
     Map<Integer, User> echoUsers(@XmlJavaTypeAdapter(IntegerUserMapAdapter.class) Map<Integer, User> users);
+    
+    @POST
+    @Produces("text/xml")
+    @Consumes("text/xml")
+    @Path("user")
+    @WebResult(name = "User")
+    User echoUser(@WebParam(name = "User") User user);
 }
