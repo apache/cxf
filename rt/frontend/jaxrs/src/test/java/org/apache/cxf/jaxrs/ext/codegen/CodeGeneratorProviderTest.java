@@ -327,6 +327,7 @@ public class CodeGeneratorProviderTest extends Assert {
         e.put(Endpoint.class, endpoint);
         endpoint.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(ProviderFactory.getSharedInstance());
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
         endpoint.getEndpointInfo();
         EasyMock.expectLastCall().andReturn(epr).anyTimes();
         control.replay();

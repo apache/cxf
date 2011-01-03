@@ -505,8 +505,8 @@ public class JavaToProcessorTest extends ProcessorTestBase {
         // To test there is wsam:action generated for the
         String wsdlString = getStringFromFile(wsdlFile);
         assertTrue("The wsam and wsaw action are not both generated", wsdlString
-            .indexOf("wsam:Action=\"http://cxf.apache.org/fault3\"" 
-                     + "  wsaw:Action=\"http://cxf.apache.org/fault3\"") > -1);
+            .indexOf("wsam:Action=\"http://cxf.apache.org/fault3\"") > -1 
+            && wsdlString.indexOf("wsaw:Action=\"http://cxf.apache.org/fault3\"") > -1);
         assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString
             .indexOf("http://fortest.tools.cxf.apache.org/AddNumbersImpl/addNumbers2Request") > -1);
         assertTrue("The wsaAction is not generated for NOActionAnotation method", wsdlString

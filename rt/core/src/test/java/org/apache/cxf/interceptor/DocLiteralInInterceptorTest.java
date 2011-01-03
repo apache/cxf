@@ -97,6 +97,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         exchange.put(Service.class, service);
         EasyMock.expect(service.getDataBinding()).andReturn(new SourceDataBinding());
         EasyMock.expect(service.size()).andReturn(0).anyTimes();
+        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
         
         Endpoint endpoint = control.createMock(Endpoint.class);
         exchange.put(Endpoint.class, endpoint);
@@ -120,6 +121,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(binding.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
         
         ServiceInfo serviceInfo = control.createMock(ServiceInfo.class);
         EasyMock.expect(endpointInfo.getService()).andReturn(serviceInfo).anyTimes();
@@ -177,6 +179,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         exchange.put(Service.class, service);
         EasyMock.expect(service.getDataBinding()).andReturn(new SourceDataBinding()).anyTimes();
         EasyMock.expect(service.size()).andReturn(0).anyTimes();
+        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
 
         Endpoint endpoint = control.createMock(Endpoint.class);
         exchange.put(Endpoint.class, endpoint);
@@ -217,6 +220,7 @@ public class DocLiteralInInterceptorTest extends Assert {
         EasyMock.expect(binding.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         EasyMock.expect(endpointInfo.getProperties()).andReturn(new HashMap<String, Object>()).anyTimes();
         EasyMock.expect(endpoint.size()).andReturn(0).anyTimes();
+        EasyMock.expect(endpoint.isEmpty()).andReturn(true).anyTimes();
         EasyMock.expect(endpointInfo.getService()).andReturn(serviceInfo).anyTimes();
 
         EasyMock.expect(endpointInfo.getName()).andReturn(new QName("http://foo.com", "endpoint")).anyTimes();

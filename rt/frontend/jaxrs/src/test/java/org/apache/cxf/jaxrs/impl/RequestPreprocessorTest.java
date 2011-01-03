@@ -120,6 +120,7 @@ public class RequestPreprocessorTest extends Assert {
         control.reset();
         Endpoint endp = control.createMock(Endpoint.class);
         e.put(Endpoint.class, endp);
+        EasyMock.expect(endp.isEmpty()).andReturn(true).anyTimes();
         endp.get(ProviderFactory.class.getName());
         EasyMock.expectLastCall().andReturn(ProviderFactory.getInstance()).anyTimes();
         ServletDestination d = control.createMock(ServletDestination.class);

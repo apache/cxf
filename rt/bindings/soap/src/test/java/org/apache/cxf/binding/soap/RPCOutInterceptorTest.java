@@ -68,6 +68,7 @@ public class RPCOutInterceptorTest extends TestBase {
 
         control.reset();
         Service service = control.createMock(Service.class);
+        EasyMock.expect(service.isEmpty()).andReturn(true).anyTimes();
         JAXBDataBinding dataBinding = new JAXBDataBinding(MyComplexStruct.class);
         service.getDataBinding();
         EasyMock.expectLastCall().andReturn(dataBinding).anyTimes();
