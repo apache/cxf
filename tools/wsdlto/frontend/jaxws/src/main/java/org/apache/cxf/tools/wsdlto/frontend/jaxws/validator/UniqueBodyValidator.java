@@ -21,7 +21,9 @@ package org.apache.cxf.tools.wsdlto.frontend.jaxws.validator;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 import javax.xml.namespace.QName;
 
@@ -31,6 +33,7 @@ import org.apache.cxf.service.model.BindingFaultInfo;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.service.model.MessageInfo;
 import org.apache.cxf.service.model.MessagePartInfo;
 import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
@@ -66,6 +69,7 @@ public class UniqueBodyValidator extends ServiceValidator {
     private boolean isValidEndpoint(EndpointInfo endpoint) {
         BindingInfo binding = endpoint.getBinding();
         Map<QName, QName> uniqueNames = new HashMap<QName, QName>();
+        Map<QName, Set<String>> actions = new HashMap<QName, Set<String>>();
 
         Collection<BindingOperationInfo> bos = binding.getOperations();
         for (BindingOperationInfo bo : bos) {
@@ -77,7 +81,12 @@ public class UniqueBodyValidator extends ServiceValidator {
                     continue;
                 }
                 QName mName = part.getElementQName();
+                String action = getWSAAction(op.getInput());
                 QName opName = uniqueNames.get(mName);
+                Set<String> opActions = actions.get(mName);
+                if (opName != null && opActions != null && !opActions.contains(action)) {
+                    opName = null;
+                }
                 if (opName != null) {
                     Message msg = new Message("NON_UNIQUE_BODY", LOG, 
                                               endpoint.getName(), op.getName(), opName, mName);
@@ -85,6 +94,13 @@ public class UniqueBodyValidator extends ServiceValidator {
                     return false;
                 } else {
                     uniqueNames.put(mName, op.getName());
+                    if (action != null) {
+                        if (opActions == null) {
+                            opActions = new HashSet<String>();
+                            actions.put(mName, opActions);
+                        }
+                        opActions.add(action);
+                    }
                 }
             }
             
@@ -99,5 +115,16 @@ public class UniqueBodyValidator extends ServiceValidator {
             }
         }
         return true;
+    }
+
+    private String getWSAAction(MessageInfo input) {
+        if (input.getExtensionAttributes() != null) {
+            for (Map.Entry<QName, Object> ent : input.getExtensionAttributes().entrySet()) {
+                if ("Action".equals(ent.getKey().getLocalPart())) {
+                    return ent.getValue().toString();
+                }
+            }
+        }
+        return null;
     }
 }
