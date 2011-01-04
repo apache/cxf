@@ -52,10 +52,10 @@ public class WrapperStyleNameCollisionValidator extends ServiceValidator {
 
     @Override
     public boolean isValid() {
-        return checkNameColllision();
+        return checkNameCollision();
     }
 
-    private boolean checkNameColllision() {
+    private boolean checkNameCollision() {
         InterfaceInfo interfaceInfo = service.getInterface();
         if (interfaceInfo != null) {
             for (OperationInfo operation : interfaceInfo.getOperations()) {
