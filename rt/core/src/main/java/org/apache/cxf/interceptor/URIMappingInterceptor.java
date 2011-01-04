@@ -134,11 +134,7 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
     protected Map<String, String> keepInOrder(Map<String, String> params, 
                                               OperationInfo operation,
                                               List<String> order) {
-        if (params == null) {
-            return params;
-        }
-        
-        if (order == null || order.size() == 0) {
+        if (params == null || order == null) {
             return params;
         }
                 
@@ -148,12 +144,12 @@ public class URIMappingInterceptor extends AbstractInDatabindingInterceptor {
         }
         
         if (order.size() != params.size()) {
-            LOG.info(order.size()
+            LOG.fine(order.size()
                      + " parameters definded in WSDL but found " 
                      + params.size() + " in request!");            
             Collection rest = CollectionUtils.diff(order, params.keySet());
             if (rest != null && rest.size() > 0) {
-                LOG.info("Set the following parameters to null: " + rest);
+                LOG.fine("Set the following parameters to null: " + rest);
                 for (Iterator iter = rest.iterator(); iter.hasNext();) {
                     String key = (String)iter.next();
                     orderedParameters.put(key, null);
