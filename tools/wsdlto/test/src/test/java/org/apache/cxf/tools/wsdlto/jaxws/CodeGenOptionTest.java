@@ -20,10 +20,18 @@ package org.apache.cxf.tools.wsdlto.jaxws;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.tools.common.ToolConstants;
+import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.wsdlto.AbstractCodeGenTest;
+import org.apache.cxf.wsdl11.WSDLRuntimeException;
+
 import org.junit.Test;
 
 public class CodeGenOptionTest extends AbstractCodeGenTest {
@@ -62,6 +70,127 @@ public class CodeGenOptionTest extends AbstractCodeGenTest {
         assertNotNull("Server should be generated", greeterServer);
     }
 
+    /**
+     * Testing if the wsdlList option is used then all wsdls from a given file gets processed.
+     */
+    @Test
+    public void testWSDLListOptionMultipleWSDL() throws Exception {
+
+        env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
+        env.put(ToolConstants.CFG_WSDLLIST, ToolConstants.CFG_WSDLLIST);
+
+        // Getting the full path of the wsdl
+        String wsdl1 = getLocation("/wsdl2java_wsdl/hello_world.wsdl");
+        String wsdl2 = getLocation("/wsdl2java_wsdl/cardealer.wsdl");
+
+        doWSDLListOptionTest(null, Arrays.asList(wsdl1, wsdl2));
+
+        Class greeterServer = classLoader
+            .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
+        assertNotNull("Server should be generated", greeterServer);
+
+        Class carDealerServer = classLoader
+            .loadClass("type_substitution.server.CarDealer_CarDealerPort_Server");
+        assertNotNull("Server should be generated", carDealerServer);
+
+    }
+
+    /**
+     * Testing if the wsdlList option is used and the file contains only one WSDL, then that WSDL is processed
+     */
+    @Test
+    public void testWSDLListOptionOneWSDL() throws Exception {
+
+        env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
+        env.put(ToolConstants.CFG_WSDLLIST, ToolConstants.CFG_WSDLLIST);
+
+        // Getting the full path of the wsdl
+        String wsdl1 = getLocation("/wsdl2java_wsdl/hello_world.wsdl");
+
+        doWSDLListOptionTest(null, Arrays.asList(wsdl1));
+
+        Class greeterServer = classLoader
+            .loadClass("org.apache.cxf.w2j.hello_world_soap_http.Greeter_SoapPort_Server");
+        assertNotNull("Server should be generated", greeterServer);
+    }
+
+    /**
+     * Testing if the wsdlList option is used and the file contains an incorrect WSDL, then an exception is
+     * thrown
+     */
+    @Test
+    public void testWSDLListOptionIncorrectWSDLUrl() throws Exception {
+
+        env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
+        env.put(ToolConstants.CFG_WSDLLIST, ToolConstants.CFG_WSDLLIST);
+
+        // Getting the full path of the wsdl
+        String wsdl1 = getLocation("/wsdl2java_wsdl/hello_world.wsdl");
+
+        try {
+            doWSDLListOptionTest(null, Arrays.asList(wsdl1, "test"));
+        } catch (WSDLRuntimeException e) {
+            return;
+        }
+        fail();
+    }
+
+    /**
+     * Testing if the wsdlList option is used and a file that does not exist is specified, then an exception
+     * occurs
+     */
+    @Test
+    public void testWSDLListOptionIncorrectFile() throws Exception {
+
+        env.put(ToolConstants.CFG_ALL, ToolConstants.CFG_ALL);
+        env.put(ToolConstants.CFG_WSDLLIST, ToolConstants.CFG_WSDLLIST);
+
+        // Getting the full path of the wsdl
+        String wsdl1 = getLocation("/wsdl2java_wsdl/hello_world.wsdl");
+
+        try {
+            doWSDLListOptionTest("/Temp/temp.txt", Arrays.asList(wsdl1));
+        } catch (ToolException e) {
+            return;
+        }
+        fail();
+    }
+    
+    /**
+     * Performs the WSDLList option test for the specified list of parameters.
+     * 
+     * @param wsdlURL The url of the wsdlList. Can be null.
+     * @param wsdls
+     * @throws IOException
+     * @throws ToolException
+     */
+    private void doWSDLListOptionTest(String wsdlURL, List<String> wsdls) 
+        throws IOException, ToolException {
+        
+        File file = null;
+        if (wsdlURL == null) {
+            // Creating a file containing a list of wsdls URLs in a temp folder
+            file = tmpDir.newFile("wsdl_list.txt");
+            PrintWriter writer = new PrintWriter(new FileWriter(file));
+            for (String wsdl : wsdls) {
+                writer.println(wsdl);
+            }
+            writer.close();
+            
+            wsdlURL = file.getPath();
+        }
+    
+        env.put(ToolConstants.CFG_WSDLURL, wsdlURL);
+        processor.setContext(env);
+        
+        try {
+            processor.execute();
+        } finally {
+            if (file != null) {
+                file.delete();
+            }
+        }
+    }
 
     @Test
     public void testHelloWorldExternalBindingFile() throws Exception {

@@ -104,6 +104,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
         boolean isWsdlList = context.optionSet(ToolConstants.CFG_WSDLLIST);
 
         if (isWsdlList) {
+            BufferedReader reader = null;
             try {
                 ToolContext initialContextState = context.makeCopy();
                 String wsdlURL = (String)context.get(ToolConstants.CFG_WSDLURL);
@@ -111,7 +112,7 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
 
                 URL url = new URL(wsdlURL);
                 InputStream is = (InputStream)url.getContent();
-                BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+                reader = new BufferedReader(new InputStreamReader(is));
                 String tempLine = null;
                 while ((tempLine = reader.readLine()) != null) {                    
                     ToolContext freshContext = initialContextState.makeCopy();
@@ -123,7 +124,15 @@ public class WSDLToJavaContainer extends AbstractCXFToolContainer {
                 }
             } catch (IOException e) {
                 throw new ToolException(e);
-            }       
+            } finally {
+                try {
+                    if (reader != null) {
+                        reader.close();
+                    }
+                } catch (IOException e) {
+                    throw new ToolException(e);
+                }
+            }
         } else {
             processWsdl();
         }
