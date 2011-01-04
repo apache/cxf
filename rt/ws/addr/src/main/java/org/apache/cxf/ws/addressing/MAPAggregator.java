@@ -87,7 +87,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
     public static final String ADDRESSING_DISABLED = MAPAggregator.class.getName() + ".addressingDisabled";
     public static final String DECOUPLED_DESTINATION = MAPAggregator.class.getName() 
         + ".decoupledDestination";
-
+    public static final String ACTION_VERIFIED = MAPAggregator.class.getName() + ".actionVerified";
+    
     private static final Logger LOG = 
         LogUtils.getL7dLogger(MAPAggregator.class);
     private static final ResourceBundle BUNDLE = LOG.getResourceBundle();
@@ -1160,6 +1161,7 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
             if (s == null && headers != null) {
                 s = headers.get(Names.SOAP_ACTION_HEADER.toLowerCase());
             }
+            
             if (maps.getAction() == null || maps.getAction().getValue() == null) {
                 String reason =
                     BUNDLE.getString("MISSING_ACTION_MESSAGE");
@@ -1170,7 +1172,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 valid = false;
             }
             
-            if (s != null && s.size() > 0 && valid) {
+            if (s != null && s.size() > 0 && valid 
+                && !MessageUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
                 String sa = s.get(0);
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
