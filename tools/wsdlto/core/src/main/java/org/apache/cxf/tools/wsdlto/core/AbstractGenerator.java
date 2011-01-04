@@ -25,6 +25,8 @@ import java.util.Calendar;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.xml.bind.DatatypeConverter;
+
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.tools.common.FrontEndGenerator;
@@ -101,10 +103,13 @@ public abstract class AbstractGenerator implements FrontEndGenerator {
     }
 
     protected void setCommonAttributes() {
-        setAttributes("currentdate", Calendar.getInstance().getTime());
+        // Set generated date in ISO-8601 format, as is required for the date attribute for @Generated
+        // annotation.
+        setAttributes("currentdate", DatatypeConverter.printDateTime(Calendar.getInstance()));
         setAttributes("version", Version.getCurrentVersion());
         setAttributes("fullversion", Version.getCompleteVersionString());
         setAttributes("name", Version.getName());
+        setAttributes("mark-generated", env.optionSet(ToolConstants.CFG_MARK_GENERATED));
     }
 
     protected void clearAttributes() {

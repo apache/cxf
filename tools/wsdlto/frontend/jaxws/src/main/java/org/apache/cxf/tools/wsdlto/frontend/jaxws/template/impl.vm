@@ -23,6 +23,9 @@
 package $intf.PackageName;
 
 import java.util.logging.Logger;
+#if ($mark-generated == "true")
+import javax.annotation.Generated;
+#end
 #foreach ($import in $intf.Imports)
 import ${import};
 #end
@@ -49,14 +52,23 @@ import ${import};
 #end
                       endpointInterface = "$intf.PackageName.$intf.Name")
                       
+#if ($mark-generated == "true")
+@Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
+#end
 public class ${implName} implements $intf.Name {
 
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     private static final Logger LOG = Logger.getLogger(${intf.Name}Impl.class.getName());
 
 #foreach ($method in $intf.Methods)
     /* (non-Javadoc)
      * @see $intf.PackageName.$intf.Name#${method.Name}(#foreach ($parameter in $method.Parameters)$parameter.ClassName  $parameter.Name #if ($velocityCount != $method.getParameters().size()),#end)#end*
      */
+#if ($mark-generated == "true")
+    @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
+#end
     public $method.return.ClassName ${method.Name}(#if($method.ParameterListWithoutAnnotation.size() == 0))#end#if($method.ParameterListWithoutAnnotation.size() != 0)#foreach($param in ${method.ParameterListWithoutAnnotation})$param#end)#end#if($method.Exceptions.size() > 0) throws #foreach($exception in $method.Exceptions)$exception.ClassName #if($velocityCount != $method.Exceptions.size()),#end #end #end { 
 #if ($method.Async)
        return null;

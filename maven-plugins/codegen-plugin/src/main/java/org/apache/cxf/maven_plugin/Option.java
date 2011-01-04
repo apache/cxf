@@ -141,6 +141,11 @@ public class Option {
     Boolean useFQCNForFaultSerialVersionUID;
 
     /**
+     * Uses @Generated annotation in all generated java classes if the flag is set to true.
+     */
+    Boolean markGenerated;
+
+    /**
      * The WSDL service name to use for the generated code
      */
     String serviceName;
@@ -318,6 +323,14 @@ public class Option {
         this.useFQCNForFaultSerialVersionUID = useFQCNForFaultSerialVersionUID;
     }
 
+    public Boolean isMarkGenerated() {
+        return markGenerated;
+    }
+
+    public void setMarkGenerated(Boolean markGenerated) {
+        this.markGenerated = markGenerated;
+    }
+
     public Boolean getDefaultExcludesNamespace() {
         return defaultExcludesNamespace;
     }
@@ -386,6 +399,7 @@ public class Option {
         destination.setServiceName(getServiceName());
         destination.setValidateWsdl(isValidateWsdl());
         destination.setUseFQCNForFaultSerialVersionUID(isUseFQCNForFaultSerialVersionUID());
+        destination.setMarkGenerated(isMarkGenerated());
         destination.setAllowElementRefs(isAllowElementRefs());
         if (isSetWsdlLocation()) {
             destination.setWsdlLocation(getWsdlLocation());
@@ -406,6 +420,7 @@ public class Option {
         validateWsdl = setIfNull(validateWsdl, defaultOptions.validateWsdl);
         useFQCNForFaultSerialVersionUID = setIfNull(useFQCNForFaultSerialVersionUID,
             defaultOptions.useFQCNForFaultSerialVersionUID);
+        markGenerated = setIfNull(markGenerated, defaultOptions.markGenerated);
         autoNameResolution = setIfNull(autoNameResolution, defaultOptions.autoNameResolution);
         noAddressBinding = setIfNull(noAddressBinding, defaultOptions.noAddressBinding);
         allowElementRefs = setIfNull(allowElementRefs, defaultOptions.allowElementRefs);
