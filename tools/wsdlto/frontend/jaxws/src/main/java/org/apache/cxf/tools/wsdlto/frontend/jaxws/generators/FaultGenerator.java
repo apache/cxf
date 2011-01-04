@@ -90,6 +90,13 @@ public class FaultGenerator extends AbstractJAXWSGenerator {
                 for (JavaField jf : expClz.getFields()) {
                     setAttributes("paraName", ProcessorUtil.mangleNameToVariableName(jf.getName()));
                 }
+                
+                String exceptionSuperclass = "Exception";
+                if (expClz.getName().equals(exceptionSuperclass)) {
+                    exceptionSuperclass = "java.lang.Exception";
+                }
+                setAttributes("exceptionSuperclass", exceptionSuperclass);
+
                 setCommonAttributes();
                 doWrite(FAULT_TEMPLATE, parseOutputName(expClz.getPackageName(),
                         expClz.getName()));
