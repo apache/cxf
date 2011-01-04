@@ -1147,8 +1147,8 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         File f = new File(output, "org/apache/cxf/testcase/cxf3105/Login.java");
         assertTrue(f.exists());
         String contents = IOUtils.readStringFromStream(new FileInputStream(f));
-        assertTrue(contents.contains("Loginrequest loginRequest"));
-        assertTrue(contents.contains("<Loginresponse> loginResponse"));
+        assertTrue(contents.contains("Loginrequesttype loginRequest"));
+        assertTrue(contents.contains("<Loginresponsetype> loginResponse"));
     }
 
     @Test
