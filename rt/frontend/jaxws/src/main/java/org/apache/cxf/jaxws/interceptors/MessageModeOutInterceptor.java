@@ -46,10 +46,12 @@ import org.apache.cxf.binding.soap.saaj.SAAJOutInterceptor.SAAJOutEndingIntercep
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.interceptor.Fault;
+import org.apache.cxf.interceptor.StaxOutInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageContentsList;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.model.BindingOperationInfo;
@@ -155,6 +157,23 @@ public class MessageModeOutInterceptor extends AbstractPhaseInterceptor<Message>
             SOAPMessage soapMessage = (SOAPMessage)o;
             if (soapMessage.countAttachments() > 0) {
                 message.put("write.attachments", Boolean.TRUE);
+            }
+            try {
+                Object enc = soapMessage.getProperty(SOAPMessage.CHARACTER_SET_ENCODING);
+                if (enc instanceof String) {
+                    message.put(Message.ENCODING, enc);
+                }
+            } catch (SOAPException e) {
+                //ignore
+            }
+            try {
+                Object xmlDec = soapMessage.getProperty(SOAPMessage.WRITE_XML_DECLARATION);
+                if (xmlDec != null) {
+                    boolean b = MessageUtils.isTrue(xmlDec);
+                    message.put(StaxOutInterceptor.FORCE_START_DOCUMENT, b);
+                }
+            } catch (SOAPException e) {
+                //ignore
             }
         }
         message.getInterceptorChain().add(internal);
