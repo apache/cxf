@@ -46,12 +46,14 @@ import org.apache.cxf.phase.AbstractPhaseInterceptor;
 import org.apache.cxf.phase.Phase;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.invoker.Invoker;
+import org.apache.cxf.service.model.BindingOperationInfo;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.ws.addressing.AddressingProperties;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.JAXWSAConstants;
+import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.EndpointPolicy;
@@ -249,6 +251,9 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
             endpoint.getService().setInvoker(new STSInvoker());
             ex.put(Endpoint.class, endpoint);
             ex.put(Service.class, endpoint.getService());
+            ex.put(org.apache.cxf.binding.Binding.class, endpoint.getBinding());
+            ex.remove(BindingOperationInfo.class);
+            message.put(MAPAggregator.ACTION_VERIFIED, Boolean.TRUE);
         } catch (Exception exc) {
             throw new Fault(exc);
         }
