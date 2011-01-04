@@ -1153,4 +1153,14 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         assertTrue(contents.contains("<Loginresponse> loginResponse"));
     }
 
+    @Test
+    public void testOverloadWithAction() throws Exception {
+        String[] args = new String[] {"-d", output.getCanonicalPath(),
+            getLocation("/wsdl2java_wsdl/hello_world_overload.wsdl")};
+        WSDLToJava.main(args);
+        
+        assertNotNull(output);
+        File f = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/SayHi.java");
+        assertTrue(f.exists());
+    }
 }
