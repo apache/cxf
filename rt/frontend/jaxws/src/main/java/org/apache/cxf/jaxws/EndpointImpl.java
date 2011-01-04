@@ -27,6 +27,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executor;
 import java.util.logging.Logger;
 
@@ -321,6 +322,13 @@ public class EndpointImpl extends javax.xml.ws.Endpoint
                     // TODO is there a good place to put this key-string as a constant?
                     endpointInfo.setProperty("publishedEndpointUrl", publishedEndpointUrl);
                 }
+
+                if (null != properties) {
+                    for (Entry<String, Object> entry : properties.entrySet()) {
+                        endpointInfo.setProperty(entry.getKey(), entry.getValue());
+                    }
+                }
+
                 this.address = endpointInfo.getAddress();
             }
             serv.start();

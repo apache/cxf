@@ -58,6 +58,7 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.helpers.XMLUtils;
+import org.apache.cxf.message.MessageUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.transports.http.StemMatchingQueryHandler;
@@ -296,10 +297,10 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                     LOG,
                     base), e);
         }
-        
-        Boolean rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress", Boolean.class);
-        
-        if (rewriteSoapAddress != null && rewriteSoapAddress.booleanValue()) {
+
+        Object rewriteSoapAddress = ei.getProperty("autoRewriteSoapAddress");
+
+        if (rewriteSoapAddress != null && MessageUtils.isTrue(rewriteSoapAddress)) {
             List<Element> serviceList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                               "http://schemas.xmlsoap.org/wsdl/",
                                                               "service");
