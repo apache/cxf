@@ -99,15 +99,26 @@ public class OneWayProcessorInterceptor extends AbstractPhaseInterceptor<Message
             if (Boolean.FALSE.equals(o)) {
                 chain.pause();
                 try {
-                    message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
-                    .getAutomaticWorkQueue().execute(new Runnable() {
-                        public void run() {
-                            chain.resume();
-                        }
-                    });
+                    synchronized (chain) {
+                        message.getExchange().get(Bus.class).getExtension(WorkQueueManager.class)
+                            .getAutomaticWorkQueue().execute(new Runnable() {
+                                public void run() {
+                                    synchronized (chain) {
+                                        chain.notifyAll();
+                                    }
+                                    chain.resume();
+                                }
+                            });
+                        //wait a few milliseconds for the background thread to start processing
+                        //Mostly just to make an attempt at keeping the ordering of the 
+                        //messages coming in from a client.  Not guaranteed though.
+                        chain.wait(20);
+                    }
                 } catch (RejectedExecutionException e) {
                     //the executor queue is full, so run the task in the caller thread
                     chain.resume();
+                } catch (InterruptedException e) {
+                    //ignore - likely a busy work queue so we'll just let the one-way go
                 }
             }
         }
