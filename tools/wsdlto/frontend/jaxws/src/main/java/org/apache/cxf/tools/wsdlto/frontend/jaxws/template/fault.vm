@@ -36,7 +36,7 @@ import javax.xml.ws.WebFault;
 #if ($mark-generated == "true")
 @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate", comments = "$fullversion")
 #end
-public class $expClass.Name extends Exception {
+public class $expClass.Name extends $exceptionSuperclass {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
