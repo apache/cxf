@@ -63,7 +63,10 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.stream.util.StreamReaderDelegate;
 import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Attr;
 import org.w3c.dom.Element;
+import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
 import org.apache.cxf.common.i18n.Message;
@@ -77,6 +80,7 @@ import org.apache.cxf.service.model.SchemaInfo;
 import org.apache.cxf.staxutils.DepthXMLStreamReader;
 import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.staxutils.W3CDOMStreamWriter;
+import org.apache.cxf.staxutils.W3CNamespaceContext;
 import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSimpleType;
 import org.apache.ws.commons.schema.XmlSchemaSimpleTypeList;
@@ -813,18 +817,33 @@ public final class JAXBEncoderDecoder {
         NamespaceContext c = source.getNamespaceContext();
         final Map<String, String> nsMap = new TreeMap<String, String>();
         try {
-            try {
-                //Woodstox version
-                c = (NamespaceContext)c.getClass().getMethod("createNonTransientNsContext", Location.class)
-                    .invoke(c, new Object[1]);
-            } catch (Throwable t) {
-                //ignore
-            }
-            Field f = c.getClass().getDeclaredField("mNamespaces");
-            f.setAccessible(true);
-            String ns[] = (String[])f.get(c);
-            for (int x = 0; x < ns.length; x += 2) {
-                nsMap.put(ns[x], ns[x + 1]);
+            if (c instanceof W3CNamespaceContext) {                                
+                Element element = ((W3CNamespaceContext)c).getElement();
+                while (element != null) {
+                    NamedNodeMap namedNodeMap = element.getAttributes();
+                    for (int i = 0; i < namedNodeMap.getLength(); i++) {
+                        Attr attr = (Attr)namedNodeMap.item(i);
+                        if (attr.getPrefix() != null && attr.getPrefix().equals("xmlns")) {
+                            nsMap.put(attr.getLocalName(), attr.getValue());
+                        }
+                    }
+                    element = (Element)element.getParentNode();
+                }
+            } else {
+                try {
+                    //Woodstox version
+                    c = (NamespaceContext)c.getClass().getMethod("createNonTransientNsContext", 
+                                                                 Location.class)
+                        .invoke(c, new Object[1]);
+                } catch (Throwable t) {
+                    //ignore
+                }
+                Field f = c.getClass().getDeclaredField("mNamespaces");
+                f.setAccessible(true);
+                String ns[] = (String[])f.get(c);
+                for (int x = 0; x < ns.length; x += 2) {
+                    nsMap.put(ns[x], ns[x + 1]);
+                }
             }
         } catch (Throwable t) {
             //internal JDK/xerces version
