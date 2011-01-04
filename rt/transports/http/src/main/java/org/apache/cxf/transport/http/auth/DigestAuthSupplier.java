@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -33,7 +33,7 @@ import org.apache.cxf.message.Message;
 /**
  * 
  */
-public class DigestAuthSupplier extends HttpAuthSupplier {
+public class DigestAuthSupplier implements HttpAuthSupplier {
     private static final char[] HEXADECIMAL = {
         '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'
     };
@@ -60,11 +60,23 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
         return true;
     }
 
-    @Override
-    public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL,
-                                           Message message,
-                                           String realm, String fullHeader) {
-        AuthorizationPolicy authPolicy = conduit.getEffectiveAuthPolicy(message);
+    public String getAuthorization(AuthorizationPolicy  authPolicy,
+                                   URL currentURL,
+                                   Message message,
+                                   String fullHeader) {
+        if (fullHeader == null) {
+            DigestInfo di = authInfo.get(currentURL);
+            if (di != null) {
+                /* Preemptive authentication is only possible if we have a cached
+                 * challenge
+                 */
+                return di.generateAuth(currentURL.getFile(), 
+                                       authPolicy.getUserName(),
+                                       authPolicy.getPassword());            
+            } else {
+                return null;
+            }
+        }
         HttpAuthHeader authHeader = new HttpAuthHeader(fullHeader);
         if (authHeader.authTypeIsDigest() && authPolicy != null) {
             Map<String, String> map = authHeader.getParams();
@@ -92,17 +104,6 @@ public class DigestAuthSupplier extends HttpAuthSupplier {
                                        authPolicy.getPassword());
             }
             
-        }
-        return null;
-    }
-    @Override
-    public String getPreemptiveAuthorization(HTTPConduit conduit, URL currentURL, Message message) {
-        DigestInfo di = authInfo.get(currentURL);
-        AuthorizationPolicy authPolicy = conduit.getEffectiveAuthPolicy(message);
-        if (di != null) {
-            return di.generateAuth(currentURL.getFile(), 
-                                   authPolicy.getUserName(),
-                                   authPolicy.getPassword());            
         }
         return null;
     }

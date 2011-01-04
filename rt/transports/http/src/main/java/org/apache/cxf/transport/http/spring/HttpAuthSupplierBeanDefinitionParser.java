@@ -22,7 +22,7 @@ package org.apache.cxf.transport.http.spring;
 
 import org.w3c.dom.Element;
 import org.apache.cxf.configuration.spring.AbstractBeanDefinitionParser;
-import org.apache.cxf.transport.http.HttpAuthSupplier;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 
 public class HttpAuthSupplierBeanDefinitionParser extends
         AbstractBeanDefinitionParser {

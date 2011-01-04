@@ -27,6 +27,8 @@ import java.util.Map;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
+import org.apache.cxf.transport.http.auth.HttpAuthHeader;
 import org.easymock.classextension.EasyMock;
 import org.easymock.classextension.IMocksControl;
 
@@ -71,18 +73,15 @@ public class DigestAuthSupplierTest {
             
         };
         IMocksControl control = EasyMock.createControl();
-        HTTPConduit conduit = control.createMock(HTTPConduit.class);
         AuthorizationPolicy authorizationPolicy = new AuthorizationPolicy();
         authorizationPolicy.setUserName("testUser");
         authorizationPolicy.setPassword("testPassword");
-        
-        EasyMock.expect(conduit.getEffectiveAuthPolicy(EasyMock.isA(Message.class)))
-            .andReturn(authorizationPolicy).atLeastOnce();
         URL url = new URL("http://myserver");
         Message message = new MessageImpl();
         control.replay();
+        
         String authToken = authSupplier
-            .getAuthorizationForRealm(conduit, url, message, "myRealm", fullHeader);
+            .getAuthorization(authorizationPolicy, url, message, fullHeader);
         HttpAuthHeader authHeader = new HttpAuthHeader(authToken);
         assertEquals("Digest", authHeader.getAuthType());
         Map<String, String> params = authHeader.getParams();

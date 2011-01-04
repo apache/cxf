@@ -21,6 +21,8 @@ package org.apache.cxf.transport.http;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.cxf.transport.http.auth.HttpAuthHeader;
+
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

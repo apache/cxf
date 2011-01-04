@@ -35,6 +35,7 @@ import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
@@ -68,20 +69,16 @@ public class HTTPConduitTest extends Assert {
         return message;
     }
 
-    /**
-     * This test class is a Basic Auth Supplier with a
-     * preemptive UserPass.
-     */
-    class BasicAuthSupplier extends HttpBasicAuthSupplier {
-        public UserPass getPreemptiveUserPass(
-                String conduitName, URL url, Message m) {
-            return createUserPass("Gandalf", "staff");
-        }
-        public UserPass getUserPassForRealm(
-                String conduitName, URL url, Message m, String r) {
-            return null;
+    private final class TestAuthSupplier implements HttpAuthSupplier {
+
+        public String getAuthorization(AuthorizationPolicy authPolicy, URL currentURL, Message message,
+                                       String fullHeader) {
+            return "myauth";
         }
 
+        public boolean requiresRequestCaching() {
+            return false;
+        }
     }
 
     /**
@@ -200,7 +197,7 @@ public class HTTPConduitTest extends Assert {
                 headers.get("Authorization").get(0));
 
         // Setting a Basic Auth User Pass should override
-        conduit.setAuthSupplier(new BasicAuthSupplier());
+        conduit.setAuthSupplier(new TestAuthSupplier());
         message = getNewMessage();
 
         // Test Call
@@ -208,10 +205,9 @@ public class HTTPConduitTest extends Assert {
 
         headers =
             CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-
-        assertEquals("Unexpected Authorization Token",
-                "Basic " + Base64Utility.encode("Gandalf:staff".getBytes()),
-                headers.get("Authorization").get(0));
+        List<String> authorization = headers.get("Authorization");
+        assertNotNull("Authorization Token must be set", authorization);
+        assertEquals("Wrong Authorization Token", "myauth", authorization.get(0));
 
         conduit.setAuthSupplier(null);
         // Setting authorization policy on the message should override 

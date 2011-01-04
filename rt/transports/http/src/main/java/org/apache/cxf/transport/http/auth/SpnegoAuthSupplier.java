@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.net.URL;
 import java.security.PrivilegedActionException;
@@ -42,17 +42,22 @@ import org.ietf.jgss.GSSManager;
 import org.ietf.jgss.GSSName;
 import org.ietf.jgss.Oid;
 
-public class SpnegoAuthSupplier extends HttpAuthSupplier {
+public class SpnegoAuthSupplier implements HttpAuthSupplier {
     private static final String KERBEROS_OID = "1.2.840.113554.1.2.2";
     //private static final String SPNEGO_OID = "1.3.6.1.5.5.2";
 
-    private static final Logger LOG = LogUtils.getL7dLogger(HTTPConduit.class);
+    private static final Logger LOG = LogUtils.getL7dLogger(SpnegoAuthSupplier.class);
 
     private LoginContext lc;
+    
+    public boolean requiresRequestCaching() {
+        return false;
+    }
 
-    @Override
-    public String getPreemptiveAuthorization(HTTPConduit conduit, URL currentURL, Message message) {
-        AuthorizationPolicy authPolicy = conduit.getEffectiveAuthPolicy(message);
+    public String getAuthorization(AuthorizationPolicy  authPolicy,
+                                    URL currentURL,
+                                    Message message,
+                                    String fullHeader) {
         if (!HttpAuthHeader.AUTH_TYPE_NEGOTIATE.equals(authPolicy.getAuthorizationType())) {
             return null;
         }
@@ -66,12 +71,6 @@ public class SpnegoAuthSupplier extends HttpAuthSupplier {
         } catch (GSSException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
-    }
-
-    @Override
-    public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL, Message message,
-                                           String realm, String fullHeader) {
-        return getPreemptiveAuthorization(conduit, currentURL, message);
     }
 
     /**
@@ -169,4 +168,5 @@ public class SpnegoAuthSupplier extends HttpAuthSupplier {
         };
         return handler;
     }
+
 }

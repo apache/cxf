@@ -16,34 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.net.URL;
 
+import org.apache.cxf.common.util.Base64Utility;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.message.Message;
 
-final class DefaultBasicAuthSupplier extends HttpAuthSupplier {
-    DefaultBasicAuthSupplier() {
+public final class DefaultBasicAuthSupplier implements HttpAuthSupplier {
+    public DefaultBasicAuthSupplier() {
         super();
     }
 
-    @Override
-    public String getPreemptiveAuthorization(HTTPConduit conduit, URL currentURL, Message message) {
-        AuthorizationPolicy effectiveAuthPolicy = conduit.getEffectiveAuthPolicy(message);
-        if (effectiveAuthPolicy.getUserName() != null && effectiveAuthPolicy.getPassword() != null) {
-            return HttpBasicAuthSupplier.getBasicAuthHeader(effectiveAuthPolicy.getUserName(), 
-                                                            effectiveAuthPolicy.getPassword());
+    public boolean requiresRequestCaching() {
+        return false;
+    }
+    
+    public static String getBasicAuthHeader(String userName, String passwd) {
+        String userAndPass = userName + ":" + passwd;
+        return "Basic " + Base64Utility.encode(userAndPass.getBytes());
+    }
+
+    public String getAuthorization(AuthorizationPolicy  authPolicy,
+                                   URL currentURL,
+                                   Message message,
+                                   String fullHeader) {
+        if (authPolicy.getUserName() != null && authPolicy.getPassword() != null) {
+            return getBasicAuthHeader(authPolicy.getUserName(), 
+                                      authPolicy.getPassword());
         } else {
             return null;
         }
     }
-
-    @Override
-    public String getAuthorizationForRealm(HTTPConduit conduit, URL currentURL, Message message,
-                                           String realm, String fullHeader) {
-        return getPreemptiveAuthorization(conduit, currentURL, message);
-    }
-
 
 }

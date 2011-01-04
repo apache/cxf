@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.transport.http;
+package org.apache.cxf.transport.http.auth;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;

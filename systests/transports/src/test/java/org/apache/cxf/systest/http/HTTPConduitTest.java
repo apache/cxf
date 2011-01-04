@@ -52,10 +52,11 @@ import org.apache.cxf.message.Message;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
 import org.apache.cxf.transport.http.HTTPConduit;
-import org.apache.cxf.transport.http.HttpAuthSupplier;
 import org.apache.cxf.transport.http.MessageTrustDecider;
 import org.apache.cxf.transport.http.URLConnectionInfo;
 import org.apache.cxf.transport.http.UntrustedURLConnectionIOException;
+import org.apache.cxf.transport.http.auth.HttpAuthHeader;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
 
 import org.apache.cxf.transport.https.HttpsURLConnectionInfo;
 
@@ -742,7 +743,7 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
         
     }
 
-    public class MyBasicAuthSupplier extends HttpAuthSupplier {
+    public class MyBasicAuthSupplier implements HttpAuthSupplier {
 
         String realm;
         String user;
@@ -759,27 +760,18 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             user  = u;
             pass  = p;
         }
-        @Override
-        public String getPreemptiveAuthorization(
-                HTTPConduit  conduit,
-                URL     currentURL,
-                Message message
-        ) {
-            return null;
-        }
 
         /**
          * If we don't have the realm set, then we loop
          * through the realms.
          */
-        @Override
-        public String getAuthorizationForRealm(
-                HTTPConduit  conduit, 
+        public String getAuthorization(
+                AuthorizationPolicy authPolicy,
                 URL     currentURL,
-                Message message, 
-                String  reqestedRealm,
+                Message message,
                 String fullHeader
         ) {
+            String reqestedRealm = new HttpAuthHeader(fullHeader).getRealm();
             if (realm != null && realm.equals(reqestedRealm)) {
                 return createUserPass(user, pass);
             }
@@ -802,6 +794,10 @@ public class HTTPConduitTest extends AbstractBusClientServerTestBase {
             String userpass = usr + ":" + pwd;
             String token = Base64Utility.encode(userpass.getBytes());
             return "Basic " + token;
+        }
+
+        public boolean requiresRequestCaching() {
+            return false;
         }
 
     }

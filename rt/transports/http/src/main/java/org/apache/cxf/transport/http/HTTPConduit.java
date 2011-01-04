@@ -64,6 +64,11 @@ import org.apache.cxf.phase.PhaseInterceptorChain;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractConduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.auth.DefaultBasicAuthSupplier;
+import org.apache.cxf.transport.http.auth.DigestAuthSupplier;
+import org.apache.cxf.transport.http.auth.HttpAuthHeader;
+import org.apache.cxf.transport.http.auth.HttpAuthSupplier;
+import org.apache.cxf.transport.http.auth.SpnegoAuthSupplier;
 import org.apache.cxf.transport.http.policy.PolicyUtils;
 import org.apache.cxf.transport.https.CertConstraints;
 import org.apache.cxf.transport.https.CertConstraintsInterceptor;
@@ -236,9 +241,16 @@ public class HTTPConduit
     private MessageTrustDecider trustDecider;
     
     /**
-     * This field contains the HttpAuthSupplier.
+     * Implements the authentication handling when talking to a server. If it is not set
+     * it will be created from the authorizationPolicy.authType
      */
     private HttpAuthSupplier authSupplier;
+    
+    /**
+     * Implements the proxy authentication handling. If it is not set
+     * it will be created from the proxyAuthorizationPolicy.authType
+     */
+    private HttpAuthSupplier proxyAuthSupplier;
 
     private Cookies cookies;
     
@@ -361,8 +373,6 @@ public class HTTPConduit
         } else {
             LOG.log(Level.FINE, "HttpAuthSupplier of class '" 
                     + authSupplier.getClass().getName()
-                    + "' with logical name of '"
-                    + authSupplier.getLogicalName()
                     + "' has been configured for Conduit '" 
                     + getConduitName()
                     + "'");
@@ -471,8 +481,11 @@ public class HTTPConduit
         int chunkThreshold = 0;
         final AuthorizationPolicy effectiveAuthPolicy = getEffectiveAuthPolicy(message);
         if (this.authSupplier == null) {
-            String authType = effectiveAuthPolicy.getAuthorizationType();
-            this.authSupplier = createAuthSupplier(authType);
+            this.authSupplier = createAuthSupplier(effectiveAuthPolicy.getAuthorizationType());
+        }
+        
+        if (this.proxyAuthSupplier == null) {
+            this.proxyAuthSupplier = createAuthSupplier(proxyAuthorizationPolicy.getAuthorizationType());
         }
 
         if (this.authSupplier.requiresRequestCaching()) {
@@ -727,26 +740,16 @@ public class HTTPConduit
             URL url
     ) {
         Headers headers = new Headers(message);
-        String authString = authSupplier.getPreemptiveAuthorization(this, url, message);
+        AuthorizationPolicy effectiveAuthPolicy = getEffectiveAuthPolicy(message);
+        String authString = authSupplier.getAuthorization(effectiveAuthPolicy, url, message, null);
         if (authString != null) {
             headers.setAuthorization(authString);
         }
         
-        // TODO Also use an authSupplier for proxy auth
-        AuthorizationPolicy proxyAuthPolicy = getProxyAuthorization();
-        if (proxyAuthPolicy != null && proxyAuthPolicy.isSetUserName()) {
-            String userName = proxyAuthPolicy.getUserName();
-            if (userName != null) {
-                String passwd = "";
-                if (proxyAuthPolicy.isSetPassword()) {
-                    passwd = proxyAuthPolicy.getPassword();
-                }
-                headers.setProxyAuthorization(HttpBasicAuthSupplier.getBasicAuthHeader(userName, passwd));
-            } else if (proxyAuthPolicy.isSetAuthorizationType() 
-                       && proxyAuthPolicy.isSetAuthorization()) {
-                headers.setProxyAuthorization(proxyAuthPolicy.getAuthorizationType() + " " 
-                        + proxyAuthPolicy.getAuthorization());
-            }
+        String proxyAuthString = authSupplier.getAuthorization(proxyAuthorizationPolicy, 
+                                                               url, message, null);
+        if (proxyAuthString != null) {
+            headers.setProxyAuthorization(proxyAuthString);
         }
     }
 
@@ -906,6 +909,14 @@ public class HTTPConduit
         this.authSupplier = supplier;
     }
     
+    public HttpAuthSupplier getProxyAuthSupplier() {
+        return proxyAuthSupplier;
+    }
+
+    public void setProxyAuthSupplier(HttpAuthSupplier proxyAuthSupplier) {
+        this.proxyAuthSupplier = proxyAuthSupplier;
+    }
+
     /**
      * This function processes any retransmits at the direction of redirections
      * or "unauthorized" responses.
@@ -1002,27 +1013,17 @@ public class HTTPConduit
         CacheAndWriteOutputStream cachedStream
     ) throws IOException {
         HttpAuthHeader authHeader = new HttpAuthHeader(connection.getHeaderField("WWW-Authenticate"));
-        // If we don't have a dynamic supply of user pass, then
-        // we don't retransmit. We just die with a Http 401 response.
-        if (authSupplier == null) {
-            if (authHeader.authTypeIsDigest()) {
-                authSupplier = new DigestAuthSupplier();
-            } else {
-                return connection;
-            }
-        }
-        
         URL currentURL = connection.getURL();
         String realm = authHeader.getRealm();
         detectAuthorizationLoop(getConduitName(), message, currentURL, realm);
+        AuthorizationPolicy effectiveAthPolicy = getEffectiveAuthPolicy(message);
         String authorizationToken = 
-            authSupplier.getAuthorizationForRealm(
-                this, currentURL, message, realm, authHeader.getFullHeader());
+            authSupplier.getAuthorization(
+                effectiveAthPolicy, currentURL, message, authHeader.getFullHeader());
         if (authorizationToken == null) {
             // authentication not possible => we give up
             return connection;
         }
-
         new Headers(message).setAuthorization(authorizationToken);
         cookies.writeToMessageHeaders(message);
         connection.disconnect();
@@ -1626,11 +1627,6 @@ public class HTTPConduit
     
     public boolean canAssert(QName type) {
         return PolicyUtils.HTTPCLIENTPOLICY_ASSERTION_QNAME.equals(type);  
-    }
-
-    @Deprecated
-    public void setBasicAuthSupplier(HttpBasicAuthSupplier basicAuthSupplier) {
-        setAuthSupplier(basicAuthSupplier);
     }
 
     public void propertyChange(PropertyChangeEvent evt) {
