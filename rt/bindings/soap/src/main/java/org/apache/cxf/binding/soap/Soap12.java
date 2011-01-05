@@ -137,9 +137,5 @@ public final class Soap12 implements SoapVersion {
     public String getContentType() {
         return "application/soap+xml";
     }
-    
-    public String getPrefix() {
-        return "soap";
-    }
 
 }

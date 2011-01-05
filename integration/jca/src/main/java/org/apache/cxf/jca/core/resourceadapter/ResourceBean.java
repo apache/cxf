@@ -38,11 +38,6 @@ public class ResourceBean implements Serializable {
     public static final String DEFAULT_VALUE_STRING = "DEFAULT";
     public static final String LOG_LEVEL = "log.level";
     
-    @Deprecated
-    public static final String CONFIG_DOMAIN = "cxf";
-    @Deprecated
-    public static final String CONFIG_SCOPE = "j2ee";
-    
     public static final String DEFAULT_MONITOR_POLL_INTERVAL = "120";    
     public static final String EJB_SERVICE_PROPERTIES_URL = "ejb.service.properties.url";
     public static final String MONITOR_EJB_SERVICE_PROPERTIES = "monitor.ejb.service.properties";

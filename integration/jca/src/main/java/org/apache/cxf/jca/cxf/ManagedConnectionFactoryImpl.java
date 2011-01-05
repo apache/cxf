@@ -60,16 +60,6 @@ public class ManagedConnectionFactoryImpl
     public void setLogLevel(String logLevel) {
         setProperty(LOG_LEVEL, logLevel);
     }
-
-    @Deprecated
-    public void setConfigurationDomain(String name) {
-        setProperty(CONFIG_DOMAIN, name);
-    }
-
-    @Deprecated
-    public void setConfigurationScope(String name) {
-        setProperty(CONFIG_SCOPE, name);
-    }
     
     public void setEJBServicePropertiesURL(String name) {
         setProperty(EJB_SERVICE_PROPERTIES_URL, name);
@@ -86,17 +76,7 @@ public class ManagedConnectionFactoryImpl
     public String getLogLevel() {
         return getPluginProps().getProperty(LOG_LEVEL);
     }
-    
-    @Deprecated
-    public String getConfigurationDomain() {
-        return getPluginProps().getProperty(CONFIG_DOMAIN, CONFIG_DOMAIN);
-    }
-
-    @Deprecated
-    public String getConfigurationScope() {
-        return getPluginProps().getProperty(CONFIG_SCOPE, CONFIG_SCOPE);
-    }
-    
+        
     public String getEJBServicePropertiesURL() {
         return getPluginProps().getProperty(EJB_SERVICE_PROPERTIES_URL);
     }

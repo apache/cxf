@@ -156,9 +156,4 @@ public final class Soap11 implements SoapVersion {
     public String getContentType() {
         return "text/xml";
     }
-
-
-    public String getPrefix() {
-        return "soap";
-    }
 }

@@ -73,47 +73,6 @@ public class ManagedConnectionFactoryImplTest extends Assert {
                                               new QName("fooPort3"));
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testSetConfigurationDomain() throws Exception {
-        final String domainName = "SomeDomain";
-        Properties p = new Properties();
-        ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
-
-        mcf.setConfigurationDomain(domainName);
-        assertTrue(p.containsValue(domainName));
-        assertEquals(domainName, mcf.getConfigurationDomain());
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testGetConfigurationDomainReturnsDefaultValue() throws Exception {
-        Properties p = new Properties();
-        ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
-        assertEquals(ManagedConnectionFactoryImpl.CONFIG_DOMAIN, mcf.getConfigurationDomain());
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testSetConfigurationScope() throws Exception {
-        final String name = "a.b.c";
-        Properties p = new Properties();
-        ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
-
-        mcf.setConfigurationScope(name);
-        assertTrue(p.containsValue(name));
-        assertEquals(name, mcf.getConfigurationScope());
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    public void testGetConfigurationScopeReturnsDefaultValue() throws Exception {
-        Properties p = new Properties();
-        ManagedConnectionFactoryImpl mcf = new ManagedConnectionFactoryImpl(p);
-        assertEquals(ManagedConnectionFactoryImpl.CONFIG_SCOPE, mcf.getConfigurationScope());
-    }
-
-
     @Test
     public void testSetEJBServicePropertiesURL() throws Exception {
         final String name = "file://foo.txt";
