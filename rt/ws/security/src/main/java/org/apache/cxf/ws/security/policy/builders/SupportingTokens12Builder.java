@@ -69,32 +69,48 @@ public class SupportingTokens12Builder implements AssertionBuilder {
 
         if (SP12Constants.SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_SUPPORTING, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_SUPPORTING,
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.SIGNED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_SIGNED, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_SIGNED, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.ENDORSING_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_ENDORSING, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_ENDORSING, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.ENCRYPTED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_ENCRYPTED, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.SIGNED_ENCRYPTED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENCRYPTED, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_ENDORSING_ENCRYPTED, 
+                    SP12Constants.INSTANCE,
+                    builder);
         } else if (SP12Constants.SIGNED_ENDORSING_ENCRYPTED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(
-                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED, SP12Constants.INSTANCE);
+                    SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING_ENCRYPTED, 
+                    SP12Constants.INSTANCE,
+                    builder);
         }
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy) policy.normalize(false);
+        policy = (Policy) policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative((List) iterator.next(), supportingToken);

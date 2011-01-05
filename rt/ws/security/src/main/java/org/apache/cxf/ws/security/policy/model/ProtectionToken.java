@@ -22,16 +22,17 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class ProtectionToken extends TokenWrapper {
 
-    public ProtectionToken() {
-        super(SP12Constants.INSTANCE);
+    public ProtectionToken(PolicyBuilder b) {
+        super(SP12Constants.INSTANCE, b);
     }
-    public ProtectionToken(SPConstants version) {
-        super(version);
+    public ProtectionToken(SPConstants version, PolicyBuilder b) {
+        super(version, b);
     }
 
     /**

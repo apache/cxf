@@ -44,6 +44,7 @@ import org.apache.neethi.ExactlyOne;
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyOperator;
 import org.apache.neethi.PolicyReference;
+import org.apache.neethi.PolicyRegistry;
 
 
 /**
@@ -197,6 +198,11 @@ public class PolicyBuilderImpl implements PolicyBuilder, BusExtension {
             }
             return operator;
         }
+    }
+
+    public PolicyRegistry getPolicyRegistry() {
+        PolicyEngine e = bus.getExtension(PolicyEngine.class);
+        return e == null ? null : e.getRegistry();
     }
     
 }

@@ -22,6 +22,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
@@ -36,11 +37,11 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
     private SignatureToken signatureToken;
     private ProtectionToken protectionToken;
 
-    public SymmetricBinding() {
-        super(SP12Constants.INSTANCE);
+    public SymmetricBinding(PolicyBuilder b) {
+        super(SP12Constants.INSTANCE, b);
     }
-    public SymmetricBinding(SPConstants version) {
-        super(version);
+    public SymmetricBinding(SPConstants version, PolicyBuilder b) {
+        super(version, b);
     }
 
     /**
@@ -135,7 +136,7 @@ public class SymmetricBinding extends SymmetricAsymmetricBindingBase {
 
         
         ea.addPolicyComponent(all);
-        PolicyComponent pc = p.normalize(true);
+        PolicyComponent pc = p.normalize(builder.getPolicyRegistry(), true);
         if (pc instanceof Policy) {
             return (Policy)pc;
         } else {

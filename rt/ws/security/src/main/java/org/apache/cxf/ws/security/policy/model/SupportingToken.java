@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 import org.apache.cxf.ws.security.policy.SPConstants.SupportTokenType;
@@ -57,8 +58,8 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
 
     private SignedEncryptedParts encryptedParts;
 
-    public SupportingToken(SupportTokenType type, SPConstants version) {
-        super(version);
+    public SupportingToken(SupportTokenType type, SPConstants version, PolicyBuilder b) {
+        super(version, b);
         this.type = type;
     }
 
@@ -327,7 +328,7 @@ public class SupportingToken extends TokenWrapper implements AlgorithmWrapper {
         }        
         
         ea.addPolicyComponent(all);
-        PolicyComponent pc = p.normalize(true);
+        PolicyComponent pc = p.normalize(builder.getPolicyRegistry(), true);
         if (pc instanceof Policy) {
             return (Policy)pc;
         } else {

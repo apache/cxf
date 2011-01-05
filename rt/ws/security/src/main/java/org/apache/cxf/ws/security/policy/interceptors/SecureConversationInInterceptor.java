@@ -58,6 +58,7 @@ import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.EndpointPolicy;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP12Constants;
@@ -160,9 +161,11 @@ class SecureConversationInInterceptor extends AbstractPhaseInterceptor<SoapMessa
                         .getAddressingPolicy(aim, false);
                     all.addPolicyComponent(ass);
                     ea.addPolicyComponent(all);
-                    SymmetricBinding binding = new SymmetricBinding(SP12Constants.INSTANCE);
+                    PolicyBuilder pbuilder = message.getExchange().getBus()
+                        .getExtension(PolicyBuilder.class);
+                    SymmetricBinding binding = new SymmetricBinding(SP12Constants.INSTANCE, pbuilder);
                     binding.setIncludeTimestamp(true);
-                    ProtectionToken token = new ProtectionToken(SP12Constants.INSTANCE);
+                    ProtectionToken token = new ProtectionToken(SP12Constants.INSTANCE, pbuilder);
                     token.setToken(new SecureConversationToken(SP12Constants.INSTANCE));
                     binding.setProtectionToken(token);
                     binding.setEntireHeadersAndBodySignatures(true);

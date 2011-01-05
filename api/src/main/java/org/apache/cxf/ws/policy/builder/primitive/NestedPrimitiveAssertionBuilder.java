@@ -72,7 +72,8 @@ public class NestedPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
         }
         
         NestedPrimitiveAssertion compatible = 
-            new NestedPrimitiveAssertion(a.getName(), a.isOptional() && b.isOptional());
+            new NestedPrimitiveAssertion(a.getName(), a.isOptional() && b.isOptional(),
+                                         null, true, builder);
         compatible.setPolicy(nested);
         
         return compatible;

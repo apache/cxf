@@ -60,10 +60,10 @@ public class AsymmetricBindingBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         
-        AsymmetricBinding asymmetricBinding = new AsymmetricBinding(consts);
+        AsymmetricBinding asymmetricBinding = new AsymmetricBinding(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative((List)iterator.next(), asymmetricBinding, consts);

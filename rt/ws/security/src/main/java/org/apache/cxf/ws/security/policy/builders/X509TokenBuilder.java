@@ -81,7 +81,7 @@ public class X509TokenBuilder implements AssertionBuilder {
 
 
             Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-            policy = (Policy)policy.normalize(false);
+            policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
             for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
                 processAlternative((List)iterator.next(), x509Token, consts);

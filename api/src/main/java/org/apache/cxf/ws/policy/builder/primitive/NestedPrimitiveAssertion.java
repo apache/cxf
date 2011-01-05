@@ -55,15 +55,24 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(NestedPrimitiveAssertion.class);    
     private Policy nested;
     private boolean assertionRequired = true;
+    private PolicyBuilder builder;
+    
+    @Deprecated
     public NestedPrimitiveAssertion(QName name, boolean optional) {
-        this(name, optional, null, true);
+        this(name, optional, null, true, null);
+    }
+    
+    public NestedPrimitiveAssertion(QName name, boolean optional, PolicyBuilder b) {
+        this(name, optional, null, true, b);
     }
     
     public NestedPrimitiveAssertion(QName name, boolean optional, 
-                                    Policy p, boolean assertionRequired) {
+                                    Policy p, boolean assertionRequired,
+                                    PolicyBuilder b) {
         super(name, optional);
         this.assertionRequired = assertionRequired;
         this.nested = p;
+        builder = b;
     }
 
     public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder) {
@@ -72,6 +81,7 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
     
     public NestedPrimitiveAssertion(Element elem, PolicyBuilder builder, boolean assertionRequired) {
         super(elem);
+        this.builder = builder;
         this.assertionRequired = assertionRequired;
         
         // expect exactly one child element of type Policy
@@ -98,7 +108,9 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
     }
     
     public PolicyComponent normalize() {
-        Policy normalisedNested = (Policy)nested.normalize(true);
+        Policy normalisedNested 
+            = (Policy)nested.normalize(builder == null ? null : builder.getPolicyRegistry(),
+                                       true);
         
         Policy p = new Policy();
         ExactlyOne ea = new ExactlyOne();
@@ -112,7 +124,7 @@ public class NestedPrimitiveAssertion extends PrimitiveAssertion {
             All all = new All();
             List<PolicyAssertion> alternative = 
                 CastUtils.cast((List)alternatives.next(), PolicyAssertion.class);
-            NestedPrimitiveAssertion a = new NestedPrimitiveAssertion(getName(), false);
+            NestedPrimitiveAssertion a = new NestedPrimitiveAssertion(getName(), false, builder);
             a.nested = new Policy();
             ExactlyOne nea = new ExactlyOne();
             a.nested.addPolicyComponent(nea);

@@ -22,13 +22,14 @@ import javax.xml.namespace.QName;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public class InitiatorToken extends TokenWrapper {
 
-    public InitiatorToken(SPConstants version) {
-        super(version);
+    public InitiatorToken(SPConstants version, PolicyBuilder b) {
+        super(version, b);
     }
 
     /**

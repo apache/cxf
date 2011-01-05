@@ -104,7 +104,7 @@ public class IssuedTokenBuilder implements AssertionBuilder {
                 issuedToken.setRstTemplate(child);
             } else if (org.apache.neethi.Constants.ELEM_POLICY.equals(ln)) {
                 Policy policy = builder.getPolicy(child);
-                policy = (Policy)policy.normalize(false);
+                policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
                 for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
                     processAlternative((List)iterator.next(), issuedToken);
