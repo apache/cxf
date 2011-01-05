@@ -35,7 +35,7 @@ public class JAXRSJaasSecurityTest extends AbstractSpringSecurityTest {
     @BeforeClass
     public static void startServers() throws Exception {
         String jaasConfig = JAXRSJaasSecurityTest.class
-            .getResource("/org/apache/cxf/systest/jaxrs/security/jaas.cfg").getFile();
+            .getResource("/org/apache/cxf/systest/jaxrs/security/jaas.cfg").toURI().getPath();
         assertTrue("server did not launch correctly", 
                    launchServer(BookServerJaasSecurity.class,
                                 Collections.singletonMap("java.security.auth.login.config", 
