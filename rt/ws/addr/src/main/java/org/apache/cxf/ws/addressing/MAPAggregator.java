@@ -26,7 +26,6 @@ import java.text.MessageFormat;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -38,6 +37,7 @@ import javax.xml.ws.WebFault;
 import org.apache.cxf.Bus;
 import org.apache.cxf.binding.soap.SoapBindingConstants;
 import org.apache.cxf.binding.soap.SoapFault;
+import org.apache.cxf.binding.soap.interceptor.SoapActionInInterceptor;
 import org.apache.cxf.binding.soap.model.SoapOperationInfo;
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
@@ -47,7 +47,6 @@ import org.apache.cxf.endpoint.ClientLifeCycleListener;
 import org.apache.cxf.endpoint.ClientLifeCycleManager;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.feature.AbstractFeature;
-import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.OneWayProcessorInterceptor;
@@ -1154,13 +1153,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
         
         if (maps != null) {
             //WSAB spec, section 4.2 validation (SOAPAction must match action
-            Map<String, List<String>> headers 
-                = CastUtils.cast((Map<?, ?>)message.get(Message.PROTOCOL_HEADERS));
-            List<String> s = headers == null ? null : headers.get(Names.SOAP_ACTION_HEADER);
+            String sa = SoapActionInInterceptor.getSoapAction(message);
             String s1 = this.getActionUri(message, false);
-            if (s == null && headers != null) {
-                s = headers.get(Names.SOAP_ACTION_HEADER.toLowerCase());
-            }
             
             if (maps.getAction() == null || maps.getAction().getValue() == null) {
                 String reason =
@@ -1172,9 +1166,8 @@ public class MAPAggregator extends AbstractPhaseInterceptor<Message> {
                 valid = false;
             }
             
-            if (s != null && s.size() > 0 && valid 
+            if (!StringUtils.isEmpty(sa) && valid 
                 && !MessageUtils.isTrue(message.get(MAPAggregator.ACTION_VERIFIED))) {
-                String sa = s.get(0);
                 if (sa.startsWith("\"")) {
                     sa = sa.substring(1, sa.lastIndexOf('"'));
                 }

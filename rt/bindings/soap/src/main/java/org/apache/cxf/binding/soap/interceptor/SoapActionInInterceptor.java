@@ -46,9 +46,14 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
         addAfter(EndpointSelectionInterceptor.class.getName());
     }
     
-    public void handleMessage(SoapMessage message) throws Fault {
+    public static String getSoapAction(Message m) {
+        if (!(m instanceof SoapMessage)) {
+            return null;
+        }
+        SoapMessage message = (SoapMessage)m;
         if (message.getVersion() instanceof Soap11) {
-            Map<String, List<String>> headers = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
+            Map<String, List<String>> headers 
+                = CastUtils.cast((Map)message.get(Message.PROTOCOL_HEADERS));
             if (headers != null) {
                 List<String> sa = headers.get(SoapBindingConstants.SOAP_ACTION);
                 if (sa != null && sa.size() > 0) {
@@ -56,14 +61,14 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                     if (action.startsWith("\"")) {
                         action = action.substring(1, action.length() - 1);
                     }
-                    getAndSetOperation(message, action);
+                    return action;
                 }
             }
         } else if (message.getVersion() instanceof Soap12) {
             String ct = (String) message.get(Message.CONTENT_TYPE);
             
             if (ct == null) {
-                return;
+                return null;
             }
             
             int start = ct.indexOf("action=");
@@ -79,9 +84,16 @@ public class SoapActionInInterceptor extends AbstractSoapInterceptor {
                         end = ct.length();
                     }
                 }
-                
-                getAndSetOperation(message, ct.substring(start, end));
+                return ct.substring(start, end);
             }
+        }
+        return null;
+    }
+    
+    public void handleMessage(SoapMessage message) throws Fault {
+        String action = getSoapAction(message);
+        if (!StringUtils.isEmpty(action)) {
+            getAndSetOperation(message, action);
         }
     }
 
