@@ -633,10 +633,9 @@ public class UriBuilderImplTest extends Assert {
     }
     
     @Test
-    @SuppressWarnings("all")
     public void testNullQueryParamValues() {
         try {
-            UriBuilder.fromPath("http://localhost:8080").queryParam("hello", null);
+            UriBuilder.fromPath("http://localhost:8080").queryParam("hello", (Object[])null);
             fail("Should be IllegalArgumentException");
         } catch (IllegalArgumentException ex) {
             //expected
