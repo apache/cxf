@@ -56,10 +56,10 @@ public class TransportTokenBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
         
-        TransportToken transportToken = new TransportToken(consts);
+        TransportToken transportToken = new TransportToken(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             transportToken.setToken((Token)(((List)iterator.next()).get(0)));

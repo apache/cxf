@@ -57,10 +57,10 @@ public class ProtectionTokenBuilder implements AssertionBuilder {
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
         
         
-        ProtectionToken protectionToken = new ProtectionToken(consts);
+        ProtectionToken protectionToken = new ProtectionToken(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative((List)iterator.next(), protectionToken);

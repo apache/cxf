@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public abstract class SymmetricAsymmetricBindingBase extends Binding {
@@ -28,8 +29,8 @@ public abstract class SymmetricAsymmetricBindingBase extends Binding {
 
     private boolean entireHeadersAndBodySignatures;
 
-    public SymmetricAsymmetricBindingBase(SPConstants version) {
-        super(version);
+    public SymmetricAsymmetricBindingBase(SPConstants version, PolicyBuilder b) {
+        super(version, b);
     }
 
     /**

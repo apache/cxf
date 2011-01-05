@@ -55,7 +55,7 @@ public class TransportBindingBuilder implements AssertionBuilder {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
-        TransportBinding transportBinding = new TransportBinding(consts);
+        TransportBinding transportBinding = new TransportBinding(consts, builder);
         processAlternative(element, transportBinding, consts);
 
         return transportBinding;

@@ -43,6 +43,7 @@ import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
 import org.apache.cxf.ws.policy.PolicyAssertion;
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.policy.builder.primitive.PrimitiveAssertion;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.cxf.ws.security.policy.SP11Constants;
@@ -158,7 +159,9 @@ public class SecureConversationTokenInterceptorProvider extends AbstractPolicyIn
         
         if (endorse) {
             SupportingToken st = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING,
-                                                     SP12Constants.INSTANCE);
+                                                     SP12Constants.INSTANCE,
+                                                     message.getExchange()
+                                                         .getBus().getExtension(PolicyBuilder.class));
             st.addToken(itok);
             all.addPolicyComponent(st);
         }

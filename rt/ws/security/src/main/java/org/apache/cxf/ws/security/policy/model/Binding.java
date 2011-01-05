@@ -18,20 +18,24 @@
  */
 package org.apache.cxf.ws.security.policy.model;
 
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SPConstants;
 
 public abstract class Binding extends AbstractSecurityAssertion implements AlgorithmWrapper {
-
+    protected PolicyBuilder builder;
+    
     private AlgorithmSuite algorithmSuite;
     private boolean includeTimestamp;
     private Layout layout;
     private SupportingToken signedSupportingToken;
     private SupportingToken signedEndorsingSupportingTokens;
     private boolean tokenProtection;
+    
 
-    public Binding(SPConstants version) {
+    public Binding(SPConstants version, PolicyBuilder b) {
         super(version);
         layout = new Layout(version);
+        builder = b;
     }
 
     /**

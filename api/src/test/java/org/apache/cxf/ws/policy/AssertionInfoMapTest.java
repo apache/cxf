@@ -175,7 +175,8 @@ public class AssertionInfoMapTest extends Assert {
         PolicyAssertion b = new PrimitiveAssertion(
                                 new QName("http://x.y.z", "b"));
         PolicyAssertion c = new NestedPrimitiveAssertion(
-                               new QName("http://x.y.z", "c"), false, nested, true);
+                               new QName("http://x.y.z", "c"), false, nested, true,
+                               null);
         
         All alt1 = new All();
         alt1.addAssertion(a1);

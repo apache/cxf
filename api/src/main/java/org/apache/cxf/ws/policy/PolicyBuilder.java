@@ -30,6 +30,7 @@ import org.xml.sax.SAXException;
 
 import org.apache.neethi.Policy;
 import org.apache.neethi.PolicyReference;
+import org.apache.neethi.PolicyRegistry;
 
 
 /**
@@ -62,4 +63,12 @@ public interface PolicyBuilder {
      */
     Policy getPolicy(InputStream stream)
         throws IOException, ParserConfigurationException, SAXException;
+    
+    
+    /**
+     * Return the PolicyRegistry associated with the builder
+     * @return
+     */
+    PolicyRegistry getPolicyRegistry();
+    
 }

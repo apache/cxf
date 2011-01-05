@@ -77,14 +77,16 @@ public class NestedPrimitiveAssertionTest extends Assert {
     @Test
     public void testNoNeedToAssertWithEmptyPolicy() {
         PolicyAssertion a = new NestedPrimitiveAssertion(
-                                new QName("abc"), false, null, false);
+                                new QName("abc"), false, null, false,
+                                null);
         AssertionInfoMap aim = new AssertionInfoMap(
                                 Collections.singletonList(a));
         assertTrue("No need to assert", a.isAsserted(aim));
         a = new NestedPrimitiveAssertion(new QName("abc"), 
                                          false, 
                                          null, 
-                                         false);
+                                         false,
+                                         null);
         assertTrue("No need to assert", a.isAsserted(aim));
     }
     
@@ -92,7 +94,8 @@ public class NestedPrimitiveAssertionTest extends Assert {
     @Test
     public void testNoNeedToAssertWithNonEmptyPolicy() {
         PolicyAssertion a = new NestedPrimitiveAssertion(
-                                new QName("abc"), false, null, false);
+                                new QName("abc"), false, null, false,
+                                null);
         AssertionInfoMap aim = new AssertionInfoMap(
                                 Collections.singletonList(a));
         assertTrue("No need to assert", a.isAsserted(aim));
@@ -101,7 +104,8 @@ public class NestedPrimitiveAssertionTest extends Assert {
         a = new NestedPrimitiveAssertion(new QName("abc"), 
                                          false, 
                                          p, 
-                                         false);
+                                         false,
+                                         null);
         assertFalse("Primitive Assertions need to be asserted", 
                     a.isAsserted(aim));
         
@@ -109,11 +113,13 @@ public class NestedPrimitiveAssertionTest extends Assert {
         p.addAssertion(new NestedPrimitiveAssertion(new QName("abc"), 
                                          false, 
                                          null, 
-                                         false));
+                                         false,
+                                         null));
         a = new NestedPrimitiveAssertion(new QName("abc"), 
                                          false, 
                                          p, 
-                                         false);
+                                         false,
+                                         null);
         assertTrue("No need to assert", a.isAsserted(aim));
     }
     
@@ -132,7 +138,8 @@ public class NestedPrimitiveAssertionTest extends Assert {
         NestedPrimitiveAssertion na = new NestedPrimitiveAssertion(new QName("nested"), 
                                          false, 
                                          nested,
-                                         true);
+                                         true,
+                                         null);
         List<PolicyAssertion> ais = 
             new ArrayList<PolicyAssertion>();
         
@@ -211,19 +218,22 @@ public class NestedPrimitiveAssertionTest extends Assert {
         int i = 0;
         
         p[i] = new Policy();
-        NestedPrimitiveAssertion a = new NestedPrimitiveAssertion(TEST_NAME1, true);
+        NestedPrimitiveAssertion a = new NestedPrimitiveAssertion(TEST_NAME1, true,
+                                                                  null);
         Policy nested = new Policy();
         a.setPolicy(nested);
         p[i++].addPolicyComponent(a);
         
         p[i] = new Policy();
-        a = new NestedPrimitiveAssertion(TEST_NAME1, false);
+        a = new NestedPrimitiveAssertion(TEST_NAME1, false,
+                                         null);
         nested = new Policy();
         a.setPolicy(nested);
         p[i++].addPolicyComponent(a);
         
         p[i] = new Policy();
-        a = new NestedPrimitiveAssertion(TEST_NAME1, false);
+        a = new NestedPrimitiveAssertion(TEST_NAME1, false,
+                                         null);
         nested = new Policy();
         a.setPolicy(nested);
         nested.addPolicyComponent(new PrimitiveAssertion(TEST_NAME2, true));
@@ -231,7 +241,8 @@ public class NestedPrimitiveAssertionTest extends Assert {
         p[i++].addPolicyComponent(a);
         
         p[i] = new Policy();
-        a = new NestedPrimitiveAssertion(TEST_NAME1, false);
+        a = new NestedPrimitiveAssertion(TEST_NAME1, false,
+                                         null);
         nested = new Policy();
         a.setPolicy(nested);
         ExactlyOne eo = new ExactlyOne();
@@ -241,7 +252,8 @@ public class NestedPrimitiveAssertionTest extends Assert {
         p[i++].addPolicyComponent(a);
         
         p[i] = new Policy();
-        a = new NestedPrimitiveAssertion(TEST_NAME1, false);
+        a = new NestedPrimitiveAssertion(TEST_NAME1, false,
+                                         null);
         nested = new Policy();
         a.setPolicy(nested);
         nested.addPolicyComponent(new PrimitiveAssertion(TEST_NAME3));  

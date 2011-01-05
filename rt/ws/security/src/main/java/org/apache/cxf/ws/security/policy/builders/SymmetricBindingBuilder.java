@@ -59,10 +59,10 @@ public class SymmetricBindingBuilder implements AssertionBuilder {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
-        SymmetricBinding symmetricBinding = new SymmetricBinding(consts);
+        SymmetricBinding symmetricBinding = new SymmetricBinding(consts, builder);
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternatives((List)iterator.next(), symmetricBinding, consts);

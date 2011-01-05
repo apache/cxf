@@ -58,11 +58,11 @@ public class InitiatorTokenBuilder implements AssertionBuilder {
         SPConstants consts = SP11Constants.SP_NS.equals(element.getNamespaceURI())
             ? SP11Constants.INSTANCE : SP12Constants.INSTANCE;
 
-        InitiatorToken initiatorToken = new InitiatorToken(consts);
+        InitiatorToken initiatorToken = new InitiatorToken(consts, builder);
         initiatorToken.setOptional(PolicyConstants.isOptional(element));
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative((List)iterator.next(), initiatorToken);

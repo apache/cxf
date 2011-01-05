@@ -35,6 +35,7 @@ import org.apache.cxf.phase.Phase;
 import org.apache.cxf.phase.PhaseInterceptor;
 import org.apache.cxf.ws.policy.AssertionInfo;
 import org.apache.cxf.ws.policy.AssertionInfoMap;
+import org.apache.cxf.ws.policy.PolicyBuilder;
 import org.apache.cxf.ws.security.policy.SP12Constants;
 import org.apache.cxf.ws.security.policy.model.AsymmetricBinding;
 import org.apache.cxf.ws.security.policy.model.Binding;
@@ -114,7 +115,9 @@ public class PolicyBasedWSS4JOutInterceptor extends AbstractPhaseInterceptor<Soa
                     }                    
                 }
                 if (transport == null && isRequestor(message)) {
-                    transport = new TransportBinding(SP12Constants.INSTANCE);
+                    transport = new TransportBinding(SP12Constants.INSTANCE,
+                                                     message.getExchange().getBus()
+                                                         .getExtension(PolicyBuilder.class));
                 }
                 
                 if (transport != null) {

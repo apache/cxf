@@ -67,20 +67,24 @@ public class SupportingTokensBuilder implements AssertionBuilder {
 
         if (SP11Constants.SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_SUPPORTING,
-                                                  SP11Constants.INSTANCE);
+                                                  SP11Constants.INSTANCE,
+                                                  builder);
         } else if (SP11Constants.SIGNED_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_SIGNED, 
-                                                  SP11Constants.INSTANCE);
+                                                  SP11Constants.INSTANCE,
+                                                  builder);
         } else if (SP11Constants.ENDORSING_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_ENDORSING, 
-                                                  SP11Constants.INSTANCE);
+                                                  SP11Constants.INSTANCE,
+                                                  builder);
         } else if (SP11Constants.SIGNED_ENDORSING_SUPPORTING_TOKENS.equals(name)) {
             supportingToken = new SupportingToken(SupportTokenType.SUPPORTING_TOKEN_SIGNED_ENDORSING,
-                                                  SP11Constants.INSTANCE);
+                                                  SP11Constants.INSTANCE,
+                                                  builder);
         }
 
         Policy policy = builder.getPolicy(DOMUtils.getFirstElement(element));
-        policy = (Policy)policy.normalize(false);
+        policy = (Policy)policy.normalize(builder.getPolicyRegistry(), false);
 
         for (Iterator iterator = policy.getAlternatives(); iterator.hasNext();) {
             processAlternative((List)iterator.next(), supportingToken);
