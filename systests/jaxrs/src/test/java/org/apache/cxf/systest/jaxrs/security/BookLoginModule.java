@@ -18,6 +18,7 @@
  */
 package org.apache.cxf.systest.jaxrs.security;
 
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +36,13 @@ public class BookLoginModule implements LoginModule {
     
     public BookLoginModule() {
         module = new PropertyFileLoginModule();
-        fileResource = getClass()
-            .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties").getFile();
+        try {
+            fileResource = getClass()
+                .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties")
+                .toURI().getPath();
+        } catch (URISyntaxException ex) {
+            throw new RuntimeException(ex);
+        }
     }
     
     public boolean abort() throws LoginException {
