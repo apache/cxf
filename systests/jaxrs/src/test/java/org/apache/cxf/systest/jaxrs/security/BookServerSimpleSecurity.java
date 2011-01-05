@@ -38,7 +38,7 @@ public class BookServerSimpleSecurity extends AbstractSpringServer {
         URL resource = getClass()
             .getResource("/org/apache/cxf/systest/jaxrs/security/jetty-realm.properties");
         LoginService realm = 
-            new HashLoginService("BookStoreRealm", resource.toString());
+            new HashLoginService("BookStoreRealm", resource.toURI().getPath());
         server.addBean(realm);
     }
     
