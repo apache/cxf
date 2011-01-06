@@ -19,8 +19,6 @@
 
 package demo.hw.server;
 
-import javax.xml.ws.Endpoint;
-
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 
 public class Server {
