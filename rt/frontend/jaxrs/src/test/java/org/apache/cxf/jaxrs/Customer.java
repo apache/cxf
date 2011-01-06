@@ -307,7 +307,9 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
         // complete
     }
     
-    public void testCustomerParam(@QueryParam("p1") Customer c, @QueryParam("p2") Customer[] c2) {
+    public void testCustomerParam(@QueryParam("p1") Customer c, 
+                                  @QueryParam("p2") Customer[] c2,
+                                  @QueryParam("p3") Customer2 c3) {
         // complete
     }
     

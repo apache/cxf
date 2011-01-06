@@ -47,6 +47,7 @@ import javax.xml.bind.JAXBContext;
 
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.jaxrs.Customer;
+import org.apache.cxf.jaxrs.Customer2;
 import org.apache.cxf.jaxrs.CustomerGender;
 import org.apache.cxf.jaxrs.CustomerParameterHandler;
 import org.apache.cxf.jaxrs.JAXBContextProvider;
@@ -644,19 +645,48 @@ public class JAXRSUtilsTest extends Assert {
         Message messageImpl = createMessage();
         ProviderFactory.getInstance(messageImpl).registerUserProvider(
             new CustomerParameterHandler());
-        Class[] argType = {Customer.class, Customer[].class};
+        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
         Method m = Customer.class.getMethod("testCustomerParam", argType);
         
-        messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry");
+        messageImpl.put(Message.QUERY_STRING, "p1=Fred&p2=Barry&p3=Jack&p4=John");
         List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
                                                            null, 
                                                            messageImpl);
-        assertEquals(2, params.size());
+        assertEquals(3, params.size());
         Customer c = (Customer)params.get(0);
         assertEquals("Fred", c.getName());
         Customer c2 = ((Customer[])params.get(1))[0];
         assertEquals("Barry", c2.getName());
+        Customer2 c3 = (Customer2)params.get(2);
+        assertEquals("Jack", c3.getName());
+        
+        try {
+            messageImpl.put(Message.QUERY_STRING, "p3=noName");
+            JAXRSUtils.processParameters(new OperationResourceInfo(m, null), null, messageImpl);
+            fail("Customer2 constructor does not accept names starting with lower-case chars");
+        } catch (Exception ex) {
+            // expected
+        }
+        
     }
+    
+    @Test
+    public void testConstructorFirstAndParameterHandler() throws Exception {
+        Message messageImpl = createMessage();
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new CustomerParameterHandler());
+        Class[] argType = {Customer.class, Customer[].class, Customer2.class};
+        Method m = Customer.class.getMethod("testCustomerParam", argType);
+        
+        messageImpl.put(Message.QUERY_STRING, "p3=jack");
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null),
+                                                           null, 
+                                                           messageImpl);
+        assertEquals(3, params.size());
+        Customer2 c3 = (Customer2)params.get(2);
+        assertEquals("jack", c3.getName());
+    }
+    
     
     @Test
     public void testArrayParamNoProvider() throws Exception {

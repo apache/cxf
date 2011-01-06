@@ -318,7 +318,11 @@ public final class InjectionUtils {
             // try valueOf
         } catch (WebApplicationException ex) {
             throw ex;
-        } catch (Exception ex) { 
+        } catch (Exception ex) {
+            Object result = createFromParameterHandler(value, pClass, message);
+            if (result != null) {
+                return result;
+            }
             LOG.severe(new org.apache.cxf.common.i18n.Message("CLASS_CONSTRUCTOR_FAILURE", 
                                                                BUNDLE, 
                                                                pClass.getName()).toString());
@@ -337,22 +341,31 @@ public final class InjectionUtils {
             }
         }
         
-        if (result == null && message != null) {
+        if (result == null) {
+            result = createFromParameterHandler(value, pClass, message);
+        }
+        
+        if (result == null) {
+            reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
+        }
+        
+        return result;
+    }
+
+    private static Object createFromParameterHandler(String value, 
+                                                     Class<?> pClass,
+                                                     Message message) {
+        Object result = null;
+        if (message != null) {
             ParameterHandler<?> pm = ProviderFactory.getInstance(message)
                 .createParameterHandler(pClass);
             if (pm != null) {
                 result = pm.fromString(value);
             }
         }
-        
-        if (result != null) {
-            return result;
-        }
-        
-        reportServerError("WRONG_PARAMETER_TYPE", pClass.getName());
-        return null;
+        return result;
     }
-
+    
     public static void reportServerError(String messageName, String parameter) {
         org.apache.cxf.common.i18n.Message errorMessage = 
             new org.apache.cxf.common.i18n.Message(messageName, 

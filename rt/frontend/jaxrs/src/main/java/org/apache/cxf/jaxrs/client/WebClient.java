@@ -180,8 +180,7 @@ public class WebClient extends AbstractClient {
     /**
      * Creates WebClient, baseURI will be set to Client currentURI
      * @param client existing client
-     * @param inheritHeaders  if existing Client headers can be inherited by new proxy 
-     *        and subresource proxies if any 
+     * @param inheritHeaders  if existing Client headers can be inherited by new client 
      */
     public static WebClient fromClient(Client client, boolean inheritHeaders) {
         
