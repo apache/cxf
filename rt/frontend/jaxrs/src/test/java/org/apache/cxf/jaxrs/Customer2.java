@@ -16,20 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.cxf.jaxrs;
 
-import org.apache.cxf.jaxrs.ext.ParameterHandler;
-
-public class CustomerParameterHandler implements ParameterHandler<Customer> {
-
-    public Customer fromString(String s) {
-        if ("noName".equals(s)) {
+public class Customer2 extends Customer {
+    
+    public Customer2() {
+        
+    }
+    
+    public Customer2(String name) {
+        if (Character.isLowerCase(((CharSequence)name).charAt(0))) {
             throw new IllegalArgumentException();
         }
-        Customer c = Character.isLowerCase(((CharSequence)s).charAt(0)) ? new Customer2() : new Customer();
-        c.setName(s);
-        return c;
+        //CHECKSTYLE:OFF    
+        setName(name);
+        //CHECKSTYLE:ON
     }
-
 }
