@@ -321,7 +321,7 @@ public final class WrapperClassGenerator extends ASMHelper {
 
 
         List<Annotation> jaxbAnnos = getJaxbAnnos(mpi);
-        if (!addJAXBAnnotations(fv, jaxbAnnos)) {
+        if (!addJAXBAnnotations(fv, jaxbAnnos, name)) {
             AnnotationVisitor av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
             av0.visit("name", name);
             if (factory.isWrapperPartQualified(mpi)) {
@@ -363,7 +363,9 @@ public final class WrapperClassGenerator extends ASMHelper {
 
     }
      
-    private boolean addJAXBAnnotations(FieldVisitor fv, List<Annotation> jaxbAnnos) {
+    private boolean addJAXBAnnotations(FieldVisitor fv,
+                                       List<Annotation> jaxbAnnos,
+                                       String name) {
         AnnotationVisitor av0;
         boolean addedEl = false;
         for (Annotation ann : jaxbAnnos) {
@@ -391,7 +393,11 @@ public final class WrapperClassGenerator extends ASMHelper {
                 addedEl = true;   
                 XmlElement el = (XmlElement)ann;
                 av0 = fv.visitAnnotation("Ljavax/xml/bind/annotation/XmlElement;", true);
-                av0.visit("name", el.name());
+                if ("##default".equals(el.name())) {
+                    av0.visit("name", name);
+                } else {
+                    av0.visit("name", el.name());
+                }
                 av0.visit("nillable", el.nillable());
                 av0.visit("required", el.required());
                 av0.visit("namespace", el.namespace());
