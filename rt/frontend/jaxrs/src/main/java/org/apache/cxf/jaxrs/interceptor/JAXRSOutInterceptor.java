@@ -202,22 +202,21 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             invoked = ori == null ? null : ori.getAnnotatedMethod() == null
                 ? ori.getMethodToInvoke() : ori.getAnnotatedMethod();
         }
+        
         Class<?> targetType = getRawResponseClass(responseObj);
-        Type genericType = 
-            getGenericResponseType(ori == null ? null : invoked, responseObj);
+        Type genericType = getGenericResponseType(ori == null ? null : invoked, responseObj, targetType);
         if (genericType instanceof TypeVariable) {
             genericType = InjectionUtils.getSuperType(ori.getClassResourceInfo().getServiceClass(), 
                                                        (TypeVariable)genericType);
         }
         
+        Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
+        
         MessageBodyWriter writer = null;
         MediaType responseType = null;
         for (MediaType type : availableContentTypes) { 
             writer = ProviderFactory.getInstance(message)
-                .createMessageBodyWriter(targetType, genericType, 
-                      invoked != null ? invoked.getAnnotations() : new Annotation[]{}, 
-                      type,
-                      message);
+                .createMessageBodyWriter(targetType, genericType, annotations, type, message);
             
             if (writer != null) {
                 responseType = type;
@@ -238,8 +237,6 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             responseType = checkFinalContentType(responseType);
             LOG.fine("Response content type is: " + responseType.toString());
             message.put(Message.CONTENT_TYPE, responseType.toString());
-            
-            Annotation[] annotations = invoked != null ? invoked.getAnnotations() : new Annotation[]{};
             
             long size = writer.getSize(entity, targetType, genericType, annotations, responseType);
             if (size > 0) {
@@ -409,11 +406,17 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         }
     }
     
-    private Type getGenericResponseType(Method invoked, Object targetObject) {
+    private Type getGenericResponseType(Method invoked, Object targetObject, Class<?> targetType) {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             return ((GenericEntity)targetObject).getType();
+        } else if (invoked == null || !invoked.getReturnType().isAssignableFrom(targetType)) {
+            // when a method has been invoked it is still possible that either an ExceptionMapper
+            // or a ResponseHandler filter overrides a response entity; if it happens then 
+            // the Type is the class of the response object, unless this new entity is assignable
+            // to invoked.getReturnType(); same applies to the case when a method returns Response
+            return targetObject.getClass(); 
         } else {
-            return invoked == null ? targetObject.getClass() : invoked.getGenericReturnType();
+            return invoked.getGenericReturnType();
         }
     }
     
