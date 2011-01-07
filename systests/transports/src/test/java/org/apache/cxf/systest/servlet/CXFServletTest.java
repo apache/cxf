@@ -39,6 +39,7 @@ import org.apache.cxf.BusException;
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.helpers.DOMUtils;
 import org.apache.cxf.testsupport.AbstractServletTest;
+import org.apache.hello_world_soap_http.BaseGreeterImpl;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -96,7 +97,7 @@ public class CXFServletTest extends AbstractServletTest {
         
         
         WebLink[] links = res.getLinks();
-        assertEquals("There should get two links for the service", 2, links.length);
+        assertEquals("There should get two links for the service", 3, links.length);
         
         Set<String> links2 = new HashSet<String>();
         for (WebLink l : links) {
@@ -116,7 +117,7 @@ public class CXFServletTest extends AbstractServletTest {
             links2.add(l.getURLString());
         }
         
-        assertEquals("There should get two links for the service", 2, links.length);
+        assertEquals("There should get two links for the service", 3, links.length);
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter?wsdl"));       
         assertTrue(links2.contains(CONTEXT_URL + "/services/greeter2?wsdl")); 
         
@@ -142,6 +143,33 @@ public class CXFServletTest extends AbstractServletTest {
         
         assertValid("//wsdl:operation[@name='greetMe']", doc);
         assertValid("//wsdlsoap:address[@location='" + CONTEXT_URL + "/services/greeter']", doc);
+    }
+    @Test
+    public void testGetWSDLWithIncludes() throws Exception {
+        ServletUnitClient client = newClient();
+        client.setExceptionsThrownOnErrorStatus(true);
+        
+        WebRequest req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter3?wsdl");
+        
+        WebResponse res = client.getResponse(req); 
+        assertEquals(200, res.getResponseCode());
+        assertEquals("text/xml", res.getContentType());
+        Document doc = DOMUtils.readXml(res.getInputStream());
+        assertNotNull(doc);
+        
+        assertXPathEquals("//xsd:include/@schemaLocation",
+                          "http://localhost/mycontext/services/greeter3?xsd=hello_world_includes2.xsd",
+                          doc.getDocumentElement());
+        
+        req = new GetMethodQueryWebRequest(CONTEXT_URL + "/services/greeter3?xsd=hello_world_includes2.xsd");
+        
+        res = client.getResponse(req); 
+        assertEquals(200, res.getResponseCode());
+        assertEquals("text/xml", res.getContentType());
+        doc = DOMUtils.readXml(res.getInputStream());
+        assertNotNull(doc);
+
+        assertValid("//xsd:complexType[@name='ErrorCode']", doc);
     }
     
     @Test
@@ -216,5 +244,13 @@ public class CXFServletTest extends AbstractServletTest {
         public String hello(String name) {
             return "Hello " + name;
         }
+    }
+    @WebService(serviceName = "SOAPService",
+                portName = "SoapPort",
+                endpointInterface = "org.apache.hello_world_soap_http.Greeter",
+                targetNamespace = "http://apache.org/hello_world_soap_http")
+    public static class NoWsdlGreeter extends BaseGreeterImpl {
+
+
     }
 }

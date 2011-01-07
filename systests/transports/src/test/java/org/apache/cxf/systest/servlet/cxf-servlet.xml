@@ -34,7 +34,15 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
     id="greeter2" 
     address="/greeter2"
   	implementor="org.apache.hello_world_xml_http.wrapped.GreeterImpl"
-  	wsdlLocation="/org/apache/cxf/systest/servlet/hello_world_xml_wrapped.wsdl"      />
+  	wsdlLocation="/org/apache/cxf/systest/servlet/hello_world_xml_wrapped.wsdl" />
   
-
+  <jaxws:endpoint 
+    id="greeter3" 
+    address="/greeter3"
+    implementor="org.apache.cxf.systest.servlet.CXFServletTest$NoWsdlGreeter">
+    <jaxws:schemaLocations >
+        <jaxws:schemaLocation>/org/apache/cxf/systest/servlet/hello_world_includes.xsd</jaxws:schemaLocation>
+    </jaxws:schemaLocations>
+  </jaxws:endpoint>
+  
 </beans>

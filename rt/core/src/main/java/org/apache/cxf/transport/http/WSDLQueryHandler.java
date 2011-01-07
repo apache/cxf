@@ -253,7 +253,6 @@ public class WSDLQueryHandler implements StemMatchingQueryHandler {
                            EndpointInfo ei) {        
         List<Element> elementList = null;
         
-        
         try {
             elementList = DOMUtils.findAllElementsByTagNameNS(doc.getDocumentElement(),
                                                                            "http://www.w3.org/2001/XMLSchema",
