@@ -19,9 +19,11 @@
 
 package org.apache.cxf.transport.servlet;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -80,20 +82,34 @@ public class ServletContextResourceResolver implements ResourceResolver {
             }
             try {
                 URL url = servletContext.getResource(entryName);
+                if (url != null
+                    && "file".equals(url.getProtocol())
+                    && !(new File(url.toURI()).exists())) {
+                    url = null;
+                }
                 if (url != null) {
                     urlMap.put(url.toString(), url);
                     return clz.cast(url);
                 }
             } catch (MalformedURLException e) {
                 //fallthrough
+            } catch (URISyntaxException e) {
+                //ignore
             }
             try {
                 URL url = servletContext.getResource("/" + entryName);
+                if (url != null
+                    && "file".equals(url.getProtocol())
+                    && !(new File(url.toURI()).exists())) {
+                    url = null;
+                }
                 if (url != null) {
                     urlMap.put(url.toString(), url);
                     return clz.cast(url);
                 }
             } catch (MalformedURLException e1) {
+                //ignore
+            } catch (URISyntaxException e) {
                 //ignore
             }
         } else if (clz.isAssignableFrom(InputStream.class)) {
