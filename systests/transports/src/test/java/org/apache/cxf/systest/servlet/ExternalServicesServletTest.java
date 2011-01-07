@@ -60,7 +60,7 @@ public class ExternalServicesServletTest extends AbstractServletTest {
         //test the '/' context get service list
         WebResponse  res = client.getResponse(CONTEXT_URL + "/");
         WebLink[] links = res.getLinks();
-        assertEquals("There should get two links for the services", 2, links.length);
+        assertEquals("There should get two links for the services", 3, links.length);
         
         Set<String> links2 = new HashSet<String>();
         for (WebLink l : links) {

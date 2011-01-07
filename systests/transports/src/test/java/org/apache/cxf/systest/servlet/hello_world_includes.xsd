@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+ 
+  http://www.apache.org/licenses/LICENSE-2.0
+ 
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+-->
+<schema targetNamespace="http://apache.org/hello_world_soap_http/types" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:x1="http://apache.org/hello_world_soap_http/types" elementFormDefault="qualified">
+    <include schemaLocation="hello_world_includes2.xsd"/>
+    <element name="sayHi">
+        <annotation>
+            <documentation>Hello sayHi users!</documentation>
+        </annotation>
+        <complexType/>
+    </element>
+    <element name="sayHiResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMe">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="testNillable">
+        <complexType>
+            <sequence>
+                <element name="NillElem" nillable="true" type="string"/>
+                <element name="intElem" type="int"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testNillableResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" nillable="true" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+
+    <element name="greetMeLater">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="long"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeLaterResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeSometime">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeSometimeResponse">
+        <complexType>
+            <sequence>
+                <element name="responseType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="greetMeOneWay">
+        <complexType>
+            <sequence>
+                <element name="requestType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testDocLitFault">
+        <complexType>
+            <sequence>
+                <element name="faultType" type="string"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="testDocLitFaultResponse">
+        <complexType>
+            <sequence/>
+        </complexType>
+    </element>
+    <element name="NoSuchCodeLit">
+        <complexType>
+            <sequence>
+                <element name="code" type="x1:ErrorCode"/>
+            </sequence>
+        </complexType>
+    </element>
+    <element name="BadRecordLit" type="string"/>
+    <complexType name="BadRecord">
+        <sequence>
+            <element name="reason" type="string"/>
+            <element name="code" type="short"/>
+        </sequence>
+    </complexType>
+    <complexType name="addNumbers">
+        <sequence>
+            <element name="arg0" type="int"/>
+            <element name="arg1" type="int"/>
+        </sequence>
+    </complexType>
+    <element name="addNumbers" type="x1:addNumbers"/>
+    <complexType name="addNumbersResponse">
+        <sequence>
+            <element name="return" type="int"/>
+        </sequence>
+    </complexType>
+    <element name="addNumbersResponse" type="x1:addNumbersResponse"/>
+    <element name="BareDocument" type="string"/>
+    <element name="BareDocumentResponse">
+        <complexType>
+            <sequence>
+                <element name="company" type="string"/>
+            </sequence>
+            <attribute name="id" type="int"/>
+        </complexType>
+    </element>      
+</schema>
+
