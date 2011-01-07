@@ -4,8 +4,10 @@
   targetNamespace="http://service.jaxws.cxf.apache.org/fooStuff">
   <xs:complexType name="foo">
     <xs:annotation>
+        <xs:documentation>
       bibbity bob
       <!-- foo bar -->
+        </xs:documentation>
     </xs:annotation>
     <xs:sequence>
     </xs:sequence>

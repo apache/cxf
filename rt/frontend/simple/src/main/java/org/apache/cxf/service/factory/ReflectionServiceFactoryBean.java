@@ -1198,7 +1198,9 @@ public class ReflectionServiceFactoryBean extends AbstractServiceFactoryBean {
             if (this.schemaLocationMapping.get(ns) != null) {
                 is.setSchemaLocation(this.schemaLocationMapping.get(ns));
             }
-            schema.getItems().add(is);
+            if (!schema.getItems().contains(is)) {
+                schema.getItems().add(is);
+            }
         }
     }
 
