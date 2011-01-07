@@ -259,7 +259,7 @@ public class JAXRSClientServerResourceCreatedSpringProviderTest extends Abstract
         assertNotNull(in);           
 
         assertEquals("Exception is not mapped correctly", 
-                     "Nonexistent method",
+                     "StringTextWriter - Nonexistent method",
                      getStringFromInputStream(in).trim());
     }
     
