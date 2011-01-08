@@ -23,9 +23,9 @@ import java.io.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.XMLEvent;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 
@@ -281,19 +281,32 @@ public class StaxUtilsTest extends Assert {
     
     @Test
     public void testDefaultPrefix() throws Exception {
-        try {
-            String soapMessage = "./resources/AddRequest.xml";     
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream(soapMessage));
-            XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
-            StaxSource staxSource = new StaxSource(reader);
-            StaxUtils.copy(staxSource, writer);
-            writer.flush();
-            baos.flush();
-        } catch (XMLStreamException e) {
-            fail("shouldn't catch this exception");
-        }
-           
-        
+        String soapMessage = "./resources/AddRequest.xml";     
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        XMLStreamReader reader = StaxUtils.createXMLStreamReader(getTestStream(soapMessage));
+        XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(baos);
+        StaxSource staxSource = new StaxSource(reader);
+        StaxUtils.copy(staxSource, writer);
+        writer.flush();
+        baos.flush();
     }
+       
+    @Test
+    public void testCXF3193() throws Exception {
+        String testString = "<a:elem1 xmlns:a=\"test\" xmlns:b=\"test\" a:attr1=\"value\"/>";
+        CachingXmlEventWriter writer = new CachingXmlEventWriter();
+        StaxUtils.copy(StaxUtils.createXMLStreamReader(new StringReader(testString)),
+                       writer);
+        StringWriter swriter = new StringWriter();
+        XMLStreamWriter xwriter = StaxUtils.createXMLStreamWriter(swriter);
+        for (XMLEvent event : writer.getEvents()) {
+            StaxUtils.writeEvent(event, xwriter);
+        }
+        xwriter.flush();
+        
+        String s = swriter.toString();
+        int idx = s.indexOf("xmlns:a");
+        idx = s.indexOf("xmlns:a", idx + 1);
+        assertEquals(-1, idx);        
+    }        
 }

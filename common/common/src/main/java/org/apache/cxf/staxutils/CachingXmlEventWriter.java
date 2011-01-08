@@ -233,35 +233,44 @@ public class CachingXmlEventWriter implements XMLStreamWriter {
             parent = p;
         }
         public void addNs(String pfx, String ns) {
-            map.put(ns, pfx);
+            map.put(pfx, ns);
         }
         
         public String getNamespaceURI(String prefix) {
-            for (Map.Entry<String, String> e : map.entrySet()) {
-                if (e.getValue().equals(prefix)) {
-                    return e.getKey();
-                }
-            }
-            if (parent != null) {
-                return parent.getNamespaceURI(prefix);
-            }
-            return null;
-        }
-
-        public String getPrefix(String namespaceURI) {
-            String ret = map.get(namespaceURI);
+            String ret = map.get(prefix);
             if (ret == null && parent != null) {
-                return parent.getPrefix(namespaceURI);
+                return parent.getNamespaceURI(prefix);
             }
             return ret;
         }
 
-        public Iterator getPrefixes(String namespaceURI) {
-            String pfx = getPrefix(namespaceURI);
-            if (pfx == null) {
-                return Collections.emptyList().iterator();
+        public String getPrefix(String namespaceURI) {
+            for (Map.Entry<String, String> e : map.entrySet()) {
+                if (e.getValue().equals(namespaceURI)) {
+                    return e.getKey();
+                }
             }
-            return Collections.singleton(pfx).iterator();
+            if (parent != null) {
+                return parent.getPrefix(namespaceURI);
+            }
+            return null;
+        }
+
+        public Iterator getPrefixes(String namespaceURI) {
+            List<String> l = new ArrayList<String>();
+            for (Map.Entry<String, String> e : map.entrySet()) {
+                if (e.getValue().equals(namespaceURI)) {
+                    l.add(e.getKey());
+                }
+            }
+            if (l.isEmpty()) {
+                String pfx = getPrefix(namespaceURI);
+                if (pfx == null) {
+                    return Collections.emptyList().iterator();
+                }
+                return Collections.singleton(pfx).iterator();
+            }
+            return l.iterator();
         }
         
     }
