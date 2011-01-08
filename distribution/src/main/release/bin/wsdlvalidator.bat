@@ -29,13 +29,13 @@ if not defined CXF_HOME goto set_cxf_home
 :cont
 if not defined JAVA_HOME goto no_java_home
 
-set SUN_TOOL_PATH=%JAVA_HOME%\lib\tools.jar;
+set TOOLS_JAR=%JAVA_HOME%\lib\tools.jar;
 
 if not exist "%CXF_HOME%\lib\cxf-manifest.jar" goto no_cxf_jar
 
 set CXF_JAR=%CXF_HOME%\lib\cxf-manifest.jar
 
-"%JAVA_HOME%\bin\java" -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%SUN_TOOL_PATH%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.validator.WSDLValidator %*
+"%JAVA_HOME%\bin\java" -Djava.endorsed.dirs="%CXF_HOME%\lib\endorsed" -cp "%CXF_JAR%;%TOOLS_JAR%;%CLASSPATH%" -Djava.util.logging.config.file="%CXF_HOME%\etc\logging.properties" org.apache.cxf.tools.validator.WSDLValidator %*
 
 @endlocal
 
@@ -46,7 +46,7 @@ echo ERROR: Unable to find cxf.jar in %cxf_home/lib
 goto end
 
 :no_java_home
-echo ERROR: Set JAVA_HOME to the path where the J2SE 5.0 (JDK5.0) is installed
+echo ERROR: Set JAVA_HOME to the path where the JDK (5.0 or higher) is installed
 goto end 
 
 :set_cxf_home
