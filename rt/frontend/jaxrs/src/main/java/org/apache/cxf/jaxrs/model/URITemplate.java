@@ -61,7 +61,8 @@ public final class URITemplate {
             UriChunk chunk = UriChunk.createUriChunk(templatePart);
             uriChunks.add(chunk);
             if (chunk instanceof Literal) {
-                String substr = escapeCharacters(chunk.getValue());
+                String encodedValue = HttpUtils.encodePartiallyEncoded(chunk.getValue(), false);
+                String substr = escapeCharacters(encodedValue);
                 literalChars.append(substr);
                 patternBuilder.append(substr);
             } else if (chunk instanceof Variable) {

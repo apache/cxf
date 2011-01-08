@@ -212,7 +212,7 @@ public final class ResourceUtils {
             Method annotatedMethod = AnnotationUtils.getAnnotatedMethod(m);
             
             String httpMethod = AnnotationUtils.getHttpMethodValue(annotatedMethod);
-            Path path = (Path)AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
+            Path path = AnnotationUtils.getMethodAnnotation(annotatedMethod, Path.class);
             
             if (httpMethod != null || path != null) {
                 md.bind(createOperationInfo(m, annotatedMethod, cri, path, httpMethod), m);

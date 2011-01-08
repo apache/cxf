@@ -389,6 +389,13 @@ public class BookStore {
     }
     
     @GET
+    @Path("/the books/{bookId}/")
+    @Produces("application/xml")
+    public Book getBookWithSpace(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return doGetBook(id);
+    }
+    
+    @GET
     @Path("/books/search")
     @Produces("application/xml")
     public Book getBook(@Context SearchContext searchContext) 

@@ -250,7 +250,26 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/acdb", values));
 
     }
+    
+    @Test
+    public void testEscapingWildCard() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/books/a*");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
+        assertTrue(uriTemplate.match("/books/a*", values));
+        assertFalse(uriTemplate.match("/books/a", values));
+        assertFalse(uriTemplate.match("/books/ac", values));
+    }
+
+    @Test
+    public void testEncodedSpace() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/1 2/%203");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/1%202/%203", values));
+        assertFalse(uriTemplate.match("/1 2/%203", values));
+    }
+    
     @Test
     public void testBasicCustomExpression4() throws Exception {
         URITemplate uriTemplate = new URITemplate("/books/{bookId:...\\.}");
@@ -559,9 +578,10 @@ public class URITemplateTest extends Assert {
         assertFalse(tok.hasNext());
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
     public void testUnclosedVariable() {
-        new URITemplate("/foo/{var/bar");
+        URITemplate ut = new URITemplate("/foo/{var/bar");
+        assertEquals("/foo/{var/bar", ut.getValue());
     }
 
     @Test
