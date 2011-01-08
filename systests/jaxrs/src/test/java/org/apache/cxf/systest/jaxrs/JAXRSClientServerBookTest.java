@@ -89,6 +89,20 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testBookWithSpace() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/").path("the books/123");
+        Book book = client.get(Book.class);
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
+    public void testBookWithSpaceProxy() throws Exception {
+        BookStore store = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
+        Book book = store.getBookWithSpace("123");
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
     public void testTempRedirectWebClient() throws Exception {
         WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/tempredirect");
         Response r = client.type("*/*").get();
