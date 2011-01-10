@@ -362,7 +362,7 @@ public class Headers {
     protected void copyToResponse(HttpServletResponse response) {
         String contentType = getContentTypeFromMessage();
  
-        if (!headers.containsKey(Message.CONTENT_TYPE)) {
+        if (!headers.containsKey(Message.CONTENT_TYPE) && contentType != null) {
             response.setContentType(contentType);
         }
 
