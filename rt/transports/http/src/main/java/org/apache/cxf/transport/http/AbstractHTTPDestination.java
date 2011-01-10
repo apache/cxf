@@ -249,7 +249,7 @@ public abstract class AbstractHTTPDestination
         Map<?, ?> headers = (Map<?, ?>)message.get(Message.PROTOCOL_HEADERS);
         if (null != headers) {
             
-            if (!headers.containsKey(Message.CONTENT_TYPE)) {
+            if (!headers.containsKey(Message.CONTENT_TYPE) && ct != null) {
                 response.setContentType(ct);
             }
             
