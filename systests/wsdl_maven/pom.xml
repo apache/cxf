@@ -22,7 +22,7 @@
     <artifactId>cxf-wsdl-maven</artifactId>
     <packaging>pom</packaging>
     <version>2.4.0-SNAPSHOT</version>
-    <name>Apache CXF System Tests for WSDL generation and retrieval</name>
+    <name>Apache CXF System Tests for Maven Plugins</name>
     <url>http://cxf.apache.org</url>
 
     <parent>

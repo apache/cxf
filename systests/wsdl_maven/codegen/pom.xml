@@ -21,7 +21,7 @@
     <groupId>org.apache.cxf.systests.wsdl_maven</groupId>
     <artifactId>cxf-systests-codegen</artifactId>
     <version>2.4.0-SNAPSHOT</version>
-    <name>Test for reading wsdl from repo and generating code from it</name>
+    <name>Test for generating code from wsdl in repo</name>
     <parent>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-parent</artifactId>
