@@ -20,10 +20,16 @@ package org.apache.cxf.jaxws;
 
 import java.util.Collection;
 
+import javax.jws.WebService;
 import javax.wsdl.Definition;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Endpoint;
+
+import org.w3c.dom.Document;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.annotations.WSDLDocumentation;
+import org.apache.cxf.annotations.WSDLDocumentationCollection;
 import org.apache.cxf.frontend.ServerFactoryBean;
 import org.apache.cxf.jaxws.service.Hello2;
 import org.apache.cxf.jaxws.service.Hello3;
@@ -34,6 +40,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.junit.Test;
 
@@ -67,7 +74,7 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
             new ServiceWSDLBuilder(bus, service.getServiceInfos().get(0));
         return wsdlBuilder.build();
     }
-
+    
     @Test
     public void testWSDL1() throws Exception {
         Definition d = createService(Hello2.class);
@@ -131,4 +138,82 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
             assertTrue(e.getMessage().contains("WebMethod"));
         }
     }
+    
+    @Test
+    public void testDocumentationOnSEI() throws Exception {
+        //CXF-3093
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo", new CXF3093Impl());
+        ServiceWSDLBuilder wsdlBuilder = 
+            new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
+        Definition def = wsdlBuilder.build();
+        Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(d);
+        assertXPathEquals("//wsdl:definitions/wsdl:documentation", "My top level documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:portType/wsdl:documentation", "My portType documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
+                          d.getDocumentElement());
+    }
+
+    @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
+    @WSDLDocumentationCollection({
+        @WSDLDocumentation("My portType documentation"), 
+        @WSDLDocumentation(value = "My top level documentation", 
+                           placement = WSDLDocumentation.Placement.TOP), 
+        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING) 
+    })
+    public static interface CXF3093PortType { 
+        int doubleIt(int numberToDouble); 
+    }
+    
+    @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+                serviceName = "DoubleItService",
+                portName = "DoubleItPort")
+    public static class CXF3093Impl implements CXF3093PortType {
+        public int doubleIt(int numberToDouble) {
+            return numberToDouble * 2;
+        }
+        
+    }
+
+    
+    @Test
+    public void testDocumentationOnImpl() throws Exception {
+        //CXF-3093
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo", new CXF3092Impl());
+        ServiceWSDLBuilder wsdlBuilder = 
+            new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
+        Definition def = wsdlBuilder.build();
+        Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(d);
+        assertXPathEquals("//wsdl:definitions/wsdl:documentation", "My top level documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:service/wsdl:documentation", "My Service documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
+                          d.getDocumentElement());
+    }
+
+    @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
+    public static interface CXF3092PortType { 
+        int doubleIt(int numberToDouble); 
+    }
+    
+    @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt",
+                serviceName = "DoubleItService",
+                portName = "DoubleItPort")
+    @WSDLDocumentationCollection({
+        @WSDLDocumentation("My Service documentation"), 
+        @WSDLDocumentation(value = "My top level documentation", 
+                           placement = WSDLDocumentation.Placement.TOP), 
+        @WSDLDocumentation(value = "My binding doc", placement = WSDLDocumentation.Placement.BINDING) 
+    })
+    public static class CXF3092Impl implements CXF3092PortType {
+        public int doubleIt(int numberToDouble) {
+            return numberToDouble * 2;
+        }
+        
+    }
+
 }
