@@ -21,7 +21,9 @@ package org.apache.cxf.interceptor.security;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.List;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.frontend.MethodDispatcher;
 import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.message.Message;
@@ -33,6 +35,7 @@ import org.apache.cxf.service.model.BindingOperationInfo;
 
 public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInterceptor<Message> {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(AbstractAuthorizingInInterceptor.class);
     private static final String ALL_ROLES = "*";
     
     
@@ -81,7 +84,9 @@ public abstract class AbstractAuthorizingInInterceptor extends AbstractPhaseInte
         if (isUserInRole(sc, expectedRoles, false)) {
             return true;
         }
-        
+        if (sc.getUserPrincipal() != null) {
+            LOG.fine(sc.getUserPrincipal().getName() + " is not authorized");
+        }
         return false;
     }
     

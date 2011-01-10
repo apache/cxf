@@ -25,13 +25,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ClassHelper;
 
 
 public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(SecureAnnotationsInterceptor.class);
     private static final String DEFAULT_ANNOTATION_CLASS_NAME = "javax.annotation.security.RolesAllowed";
     
     private static final Set<String> SKIP_METHODS;
@@ -58,6 +62,13 @@ public class SecureAnnotationsInterceptor extends SimpleAuthorizingInterceptor {
         Class<?> cls = ClassHelper.getRealClass(object);
         Map<String, String> rolesMap = new HashMap<String, String>();
         findRoles(cls, rolesMap);
+        if (rolesMap.isEmpty()) {
+            LOG.warning("The roles map is empty, the service object is not protected");
+        } else if (LOG.isLoggable(Level.FINE)) {
+            for (Map.Entry<String, String> entry : rolesMap.entrySet()) {
+                LOG.fine("Method: " + entry.getKey() + ", roles: " + entry.getValue());
+            }
+        }
         super.setMethodRolesMap(rolesMap);
     }
 
