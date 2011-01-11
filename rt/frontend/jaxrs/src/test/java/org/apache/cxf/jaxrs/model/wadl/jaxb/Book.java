@@ -72,7 +72,8 @@ public class Book implements FormInterface {
     public void form1(MultivaluedMap map) {
     }
     
-    public void form2(String f1, String f2) {
+    public String form2(String f1, String f2) {
+        return "";
     }
     
 }

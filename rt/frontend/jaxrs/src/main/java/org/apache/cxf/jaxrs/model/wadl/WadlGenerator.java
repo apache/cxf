@@ -312,7 +312,7 @@ public class WadlGenerator implements RequestHandler {
         if (ori.getMethodToInvoke().getParameterTypes().length != 0) {
             sb.append("<request>");
             if (isFormRequest(ori)) {
-                handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, null, false);
+                handleFormRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, getFormClass(ori));
             } else {
                 for (Parameter p : ori.getParameters()) {
                     handleParameter(sb, jaxbTypes, qnameResolver, clsMap, ori, p);
@@ -484,30 +484,46 @@ public class WadlGenerator implements RequestHandler {
                                       Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
                                       Class<?> type, boolean inbound) {
         List<MediaType> types = inbound ? ori.getConsumeTypes() : ori.getProduceTypes();
-        if (types.size() == 1 && types.get(0).equals(MediaType.WILDCARD_TYPE)
-            && (type == null || MultivaluedMap.class.isAssignableFrom(type))) {
+        if (MultivaluedMap.class.isAssignableFrom(type)) {
             types = Collections.singletonList(MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-        }
-        if (type != null) {
-            for (MediaType mt : types) {
-                if (InjectionUtils.isPrimitive(type)) {
-                    String rep = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
-                    String value = rep == null ? type.getSimpleName() : rep;
-                    sb.append("<!-- Primitive type : " + value + " -->");
-                }
-                sb.append("<representation");
-                sb.append(" mediaType=\"").append(mt.toString()).append("\"");
-
-                type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
-                if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
-                    generateQName(sb, qnameResolver, clsMap, type,
-                                  getBodyAnnotations(ori, inbound));
-                }
-                sb.append("/>");
+        } else if (isWildcard(types)) {
+            types = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
+        } 
+        for (MediaType mt : types) {
+            if (InjectionUtils.isPrimitive(type)) {
+                String rep = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
+                String value = rep == null ? type.getSimpleName() : rep;
+                sb.append("<!-- Primitive type : " + value + " -->");
             }
-        } else {
             sb.append("<representation");
-            sb.append(" mediaType=\"").append(types.get(0).toString()).append("\">");
+            sb.append(" mediaType=\"").append(mt.toString()).append("\"");
+
+            type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
+            if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
+                generateQName(sb, qnameResolver, clsMap, type,
+                              getBodyAnnotations(ori, inbound));
+            }
+            sb.append("/>");
+        }
+        
+    }
+    
+    private boolean isWildcard(List<MediaType> types) {
+        return types.size() == 1 && types.get(0).equals(MediaType.WILDCARD_TYPE);
+    }
+    
+    private void handleFormRepresentation(StringBuilder sb, Set<Class<?>> jaxbTypes,
+                                      ElementQNameResolver qnameResolver,
+                                      Map<Class<?>, QName> clsMap, OperationResourceInfo ori,
+                                      Class<?> type) {
+        if (type != null) {
+            handleRepresentation(sb, jaxbTypes, qnameResolver, clsMap, ori, type, true);
+        } else {
+            List<MediaType> types = ori.getConsumeTypes();
+            MediaType formType = isWildcard(types) ? MediaType.APPLICATION_FORM_URLENCODED_TYPE 
+                : types.get(0); 
+            sb.append("<representation");
+            sb.append(" mediaType=\"").append(formType).append("\">");
             for (Parameter pm : ori.getParameters()) {
                 writeParam(sb, pm, ori);
             }
@@ -652,11 +668,21 @@ public class WadlGenerator implements RequestHandler {
 
     private boolean isFormRequest(OperationResourceInfo ori) {
         for (Parameter p : ori.getParameters()) {
-            if (p.getType() == ParameterType.FORM) {
+            if (p.getType() == ParameterType.FORM
+                || p.getType() == ParameterType.REQUEST_BODY 
+                && ori.getMethodToInvoke().getParameterTypes()[p.getIndex()] == MultivaluedMap.class) {
                 return true;
             }
         }
         return false;
+    }
+    
+    private Class<?> getFormClass(OperationResourceInfo ori) {
+        if (ori.getParameters().get(0).getType() == ParameterType.FORM) {
+            return null;
+        } else {
+            return MultivaluedMap.class;
+        }
     }
 
     // TODO : can we reuse this block with JAXBBinding somehow ?
