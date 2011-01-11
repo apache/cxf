@@ -524,6 +524,10 @@ public class WadlGeneratorTest extends Assert {
                     WadlGenerator.WADL_NS, "representation"); 
         assertEquals(1, representationEls.size());
         verifyMediTypeAndElementValue(representationEls.get(0), mediaType, elementValue);
+        if ("text/plain".equals(mediaType)) { 
+            String pName = "request".equals(name) ? "request" : "result";
+            verifyParameters(representationEls.get(0), 1, new Param(pName, "plain", "xs:string"));
+        }
     }
     
     private void verifyXmlJsonRepresentations(Element element, String type) {
