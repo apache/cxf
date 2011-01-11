@@ -23,6 +23,8 @@ package org.apache.cxf.systest.jaxrs;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
 import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
@@ -71,6 +73,7 @@ import javax.xml.namespace.QName;
 import javax.xml.transform.dom.DOMSource;
 
 import org.apache.cxf.annotations.GZIP;
+import org.apache.cxf.common.util.ProxyHelper;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.jaxrs.ext.Oneway;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
@@ -386,6 +389,13 @@ public class BookStore {
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/books/{bookId}/cglib")
+    @Produces("application/xml")
+    public Book getBookCGLIB(@PathParam("bookId") String id) throws BookNotFoundFault {
+        return createCglibProxy(doGetBook(id));
     }
     
     @GET
@@ -894,6 +904,20 @@ public class BookStore {
             }
         } 
         
+    }
+    
+    private Book createCglibProxy(final Book book) {
+        final InvocationHandler handler = new InvocationHandler() {
+
+            @Override
+            public Object invoke(Object object, Method method, Object[] args) throws Throwable {
+                return method.invoke(book, args);
+            }
+            
+        };
+        return (Book)ProxyHelper.getProxy(this.getClass().getClassLoader(), 
+                                    new Class[]{Book.class}, 
+                                    handler);
     }
 }
 
