@@ -30,9 +30,9 @@ import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
-import org.apache.cxf.jaxws.schemavalidation.CkReponseType;
-import org.apache.cxf.jaxws.schemavalidation.CkRequeteType;
-import org.apache.cxf.jaxws.schemavalidation.RequeteIdType;
+import org.apache.cxf.jaxws.schemavalidation.CkRequestType;
+import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
+import org.apache.cxf.jaxws.schemavalidation.RequestIdType;
 import org.apache.cxf.jaxws.schemavalidation.Service;
 import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
@@ -91,13 +91,13 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
         updateAddressPort(greeter, PORT);
 
-        RequeteIdType requestId = new RequeteIdType();
+        RequestIdType requestId = new RequestIdType();
         requestId.setId("ffang");
-        CkRequeteType request = new CkRequeteType();
-        request.setRequete(requestId);
+        CkRequestType request = new CkRequestType();
+        request.setRequest(requestId);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
-        CkReponseType response = greeter.ckR(request); 
-        assertEquals(response.getProduit().get(0).getAction().getStatus(), 4);
+        CkResponseType response = greeter.ckR(request); 
+        assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
             
     }
     

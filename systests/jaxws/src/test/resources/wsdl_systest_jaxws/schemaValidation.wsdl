@@ -26,10 +26,10 @@
 	
 	
 	<wsdl:message name="ckRIn">
-		<wsdl:part name="ckRIn" element="tns:ckRequete"/>
+		<wsdl:part name="ckRIn" element="tns:ckRequest"/>
 	</wsdl:message>
 	<wsdl:message name="ckROut">
-		<wsdl:part name="ckROut" element="tns:ckReponse"/>
+		<wsdl:part name="ckROut" element="tns:ckResponse"/>
 	</wsdl:message>
 
 	

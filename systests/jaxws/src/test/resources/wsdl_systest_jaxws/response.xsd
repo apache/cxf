@@ -16,6 +16,6 @@
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/jaxws/schemavalidation" targetNamespace="http://cxf.apache.org/jaxws/schemavalidation" elementFormDefault="qualified">
 	<xsd:include schemaLocation="response-in.xsd"/>
-	<xsd:element name="ckReponse" type="ckReponseType">
+	<xsd:element name="ckResponse" type="ckResponseType">
 	</xsd:element>
 </xsd:schema>

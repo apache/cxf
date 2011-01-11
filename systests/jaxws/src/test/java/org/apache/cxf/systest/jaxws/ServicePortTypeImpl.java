@@ -19,21 +19,21 @@
 package org.apache.cxf.systest.jaxws;
 
 import org.apache.cxf.jaxws.schemavalidation.ActionCheckMajType;
-import org.apache.cxf.jaxws.schemavalidation.CkReponseType;
-import org.apache.cxf.jaxws.schemavalidation.CkRequeteType;
-import org.apache.cxf.jaxws.schemavalidation.ProduitPosteActionType;
+import org.apache.cxf.jaxws.schemavalidation.CkRequestType;
+import org.apache.cxf.jaxws.schemavalidation.CkResponseType;
+import org.apache.cxf.jaxws.schemavalidation.ProductPostActionType;
 import org.apache.cxf.jaxws.schemavalidation.ServicePortType;
 
 @javax.xml.ws.BindingType(value = "http://www.w3.org/2003/05/soap/bindings/HTTP/")
 public class ServicePortTypeImpl implements ServicePortType {
     
-    public CkReponseType ckR(CkRequeteType ckRIn) {
-        CkReponseType result = new CkReponseType();
+    public CkResponseType ckR(CkRequestType ckRIn) {
+        CkResponseType result = new CkResponseType();
         ActionCheckMajType action = new ActionCheckMajType();
         action.setStatus(4);
-        ProduitPosteActionType pdt = new ProduitPosteActionType();
+        ProductPostActionType pdt = new ProductPostActionType();
         pdt.setAction(action);
-        result.getProduit().add(pdt);
+        result.getProduct().add(pdt);
         return result;
     }
 }
