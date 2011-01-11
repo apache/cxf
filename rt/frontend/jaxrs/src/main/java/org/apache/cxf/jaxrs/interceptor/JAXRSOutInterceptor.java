@@ -45,6 +45,7 @@ import javax.xml.stream.events.XMLEvent;
 
 import org.apache.cxf.common.i18n.BundleUtils;
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.common.util.ClassHelper;
 import org.apache.cxf.interceptor.AbstractOutDatabindingInterceptor;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.ext.ResponseHandler;
@@ -402,7 +403,7 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
         if (GenericEntity.class.isAssignableFrom(targetObject.getClass())) {
             return ((GenericEntity)targetObject).getRawType();
         } else {
-            return targetObject.getClass();
+            return ClassHelper.getRealClassFromClass(targetObject.getClass());
         }
     }
     

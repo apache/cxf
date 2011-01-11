@@ -628,6 +628,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBook123CGLIB() throws Exception {
+        getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123/cglib",
+                               "resources/expected_get_book123.txt",
+                               "application/xml", 200);
+    }
+    
+    @Test
     public void testGetBook123() throws Exception {
         getAndCompareAsStrings("http://localhost:" + PORT + "/bookstore/books/123",
                                "resources/expected_get_book123.txt",
