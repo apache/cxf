@@ -909,7 +909,6 @@ public class BookStore {
     private Book createCglibProxy(final Book book) {
         final InvocationHandler handler = new InvocationHandler() {
 
-            @Override
             public Object invoke(Object object, Method method, Object[] args) throws Throwable {
                 return method.invoke(book, args);
             }
