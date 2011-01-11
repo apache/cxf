@@ -19,6 +19,7 @@
 
 package org.apache.cxf.ws.security.policy.interceptors;
 
+import java.security.Principal;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Vector;
@@ -47,6 +48,9 @@ import org.apache.cxf.ws.security.trust.STSClient;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JInInterceptor;
 import org.apache.cxf.ws.security.wss4j.PolicyBasedWSS4JOutInterceptor;
 import org.apache.cxf.ws.security.wss4j.WSS4JInInterceptor;
+import org.apache.ws.security.CustomTokenPrincipal;
+import org.apache.ws.security.WSConstants;
+import org.apache.ws.security.WSSecurityEngineResult;
 import org.apache.ws.security.handler.WSHandlerConstants;
 import org.apache.ws.security.handler.WSHandlerResult;
 
@@ -216,13 +220,10 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                                     (WSHandlerResult) results.get(i);
     
                             Vector wsSecEngineResults = rResult.getResults();
-    
-                            for (int j = 0; j < wsSecEngineResults.size(); j++) {
-                                //WSSecurityEngineResult wser =
-                                //        (WSSecurityEngineResult) wsSecEngineResults.get(j);
-                                //Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
-                                //how to find if it's due to an IssuedToken?
+                            SecurityToken token = findIssuedToken(wsSecEngineResults);
+                            if (token != null) {
                                 found = true;
+                                message.getExchange().put(SecurityConstants.TOKEN, token);
                             }
                         }
                     }
@@ -236,6 +237,35 @@ public class IssuedTokenInterceptorProvider extends AbstractPolicyInterceptorPro
                     }                    
                 }
             }
+        }
+        
+        private SecurityToken findIssuedToken(Vector wsSecEngineResults) {
+            for (int j = 0; j < wsSecEngineResults.size(); j++) {
+                WSSecurityEngineResult wser =
+                    (WSSecurityEngineResult) wsSecEngineResults.get(j);
+                Integer actInt = (Integer)wser.get(WSSecurityEngineResult.TAG_ACTION);
+                if (actInt.intValue() == WSConstants.SIGN) {
+                    Principal principal = 
+                        (Principal)wser.get(WSSecurityEngineResult.TAG_PRINCIPAL);
+                    if (principal instanceof CustomTokenPrincipal) {
+                        CustomTokenPrincipal customPrincipal = 
+                            (CustomTokenPrincipal)principal;
+                        byte[] secretKey = 
+                            (byte[])wser.get(WSSecurityEngineResult.TAG_DECRYPTED_KEY);
+                        if (secretKey != null) {
+                            SecurityToken token = 
+                                new SecurityToken(
+                                    customPrincipal.getName(), 
+                                    (java.util.Calendar)null, 
+                                    (java.util.Calendar)null
+                                );
+                            token.setSecret(secretKey);
+                            return token;
+                        }
+                    }
+                }
+            }
+            return null;
         }
     }
 }
