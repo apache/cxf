@@ -17,7 +17,8 @@
  * under the License.
 */ 
 
-typedef string<10> string10;
+const long NAME_LENGTH = 10;
+typedef string<NAME_LENGTH> string10;
 typedef wstring<20> wstring20;
 
 typedef string10  myString10;
