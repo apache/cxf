@@ -19,7 +19,8 @@
 -->
 <wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/String" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/String" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/">
   <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/String/typemap">
-    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string10:1.0" type="xs:string" name="string10" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="10" idltype="corba:long" name="NAME_LENGTH" type="xs:int"/>
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:string10:1.0" name="string10" type="xs:string"/>
     <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:wstring" repositoryID="IDL:wstring20:1.0" type="xs:string" name="wstring20" />
     <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="string10" repositoryID="IDL:myString10:1.0" name="myString10" />
     <corba:alias xmlns="http://cxf.apache.org/bindings/corba/idl/String/typemap" basetype="wstring20" repositoryID="IDL:myWString20:1.0" name="myWString20" />
