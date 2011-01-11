@@ -460,12 +460,10 @@ public class WadlGenerator implements RequestHandler {
     }
     
     protected void doWriteParam(StringBuilder sb, Parameter pm, Class<?> type, String paramName) {
-        if (ParameterType.REQUEST_BODY == pm.getType()) {
-            return;
-        }
         sb.append("<param name=\"").append(paramName).append("\" ");
         String style = ParameterType.PATH == pm.getType() ? "template" 
                        : ParameterType.FORM == pm.getType() ? "query"
+                       : ParameterType.REQUEST_BODY == pm.getType() ? "plain"    
                        : pm.getType().toString().toLowerCase();
         sb.append("style=\"").append(style).append("\"");
         if (pm.getDefaultValue() != null) {
@@ -488,23 +486,38 @@ public class WadlGenerator implements RequestHandler {
         } else if (isWildcard(types)) {
             types = Collections.singletonList(MediaType.APPLICATION_OCTET_STREAM_TYPE);
         } 
+        
+        boolean isPrimitive = InjectionUtils.isPrimitive(type);
         for (MediaType mt : types) {
-            if (InjectionUtils.isPrimitive(type)) {
-                String rep = XmlSchemaPrimitiveUtils.getSchemaRepresentation(type);
-                String value = rep == null ? type.getSimpleName() : rep;
-                sb.append("<!-- Primitive type : " + value + " -->");
-            }
+            
             sb.append("<representation");
             sb.append(" mediaType=\"").append(mt.toString()).append("\"");
 
-            type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
-            if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
-                generateQName(sb, qnameResolver, clsMap, type,
-                              getBodyAnnotations(ori, inbound));
+            if (isPrimitive) {
+                sb.append(">");    
+                Parameter p = inbound ? getRequestBodyParam(ori) 
+                    : new Parameter(ParameterType.REQUEST_BODY, 0, "result"); 
+                doWriteParam(sb, p, type, p.getName() == null ? "request" : p.getName());
+                sb.append("</representation>");
+            } else  { 
+                type = getActualJaxbType(type, ori.getAnnotatedMethod(), inbound);
+                if (qnameResolver != null && mt.getSubtype().contains("xml") && jaxbTypes.contains(type)) {
+                    generateQName(sb, qnameResolver, clsMap, type,
+                                  getBodyAnnotations(ori, inbound));
+                }
+                sb.append("/>");
             }
-            sb.append("/>");
         }
         
+    }
+    
+    private Parameter getRequestBodyParam(OperationResourceInfo ori) {
+        for (Parameter p : ori.getParameters()) {
+            if (p.getType() == ParameterType.REQUEST_BODY) {
+                return p;
+            }
+        }
+        throw new IllegalStateException();
     }
     
     private boolean isWildcard(List<MediaType> types) {
