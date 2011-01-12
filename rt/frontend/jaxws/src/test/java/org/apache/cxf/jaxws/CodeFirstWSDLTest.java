@@ -40,6 +40,7 @@ import org.apache.cxf.service.Service;
 import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
 import org.apache.cxf.service.model.BindingInfo;
 import org.apache.cxf.service.model.InterfaceInfo;
+import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.wsdl.WSDLManager;
 import org.apache.cxf.wsdl11.ServiceWSDLBuilder;
 import org.junit.Test;
@@ -154,6 +155,22 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
                           d.getDocumentElement());
         assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
                           d.getDocumentElement());
+        
+        
+        JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
+        builder.setServiceClass(CXF3093Impl.class);
+        ServiceInfo serviceInfo = builder.createService();
+        wsdlBuilder = new ServiceWSDLBuilder(bus, serviceInfo);
+        
+        def = wsdlBuilder.build();
+        d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(d);
+        assertXPathEquals("//wsdl:definitions/wsdl:documentation", "My top level documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:portType/wsdl:documentation", "My portType documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
+                          d.getDocumentElement());
     }
 
     @WebService(targetNamespace = "http://www.example.org/contract/DoubleIt")
@@ -180,12 +197,27 @@ public class CodeFirstWSDLTest extends AbstractJaxWsTest {
     
     @Test
     public void testDocumentationOnImpl() throws Exception {
-        //CXF-3093
+        //CXF-3092
         EndpointImpl ep = (EndpointImpl)Endpoint.publish("local://foo", new CXF3092Impl());
         ServiceWSDLBuilder wsdlBuilder = 
             new ServiceWSDLBuilder(bus, ep.getService().getServiceInfos().get(0));
         Definition def = wsdlBuilder.build();
         Document d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
+        //org.apache.cxf.helpers.XMLUtils.printDOM(d);
+        assertXPathEquals("//wsdl:definitions/wsdl:documentation", "My top level documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:service/wsdl:documentation", "My Service documentation",
+                          d.getDocumentElement());
+        assertXPathEquals("//wsdl:definitions/wsdl:binding/wsdl:documentation", "My binding doc",
+                          d.getDocumentElement());
+        
+        JaxwsServiceBuilder builder = new JaxwsServiceBuilder();
+        builder.setServiceClass(CXF3092Impl.class);
+        ServiceInfo serviceInfo = builder.createService();
+        wsdlBuilder = new ServiceWSDLBuilder(bus, serviceInfo);
+        
+        def = wsdlBuilder.build();
+        d = bus.getExtension(WSDLManager.class).getWSDLFactory().newWSDLWriter().getDocument(def);
         //org.apache.cxf.helpers.XMLUtils.printDOM(d);
         assertXPathEquals("//wsdl:definitions/wsdl:documentation", "My top level documentation",
                           d.getDocumentElement());

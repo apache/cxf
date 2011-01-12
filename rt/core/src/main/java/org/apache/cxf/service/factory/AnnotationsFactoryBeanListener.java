@@ -87,6 +87,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             break;
         }
         case ENDPOINT_SELECTED: {
+            Class<?> implCls = args.length > 3 ? (Class<?>)args[3] : null;
             Class<?> cls = (Class<?>)args[2];
             Endpoint ep = (Endpoint)args[1];
             Bus bus = factory.getBus();
@@ -103,6 +104,27 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             if (props != null) {
                 addEndpointProperties(ep, bus, props.value());
             }
+            // To avoid the NPE
+            if (implCls == null || implCls == cls) {
+                return;
+            }
+            WSDLDocumentation doc = implCls.getAnnotation(WSDLDocumentation.class);
+            if (doc != null) {
+                addDocumentation(ep, WSDLDocumentation.Placement.SERVICE, doc);
+            }
+            WSDLDocumentationCollection col = implCls.getAnnotation(WSDLDocumentationCollection.class);
+            if (col != null) {
+                addDocumentation(ep, WSDLDocumentation.Placement.SERVICE, col.value());
+            }
+            InterfaceInfo i = ep.getEndpointInfo().getInterface();
+            List<WSDLDocumentation> docs = CastUtils.cast((List<?>)i.removeProperty(EXTRA_DOCUMENTATION));
+            if (docs != null) {
+                addDocumentation(ep, 
+                                 WSDLDocumentation.Placement.SERVICE,
+                                 docs.toArray(new WSDLDocumentation[docs.size()]));
+            }
+            addBindingOperationDocs(ep);
+            
             break; 
         }
         case SERVER_CREATED: {
@@ -116,27 +138,11 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             addSchemaValidationSupport(server.getEndpoint(), cls.getAnnotation(SchemaValidation.class));
             addFastInfosetSupport(server.getEndpoint(), cls.getAnnotation(FastInfoset.class));
             addLoggingSupport(server.getEndpoint(), bus, cls.getAnnotation(Logging.class));
-            WSDLDocumentation doc = cls.getAnnotation(WSDLDocumentation.class);
-            if (doc != null) {
-                addDocumentation(server, WSDLDocumentation.Placement.SERVICE, doc);
-            }
-            WSDLDocumentationCollection col = cls.getAnnotation(WSDLDocumentationCollection.class);
-            if (col != null) {
-                addDocumentation(server, WSDLDocumentation.Placement.SERVICE, col.value());
-            }
-            InterfaceInfo i = server.getEndpoint().getEndpointInfo().getInterface();
-            List<WSDLDocumentation> docs = CastUtils.cast((List<?>)i.removeProperty(EXTRA_DOCUMENTATION));
-            if (docs != null) {
-                addDocumentation(server, 
-                                 WSDLDocumentation.Placement.SERVICE,
-                                 docs.toArray(new WSDLDocumentation[docs.size()]));
-            }
             addEndpointProperties(server.getEndpoint(), bus, cls.getAnnotation(EndpointProperty.class));
             EndpointProperties props = cls.getAnnotation(EndpointProperties.class);
             if (props != null) {
                 addEndpointProperties(server.getEndpoint(), bus, props.value());
             }
-            addBindingOperationDocs(server);
             setScope(factory, server, cls);
             break;
         }
@@ -272,8 +278,8 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
         }
     }
 
-    private void addBindingOperationDocs(Server server) {
-        for (BindingOperationInfo binfo : server.getEndpoint().getBinding()
+    private void addBindingOperationDocs(Endpoint ep) {
+        for (BindingOperationInfo binfo : ep.getBinding()
                 .getBindingInfo().getOperations()) {
             List<WSDLDocumentation> later = CastUtils.cast((List<?>)binfo.getOperationInfo()
                                                                .getProperty(EXTRA_DOCUMENTATION));
@@ -390,7 +396,7 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             }
         }
     }
-    private void addDocumentation(Server server, 
+    private void addDocumentation(Endpoint ep, 
                                   WSDLDocumentation.Placement defPlace,
                                   WSDLDocumentation ... values) {
         for (WSDLDocumentation doc : values) {
@@ -400,20 +406,20 @@ public class AnnotationsFactoryBeanListener implements FactoryBeanListener {
             }
             switch (p) {
             case PORT_TYPE:
-                server.getEndpoint().getEndpointInfo().getService()
+                ep.getEndpointInfo().getService()
                     .getInterface().setDocumentation(doc.value());
                 break;
             case TOP:
-                server.getEndpoint().getEndpointInfo().getService().setTopLevelDoc(doc.value());
+                ep.getEndpointInfo().getService().setTopLevelDoc(doc.value());
                 break;
             case SERVICE:
-                server.getEndpoint().getEndpointInfo().getService().setDocumentation(doc.value());
+                ep.getEndpointInfo().getService().setDocumentation(doc.value());
                 break;
             case SERVICE_PORT:
-                server.getEndpoint().getEndpointInfo().setDocumentation(doc.value());
+                ep.getEndpointInfo().setDocumentation(doc.value());
                 break;
             case BINDING:
-                server.getEndpoint().getEndpointInfo().getBinding().setDocumentation(doc.value());
+                ep.getEndpointInfo().getBinding().setDocumentation(doc.value());
                 break;
             default:
                 //nothing?

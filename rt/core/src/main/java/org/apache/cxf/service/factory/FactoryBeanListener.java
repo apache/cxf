@@ -115,7 +115,7 @@ public interface FactoryBeanListener {
         CLIENT_CREATED, 
         
         /**
-         * EndpointInfo, Endpoint, Class
+         * EndpointInfo, Endpoint, SEI Class, Class 
          */
         ENDPOINT_SELECTED,
         
