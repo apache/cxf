@@ -301,7 +301,7 @@ public final class PolicyUtils {
         
         if (compatible) {
             compatible &= !p1.isSetCacheControl() || !p2.isSetCacheControl()
-                || p1.getCacheControl().value().equals(p2.getCacheControl().value());
+                || p1.getCacheControl().equals(p2.getCacheControl());
         }
         
         if (compatible) {            
@@ -454,7 +454,7 @@ public final class PolicyUtils {
       
         result &= (p1.getCacheControl() == null 
                 ? p2.getCacheControl() == null 
-                : p1.getCacheControl().value().equals(p2.getCacheControl().value())
+                : p1.getCacheControl().equals(p2.getCacheControl())
                 && p1.getConnection().value().equals(p2.getConnection().value()))        
             && (p1.getConnectionTimeout() == p2.getConnectionTimeout())
             && equals(p1.getContentType(), p2.getContentType())
@@ -492,7 +492,7 @@ public final class PolicyUtils {
         
         if (compatible) {
             compatible &= !p1.isSetCacheControl() || !p2.isSetCacheControl()
-                || p1.getCacheControl().value().equals(p2.getCacheControl().value());
+                || p1.getCacheControl().equals(p2.getCacheControl());
         }
         
         if (compatible) {
@@ -605,7 +605,7 @@ public final class PolicyUtils {
         result &= (p1.isHonorKeepAlive() == p2.isHonorKeepAlive())
             && (p1.getCacheControl() == null 
                 ? p2.getCacheControl() == null 
-                : p1.getCacheControl().value().equals(p2.getCacheControl().value()))
+                : p1.getCacheControl().equals(p2.getCacheControl()))
             && equals(p1.getContentEncoding(), p2.getContentEncoding())
             && equals(p1.getContentLocation(), p2.getContentLocation())
             && equals(p1.getContentType(), p2.getContentType())

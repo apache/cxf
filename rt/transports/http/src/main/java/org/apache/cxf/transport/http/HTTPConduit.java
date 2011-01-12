@@ -1247,7 +1247,7 @@ public class HTTPConduit
         }
         if (policy.isSetCacheControl()) {
             headers.put("Cache-Control",
-                        createMutableList(policy.getCacheControl().value()));
+                        createMutableList(policy.getCacheControl()));
         }
         if (policy.isSetHost()) {
             headers.put("Host",

@@ -452,7 +452,7 @@ public abstract class AbstractHTTPDestination
         HTTPServerPolicy policy = server; 
         if (policy.isSetCacheControl()) {
             headers.put("Cache-Control",
-                        createMutableList(policy.getCacheControl().value()));
+                        createMutableList(policy.getCacheControl()));
         }
         if (policy.isSetContentLocation()) {
             headers.put("Content-Location",

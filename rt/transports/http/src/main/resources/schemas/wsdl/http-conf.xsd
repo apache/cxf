@@ -114,7 +114,7 @@
                     </xs:annotation>      
                 </xs:attribute>
 
-                <xs:attribute name="CacheControl" type="http-conf:serverCacheControlType" use="optional">
+                <xs:attribute name="CacheControl" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                         Most commonly used to specify no-cache, however the standard supports a 
@@ -281,7 +281,7 @@
 
                 </xs:attribute>
 
-                <xs:attribute name="CacheControl" type="http-conf:clientCacheControlType" use="optional">
+                <xs:attribute name="CacheControl" type="xs:string" use="optional">
                     <xs:annotation>
                         <xs:documentation>
                         Most commonly used to specify no-cache, however the standard supports a 
@@ -371,33 +371,6 @@
         </xs:complexContent>
     </xs:complexType>
     
-    <xs:simpleType name="serverCacheControlType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="no-cache"/>
-            <xs:enumeration value="public"/>
-            <xs:enumeration value="private"/>
-            <xs:enumeration value="no-store"/>
-            <xs:enumeration value="no-transform"/>
-            <xs:enumeration value="must-revalidate"/>
-            <xs:enumeration value="proxy-revalidate"/>
-            <xs:enumeration value="max-age"/>
-            <xs:enumeration value="s-max-age"/>
-            <xs:enumeration value="cache-extension"/>
-        </xs:restriction>
-    </xs:simpleType>
-
-    <xs:simpleType name="clientCacheControlType">
-        <xs:restriction base="xs:string">
-            <xs:enumeration value="no-cache"/>
-            <xs:enumeration value="no-store"/>
-            <xs:enumeration value="max-age"/>
-            <xs:enumeration value="max-stale"/>
-            <xs:enumeration value="min-fresh"/>
-            <xs:enumeration value="no-transform"/>
-            <xs:enumeration value="only-if-cached"/>
-            <xs:enumeration value="cache-extension"/>
-        </xs:restriction>
-    </xs:simpleType>
 
     <xs:simpleType name="connectionType">
         <xs:restriction base="xs:string">
