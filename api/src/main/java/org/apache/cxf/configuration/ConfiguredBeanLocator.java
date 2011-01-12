@@ -31,35 +31,32 @@ public interface ConfiguredBeanLocator {
      * Gets the names of all the configured beans of the specific type.  Does
      * not cause them to be loaded.
      * @param type
-     * @return
+     * @return List of all the bean names for the given type
      */
     List<String> getBeanNamesOfType(Class<?> type);
     
     /**
      * Gets all the configured beans of the specific types.  Causes them
      * all to be loaded. 
-     * @param <T>
      * @param type
-     * @return
+     * @return The collection of all the configured beans of the given type
      */
     <T> Collection<? extends T> getBeansOfType(Class<T> type);
 
     /**
      * Returns the bean of the given type and name.  Causes it to be loaded.
-     * @param <T>
      * @param name
      * @param type
-     * @return
+     * @return the bean of the given name and type
      */
     <T> T getBeanOfType(String name, Class<T> type);
     
     /**
      * Iterates through the beans of the given type, calling the listener
      * to determine if it should be loaded or not. 
-     * @param <T>
      * @param type
      * @param listener
-     * @return
+     * @return true if beans of the type were loaded
      */
     <T> boolean loadBeansOfType(Class<T> type, BeanLoaderListener<T> listener);
 
@@ -67,11 +64,10 @@ public interface ConfiguredBeanLocator {
      * For supporting "legacy" config, checks the configured bean to see if
      * it has a property configured with the given name/value.  Mostly used 
      * for supporting things configured with "activationNamespaces" set. 
-     * @param <T>
-     * @param type
-     * @param property
+     * @param beanName
+     * @param propertyName
      * @param value
-     * @return
+     * @return true if the bean has the given property/value
      */
     boolean hasConfiguredPropertyValue(String beanName, String propertyName, String value);
     
@@ -81,7 +77,7 @@ public interface ConfiguredBeanLocator {
          * the loader will just skip to the next bean
          * @param name
          * @param type
-         * @return
+         * @return true if the bean should be loaded 
          */
         boolean loadBean(String name, Class<? extends T> type);
 
@@ -89,8 +85,9 @@ public interface ConfiguredBeanLocator {
          * Return true if the bean that was loaded meets the requirements at
          * which point, the loader will stop loading additional beans of the
          * given type
+         * @param name
          * @param bean
-         * @return
+         * @return true if the bean meets the requirements of the listener
          */
         boolean beanLoaded(String name, T bean);
     }

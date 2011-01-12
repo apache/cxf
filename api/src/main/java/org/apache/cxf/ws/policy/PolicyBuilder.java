@@ -67,7 +67,7 @@ public interface PolicyBuilder {
     
     /**
      * Return the PolicyRegistry associated with the builder
-     * @return
+     * @return the PolicyRegistry
      */
     PolicyRegistry getPolicyRegistry();
     

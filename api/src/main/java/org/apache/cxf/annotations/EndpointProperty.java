@@ -35,13 +35,13 @@ public @interface EndpointProperty {
     
     /**
      * The value(s) of the property
-     * @return
+     * @return the value of the property
      */
     String[] value();
     
     /**
      * The key to record the property
-     * @return
+     * @return the key for the property
      */
     String key();
 }

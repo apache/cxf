@@ -33,7 +33,7 @@ public interface Observable {
     
     /**
      * Retrieves the message observer for incoming messages
-     * @return
+     * @return the MessageObserver for incoming messages
      */
     MessageObserver getMessageObserver();
 }

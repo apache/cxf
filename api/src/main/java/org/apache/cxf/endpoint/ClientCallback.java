@@ -112,7 +112,7 @@ public class ClientCallback implements Future<Object[]> {
 
     /**
      * return the map of items returned from an operation.
-     * @return
+     * @return the response context
      * @throws InterruptedException if the operation was cancelled.
      * @throws ExecutionException if the operation resulted in a fault.
      */

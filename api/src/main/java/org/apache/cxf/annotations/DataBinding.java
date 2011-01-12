@@ -37,7 +37,7 @@ public @interface DataBinding {
     /**
      * Bean reference to lookup in configuration.  Bean must be castable 
      * to the Class set above
-     * @return
+     * @return The id of the bean reference
      */
     String ref() default "";
 }

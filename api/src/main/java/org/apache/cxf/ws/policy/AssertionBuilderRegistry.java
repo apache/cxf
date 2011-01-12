@@ -51,7 +51,7 @@ public interface AssertionBuilderRegistry extends Registry<QName, AssertionBuild
      * If set to false, the policy engine will throw an exception upon
      * encountering an assertion type for which no AssertionBuilder
      * has been registered.
-     * @return
+     * @return false if unknown assertions will result in an exception 
      */
     boolean isIgnoreUnknownAssertions();
     

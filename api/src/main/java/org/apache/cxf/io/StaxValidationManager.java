@@ -32,11 +32,18 @@ import org.apache.cxf.service.model.ServiceInfo;
 public interface StaxValidationManager {
     /**
      * Install the schemas onto the reader for validation.
-     * @param reader
-     * @param schemas
+     * @param reader - the reader to enable validation
+     * @param serviceInfo - the Service to pull the schema from
      * @throws XMLStreamException 
      */
     void setupValidation(XMLStreamReader reader, ServiceInfo serviceInfo) throws XMLStreamException;
+    
+    /**
+     * Install the schemas onto the writer for validation.
+     * @param writer - the writer to enable validation
+     * @param serviceInfo - the Service to pull the schema from
+     * @throws XMLStreamException 
+     */
     void setupValidation(XMLStreamWriter writer, ServiceInfo serviceInfo) throws XMLStreamException;
 
 }
