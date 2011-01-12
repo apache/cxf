@@ -15,9 +15,9 @@
         -->
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/jaxws/schemavalidation" targetNamespace="http://cxf.apache.org/jaxws/schemavalidation" elementFormDefault="qualified">
-	<xsd:element name="ckRequete" type="ckRequeteType">
+	<xsd:element name="ckRequest" type="ckRequestType">
 	</xsd:element>
-	<xsd:complexType name="requeteIdType">
+	<xsd:complexType name="requestIdType">
 		<xsd:attribute name="id" type="GUIDType" use="required">
 		</xsd:attribute>
 	</xsd:complexType>
@@ -27,9 +27,9 @@
                 </xsd:restriction>
 	</xsd:simpleType>
 	
-	<xsd:complexType name="ckRequeteType">
+	<xsd:complexType name="ckRequestType">
 		<xsd:sequence>
-			<xsd:element name="requete" type="requeteIdType">
+			<xsd:element name="request" type="requestIdType">
 			</xsd:element>
 		</xsd:sequence>
 	</xsd:complexType>

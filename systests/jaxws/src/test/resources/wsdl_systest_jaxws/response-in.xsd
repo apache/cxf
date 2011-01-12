@@ -16,12 +16,12 @@
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://cxf.apache.org/jaxws/schemavalidation" targetNamespace="http://cxf.apache.org/jaxws/schemavalidation" elementFormDefault="qualified">
 	
-	<xsd:complexType name="ckReponseType">
+	<xsd:complexType name="ckResponseType">
 		<xsd:sequence>
-			<xsd:element name="produit" type="produitPosteActionType" minOccurs="0" maxOccurs="unbounded"/>
+			<xsd:element name="product" type="productPostActionType" minOccurs="0" maxOccurs="unbounded"/>
 		</xsd:sequence>
 	</xsd:complexType>
-	<xsd:complexType name="produitPosteActionType">
+	<xsd:complexType name="productPostActionType">
 		<xsd:sequence>
 			<xsd:element name="action" type="actionCheckMajType"/>
 		</xsd:sequence>
