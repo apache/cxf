@@ -191,7 +191,7 @@ public abstract class AbstractWSDLBasedEndpointFactory extends AbstractEndpointF
             ep.getOutFaultInterceptors().addAll(getOutFaultInterceptors());
         }
         serviceFactory.sendEvent(FactoryBeanListener.Event.ENDPOINT_SELECTED, ei, ep,
-                                 serviceFactory.getServiceClass());
+                                 serviceFactory.getServiceClass(), getServiceClass());
         return ep;
     }
     private void modifyTransportIdPerAddress(EndpointInfo ei) {
