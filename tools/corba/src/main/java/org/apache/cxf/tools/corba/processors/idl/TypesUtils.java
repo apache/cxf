@@ -109,7 +109,7 @@ public final class TypesUtils {
             if (corbaType instanceof Const) {
                 Const corbaConst = (Const) corbaType;
                 String name = corbaConst.getQName().getLocalPart();
-                if (name.equals(node.getText())) {
+                if (name.endsWith(node.getText())) {
                     return corbaConst.getValue();
                 }
             }             
