@@ -54,6 +54,9 @@ public abstract class AbstractLoggingInterceptor extends AbstractPhaseIntercepto
     public AbstractLoggingInterceptor(String phase) {
         super(phase);
     }
+    public AbstractLoggingInterceptor(String id, String phase) {
+        super(id, phase);
+    }
 
     public void setOutputLocation(String s) {
         if (s == null || "<logger>".equals(s)) {

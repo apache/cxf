@@ -43,14 +43,25 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public LoggingInInterceptor(String phase) {
         super(phase);
     }
+    public LoggingInInterceptor(String id, String phase) {
+        super(id, id);
+    }
 
     public LoggingInInterceptor(int lim) {
         this();
         limit = lim;
     }
+    public LoggingInInterceptor(String id, int lim) {
+        this(Phase.RECEIVE, id);
+        limit = lim;
+    }
 
     public LoggingInInterceptor(PrintWriter w) {
         this();
+        this.writer = w;
+    }
+    public LoggingInInterceptor(String id, PrintWriter w) {
+        this(Phase.RECEIVE, id);
         this.writer = w;
     }
     
