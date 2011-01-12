@@ -32,6 +32,7 @@ const unsigned long      glob_unsignedlong     = 4556;
 const unsigned long long glob_unsignedlonglong = 123456789;
 
 const char               glob_char             = 'r';  
+const char               glob_char2             = '\2';
 const wchar              glob_wchar            = L'x';  
 
 const boolean            glob_boolean          = FALSE;  

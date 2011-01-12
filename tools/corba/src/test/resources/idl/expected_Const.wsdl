@@ -29,6 +29,7 @@
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="4556" idltype="corba:ulong" type="xs:unsignedInt" name="glob_unsignedlong" />
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="123456789" idltype="corba:ulonglong" type="xs:unsignedLong" name="glob_unsignedlonglong" />
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="r" idltype="corba:char" type="xs:byte" name="glob_char" />
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="\2" idltype="corba:char" type="xs:byte" name="glob_char2" />
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="x" idltype="corba:wchar" type="xs:string" name="glob_wchar" />
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="FALSE" idltype="corba:boolean" type="xs:boolean" name="glob_boolean" />
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="-67.9" idltype="corba:float" type="xs:float" name="glob_float" />

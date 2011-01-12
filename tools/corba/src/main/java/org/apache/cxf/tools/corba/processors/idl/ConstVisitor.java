@@ -62,10 +62,17 @@ public class ConstVisitor extends VisitorBase {
         AST constTypeNode = constNode.getFirstChild();
         AST constNameNode = TypesUtils.getCorbaTypeNameNode(constTypeNode);
         AST constValueNode = constNameNode.getNextSibling();
-        
         // build value string
         String constValue = constValueNode.toString();
         constValueNode = constValueNode.getFirstChild();
+        if (constValue != null && constValue.length() == 1) {
+            // might be a control char
+            byte ch = (byte)constValue.charAt(0);
+            if (ch >= 0 && ch <= 31) {
+                // ascii code between 0 and 31 is invisible control code
+                constValue = "\\" + Integer.toOctalString(ch);
+            }
+        }
         while (constValueNode != null) {
             constValue = constValue + constValueNode.toString();
             constValueNode = constValueNode.getFirstChild();
@@ -100,4 +107,5 @@ public class ConstVisitor extends VisitorBase {
         
         typeMap.getStructOrExceptionOrUnion().add(corbaConst);
     }
+
 }
