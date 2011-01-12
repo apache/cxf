@@ -69,8 +69,8 @@ public abstract class AbstractPhaseInterceptor<T extends Message> implements Pha
      * <code>uniqueId</code> is set to false, the implementing class' name 
      * is used as the id.
      *
-     * @param p the interceptor's phase
-     * @param uniqueId
+     * @param phase the interceptor's phase
+     * @param uniqueId true to have a unique ID generated
      */
     public AbstractPhaseInterceptor(String phase, boolean uniqueId) {
         this(null, phase, uniqueId);

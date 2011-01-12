@@ -57,7 +57,7 @@ public interface FailoverStrategy {
     /**
      * Select one of the alternate addresses for a retried invocation.
      * 
-     * @param alternates List of alternate addresses if available
+     * @param addresses List of alternate addresses if available
      * @return the selected address
      */
     String selectAlternateAddress(List<String> addresses);

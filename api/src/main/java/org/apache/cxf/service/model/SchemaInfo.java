@@ -81,7 +81,7 @@ public final class SchemaInfo extends AbstractPropertiesHolder {
 
     /**
      * Build and return a DOM tree for this schema.
-     * @return
+     * @return a DOM Element representation of the schema
      */
     public synchronized Element getElement() {
         // if someone recently used this DOM tree, take advantage.

@@ -95,7 +95,7 @@ public interface WSDLManager {
     /**
      * This object will cache the schemas for a WSDL.
      * @param wsdl
-     * @return
+     * @return the cache of all the schemas in the wsdl
      */
     ServiceSchemaInfo getSchemasForDefinition(Definition wsdl);
     

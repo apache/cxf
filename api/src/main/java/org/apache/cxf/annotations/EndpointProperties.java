@@ -35,7 +35,7 @@ public @interface EndpointProperties {
     
     /**
      * The properties
-     * @return
+     * @return the list of properties to set
      */
     EndpointProperty[] value();
     

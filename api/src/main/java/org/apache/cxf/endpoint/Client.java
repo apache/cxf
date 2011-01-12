@@ -235,7 +235,7 @@ public interface Client extends InterceptorProvider, MessageObserver {
     
     /**
      * Checks if the Request context is thread local or global.
-     * @return
+     * @return true if the request context is a thread local
      */
     boolean isThreadLocalRequestContext();
 
