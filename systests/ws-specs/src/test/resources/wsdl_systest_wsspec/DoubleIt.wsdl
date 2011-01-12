@@ -42,6 +42,13 @@
 					</xsd:sequence>
 				</xsd:complexType>
 			</xsd:element>
+            <xsd:element name="DoubleItFault">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="reason" type="xsd:string" />
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
 		</xsd:schema>
 	</wsdl:types>
 	<wsdl:message name="DoubleItRequest">
@@ -50,10 +57,14 @@
 	<wsdl:message name="DoubleItResponse">
 		<wsdl:part element="tns:DoubleItResponse" name="parameters" />
 	</wsdl:message>
-	<wsdl:portType name="DoubleItPortType">
+	<wsdl:message name="DoubleItFault">
+        <wsdl:part element="tns:DoubleItFault" name="fault" />
+    </wsdl:message>
+    <wsdl:portType name="DoubleItPortType">
 		<wsdl:operation name="DoubleIt">
 			<wsdl:input message="tns:DoubleItRequest" />
 			<wsdl:output message="tns:DoubleItResponse" />
+            <wsdl:fault name="DoubleItFault" message="tns:DoubleItFault" />
 		</wsdl:operation>
 	</wsdl:portType>
 	<wsdl:binding name="DoubleItBinding" type="tns:DoubleItPortType">
@@ -68,6 +79,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingEncryptThenSign" type="tns:DoubleItPortType">
@@ -82,6 +96,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingSignThenEncrypt" type="tns:DoubleItPortType">
@@ -96,6 +113,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal"  name="DoubleItFault"/>
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingSign" type="tns:DoubleItPortType">
@@ -110,6 +130,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingXPath" type="tns:DoubleItPortType">
@@ -124,6 +147,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingSignedOnly" type="tns:DoubleItPortType">
@@ -139,6 +165,10 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <wsp:PolicyReference URI="#EncrBody" />
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 	<wsdl:binding name="DoubleItBindingTimestampOnly" type="tns:DoubleItPortType">
@@ -153,6 +183,9 @@
 			<wsdl:output>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
 
@@ -169,6 +202,9 @@
                 <wsp:PolicyReference URI="#SignBody"/>
 				<soap:body use="literal" />
 			</wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
 		</wsdl:operation>
 	</wsdl:binding>
     <wsdl:binding name="DoubleItBindingCXF3042" type="tns:DoubleItPortType">
@@ -184,6 +220,9 @@
             <wsdl:output>
                 <soap:body use="literal" />
             </wsdl:output>
+            <wsdl:fault name="DoubleItFault">
+                <soap:body use="literal" name="DoubleItFault" />
+            </wsdl:fault>
         </wsdl:operation>
     </wsdl:binding>
 

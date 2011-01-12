@@ -20,7 +20,9 @@
 package org.apache.cxf.systest.ws.security;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,17 +42,24 @@ import javax.xml.ws.ServiceMode;
 import javax.xml.ws.WebServiceProvider;
 import javax.xml.xpath.XPathConstants;
 
+import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
+import org.xml.sax.InputSource;
+
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
 import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.jaxws.EndpointImpl;
+import org.apache.cxf.policytest.doubleit.DoubleItFault_Exception;
 import org.apache.cxf.policytest.doubleit.DoubleItPortType;
 import org.apache.cxf.policytest.doubleit.DoubleItService;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
+import org.apache.cxf.ws.policy.PolicyConstants;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.ws.security.SecurityConstants;
 import org.apache.ws.security.WSPasswordCallback;
@@ -209,6 +218,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.ENCRYPT_PROPERTIES, 
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(BigInteger.valueOf(5));
+
         
         pt = service.getDoubleItPortSign();
         updateAddressPort(pt, PORT);
@@ -220,7 +230,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                                                       getClass().getResource("bob.properties"));
         pt.doubleIt(BigInteger.valueOf(5));
 
-        
+
         pt = service.getDoubleItPortSignThenEncrypt();
         updateAddressPort(pt, PORT);
         ((BindingProvider)pt).getRequestContext().put(SecurityConstants.CALLBACK_HANDLER, 
@@ -282,6 +292,36 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         //This should work as it should be properly signed.
         assertEquals(BigInteger.valueOf(10), pt.doubleIt(BigInteger.valueOf(5)));
         
+        StringWriter swriter = new StringWriter();
+        PrintWriter writer = new PrintWriter(swriter);
+        try {
+            ClientProxy.getClient(pt).getInInterceptors()
+                .add(new LoggingInInterceptor("CheckFaultLogging", writer));
+            pt.doubleIt(BigInteger.valueOf(-100));
+            fail("Should have resulted in a DoubleItFault_Exception");
+        } catch (DoubleItFault_Exception ex) {
+            //expected
+            writer.flush();
+            String s = swriter.toString();
+            s = s.substring(s.indexOf("Payload: ") + 9);
+            s = s.substring(0, s.lastIndexOf("Envelope>") + 9);
+            assertTrue("Content wasn't encrypted!", !s.contains("I don't like that."));
+            System.out.println(s);
+            Document d = XMLUtils.parse(new InputSource(new StringReader(s)));
+            Node nd = d.getDocumentElement().getFirstChild();
+            while (nd != null && !"Body".equals(nd.getLocalName())) {
+                nd = nd.getNextSibling();
+            }
+            if (nd == null) {
+                throw ex;
+            }
+            System.out.println(s);
+            Attr val = ((org.w3c.dom.Element)nd)
+                .getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
+            assertNotNull("No wsu:Id, thus, not signed", val);
+        }
+
+        
         //Try sending a message with the "TimestampOnly" policy into affect to the 
         //service running the "signed only" policy.  This SHOULD fail as the
         //body is then not signed.
@@ -327,6 +367,18 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
         assertEquals(XMLUtils.toString(nd), "50", o);
     }
     
+    public abstract static class AbstractDoubleItImpl implements DoubleItPortType {
+        /** {@inheritDoc}*/
+        public BigInteger doubleIt(BigInteger numberToDouble) throws DoubleItFault_Exception {
+            if (numberToDouble.equals(BigInteger.valueOf(-100))) {
+                org.apache.cxf.policytest.doubleit.DoubleItFault f 
+                    = new org.apache.cxf.policytest.doubleit.DoubleItFault();
+                f.setReason("Number is -100.  I don't like that.");
+                throw new DoubleItFault_Exception("DoubleItException.", f);
+            }
+            return numberToDouble.multiply(new BigInteger("2"));
+        }
+    }
     
     
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
@@ -334,11 +386,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImpl implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImpl extends AbstractDoubleItImpl {
     }
     
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
@@ -346,55 +394,39 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplHttps implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplHttps extends AbstractDoubleItImpl {
     }
+    
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                 portName = "DoubleItPortEncryptThenSign",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplEncryptThenSign implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplEncryptThenSign extends AbstractDoubleItImpl {
     }
+    
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                 portName = "DoubleItPortSignThenEncrypt",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplSignThenEncrypt implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplSignThenEncrypt extends AbstractDoubleItImpl {
     }
+    
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                 portName = "DoubleItPortSign",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplSign implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplSign extends AbstractDoubleItImpl {
     }
+    
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                 portName = "DoubleItPortXPath",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplXPath implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplXPath extends AbstractDoubleItImpl {
     }
     
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
@@ -402,12 +434,9 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplSignOnly implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplSignOnly extends AbstractDoubleItImpl {
     }
+    
     @WebServiceProvider(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                         portName = "DoubleItPortSignThenEncrypt",
                         serviceName = "DoubleItService", 
@@ -447,22 +476,15 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplCXF3041 implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplCXF3041 extends AbstractDoubleItImpl {
     }
+    
     @WebService(targetNamespace = "http://cxf.apache.org/policytest/DoubleIt", 
                 portName = "DoubleItPortCXF3042",
                 serviceName = "DoubleItService", 
                 endpointInterface = "org.apache.cxf.policytest.doubleit.DoubleItPortType",
                 wsdlLocation = "classpath:/wsdl_systest_wsspec/DoubleIt.wsdl")
-    public static class DoubleItImplCXF3042 implements DoubleItPortType {
-        /** {@inheritDoc}*/
-        public BigInteger doubleIt(BigInteger numberToDouble) {
-            return numberToDouble.multiply(new BigInteger("2"));
-        }
+    public static class DoubleItImplCXF3042 extends AbstractDoubleItImpl {
     }
     
     @Test

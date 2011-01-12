@@ -218,6 +218,9 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
   
     public EffectivePolicy getEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, 
                                                          Destination d) {
+
+        bfi = mapToWrappedBindingFaultInfo(bfi);
+
         EffectivePolicy effectivePolicy = (EffectivePolicy)bfi.getProperty(POLICY_INFO_FAULT_SERVER);
         if (null == effectivePolicy) {
             EffectivePolicyImpl epi = createOutPolicyInfo();
@@ -232,6 +235,18 @@ public class PolicyEngineImpl implements PolicyEngine, BusExtension {
         return effectivePolicy;
     }
 
+    private BindingFaultInfo mapToWrappedBindingFaultInfo(BindingFaultInfo bfi) {
+        BindingOperationInfo boi = bfi.getBindingOperation();
+        if (boi != null && boi.isUnwrapped()) {
+            boi = boi.getWrappedOperation();
+            for (BindingFaultInfo bf2 : boi.getFaults()) {
+                if (bf2.getFaultInfo().getName().equals(bfi.getFaultInfo().getName())) {
+                    return bf2;
+                }
+            }
+        }
+        return bfi;
+    }
     public void setEffectiveServerFaultPolicy(EndpointInfo ei, BindingFaultInfo bfi, EffectivePolicy ep) {
         bfi.setProperty(POLICY_INFO_FAULT_SERVER, ep);
     }
