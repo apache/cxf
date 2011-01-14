@@ -57,6 +57,9 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("schema-validation-enabled", Boolean.TRUE);
             ep.setProperties(map);
+            ((EndpointImpl)ep).setWsdlLocation("wsdl_systest_jaxws/schemaValidation.wsdl");
+            ((EndpointImpl)ep).setServiceName(new QName(
+                                   "http://cxf.apache.org/jaxws/schemavalidation", "service"));
             ((EndpointImpl)ep).getInInterceptors().add(new LoggingInInterceptor());
             ((EndpointImpl)ep).getOutInterceptors().add(new LoggingOutInterceptor());
             ep.publish(address);
@@ -92,12 +95,22 @@ public class SchemaValidationClientServerTest extends AbstractBusClientServerTes
         updateAddressPort(greeter, PORT);
 
         RequestIdType requestId = new RequestIdType();
-        requestId.setId("ffang");
+        requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee");
         CkRequestType request = new CkRequestType();
         request.setRequest(requestId);
         ((BindingProvider)greeter).getRequestContext().put("schema-validation-enabled", Boolean.TRUE);
         CkResponseType response = greeter.ckR(request); 
         assertEquals(response.getProduct().get(0).getAction().getStatus(), 4);
+        
+        try {
+            requestId.setId("aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeeez");
+            request.setRequest(requestId);
+            greeter.ckR(request);
+            fail("should catch marshall exception as the invalid outgoing message per schema");
+        } catch (Exception e) {
+            assertTrue(e.getMessage().contains("Marshalling Error"));
+            assertTrue(e.getMessage().contains("is not facet-valid with respect to pattern"));
+        }
             
     }
     
