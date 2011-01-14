@@ -22,10 +22,15 @@
 		</xsd:attribute>
 	</xsd:complexType>
 	<xsd:simpleType name="GUIDType">
-		<xsd:restriction base="xsd:string">
+		<!--xsd:restriction base="xsd:string">
 		     <xsd:maxLength value="10" />
-                </xsd:restriction>
-	</xsd:simpleType>
+                </xsd:restriction-->
+                <xsd:restriction base="xsd:token">
+		    <xsd:length value="36" />
+		    <xsd:pattern
+		        value="[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}" />
+	        </xsd:restriction>
+        </xsd:simpleType>
 	
 	<xsd:complexType name="ckRequestType">
 		<xsd:sequence>
