@@ -23,13 +23,13 @@ package org.apache.cxf.systest.http.auth;
 import java.net.URL;
 
 import javax.xml.namespace.QName;
-import javax.xml.ws.soap.SOAPFaultException;
 
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.cxf.transport.http.HTTPConduit;
+import org.apache.cxf.transport.http.HTTPException;
 import org.apache.hello_world.Greeter;
 import org.apache.hello_world.services.SOAPService;
 
@@ -97,13 +97,11 @@ public class DigestAuthTest extends AbstractBusClientServerTestBase {
         try {
             String answer = mortimer.sayHi();
             Assert.fail("Unexpected reply (" + answer + "). Should throw exception");
-        } catch (SOAPFaultException e) {
-            // TODO do we really expect Can't find input stream here. I rather would expect
-            // authorization failed with some infos
+        } catch (Exception e) {
             Throwable cause = e.getCause();
-            Assert.assertEquals(RuntimeException.class, cause.getClass());
-            RuntimeException rte = (RuntimeException)cause;
-            Assert.assertTrue(rte.getMessage().startsWith("Can't find input stream"));
+            Assert.assertEquals(HTTPException.class, cause.getClass());
+            HTTPException he = (HTTPException)cause;
+            Assert.assertEquals(401, he.getResponseCode());
         }
     }
 

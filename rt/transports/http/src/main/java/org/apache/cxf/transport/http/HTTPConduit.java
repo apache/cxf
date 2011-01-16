@@ -21,6 +21,7 @@ package org.apache.cxf.transport.http;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -1493,11 +1494,13 @@ public class HTTPConduit
             
             logResponseInfo(responseCode);
             
-            if (responseCode == HttpURLConnection.HTTP_NOT_FOUND
-                && !MessageUtils.isTrue(outMessage.getContextualProperty(
-                    "org.apache.cxf.http.no_io_exceptions"))) {
-                throw new IOException("HTTP response '" + responseCode + ": " 
-                    + connection.getResponseMessage() + "'");
+            // This property should be set in case the exceptions should not be handled here
+            // For example jax rs uses this
+            boolean noExceptions = MessageUtils.isTrue(outMessage.getContextualProperty(
+                "org.apache.cxf.http.no_io_exceptions"));
+            if (responseCode >= 400 && responseCode != 500 && !noExceptions) {
+                throw new HTTPException(responseCode, connection.getResponseMessage(), 
+                                        connection.getURL());
             }
 
             InputStream in = null;
@@ -1550,8 +1553,10 @@ public class HTTPConduit
                     in = connection.getInputStream();
                 }
             }
-            // if (in == null) : it's perfectly ok for non-soap http services
-            // have no response body : those interceptors which do need it will check anyway        
+            if (in == null) {
+                // Create an empty stream to avoid NullPointerExceptions
+                in = new ByteArrayInputStream(new byte[] {});
+            }
             inMessage.setContent(InputStream.class, in);
             
             
