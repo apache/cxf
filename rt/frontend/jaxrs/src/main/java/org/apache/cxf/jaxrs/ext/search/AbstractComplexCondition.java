@@ -68,23 +68,11 @@ public abstract class AbstractComplexCondition<T> implements SearchCondition<T> 
     }
 
     public String toSQL(String table, String... columns) {
-        StringBuilder sb = new StringBuilder();
-        
-        if (table != null) {
-            SearchUtils.startSqlQuery(sb, table, columns);
-        }
-        
-        boolean first = true;
-        for (SearchCondition<T> sc : conditions) {
-            if (!first) {
-                sb.append(" " + cType.toString() + " ");
-            } else {
-                first = false;
-            }
-            
-            sb.append("(").append(sc.toSQL(null)).append(")");
-        }
-        return sb.toString();
+        return SearchUtils.toSQL(this, table, columns);
     }
 
+    public void accept(SearchConditionVisitor<T> visitor) {
+        visitor.visit(this);    
+    }
+    
 }

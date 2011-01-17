@@ -19,31 +19,21 @@
 package org.apache.cxf.jaxrs.ext.search;
 
 /**
- * Encapsulates a basic search statement such as a = b, i < 5, etc
+ * Interface for visitors to SearchCondition objects.
+ * Custom implementations can use it to convert SearchCondition into
+ * specific query language such as SQL, etc
  */
 
-public class PrimitiveStatement {
+public interface SearchConditionVisitor<T> {
+    /*
+     * Callback providing a current SearchCondition object 
+     */
+    void visit(SearchCondition<T> sc);
+    
+    /**
+     * Recover the accumulated query
+     * @return query string
+     */
+    String getResult();
 
-    private String property;
-    private Object value;
-    private ConditionType condition;
-    
-    public PrimitiveStatement(String property, Object value, ConditionType condition) {
-        this.property = property;
-        this.value = value;
-        this.condition = condition;
-    }
-    
-    public String getProperty() {
-        return property;
-    }
-    
-    public Object getValue() {
-        return value;
-    }
-    public ConditionType getCondition() {
-        return condition;
-    }
-
-    
 }

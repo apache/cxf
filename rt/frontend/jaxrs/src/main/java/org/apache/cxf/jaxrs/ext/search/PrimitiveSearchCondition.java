@@ -87,21 +87,13 @@ public class PrimitiveSearchCondition<T> implements SearchCondition<T> {
     }
     
     public String toSQL(String table, String... columns) {
-        StringBuilder sb = new StringBuilder();
-        
-        if (table != null) {
-            SearchUtils.startSqlQuery(sb, table, columns);
-        }
-        
-        String rvalStr = propertyValue.toString();
-        rvalStr = rvalStr.replaceAll("\\*", "%");
-        
-        
-        sb.append(propertyName).append(" ").append(
-            SearchUtils.conditionTypeToSqlOperator(cType, rvalStr)).append(" ")
-            .append("'").append(rvalStr).append("'");
-        return sb.toString();
+        return SearchUtils.toSQL(this, table, columns);
     }
+
+    public void accept(SearchConditionVisitor<T> visitor) {
+        visitor.visit(this);    
+    }
+   
 
     private boolean isPrimitive(T pojo) {
         return pojo.getClass().getName().startsWith("java.lang");

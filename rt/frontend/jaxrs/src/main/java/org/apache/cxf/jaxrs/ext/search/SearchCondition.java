@@ -65,30 +65,45 @@ public interface SearchCondition<T> {
     
     /**
      * Primitive statement such a > b, i < 5, etc
-     * this condition may represent  
+     * this condition may represent. Complex conditions will return null.  
      *  
      * @return primitive search statement, can be null 
      */
     PrimitiveStatement getStatement();
     
     /**
-     * List of conditions this SearchCondition may represent  
+     * List of conditions this SearchCondition may represent.
+     * Composite SearchConditions will return a list of conditions they are
+     * composed from, primitive ones will return null  
      * @return list of conditions, can be null
      */
     List<SearchCondition<T>> getSearchConditions();
     
     /**
-     * Type of condition this SearchCondition represents
+     * Returns the type of the condition this SearchCondition represents
      * @return condition type
      */
     ConditionType getConditionType();
+
+    /**
+     * Provides a visitor which will convert this SearchCondition into
+     * a custom expression, for example, into the SQL statement, etc 
+     * @param visitor
+     */
+    void accept(SearchConditionVisitor<T> visitor);
     
     /**
+     * 
+     * This method is now deprecated and will be removed soon.
+     * 
      * Utility method for converting this condition into an SQL expression
      * @param table table name
      * @param columns column names, a wildcard as in 'SELECT * from table' will be used
      *                if names are not provided 
      * @return SQL expression
      */    
+    @Deprecated
     String toSQL(String table, String... columns);
+    
+    
 }

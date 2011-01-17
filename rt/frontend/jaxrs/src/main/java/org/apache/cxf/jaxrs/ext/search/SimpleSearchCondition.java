@@ -270,30 +270,7 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
     }
 
     public String toSQL(String table, String... columns) {
-        if (isPrimitive(condition)) {
-            return null;
-        }
-        StringBuilder sb = new StringBuilder();
-        
-        if (table != null) {
-            SearchUtils.startSqlQuery(sb, table, columns);
-        }
-        
-        boolean first = true;
-        for (SearchCondition<T> sc : scts) {
-            PrimitiveStatement ps = sc.getStatement();
-            if (ps.getPropery() == null) {
-                continue;
-            }
-            if (!first) {
-                sb.append(" " + joiningType.toString() + " ");
-            } else {
-                first = false;
-            }
-            
-            sb.append(sc.toSQL(null));
-        }
-        return sb.toString();
+        return SearchUtils.toSQL(this, table, columns);
     }
     
     public PrimitiveStatement getStatement() {
@@ -302,6 +279,11 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         } else {
             return null;
         }
+    }
+
+    @Override
+    public void accept(SearchConditionVisitor<T> visitor) {
+        visitor.visit(this);
     }
     
     

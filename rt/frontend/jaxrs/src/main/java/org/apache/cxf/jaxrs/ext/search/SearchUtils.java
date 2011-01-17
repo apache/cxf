@@ -24,6 +24,12 @@ public final class SearchUtils {
         
     }
     
+    public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {
+        SearchConditionVisitor<T> visitor = new SQLPrinterConditionVisitor<T>(table, columns);
+        sc.accept(visitor);
+        return visitor.getResult();
+    }
+    
     public static void startSqlQuery(StringBuilder sb, String table, String... columns) {
         sb.append("SELECT ");
         if (columns.length > 0) {

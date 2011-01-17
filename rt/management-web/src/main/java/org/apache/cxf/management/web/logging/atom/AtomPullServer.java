@@ -46,6 +46,7 @@ import org.apache.cxf.jaxrs.ext.search.ConditionType;
 import org.apache.cxf.jaxrs.ext.search.OrSearchCondition;
 import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
 import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
 import org.apache.cxf.management.web.logging.LogLevel;
 import org.apache.cxf.management.web.logging.LogRecord;
 import org.apache.cxf.management.web.logging.ReadWriteLogStorage;
@@ -467,8 +468,10 @@ public class AtomPullServer extends AbstractAtomBean {
         public String toSQL(String table, String... columns) {
             return null;
         }
-        
-        
+
+        @Override
+        public void accept(SearchConditionVisitor<LogRecord> visitor) {
+        }
     }
     
     private static class LogRecordComparator implements Comparator<LogRecord> {
