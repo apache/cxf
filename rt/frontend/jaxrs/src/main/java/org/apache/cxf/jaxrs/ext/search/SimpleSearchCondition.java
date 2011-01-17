@@ -281,7 +281,6 @@ public class SimpleSearchCondition<T> implements SearchCondition<T> {
         }
     }
 
-    @Override
     public void accept(SearchConditionVisitor<T> visitor) {
         visitor.visit(this);
     }
