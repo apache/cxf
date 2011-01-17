@@ -102,3 +102,15 @@ For CORBA support:
 
 For JavaScript functionality:
 - js.jar
+
+For schema validation with the Aegis data binding, 
+you must retrieve and include the following jars. 
+The licenses of these jars are do not permit
+redistribution with Apache CXF releases.
+
+ - msv-core.jar (version 2010.1)
+ - xsdlib:jar (version 2010.1)
+ - isorelax.jar (version 20030108)
+ - relaxngDatatype.jar (version 20020414)
+
+
