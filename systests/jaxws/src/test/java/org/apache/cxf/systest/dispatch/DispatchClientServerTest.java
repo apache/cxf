@@ -42,6 +42,8 @@ import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
 import javax.xml.ws.soap.SOAPFaultException;
+import javax.xml.ws.wsaddressing.W3CEndpointReference;
+import javax.xml.ws.wsaddressing.W3CEndpointReferenceBuilder;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -69,6 +71,7 @@ import org.apache.hello_world_soap_http.types.GreetMeLater;
 import org.apache.hello_world_soap_http.types.GreetMeResponse;
 import org.junit.BeforeClass;
 import org.junit.Test;
+
 
 public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
 
@@ -265,6 +268,35 @@ public class DispatchClientServerTest extends AbstractBusClientServerTestBase {
         assertEquals("Response should be : Hello TestSOAPInputMessage3", 
                      expected3, tsmh.getReplyBuffer().trim());
 
+    }
+    
+    @Test
+    public void testCreateDispatchWithEPR() throws Exception {
+
+        URL wsdl = getClass().getResource("/wsdl/hello_world.wsdl");
+        assertNotNull(wsdl);
+
+        SOAPService service = new SOAPService(wsdl, SERVICE_NAME);
+        assertNotNull(service);
+
+        W3CEndpointReferenceBuilder builder = new  W3CEndpointReferenceBuilder();
+        builder.address("http://localhost:" 
+                        + greeterPort 
+                        + "/SOAPDispatchService/SoapDispatchPort");
+        builder.serviceName(SERVICE_NAME);
+        builder.endpointName(PORT_NAME);
+        W3CEndpointReference w3cEpr = builder.build();
+        Dispatch<SOAPMessage> disp = service
+            .createDispatch(w3cEpr, SOAPMessage.class, Service.Mode.MESSAGE);
+        InputStream is = getClass().getResourceAsStream("resources/GreetMeDocLiteralReq.xml");
+        SOAPMessage soapReqMsg = MessageFactory.newInstance().createMessage(null, is);
+        assertNotNull(soapReqMsg);
+        SOAPMessage soapResMsg = disp.invoke(soapReqMsg);
+        
+        assertNotNull(soapResMsg);
+        String expected = "Hello TestSOAPInputMessage";
+        assertEquals("Response should be : Hello TestSOAPInputMessage", expected, soapResMsg.getSOAPBody()
+            .getTextContent().trim());
     }
     
     @Test
