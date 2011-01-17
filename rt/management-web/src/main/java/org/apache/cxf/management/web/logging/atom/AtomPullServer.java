@@ -469,7 +469,6 @@ public class AtomPullServer extends AbstractAtomBean {
             return null;
         }
 
-        @Override
         public void accept(SearchConditionVisitor<LogRecord> visitor) {
         }
     }
