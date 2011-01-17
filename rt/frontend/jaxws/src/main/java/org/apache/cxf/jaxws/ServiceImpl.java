@@ -252,10 +252,16 @@ public class ServiceImpl extends ServiceDelegate {
                 }
             }
         }
-
+        
         if (ei == null) {
             Message msg = new Message("INVALID_PORT", BUNDLE, portName);
             throw new WebServiceException(msg.toString());
+        }
+        
+        //When the dispatch is created from EPR, the EPR's address will be set in portInfo
+        PortInfoImpl portInfo = getPortInfo(portName);
+        if (portInfo != null && !portInfo.getAddress().equals(ei.getAddress())) {
+            ei.setAddress(portInfo.getAddress());
         }
 
         try {
@@ -628,7 +634,13 @@ public class ServiceImpl extends ServiceDelegate {
         if (executor != null) {
             client.getEndpoint().setExecutor(executor);
         }
-                
+        
+        //Set the the EPR's address in EndpointInfo
+        PortInfoImpl portInfo = portInfos.get(portName);
+        if (portInfo != null && !StringUtils.isEmpty(portInfo.getAddress())) {
+            client.getEndpoint().getEndpointInfo().setAddress(portInfo.getAddress());
+        }
+
         Dispatch<T> disp = new DispatchImpl<T>(client, mode, type);
         configureObject(disp);
         return disp;
@@ -640,10 +652,11 @@ public class ServiceImpl extends ServiceDelegate {
                                           Mode mode,
                                           WebServiceFeature... features) {
         EndpointReferenceType ref = VersionTransformer.convertToInternal(endpointReference);
-        return createDispatch(EndpointReferenceUtils.getPortQName(ref, bus), 
+        QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
+        updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
+        return createDispatch(portName, 
                               type, mode, features);
     }   
-
 
     @Override
     public Dispatch<Object> createDispatch(QName portName, JAXBContext context, Mode mode) {
@@ -691,8 +704,9 @@ public class ServiceImpl extends ServiceDelegate {
                                            Mode mode,
                                            WebServiceFeature... features) {
         EndpointReferenceType ref = VersionTransformer.convertToInternal(endpointReference);
-        return createDispatch(EndpointReferenceUtils.getPortQName(ref, bus), 
-                              context, mode, features);        
+        QName portName = EndpointReferenceUtils.getPortQName(ref, bus);
+        updatePortInfoAddress(portName, EndpointReferenceUtils.getAddress(ref));
+        return createDispatch(portName, context, mode, features);        
     }
 
     @Override
@@ -708,7 +722,14 @@ public class ServiceImpl extends ServiceDelegate {
         client.getOutInterceptors().addAll(clientFact.getOutInterceptors());
         client.getInFaultInterceptors().addAll(clientFact.getInFaultInterceptors());
         client.getOutFaultInterceptors().addAll(clientFact.getOutFaultInterceptors());
-    }    
+    } 
+    
+    private void updatePortInfoAddress(QName portName, String eprAddress) {
+        PortInfoImpl portInfo = portInfos.get(portName);
+        if (!StringUtils.isEmpty(eprAddress) && portInfo != null) {
+            portInfo.setAddress(eprAddress);
+        }
+    }
 }
 
 
