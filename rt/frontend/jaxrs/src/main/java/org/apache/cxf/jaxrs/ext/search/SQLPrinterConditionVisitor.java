@@ -32,7 +32,6 @@ public class SQLPrinterConditionVisitor<T> implements SearchConditionVisitor<T> 
     }
     
     
-    @Override
     public void visit(SearchCondition<T> sc) {
         
         if (sb == null) {
