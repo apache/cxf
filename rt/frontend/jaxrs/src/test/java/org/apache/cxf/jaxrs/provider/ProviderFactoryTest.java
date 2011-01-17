@@ -233,6 +233,21 @@ public class ProviderFactoryTest extends Assert {
     }
     
     @Test
+    public void testMessageBodyWriterNoTypes() throws Exception {
+        ProviderFactory pf = ProviderFactory.getInstance();
+        List<Object> providers = new ArrayList<Object>();
+        SuperBookReaderWriter2 superBookHandler = new SuperBookReaderWriter2();
+        providers.add(superBookHandler);
+        pf.setUserProviders(providers);
+        assertSame(superBookHandler, 
+                   pf.createMessageBodyReader(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+        assertSame(superBookHandler, 
+                   pf.createMessageBodyWriter(SuperBook.class, SuperBook.class, new Annotation[]{}, 
+                                              MediaType.APPLICATION_XML_TYPE, new MessageImpl()));
+    }
+    
+    @Test
     public void testSortEntityProviders() throws Exception {
         ProviderFactory pf = ProviderFactory.getInstance();
         pf.registerUserProvider(new TestStringProvider());
@@ -595,6 +610,43 @@ public class ProviderFactoryTest extends Assert {
 
         public void writeTo(SuperBook arg0, Class<?> arg1, Type arg2, 
                             Annotation[] arg3, MediaType arg4, MultivaluedMap<String, Object> arg5, 
+                            OutputStream arg6) throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            
+        }
+        
+    }
+    
+    @Produces("application/xml")
+    @Consumes("application/xml")
+    private static class SuperBookReaderWriter2 implements MessageBodyReader, MessageBodyWriter {
+
+        public boolean isReadable(Class type, Type genericType, Annotation[] annotations, 
+                                  MediaType mediaType) {
+            return true;
+        }
+
+        public Object readFrom(Class arg0, Type arg1, Annotation[] arg2, MediaType arg3, 
+                                  MultivaluedMap arg4, InputStream arg5) 
+            throws IOException, WebApplicationException {
+            // TODO Auto-generated method stub
+            return null;
+        }
+
+        public long getSize(Object t, Class type, Type genericType, 
+                            Annotation[] annotations, MediaType mediaType) {
+            // TODO Auto-generated method stub
+            return 0;
+        }
+
+        public boolean isWriteable(Class type, Type genericType, 
+                                   Annotation[] annotations, MediaType mediaType) {
+            return true;
+        }
+
+        
+        public void writeTo(Object arg0, Class arg1, Type arg2, 
+                            Annotation[] arg3, MediaType arg4, MultivaluedMap arg5, 
                             OutputStream arg6) throws IOException, WebApplicationException {
             // TODO Auto-generated method stub
             

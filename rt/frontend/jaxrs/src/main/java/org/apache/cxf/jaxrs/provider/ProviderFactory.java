@@ -174,7 +174,7 @@ public final class ProviderFactory {
         List<ExceptionMapper<T>> candidates = new LinkedList<ExceptionMapper<T>>();
         
         for (ProviderInfo<ExceptionMapper> em : exceptionMappers) {
-            handleMapper((List)candidates, em, exceptionType, m);
+            handleMapper((List)candidates, em, exceptionType, m, ExceptionMapper.class);
         }
         if (candidates.size() == 0) {
             return null;
@@ -189,7 +189,7 @@ public final class ProviderFactory {
         List<ParameterHandler<T>> candidates = new LinkedList<ParameterHandler<T>>();
         
         for (ProviderInfo<ParameterHandler> em : paramHandlers) {
-            handleMapper((List)candidates, em, paramType, null);
+            handleMapper((List)candidates, em, paramType, null, ParameterHandler.class);
         }
         if (candidates.size() == 0) {
             return null;
@@ -205,7 +205,7 @@ public final class ProviderFactory {
         List<ResponseExceptionMapper<T>> candidates = new LinkedList<ResponseExceptionMapper<T>>();
         
         for (ProviderInfo<ResponseExceptionMapper> em : responseExceptionMappers) {
-            handleMapper((List)candidates, em, paramType, null);
+            handleMapper((List)candidates, em, paramType, null, ResponseExceptionMapper.class);
         }
         if (candidates.size() == 0) {
             return null;
@@ -215,7 +215,7 @@ public final class ProviderFactory {
     }
     
     private static void handleMapper(List<Object> candidates, ProviderInfo em, 
-                                     Class<?> expectedType, Message m) {
+                                     Class<?> expectedType, Message m, Class<?> providerClass) {
         
         Class<?> mapperClass =  ClassHelper.getRealClass(em.getProvider());
         Type[] types = getGenericInterfaces(mapperClass);
@@ -259,6 +259,8 @@ public final class ProviderFactory {
                         return;
                     }
                 }
+            } else if (t instanceof Class && ((Class<?>)t).isAssignableFrom(providerClass)) {
+                candidates.add(em.getProvider());
             }
         }
     }
@@ -433,7 +435,7 @@ public final class ProviderFactory {
                     InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                     return ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m);
+                handleMapper((List)candidates, ep, type, m, MessageBodyReader.class);
             }
         }     
         
@@ -487,7 +489,7 @@ public final class ProviderFactory {
                     InjectionUtils.injectContextMethods(ep.getProvider(), ep, m);
                     return ep.getProvider();
                 }
-                handleMapper((List)candidates, ep, type, m);
+                handleMapper((List)candidates, ep, type, m, MessageBodyWriter.class);
             }
         }     
         if (candidates.size() == 0) {
