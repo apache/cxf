@@ -891,6 +891,9 @@ public final class ContextUtils {
                                                            Names.WSAW_ACTION_NAME));
         }
         if (o == null) {
+            o = ext.getExtensionAttributes().get(new QName(JAXWSAConstants.NS_WSA, Names.WSAW_ACTION_NAME));
+        }
+        if (o == null) {
             o = ext.getExtensionAttributes().get(new QName(Names.WSA_NAMESPACE_WSDL_NAME_OLD,
                                                    Names.WSAW_ACTION_NAME));
         }
