@@ -96,6 +96,16 @@ public class MustUnderstandInterceptor extends AbstractSoapInterceptor {
             checkUltimateReceiverHeaders(ultimateReceiverHeaders, mustUnderstandQNames, soapMessage);
         }
     }
+    public void handleFault(SoapMessage message) {
+        SoapFault soapFault = (SoapFault)message.get(MustUnderstandInterceptor.FAULT);
+        if (soapFault != null
+            && !message.getExchange().isOneWay()
+            && soapFault != message.getContent(Exception.class)) {
+            
+            message.setContent(Exception.class, soapFault);
+        }
+    }
+
 
     private void checkUltimateReceiverHeaders(Set<Header> ultimateReceiverHeaders,
                                               Set<QName> mustUnderstandQNames, 

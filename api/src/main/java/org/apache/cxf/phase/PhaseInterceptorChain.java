@@ -285,25 +285,29 @@ public class PhaseInterceptorChain implements InterceptorChain {
                                 description.append("\' ");
                             }
                         }
+                        
+                        message.setContent(Exception.class, ex);
+                        unwind(message);
+                        Exception ex2 = message.getContent(Exception.class);
+                        if (ex2 == null) {
+                            ex2 = ex;
+                        }
 
                         FaultListener flogger = (FaultListener)
                                 message.getContextualProperty(FaultListener.class.getName());
                         boolean useDefaultLogging = true;
                         if (flogger != null) {
-                            useDefaultLogging = flogger.faultOccurred(ex, description.toString(), message);
+                            useDefaultLogging = flogger.faultOccurred(ex2, description.toString(), message);
                         }
                         if (useDefaultLogging) {
-                            doDefaultLogging(message, ex, description);
+                            doDefaultLogging(message, ex2, description);
                         }
 
     
-                        message.setContent(Exception.class, ex);
-                                            
-                        unwind(message);
                         
                         boolean isOneWay = false;
                         if (message.getExchange() != null) {
-                            message.getExchange().put(Exception.class, ex);
+                            message.getExchange().put(Exception.class, ex2);
                             isOneWay = message.getExchange().isOneWay();
                         }
                         
@@ -324,7 +328,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         }
     }
 
-    private void doDefaultLogging(Message message, RuntimeException ex, StringBuilder description) {
+    private void doDefaultLogging(Message message, Exception ex, StringBuilder description) {
         FaultMode mode = message.get(FaultMode.class);
         if (mode == FaultMode.CHECKED_APPLICATION_FAULT) {
             if (isFineLogging) {
