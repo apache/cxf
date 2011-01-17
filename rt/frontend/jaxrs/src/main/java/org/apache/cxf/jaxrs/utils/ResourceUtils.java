@@ -550,12 +550,20 @@ public final class ResourceUtils {
         List<Object> providers = new ArrayList<Object>();
         Map<Class, ResourceProvider> map = new HashMap<Class, ResourceProvider>();
         
-        // at the moment we don't support per-request providers, only resource classes
         // Note, app.getClasse() returns a list of per-resource classes
+        // or singleton provider classes
         for (Class<?> c : app.getClasses()) {
-            if (isValidPerRequestResourceClass(c, singletons)) {
-                resourceClasses.add(c);
-                map.put(c, new PerRequestResourceProvider(c));
+            if (isValidApplicationClass(c, singletons)) {
+                if (c.getAnnotation(Provider.class) != null) {
+                    try {
+                        providers.add(c.newInstance());
+                    } catch (Throwable ex) {
+                        throw new RuntimeException("Provider " + c.getName() + " can not be created", ex); 
+                    }
+                } else {
+                    resourceClasses.add(c);
+                    map.put(c, new PerRequestResourceProvider(c));
+                }
             }
         }
         
@@ -611,7 +619,7 @@ public final class ResourceUtils {
         return true;
     }
     
-    private static boolean isValidPerRequestResourceClass(Class<?> c, Set<Object> singletons) {
+    private static boolean isValidApplicationClass(Class<?> c, Set<Object> singletons) {
         if (!isValidResourceClass(c)) {
             return false;
         }

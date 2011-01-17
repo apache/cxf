@@ -30,6 +30,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactory;
 import org.apache.cxf.jaxrs.client.JAXRSClientFactoryBean;
+import org.apache.cxf.jaxrs.client.ServerWebApplicationException;
 import org.apache.cxf.jaxrs.client.WebClient;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 
@@ -143,6 +144,32 @@ public class JAXRSClientServerNonSpringBookTest extends AbstractBusClientServerT
         getAndCompareAsStrings("http://localhost:" + PORT + "/application11/thebooks/bookstore/books/123",
                                "resources/expected_get_book123.txt",
                                "application/xml", 200);
+        
+    }
+    
+    @Test
+    public void testGetNonExistentBook() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT 
+                                        + "/application11/thebooks/bookstore/books/321");
+        try {
+            wc.accept("*/*").get(Book.class);
+            fail();
+        } catch (ServerWebApplicationException ex) {
+            assertEquals("No book found at all : 321", ex.getMessage());
+        }
+        
+    }
+    
+    @Test
+    public void testBookWithNonExistentMethod() throws Exception {
+        WebClient wc = WebClient.create("http://localhost:" + PORT
+                                        + "/application11/thebooks/bookstore/nonexistent");
+        try {
+            wc.accept("*/*").get(Book.class);
+            fail();
+        } catch (ServerWebApplicationException ex) {
+            assertEquals("Nonexistent method", ex.getMessage());
+        }
         
     }
     

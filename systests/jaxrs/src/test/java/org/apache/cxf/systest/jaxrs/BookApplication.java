@@ -32,6 +32,7 @@ public class BookApplication extends Application {
         Set<Class<?>> classes = new HashSet<Class<?>>();
         classes.add(org.apache.cxf.systest.jaxrs.BookStorePerRequest.class);
         classes.add(org.apache.cxf.systest.jaxrs.jaxws.BookStoreJaxrsJaxws.class);
+        classes.add(org.apache.cxf.systest.jaxrs.RuntimeExceptionMapper.class);
         return classes;
     }
 
@@ -39,6 +40,9 @@ public class BookApplication extends Application {
     public Set<Object> getSingletons() {
         Set<Object> classes = new HashSet<Object>();
         classes.add(new org.apache.cxf.systest.jaxrs.BookStore());
+        BookExceptionMapper mapper = new org.apache.cxf.systest.jaxrs.BookExceptionMapper();
+        mapper.setToHandle(true);
+        classes.add(mapper);
         return classes;
     }
     
