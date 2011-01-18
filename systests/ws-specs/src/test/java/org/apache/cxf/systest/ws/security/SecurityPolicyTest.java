@@ -306,7 +306,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             s = s.substring(s.indexOf("Payload: ") + 9);
             s = s.substring(0, s.lastIndexOf("Envelope>") + 9);
             assertTrue("Content wasn't encrypted!", !s.contains("I don't like that."));
-            System.out.println(s);
+            //System.out.println(s);
             Document d = XMLUtils.parse(new InputSource(new StringReader(s)));
             Node nd = d.getDocumentElement().getFirstChild();
             while (nd != null && !"Body".equals(nd.getLocalName())) {
