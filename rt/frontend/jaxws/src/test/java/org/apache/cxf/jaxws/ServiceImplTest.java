@@ -70,6 +70,19 @@ public class ServiceImplTest extends AbstractJaxWsTest {
     
     private boolean isClientProxyFactoryBeanConfigured;
     
+    
+    @Test
+    public void testAddPort() throws Exception {
+        QName sName = new QName("service");
+        QName pName = new QName("port");
+        
+        javax.xml.ws.Service service = Service.create(sName);
+        service.addPort(pName, SOAPBinding.SOAP11HTTP_BINDING, "http://mysite.org/test");
+        
+        Iterator<QName> ports = service.getPorts(); 
+        assertTrue(ports.hasNext());
+    }
+    
     @Test
     public void testServiceImpl() throws Exception {
         SOAPService service = new SOAPService();

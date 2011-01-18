@@ -24,9 +24,7 @@ import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +113,6 @@ public class ServiceImpl extends ServiceDelegate {
     private QName serviceName;
     private Class<?> clazz;
 
-    private final Collection<QName> ports = new HashSet<QName>();
     private Map<QName, PortInfoImpl> portInfos = new HashMap<QName, PortInfoImpl>();
     private WebServiceFeature serviceFeatures[];
 
@@ -198,7 +195,6 @@ public class ServiceImpl extends ServiceDelegate {
                         address = ((SOAPAddress)e).getLocationURI();                        
                     }
                 }
-                this.ports.add(name);
                 addPort(name, bindingID, address);
             }
         } catch (WebServiceException e) {
@@ -208,7 +204,6 @@ public class ServiceImpl extends ServiceDelegate {
             Service service = sf.create();
             for (ServiceInfo si : service.getServiceInfos()) { 
                 for (EndpointInfo ei : si.getEndpoints()) {
-                    this.ports.add(ei.getName());
                     String bindingID = BindingID.getJaxwsBindingID(ei.getTransportId());
                     addPort(ei.getName(), bindingID, ei.getAddress());
                 }
@@ -328,7 +323,7 @@ public class ServiceImpl extends ServiceDelegate {
             throw new WebServiceException(BUNDLE.getString("PORT_NAME_NULL_EXC"));
         }
         
-        if (!ports.contains(portName) && !portInfos.containsKey(portName)) {
+        if (!portInfos.containsKey(portName)) {
             throw new WebServiceException(new Message("INVALID_PORT", BUNDLE, portName).toString());
         }
         
@@ -371,7 +366,7 @@ public class ServiceImpl extends ServiceDelegate {
     } 
     
     public Iterator<QName> getPorts() {
-        return ports.iterator();
+        return portInfos.keySet().iterator();
     }
 
     public QName getServiceName() {
@@ -494,8 +489,9 @@ public class ServiceImpl extends ServiceDelegate {
         hc.addAll(handlerResolver.getHandlerChain(portInfos.get(portName)));
         jaxwsEndpoint.getJaxwsBinding().setHandlerChain(hc);
         LOG.log(Level.FINE, "created proxy", obj);
-
-        ports.add(portName);
+        if (portInfo == null) {
+            addPort(portName, clientFac.getBindingId(), clientFac.getAddress());
+        }
         return serviceEndpointInterface.cast(obj);
     }
     
