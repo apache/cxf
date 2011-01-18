@@ -176,6 +176,8 @@ public final class IdlPreprocessorReader extends Reader {
                 handleIfndef(line);
             } else if (line.startsWith("#ifdef")) {
                 handleIfdef(line);
+            } else if (line.startsWith("#if")) {
+                handleIf(line);
             } else if (line.startsWith("#endif")) {
                 handleEndif(lineNo, ise);
             } else if (line.startsWith("#else")) {
@@ -252,6 +254,21 @@ public final class IdlPreprocessorReader extends Reader {
         String symbol = line.substring("#ifdef".length()).trim();
         boolean isDefined = defineState.isDefined(symbol);
         registerIf(!isDefined);
+        buf.append(LF);
+    }
+    
+    private void handleIf(String line) {
+        String symbol = line.substring("#if".length()).trim();
+        boolean notSkip = true;
+        try {
+            int value = Integer.valueOf(symbol);
+            if (value == 0) {
+                notSkip = false;
+            }
+        } catch (NumberFormatException e) {
+            //do nothig
+        }
+        registerIf(!notSkip);
         buf.append(LF);
     }
 

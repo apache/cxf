@@ -21,6 +21,16 @@ module c
 
 
 // endif _c
+
+
+
+
+
+    const char e = 'e';
+
+
+    const char f = 'f';
+
   };
 };
 
