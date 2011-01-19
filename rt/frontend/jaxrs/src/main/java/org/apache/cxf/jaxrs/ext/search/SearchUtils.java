@@ -18,6 +18,8 @@
  */
 package org.apache.cxf.jaxrs.ext.search;
 
+import org.apache.cxf.jaxrs.ext.search.sql.SQLPrinterVisitor;
+
 public final class SearchUtils {
     
     private SearchUtils() {
@@ -25,7 +27,7 @@ public final class SearchUtils {
     }
     
     public static <T> String toSQL(SearchCondition<T> sc, String table, String... columns) {
-        SearchConditionVisitor<T> visitor = new SQLPrinterConditionVisitor<T>(table, columns);
+        SearchConditionVisitor<T> visitor = new SQLPrinterVisitor<T>(table, columns);
         sc.accept(visitor);
         return visitor.getResult();
     }

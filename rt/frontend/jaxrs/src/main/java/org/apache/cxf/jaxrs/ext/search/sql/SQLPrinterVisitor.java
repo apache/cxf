@@ -16,21 +16,36 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.cxf.jaxrs.ext.search;
+package org.apache.cxf.jaxrs.ext.search.sql;
+
+import java.util.Map;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.jaxrs.ext.search.PrimitiveStatement;
+import org.apache.cxf.jaxrs.ext.search.SearchCondition;
+import org.apache.cxf.jaxrs.ext.search.SearchConditionVisitor;
+import org.apache.cxf.jaxrs.ext.search.SearchUtils;
 
 
-public class SQLPrinterConditionVisitor<T> implements SearchConditionVisitor<T> {
+public class SQLPrinterVisitor<T> implements SearchConditionVisitor<T> {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(SQLPrinterVisitor.class);
+    
     private StringBuilder sb;
     private String table;
     private String[] columns;
-
+    private Map<String, String> fieldMap;
     
-    public SQLPrinterConditionVisitor(String table, String... columns) {
+    public SQLPrinterVisitor(String table, String... columns) {
+        this(null, table, columns);
+    }
+    
+    public SQLPrinterVisitor(Map<String, String> fieldMap, String table, String... columns) {
+        this.fieldMap = fieldMap;
         this.columns = columns;
         this.table = table;
     }
-    
     
     public void visit(SearchCondition<T> sc) {
         
@@ -45,7 +60,17 @@ public class SQLPrinterConditionVisitor<T> implements SearchConditionVisitor<T> 
         if (statement != null) {
             if (statement.getProperty() != null) {
                 String rvalStr = statement.getValue().toString().replaceAll("\\*", "%");
-                sb.append(statement.getProperty()).append(" ").append(
+                String name = statement.getProperty();
+                if (fieldMap != null) {
+                    if (fieldMap.containsKey(name)) {
+                        name = fieldMap.get(name);
+                    } else {
+                        LOG.warning("Unrecognized field alias : " + name);
+                        return;
+                    }
+                }
+                
+                sb.append(name).append(" ").append(
                             SearchUtils.conditionTypeToSqlOperator(sc.getConditionType(), rvalStr))
                             .append(" ").append("'").append(rvalStr).append("'");
             }
