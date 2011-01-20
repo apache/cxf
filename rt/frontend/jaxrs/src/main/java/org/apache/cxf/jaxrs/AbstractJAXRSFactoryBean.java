@@ -88,6 +88,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         setBindingId(JAXRSBindingFactory.JAXRS_BINDING_ID);
     }
     
+    /**
+     * {@inheritDoc}
+     */
     public Bus getBus() {
         Bus b = super.getBus();
         checkBindingFactory(bus);
@@ -105,6 +108,9 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public void setBus(Bus bus) {
         super.setBus(bus);
         checkBindingFactory(bus);
@@ -181,10 +187,19 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         return null;
     }
 
+    /**
+     * Returns the service factory
+     * @return the factory
+     */
     public JAXRSServiceFactoryBean getServiceFactory() {
         return serviceFactory;
     }
 
+    /**
+     * Sets the custom service factory which processes 
+     * the registered classes and providers 
+     * @param serviceFactory the factory
+     */
     public void setServiceFactory(JAXRSServiceFactoryBean serviceFactory) {
         this.serviceFactory = serviceFactory;
     }
@@ -225,28 +240,53 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         return ep;
     }
     
+    /**
+     * Sets the location of the schema which can be used to validate
+     * the incoming XML or JAXB-driven JSON. JAX-RS MessageBodyReader implementations
+     * which have the setSchemaLocations method accepting a list of schema locations 
+     * will be injected with this value.
+     * 
+     * @param schema the schema location
+     */
     public void setSchemaLocation(String schema) {
         setSchemaLocations(Collections.singletonList(schema));    
     }
     
+    /**
+     * Sets the locations of the schemas which can be used to validate
+     * the incoming XML or JAXB-driven JSON. JAX-RS MessageBodyReader implementations
+     * which have the setSchemaLocations method accepting a list of schema locations 
+     * will be injected with this value.
+     * 
+     * For example, if A.xsd imports B.xsd then both A.xsd and B.xsd need to be referenced.
+     * 
+     * @param schema the schema locations
+     */
     public void setSchemaLocations(List<String> schemas) {
         this.schemaLocations = schemas;    
     }
     
     /**
-     * @return the entityProviders
+     * @return the list of custom JAX-RS providers
      */
     public List<?> getProviders() {
         return entityProviders;
     }
 
     /**
-     * @param entityProviders the entityProviders to set
+     * Sets custom JAX-RS providers.
+     * 
+     * @param entityProviders the entityProviders
      */
     public void setProviders(List<? extends Object> providers) {
         this.entityProviders = providers;
     }
     
+    /**
+     * Sets a custom JAX-RS provider.
+     * 
+     * @param provider the custom provider.
+     */
     public void setProvider(Object provider) {
         setProviders(Collections.singletonList(provider));
     }

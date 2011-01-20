@@ -51,6 +51,10 @@ import org.apache.cxf.service.model.OperationInfo;
 import org.apache.cxf.service.model.ServiceInfo;
 import org.apache.cxf.workqueue.SynchronousExecutor;
 
+/**
+ * The CXF Service implementation which is used 
+ * to register the JAX-RS endpoint with the runtime.
+ */
 public class JAXRSServiceImpl extends AbstractAttributedInterceptorProvider implements Service, Configurable {
     private List<ClassResourceInfo> classResourceInfos;
     private DataBinding dataBinding;

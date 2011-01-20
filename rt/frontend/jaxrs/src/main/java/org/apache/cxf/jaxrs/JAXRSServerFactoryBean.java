@@ -73,14 +73,31 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         super(sf);
     }
     
+    /**
+     * Resource comparator which may be used to customize the way 
+     * a root resource or resource method is selected 
+     * @param rcomp comparator
+     */
     public void setResourceComparator(ResourceComparator rcomp) {
         rc = rcomp;
     }
     
+    /**
+     * By default the subresources are resolved dynamically, mainly due to
+     * the JAX-RS specification allowing Objects being returned from the subresource
+     * locators. Setting this property to true enables the runtime to do the 
+     * earky resolution.
+     * 
+     * @param enableStatic enabling the static resolution if set to true
+     */
     public void setStaticSubresourceResolution(boolean enableStatic) {
         serviceFactory.setEnableStaticResolution(enableStatic);
     }
-    
+
+    /**
+     * Creates the JAX-RS Server instance
+     * @return the server
+     */
     public Server create() {
         try {
             serviceFactory.setBus(getBus());
@@ -147,10 +164,22 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return new JAXRSInvoker();
     }
 
+    /**
+     * Sets the language mappings, 
+     * example, 'en' is the key and 'en-gb' is the value.
+     * 
+     * @param lMaps the language mappings
+     */
     public void setLanguageMappings(Map<Object, Object> lMaps) {
         languageMappings = lMaps;
     }
     
+    /**
+     * Sets the extension mappings, 
+     * example, 'xml' is the key and 'text/xml' is the value.
+     * 
+     * @param lMaps the extension mappings
+     */
     public void setExtensionMappings(Map<Object, Object> extMaps) {
         extensionMappings = extMaps;
     }
@@ -159,44 +188,92 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         return serviceFactory.getResourceClasses();
     }
     
+    /**
+     * This method is used primarily by Spring handler processing
+     * the jaxrs:server/@serviceClass attribute. It delegates to
+     * setResourceClasses method accepting the array of Class parameters.
+     * @param clazz the service/resource class
+     */
     public void setServiceClass(Class clazz) {
         serviceFactory.setResourceClasses(clazz);
     }
 
+    /**
+     * Sets one or more root resource classes 
+     * @param classes the list of resource classes
+     */
     public void setResourceClasses(List<Class> classes) {
         serviceFactory.setResourceClasses(classes);
     }
 
+    /**
+     * Sets one or more root resource classes 
+     * @param classes the array of resource classes
+     */
     public void setResourceClasses(Class... classes) {
         serviceFactory.setResourceClasses(classes);
     }
     
     /**
-     * Set the backing service bean. If this is set, JAX-RS runtime will not be
-     * responsible for the lifecycle of resource classes.
+     * Sets the resource beans. If this is set then the JAX-RS runtime 
+     * will not be responsible for the life-cycle of resource classes.
      * 
-     * @return
+     * @param beans the array of resource instances
      */
     public void setServiceBeanObjects(Object... beans) {
         setServiceBeans(Arrays.asList(beans));
     }
+    
+    /**
+     * Sets the single resource bean. If this is set then the JAX-RS runtime 
+     * will not be responsible for the life-cycle of resource classes.
+     * 
+     * @param bean resource instance
+     */
     public void setServiceBean(Object bean) {
         setServiceBeans(Arrays.asList(bean));
     }
     
+    /**
+     * Sets the resource beans. If this is set then the JAX-RS runtime 
+     * will not be responsible for the life-cycle of resource classes.
+     * 
+     * @param beans the list of resource instances
+     */
     public void setServiceBeans(List<Object> beans) {
         serviceFactory.setResourceClassesFromBeans(beans);
     }
     
+    /**
+     * Sets the provider managing the life-cycle of the given resource class
+     * <pre>
+     * Example:
+     *  setResourceProvider(BookStoreInterface.class, new SingletonResourceProvider(new BookStore()));
+     * </pre>
+     * @param c resource class
+     * @param rp resource provider
+     */
     public void setResourceProvider(Class c, ResourceProvider rp) {
         resourceProviders.put(c, rp);
     }
     
+    /**
+     * Sets the provider managing the life-cycle of the resource class
+     * <pre>
+     * Example:
+     *  setResourceProvider(new SingletonResourceProvider(new BookStore()));
+     * </pre>
+     * @param rp resource provider
+     */
     public void setResourceProvider(ResourceProvider rp) {
         setResourceProviders(CastUtils.cast(Collections.singletonList(rp), ResourceProvider.class));
     }
     
-    
+    /**
+     * Sets the list of providers managing the life-cycle of the resource classes
+     * 
+     * @param rps resource providers
+     */
     public void setResourceProviders(List<ResourceProvider> rps) {
         for (ResourceProvider rp : rps) {
             Class<?> c = rp.getResourceClass();
@@ -205,10 +282,20 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
 
+    /**
+     * Sets the custom Invoker which can be used to customize the way 
+     * the default JAX-RS invoker calls on the service bean
+     * @param invoker
+     */
     public void setInvoker(Invoker invoker) {
         serviceFactory.setInvoker(invoker);
     }
 
+    /**
+     * Can be used to postpone starting the Server instance during the create() call.
+     * @param start Server instance will not be started during the create() call if set to false
+     *        default is true.  
+     */
     public void setStart(boolean start) {
         this.start = start;
     }
