@@ -434,10 +434,8 @@ public class ServiceImpl extends ServiceDelegate {
             Service service = serviceFactory.getService();
             if (service == null) {
                 serviceFactory.setServiceClass(serviceEndpointInterface);
-                serviceFactory.setBus(getBus());
+                serviceFactory.setBus(getBus());                
                 service = serviceFactory.create();
-                //Add this flag and not need to create service twice
-                serviceFactory.setNeedReset(false);
             }
             
             EndpointInfo ei = ServiceModelUtil.findBestEndpointInfo(portTypeName, service.getServiceInfos());
