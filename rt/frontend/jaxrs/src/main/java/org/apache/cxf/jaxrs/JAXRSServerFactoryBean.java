@@ -86,7 +86,7 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
      * By default the subresources are resolved dynamically, mainly due to
      * the JAX-RS specification allowing Objects being returned from the subresource
      * locators. Setting this property to true enables the runtime to do the 
-     * earky resolution.
+     * early resolution.
      * 
      * @param enableStatic enabling the static resolution if set to true
      */
