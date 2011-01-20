@@ -44,7 +44,7 @@ import org.apache.cxf.service.invoker.Invoker;
 
 
 /**
- * Build a JAX-RS service model from resource classes.
+ * Builds a JAX-RS service model from resource classes.
  */
 public class JAXRSServiceFactoryBean extends AbstractServiceFactoryBean {
     
