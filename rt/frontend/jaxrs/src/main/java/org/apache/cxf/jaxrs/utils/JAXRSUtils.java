@@ -246,7 +246,7 @@ public final class JAXRSUtils {
                                                                 path, 
                                                                 cri.getURITemplate().getValue()).toString());
             } else {
-                LOG.fine(new org.apache.cxf.common.i18n.Message("NO_CRI_MATCH", 
+                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH", 
                                                                 BUNDLE, 
                                                                 path,
                                                                 cri.getServiceClass().getName()).toString());
