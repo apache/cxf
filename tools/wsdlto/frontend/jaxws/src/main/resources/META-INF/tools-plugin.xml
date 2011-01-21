@@ -20,17 +20,31 @@ under the License.
 
 <plugin name="jaxws" version="" provider="cxf.apache.org" xmlns="http://cxf.apache.org/tools/plugin">
     <frontend name="jaxws" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="JAXWSProfile">
-	<container name="JAXWSContainer" toolspec="jaxws-toolspec.xml"/>
-	<processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
-	<builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
-	<generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
-	    <generator name="AntGenerator"/>
-	    <generator name="ClientGenerator"/>
-	    <generator name="FaultGenerator"/>
-	    <generator name="ImplGenerator"/>
-	    <generator name="SEIGenerator"/>
-	    <generator name="ServerGenerator"/>
-	    <generator name="ServiceGenerator"/>
-	</generators>
+	   <container name="JAXWSContainer" toolspec="jaxws-toolspec.xml"/>
+	   <processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
+	   <builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
+	   <generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
+	       <generator name="AntGenerator"/>
+	       <generator name="ClientGenerator"/>
+	       <generator name="FaultGenerator"/>
+	       <generator name="ImplGenerator"/>
+	       <generator name="SEIGenerator"/>
+	       <generator name="ServerGenerator"/>
+	       <generator name="ServiceGenerator"/>
+	   </generators>
+    </frontend>
+    <frontend name="jaxws21" package="org.apache.cxf.tools.wsdlto.frontend.jaxws" profile="JAXWSProfile">
+       <container name="JAXWS21Container" toolspec="jaxws-toolspec.xml"/>
+       <processor name="WSDLToJavaProcessor" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.processor"/>
+       <builder name="JAXWSDefinitionBuilder" package="org.apache.cxf.tools.wsdlto.frontend.jaxws.wsdl11"/>
+       <generators package="org.apache.cxf.tools.wsdlto.frontend.jaxws.generators">
+           <generator name="AntGenerator"/>
+           <generator name="ClientGenerator"/>
+           <generator name="FaultGenerator"/>
+           <generator name="ImplGenerator"/>
+           <generator name="SEIGenerator"/>
+           <generator name="ServerGenerator"/>
+           <generator name="JAXWS21ServiceGenerator"/>
+       </generators>
     </frontend>
 </plugin>

@@ -137,7 +137,7 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 setAttributes("wsdlUrl", url);
                 setCommonAttributes();
                 
-                if (Service.class.getDeclaredConstructors().length == 2) {
+                if (isJaxws22()) {
                     setAttributes("jaxws22", true);
                 }
     
@@ -145,6 +145,10 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                                                           js.getName()));
             }
         }
+    }
+    
+    public boolean isJaxws22() {
+        return Service.class.getDeclaredConstructors().length == 2;
     }
 
     public void register(final ClassCollector collector, String packageName, String fileName) {
