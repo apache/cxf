@@ -54,6 +54,7 @@ import org.apache.cxf.jaxrs.lifecycle.ResourceProvider;
 import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.ProviderInfo;
+import org.apache.cxf.jaxrs.provider.AbstractConfigurableProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.InjectionUtils;
@@ -291,12 +292,14 @@ public class JAXRSOutInterceptor extends AbstractOutDatabindingInterceptor {
             return false;
         }
         Object outBuf = m.getContextualProperty(OUT_BUFFERING);
-        boolean enabled = Boolean.TRUE.equals(outBuf) || "true".equals(outBuf);
-        if (!enabled && outBuf == null) {
-            enabled = InjectionUtils.invokeBooleanGetter(w, "getEnableBuffering");
+        boolean enabled = MessageUtils.isTrue(outBuf);
+        boolean configurableProvider = w instanceof AbstractConfigurableProvider;
+        if (!enabled && outBuf == null && configurableProvider) {
+            enabled = ((AbstractConfigurableProvider)w).getEnableBuffering();
         }
         if (enabled) {
-            boolean streamingOn = InjectionUtils.invokeBooleanGetter(w, "getEnableStreaming");
+            boolean streamingOn = configurableProvider 
+                ? ((AbstractConfigurableProvider)w).getEnableStreaming() : false;
             if (streamingOn) {
                 m.setContent(XMLStreamWriter.class, new CachingXmlEventWriter());
             } else {
