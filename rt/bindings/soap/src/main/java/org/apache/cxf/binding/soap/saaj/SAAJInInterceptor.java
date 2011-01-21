@@ -98,6 +98,10 @@ public class SAAJInInterceptor extends AbstractSoapInterceptor {
     }
     
     public void handleMessage(SoapMessage message) throws Fault {
+        if (isGET(message)) {
+            return;
+        }
+
         try {
             MessageFactory factory = getFactory(message);
             SOAPMessage soapMessage = factory.createMessage();

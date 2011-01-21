@@ -22,7 +22,9 @@ package org.apache.cxf.systest.jaxws;
 import javax.xml.ws.Endpoint;
 
 import org.apache.cxf.anonymous_complex_type.AnonymousComplexTypeImpl;
+import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.jaxb_element_test.JaxbElementTestImpl;
+import org.apache.cxf.jaxws.EndpointImpl;
 import org.apache.cxf.jaxws.JAXWSMethodInvoker;
 import org.apache.cxf.jaxws.JaxWsServerFactoryBean;
 import org.apache.cxf.ordered_param_holder.OrderedParamHolderImpl;
@@ -82,7 +84,9 @@ public class ServerMisc extends AbstractBusTestServerBase {
         //Endpoint.publish(DOCLIT_CODEFIRST_URL, implementor4);
         
         Object implementor7 = new DocLitBareCodeFirstServiceImpl();
-        Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
+        EndpointImpl ep = (EndpointImpl)Endpoint.publish(DOCLITBARE_CODEFIRST_URL, implementor7);
+        ep.getServer().getEndpoint().getInInterceptors().add(new SAAJInInterceptor());
+
         
         Object implementor6 = new InterfaceInheritTestImpl();
         Endpoint.publish(DOCLIT_CODEFIRST_BASE_URL, implementor6);
@@ -107,6 +111,7 @@ public class ServerMisc extends AbstractBusTestServerBase {
         
         Endpoint.publish("http://localhost:" + PORT + "/InheritContext/InheritPort",
                          new InheritImpl());
+
     }
 
     public static void main(String[] args) {
