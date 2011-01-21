@@ -58,6 +58,7 @@ import org.apache.cxf.common.WSDLConstants;
 import org.apache.cxf.common.util.ASMHelper;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxyFactoryBean;
+import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.helpers.XMLUtils;
 import org.apache.cxf.helpers.XPathUtils;
 import org.apache.cxf.jaxb_element_test.JaxbElementTest;
@@ -87,7 +88,14 @@ public class ClientServerMiscTest extends AbstractBusClientServerTestBase {
     public static void startServers() throws Exception {
         assertTrue("server did not launch correctly", launchServer(ServerMisc.class));
     }
-
+    @Test
+    public void testCXF3170() throws Exception {
+        URL url = new URL(ServerMisc.DOCLITBARE_CODEFIRST_URL + "/foo");
+        HttpURLConnection con = (HttpURLConnection)url.openConnection();
+        con.getResponseCode();
+        String  str = IOUtils.readStringFromStream(con.getErrorStream());
+        assertTrue(str.contains("/foo"));  //No such operation
+    }
     @Test
     public void testWSDLDocs() throws Exception {
         Map<String, String> ns = new HashMap<String, String>();
