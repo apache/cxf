@@ -315,7 +315,7 @@ public class SecurityPolicyTest extends AbstractBusClientServerTestBase  {
             if (nd == null) {
                 throw ex;
             }
-            System.out.println(s);
+            //System.out.println(s);
             Attr val = ((org.w3c.dom.Element)nd)
                 .getAttributeNodeNS(PolicyConstants.WSU_NAMESPACE_URI, "Id");
             assertNotNull("No wsu:Id, thus, not signed", val);
