@@ -76,7 +76,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                                     Marshaller.JAXB_SCHEMA_LOCATION});
     
     private Map<String, Object> mProperties = Collections.emptyMap();
-    private boolean enableStreaming;
     private ValidationEventHandler eventHandler;
     
     public JAXBElementProvider() {
@@ -103,14 +102,6 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
     
     public void setValidationHandler(ValidationEventHandler handler) {
         eventHandler = handler;
-    }
-    
-    public void setEnableStreaming(boolean enableStream) {
-        enableStreaming = enableStream; 
-    }
-    
-    public boolean getEnableStreaming() {
-        return enableStreaming;
     }
     
     public void setEnableBuffering(boolean enableBuf) {
@@ -425,7 +416,7 @@ public class JAXBElementProvider extends AbstractJAXBProvider  {
                     }
                 }
             }
-            if (writer == null && enableStreaming) {
+            if (writer == null && getEnableStreaming()) {
                 writer = StaxUtils.createXMLStreamWriter(os);
             }
         } 
