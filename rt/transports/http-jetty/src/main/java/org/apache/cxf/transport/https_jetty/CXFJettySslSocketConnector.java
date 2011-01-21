@@ -34,10 +34,9 @@ import org.apache.cxf.transport.https.SSLUtils;
 import org.eclipse.jetty.server.ssl.SslSelectChannelConnector;
 
 /**
- * This class extends the Jetty SslSocketConnector, which allows
+ * This class extends the Jetty SslSelectChannelConnector, which allows
  * us to configure it more in tune with the JSSE, using KeyManagers
- * and TrustManagers. Also, Jetty version 6.1.3 has a bug where
- * the Trust store needs a password.
+ * and TrustManagers. 
  */
 public class CXFJettySslSocketConnector extends SslSelectChannelConnector {
     private static final Logger LOG = LogUtils.getL7dLogger(CXFJettySslSocketConnector.class);    
