@@ -655,8 +655,8 @@ public class SymmetricBindingHandler extends AbstractBindingBuilder {
                 : WSConstants.CUSTOM_SYMM_SIGNING_DIRECT;
             if (policyToken instanceof X509Token) {
                 if (isRequestor()) {
-                    sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
-                                          + WSConstants.ENC_KEY_VALUE_TYPE);
+                    sig.setCustomTokenValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
+                                                + WSConstants.ENC_KEY_VALUE_TYPE);
                     sig.setKeyIdentifierType(type);
                 } else {
                     //the tok has to be an EncryptedKey token

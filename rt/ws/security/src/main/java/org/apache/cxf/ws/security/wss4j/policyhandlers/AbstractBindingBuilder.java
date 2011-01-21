@@ -1509,7 +1509,7 @@ public abstract class AbstractBindingBuilder {
         // be used in the wsse:Reference in ds:KeyInfo
         if (policyToken instanceof X509Token) {
             if (isRequestor()) {
-                sig.setCustomTokenValueType(WSConstants.WSS_SAML_NS
+                sig.setCustomTokenValueType(WSConstants.SOAPMESSAGE_NS11 + "#"
                                       + WSConstants.ENC_KEY_VALUE_TYPE);
                 sig.setKeyIdentifierType(WSConstants.CUSTOM_SYMM_SIGNING);
             } else {
