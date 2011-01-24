@@ -589,6 +589,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookFromResponseWithWebClient() throws Exception {
+        String address = "http://localhost:" + PORT + "/bookstore/genericresponse/123";
+        WebClient wc = WebClient.create(address, 
+                                        Collections.singletonList(
+                                        new ResponseReader(Book.class)));
+        Response r = wc.accept("application/xml").get();
+        assertEquals(200, r.getStatus());
+        Book book = (Book)r.getEntity();
+        assertEquals(123L, book.getId());
+    }
+    
+    @Test
     public void testUpdateWithProxy() throws Exception {
         BookStore bs = JAXRSClientFactory.create("http://localhost:" + PORT, BookStore.class);
         Book book = new Book();

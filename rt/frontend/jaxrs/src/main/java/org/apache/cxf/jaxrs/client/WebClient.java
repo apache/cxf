@@ -237,7 +237,7 @@ public class WebClient extends AbstractClient {
      *         error message if client or server error occured
      */
     public Response invoke(String httpMethod, Object body) {
-        return doInvoke(httpMethod, body, InputStream.class, InputStream.class);
+        return doInvoke(httpMethod, body, Response.class, Response.class);
     }
     
     /**
@@ -636,7 +636,8 @@ public class WebClient extends AbstractClient {
             
             Object entity = readBody(currentResponse, conn, outMessage, responseClass, genericType,
                                      new Annotation[]{});
-            rb.entity(entity);
+            rb.entity(entity instanceof Response 
+                      ? ((Response)entity).getEntity() : entity);
             
             return rb.build();
         } catch (Throwable ex) {
