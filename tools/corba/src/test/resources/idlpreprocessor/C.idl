@@ -5,7 +5,7 @@
 #else
  #define _c
 #endif
-
+#pragma prefix "org.apache.cxf"
 module c
 {
   interface C {

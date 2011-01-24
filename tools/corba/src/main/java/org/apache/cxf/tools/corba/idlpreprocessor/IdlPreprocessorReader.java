@@ -79,6 +79,8 @@ public final class IdlPreprocessorReader extends Reader {
     private final StringBuilder buf = new StringBuilder();
 
     private int readPos;
+    
+    private String pragmaPrefix;
 
     /**
      * Creates a new IncludeReader.
@@ -184,6 +186,8 @@ public final class IdlPreprocessorReader extends Reader {
                 handleElse(lineNo, ise);
             } else if (line.startsWith("#define")) {
                 handleDefine(line);
+            } else if (line.startsWith("#pragma")) {
+                handlePragma(line);
             } else {
                 throw new PreprocessingException("unknown preprocessor instruction", ise.getURL(), lineNo);
             }
@@ -272,6 +276,18 @@ public final class IdlPreprocessorReader extends Reader {
         buf.append(LF);
     }
 
+    private void handlePragma(String line) {
+        String symbol = line.substring(line.indexOf("prefix") + "prefix".length()).trim();
+        if (symbol.startsWith("\"")) {
+            symbol = symbol.substring(1);
+        }
+        if (symbol.endsWith("\"")) {
+            symbol = symbol.substring(0, symbol.length() - 1);
+        }
+        setPragmaPrefix(symbol);
+        buf.append(LF);     
+    }
+    
     private void handleIfndef(String line) {
         String symbol = line.substring("#ifndef".length()).trim();
         boolean isDefined = defineState.isDefined(symbol);
@@ -356,6 +372,14 @@ public final class IdlPreprocessorReader extends Reader {
      */
     private void signalFileChange(String location, int lineNumber, char flag) {
         buf.append("# ").append(lineNumber).append(' ').append(location).append(' ').append(flag).append(LF);
+    }
+
+    public void setPragmaPrefix(String pragmaPrefix) {
+        this.pragmaPrefix = pragmaPrefix;
+    }
+
+    public String getPragmaPrefix() {
+        return pragmaPrefix;
     }
 
 }

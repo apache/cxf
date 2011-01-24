@@ -74,8 +74,9 @@ public final class WSDLASTVisitor implements ASTVisitor {
     private ModuleToNSMapper moduleToNSMapper;    
     private WSDLSchemaManager manager;
     private Map<Scope, List<Scope>> inheritScopeMap;
+    private String pragmaPrefix;
 
-    public WSDLASTVisitor(String tns, String schemans, String corbatypemaptns)
+    public WSDLASTVisitor(String tns, String schemans, String corbatypemaptns, String pragmaPrefix)
         throws WSDLException, JAXBException {
         
         manager = new WSDLSchemaManager();
@@ -106,8 +107,14 @@ public final class WSDLASTVisitor implements ASTVisitor {
         setBoundedStringOverride(false);
 
         moduleToNSMapper = new ModuleToNSMapper();
+        this.setPragmaPrefix(pragmaPrefix);
     }
 
+    public WSDLASTVisitor(String tns, String schemans, String corbatypemaptns)
+        throws WSDLException, JAXBException {
+        this(tns, schemans, corbatypemaptns, null);
+    }
+    
     public void visit(AST node) {
         // <specification> ::= <definition>+
 
@@ -476,6 +483,14 @@ public final class WSDLASTVisitor implements ASTVisitor {
 
     public void setExcludedModules(Map<String, List> modules) {
         moduleToNSMapper.setExcludedModuleMap(modules);
+    }
+
+    public void setPragmaPrefix(String pragmaPrefix) {
+        this.pragmaPrefix = pragmaPrefix;
+    }
+
+    public String getPragmaPrefix() {
+        return pragmaPrefix;
     }
 
 }

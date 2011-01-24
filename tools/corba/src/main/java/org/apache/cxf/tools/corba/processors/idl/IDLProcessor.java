@@ -38,8 +38,10 @@ public class IDLProcessor implements Processor {
 
     protected ProcessorEnvironment env;
 
+    protected IdlPreprocessorReader preprocessor;
+    
     private IDLParser parser;
-
+    
     public void setEnvironment(ProcessorEnvironment penv) {
         env = penv;
     }
@@ -54,7 +56,7 @@ public class IDLProcessor implements Processor {
             URL orig = file.toURI().toURL();
             DefaultIncludeResolver includeResolver = getDefaultIncludeResolver(file.getParentFile());
             DefineState defineState = new DefineState(new HashMap<String, String>());
-            IdlPreprocessorReader preprocessor = new IdlPreprocessorReader(orig,
+            preprocessor = new IdlPreprocessorReader(orig,
                                                                            location,
                                                                            includeResolver,
                                                                            defineState);

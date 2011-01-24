@@ -1,0 +1,21 @@
+#ifndef TEST2_IDL
+#define TEST2_IDL
+
+#pragma prefix "org.apache.cxf"
+
+module Test2 {
+  
+  
+  //const char MYCHAR = '\0';
+  //const char CLEARED = '\1';   
+  const char TRANSIENT = '\2'; 
+#if 0
+  const char NEW = '\65';
+#endif
+
+  interface ForTesting {
+
+    void greetMe(in string who);
+  };
+};
+#endif

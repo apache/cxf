@@ -303,6 +303,12 @@ public class IDLToWSDLGenerationTest extends ProcessorTestBase {
         // This tests for recursive unions
         testWSDLGeneration("/idl/RecursiveUnion.idl", "/idl/expected_RecursiveUnion.wsdl");
     }
+    
+    @Test
+    public void testPragmaPrefix() throws Exception {
+        // This tests for how pragma prefix directive affect the corba binding repositoryID
+        testWSDLGeneration("/idl/PragmaPrefix.idl", "/idl/expected_PragmaPrefix.wsdl");
+    }
 
     public void testLogicalPhysicalSchemaGeneration(String idlFilename, 
                                              String logicalName,
