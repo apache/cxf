@@ -247,7 +247,11 @@ public class PortTypeVisitor extends VisitorBase {
         try {
             BindingType bindingType = (BindingType)
                 extReg.createExtension(Binding.class, CorbaConstants.NE_CORBA_BINDING);
+            String pragmaPrefix = (this.getWsdlVisitor().getPragmaPrefix() != null 
+                                        && this.getWsdlVisitor().getPragmaPrefix().length() > 0) 
+                ? this.getWsdlVisitor().getPragmaPrefix() + "/" : ""; 
             bindingType.setRepositoryID(CorbaConstants.REPO_STRING
+                                        + pragmaPrefix
                                         + scopedPortTypeName.replace('.', '/')
                                         + CorbaConstants.IDL_VERSION);
             binding.addExtensibilityElement(bindingType);

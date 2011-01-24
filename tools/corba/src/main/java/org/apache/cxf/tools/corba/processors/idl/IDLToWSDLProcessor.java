@@ -160,7 +160,8 @@ public class IDLToWSDLProcessor extends IDLProcessor {
         outputDir = ".";
 
         try {
-            WSDLASTVisitor visitor = new WSDLASTVisitor(tns, schemans, corbatypemaptns);
+            WSDLASTVisitor visitor = new WSDLASTVisitor(tns, schemans, corbatypemaptns, 
+                                                        preprocessor.getPragmaPrefix());
             visitor.getManager().setIgnoreImports(ignoreImports);
             if (env.optionSet(ToolConstants.CFG_OUTPUTDIR)) {
                 outputDir =  (String) env.get(ToolConstants.CFG_OUTPUTDIR);

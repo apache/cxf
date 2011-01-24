@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix/typemap">
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="\2" idltype="corba:char" name="Test2.TRANSIENT" type="xs:byte"/>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="greetMe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="who" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="greetMeResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="greetMeResponse">
+    <wsdl:part name="outparameter" element="tns:greetMeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMe">
+    <wsdl:part name="inparameter" element="tns:greetMe">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Test2.ForTesting">
+    <wsdl:operation name="greetMe">
+      <wsdl:input name="greetMeRequest" message="tns:greetMe">
+    </wsdl:input>
+      <wsdl:output name="greetMeResponse" message="tns:greetMeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Test2.ForTestingCORBABinding" type="tns:Test2.ForTesting">
+    <corba:binding repositoryID="IDL:org.apache.cxf/Test2/ForTesting:1.0"/>
+    <wsdl:operation name="greetMe">
+      <corba:operation name="greetMe">
+        <corba:param mode="in" name="who" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="greetMeRequest">
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Test2.ForTestingCORBAService">
+    <wsdl:port name="Test2.ForTestingCORBAPort" binding="tns:Test2.ForTestingCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
