@@ -43,6 +43,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
 import javax.ws.rs.core.HttpHeaders;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.PathSegment;
 import javax.ws.rs.core.Request;
 import javax.ws.rs.core.SecurityContext;
@@ -338,6 +340,13 @@ public class Customer extends AbstractCustomer implements CustomerInfo {
     
     public void testFormParam(@FormParam("p1") String fp1, 
                               @FormParam("p2") List<String> fp2) {
+        // complete
+    }
+    
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    public void testMultivaluedMapAndFormParam(MultivaluedMap<String, String> params,
+                                               @FormParam("p1") String fp1, 
+                                               @FormParam("p2") List<String> fp2) {
         // complete
     }
     

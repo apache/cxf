@@ -33,6 +33,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.MultivaluedMap;
 
 import org.apache.cxf.systest.jaxrs.Book;
 import org.apache.cxf.systest.jaxrs.BookNotFoundFault;
@@ -51,8 +52,10 @@ public class SecureBookStoreNoInterface {
     @POST
     @Path("/bookforms")
     @RolesAllowed({"ROLE_USER", "ROLE_ADMIN" })
-    public Book getBookFromFormParams(@FormParam("name") String name, @FormParam("id") long id) {
-        if (name == null || id == 0) {
+    public Book getBookFromFormParams(MultivaluedMap<String, String> map,
+        @FormParam("name") String name, @FormParam("id") long id) {
+        if (name == null || id == 0 || map.getFirst("name") == null
+            || Integer.valueOf(map.getFirst("id")) == 0) {
             throw new RuntimeException("FormParams are not set");
         }
         return new Book(name, id);
@@ -64,7 +67,12 @@ public class SecureBookStoreNoInterface {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     public Book getBookFromHttpRequestParams(@Context HttpServletRequest request) {
         Map<String, String[]> params = request.getParameterMap();
-        return getBookFromFormParams(params.get("name")[0], Long.valueOf(params.get("id")[0]));
+        String name = params.get("name")[0];
+        Long id = Long.valueOf(params.get("id")[0]);
+        if (name == null || id == 0) {
+            throw new RuntimeException("FormParams are not set");
+        }
+        return new Book(name, id);
     }
     
     @GET

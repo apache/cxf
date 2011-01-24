@@ -39,8 +39,9 @@ import org.apache.cxf.jaxrs.ext.multipart.ContentDisposition;
 import org.apache.cxf.jaxrs.ext.multipart.MultipartBody;
 
 public final class FormUtils {
-    
-    private static final String FORM_DATA_TYPE = "form-data";  
+
+    public static final String FORM_PARAM_MAP = "org.apache.cxf.form_data";
+    private static final String MULTIPART_FORM_DATA_TYPE = "form-data";  
         
     private FormUtils() {
         
@@ -109,7 +110,7 @@ public final class FormUtils {
         List<Attachment> atts = body.getAllAttachments();
         for (Attachment a : atts) {
             ContentDisposition cd = a.getContentDisposition();
-            if (cd == null || !FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())
+            if (cd == null || !MULTIPART_FORM_DATA_TYPE.equalsIgnoreCase(cd.getType())
                 || cd.getParameter("name") == null) {
                 throw new WebApplicationException(415);
             }

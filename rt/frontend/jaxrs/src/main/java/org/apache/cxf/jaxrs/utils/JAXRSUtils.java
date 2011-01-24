@@ -110,8 +110,7 @@ public final class JAXRSUtils {
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
     private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
-    private static final String FORM_PARAM_MAP = JAXRSUtils.class.getName() + ".FORM_DATA";
-
+    
     private JAXRSUtils() {        
     }
     
@@ -689,18 +688,15 @@ public final class JAXRSUtils {
         MediaType mt = mc.getHttpHeaders().getMediaType();
         
         @SuppressWarnings("unchecked")
-        MultivaluedMap<String, String> params = (MultivaluedMap<String, String>)m.get(FORM_PARAM_MAP); 
+        MultivaluedMap<String, String> params = 
+            (MultivaluedMap<String, String>)m.get(FormUtils.FORM_PARAM_MAP); 
         
         if (params == null) {
             params = new MetadataMap<String, String>();
-            m.put(FORM_PARAM_MAP, params);
+            m.put(FormUtils.FORM_PARAM_MAP, params);
         
             if (mt == null || mt.isCompatible(MediaType.APPLICATION_FORM_URLENCODED_TYPE)) {
-                String body = (String)m.get("org.apache.cxf.jaxrs.provider.form.body");
-                if (body == null) {
-                    body = FormUtils.readBody(m.getContent(InputStream.class), mt);
-                    m.put("org.apache.cxf.jaxrs.provider.form.body", body);
-                }
+                String body = FormUtils.readBody(m.getContent(InputStream.class), mt);
                 HttpServletRequest request = (HttpServletRequest)m.get(AbstractHTTPDestination.HTTP_REQUEST);
                 FormUtils.populateMapFromString(params, (String)body, decode, request);
             } else {
