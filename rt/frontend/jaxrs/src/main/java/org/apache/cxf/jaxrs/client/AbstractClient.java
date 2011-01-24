@@ -392,10 +392,6 @@ public class AbstractClient implements Client {
         
         MessageBodyWriter mbw = ProviderFactory.getInstance(outMessage).createMessageBodyWriter(
             cls, type, anns, contentType, outMessage);
-        if (mbw == null) {
-            mbw = ProviderFactory.getInstance().createMessageBodyWriter(
-                      cls, type, anns, contentType, outMessage);
-        }
         if (mbw != null) {
             try {
                 mbw.writeTo(o, cls, type, anns, contentType, headers, os);
@@ -436,10 +432,6 @@ public class AbstractClient implements Client {
         
         MessageBodyReader mbr = ProviderFactory.getInstance(outMessage).createMessageBodyReader(
             cls, type, anns, contentType, outMessage);
-        if (mbr == null) {
-            ProviderFactory.getInstance().createMessageBodyReader(
-                cls, type, anns, contentType, outMessage);
-        }
         if (mbr != null) {
             try {
                 return mbr.readFrom(cls, type, anns, contentType, 
