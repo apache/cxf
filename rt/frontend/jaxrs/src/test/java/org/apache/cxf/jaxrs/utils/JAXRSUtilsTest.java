@@ -73,6 +73,7 @@ import org.apache.cxf.jaxrs.model.ClassResourceInfo;
 import org.apache.cxf.jaxrs.model.MethodDispatcher;
 import org.apache.cxf.jaxrs.model.OperationResourceInfo;
 import org.apache.cxf.jaxrs.model.URITemplate;
+import org.apache.cxf.jaxrs.provider.FormEncodingProvider;
 import org.apache.cxf.jaxrs.provider.ProviderFactory;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -1049,6 +1050,47 @@ public class JAXRSUtilsTest extends Assert {
         assertEquals("First Form Parameter not matched correctly", 
                      "1", params.get(0));
         List<String> list = (List<String>)params.get(1);
+        assertEquals(2, list.size());
+        assertEquals("2", list.get(0));
+        assertEquals("3", list.get(1));
+    }
+    
+    @SuppressWarnings("unchecked")
+    @Test
+    public void testFormParametersAndMap() throws Exception {
+        Class[] argType = {MultivaluedMap.class, String.class, List.class};
+        Method m = Customer.class.getMethod("testMultivaluedMapAndFormParam", argType);
+        final Message messageImpl = createMessage();
+        String body = "p1=1&p2=2&p2=3";
+        messageImpl.put(Message.REQUEST_URI, "/foo");
+        messageImpl.put("Content-Type", MediaType.APPLICATION_FORM_URLENCODED);
+        messageImpl.setContent(InputStream.class, new ByteArrayInputStream(body.getBytes()));
+        
+        ProviderFactory.getInstance(messageImpl).registerUserProvider(
+            new FormEncodingProvider() {
+                @Override
+                protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
+                    messageImpl.put(FormUtils.FORM_PARAM_MAP, params);    
+                }
+            });
+        
+        List<Object> params = JAXRSUtils.processParameters(new OperationResourceInfo(m, null), 
+                                                           new MetadataMap<String, String>(), messageImpl);
+        assertEquals("3 params should've been identified", 3, params.size());
+        
+        MultivaluedMap<String, String> map = (MultivaluedMap<String, String>)params.get(0);
+        assertEquals(2, map.size());
+        assertEquals(1, map.get("p1").size());
+        assertEquals("First map parameter not matched correctly", 
+                     "1", map.getFirst("p1"));
+        assertEquals(2, map.get("p2").size());
+        
+        assertEquals("2", map.get("p2").get(0));
+        assertEquals("3", map.get("p2").get(1));
+        
+        assertEquals("First Form Parameter not matched correctly", 
+                     "1", params.get(1));
+        List<String> list = (List<String>)params.get(2);
         assertEquals(2, list.size());
         assertEquals("2", list.get(0));
         assertEquals("3", list.get(1));

@@ -51,6 +51,8 @@ import org.apache.cxf.jaxrs.utils.AnnotationUtils;
 import org.apache.cxf.jaxrs.utils.FormUtils;
 import org.apache.cxf.jaxrs.utils.HttpUtils;
 import org.apache.cxf.jaxrs.utils.multipart.AttachmentUtils;
+import org.apache.cxf.message.Message;
+import org.apache.cxf.phase.PhaseInterceptorChain;
 
 @Produces({"application/x-www-form-urlencoded", "multipart/form-data" })
 @Consumes({"application/x-www-form-urlencoded", "multipart/form-data" })
@@ -98,6 +100,9 @@ public class FormEncodingProvider implements
             populateMap(params, is, mt,
                         AnnotationUtils.getAnnotation(annotations, Encoded.class) == null);
             validateMap(params);
+            
+            persistParamsOnMessage(params);
+            
             return params;
         } catch (WebApplicationException e) {
             throw e;
@@ -106,6 +111,13 @@ public class FormEncodingProvider implements
         }
     }
 
+    protected void persistParamsOnMessage(MultivaluedMap<String, String> params) {
+        Message message = PhaseInterceptorChain.getCurrentMessage();
+        if (message != null) {
+            message.put(FormUtils.FORM_PARAM_MAP, params);
+        }
+    }
+    
     @SuppressWarnings("unchecked")
     protected MultivaluedMap<String, String> createMap(Class<?> clazz) throws Exception {
         if (clazz == MultivaluedMap.class) {
