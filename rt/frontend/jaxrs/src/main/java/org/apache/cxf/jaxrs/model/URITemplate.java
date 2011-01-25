@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.regex.PatternSyntaxException;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.core.MultivaluedMap;
@@ -351,11 +350,11 @@ public final class URITemplate {
             if (uriChunk == null || "".equals(uriChunk)) {
                 throw new IllegalArgumentException("uriChunk is empty");
             }
-            try {
-                return new Variable(uriChunk);
-            } catch (IllegalArgumentException e) {
-                return new Literal(uriChunk);
+            UriChunk uriChunkRepresentation = Variable.create(uriChunk);
+            if (uriChunkRepresentation == null) {
+                uriChunkRepresentation = Literal.create(uriChunk);
             }
+            return uriChunkRepresentation;
         }
 
         public abstract String getValue();
@@ -369,11 +368,17 @@ public final class URITemplate {
     private static final class Literal extends UriChunk {
         private String value;
 
-        public Literal(String uriChunk) {
+        private Literal() {
+            // empty constructor
+        }
+
+        public static Literal create(String uriChunk) {
             if (uriChunk == null || "".equals(uriChunk)) {
                 throw new IllegalArgumentException("uriChunk is empty");
             }
-            value = uriChunk;
+            Literal literal = new Literal();
+            literal.value = uriChunk;
+            return literal;
         }
 
         @Override
@@ -391,30 +396,34 @@ public final class URITemplate {
         private String name;
         private Pattern pattern;
 
+        private Variable() {
+            // empty constructor
+        }
+
         /**
          * Creates variable from stringified part of URI.
-         * 
-         * @param uriChunk chunk that depicts variable
-         * @throws IllegalArgumentException when param is null, empty or does not have variable syntax.
-         * @throws PatternSyntaxException when pattern of variable has wrong syntax.
+         *
+         * @param uriChunk uriChunk chunk that depicts variable
+         * @return Variable if variable was successfully created; null if uriChunk was not a variable
          */
-        public Variable(String uriChunk) throws IllegalArgumentException, PatternSyntaxException {
+        public static Variable create(String uriChunk) {
+            Variable newVariable = new Variable();
             if (uriChunk == null || "".equals(uriChunk)) {
-                throw new IllegalArgumentException("uriChunk is empty");
+                return null;
             }
             if (CurlyBraceTokenizer.insideBraces(uriChunk)) {
                 uriChunk = CurlyBraceTokenizer.stripBraces(uriChunk).trim();
                 Matcher matcher = VARIABLE_PATTERN.matcher(uriChunk);
                 if (matcher.matches()) {
-                    name = matcher.group(1).trim();
+                    newVariable.name = matcher.group(1).trim();
                     if (matcher.group(2) != null && matcher.group(3) != null) {
                         String patternExpression = matcher.group(3).trim();
-                        pattern = Pattern.compile(patternExpression);
+                        newVariable.pattern = Pattern.compile(patternExpression);
                     }
-                    return;
+                    return newVariable;
                 }
             }
-            throw new IllegalArgumentException("not a variable syntax");
+            return null;
         }
 
         public String getName() {
