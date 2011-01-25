@@ -20,10 +20,17 @@
 package org.apache.cxf.tools.corba.idlpreprocessor;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.apache.cxf.common.logging.LogUtils;
+
 
 /**
  * @author lk
@@ -31,6 +38,7 @@ import java.util.Arrays;
  */
 public class DefaultIncludeResolver implements IncludeResolver {
 
+    private static final Logger LOG = LogUtils.getL7dLogger(DefaultIncludeResolver.class);
     private final File[] userIdlDirs;
 
     public DefaultIncludeResolver(File... idlDirs) {
@@ -61,8 +69,21 @@ public class DefaultIncludeResolver implements IncludeResolver {
                 // offload slash vs backslash to URL machinery
                 URL searchDirURL = searchDirURI.toURL();
                 final URL url = new URL(searchDirURL, spec);
-                // TODO: if "file in URL exists"
-                return url;
+                
+                // Check if file in URL exists, otherwise try next searchDir 
+                try {
+                    // If we can open a stream, the file exists 
+                    InputStream str = url.openStream();
+                    str.close();
+                    return url;
+                } catch (IOException ioe) {
+                    if (LOG.isLoggable(Level.WARNING)) {
+                        LOG.fine("Not able to resolve " 
+                                 + spec  
+                                 + "from  " 
+                                 + searchDirURL.toString());
+                    }
+                } 
             } catch (MalformedURLException e) {
                 final PreprocessingException preprocessingException = new PreprocessingException(
                     "Unable to resolve user include '" + spec + "' in '"

@@ -319,4 +319,24 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertEquals("IDLToWSDL Failed", noError, exc);
         doTestGeneratedWsdl(expected, actual);
     }
+    
+    public void testMultipleIncludes() throws Exception {
+        File input = new File(getClass().getResource("/idl/Parent.idl").toURI());
+        File actual = new File(output, "Parent.wsdl");
+        File expected = 
+            new File(getClass().getResource("/idl/expected_Parent.wsdl").toURI());
+        
+        File include1Dir = new File(getClass().getResource("/idl/subdir1").toURI());
+        File include2Dir = new File(getClass().getResource("/idl/subdir2").toURI());
+        
+        String[] args = new String[] {"-ow", "Parent.wsdl",
+                                      "-o", output.toString(),
+                                      "-I", include1Dir.toString(),
+                                      "-I", include2Dir.toString(),
+                                      input.toString()
+        };
+        int exc = execute(args);
+        assertEquals("IDLToWSDL Failed", noError, exc);
+        doTestGeneratedWsdl(expected, actual);
+    }
 }
