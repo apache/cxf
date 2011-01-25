@@ -307,6 +307,33 @@ public class JAXRSUtilsTest extends Assert {
     }
     
     @Test
+    public void testIntersectMimeTypesCompositeSubtype2() throws Exception {
+        List <MediaType> candidateList = 
+            JAXRSUtils.intersectMimeTypes("application/bar+xml", "application/bar+xml");  
+
+        assertEquals(1, candidateList.size());
+        assertEquals("application/bar+xml", candidateList.get(0).toString());
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype3() throws Exception {
+        List <MediaType> candidateList = 
+            JAXRSUtils.intersectMimeTypes("application/*+xml", "application/bar+xml");  
+
+        assertEquals(1, candidateList.size());
+        assertEquals("application/bar+xml", candidateList.get(0).toString());
+    }
+    
+    @Test
+    public void testIntersectMimeTypesCompositeSubtype4() throws Exception {
+        List <MediaType> candidateList = 
+            JAXRSUtils.intersectMimeTypes("application/*+xml", "application/bar+json");  
+
+        assertEquals(0, candidateList.size());
+        
+    }
+    
+    @Test
     public void testIntersectMimeTypes() throws Exception {
         //test basic
         List<MediaType> methodMimeTypes = new ArrayList<MediaType>(
