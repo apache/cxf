@@ -13,7 +13,7 @@ module Test2 {
   const char NEW = '\65';
 #endif
 
-  interface ForTesting {
+  local interface ForTesting {
 
     void greetMe(in string who);
   };
