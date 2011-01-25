@@ -28,6 +28,7 @@ import javax.xml.ws.Provider;
 import javax.xml.ws.handler.MessageContext.Scope;
 
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.jaxws.context.WebServiceContextImpl;
 import org.apache.cxf.jaxws.context.WrappedMessageContext;
 import org.apache.cxf.message.Exchange;
@@ -61,6 +62,10 @@ public class JAXWSMethodInvoker extends AbstractJAXWSMethodInvoker {
             addHandlerProperties(ctx, handlerScopedStuff);
             //update the webservice response context
             updateWebServiceContext(exchange, ctx);
+        } catch (Fault f) {
+            //get chance to copy over customer's header
+            updateHeader(exchange, ctx);
+            throw f;
         } finally {
             //clear the WebServiceContextImpl's ThreadLocal variable
             WebServiceContextImpl.clear();

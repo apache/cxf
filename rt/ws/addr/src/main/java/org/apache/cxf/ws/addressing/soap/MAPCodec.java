@@ -64,6 +64,7 @@ import org.apache.cxf.ws.addressing.MAPAggregator;
 import org.apache.cxf.ws.addressing.Names;
 import org.apache.cxf.ws.addressing.ReferenceParametersType;
 import org.apache.cxf.ws.addressing.RelatesToType;
+import org.apache.cxf.ws.addressing.VersionTransformer.Names200408;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 
 
@@ -702,7 +703,8 @@ public class MAPCodec extends AbstractSoapInterceptor {
         Iterator<Header> iter = header.iterator();
         while (iter.hasNext()) {
             Header hdr = iter.next();
-            if (Names.WSA_NAMESPACE_NAME.equals(hdr.getName().getNamespaceURI())) {
+            if (Names.WSA_NAMESPACE_NAME.equals(hdr.getName().getNamespaceURI())
+                || Names200408.WSA_NAMESPACE_NAME.equals(hdr.getName().getNamespaceURI())) {
                 iter.remove();
             }
         }

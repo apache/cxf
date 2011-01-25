@@ -168,4 +168,29 @@ public abstract class AbstractJAXWSMethodInvoker extends FactoryInvoker {
         }
     }
 
+    protected void updateHeader(Exchange exchange, MessageContext ctx) {
+        if (ctx.containsKey(Header.HEADER_LIST) 
+                && ctx.get(Header.HEADER_LIST) instanceof List<?>) {
+            List list = (List) ctx.get(Header.HEADER_LIST);
+            if (list != null && !list.isEmpty()) {
+                SoapMessage sm = (SoapMessage) createResponseMessage(exchange);
+                if (sm != null) {
+                    Iterator iter = list.iterator();
+                    while (iter.hasNext()) {
+                        Header header = (Header) iter.next();
+                        if (!header.getName().getNamespaceURI().
+                            equals("http://docs.oasis-open.org/wss/2004/01/" 
+                                   + "oasis-200401-wss-wssecurity-secext-1.0.xsd")
+                                && !header.getName().getNamespaceURI().
+                                equals("http://docs.oasis-open.org/" 
+                                    + "wss/oasis-wss-wssecurity-secext-1.1.xsd")) {
+                            //don't copy over security header, out interceptor chain will take care of it.
+                            sm.getHeaders().add(header);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
 }
