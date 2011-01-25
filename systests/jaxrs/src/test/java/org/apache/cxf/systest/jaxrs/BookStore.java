@@ -57,6 +57,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Cookie;
+import javax.ws.rs.core.EntityTag;
 import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
@@ -389,6 +390,15 @@ public class BookStore {
     @Produces("application/xml")
     public Book getBook(@PathParam("bookId") String id) throws BookNotFoundFault {
         return doGetBook(id);
+    }
+    
+    @GET
+    @Path("/books/response/{bookId}/")
+    @Produces("application/xml")
+    public Response getBookAsResponse(@PathParam("bookId") String id) throws BookNotFoundFault {
+        Book entity = doGetBook(id);
+        EntityTag etag = new EntityTag(Integer.toString(entity.hashCode()));
+        return Response.ok().tag(etag).entity(entity).build();
     }
     
     @GET

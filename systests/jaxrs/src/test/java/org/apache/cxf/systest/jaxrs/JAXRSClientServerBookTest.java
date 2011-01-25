@@ -80,6 +80,21 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
         assertEquals(123L, book.getId());
     }
     
+    @Test
+    public void testGetBookResponseAndETag() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/books/response/123"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        Book book = wc.get(Book.class);
+        assertEquals(200, wc.getResponse().getStatus());
+        assertEquals(123L, book.getId());
+        MultivaluedMap<String, Object> headers = wc.getResponse().getMetadata();
+        assertTrue(headers.size() > 0);
+        Object etag = headers.getFirst("ETag");
+        assertNotNull(etag);
+    }
+    
     
     @Test
     public void testOnewayWebClient() throws Exception {

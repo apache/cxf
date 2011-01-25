@@ -253,7 +253,7 @@ public class AbstractClient implements Client {
         if (state.getResponseBuilder() == null) {
             return null;
         }
-        return state.getResponseBuilder().build();
+        return state.getResponseBuilder().clone().build();
     }
     
     /**
