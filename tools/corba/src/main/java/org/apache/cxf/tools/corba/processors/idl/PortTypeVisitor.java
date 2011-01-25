@@ -82,8 +82,10 @@ public class PortTypeVisitor extends VisitorBase {
         // <interface_name> ::= <scoped_name>
         
         
-        AST identifierNode = node.getFirstChild();        
-        
+        AST identifierNode = node.getFirstChild();   
+        if (identifierNode.getText().equals("local")) {
+            identifierNode = identifierNode.getNextSibling();
+        }
         // Check if its a forward declaration
         if (identifierNode.getFirstChild() == null && identifierNode.getNextSibling() == null) {
             visitForwardDeclaredInterface(identifierNode);        
