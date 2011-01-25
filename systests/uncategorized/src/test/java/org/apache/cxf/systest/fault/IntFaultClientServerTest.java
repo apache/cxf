@@ -20,8 +20,18 @@
 package org.apache.cxf.systest.fault;
 
 import java.net.URL;
-import javax.xml.namespace.QName;
+import java.util.List;
 
+import javax.xml.namespace.QName;
+import javax.xml.ws.BindingProvider;
+
+import org.w3c.dom.Node;
+
+import org.apache.cxf.binding.soap.SoapHeader;
+import org.apache.cxf.frontend.ClientProxy;
+import org.apache.cxf.headers.Header;
+import org.apache.cxf.interceptor.LoggingInInterceptor;
+import org.apache.cxf.interceptor.LoggingOutInterceptor;
 import org.apache.cxf.testutil.common.AbstractBusClientServerTestBase;
 import org.apache.intfault.BadRecordLitFault;
 import org.apache.intfault.Greeter;
@@ -46,14 +56,38 @@ public class IntFaultClientServerTest extends AbstractBusClientServerTestBase {
 
         SOAPService service = new SOAPService(wsdl, serviceName);
         assertNotNull("Service is null", service);
-
+        
         Greeter greeter = service.getSoapPort();
+        ClientProxy.getClient(greeter).getInInterceptors().add(new LoggingInInterceptor());
+        ClientProxy.getClient(greeter).getOutInterceptors().add(new LoggingOutInterceptor());
         updateAddressPort(greeter, PORT);
         try {
             greeter.testDocLitFault("fault");
         } catch (BadRecordLitFault e) {
             assertEquals(5, e.getFaultInfo());
+            assertSoapHeader((BindingProvider)greeter);
         }
 
     }
+    
+    private void assertSoapHeader(BindingProvider serviceProxy) {
+        List<?> headers = (List<?>) serviceProxy.getResponseContext().get(Header.HEADER_LIST);
+        QName testQName = new QName("http://test", "test");
+        if (headers != null) {
+            for (Object o : headers) {
+                if (o instanceof SoapHeader) {
+                    SoapHeader soapHeader = (SoapHeader) o;
+                    QName qName = soapHeader.getName();
+                    if (testQName.getNamespaceURI().equals(qName.getNamespaceURI())
+                            && testQName.getLocalPart().equals(qName.getLocalPart())) {
+                        Node returnedContent = (Node) soapHeader.getObject();
+                        assertEquals("test", returnedContent.getTextContent());
+                        return;
+                    }
+                }
+            }
+        }
+        fail("Header not found");
+    }
+
 }
