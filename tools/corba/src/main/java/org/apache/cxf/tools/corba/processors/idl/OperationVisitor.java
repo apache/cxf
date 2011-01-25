@@ -89,7 +89,11 @@ public class OperationVisitor extends VisitorBase {
                                  WSDLASTVisitor wsdlVisitor) {
         boolean result = false;
         AST node2 = node.getFirstChild();
-        if (node2.getType() == IDLTokenTypes.LITERAL_oneway) {
+        
+        if (null == node2) {
+           // throw whatever appropriate error 
+           // or do nothing and return false
+        } else if (node2.getType() == IDLTokenTypes.LITERAL_oneway) {
             result = true;
         } else {
             int type = node2.getType();

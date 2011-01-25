@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+-->
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/Parent" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/Parent" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/Parent/typemap">
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:Included1/MyType1:1.0" name="Included1.MyType1" type="xs:string"/>
+    <corba:alias xmlns:xs="http://www.w3.org/2001/XMLSchema" basetype="corba:string" repositoryID="IDL:Included2/MyType2:1.0" name="Included2.MyType2" type="xs:string"/>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/Parent" xmlns="http://cxf.apache.org/bindings/corba/idl/Parent" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="testOperation">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="arg1" type="xs:string">
+            </xs:element>
+            <xs:element name="arg2" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testOperationResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testOperation">
+    <wsdl:part name="inparameter" element="tns:testOperation">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testOperationResponse">
+    <wsdl:part name="outparameter" element="tns:testOperationResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="Parent.TestForMultipleIncludes">
+    <wsdl:operation name="testOperation">
+      <wsdl:input name="testOperationRequest" message="tns:testOperation">
+    </wsdl:input>
+      <wsdl:output name="testOperationResponse" message="tns:testOperationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Parent.TestForMultipleIncludesCORBABinding" type="tns:Parent.TestForMultipleIncludes">
+    <corba:binding repositoryID="IDL:Parent/TestForMultipleIncludes:1.0"/>
+    <wsdl:operation name="testOperation">
+      <corba:operation name="testOperation">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Parent/typemap" mode="in" name="arg1" idltype="Included1.MyType1"/>
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/Parent/typemap" mode="in" name="arg2" idltype="Included2.MyType2"/>
+      </corba:operation>
+      <wsdl:input name="testOperationRequest">
+      </wsdl:input>
+      <wsdl:output name="testOperationResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="Parent.TestForMultipleIncludesCORBAService">
+    <wsdl:port name="Parent.TestForMultipleIncludesCORBAPort" binding="tns:Parent.TestForMultipleIncludesCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

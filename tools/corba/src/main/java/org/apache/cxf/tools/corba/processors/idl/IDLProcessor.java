@@ -21,7 +21,6 @@ package org.apache.cxf.tools.corba.processors.idl;
 import java.io.File;
 import java.net.URL;
 import java.util.HashMap;
-import java.util.StringTokenizer;
 
 import antlr.TokenStreamHiddenTokenFilter;
 import antlr.collections.AST;
@@ -85,17 +84,13 @@ public class IDLProcessor implements Processor {
 
     private DefaultIncludeResolver getDefaultIncludeResolver(File currentDir) {
         DefaultIncludeResolver includeResolver;
-        if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {                        
-            String includedDirs = env.get(ToolCorbaConstants.CFG_INCLUDEDIR).toString();
-            StringTokenizer tok = new StringTokenizer(includedDirs, "");
-            File[] includeDirs = new File[tok.countTokens()];
-            int i = 0;
-            while (tok.hasMoreTokens()) {
-                String includeDir = tok.nextToken();
-                File infile = new File(includeDir);
-                includeDirs[i] = infile;
-                i++;
+        if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {      
+            String[] includedDirs = (String[]) env.get(ToolCorbaConstants.CFG_INCLUDEDIR);
+            File[] includeDirs = new File[includedDirs.length];
+            for (int i = 0; i < includedDirs.length; i++) {
+                includeDirs[i] = new File(includedDirs[i]);
             }
+            
             includeResolver = new DefaultIncludeResolver(includeDirs);
         } else {
             includeResolver = new DefaultIncludeResolver(currentDir);

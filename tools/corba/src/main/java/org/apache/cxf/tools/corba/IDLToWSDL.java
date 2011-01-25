@@ -51,7 +51,9 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
     }
 
     private Set getArrayKeys() {
-        return new HashSet<String>();
+        Set<String> arrayKeys = new HashSet<String>();
+        arrayKeys.add(ToolCorbaConstants.CFG_INCLUDEDIR);
+        return arrayKeys;
     }
 
     public void execute(boolean exitOnFinish) {
@@ -144,7 +146,7 @@ public class IDLToWSDL extends AbstractCXFToolContainer {
         
         if (env.optionSet(ToolCorbaConstants.CFG_INCLUDEDIR)) {
             env.put(ToolCorbaConstants.CFG_INCLUDEDIR,
-                    doc.getParameter(ToolCorbaConstants.CFG_INCLUDEDIR));
+                    doc.getParameters(ToolCorbaConstants.CFG_INCLUDEDIR));
         }
         if (env.optionSet(ToolCorbaConstants.CFG_WSDLOUTPUTFILE)) {
             env.put(ToolCorbaConstants.CFG_WSDLOUTPUTFILE,
