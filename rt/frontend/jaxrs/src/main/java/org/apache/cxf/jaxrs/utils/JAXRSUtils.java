@@ -1066,11 +1066,14 @@ public final class JAXRSUtils {
                     requiredType.isCompatible(userType) || userType.isCompatible(requiredType);
                 if (!isCompatible && requiredType.getType().equalsIgnoreCase(userType.getType())) {
                     // check if we have composite subtypes
-                    String[] subtypes1 = requiredType.getSubtype().split("\\+");
-                    String[] subtypes2 = userType.getSubtype().split("\\+");
-                    if (subtypes1.length == 2 && subtypes2.length == 2
-                        && subtypes1[1].equalsIgnoreCase(subtypes2[1])
-                        && (subtypes1[0].equals("*") || subtypes2[0].equals("*"))) {
+                    String subType1 = requiredType.getSubtype();
+                    String subTypeAfterPlus1 = splitMediaSubType(subType1); 
+                    String subType2 = userType.getSubtype();
+                    String subTypeAfterPlus2 = splitMediaSubType(subType2);
+                    
+                    if (subTypeAfterPlus1 != null && subTypeAfterPlus2 != null
+                        && subTypeAfterPlus1.equalsIgnoreCase(subTypeAfterPlus2)
+                        && (subType1.charAt(0) == '*' || subType2.charAt(0) == '*')) {
                         isCompatible = true;
                     }
                 }
@@ -1086,10 +1089,10 @@ public final class JAXRSUtils {
                     if (!parametersMatched) {
                         continue;
                     }
-                    
+                   
                     String type = requiredType.getType().equals(MediaType.MEDIA_TYPE_WILDCARD) 
                                       ? userType.getType() : requiredType.getType();
-                    String subtype = requiredType.getSubtype().equals(MediaType.MEDIA_TYPE_WILDCARD) 
+                    String subtype = requiredType.getSubtype().startsWith(MediaType.MEDIA_TYPE_WILDCARD) 
                                       ? userType.getSubtype() : requiredType.getSubtype();
                     Map<String, String> parameters = userType.getParameters();
                     if (addRequiredParamsIfPossible) {
@@ -1107,6 +1110,11 @@ public final class JAXRSUtils {
 
         return new ArrayList<MediaType>(supportedMimeTypeList);
         
+    }
+    
+    static String splitMediaSubType(String type) {
+        int index = type.indexOf('+');
+        return index == -1 ? null : type.substring(index + 1);
     }
     
     public static List<MediaType> intersectMimeTypes(List<MediaType> mimeTypesA, 
