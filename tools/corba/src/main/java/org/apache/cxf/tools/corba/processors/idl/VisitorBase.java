@@ -61,7 +61,7 @@ public abstract class VisitorBase implements Visitor {
         mapper = wsdlVisitor.getModuleToNSMapper();
 
         scope = scopeRef;
-
+        scope.setPrefix(wsdlASTVisitor.getPragmaPrefix());
         fullyQualifiedName = null;        
         schemaType = null;
         corbaType = null;

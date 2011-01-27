@@ -33,7 +33,8 @@ module Test2 {
 #endif
 
   local interface ForTesting {
-
+    readonly attribute ForTesting session;
+   
     void greetMe(in string who);
   };
 };
