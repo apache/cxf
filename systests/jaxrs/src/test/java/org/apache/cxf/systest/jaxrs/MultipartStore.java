@@ -34,11 +34,13 @@ import javax.imageio.ImageIO;
 import javax.mail.util.ByteArrayDataSource;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBContext;
@@ -167,6 +169,32 @@ public class MultipartStore {
         objects.put("application/xml", jaxb);
         objects.put("application/json", json);
         objects.put("application/octet-stream", new ByteArrayInputStream(image));
+        return objects;
+        
+    }
+    
+    @GET
+    @Path("/books/jaxbjsonimage/read")
+    @Produces("multipart/mixed")
+    public Map<String, Book> getBookJaxbJson() throws Exception {
+        Book jaxb = new Book("jaxb", 1L);
+        Book json = new Book("json", 2L);
+        Map<String, Book> objects = new LinkedHashMap<String, Book>();
+        objects.put(MediaType.APPLICATION_XML, jaxb);
+        objects.put(MediaType.APPLICATION_JSON, json);
+        return objects;
+        
+    }
+    
+    @GET
+    @Path("/books/jaxbjsonimage/read-object")
+    @Produces("multipart/mixed")
+    public Map<String, Object> getBookJaxbJsonObject() throws Exception {
+        Book jaxb = new Book("jaxb", 1L);
+        Book json = new Book("json", 2L);
+        Map<String, Object> objects = new LinkedHashMap<String, Object>();
+        objects.put(MediaType.APPLICATION_XML, jaxb);
+        objects.put(MediaType.APPLICATION_JSON, json);
         return objects;
         
     }
