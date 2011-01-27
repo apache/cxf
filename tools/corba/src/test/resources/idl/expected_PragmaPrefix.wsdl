@@ -1,29 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!--
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements. See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership. The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License. You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied. See the License for the
- * specific language governing permissions and limitations
- * under the License.
--->
-
-<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
   <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix/typemap">
     <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="\2" idltype="corba:char" name="Test2.TRANSIENT" type="xs:byte"/>
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" binding="Test2.ForTestingCORBABinding" repositoryID="IDL:org.apache.cxf/Test2/ForTesting:1.0" name="Test2.ForTesting" type="ns4:EndpointReferenceType"/>
   </corba:typeMapping>
   <wsdl:types>
-    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="_get_session">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Test2.ForTestingRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_get_sessionResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
       <xs:element name="greetMe">
         <xs:complexType>
           <xs:sequence>
@@ -40,6 +44,10 @@
       </xs:element>
     </xs:schema>
   </wsdl:types>
+  <wsdl:message name="_get_session">
+    <wsdl:part name="parameters" element="tns:_get_session">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:message name="greetMeResponse">
     <wsdl:part name="outparameter" element="tns:greetMeResponse">
     </wsdl:part>
@@ -48,7 +56,17 @@
     <wsdl:part name="inparameter" element="tns:greetMe">
     </wsdl:part>
   </wsdl:message>
+  <wsdl:message name="_get_sessionResponse">
+    <wsdl:part name="parameters" element="tns:_get_sessionResult">
+    </wsdl:part>
+  </wsdl:message>
   <wsdl:portType name="Test2.ForTesting">
+    <wsdl:operation name="_get_session">
+      <wsdl:input name="_get_session" message="tns:_get_session">
+    </wsdl:input>
+      <wsdl:output name="_get_sessionResponse" message="tns:_get_sessionResponse">
+    </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="greetMe">
       <wsdl:input name="greetMeRequest" message="tns:greetMe">
     </wsdl:input>
@@ -58,6 +76,15 @@
   </wsdl:portType>
   <wsdl:binding name="Test2.ForTestingCORBABinding" type="tns:Test2.ForTesting">
     <corba:binding repositoryID="IDL:org.apache.cxf/Test2/ForTesting:1.0"/>
+    <wsdl:operation name="_get_session">
+      <corba:operation name="_get_session">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/PragmaPrefix/typemap" name="return" idltype="Test2.ForTesting"/>
+      </corba:operation>
+      <wsdl:input name="_get_session">
+      </wsdl:input>
+      <wsdl:output name="_get_sessionResponse">
+      </wsdl:output>
+    </wsdl:operation>
     <wsdl:operation name="greetMe">
       <corba:operation name="greetMe">
         <corba:param mode="in" name="who" idltype="corba:string"/>

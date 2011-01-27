@@ -32,6 +32,7 @@ public final class Scope implements Comparable {
     private static final String SEPARATOR = ".";
     private List<String> scope;
     private Scope parent;
+    private String prefix;
     
     public Scope() {
         scope = new ArrayList<String>();
@@ -55,12 +56,14 @@ public final class Scope implements Comparable {
     public Scope(Scope containingScope) {
         scope = new ArrayList<String>(containingScope.scope);
         parent = containingScope.getParent();
+        this.setPrefix(parent.getPrefix());
     }
     
     public Scope(Scope containingScope, String str) {
         scope = new ArrayList<String>(containingScope.scope);
         scope.add(str);
         parent = containingScope;
+        this.setPrefix(parent.getPrefix());
     }
 
     // This is used for interface inheritance
@@ -69,6 +72,7 @@ public final class Scope implements Comparable {
         scope.addAll(prefixScope.scope);
         scope.add(str);
         parent = containingScope;
+        this.setPrefix(parent.getPrefix());
     }
     
     public Scope(Scope containingScope, AST node) {
@@ -77,6 +81,7 @@ public final class Scope implements Comparable {
             scope.add(node.toString());
         }
         parent = containingScope;
+        this.setPrefix(parent.getPrefix());
     }
     
     public String tail() {
@@ -111,11 +116,14 @@ public final class Scope implements Comparable {
     public String toIDLRepositoryID() {
         StringBuilder result = new StringBuilder();
         result.append(CorbaConstants.REPO_STRING);
+        if (prefix != null && prefix.length() > 0) {
+            result.append(prefix + "/");
+        }
         result.append(toString("/"));
         result.append(CorbaConstants.IDL_VERSION);
         return result.toString();
     }
-
+    
     public boolean equals(Object otherScope) {
         if (otherScope instanceof Scope) {
             return toString().equals(((Scope)otherScope).toString());   
@@ -138,5 +146,13 @@ public final class Scope implements Comparable {
             throw new ClassCastException("Scope class expected but found "
                                          + otherScope.getClass().getName());
         }
+    }
+
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
+    public String getPrefix() {
+        return prefix;
     }
 }
