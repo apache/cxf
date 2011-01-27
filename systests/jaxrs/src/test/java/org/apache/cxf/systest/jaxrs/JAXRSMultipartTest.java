@@ -353,6 +353,34 @@ public class JAXRSMultipartTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookJaxbJsonProxy() throws Exception {
+        String address = "http://localhost:" + PORT;
+        MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
+        
+        
+        Map<String, Book> map = client.getBookJaxbJson();
+        List<Book> result = new ArrayList<Book>(map.values());
+        Book jaxb = result.get(0);
+        assertEquals("jaxb", jaxb.getName());
+        assertEquals(1L, jaxb.getId());
+        Book json = result.get(1);
+        assertEquals("json", json.getName());
+        assertEquals(2L, json.getId());
+    }
+    
+    @Test
+    public void testGetBookJaxbJsonProxy2() throws Exception {
+        String address = "http://localhost:" + PORT;
+        MultipartStore client = JAXRSClientFactory.create(address, MultipartStore.class);
+        
+        Map<String, Object> map = client.getBookJaxbJsonObject();
+        List<Object> result = new ArrayList<Object>(map.values());
+        assertEquals(2, result.size());
+        assertTrue(((Attachment)result.get(0)).getContentType().toString().contains("application/xml"));
+        assertTrue(((Attachment)result.get(1)).getContentType().toString().contains("application/json"));
+    }
+    
+    @Test
     public void testAddBookJaxbJsonImageAttachments() throws Exception {
         String address = "http://localhost:" + PORT + "/bookstore/books/jaxbimagejson";
         WebClient client = WebClient.create(address);

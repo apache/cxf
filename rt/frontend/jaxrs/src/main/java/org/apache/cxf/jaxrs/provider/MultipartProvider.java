@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
@@ -126,8 +127,7 @@ public class MultipartProvider extends AbstractConfigurableProvider
         
         if (Collection.class.isAssignableFrom(c) 
             && AnnotationUtils.getAnnotation(anns, Multipart.class) == null) {
-            Class<?> actual = InjectionUtils.getActualType(t);
-            actual = actual != null ? actual : Object.class;
+            Class<?> actual = getActualType(t, 0);
             if (Attachment.class.isAssignableFrom(actual)) {
                 return infos;
             }
@@ -136,6 +136,14 @@ public class MultipartProvider extends AbstractConfigurableProvider
                 objects.add(fromAttachment(a, actual, actual, anns));
             }
             return objects;
+        }
+        if (Map.class.isAssignableFrom(c)) {
+            Map<String, Object> map = new LinkedHashMap<String, Object>(infos.size());
+            Class<?> actual = getActualType(t, 1);
+            for (Attachment a : infos) {
+                map.put(a.getContentType().toString(), fromAttachment(a, actual, actual, anns));
+            }
+            return map;
         }
         if (MultipartBody.class.isAssignableFrom(c)) {
             return new MultipartBody(infos);
@@ -146,6 +154,16 @@ public class MultipartProvider extends AbstractConfigurableProvider
             return fromAttachment(multipart, c, t, anns);
         }
         throw new WebApplicationException(404);
+    }
+    
+    private Class<?> getActualType(Type type, int pos) {
+        Class<?> actual = null;
+        try {
+            actual = InjectionUtils.getActualType(type, pos);
+        } catch (Exception ex) {
+            // ignore;
+        }
+        return actual != null && actual != Object.class ? actual : Attachment.class;
     }
     
     @SuppressWarnings("unchecked")
