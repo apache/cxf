@@ -109,7 +109,7 @@ public final class JAXRSUtils {
     
     private static final Logger LOG = LogUtils.getL7dLogger(JAXRSUtils.class);
     private static final ResourceBundle BUNDLE = BundleUtils.getBundle(JAXRSUtils.class);
-    private static final String PROPOGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
+    private static final String PROPAGATE_EXCEPTION = "org.apache.cxf.propagate.exception";
     
     private JAXRSUtils() {        
     }
@@ -1180,7 +1180,7 @@ public final class JAXRSUtils {
         
     public static boolean propogateException(Message m) {
         
-        Object value = m.getContextualProperty(PROPOGATE_EXCEPTION);
+        Object value = m.getContextualProperty(PROPAGATE_EXCEPTION);
         
         if (value == null) {
             return true;
