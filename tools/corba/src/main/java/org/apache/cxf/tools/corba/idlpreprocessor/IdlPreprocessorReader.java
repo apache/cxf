@@ -198,8 +198,8 @@ public final class IdlPreprocessorReader extends Reader {
         int pos = line.indexOf("**/");
         //The comments need to be end with */, so if the line has ****/,
         //we need to insert space to make it *** */
-        if ((pos != -1) && (pos != 0)) {
-            line = line.substring(0, pos) + " " + line.substring(pos + 1);
+        if (pos != -1) {
+            line = line.substring(0, pos + 1) + " " + line.substring(pos + 1);
         }
         return line;
     }
