@@ -325,12 +325,13 @@ public class IDLToWSDLTest extends ToolTestBase {
         File actual = new File(output, "Parent.wsdl");
         File expected = 
             new File(getClass().getResource("/idl/expected_Parent.wsdl").toURI());
-        
+        File include0Dir = new File(getClass().getResource("/idl").toURI());
         File include1Dir = new File(getClass().getResource("/idl/subdir1").toURI());
         File include2Dir = new File(getClass().getResource("/idl/subdir2").toURI());
         
         String[] args = new String[] {"-ow", "Parent.wsdl",
                                       "-o", output.toString(),
+                                      "-I", include0Dir.toString(),
                                       "-I", include1Dir.toString(),
                                       "-I", include2Dir.toString(),
                                       input.toString()
@@ -339,4 +340,25 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertEquals("IDLToWSDL Failed", noError, exc);
         doTestGeneratedWsdl(expected, actual);
     }
+    
+    public void testExternalInterfaceRef() throws Exception {
+        File input = new File(getClass().getResource("/idl/ExternalInterfaceRef.idl").toURI());
+        File actual = new File(output, "ExternalInterfaceRef.wsdl");
+        File expected = 
+            new File(getClass().getResource("/idl/expected_ExternalInterfaceRef.wsdl").toURI());
+        
+        
+        File include1Dir = new File(getClass().getResource("/idl").toURI());
+               
+        String[] args = new String[] {"-ow", "ExternalInterfaceRef.wsdl",
+                                      "-o", output.toString(),
+                                      "-I", include1Dir.toString(),
+                                      "-verbose",
+                                      input.toString()
+        };
+        int exc = execute(args);
+        assertEquals("IDLToWSDL Failed", noError, exc);
+        doTestGeneratedWsdl(expected, actual);
+    }
+    
 }

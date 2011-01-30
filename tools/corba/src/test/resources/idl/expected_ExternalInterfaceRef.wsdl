@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef/typemap">
+    <corba:const xmlns:xs="http://www.w3.org/2001/XMLSchema" value="\2" idltype="corba:char" name="Test2.TRANSIENT" type="xs:byte"/>
+    <corba:object xmlns:ns4="http://www.w3.org/2005/08/addressing" xmlns="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef" binding="Test2.ForTestingCORBABinding" repositoryID="IDL:org.apache.cxf/Test2/ForTesting:1.0" name="Test2.ForTesting" type="ns4:EndpointReferenceType"/>
+  </corba:typeMapping>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef" xmlns="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef" xmlns:wsa="http://www.w3.org/2005/08/addressing" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:import namespace="http://www.w3.org/2005/08/addressing" schemaLocation="http://www.w3.org/2005/08/addressing/ws-addr.xsd">
+      </xs:import>
+      <xs:element name="_get_session">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="Test2.ForTestingRef" type="wsa:EndpointReferenceType">
+        <xs:annotation>
+          <xs:appinfo>
+          </xs:appinfo>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="_get_sessionResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="greetMe">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="who" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="greetMeResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testExternalInterfRef">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="arg0" nillable="true" type="wsa:EndpointReferenceType">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testExternalInterfRefResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="testExternalInterfRef">
+    <wsdl:part name="inparameter" element="tns:testExternalInterfRef">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMe">
+    <wsdl:part name="inparameter" element="tns:greetMe">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_sessionResponse">
+    <wsdl:part name="parameters" element="tns:_get_sessionResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testExternalInterfRefResponse">
+    <wsdl:part name="outparameter" element="tns:testExternalInterfRefResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_session">
+    <wsdl:part name="parameters" element="tns:_get_session">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="greetMeResponse">
+    <wsdl:part name="outparameter" element="tns:greetMeResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="ExternalInterfaceRef.TestForExternalInterfaceRef">
+    <wsdl:operation name="testExternalInterfRef">
+      <wsdl:input name="testExternalInterfRefRequest" message="tns:testExternalInterfRef">
+    </wsdl:input>
+      <wsdl:output name="testExternalInterfRefResponse" message="tns:testExternalInterfRefResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="Test2.ForTesting">
+    <wsdl:operation name="_get_session">
+      <wsdl:input name="_get_session" message="tns:_get_session">
+    </wsdl:input>
+      <wsdl:output name="_get_sessionResponse" message="tns:_get_sessionResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <wsdl:input name="greetMeRequest" message="tns:greetMe">
+    </wsdl:input>
+      <wsdl:output name="greetMeResponse" message="tns:greetMeResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="Test2.ForTestingCORBABinding" type="tns:Test2.ForTesting">
+    <corba:binding repositoryID="IDL:org.apache.cxf/Test2/ForTesting:1.0"/>
+    <wsdl:operation name="_get_session">
+      <corba:operation name="_get_session">
+        <corba:return xmlns="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef/typemap" name="return" idltype="Test2.ForTesting"/>
+      </corba:operation>
+      <wsdl:input name="_get_session">
+      </wsdl:input>
+      <wsdl:output name="_get_sessionResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="greetMe">
+      <corba:operation name="greetMe">
+        <corba:param mode="in" name="who" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="greetMeRequest">
+      </wsdl:input>
+      <wsdl:output name="greetMeResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="ExternalInterfaceRef.TestForExternalInterfaceRefCORBABinding" type="tns:ExternalInterfaceRef.TestForExternalInterfaceRef">
+    <corba:binding repositoryID="IDL:org.apache.cxf/ExternalInterfaceRef/TestForExternalInterfaceRef:1.0"/>
+    <wsdl:operation name="testExternalInterfRef">
+      <corba:operation name="testExternalInterfRef">
+        <corba:param xmlns="http://cxf.apache.org/bindings/corba/idl/ExternalInterfaceRef/typemap" mode="in" name="arg0" idltype="Test2.ForTesting"/>
+      </corba:operation>
+      <wsdl:input name="testExternalInterfRefRequest">
+      </wsdl:input>
+      <wsdl:output name="testExternalInterfRefResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="ExternalInterfaceRef.TestForExternalInterfaceRefCORBAService">
+    <wsdl:port name="ExternalInterfaceRef.TestForExternalInterfaceRefCORBAPort" binding="tns:ExternalInterfaceRef.TestForExternalInterfaceRefCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="Test2.ForTestingCORBAService">
+    <wsdl:port name="Test2.ForTestingCORBAPort" binding="tns:Test2.ForTestingCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

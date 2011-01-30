@@ -185,6 +185,12 @@ public class ObjectReferenceVisitor extends VisitorBase {
             }
             repositoryID = customScope.toIDLRepositoryID();
             bindingName = getBindingQNameByID(definition, repositoryID, objRefWsdlVisitor);
+            if (bindingName == null) {
+                //check bindingName with prefix
+                customScope.setPrefix(objRefWsdlVisitor.getPragmaPrefix());
+                repositoryID = customScope.toIDLRepositoryID();
+                bindingName = getBindingQNameByID(definition, repositoryID, objRefWsdlVisitor);
+            }
         }
 
         if (bindingName == null) {
@@ -540,6 +546,12 @@ public class ObjectReferenceVisitor extends VisitorBase {
             }
             repositoryID = customScope.toIDLRepositoryID();
             bindingName = getBindingQNameByID(def, repositoryID, wsdlVisitor);
+            if (bindingName == null) {
+                //check bindingName with prefix
+                customScope.setPrefix(wsdlVisitor.getPragmaPrefix());
+                repositoryID = customScope.toIDLRepositoryID();
+                bindingName = getBindingQNameByID(def, repositoryID, wsdlVisitor);
+            }
         }
 
         if (bindingName != null) {
