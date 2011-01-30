@@ -23,6 +23,10 @@
 #include "PragmaPrefix.idl"
 
 module ExternalInterfaceRef {
+
+/**
+some comment
+**/
   
   interface TestForExternalInterfaceRef 
   {
