@@ -353,18 +353,21 @@ public class PortTypeVisitor extends VisitorBase {
                                                     mapper.mapNSToPrefix(inputNS), 
                                                     manager.getImportedWSDLDefinitionFile(inputNS));
                 }
+                if (op.getOutput() != null) {
+                    String outputNS = op.getOutput().getMessage().getQName().getNamespaceURI();
+                    manager.addWSDLDefinitionNamespace(definition, mapper.mapNSToPrefix(outputNS), outputNS);
 
-                String outputNS = op.getOutput().getMessage().getQName().getNamespaceURI();
-                manager.addWSDLDefinitionNamespace(definition, mapper.mapNSToPrefix(outputNS), outputNS);
-
-                // Make sure we import the wsdl for the output namespace
-                if (definition.getImports().get(outputNS) == null && !mapper.isDefaultMapping()
-                    && !definition.getTargetNamespace().equals(outputNS)) {
-                    manager.addWSDLDefinitionImport(definition, 
-                                                    manager.getWSDLDefinition(outputNS), 
-                                                    mapper.mapNSToPrefix(outputNS), 
-                                                    manager.getImportedWSDLDefinitionFile(outputNS));
+                    // Make sure we import the wsdl for the output namespace
+                    if (definition.getImports().get(outputNS) == null && !mapper.isDefaultMapping()
+                        && !definition.getTargetNamespace().equals(outputNS)) {
+                        manager.addWSDLDefinitionImport(definition, 
+                                                        manager.getWSDLDefinition(outputNS), 
+                                                        mapper.mapNSToPrefix(outputNS), 
+                                                        manager.getImportedWSDLDefinitionFile(outputNS));
+                    }
                 }
+
+                
                 
                 for (Iterator<Fault> faults = CastUtils.cast(op.getFaults().values().iterator());
                     faults.hasNext();) {
