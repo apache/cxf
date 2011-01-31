@@ -937,17 +937,21 @@ public final class JAXRSUtils {
         if (!StringUtils.isEmpty(query)) {            
             List<String> parts = Arrays.asList(query.split(sep));
             for (String part : parts) {
-                String[] values = part.split("=");
+                int index = part.indexOf('=');
+                String name = null;
                 String value = null;
-                if (values.length == 1) {
+                if (index == -1) {
+                    name = part;
                     value = "";
-                } else if (decode || (decodePlus && values[1].contains("+"))) {
-                    value = (";".equals(sep))
-                        ? HttpUtils.pathDecode(values[1]) : HttpUtils.urlDecode(values[1]); 
                 } else {
-                    value = values[1];
+                    name = part.substring(0, index);
+                    value =  index < part.length() ? part.substring(index + 1) : "";
+                    if (decode || (decodePlus && value.contains("+"))) {
+                        value = (";".equals(sep))
+                            ? HttpUtils.pathDecode(value) : HttpUtils.urlDecode(value); 
+                    }
                 }
-                queries.add(HttpUtils.urlDecode(values[0]), value);
+                queries.add(HttpUtils.urlDecode(name), value);
             }
         }
     }

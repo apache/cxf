@@ -19,7 +19,9 @@
 
 package org.apache.cxf.jaxrs.ext.search;
 
-import org.apache.cxf.jaxrs.utils.HttpUtils;
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 import org.apache.cxf.message.Message;
 
 public class SearchContextImpl implements SearchContext {
@@ -51,13 +53,17 @@ public class SearchContextImpl implements SearchContext {
     private String getExpression() {
         String queryStr = (String)message.get(Message.QUERY_STRING);
         if (queryStr != null 
-            && (queryStr.startsWith(SEARCH_QUERY) || queryStr.startsWith(SHORT_SEARCH_QUERY))) {
-            int ind = queryStr.indexOf('=');
-            if (ind + 1 < queryStr.length()) {
-                return HttpUtils.urlDecode(queryStr.substring(ind + 1));
+            && (queryStr.contains(SHORT_SEARCH_QUERY) || queryStr.contains(SEARCH_QUERY))) {
+            MultivaluedMap<String, String> params = 
+                JAXRSUtils.getStructuredParams(queryStr, "&", true, false);
+            if (params.containsKey(SHORT_SEARCH_QUERY)) {
+                return params.getFirst(SHORT_SEARCH_QUERY);
+            } else {
+                return params.getFirst(SEARCH_QUERY);
             }
+        } else {
+            return null;
         }
-        return null;
     }
     
     private <T> FiqlParser<T> getParser(Class<T> cls) {

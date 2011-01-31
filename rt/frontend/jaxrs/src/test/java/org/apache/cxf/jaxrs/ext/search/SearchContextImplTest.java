@@ -32,19 +32,29 @@ public class SearchContextImplTest extends Assert {
 
     @Test
     public void testFiqlSearchCondition() {
-        doTestFiqlSearchCondition(SearchContextImpl.SEARCH_QUERY,
-                                  "name==CXF%20Rocks;id=gt=123");
+        doTestFiqlSearchCondition(
+            SearchContextImpl.SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
     
     @Test
     public void testFiqlSearchConditionWithShortQuery() {
-        doTestFiqlSearchCondition(SearchContextImpl.SHORT_SEARCH_QUERY,
-                                  "name==CXF%20Rocks;id=gt=123");
+        doTestFiqlSearchCondition(
+            SearchContextImpl.SHORT_SEARCH_QUERY + "=" + "name==CXF%20Rocks;id=gt=123");
     }
     
-    private void doTestFiqlSearchCondition(String queryName, String queryValue) {
+    @Test
+    public void testFiqlSearchConditionWithNonFiqlQuery() {
+        doTestFiqlSearchCondition(
+            "_s=name==CXF%20Rocks;id=gt=123&a=b");
+        doTestFiqlSearchCondition(
+            "a=b&_s=name==CXF%20Rocks;id=gt=123");
+        doTestFiqlSearchCondition(
+            "a=b&_s=name==CXF%20Rocks;id=gt=123&c=d");
+    }
+    
+    private void doTestFiqlSearchCondition(String queryString) {
         Message m = new MessageImpl();
-        m.put(Message.QUERY_STRING, queryName + "=" + queryValue);
+        m.put(Message.QUERY_STRING, queryString);
         SearchContext context = new SearchContextImpl(m);
         SearchCondition<Book> sc = context.getCondition(Book.class);
         assertNotNull(sc);
