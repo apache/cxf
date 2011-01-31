@@ -90,10 +90,11 @@ public final class CustomizationParser {
         try {
             wsdlURL = URIParserUtil.getAbsoluteURI((String)env.get(ToolConstants.CFG_WSDLURL));
 
-            wsdlNode = getTargetNode(this.wsdlURL);
-
-            if (wsdlNode == null && env.get(ToolConstants.CFG_CATALOG) != null) {
+            if (env.get(ToolConstants.CFG_CATALOG) != null) {
                 wsdlNode = resolveNodeByCatalog(wsdlURL);
+            } 
+            if (wsdlNode == null) {
+                wsdlNode = getTargetNode(this.wsdlURL);
             }
             
             if (wsdlNode == null) {
@@ -132,6 +133,9 @@ public final class CustomizationParser {
     }
 
     public Element getTargetNode(String uri) {
+        if (uri == null) {
+            return null;
+        }
         if (uri.equals(wsdlURL) && wsdlNode != null) {
             return wsdlNode;
         }
