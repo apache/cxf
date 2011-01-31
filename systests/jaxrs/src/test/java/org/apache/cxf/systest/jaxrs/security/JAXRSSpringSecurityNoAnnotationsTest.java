@@ -23,7 +23,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class JAXRSSpringSecurityNoAnnotationsTest extends AbstractSpringSecurityTest {
-    public static final String PORT = BookServerSecuritySpringInterface.PORT;
+    public static final String PORT = BookServerSecuritySpringNoAnnotations.PORT;
 
     @BeforeClass
     public static void startServers() throws Exception {
