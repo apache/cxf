@@ -70,6 +70,11 @@ public class TypeDclVisitor extends VisitorBase {
             //
             // native type not supported
             throw new RuntimeException("[TypeDclVisitor: native type not supported!]");
+        }  else if (node.getType() == IDLTokenTypes.LITERAL_typeprefix) {
+            // typeprefix <scoped_name> <string_literal>
+            // typeprefix not supported
+            // keyword since CORBA 3.0
+            throw new RuntimeException("[TypeDclVisitor: typeprefix not supported!]");
         }
 
         // TODO forward declaration <constr_forward_declaration>
