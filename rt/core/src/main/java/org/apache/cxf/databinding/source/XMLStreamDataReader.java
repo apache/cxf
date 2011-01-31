@@ -97,16 +97,21 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                 input = StaxUtils.createXMLStreamReader(dom);
             }
             if (type != null) {
+                Object retVal = null;
                 if (SAXSource.class.isAssignableFrom(type)
                     || StaxSource.class.isAssignableFrom(type)) {
-                    return new StaxSource(resetForStreaming(input));
+                    retVal = new StaxSource(resetForStreaming(input));
                 } else if (StreamSource.class.isAssignableFrom(type)) {
-                    return new StreamSource(getInputStream(input));
+                    retVal = new StreamSource(getInputStream(input));
                 } else if (XMLStreamReader.class.isAssignableFrom(type)) {
-                    return resetForStreaming(input);
+                    retVal = resetForStreaming(input);
+                } else if (Element.class.isAssignableFrom(type)) {
+                    retVal = dom == null ? read(input).getNode() : dom;
+                } else if (Document.class.isAssignableFrom(type)) {
+                    retVal = dom == null ? read(input).getNode() : dom;
                 } else if (DataSource.class.isAssignableFrom(type)) {
                     final InputStream ins = getInputStream(input);
-                    return new DataSource() {
+                    retVal = new DataSource() {
                         public String getContentType() {
                             return "text/xml";
                         }
@@ -124,8 +129,11 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
                     input = resetForStreaming(input);
                     Object o = createStaxSource(input, type);
                     if (o != null) {
-                        return o;
+                        retVal = o;
                     }
+                }
+                if (retVal != null) {
+                    return retVal;
                 }
             }
             return dom == null ? read(input) : new DOMSource(dom);
