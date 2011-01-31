@@ -30,6 +30,7 @@ import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.validation.Schema;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.DocumentFragment;
 import org.w3c.dom.Node;
 
@@ -72,7 +73,12 @@ public class XMLStreamDataWriter implements DataWriter<XMLStreamWriter> {
                         return;
                     }
                 }
-                StaxUtils.writeNode(nd, writer, true);
+                if (nd instanceof Document) {
+                    StaxUtils.writeDocument((Document)nd,
+                                            writer, false, true);
+                } else {
+                    StaxUtils.writeNode(nd, writer, true);                    
+                }
             } else {
                 Source s = (Source) obj;
                 if (s instanceof DOMSource
