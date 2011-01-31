@@ -194,6 +194,11 @@
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-jaxws_2.2_spec</artifactId>
                 </dependency>
+                <dependency>
+            		<groupId>org.apache.cxf</groupId>
+           	 		<artifactId>cxf-rt-transports-http</artifactId>
+            		<version>${project.version}</version>
+        		</dependency>
             </dependencies>
             <properties>
                 <cxf.spi-dir>spi-2.2</cxf.spi-dir>
@@ -292,6 +297,11 @@
                 <cxf.spi-dir>spi-2.2</cxf.spi-dir>
             </properties>
             <dependencies>
+                <dependency>
+            		<groupId>org.apache.cxf</groupId>
+           	 		<artifactId>cxf-rt-transports-http</artifactId>
+            		<version>${project.version}</version>
+        		</dependency>
                 <dependency>
                     <groupId>org.apache.geronimo.specs</groupId>
                     <artifactId>geronimo-activation_1.1_spec</artifactId>
