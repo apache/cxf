@@ -246,7 +246,8 @@ public class JMSConduit extends AbstractConduit implements JMSExchangeSender, Me
                         try {
                             ((TemporaryQueue)replyToDestination).delete();
                         } catch (JMSException e) {
-                            throw new RuntimeException("Unable to remove temporary queue", e);
+                            // Only log the exception as the exchange should be able to proceed
+                            LOG.log(Level.WARNING, "Unable to remove temporary queue: " + e.getMessage(), e);
                         }
                     }
                 }
