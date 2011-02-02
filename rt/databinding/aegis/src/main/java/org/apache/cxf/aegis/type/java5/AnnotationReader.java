@@ -42,25 +42,10 @@ public class AnnotationReader {
     private static final Class<? extends Annotation> XML_TRANSIENT =
             load("javax.xml.bind.annotation.XmlTransient");
 
-    private static final Class<? extends Annotation> XFIRE_IGNORE_PROPERTY =
-            load("org.codehaus.xfire.aegis.type.java5.IgnoreProperty");
-    private static final Class<? extends Annotation> XFIRE_XML_ATTRIBUTE =
-        load("org.codehaus.xfire.aegis.type.java5.XmlAttribute");
-    private static final Class<? extends Annotation> XFIRE_XML_ELEMENT =
-        load("org.codehaus.xfire.aegis.type.java5.XmlElement");
-    private static final Class<? extends Annotation> XFIRE_XML_TYPE =
-        load("org.codehaus.xfire.aegis.type.java5.XmlType");
-    private static final Class<? extends Annotation> XFIRE_XML_PARAM_TYPE =
-        load("org.codehaus.xfire.aegis.type.java5.XmlParamType");
-    private static final Class<? extends Annotation> XFIRE_XML_RETURN_TYPE =
-        load("org.codehaus.xfire.aegis.type.java5.XmlReturnType");
-
-
     @SuppressWarnings("unchecked")
     public boolean isIgnored(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 IgnoreProperty.class,
-                XFIRE_IGNORE_PROPERTY,
                 XML_TRANSIENT);
     }
 
@@ -68,7 +53,6 @@ public class AnnotationReader {
     public boolean isAttribute(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlAttribute.class,
-                XFIRE_XML_ATTRIBUTE,
                 XML_ATTRIBUTE);
     }
 
@@ -76,7 +60,6 @@ public class AnnotationReader {
     public boolean isElement(AnnotatedElement element) {
         return isAnnotationPresent(element,
                 XmlElement.class,
-                XFIRE_XML_ELEMENT,
                 XML_ELEMENT);
     }
 
@@ -87,7 +70,6 @@ public class AnnotationReader {
                 element,
                 Boolean.FALSE,
                 XmlElement.class,
-                XFIRE_XML_ELEMENT,
                 XML_ELEMENT));
     }
     @SuppressWarnings("unchecked")
@@ -98,7 +80,6 @@ public class AnnotationReader {
         return (Boolean)getAnnotationValue("nillable", // NOPMD
                 anns,
                 XmlElement.class,
-                XFIRE_XML_ELEMENT,
                 XML_ELEMENT);
     }
 
@@ -108,9 +89,7 @@ public class AnnotationReader {
                 element,
                 AegisType.class,
                 XmlAttribute.class,
-                XmlElement.class,
-                XFIRE_XML_ATTRIBUTE,
-                XFIRE_XML_ELEMENT);
+                XmlElement.class);
         // jaxb uses a different default value
         if (value == null) {
             value = (Class) getAnnotationValue("type",
@@ -128,8 +107,7 @@ public class AnnotationReader {
                 method,
                 index,
                 AegisType.class,
-                XmlParamType.class,
-                XFIRE_XML_PARAM_TYPE);
+                XmlParamType.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -137,8 +115,7 @@ public class AnnotationReader {
         return (Class) getAnnotationValue("type",
                 element,
                 AegisType.class,
-                XmlReturnType.class,
-                XFIRE_XML_RETURN_TYPE);
+                XmlReturnType.class);
     }
 
     @SuppressWarnings("unchecked")
@@ -147,11 +124,8 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlType.class,
-                XFIRE_XML_TYPE,
                 XmlAttribute.class,
-                XFIRE_XML_ATTRIBUTE,
-                XmlElement.class,
-                XFIRE_XML_ELEMENT);
+                XmlElement.class);
 
         // jaxb uses a different default value
         if (name == null) {
@@ -172,7 +146,6 @@ public class AnnotationReader {
                 index,
                 AegisType.class,
                 XmlParamType.class,
-                XFIRE_XML_PARAM_TYPE,
                 WEB_PARAM);
     }
 
@@ -182,7 +155,6 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlReturnType.class,
-                XFIRE_XML_RETURN_TYPE,
                 WEB_RESULT);
     }
 
@@ -197,11 +169,8 @@ public class AnnotationReader {
                 element,
                 "",
                 XmlType.class,
-                XFIRE_XML_TYPE,
                 XmlAttribute.class,
-                XFIRE_XML_ATTRIBUTE,
                 XmlElement.class,
-                XFIRE_XML_ELEMENT,
                 XML_SCHEMA);
 
         // jaxb uses a different default value
@@ -223,8 +192,7 @@ public class AnnotationReader {
                 method,
                 index,
                 "",
-                XmlParamType.class,
-                XFIRE_XML_PARAM_TYPE);
+                XmlParamType.class);
 
         // JWS annotation field is named targetNamespace
         if (namespace == null) {
@@ -238,8 +206,7 @@ public class AnnotationReader {
         String namespace = (String) getAnnotationValue("namespace",
                 element,
                 "",
-                XmlReturnType.class,
-                XFIRE_XML_RETURN_TYPE);
+                XmlReturnType.class);
 
         // JWS annotation field is named targetNamespace
         if (namespace == null) {
@@ -253,8 +220,7 @@ public class AnnotationReader {
         String minOccurs = (String) getAnnotationValue("minOccurs",
                 element,
                 "",
-                XmlElement.class,
-                XFIRE_XML_ELEMENT);
+                XmlElement.class);
         if (minOccurs != null) {
             return Integer.parseInt(minOccurs);
         }
@@ -274,8 +240,7 @@ public class AnnotationReader {
         }
         String minOccurs = (String) getAnnotationValue("minOccurs",
                 anns,
-                XmlElement.class,
-                XFIRE_XML_ELEMENT);
+                XmlElement.class);
         if (minOccurs != null) {
             return Integer.valueOf(minOccurs);
         }
@@ -292,8 +257,7 @@ public class AnnotationReader {
         Boolean extensibleElements = (Boolean) getAnnotationValue("extensibleElements",
                 element,
                 Boolean.TRUE,
-                XmlType.class,
-                XFIRE_XML_TYPE);
+                XmlType.class);
 
         if (extensibleElements == null) {
             return defaultValue;
@@ -306,8 +270,7 @@ public class AnnotationReader {
         Boolean extensibleAttributes = (Boolean) getAnnotationValue("extensibleAttributes",
                 element,
                 Boolean.TRUE,
-                XmlType.class,
-                XFIRE_XML_TYPE);
+                XmlType.class);
 
         if (extensibleAttributes == null) {
             return defaultValue;
