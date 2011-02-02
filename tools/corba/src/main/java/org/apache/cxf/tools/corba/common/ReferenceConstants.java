@@ -29,9 +29,5 @@ public interface ReferenceConstants {
     String WSADDRESSING_LOCAL_NAME = "EndpointReferenceType";
     QName  WSADDRESSING_TYPE = new QName(WSADDRESSING_NAMESPACE, WSADDRESSING_LOCAL_NAME);
 
-    String REFERENCE_NAMESPACE = "http://schemas.iona.com/references";
-    String REFERENCE_LOCAL_NAME = "Reference";
-    QName  REFERENCE_TYPE = new QName(REFERENCE_NAMESPACE, REFERENCE_LOCAL_NAME);
-    
     String getValue(String value);
 }

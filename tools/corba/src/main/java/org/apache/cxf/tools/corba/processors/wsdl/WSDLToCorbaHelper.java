@@ -1566,8 +1566,7 @@ public class WSDLToCorbaHelper {
     }
 
     private boolean isIDLObjectType(QName typeName) {
-        if (typeName.equals(ReferenceConstants.REFERENCE_TYPE)
-            || typeName.equals(ReferenceConstants.WSADDRESSING_TYPE)) {
+        if (typeName.equals(ReferenceConstants.WSADDRESSING_TYPE)) {
             return true;
         }
 
@@ -1577,8 +1576,7 @@ public class WSDLToCorbaHelper {
     private boolean isAddressingNamespace(QName typeName) {
         return (typeName != null)
                 && (!isIDLObjectType(typeName))
-                && (typeName.getNamespaceURI().equals(ReferenceConstants.REFERENCE_NAMESPACE)
-                || typeName.getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE));
+                && (typeName.getNamespaceURI().equals(ReferenceConstants.WSADDRESSING_NAMESPACE));
     }
 
     protected static boolean queryBinding(Definition definition, QName bqname) {
