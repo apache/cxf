@@ -55,7 +55,8 @@ public class InMessageRecorder extends AbstractPhaseInterceptor<Message> {
             IOUtils.copy(is, bos);
             is.close();
             bos.close();
-            inbound.add(bos.toByteArray());
+            byte bytes[] = bos.toByteArray();
+            inbound.add(bytes);
             if (LOG.isLoggable(Level.FINE)) {
                 LOG.fine("inbound: " + bos.toString());
             }

@@ -19,16 +19,26 @@
 
 package org.apache.cxf.ws.rm;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
+import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.ws.addressing.AddressingPropertiesImpl;
 import org.apache.cxf.ws.rm.persistence.RMStore;
 
 public class Destination extends AbstractEndpoint {
+    
+    private static final Logger LOG = LogUtils.getL7dLogger(Destination.class);
 
     private Map<String, DestinationSequence> map;
 
@@ -91,12 +101,31 @@ public class Destination extends AbstractEndpoint {
         DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
         if (null != seq) {
-            seq.applyDeliveryAssurance(sequenceType.getMessageNumber());
-            seq.acknowledge(message);
-
-            if (null != sequenceType.getLastMessage()) {
-                seq.setLastMessageNumber(sequenceType.getMessageNumber());
-                ackImmediately(seq, message);
+            if (seq.applyDeliveryAssurance(sequenceType.getMessageNumber(), message)) {
+                seq.acknowledge(message);
+    
+                if (null != sequenceType.getLastMessage()) {
+                    seq.setLastMessageNumber(sequenceType.getMessageNumber());
+                    ackImmediately(seq, message);
+                }
+            } else {
+                try {
+                    message.getInterceptorChain().abort();
+                    Conduit conduit = message.getExchange().getDestination()
+                        .getBackChannel(message, null, null);
+                    if (conduit != null) {
+                        //for a one-way, the back channel could be
+                        //null if it knows it cannot send anything.
+                        Message partial = createMessage(message.getExchange());
+                        partial.remove(Message.CONTENT_TYPE);
+                        partial.setExchange(message.getExchange());
+                        conduit.prepare(partial);
+                        conduit.close(partial);
+                    }
+                } catch (IOException e) {
+                    LOG.log(Level.SEVERE, e.getMessage());
+                    throw new RMException(e);
+                }
             }
         } else {
             SequenceFaultFactory sff = new SequenceFaultFactory();
@@ -140,5 +169,28 @@ public class Destination extends AbstractEndpoint {
             getReliableEndpoint().getProxy().acknowledge(seq);                    
         }
     }
+    
+    void processingComplete(Message message) {
+        SequenceType sequenceType = RMContextUtils.retrieveRMProperties(message, false).getSequence();
+        if (null == sequenceType) {
+            return;
+        }
+        
+        DestinationSequence seq = getSequence(sequenceType.getIdentifier());
 
+        if (null != seq) {
+            seq.processingComplete(sequenceType.getMessageNumber());
+        }
+    }
+    
+    private static Message createMessage(Exchange exchange) {
+        Endpoint ep = exchange.get(Endpoint.class);
+        Message msg = null;
+        if (ep != null) {
+            msg = new MessageImpl();
+            msg.setExchange(exchange);
+            msg = ep.getBinding().createMessage(msg);
+        }
+        return msg;
+    }
 }

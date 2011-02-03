@@ -146,7 +146,7 @@ public class DestinationTest extends Assert {
         BigInteger nr = BigInteger.TEN;
         EasyMock.expect(st.getMessageNumber()).andReturn(nr);  
         RMException ex = new RMException(new RuntimeException("already acknowledged"));
-        ds.applyDeliveryAssurance(nr);
+        ds.applyDeliveryAssurance(nr, message);
         EasyMock.expectLastCall().andThrow(ex);
         control.replay();
         try {
@@ -177,8 +177,8 @@ public class DestinationTest extends Assert {
         DestinationSequence ds = control.createMock(DestinationSequence.class);
         EasyMock.expect(destination.getSequence(id)).andReturn(ds);
         
-        ds.applyDeliveryAssurance(nr);
-        EasyMock.expectLastCall();
+        ds.applyDeliveryAssurance(nr, message);
+        EasyMock.expectLastCall().andReturn(Boolean.TRUE);
         ds.acknowledge(message);
         EasyMock.expectLastCall();
         SequenceType.LastMessage lm = control.createMock(SequenceType.LastMessage.class);

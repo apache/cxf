@@ -22,12 +22,16 @@ package org.apache.cxf.ws.rm;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TimerTask;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.cxf.common.logging.LogUtils;
+import org.apache.cxf.continuations.Continuation;
+import org.apache.cxf.continuations.ContinuationProvider;
+import org.apache.cxf.continuations.SuspendedInvocationException;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.ws.addressing.v200408.EndpointReferenceType;
 import org.apache.cxf.ws.rm.SequenceAcknowledgement.AcknowledgementRange;
@@ -51,6 +55,9 @@ public class DestinationSequence extends AbstractSequence {
     private List<DeferredAcknowledgment> deferredAcknowledgments;
     private SequenceTermination scheduledTermination;
     private String correlationID;
+    private BigInteger inProcessNumber;
+    private BigInteger highNumberCompleted = BigInteger.ZERO;
+    private List<Continuation> continuations = new LinkedList<Continuation>();
     
     public DestinationSequence(Identifier i, EndpointReferenceType a, Destination d) {
         this(i, a, null, null);
@@ -141,7 +148,7 @@ public class DestinationSequence extends AbstractSequence {
                 acknowledgement.getAcknowledgementRange().add(i, range);
             }
             mergeRanges();
-            notifyAll();
+            wakeupAll();
         }
         
         purgeAcknowledged(messageNumber);
@@ -208,45 +215,102 @@ public class DestinationSequence extends AbstractSequence {
         // can be included in a HTTP response
         return getAcksTo().getAddress().getValue().equals(RMConstants.getAnonymousAddress());
     }
-       
+    
     /**
      * Ensures that the delivery assurance is honored, e.g. by throwing an 
      * exception if the message had already been delivered and the delivery
      * assurance is AtMostOnce.
-     * This method blocks in case the delivery assurance is 
-     * InOrder and and not all messages with lower message numbers have been 
-     * delivered.
+     * If the delivery assurance includes either AtLeastOnce or ExactlyOnce, combined with InOrder, this
+     * queues out-of-order messages for processing after the missing messages have been received.
      * 
-     * @param s the SequenceType object including identifier and message number
+     * @param mn message number
+     * @return <code>true</code> if message processing to continue, <code>false</code> if to be dropped
      * @throws Fault if message had already been acknowledged
      */
-    void applyDeliveryAssurance(BigInteger mn) throws RMException {
+    boolean applyDeliveryAssurance(BigInteger mn, Message message) throws RMException {
+        Continuation cont = getContinuation(message);
         DeliveryAssuranceType da = destination.getManager().getDeliveryAssurance();
-        if (da.isSetAtMostOnce() && isAcknowledged(mn)) {            
+        if (cont != null && da.isSetInOrder() && !cont.isNew()) {
+            return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
+                               message, cont);
+        }
+        if ((da.isSetExactlyOnce() || da.isSetAtMostOnce()) && isAcknowledged(mn)) {            
             org.apache.cxf.common.i18n.Message msg = new org.apache.cxf.common.i18n.Message(
                 "MESSAGE_ALREADY_DELIVERED_EXC", LOG, mn, getIdentifier().getValue());
-            LOG.log(Level.SEVERE, msg.toString());
+            LOG.log(Level.INFO, msg.toString());
             throw new RMException(msg);
         } 
-        if (da.isSetInOrder() && da.isSetAtLeastOnce()) {
-            synchronized (this) {
-                boolean ok = allPredecessorsAcknowledged(mn);
-                while (!ok) {
-                    try {
-                        wait();                        
-                        ok = allPredecessorsAcknowledged(mn);
-                    } catch (InterruptedException ie) {
-                        // ignore
-                    }
+        if (da.isSetInOrder()) {
+            return waitInQueue(mn, !(da.isSetAtLeastOnce() || da.isSetExactlyOnce()),
+                               message, cont);
+        }
+        return true;
+    }
+    
+    private Continuation getContinuation(Message message) {
+        if (message == null) {
+            return null;
+        }
+        return message.get(Continuation.class);
+    }
+    
+    synchronized boolean waitInQueue(BigInteger mn, boolean canSkip,
+                                     Message message, Continuation continuation) {
+        while (true) {
+            
+            // can process now if no other in process and this one is next
+            if (inProcessNumber == null) {
+                BigInteger diff = mn.subtract(highNumberCompleted);
+                if (BigInteger.ONE.equals(diff) || (canSkip && diff.signum() > 0)) {
+                    inProcessNumber = mn;
+                    return true;
                 }
+            }
+            
+            // can abort now if same message in process or already processed
+            BigInteger compare = inProcessNumber == null ? highNumberCompleted : inProcessNumber;
+            if (compare.compareTo(mn) >= 0) {
+                return false;
+            }
+            if (continuation == null) {
+                ContinuationProvider p = message.get(ContinuationProvider.class);
+                if (p != null) {
+                    boolean isOneWay = message.getExchange().isOneWay();
+                    message.getExchange().setOneWay(false);
+                    continuation = p.getContinuation();
+                    message.getExchange().setOneWay(isOneWay);
+                    message.put(Continuation.class, continuation);
+                }
+            }
+
+            if (continuation != null) {
+                continuation.setObject(message);
+                if (continuation.suspend(-1)) {
+                    continuations.add(continuation);
+                    throw new SuspendedInvocationException();
+                }
+            }
+            try {
+                //if we get here, there isn't a continuation available
+                //so we need to block/wait
+                wait();                        
+            } catch (InterruptedException ie) {
+                // ignore
             }
         }
     }
+    synchronized void wakeupAll() {
+        while (!continuations.isEmpty()) {
+            Continuation c = continuations.remove(0);
+            c.resume();
+        }
+        notifyAll();
+    }
     
-    synchronized boolean allPredecessorsAcknowledged(BigInteger mn) {
-        return acknowledgement.getAcknowledgementRange().size() == 1
-            && acknowledgement.getAcknowledgementRange().get(0).getLower().equals(BigInteger.ONE)
-            && acknowledgement.getAcknowledgementRange().get(0).getUpper().subtract(mn).signum() >= 0;
+    synchronized void processingComplete(BigInteger mn) {
+        inProcessNumber = null;
+        highNumberCompleted = mn;
+        wakeupAll();
     }
     
     void purgeAcknowledged(BigInteger messageNr) {
