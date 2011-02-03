@@ -24,8 +24,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -33,6 +31,7 @@ import org.w3c.dom.Node;
 
 import junit.framework.Assert;
 
+import org.apache.cxf.staxutils.StaxUtils;
 import org.apache.cxf.ws.rm.RMConstants;
 
 
@@ -64,21 +63,18 @@ public class MessageFlow extends Assert {
             out.remove(0);
         }
         outStreams = out;
-        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        factory.setNamespaceAware(true);
-        DocumentBuilder parser = factory.newDocumentBuilder();
         inboundMessages.clear();
         for (int i = 0; i < inStreams.size(); i++) {
             byte[] bytes = inStreams.get(i);
             ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-            Document document = parser.parse(is);
+            Document document = StaxUtils.read(is);
             inboundMessages.add(document);
         }
         outboundMessages.clear();
         for (int i = 0; i < outStreams.size(); i++) {
             byte[] bytes = outStreams.get(i);
             ByteArrayInputStream is = new ByteArrayInputStream(bytes);
-            Document document = parser.parse(is);
+            Document document = StaxUtils.read(is);
             outboundMessages.add(document);
         }
     }

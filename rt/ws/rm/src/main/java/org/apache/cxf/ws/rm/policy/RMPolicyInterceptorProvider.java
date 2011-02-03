@@ -25,6 +25,7 @@ import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.ws.policy.AbstractPolicyInterceptorProvider;
+import org.apache.cxf.ws.rm.RMDeliveryInterceptor;
 import org.apache.cxf.ws.rm.RMInInterceptor;
 import org.apache.cxf.ws.rm.RMOutInterceptor;
 import org.apache.cxf.ws.rm.soap.RMSoapInterceptor;
@@ -35,6 +36,7 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
     private RMInInterceptor rmIn = new RMInInterceptor();
     private RMOutInterceptor rmOut = new RMOutInterceptor();
     private RMSoapInterceptor rmSoap = new RMSoapInterceptor();
+    private RMDeliveryInterceptor rmDelivery = new RMDeliveryInterceptor();
 
     static {
         Collection<QName> types = new ArrayList<QName>();
@@ -46,15 +48,18 @@ public class RMPolicyInterceptorProvider extends AbstractPolicyInterceptorProvid
         super(ASSERTION_TYPES);
         rmIn.setBus(bus);
         rmOut.setBus(bus);
+        rmDelivery.setBus(bus);
         
         getInInterceptors().add(rmIn);
         getInInterceptors().add(rmSoap);
+        getInInterceptors().add(rmDelivery);
 
         getOutInterceptors().add(rmOut);
         getOutInterceptors().add(rmSoap);
 
         getInFaultInterceptors().add(rmIn);
         getInFaultInterceptors().add(rmSoap);
+        getInInterceptors().add(rmDelivery);
 
         getOutFaultInterceptors().add(rmOut);
         getOutFaultInterceptors().add(rmSoap);

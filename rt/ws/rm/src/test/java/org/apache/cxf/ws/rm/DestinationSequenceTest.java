@@ -462,7 +462,7 @@ public class DestinationSequenceTest extends Assert {
         control.replay();        
         DestinationSequence ds = new DestinationSequence(id, ref, null, ack);
         ds.setDestination(destination);
-        ds.applyDeliveryAssurance(mn);
+        ds.applyDeliveryAssurance(mn, null);
         control.verify();
         
         control.reset();
@@ -475,7 +475,7 @@ public class DestinationSequenceTest extends Assert {
         EasyMock.expect(r.getUpper()).andReturn(new BigInteger("15"));
         control.replay();     
         try {
-            ds.applyDeliveryAssurance(mn);
+            ds.applyDeliveryAssurance(mn, null);
             fail("Expected Fault not thrown.");
         } catch (RMException ex) {
             assertEquals("MESSAGE_ALREADY_DELIVERED_EXC", ex.getCode());
@@ -483,34 +483,6 @@ public class DestinationSequenceTest extends Assert {
           
         control.verify();
 
-    }
-    
-    @Test
-    public void testInOrderNoWait() throws RMException {
-        setUpDestination();
-
-        BigInteger mn = BigInteger.TEN;
-        
-        DeliveryAssuranceType da = control.createMock(DeliveryAssuranceType.class);
-        EasyMock.expect(manager.getDeliveryAssurance()).andReturn(da);
-        EasyMock.expect(da.isSetAtMostOnce()).andReturn(false);
-        EasyMock.expect(da.isSetAtLeastOnce()).andReturn(true);
-        EasyMock.expect(da.isSetInOrder()).andReturn(true); 
-        
-        SequenceAcknowledgement ack = control.createMock(SequenceAcknowledgement.class);
-        List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
-        AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
-        ranges.add(r);
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges).times(3);
-        EasyMock.expect(r.getLower()).andReturn(BigInteger.ONE);
-        EasyMock.expect(r.getUpper()).andReturn(new BigInteger("15"));
-        
-        control.replay(); 
-        
-        DestinationSequence ds = new DestinationSequence(id, ref, null, ack);
-        ds.setDestination(destination);
-        ds.applyDeliveryAssurance(mn);
-        control.verify();
     }
     
     @Test
@@ -549,7 +521,7 @@ public class DestinationSequenceTest extends Assert {
             public void run() {
                 try {
                     ds.acknowledge(message);
-                    ds.applyDeliveryAssurance(messageNr);
+                    ds.applyDeliveryAssurance(messageNr, message);
                 } catch (Exception ex) {
                     // ignore
                 }
@@ -579,51 +551,6 @@ public class DestinationSequenceTest extends Assert {
         }
         assertTrue("timed out waiting for messages to be processed in order", !timedOut);
         
-        control.verify();
-    }
-    
-    @Test
-    public void testAllPredecessorsAcknowledged() {
-
-        SequenceAcknowledgement ack = control.createMock(SequenceAcknowledgement.class);
-        List<AcknowledgementRange> ranges = new ArrayList<AcknowledgementRange>();
-        AcknowledgementRange r = control.createMock(AcknowledgementRange.class);
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        control.replay();
-        DestinationSequence ds = new DestinationSequence(id, ref, null, ack);
-        ds.setDestination(destination);
-        assertTrue("all predecessors acknowledged", !ds.allPredecessorsAcknowledged(BigInteger.TEN));
-        control.verify();
-        
-        control.reset();
-        ranges.add(r);
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges).times(2);
-        EasyMock.expect(r.getLower()).andReturn(BigInteger.TEN);
-        control.replay();
-        assertTrue("all predecessors acknowledged", !ds.allPredecessorsAcknowledged(BigInteger.TEN));
-        control.verify();
-        
-        control.reset();
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges).times(3);
-        EasyMock.expect(r.getLower()).andReturn(BigInteger.ONE);
-        EasyMock.expect(r.getUpper()).andReturn(new BigInteger("5"));
-        control.replay();
-        assertTrue("all predecessors acknowledged", !ds.allPredecessorsAcknowledged(BigInteger.TEN));
-        control.verify();
-        
-        control.reset();
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges).times(3);
-        EasyMock.expect(r.getLower()).andReturn(BigInteger.ONE);
-        EasyMock.expect(r.getUpper()).andReturn(BigInteger.TEN);
-        control.replay();
-        assertTrue("not all predecessors acknowledged", ds.allPredecessorsAcknowledged(BigInteger.TEN));
-        control.verify();
-        
-        ranges.add(r);
-        control.reset();
-        EasyMock.expect(ack.getAcknowledgementRange()).andReturn(ranges);
-        control.replay();
-        assertTrue("all predecessors acknowledged", !ds.allPredecessorsAcknowledged(BigInteger.TEN));
         control.verify();
     }
     

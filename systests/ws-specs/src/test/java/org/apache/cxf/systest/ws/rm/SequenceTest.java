@@ -1104,7 +1104,8 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             OutMessageRecorder outRecorder;  
             String id;
             
-            ClientThread(SpringBusFactory bf, String cfgResource, int n) { 
+            ClientThread(SpringBusFactory bf, String cfgResource, int n) {
+                super("client " + n);
                 SequenceTest.this.initGreeter(bf, cfgResource, true, null);
                 greeter = SequenceTest.this.greeter;
                 greeterBus = SequenceTest.this.greeterBus;
@@ -1114,9 +1115,18 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             }
             
             public void run() {
-                greeter.greetMe(id + ": a");
-                greeter.greetMe(id + ": b");
-                greeter.greetMe(id + ": c");
+                String s = greeter.greetMe(id + ": a").toLowerCase();
+                if (!s.contains(id)) {
+                    System.out.println("Correlation problem <" + s + ">  <" + id + ">");
+                }
+                s = greeter.greetMe(id + ": b").toLowerCase();
+                if (!s.contains(id)) {
+                    System.out.println("Correlation problem <" + s + ">  <" + id + ">");
+                }
+                s = greeter.greetMe(id + ": c").toLowerCase();
+                if (!s.contains(id)) {
+                    System.out.println("Correlation problem <" + s + ">  <" + id + ">");
+                }
 
                 // three application messages plus createSequence
 
@@ -1134,9 +1144,10 @@ public class SequenceTest extends AbstractBusClientServerTestBase {
             for (int i = 0; i < clients.length; i++) {
                 clients[i].start();
             }
-
             for (int i = 0; i < clients.length; i++) {
                 clients[i].join();
+            }
+            for (int i = 0; i < clients.length; i++) {
                 MessageFlow mf = new MessageFlow(clients[i].outRecorder.getOutboundMessages(), 
                                                  clients[i].inRecorder.getInboundMessages());
                                 
