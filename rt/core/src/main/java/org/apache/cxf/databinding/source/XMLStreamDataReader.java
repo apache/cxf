@@ -163,7 +163,7 @@ public class XMLStreamDataReader implements DataReader<XMLStreamReader> {
             final InputStream ins = message.getContent(InputStream.class);
             message.removeContent(InputStream.class);
             
-            input = new FragmentStreamReader(input) {
+            input = new FragmentStreamReader(input, true) {
                 boolean closed;
                 public boolean hasNext() throws XMLStreamException {
                     boolean b = super.hasNext();

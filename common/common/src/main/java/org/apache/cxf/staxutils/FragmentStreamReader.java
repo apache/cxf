@@ -28,14 +28,13 @@ import javax.xml.stream.XMLStreamReader;
  * @author <a href="mailto:dan@envoisolutions.com">Dan Diephouse</a>
  */
 public class FragmentStreamReader extends DepthXMLStreamReader {
-    private boolean startDoc;
     private boolean startElement;
     private boolean middle = true;
     private boolean endDoc;
     private boolean doDocEvents = true;
 
     private int depth;
-    private int current = -1;
+    private int current = XMLStreamReader.START_DOCUMENT;
     private boolean filter = true;
     private boolean advanceAtEnd = true;
     
@@ -46,11 +45,11 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
         super(reader);
         this.doDocEvents = doDocEvents;
         if (!doDocEvents) {
-            startDoc = true;
-            
             depth = getDepth();
             current = reader.getEventType();
-            startElement = true;
+            if (current != XMLStreamReader.START_DOCUMENT) {
+                startElement = true;
+            }
         }
     }    
    
@@ -59,9 +58,6 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     }
 
     public boolean hasNext() throws XMLStreamException {
-        if (!startDoc) {
-            return true;
-        }
         
         if (endDoc) {
             return false;
@@ -71,10 +67,7 @@ public class FragmentStreamReader extends DepthXMLStreamReader {
     }
     
     public final int next() throws XMLStreamException {
-        if (!startDoc) {
-            startDoc = true;
-            current = START_DOCUMENT;
-        } else if (!startElement) {
+        if (!startElement) {
             depth = getDepth();
             
             current = reader.getEventType();
