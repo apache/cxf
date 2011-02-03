@@ -72,6 +72,12 @@ public abstract class AbstractSourcePayloadProvider implements SourceProvider {
         
         try {
             System.out.println(request.getClass().getName());
+            if (request instanceof StaxSource) {
+                StaxSource ss = (StaxSource)request;
+                if (ss.getXMLStreamReader().getEventType() == -1) {
+                    throw new RuntimeException("Should not be a -1 event");
+                }
+            }
             String input = getSourceAsString(request);
             System.out.println(input);  
             
