@@ -167,7 +167,9 @@
     </dependencies>
 
     <build>
+<!--
         <outputDirectory>${gwt.classes.dir}</outputDirectory>
+-->
 
         <plugins>
             <!--
@@ -200,7 +202,7 @@
                     <source>1.5</source>
                     <target>1.5</target>
                     <excludes>
-                        <exclude>${basedir}/src/main/java/org/apache/cxf/management/web/browser/**</exclude>
+                        <exclude>org/apache/cxf/management/web/browser/**</exclude>
                     </excludes>
                 </configuration>
              </plugin>
