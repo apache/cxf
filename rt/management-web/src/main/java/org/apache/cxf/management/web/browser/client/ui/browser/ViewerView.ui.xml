@@ -1,0 +1,107 @@
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+  -->
+
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+             xmlns:g='urn:import:com.google.gwt.user.client.ui'
+             xmlns:logbrowser='urn:import:org.apache.cxf.management.web.browser.client.ui.browser'>
+
+    <ui:with field='res'
+             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>
+        
+    <g:SplitLayoutPanel>
+        <g:north size='200'>
+            <g:DockLayoutPanel styleName='{res.css.browserTabToolBar}'
+                               unit='EM'>
+                <g:north size='2.2'>
+
+                    <g:HTMLPanel>
+                        <table class='{res.css.browserTabEntryTableHeaders}'>
+                            <thead style="display:none;">
+                                <tr>
+                                    <!--TODO move this values to constans-->
+                                    <th width="160px"/>
+                                    <th width="128px"/>
+                                    <th/>
+                                    <th width="350px"/>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        Date
+                                    </td>
+                                    <td>
+                                        Level
+                                    </td>
+                                    <td>
+                                        Message
+                                    </td>
+                                    <td style="text-align:right;">
+                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
+                                                  ui:field='firstButton' href='javascript:;'>
+                                            &#171; first
+                                        </g:Anchor>
+
+                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
+                                                  ui:field='olderButton' href='javascript:;'>
+                                            &#8249; previous
+                                        </g:Anchor>
+
+                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
+                                                  ui:field='refreshButton' href='javascript:;'>
+                                            refresh
+                                        </g:Anchor>
+
+                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
+                                                  ui:field='newerButton' href='javascript:;'>
+                                            next &#8250;
+                                        </g:Anchor>
+
+                                        <g:Anchor styleName='{res.css.browserTabNavigationLink}'
+                                                  ui:field='lastButton' href='javascript:;'>
+                                            last &#187;
+                                        </g:Anchor>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+
+                    </g:HTMLPanel>
+                </g:north>
+
+                <g:center>
+                    <logbrowser:EntryTable ui:field='entryTable'
+                                           styleName='{res.css.browserTabEntrySelectableTable}'/>
+                </g:center>
+            </g:DockLayoutPanel>
+        </g:north>
+
+        <g:center size='200'>
+            <g:DockLayoutPanel styleName='{res.css.browserTabEntryDetailsSection}'
+                               unit='EM'>
+                <g:center>
+                    <g:ScrollPanel>
+                        <g:HTML ui:field='entryDetails'
+                                styleName='{res.css.browserTabEntryDetailsContent}'/>
+                    </g:ScrollPanel>
+                </g:center>
+            </g:DockLayoutPanel>
+        </g:center>
+    </g:SplitLayoutPanel>
+</ui:UiBinder>

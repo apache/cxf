@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements. See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership. The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied. See the License for the
+  specific language governing permissions and limitations
+  under the License.
+  -->
+
+<ui:UiBinder xmlns:ui='urn:ui:com.google.gwt.uibinder'
+	xmlns:g='urn:import:com.google.gwt.user.client.ui'>
+
+    <ui:with field='res'
+             type='org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResources'/>    
+
+	<g:RootLayoutPanel>
+		<g:layer>
+			<g:DockLayoutPanel unit='EM'>
+				<g:north size='2'>
+                    <g:FlowPanel ui:field="navigationHeaderSlot"/>
+				</g:north>
+
+				<g:center>
+					<g:SplitLayoutPanel>
+						<g:west size='192'>
+                            <g:FlowPanel styleName="{res.css.navigationSidebarSlot}"
+                                         ui:field="navigationSidebarSlot"/>
+                        </g:west>
+                        
+                        <g:center>
+                            <g:VerticalPanel>
+                                <g:FlowPanel  styleName="{res.css.viewerSlot}" ui:field="viewerSlot"/>
+                            </g:VerticalPanel>
+                        </g:center>
+					</g:SplitLayoutPanel>
+				</g:center>
+			</g:DockLayoutPanel>
+		</g:layer>
+	</g:RootLayoutPanel>
+
+</ui:UiBinder>

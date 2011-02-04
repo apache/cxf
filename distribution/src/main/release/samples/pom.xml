@@ -81,6 +81,7 @@
         <module>wsdl_first_rpclit</module>
         <module>jms_pubsub</module>
         <module>jax_rs/spring_security</module>
+        <module>logbrowser</module>
 
         <!--
         these are a bit fragile as they need to go off to external sites to get stuff like
