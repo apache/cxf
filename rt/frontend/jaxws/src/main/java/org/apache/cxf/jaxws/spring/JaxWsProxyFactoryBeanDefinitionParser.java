@@ -73,6 +73,10 @@ public class JaxWsProxyFactoryBeanDefinitionParser extends ClientProxyFactoryBea
                 setBus(bus);
             }
         }
+        public Object create() {
+            configured = true;
+            return super.create();
+        }
         public synchronized Object getObject() throws Exception {
             if (obj == null) {
                 obj = create();

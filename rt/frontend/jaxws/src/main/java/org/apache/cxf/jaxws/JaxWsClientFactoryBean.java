@@ -25,6 +25,7 @@ import javax.xml.ws.soap.SOAPBinding;
 import org.apache.cxf.binding.soap.SoapBindingConfiguration;
 import org.apache.cxf.frontend.ClientFactoryBean;
 import org.apache.cxf.jaxws.binding.soap.JaxWsSoapBindingConfiguration;
+import org.apache.cxf.jaxws.support.JaxWsImplementorInfo;
 import org.apache.cxf.jaxws.support.JaxWsServiceFactoryBean;
 
 /**
@@ -36,7 +37,14 @@ public class JaxWsClientFactoryBean extends ClientFactoryBean {
     public JaxWsClientFactoryBean() {
         super(new JaxWsServiceFactoryBean());
     }
-    
+    public void setServiceClass(Class serviceClass) {
+        super.setServiceClass(serviceClass);
+        if (((JaxWsServiceFactoryBean)getServiceFactory()).getJaxWsImplementorInfo() == null) {
+            JaxWsImplementorInfo implInfo = new JaxWsImplementorInfo(serviceClass);
+            ((JaxWsServiceFactoryBean)getServiceFactory()).setJaxWsImplementorInfo(implInfo);
+        }
+    }
+
     protected SoapBindingConfiguration createSoapBindingConfig() {
         JaxWsSoapBindingConfiguration bc  
             = new JaxWsSoapBindingConfiguration((JaxWsServiceFactoryBean)getServiceFactory());

@@ -22,6 +22,7 @@ import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.namespace.QName;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 
@@ -64,6 +65,14 @@ public class JaxWsProxyFactoryBean extends ClientProxyFactoryBean {
     }
     public JaxWsProxyFactoryBean(ClientFactoryBean fact) {
         super(fact);
+    }
+    protected String getConfiguredName() {
+        QName name = getEndpointName();
+        if (name == null) {
+            JaxWsServiceFactoryBean sfb = (JaxWsServiceFactoryBean)getClientFactoryBean().getServiceFactory();
+            name = sfb.getJaxWsImplementorInfo().getEndpointName();
+        }
+        return name + ".jaxws-client.proxyFactory";
     }
 
     /**

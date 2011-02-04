@@ -43,6 +43,7 @@ import org.apache.cxf.configuration.spring.AbstractFactoryBeanDefinitionParser;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.databinding.source.SourceDataBinding;
 import org.apache.cxf.endpoint.Client;
+import org.apache.cxf.endpoint.ClientImpl;
 import org.apache.cxf.endpoint.NullConduitSelector;
 import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.interceptor.Interceptor;
@@ -369,5 +370,25 @@ public class SpringBeansTest extends Assert {
         Greeter g2 = greeters.getGreet2();
         assertNotSame(g1, g2);
     }
+    @Test
+    public void testClientFromFactory() throws Exception {
+        AbstractFactoryBeanDefinitionParser.setFactoriesAreAbstract(false);
+        ClassPathXmlApplicationContext ctx =
+            new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/jaxws/spring/clients.xml"});
+
+        
+        JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
+        
+        Greeter g = factory.create(Greeter.class);
+        ClientImpl c = (ClientImpl)ClientProxy.getClient(g);
+        for (Interceptor<? extends Message> i : c.getInInterceptors()) {
+            if (i instanceof LoggingInInterceptor) {
+                ctx.close();
+                return;
+            }
+        }
+        fail("Did not configure the client");
+    }
 
 }
+

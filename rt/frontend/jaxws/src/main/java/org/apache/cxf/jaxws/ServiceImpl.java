@@ -456,7 +456,7 @@ public class ServiceImpl extends ServiceDelegate {
             clientFac.setBindingId(portInfo.getBindingID());
             clientFac.setAddress(portInfo.getAddress());
         }
-        configureObject(portName.toString() + ".jaxws-client.proxyFactory", proxyFac);
+        //configureObject(portName.toString() + ".jaxws-client.proxyFactory", proxyFac);
         if (clazz != ServiceImpl.class) {
             // handlerchain should be on the generated Service object
             proxyFac.setLoadHandlers(false);

@@ -27,8 +27,10 @@ import java.util.Map;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusFactory;
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.common.injection.NoJSR250Annotations;
+import org.apache.cxf.configuration.Configurer;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.apache.cxf.databinding.DataBinding;
 import org.apache.cxf.endpoint.Client;
@@ -53,6 +55,7 @@ import org.apache.cxf.service.factory.ReflectionServiceFactoryBean;
  */
 @NoJSR250Annotations
 public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
+    protected boolean configured;
     private ClientFactoryBean clientFactoryBean;
     private String username;
     private String password;
@@ -85,6 +88,28 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
         setServiceClass(serviceClass);
         return serviceClass.cast(create());
     }
+    private void configureObject() {
+        if (configured) {
+            return;
+        }
+        if (bus == null) {
+            bus = BusFactory.getThreadDefaultBus();
+        }
+        Configurer configurer = bus.getExtension(Configurer.class);
+        String name = getConfiguredName();
+        if (null != configurer && name != null) {
+            configurer.configureBean(name, this);
+        }
+        configured = true;
+    }
+    
+    protected String getConfiguredName() {
+        QName name = getEndpointName();
+        if (name == null) {
+            return null;
+        }
+        return name.toString() + ".client.proxyFactory";
+    }
 
     /**
      * Creates a proxy object that can be used to make remote invocations.
@@ -92,6 +117,8 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
      * @return the proxy. You must cast the returned object to the appropriate class before using it.
      */
     public Object create() {
+        configureObject();
+        
         if (properties == null) {
             properties = new HashMap<String, Object>();
         }
@@ -215,7 +242,11 @@ public class ClientProxyFactoryBean extends AbstractBasicInterceptorProvider {
     }
 
     public QName getEndpointName() {
-        return clientFactoryBean.getEndpointName();
+        QName qn = clientFactoryBean.getEndpointName();
+        if (qn == null) {
+            qn = clientFactoryBean.getServiceFactory().getEndpointName(false);
+        }
+        return qn;
     }
 
     public void setEndpointName(QName endpointName) {
