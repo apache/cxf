@@ -41,6 +41,8 @@
 
         <gwt.hostedmode.dir>${project.build.directory}/war</gwt.hostedmode.dir>
         <gwt.classes.dir>${gwt.hostedmode.dir}/WEB-INF/classes</gwt.classes.dir>
+
+        <cxf.pmd.eclipse.ruleset>cxf-pmd-ruleset-generated.xml</cxf.pmd.eclipse.ruleset>
     </properties>
 
     <!-- This will need to be removed with dependencies pushed to Maven Central -->
@@ -183,6 +185,7 @@
 
                     <hostedWebapp>${gwt.hostedmode.dir}</hostedWebapp>
                     <runTarget>logbrowser/LogBrowser.html</runTarget>
+                    <gen>${project.build.directory}/generated-sources/gwt</gen>
                 </configuration>
             </plugin>
         </plugins>
