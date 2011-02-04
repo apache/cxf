@@ -88,4 +88,14 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
 			<soap:soapBinding mtomEnabled="true" version="1.2" />
 		</jaxws:binding>
 	</jaxws:client>
+
+	<jaxws:client name="{http://apache.org/hello_world_soap_http}GreeterPort"
+        serviceClass="org.apache.hello_world_soap_http.Greeter" serviceName="s:SOAPService"
+        endpointName="s:SoapPort" xmlns:s="http://apache.org/hello_world_soap_http"
+        address="http://localhost:8080/simpleWithAddress" wsdlLocation="wsdl/hello_world.wsdl" 
+        createdFromAPI="true">
+        <jaxws:inInterceptors>
+            <bean class="org.apache.cxf.interceptor.LoggingInInterceptor" />
+        </jaxws:inInterceptors>
+    </jaxws:client>
 </beans>
