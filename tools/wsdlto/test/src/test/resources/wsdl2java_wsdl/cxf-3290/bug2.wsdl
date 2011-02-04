@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+    xmlns:tns="http://bugs3290.cxf.apache.org/services/bug2"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    targetNamespace="http://bugs3290.cxf.apache.org/services/bug2" 
+    name="bug2">
+
+	<wsdl:types>
+
+		<schema xmlns="http://www.w3.org/2001/XMLSchema"
+			elementFormDefault="qualified" attributeFormDefault="qualified"
+			targetNamespace="http://bugs3290.cxf.apache.org/services/bug2">
+
+			<xsd:complexType name="requestDataType">
+				<xsd:sequence>
+					<xsd:element name="myString1" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<xsd:complexType name="responseDataType">
+				<xsd:sequence>
+					<xsd:element name="myString2" type="xsd:string" />
+				</xsd:sequence>
+			</xsd:complexType>
+
+			<element name="myBug1" type="tns:requestDataType" />
+			<element name="myBug1Response" type="tns:responseDataType" />
+		</schema>
+	</wsdl:types>
+
+	<wsdl:message name="myBug1RequestMessage">
+		<wsdl:part name="parameters" element="tns:myBug1" />
+	</wsdl:message>
+	<wsdl:message name="myBug1ResponseMessage">
+		<wsdl:part name="parameters" element="tns:myBug1Response" />
+	</wsdl:message>
+
+	<wsdl:portType name="myBugService">
+		<wsdl:operation name="myBug1">
+			<wsdl:input message="tns:myBug1RequestMessage" />
+			<wsdl:output message="tns:myBug1ResponseMessage" />
+		</wsdl:operation>
+	</wsdl:portType>
+
+</wsdl:definitions>

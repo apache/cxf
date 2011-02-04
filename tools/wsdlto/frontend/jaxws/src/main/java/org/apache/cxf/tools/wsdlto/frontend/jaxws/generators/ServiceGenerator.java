@@ -109,7 +109,8 @@ public class ServiceGenerator extends AbstractJAXWSGenerator {
                 }
     
                 for (JavaPort port : js.getPorts()) {
-                    if (!port.getPackageName().equals(js.getPackageName())) {
+                    if (!port.getPackageName().equals(js.getPackageName())
+                        && !port.getInterfaceClass().equals(js.getName())) {
                         js.addImport(port.getFullClassName());
                     }
                 }
