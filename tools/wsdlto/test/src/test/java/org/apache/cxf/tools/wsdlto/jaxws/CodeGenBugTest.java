@@ -1161,4 +1161,18 @@ public class CodeGenBugTest extends AbstractCodeGenTest {
         File f = new File(output, "org/apache/cxf/w2j/hello_world_soap_http/SayHi.java");
         assertTrue(f.exists());
     }
+    @Test
+    public void testCXF3290() throws Exception {
+        env.put(ToolConstants.CFG_COMPILE, "compile");
+        env.put(ToolConstants.CFG_OUTPUTDIR, output.getCanonicalPath());
+        env.put(ToolConstants.CFG_CLASSDIR, output.getCanonicalPath() + "/classes");
+        env.put(ToolConstants.CFG_WSDLURL, getLocation("/wsdl2java_wsdl/cxf-3290/bug.wsdl"));
+        processor.setContext(env);
+        processor.execute();
+        
+        Class<?> cls = classLoader.loadClass("org.apache.cxf.bugs3290.services.bug1.MyBugService");
+        Method m = cls.getMethod("getMyBug1");
+        assertEquals(classLoader.loadClass("org.apache.cxf.bugs3290.services.bug2.MyBugService"),
+                     m.getReturnType());
+    }
 }

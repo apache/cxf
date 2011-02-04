@@ -144,6 +144,10 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #end
 
 #foreach ($port in $service.Ports)
+#set($portClassName = ${port.InterfaceClass})
+#if ($portClassName == ${service.Name}) 
+#set($portClassName = ${port.fullClassName})
+#end
     /**
      * 
      * @return
@@ -153,8 +157,8 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${port.InterfaceClass} get${port.Name}() {
-        return super.getPort($port.Name, ${port.InterfaceClass}.class);
+    public ${portClassName} get${port.Name}() {
+        return super.getPort($port.Name, ${portClassName}.class);
     }
 
     /**
@@ -168,8 +172,8 @@ public class ${service.Name} extends ${serviceSuperclass} {
 #if ($mark-generated == "true")
     @Generated(value = "org.apache.cxf.tools.wsdlto.WSDLToJava", date = "$currentdate")
 #end
-    public ${port.InterfaceClass} get${port.Name}(WebServiceFeature... features) {
-        return super.getPort($port.Name, ${port.InterfaceClass}.class, features);
+    public ${portClassName} get${port.Name}(WebServiceFeature... features) {
+        return super.getPort($port.Name, ${portClassName}.class, features);
     }
 #end
 

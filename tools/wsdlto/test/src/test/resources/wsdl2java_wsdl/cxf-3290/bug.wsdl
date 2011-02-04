@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions 
+    xmlns:tns="http://bugs3290.cxf.apache.org/services/bug1"
+    xmlns:bug2="http://bugs3290.cxf.apache.org/services/bug2"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" 
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" 
+    targetNamespace="http://bugs3290.cxf.apache.org/services/bug1" 
+    name="bug1">
+
+<wsdl:import namespace="http://bugs3290.cxf.apache.org/services/bug2" location="bug2.wsdl" />
+
+	<wsdl:binding name="myBug1PortSoapBinding" type="bug2:myBugService">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+
+		<wsdl:operation name="myBug1">
+			<soap:operation style="document" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="myBugService">
+		<wsdl:port name="myBug1" binding="tns:myBug1PortSoapBinding">
+			<soap:address location="http://REPLACE_WITH_HOST_INFO/myBug1" />
+		</wsdl:port>
+	</wsdl:service>
+
+</wsdl:definitions>
