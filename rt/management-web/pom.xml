@@ -168,8 +168,9 @@
 
     <build>
         <outputDirectory>${gwt.classes.dir}</outputDirectory>
-        <plugins>
 
+        <plugins>
+            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
@@ -187,14 +188,28 @@
                     <disableCastChecking>true</disableCastChecking>
                     <webappDirectory>${gwt.classes.dir}/static-content</webappDirectory>
 
-                    <!--Hosted mode configuration-->
                     <hostedWebapp>${gwt.hostedmode.dir}</hostedWebapp>
                     <runTarget>logbrowser/LogBrowser.html</runTarget>
                 </configuration>
             </plugin>
-        </plugins>
-    </build>
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.5</source>
+                    <target>1.5</target>
+                    <excludes>
+                        <exclude>${basedir}/src/main/java/org/apache/cxf/management/web/browser/**</exclude>
+                    </excludes>
+                </configuration>
+             </plugin>
 
+        </plugins>
+
+        
+    </build>
+<!--
     <profiles>
         <profile>
             <id>dev</id>
@@ -244,6 +259,6 @@
             </build>
         </profile>
     </profiles>
-
+-->
 
 </project>
