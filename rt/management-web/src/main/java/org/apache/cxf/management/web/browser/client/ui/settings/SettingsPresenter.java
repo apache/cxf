@@ -150,12 +150,12 @@ public class SettingsPresenter extends BasePresenter
         Map<HasValue, String> errors = new HashMap<HasValue, String>();
 
         String nameValue = name.getValue();
-        if (nameValue == null || nameValue.isEmpty()) {
+        if (nameValue == null || nameValue.length() == 0) {
             errors.put(name, constans.settingsTabSubscriptionDialogEmptyName());
         }
 
         String urlValue = url.getValue();
-        if (urlValue == null || urlValue.isEmpty()) {
+        if (urlValue == null || urlValue.length() == 0) {
             errors.put(url, constans.settingsTabSubscriptionDialogEmptyUrl());
         }
 

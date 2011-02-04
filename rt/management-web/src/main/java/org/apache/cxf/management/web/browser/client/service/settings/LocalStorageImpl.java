@@ -199,7 +199,7 @@ public class LocalStorageImpl implements LocalStorage {
             }
         }-*/;
     }
-    @SuppressWarnings("unused")
+
     private static class LocalCredentials extends JavaScriptObject {
 
         protected LocalCredentials() { }
@@ -223,7 +223,6 @@ public class LocalStorageImpl implements LocalStorage {
         }-*/;
     }
 
-    @SuppressWarnings("unused")
     private static class LocalSubscription extends JavaScriptObject {
 
         protected LocalSubscription() { }

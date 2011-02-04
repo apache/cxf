@@ -146,17 +146,9 @@
         </dependency>
 
         <dependency>
-            <groupId>gwtexpui</groupId>
-            <artifactId>gwtexpui</artifactId>
-            <version>${gwt.expui.version}</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>gwtexpui</groupId>
-            <artifactId>gwtexpui</artifactId>
-            <version>${gwt.expui.version}</version>
-            <classifier>sources</classifier>
-            <type>jar</type>
+            <groupId>org.apache.geronimo.specs</groupId>
+            <artifactId>geronimo-activation_1.1_spec</artifactId>
+            <version>1.1</version>
         </dependency>
 
         <dependency>
@@ -172,7 +164,6 @@
 -->
 
         <plugins>
-            <!--
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>gwt-maven-plugin</artifactId>
@@ -194,22 +185,7 @@
                     <runTarget>logbrowser/LogBrowser.html</runTarget>
                 </configuration>
             </plugin>
-            -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.5</source>
-                    <target>1.5</target>
-                    <excludes>
-                        <exclude>org/apache/cxf/management/web/browser/**</exclude>
-                    </excludes>
-                </configuration>
-             </plugin>
-
         </plugins>
-
-        
     </build>
 <!--
     <profiles>

@@ -31,7 +31,7 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwtexpui.user.client.PluginSafePopupPanel;
+import com.google.gwt.user.client.ui.PopupPanel;
 import com.google.inject.Inject;
 
 import org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserConstans;
@@ -40,7 +40,7 @@ import org.apache.cxf.management.web.browser.client.ui.resources.LogBrowserResou
 /**
  * A dialog box showing an error message, when bad things happen.
  */
-public class ErrorDialog extends PluginSafePopupPanel {
+public class ErrorDialog extends PopupPanel {
     
     @Nonnull
     private final LogBrowserResources resources;
