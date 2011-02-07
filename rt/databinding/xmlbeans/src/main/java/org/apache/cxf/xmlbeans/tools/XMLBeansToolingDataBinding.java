@@ -50,6 +50,7 @@ import org.apache.cxf.tools.common.ToolException;
 import org.apache.cxf.tools.common.model.DefaultValueWriter;
 import org.apache.cxf.tools.util.ClassCollector;
 import org.apache.cxf.tools.wsdlto.core.DataBindingProfile;
+import org.apache.xmlbeans.SchemaGlobalElement;
 import org.apache.xmlbeans.SchemaType;
 import org.apache.xmlbeans.SchemaTypeLoader;
 import org.apache.xmlbeans.SchemaTypeSystem;
@@ -89,6 +90,7 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     }    
     
     SchemaTypeSystem typeSystem;
+    SchemaTypeLoader typeLoader;
     Map<String, String> sourcesToCopyMap = new HashMap<String, String>();
     List<XmlError> errors = new LinkedList<XmlError>();
     XmlErrorWatcher errorListener = new XmlErrorWatcher(errors);
@@ -137,18 +139,35 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
     public String getType(QName qn, boolean element) {
         String ret;
         if (element) {
-            ret = typeSystem.findDocumentType(qn).getFullJavaName();                  
+            SchemaType type = typeSystem.findDocumentType(qn);
+            if (type == null)  {
+                type = typeLoader.findDocumentType(qn);
+            }
+
+            ret = type.getFullJavaName();
             if (ret.contains("$")) {
                 ret = ret.substring(0, ret.indexOf('$'));
             }
             return ret;
         }
-        ret = typeSystem.findType(qn).getFullJavaName();
+
+        SchemaType type = typeSystem.findType(qn);
+        if (type == null) {
+            type = typeLoader.findType(qn);
+        }
+
+        ret = type.getFullJavaName();
         return ret.replace('$', '.');
     }
 
     public String getWrappedElementType(QName wrapperElement, QName item) {        
-        SchemaType st = typeSystem.findElement(wrapperElement).getType();
+        SchemaGlobalElement elem = typeSystem.findElement(wrapperElement);
+
+        if (elem == null)  {
+            elem = typeLoader.findElement(wrapperElement);
+        }
+
+        SchemaType st = elem.getType();
         SchemaType partType = st.getElementProperty(item).getType();        
         return XMLBeansSchemaTypeUtils.getNaturalJavaClassName(partType);        
     }
@@ -379,6 +398,9 @@ public class XMLBeansToolingDataBinding implements DataBindingProfile {
         params.setConfig(BindingConfigImpl.forConfigDocuments(cdocs, 
                                                               javaFiles.toArray(new File[javaFiles.size()]), 
                                                               CodeGenUtil.systemClasspath()));
+
+        typeLoader = loader;
+
         params.setLinkTo(linkTo);
         params.setOptions(opts);
         params.setErrorListener(errorListener);
