@@ -32,7 +32,7 @@ import org.apache.cxf.helpers.IOUtils;
 import org.apache.cxf.jaxrs.impl.MetadataMap;
 
 /**
- * Utility Exception class which makes it easier to get to the status,
+ * Utility Exception class which makes it easier to get the response status,
  * headers and error message if any
  */
 public class ServerWebApplicationException extends WebApplicationException {

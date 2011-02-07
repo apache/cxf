@@ -227,6 +227,8 @@ public class JAXRSServerFactoryBean extends AbstractJAXRSFactoryBean {
     /**
      * Sets the single resource bean. If this is set then the JAX-RS runtime 
      * will not be responsible for the life-cycle of resource classes.
+     * Please avoid setting the resource class of this bean explicitly,
+     * the runtime will determine it itself.  
      * 
      * @param bean resource instance
      */

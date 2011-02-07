@@ -59,38 +59,88 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         
     }
     
+    /**
+     * Indicates if a single proxy or WebClient instance can be reused 
+     * by multiple threads.
+     *   
+     * @param threadSafe if true then multiple threads can invoke on
+     *        the same proxy or WebClient instance.
+     */
     public void setThreadSafe(boolean threadSafe) {
         this.threadSafe = threadSafe;
     }
     
+    /**
+     * Gets the user name
+     * @return the name
+     */
     public String getUsername() {
         return username;
     }
 
+    /**
+     * Sets the username. 
+     * Setting the username and password is a simple way to 
+     * create a Basic Authentication token.
+     * 
+     * @param username the user name
+     */
     public void setUsername(String username) {        
         this.username = username;
     }
     
+    /**
+     * Gets the password
+     * @return the password
+     */
     public String getPassword() {
         return password;
     }
 
+    /**
+     * Sets the password. 
+     * Setting the username and password is a simple way to 
+     * create a Basic Authentication token.
+     * 
+     * @param password the password
+     */
     public void setPassword(String password) {
         this.password = password;
     }
     
+    /**
+     * Indicates if the headers set by a current proxy will be inherited
+     * when a subresource proxy is created
+     * vice versa.
+     * 
+     * @param ih if set to true then the current headers will be inherited
+     */
     public void setInheritHeaders(boolean ih) {
         inheritHeaders = ih;
     }
     
+    /**
+     * Sets the resource class
+     * @param cls the resource class
+     */
     public void setResourceClass(Class cls) {
         setServiceClass(cls);
     }
     
+    /**
+     * Sets the resource class, may be called from a Spring handler 
+     * @param cls the resource class
+     */
     public void setServiceClass(Class cls) {
         serviceFactory.setResourceClass(cls);
     }
     
+    /**
+     * Sets the headers new proxy or WebClient instances will be
+     * initialized with.
+     * 
+     * @param map the headers
+     */
     public void setHeaders(Map<String, String> map) {
         headers = new MetadataMap<String, String>();
         for (Map.Entry<String, String> entry : map.entrySet()) {
@@ -103,10 +153,18 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
     
+    /**
+     * Gets the initial headers
+     * @return the headers
+     */
     public Map getHeaders() {
         return headers;
     }
     
+    /**
+     * Creates a WebClient instance
+     * @return WebClient instance
+     */
     public WebClient createWebClient() {
         
         Service service = new JAXRSServiceImpl(getAddress(), getServiceName());
@@ -138,14 +196,32 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
     
+    /**
+     * Creates a proxy
+     * @param cls the proxy class
+     * @param varValues optional list of values which will be used to substitute
+     *        template variables specified in the class-level JAX-RS Path annotations
+     * @return the proxy
+     */
     public <T> T create(Class<T> cls, Object... varValues) {
         return cls.cast(createWithValues(varValues));
     }
     
+    /**
+     * Create a Client instance. Proxies and WebClients are Clients.
+     * @return the client
+     */
     public Client create() { 
         return createWithValues();
     }
     
+    /**
+     * Create a Client instance. Proxies and WebClients are Clients.
+     * @param varValues optional list of values which will be used to substitute
+     *        template variables specified in the class-level JAX-RS Path annotations
+     *        
+     * @return the client
+     */
     public Client createWithValues(Object... varValues) {
         serviceFactory.setBus(getBus());
         checkResources(false);
@@ -233,6 +309,10 @@ public class JAXRSClientFactoryBean extends AbstractJAXRSFactoryBean {
         }
     }
 
+    /**
+     * Sets the initial client state, can be a thread-safe state.
+     * @param initialState the state
+     */
     public void setInitialState(ClientState initialState) {
         this.initialState = initialState;
     }

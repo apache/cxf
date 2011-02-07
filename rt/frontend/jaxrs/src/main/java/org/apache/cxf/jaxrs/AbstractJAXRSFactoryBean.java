@@ -359,18 +359,48 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         factory.setUserProviders(Collections.singletonList(new DataBindingProvider(db)));
     }
     
+    /**
+     * Sets the description of root resources.
+     * Can be used to 'attach' the JAX-RS like description to the application
+     * classes without adding JAX-RS annotations.
+     *   
+     * @param resources root resource descriptions 
+     */
     public void setModelBeans(UserResource... resources) {
         setModelBeans(Arrays.asList(resources));
     }
     
+    /**
+     * Sets the description of root resources.
+     * Can be used to 'attach' the JAX-RS like description to the application
+     * classes without adding JAX-RS annotations.
+     *   
+     * @param resources root resource descriptions 
+     */
     public void setModelBeans(List<UserResource> resources) {
         serviceFactory.setUserResources(resources);
     }
     
+    /**
+     * Sets the description of root resources with the list of concrete classes.
+     * Can be used to 'attach' the JAX-RS like description to the application
+     * classes without adding JAX-RS annotations. Some models may only reference
+     * interfaces, thus providing a list of concrete classes that will be
+     * instantiated is required in such cases.
+     *   
+     * @param resources root resource descriptions.
+     * @param sClasses concrete root resource classes
+     */
     public void setModelBeansWithServiceClass(List<UserResource> resources, Class<?>... sClasses) {
         serviceFactory.setUserResourcesWithServiceClass(resources, sClasses);
     }
     
+    /**
+     * Sets a reference to the external user model, 
+     * Example: "classpath:/model/resources.xml"
+     * 
+     * @param modelRef the reference to the external model resource.
+     */
     public void setModelRef(String modelRef) {
         List<UserResource> resources = ResourceUtils.getUserResources(modelRef, getBus());
         if (resources != null) {
@@ -378,6 +408,15 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         }
     }
     
+    /**
+     * Sets a reference to the external user model, 
+     * Example: "classpath:/model/resources.xml".
+     * Some models may only reference interfaces, thus providing a list of 
+     * concrete classes that will be instantiated is required in such cases.
+     * 
+     * @param modelRef the reference to the external model resource.
+     * @param sClasses concrete root resource classes
+     */
     public void setModelRefWithServiceClass(String modelRef, Class<?>... sClasses) {
         List<UserResource> resources = ResourceUtils.getUserResources(modelRef, getBus());
         if (resources != null) {
