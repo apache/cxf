@@ -61,6 +61,8 @@ public class LocalConduit extends AbstractConduit {
             // prepare the stream here
             CachedOutputStream stream = new CachedOutputStream();
             message.setContent(OutputStream.class, stream);
+            //save the original stream
+            message.put(CachedOutputStream.class, stream);
         }
     }
 
@@ -87,7 +89,10 @@ public class LocalConduit extends AbstractConduit {
         transportFactory.copy(message, copy);
         MessageImpl.copyContent(message, copy);
         
-        CachedOutputStream stream = (CachedOutputStream)message.getContent(OutputStream.class);
+        OutputStream out = message.getContent(OutputStream.class);
+        out.flush();
+        
+        CachedOutputStream stream = message.get(CachedOutputStream.class);
         copy.setContent(InputStream.class, stream.getInputStream());
 
         // Create a new incoming exchange and store the original exchange for the response
