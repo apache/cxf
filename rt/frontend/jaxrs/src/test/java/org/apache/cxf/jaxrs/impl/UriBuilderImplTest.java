@@ -34,6 +34,7 @@ import org.apache.cxf.jaxrs.resources.UriBuilderWrongAnnotations;
 import org.apache.cxf.jaxrs.utils.JAXRSUtils;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class UriBuilderImplTest extends Assert {
@@ -1138,4 +1139,64 @@ public class UriBuilderImplTest extends Assert {
             .replaceQuery("name1=x&name2=%20&name3=x+y&name4=23&name5=x y").build();
         assertEquals(expected, uri.toString());        
     }
+
+    @Ignore
+    @Test
+    public void testPathParamSpaceBuild() {
+        String expected = "http://localhost:8080/name/%20";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name/%20").build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testPathParamSpaceBuild2() {
+        String expected = "http://localhost:8080/name/%2520";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name/{value}").build("%20");
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testPathParamSpaceBuild3() {
+        String expected = "http://localhost:8080/name%20space";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name space").build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testPathParamSpaceBuild4() {
+        String expected = "http://localhost:8080/name%20space";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name space").buildFromEncoded();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testPathParamSpaceBuildEncoded() {
+        String expected = "http://localhost:8080/name/%20";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name/%20").buildFromEncoded();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testPathParamSpaceBuildEncoded2() {
+        String expected = "http://localhost:8080/name/%20";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").path("name/{value}").buildFromEncoded("%20");
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Test
+    public void testQueryParamSpaceBuild() {
+        String expected = "http://localhost:8080?name=%20";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").queryParam("name", "%20").build();
+        assertEquals(expected, uri.toString());
+    }
+    
+    @Ignore
+    @Test
+    public void testQueryParamSpaceBuild2() {
+        String expected = "http://localhost:8080?name=%2520";
+        URI uri = UriBuilder.fromUri("http://localhost:8080").queryParam("name", "{value}").build("%20");
+        assertEquals(expected, uri.toString());
+    }
+    
+    
 }
