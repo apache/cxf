@@ -142,11 +142,6 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
                         assertUsernameTokens(message, princ);
                         message.put(WSS4JInInterceptor.PRINCIPAL_RESULT, princ);                   
                         
-                        boolean utWithCallbacks = !MessageUtils.getContextualBoolean(message, 
-                                 SecurityConstants.USERNAME_TOKEN_NO_CALLBACKS, false);
-                        if (!utWithCallbacks) {
-                            WSS4JTokenConverter.convertToken(message, princ);
-                        }
                         SecurityContext sc = message.get(SecurityContext.class);
                         if (sc == null || sc.getUserPrincipal() == null) {
                             Subject subject = createSubject(princ.getName(), princ.getPassword(),
