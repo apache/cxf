@@ -101,7 +101,7 @@ public class AbstractJAXRSFactoryBean extends AbstractEndpointFactory {
         BindingFactoryManager bfm = bus.getExtension(BindingFactoryManager.class);
         try {
             bfm.getBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID);
-        } catch (BusException b) {
+        } catch (Throwable b) {
             //not registered, let's register one
             bfm.registerBindingFactory(JAXRSBindingFactory.JAXRS_BINDING_ID, 
                                        new JAXRSBindingFactory(bus));
