@@ -101,7 +101,7 @@
             <entry key="ws-security.username" value="Alice"/>
             <entry key="ws-security.callback-handler" value="org.apache.cxf.systest.ws.wssec10.server.UTPasswordCallback"/>
             <!-- new property -->
-            <entry key="ws-security.ut.no-callbacks" value="true"/>
+            <entry key="ws-security.validate.token" value="false"/>
         </jaxws:properties> 
 
         <jaxws:inInterceptors>

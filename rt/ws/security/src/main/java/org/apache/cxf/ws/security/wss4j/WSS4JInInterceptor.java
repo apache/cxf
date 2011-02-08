@@ -157,7 +157,7 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
         msg.put(SECURITY_PROCESSED, Boolean.TRUE);
         
         boolean utWithCallbacks = 
-            !MessageUtils.getContextualBoolean(msg, SecurityConstants.USERNAME_TOKEN_NO_CALLBACKS, false);
+            MessageUtils.getContextualBoolean(msg, SecurityConstants.VALIDATE_TOKEN, true);
         
         WSSConfig config = (WSSConfig)msg.getContextualProperty(WSSConfig.class.getName()); 
         WSSecurityEngine engine;

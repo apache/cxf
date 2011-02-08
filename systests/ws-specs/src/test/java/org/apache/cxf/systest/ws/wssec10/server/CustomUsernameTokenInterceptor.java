@@ -55,7 +55,7 @@ public class CustomUsernameTokenInterceptor extends UsernameTokenInterceptor {
     }
     
     public void handleMessage(SoapMessage message) throws Fault {
-        message.put(SecurityConstants.USERNAME_TOKEN_NO_CALLBACKS, Boolean.TRUE);
+        message.put(SecurityConstants.VALIDATE_TOKEN, Boolean.FALSE);
         super.handleMessage(message);
     }
     

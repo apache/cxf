@@ -163,7 +163,7 @@ public class UsernameTokenInterceptor extends AbstractSoapInterceptor {
         throws WSSecurityException {
         
         boolean utWithCallbacks = 
-            !MessageUtils.getContextualBoolean(message, SecurityConstants.USERNAME_TOKEN_NO_CALLBACKS, false);
+            MessageUtils.getContextualBoolean(message, SecurityConstants.VALIDATE_TOKEN, true);
         if (utWithCallbacks) {
             UsernameTokenProcessor p = new UsernameTokenProcessor();
             return p.handleUsernameToken(tokenElement, getCallback(message));
