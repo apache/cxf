@@ -26,7 +26,7 @@ import org.apache.cxf.Bus;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.WSAEndpointReferenceUtils;
 
 /**
  * Abstract base class factoring out common Destination logic, 
@@ -100,7 +100,7 @@ public abstract class AbstractDestination
     protected abstract class AbstractBackChannelConduit extends AbstractConduit {
 
         public AbstractBackChannelConduit() {
-            super(EndpointReferenceUtils.getAnonymousEndpointReference());
+            super(WSAEndpointReferenceUtils.getAnonymousEndpointReference());
         }
 
         /**

@@ -229,8 +229,8 @@ public final class EndpointReferenceUtils {
         }
     }
 
-    public static final String ANONYMOUS_ADDRESS = "http://www.w3.org/2005/08/addressing/anonymous";
-
+    public static final String ANONYMOUS_ADDRESS = WSAEndpointReferenceUtils.ANONYMOUS_ADDRESS;
+    
     private static final Logger LOG = LogUtils.getL7dLogger(EndpointReferenceUtils.class);
 
     private static final String NS_WSAW_2005 = "http://www.w3.org/2005/02/addressing/wsdl";
@@ -257,9 +257,6 @@ public final class EndpointReferenceUtils {
     
     private static final org.apache.cxf.ws.addressing.wsdl.ObjectFactory WSA_WSDL_OBJECT_FACTORY = 
         new org.apache.cxf.ws.addressing.wsdl.ObjectFactory();
-    private static final org.apache.cxf.ws.addressing.ObjectFactory WSA_OBJECT_FACTORY = 
-        new org.apache.cxf.ws.addressing.ObjectFactory();
-
     
     private EndpointReferenceUtils() {
         // Utility class - never constructed
@@ -276,11 +273,7 @@ public final class EndpointReferenceUtils {
                                              String portName) {
         if (null != serviceName) {
             JAXBElement<ServiceNameType> jaxbElement = getServiceNameType(serviceName, portName);
-            MetadataType mt = ref.getMetadata();
-            if (null == mt) {
-                mt = new MetadataType();
-                ref.setMetadata(mt);
-            }
+            MetadataType mt = WSAEndpointReferenceUtils.getSetMetadata(ref);
 
             mt.getAny().add(jaxbElement);
         }
@@ -417,11 +410,7 @@ public final class EndpointReferenceUtils {
             JAXBElement<AttributedQNameType> jaxbElement = 
                 WSA_WSDL_OBJECT_FACTORY.createInterfaceName(interfaceNameType);
 
-            MetadataType mt = ref.getMetadata();
-            if (null == mt) {
-                mt = WSA_OBJECT_FACTORY.createMetadataType();
-                ref.setMetadata(mt);
-            }
+            MetadataType mt = WSAEndpointReferenceUtils.getSetMetadata(ref);
             mt.getAny().add(jaxbElement);
         }
     }
@@ -495,11 +484,7 @@ public final class EndpointReferenceUtils {
 
     public static void setWSDLLocation(EndpointReferenceType ref, String... wsdlLocation) {
         
-        MetadataType metadata = ref.getMetadata();
-        if (null == metadata) {
-            metadata = WSA_OBJECT_FACTORY.createMetadataType();
-            ref.setMetadata(metadata);
-        }
+        MetadataType metadata = WSAEndpointReferenceUtils.getSetMetadata(ref);
 
         //wsdlLocation attribute is a list of anyURI.
         StringBuilder strBuf = new StringBuilder();
@@ -541,11 +526,7 @@ public final class EndpointReferenceUtils {
         throws EndpointUtilsException {
         
         if (null != ref) {
-            MetadataType mt = ref.getMetadata();
-            if (null == mt) {
-                mt = new MetadataType();
-                ref.setMetadata(mt);
-            }
+            MetadataType mt = WSAEndpointReferenceUtils.getSetMetadata(ref);
             List<Object> anyList = mt.getAny();
             try {
                 for (Source source : metadata) {
@@ -819,13 +800,7 @@ public final class EndpointReferenceUtils {
      * @return String the address of the endpoint
      */
     public static String getAddress(EndpointReferenceType ref) {
-        AttributedURIType a = ref.getAddress();
-        
-        if (null != a) {
-            return a.getValue();
-        }
-        // should wsdl be parsed for an address now?
-        return null;
+        return WSAEndpointReferenceUtils.getAddress(ref);
     }
 
     /**
@@ -834,9 +809,7 @@ public final class EndpointReferenceUtils {
      * @param address - the address
      */
     public static void setAddress(EndpointReferenceType ref, String address) {
-        AttributedURIType a = WSA_OBJECT_FACTORY.createAttributedURIType();
-        a.setValue(address);
-        ref.setAddress(a);
+        WSAEndpointReferenceUtils.setAddress(ref, address);
     }
     /**
      * Create an endpoint reference for the provided wsdl, service and portname.
@@ -848,8 +821,8 @@ public final class EndpointReferenceUtils {
     public static EndpointReferenceType getEndpointReference(URL wsdlUrl, 
                                                              QName serviceName,
                                                              String portName) {
-        EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
-        reference.setMetadata(WSA_OBJECT_FACTORY.createMetadataType());
+        EndpointReferenceType reference = 
+            WSAEndpointReferenceUtils.createEndpointReferenceWithMetadata();
         setServiceAndPortName(reference, serviceName, portName);
         //TODO To Ensure it is a valid URI syntax.
         setWSDLLocation(reference, wsdlUrl.toString());
@@ -865,11 +838,7 @@ public final class EndpointReferenceUtils {
      */
     public static EndpointReferenceType duplicate(EndpointReferenceType ref) {
 
-        EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
-        reference.setMetadata(ref.getMetadata());
-        reference.getAny().addAll(ref.getAny());
-        reference.setAddress(ref.getAddress());
-        return reference;
+        return WSAEndpointReferenceUtils.duplicate(ref);
     }
     
     /**
@@ -879,16 +848,12 @@ public final class EndpointReferenceUtils {
      */
     public static EndpointReferenceType getEndpointReference(String address) {
 
-        EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
-        setAddress(reference, address);
-        return reference;
+        return WSAEndpointReferenceUtils.getEndpointReference(address);
     }
     
     public static EndpointReferenceType getEndpointReference(AttributedURIType address) {
 
-        EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
-        reference.setAddress(address);
-        return reference;
+        return WSAEndpointReferenceUtils.getEndpointReference(address);
     }    
     
     /**
@@ -897,9 +862,7 @@ public final class EndpointReferenceUtils {
      */
     public static EndpointReferenceType getAnonymousEndpointReference() {
         
-        EndpointReferenceType reference = WSA_OBJECT_FACTORY.createEndpointReferenceType();
-        setAddress(reference, ANONYMOUS_ADDRESS);
-        return reference;
+        return WSAEndpointReferenceUtils.getAnonymousEndpointReference();
     }
     
     /**
@@ -1027,8 +990,9 @@ public final class EndpointReferenceUtils {
     public static Source convertToXML(EndpointReferenceType epr) {
         try {
             JAXBContext jaxbContext = 
-                JAXBContext.newInstance(new Class[] {WSA_WSDL_OBJECT_FACTORY.getClass(), 
-                                                     WSA_OBJECT_FACTORY.getClass()});
+                JAXBContext.newInstance(new Class[] {
+                                            WSA_WSDL_OBJECT_FACTORY.getClass(), 
+                                            WSAEndpointReferenceUtils.WSA_OBJECT_FACTORY.getClass()});
             javax.xml.bind.Marshaller jm = jaxbContext.createMarshaller();
             jm.setProperty(Marshaller.JAXB_FRAGMENT, true);
             QName qname = new QName("http://www.w3.org/2005/08/addressing", "EndpointReference");

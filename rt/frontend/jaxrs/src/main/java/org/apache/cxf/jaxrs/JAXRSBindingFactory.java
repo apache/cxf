@@ -20,7 +20,7 @@ package org.apache.cxf.jaxrs;
 
 
 import org.apache.cxf.Bus;
-import org.apache.cxf.binding.AbstractBindingFactory;
+import org.apache.cxf.binding.AbstractBaseBindingFactory;
 import org.apache.cxf.binding.Binding;
 import org.apache.cxf.binding.xml.XMLBinding;
 import org.apache.cxf.binding.xml.interceptor.XMLFaultOutInterceptor;
@@ -31,9 +31,12 @@ import org.apache.cxf.jaxrs.interceptor.JAXRSOutInterceptor;
 import org.apache.cxf.service.Service;
 import org.apache.cxf.service.model.BindingInfo;
 
-
+/**
+ * The CXF BindingFactory implementation which is used to register 
+ * CXF JAX-RS interceptors with the runtime.
+ */
 @NoJSR250Annotations(unlessNull = { "bus" })
-public class JAXRSBindingFactory extends AbstractBindingFactory {
+public class JAXRSBindingFactory extends AbstractBaseBindingFactory {
 
     public static final String JAXRS_BINDING_ID = "http://apache.org/cxf/binding/jaxrs";
 

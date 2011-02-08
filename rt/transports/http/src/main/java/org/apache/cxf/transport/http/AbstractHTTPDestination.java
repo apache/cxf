@@ -73,6 +73,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.ws.policy.Assertor;
 import org.apache.cxf.ws.policy.PolicyEngine;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.WSDLLibrary;
 
 /**
  * Common base for HTTP Destination implementations.
@@ -369,7 +370,7 @@ public abstract class AbstractHTTPDestination
             && null != endpointInfo.getService()) {
             server = PolicyUtils.getServer(engine, endpointInfo, this);
         }
-        if (null == server) {
+        if (null == server && WSDLLibrary.isAvailable()) {
             server = endpointInfo.getTraversedExtensor(
                     new HTTPServerPolicy(), HTTPServerPolicy.class);
         }
@@ -417,8 +418,9 @@ public abstract class AbstractHTTPDestination
         }
 
         cacheInput(outMessage);
-
-        new Headers(outMessage).setFromServerPolicy(server);
+        if (server != null) {
+            new Headers(outMessage).setFromServerPolicy(server);
+        }
 
         OutputStream responseStream = null;
         boolean oneWay = isOneWay(outMessage);

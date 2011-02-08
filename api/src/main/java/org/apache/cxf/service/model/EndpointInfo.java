@@ -22,7 +22,7 @@ package org.apache.cxf.service.model;
 import javax.xml.namespace.QName;
 
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.apache.cxf.wsdl.EndpointReferenceUtils;
+import org.apache.cxf.wsdl.WSAEndpointReferenceUtils;
 
 /**
  * The EndpointInfo contains the information for a web service 'port' inside of a service.
@@ -87,9 +87,9 @@ public class EndpointInfo extends AbstractDescriptionElement implements NamedIte
     
     public void setAddress(String addr) {
         if (null == address) {
-            address = EndpointReferenceUtils.getEndpointReference(addr);
+            address = WSAEndpointReferenceUtils.getEndpointReference(addr);
         } else {
-            EndpointReferenceUtils.setAddress(address, addr);
+            WSAEndpointReferenceUtils.setAddress(address, addr);
         }
     }
     

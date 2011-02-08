@@ -39,6 +39,7 @@ import org.apache.cxf.transport.http.AbstractHTTPDestination;
 import org.apache.cxf.transport.http.DestinationRegistry;
 import org.apache.cxf.transports.http.QueryHandler;
 import org.apache.cxf.transports.http.QueryHandlerRegistry;
+import org.apache.cxf.wsdl.WSDLLibrary;
 import org.apache.cxf.wsdl.http.AddressType;
 
 public class ServletController extends AbstractServletController {
@@ -82,7 +83,8 @@ public class ServletController extends AbstractServletController {
                     request.setAttribute("org.apache.cxf.transport.endpoint.address", base + path);
                 } else {
                     d2.getEndpointInfo().setAddress(base + path);
-                    if (d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
+                    if (WSDLLibrary.isAvailable() 
+                        && d2.getEndpointInfo().getExtensor(AddressType.class) != null) {
                         d2.getEndpointInfo().getExtensor(AddressType.class).setLocation(base + path);
                     }
                 }
