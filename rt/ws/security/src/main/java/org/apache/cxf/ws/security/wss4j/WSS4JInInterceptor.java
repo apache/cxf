@@ -47,7 +47,6 @@ import org.apache.cxf.binding.soap.saaj.SAAJInInterceptor;
 import org.apache.cxf.common.classloader.ClassLoaderUtils;
 import org.apache.cxf.common.i18n.Message;
 import org.apache.cxf.common.logging.LogUtils;
-import org.apache.cxf.common.security.UsernameToken;
 import org.apache.cxf.endpoint.Endpoint;
 import org.apache.cxf.helpers.CastUtils;
 import org.apache.cxf.interceptor.Fault;
@@ -433,16 +432,8 @@ public class WSS4JInInterceptor extends AbstractWSS4JInterceptor {
             final Principal p = (Principal)o.get(WSSecurityEngineResult.TAG_PRINCIPAL);
             if (p != null) {
                 msg.put(PRINCIPAL_RESULT, p);
-                if (!utWithCallbacks && p instanceof WSUsernameTokenPrincipal) {
-                    WSUsernameTokenPrincipal utp = (WSUsernameTokenPrincipal)p;
-                    msg.put(org.apache.cxf.common.security.SecurityToken.class, 
-                            new UsernameToken(utp.getName(),
-                                              utp.getPassword(),
-                                              utp.getPasswordType(),
-                                              utp.isPasswordDigest(),
-                                              utp.getNonce(),
-                                              utp.getCreatedTime()));
-                    
+                if (!utWithCallbacks) {
+                    WSS4JTokenConverter.convertToken(msg, p);
                 }
                 SecurityContext sc = msg.get(SecurityContext.class);
                 if (sc == null || sc.getUserPrincipal() == null) {
