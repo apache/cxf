@@ -21,10 +21,14 @@ package org.apache.cxf.jaxrs.client;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.BusException;
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.common.util.ModCountCopyOnWriteArrayList;
 import org.apache.cxf.endpoint.ConduitSelector;
+import org.apache.cxf.interceptor.Fault;
 import org.apache.cxf.interceptor.Interceptor;
 import org.apache.cxf.interceptor.InterceptorProvider;
 import org.apache.cxf.message.Exchange;
@@ -32,11 +36,19 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiatorManager;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.http.ClientOnlyHTTPTransportFactory;
 import org.apache.cxf.transport.http.HTTPConduit;
 
+/**
+ * Represents the configuration of the current proxy or WebClient.
+ * Given an instance with the name 'client', one can access its configuration
+ * using a WebClient.getConfig(client) call.
+ */
 public class ClientConfiguration implements InterceptorProvider {
-
+    private static final Logger LOG = LogUtils.getL7dLogger(ClientConfiguration.class);
+    
     private List<Interceptor<? extends Message>> inInterceptors 
         = new ModCountCopyOnWriteArrayList<Interceptor<? extends Message>>();
     private List<Interceptor<? extends Message>> outInterceptors 
@@ -51,18 +63,54 @@ public class ClientConfiguration implements InterceptorProvider {
     private Map<String, Object> responseContext = new HashMap<String, Object>();
     
     
+    /**
+     * Sets the conduit selector 
+     * @param cs the selector
+     */
     public void setConduitSelector(ConduitSelector cs) {
         this.conduitSelector = cs;
     }
-    
+    /**
+     * Gets the conduit selector 
+     * @return the conduit the selector
+     */
     public ConduitSelector getConduitSelector() {
         return conduitSelector;
     }
     
+    void prepareConduitSelector(Message message) {
+        try {
+            getConduitSelector().prepare(message);
+        } catch (Fault ex) {
+            LOG.fine("Failure to prepare a message from conduit selector");
+            if (ex.getCause() instanceof BusException) {
+                String code = ((BusException)ex.getCause()).getCode();
+                if ("NO_CONDUIT_INITIATOR".equals(code)) {
+                    ConduitInitiatorManager cim = getBus().getExtension(ConduitInitiatorManager.class);
+                    ClientOnlyHTTPTransportFactory factory = new ClientOnlyHTTPTransportFactory();
+                    factory.setBus(getBus());                   
+                    cim.registerConduitInitiator(
+                        getConduitSelector().getEndpoint().getEndpointInfo().getTransportId(), factory);
+                    getConduitSelector().prepare(message);
+                } else {
+                    throw ex;
+                }
+            }
+        }
+    }
+    
+    /**
+     * Sets the bus
+     * @param bus the bus
+     */
     public void setBus(Bus bus) {
         this.bus = bus;
     }
     
+    /**
+     * Gets the bus
+     * @return the bus
+     */
     public Bus getBus() {
         return bus;
     }
@@ -83,45 +131,89 @@ public class ClientConfiguration implements InterceptorProvider {
         return outInterceptors;
     }
 
+    /**
+     * Sets the list of in interceptors which pre-process 
+     * the responses from remote services.
+     *  
+     * @param interceptors in interceptors
+     */
     public void setInInterceptors(List<Interceptor<? extends Message>> interceptors) {
         inInterceptors = interceptors;
     }
 
+    /**
+     * Sets the list of out interceptors which post-process 
+     * the requests to the remote services.
+     *  
+     * @param interceptors out interceptors
+     */
     public void setOutInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outInterceptors = interceptors;
     }
     
+    /**
+     * Sets the list of in fault interceptors which will deal with the HTTP
+     * faults; the client code may choose to catch {@link ServerWebApplicationException}
+     * exceptions instead.
+     *  
+     * @param interceptors in fault interceptors
+     */
     public void setInFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         inFault = interceptors;
     }
 
+    /**
+     * Sets the list of out fault interceptors which will deal with the client-side
+     * faults; the client code may choose to catch {@link ClientWebApplicationException}
+     * exceptions instead.
+     *  
+     * @param interceptors out fault interceptors
+     */
     public void setOutFaultInterceptors(List<Interceptor<? extends Message>> interceptors) {
         outFault = interceptors;
     }
     
+    /**
+     * Gets the conduit responsible for a transport-level
+     * communication with the remote service. 
+     * @return the conduit
+     */
     public Conduit getConduit() {
         Message message = new MessageImpl();
         Exchange exchange = new ExchangeImpl();
         message.setExchange(exchange);
         exchange.put(MessageObserver.class, new ClientMessageObserver(this));
         exchange.put(Bus.class, bus);
+        prepareConduitSelector(message);
         return getConduitSelector().selectConduit(message);
     }
     
+    /**
+     * Gets the HTTP conduit responsible for a transport-level
+     * communication with the remote service. 
+     * @return the HTTP conduit
+     */
     public HTTPConduit getHttpConduit() {
-        Message message = new MessageImpl();
-        Exchange exchange = new ExchangeImpl();
-        message.setExchange(exchange);
-        exchange.put(MessageObserver.class, new ClientMessageObserver(this));
-        exchange.put(Bus.class, bus);
-        Conduit conduit = getConduitSelector().selectConduit(message);
+        Conduit conduit = getConduit();
         return conduit instanceof HTTPConduit ? (HTTPConduit)conduit : null;
     }
-    
+ 
+    /**
+     * Get the map of properties which affect the responses only. 
+     * These additional properties may be optionally set after a 
+     * proxy or WebClient has been created.
+     * @return the response context properties
+     */
     public Map<String, Object> getResponseContext() {
         return responseContext;
     }
     
+    /**
+     * Get the map of properties which affect the requests only. 
+     * These additional properties may be optionally set after a 
+     * proxy or WebClient has been created.
+     * @return the request context properties
+     */
     public Map<String, Object> getRequestContext() {
         return requestContext;
     }
