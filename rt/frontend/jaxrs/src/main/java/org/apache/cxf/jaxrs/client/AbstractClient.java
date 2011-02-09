@@ -542,7 +542,7 @@ public class AbstractClient implements Client {
     
     protected void prepareConduitSelector(Message message) {
         try {
-            cfg.getConduitSelector().prepare(message);
+            cfg.prepareConduitSelector(message);
         } catch (Fault ex) {
             LOG.fine("Failure to prepare a message from conduit selector");
             if (ex.getCause() instanceof BusException) {
@@ -553,7 +553,7 @@ public class AbstractClient implements Client {
                     factory.setBus(cfg.getBus());                   
                     cim.registerConduitInitiator(
                         cfg.getConduitSelector().getEndpoint().getEndpointInfo().getTransportId(), factory);
-                    cfg.getConduitSelector().prepare(message);
+                    cfg.prepareConduitSelector(message);
                 } else {
                     throw ex;
                 }
