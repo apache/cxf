@@ -19,27 +19,25 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
-import java.security.acl.Group;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
 import org.apache.cxf.security.LoginSecurityContext;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-public class DefaultSecurityContextTest extends Assert {
+public class RolePrefixSecurityContextImplTest extends Assert {
 
     @Test
     public void testUserNotInRole() {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        assertFalse(new DefaultSecurityContext(p, s).isUserInRole("friend"));
+        assertFalse(new RolePrefixSecurityContextImpl(s, "").isUserInRole("friend"));
     }
     
     @Test
@@ -47,8 +45,9 @@ public class DefaultSecurityContextTest extends Assert {
         Subject s = new Subject();
         Principal p = new SimplePrincipal("Barry");
         s.getPrincipals().add(p);
-        s.getPrincipals().add(new SimpleGroup("friend", p));
-        assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
+        s.getPrincipals().add(new SimplePrincipal("role_friend"));
+        assertTrue(new RolePrefixSecurityContextImpl(s, "role_")
+                       .isUserInRole("role_friend"));
     }
     
     @Test
@@ -58,14 +57,14 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(p);
         
         Set<Principal> roles = new HashSet<Principal>();
-        roles.add(new SimpleGroup("friend", p));
-        roles.add(new SimpleGroup("admin", p));
+        roles.add(new SimplePrincipal("role_friend"));
+        roles.add(new SimplePrincipal("role_admin"));
         s.getPrincipals().addAll(roles);
         
-        LoginSecurityContext context = new DefaultSecurityContext(p, s);
-        assertTrue(context.isUserInRole("friend"));
-        assertTrue(context.isUserInRole("admin"));
-        assertFalse(context.isUserInRole("bar"));
+        LoginSecurityContext context = new RolePrefixSecurityContextImpl(s, "role_");
+        assertTrue(context.isUserInRole("role_friend"));
+        assertTrue(context.isUserInRole("role_admin"));
+        assertFalse(context.isUserInRole("role_bar"));
         
         Set<Principal> roles2 =  context.getUserRoles();
         assertEquals(roles2, roles);
@@ -74,31 +73,7 @@ public class DefaultSecurityContextTest extends Assert {
     @Test
     public void testGetSubject() {
         Subject s = new Subject();
-        assertSame(new DefaultSecurityContext(s).getSubject(), s);
-    }
-    
-    @Test
-    public void testUserInRole2() {
-        Subject s = new Subject();
-        Principal p = new SimplePrincipal("Barry");
-        s.getPrincipals().add(p);
-        Group group = new SimpleGroup("Roles", p);
-        group.addMember(new SimpleGroup("friend"));
-        s.getPrincipals().add(group);
-        assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
-    }
-    
-    @Test
-    public void testUserInRole3() {
-        Subject s = new Subject();
-        Principal p = new SimplePrincipal("Barry");
-        s.getPrincipals().add(p);
-        Group group = new SimpleGroup("Roles", p);
-        Group subgroup = new SimpleGroup("subgroup");
-        subgroup.addMember(new SimpleGroup("friend"));
-        group.addMember(subgroup);
-        s.getPrincipals().add(group);
-        assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
+        assertSame(new RolePrefixSecurityContextImpl(s, "").getSubject(), s);
     }
     
 }
