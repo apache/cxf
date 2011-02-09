@@ -38,26 +38,19 @@ import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.Source;
 import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.sax.SAXSource;
 import javax.xml.transform.stream.StreamSource;
 
 import org.w3c.dom.Document;
 
 import org.apache.cxf.jaxrs.ext.xml.XMLSource;
-import org.apache.cxf.jaxrs.utils.HttpUtils;
-import org.apache.cxf.message.Message;
-import org.apache.cxf.phase.PhaseInterceptorChain;
-import org.apache.cxf.staxutils.StaxSource;
 import org.apache.cxf.staxutils.StaxUtils;
 
 @Provider
 @Produces({"application/xml", "application/*+xml", "text/xml" })
 @Consumes({"application/xml", "application/*+xml", "text/xml", "text/html" })
-public class SourceProvider extends AbstractConfigurableProvider implements 
+public class SourceProvider implements 
     MessageBodyReader<Object>, MessageBodyWriter<Source> {
 
-    private static final String PREFERRED_FORMAT = "source-preferred-format";
-    
     public boolean isWriteable(Class<?> type, Type genericType, Annotation[] annotations, MediaType mt) {
         return Source.class.isAssignableFrom(type);
     }
@@ -71,18 +64,9 @@ public class SourceProvider extends AbstractConfigurableProvider implements
     public Object readFrom(Class<Object> source, Type genericType, Annotation[] annotations, MediaType m,  
         MultivaluedMap<String, String> headers, InputStream is) 
         throws IOException {
-        
-        Class<?> theSource = source;
-        if (theSource == Source.class) {
-            String s = getPreferredSource();
-            if ("sax".equalsIgnoreCase(s) || "cxf.stax".equalsIgnoreCase(s)) {
-                theSource = SAXSource.class;
-            }
-        }
-        
-        if (DOMSource.class.isAssignableFrom(theSource) || Document.class.isAssignableFrom(theSource)) {
+        if (DOMSource.class.isAssignableFrom(source) || Document.class.isAssignableFrom(source)) {
             
-            boolean docRequired = Document.class.isAssignableFrom(theSource);
+            boolean docRequired = Document.class.isAssignableFrom(source);
             XMLStreamReader reader = StaxUtils.createXMLStreamReader(is);
             try {
                 Document doc = StaxUtils.read(reader);
@@ -98,34 +82,21 @@ public class SourceProvider extends AbstractConfigurableProvider implements
                     //ignore
                 }
             }
-        } else if (SAXSource.class.isAssignableFrom(theSource)
-            || StaxSource.class.isAssignableFrom(theSource)) {
-            return new StaxSource(StaxUtils.createXMLStreamReader(is));
-        } 
-        else if (StreamSource.class.isAssignableFrom(theSource)
-                   || Source.class.isAssignableFrom(theSource)) {
+        } else if (StreamSource.class.isAssignableFrom(source)
+                   || Source.class.isAssignableFrom(source)) {
             return new StreamSource(is);
-        } else if (XMLSource.class.isAssignableFrom(theSource)) {
+        } else if (XMLSource.class.isAssignableFrom(source)) {
             return new XMLSource(is);
         }
         
         throw new IOException("Unrecognized source");
     }
 
-    protected String getPreferredSource() {
-        Message m = PhaseInterceptorChain.getCurrentMessage();
-        if (m != null) {
-            return (String)m.getContextualProperty(PREFERRED_FORMAT);
-        } else {
-            return "sax";
-        }
-    }
-    
     public void writeTo(Source source, Class<?> clazz, Type genericType, Annotation[] annotations,  
-        MediaType mt, MultivaluedMap<String, Object> headers, OutputStream os)
+        MediaType m, MultivaluedMap<String, Object> headers, OutputStream os)
         throws IOException {
         
-        String encoding = HttpUtils.getSetEncoding(mt, headers, "UTF-8");
+        String encoding = "utf-8"; //FIXME
         
         XMLStreamReader reader = StaxUtils.createXMLStreamReader(source);
         XMLStreamWriter writer = StaxUtils.createXMLStreamWriter(os, encoding);

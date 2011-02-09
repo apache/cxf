@@ -20,14 +20,11 @@ package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
 import java.security.acl.Group;
-import java.util.HashSet;
-import java.util.Set;
 
 import javax.security.auth.Subject;
 
 import org.apache.cxf.common.security.SimpleGroup;
 import org.apache.cxf.common.security.SimplePrincipal;
-import org.apache.cxf.security.LoginSecurityContext;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -49,32 +46,6 @@ public class DefaultSecurityContextTest extends Assert {
         s.getPrincipals().add(p);
         s.getPrincipals().add(new SimpleGroup("friend", p));
         assertTrue(new DefaultSecurityContext(p, s).isUserInRole("friend"));
-    }
-    
-    @Test
-    public void testMultipleRoles() {
-        Subject s = new Subject();
-        Principal p = new SimplePrincipal("Barry");
-        s.getPrincipals().add(p);
-        
-        Set<Principal> roles = new HashSet<Principal>();
-        roles.add(new SimpleGroup("friend", p));
-        roles.add(new SimpleGroup("admin", p));
-        s.getPrincipals().addAll(roles);
-        
-        LoginSecurityContext context = new DefaultSecurityContext(p, s);
-        assertTrue(context.isUserInRole("friend"));
-        assertTrue(context.isUserInRole("admin"));
-        assertFalse(context.isUserInRole("bar"));
-        
-        Set<Principal> roles2 =  context.getUserRoles();
-        assertEquals(roles2, roles);
-    }
-    
-    @Test
-    public void testGetSubject() {
-        Subject s = new Subject();
-        assertSame(new DefaultSecurityContext(s).getSubject(), s);
     }
     
     @Test
