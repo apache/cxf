@@ -525,7 +525,12 @@ public class STSClient implements Configurable, InterceptorProvider {
         writer.writeStartElement("dsig", "KeyInfo", "http://www.w3.org/2000/09/xmldsig#");
         writer.writeNamespace("dsig", "http://www.w3.org/2000/09/xmldsig#");
 
-        if (useCertificateForConfirmationKeyInfo) {
+        boolean useCert = useCertificateForConfirmationKeyInfo;
+        String useCertStr = (String)getProperty(SecurityConstants.STS_TOKEN_USE_CERT_FOR_KEYINFO);
+        if (useCertStr != null) {
+            useCert = Boolean.parseBoolean(useCertStr);
+        }
+        if (useCert) {
             X509Data certElem = new X509Data(writer.getDocument());
             certElem.addCertificate(cert);
             writer.getCurrentNode().appendChild(certElem.getElement());

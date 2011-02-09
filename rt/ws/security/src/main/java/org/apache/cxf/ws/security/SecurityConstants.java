@@ -68,6 +68,8 @@ public final class SecurityConstants {
     public static final String STS_TOKEN_CRYPTO = "ws-security.sts.token.crypto";
     public static final String STS_TOKEN_PROPERTIES = "ws-security.sts.token.properties";
     public static final String STS_TOKEN_USERNAME = "ws-security.sts.token.username";
+    public static final String STS_TOKEN_USE_CERT_FOR_KEYINFO = 
+        "ws-security.sts.token.usecert";
     
     public static final String STS_TOKEN_DO_CANCEL = "ws-security.sts.token.do.cancel";
     
@@ -82,7 +84,7 @@ public final class SecurityConstants {
             ENCRYPT_USERNAME, ENCRYPT_PROPERTIES, ENCRYPT_CRYPTO,
             TOKEN, TOKEN_ID, STS_CLIENT, STS_TOKEN_PROPERTIES, STS_TOKEN_CRYPTO,
             STS_TOKEN_DO_CANCEL, TIMESTAMP_TTL, ALWAYS_ENCRYPT_UT,
-            STS_TOKEN_ACT_AS
+            STS_TOKEN_ACT_AS, STS_TOKEN_USERNAME, STS_TOKEN_USE_CERT_FOR_KEYINFO
         }));
         ALL_PROPERTIES = Collections.unmodifiableSet(s);
     }
