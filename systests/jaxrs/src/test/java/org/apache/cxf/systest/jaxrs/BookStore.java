@@ -224,6 +224,12 @@ public class BookStore {
     }
     
     @POST
+    @Path("post401")
+    public Response get401WithText() throws Exception {
+        return Response.status(401).entity("This is 401").build();
+    }
+    
+    @POST
     @Path("/collections")
     @Produces({"application/xml", "application/json" })
     @Consumes({"application/xml", "application/json" })

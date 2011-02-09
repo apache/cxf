@@ -66,6 +66,17 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
                    launchServer(BookServer.class));
     }
     
+    @Test
+    public void testPostAnd401WithText() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/post401"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        WebClient.getConfig(wc).getHttpConduit().getClient().setAllowChunking(false);
+        Response r = wc.post(null);
+        assertEquals(401, r.getStatus());
+        assertEquals("This is 401", getStringFromInputStream((InputStream)r.getEntity()));
+    }
 
     @Test
     public void testGetCollectionOfBooks() throws Exception {
