@@ -92,12 +92,11 @@ public class DefaultSecurityContext implements LoginSecurityContext {
         return false;    
     }
 
-    @Override
+    
     public Subject getSubject() {
         return subject;
     }
 
-    @Override
     public Set<Principal> getUserRoles() {
         Set<Principal> roles = new HashSet<Principal>();
         if (subject != null) {
