@@ -19,8 +19,6 @@
 package org.apache.cxf.frontend.spring;
 import java.util.Arrays;
 
-import junit.framework.Assert;
-
 import org.apache.cxf.BusFactory;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.frontend.ClientProxy;
@@ -34,13 +32,15 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
+
+
 // set up the client and server with spring bean configuration
 
-public class ClientServerTest extends Assert {
+public class ClientServerTest extends AbstractSimpleFrontendSpringTest {
+    
     @Test
     public void testClientServer() {
-        BusFactory.setDefaultBus(null);
-        ClassPathXmlApplicationContext ctx = 
+        ctx = 
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/frontend/spring/rountrip.xml"});
         
         HelloService greeter = (HelloService) ctx.getBean("client");
@@ -62,6 +62,8 @@ public class ClientServerTest extends Assert {
         result = greeter.sayHello();
         assertTrue(out.wasCalled());
         assertTrue(in.wasCalled());
+        ctx.close();
+        BusFactory.setDefaultBus(null);
     }
     
     private class TestInterceptor extends AbstractPhaseInterceptor<Message> {
