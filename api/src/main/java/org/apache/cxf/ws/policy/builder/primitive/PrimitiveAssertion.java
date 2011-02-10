@@ -46,7 +46,8 @@ public class PrimitiveAssertion implements PolicyAssertion {
     
     protected QName name;
     protected boolean optional;
-    
+    protected boolean ignorable;
+
     public PrimitiveAssertion() {
         this((QName)null);
     }
@@ -102,6 +103,13 @@ public class PrimitiveAssertion implements PolicyAssertion {
 
     public void setOptional(boolean o) {
         optional = o;        
+    }
+    public boolean isIgnorable() {
+        return ignorable;
+    }
+
+    public void setIgnorable(boolean o) {
+        ignorable = o;        
     }
     
     public PolicyComponent normalize() {

@@ -49,7 +49,7 @@ public class NestedPrimitiveAssertionBuilder extends PrimitiveAssertionBuilder {
     /**
      * If the nested policies in both assertions are empty, the compatible policy
      * . 
-     * The compatible policy is optional iff both assertions are optional.
+     * The compatible policy is optional if both assertions are optional.
      */
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
         if (!getKnownElements().contains(a.getName()) || !a.getName().equals(b.getName())) {

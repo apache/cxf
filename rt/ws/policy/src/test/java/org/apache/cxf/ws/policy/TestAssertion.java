@@ -75,4 +75,8 @@ public class TestAssertion implements PolicyAssertion {
         // TODO Auto-generated method stub
         return false;
     }
+
+    public boolean isIgnorable() {
+        return false;
+    }
 }

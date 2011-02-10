@@ -31,6 +31,7 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
     protected final SPConstants constants;
 
     private boolean isOptional;
+    private boolean ignorable;
     private boolean normalized;
 
     
@@ -47,6 +48,13 @@ public abstract class AbstractSecurityAssertion implements PolicyAssertion {
 
     public void setOptional(boolean optional) {
         this.isOptional = optional;
+    }
+    public boolean isIgnorable() {
+        return ignorable;
+    }
+
+    public void setIgnorable(boolean ignorable) {
+        this.ignorable = ignorable;
     }
 
     public short getType() {

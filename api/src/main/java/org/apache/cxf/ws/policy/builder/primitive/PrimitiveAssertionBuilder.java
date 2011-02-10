@@ -60,7 +60,7 @@ public class PrimitiveAssertionBuilder implements AssertionBuilder {
 
     /**
      * If the two assertions are equal, they are also compatible. 
-     * The compatible policy is optional iff both assertions are optional.
+     * The compatible policy is optional if both assertions are optional.
      */
     public PolicyAssertion buildCompatible(PolicyAssertion a, PolicyAssertion b) {
         if (knownElements.contains(a.getName()) && a.getName().equals(b.getName())) {
