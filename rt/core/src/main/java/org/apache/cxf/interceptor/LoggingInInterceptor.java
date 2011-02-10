@@ -34,7 +34,6 @@ import org.apache.cxf.phase.Phase;
  */
 @NoJSR250Annotations
 public class LoggingInInterceptor extends AbstractLoggingInterceptor {
-
     
     public LoggingInInterceptor() {
         super(Phase.RECEIVE);
@@ -43,8 +42,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public LoggingInInterceptor(String phase) {
         super(phase);
     }
+
     public LoggingInInterceptor(String id, String phase) {
-        super(id, id);
+        super(id, phase);
     }
 
     public LoggingInInterceptor(int lim) {
