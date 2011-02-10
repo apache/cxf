@@ -222,10 +222,12 @@ public final class JAXRSUtils {
                                                  String path, 
                                                  MultivaluedMap<String, String> values,
                                                  Message message) {
-        
-        LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
+        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+        if (isFineLevelLoggable) {
+            LOG.fine(new org.apache.cxf.common.i18n.Message("START_CRI_MATCH", 
                                                         BUNDLE, 
                                                         path).toString());
+        }
         if (resources.size() == 1) { 
             return resources.get(0).getURITemplate().match(path, values)
                    ? resources.get(0) : null;
@@ -239,12 +241,14 @@ public final class JAXRSUtils {
             MultivaluedMap<String, String> map = new MetadataMap<String, String>();
             if (cri.getURITemplate().match(path, map)) {
                 candidateList.put(cri, map);
-                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY", 
+                if (isFineLevelLoggable) {
+                    LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED_POSSIBLY", 
                                                                 BUNDLE, 
                                                                 cri.getServiceClass().getName(),
                                                                 path, 
                                                                 cri.getURITemplate().getValue()).toString());
-            } else {
+                }
+            } else if (isFineLevelLoggable) {
                 LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_NO_MATCH", 
                                                                 BUNDLE, 
                                                                 path,
@@ -257,10 +261,12 @@ public final class JAXRSUtils {
                 candidateList.entrySet().iterator().next();
             values.putAll(firstEntry.getValue());
             ClassResourceInfo cri = firstEntry.getKey();
-            LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
+            if (isFineLevelLoggable) {
+                LOG.fine(new org.apache.cxf.common.i18n.Message("CRI_SELECTED", 
                                                          BUNDLE, 
                                                          cri.getServiceClass().getName(),
                                                          path, cri.getURITemplate().getValue()).toString());
+            }
             return cri;
         }
         
@@ -274,7 +280,8 @@ public final class JAXRSUtils {
                                                          String requestContentType, 
                                                          List<MediaType> acceptContentTypes,
                                                          boolean logNow) {
-        if (LOG.isLoggable(Level.FINE)) {
+        boolean isFineLevelLoggable = LOG.isLoggable(Level.FINE); 
+        if (isFineLevelLoggable) {
             org.apache.cxf.common.i18n.Message msg = 
                 new org.apache.cxf.common.i18n.Message("START_OPER_MATCH", 
                                                        BUNDLE,
@@ -331,7 +338,7 @@ public final class JAXRSUtils {
                             logNoMatchMessage(ori, path, httpMethod, requestType, acceptContentTypes);
                         }
                     }
-                    if (added && LOG.isLoggable(Level.FINE)) {
+                    if (added && isFineLevelLoggable) {
                         LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED_POSSIBLY", 
                                   BUNDLE, 
                                   ori.getMethodToInvoke().getName()).toString());
@@ -355,9 +362,11 @@ public final class JAXRSUtils {
                          BUNDLE, resource.getServiceClass().getName(), 
                          ori.getMethodToInvoke().getName()).toString());
             }
-            LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
-                           BUNDLE, ori.getMethodToInvoke().getName(), 
-                           resource.getServiceClass().getName()).toString());
+            if (isFineLevelLoggable) {
+                LOG.fine(new org.apache.cxf.common.i18n.Message("OPER_SELECTED", 
+                               BUNDLE, ori.getMethodToInvoke().getName(), 
+                               resource.getServiceClass().getName()).toString());
+            }
             return ori;
         }
         
