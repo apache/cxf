@@ -28,6 +28,7 @@ public final class LoggingMessage {
     private final StringBuilder address;
     private final StringBuilder contentType;
     private final StringBuilder encoding;
+    private final StringBuilder httpMethod;
     private final StringBuilder header;
     private final StringBuilder message;
     private final StringBuilder payload;
@@ -42,6 +43,7 @@ public final class LoggingMessage {
         contentType = new StringBuilder();
         address = new StringBuilder();
         encoding = new StringBuilder();
+        httpMethod = new StringBuilder();
         header = new StringBuilder();
         message = new StringBuilder();
         payload = new StringBuilder();
@@ -63,6 +65,10 @@ public final class LoggingMessage {
 
     public StringBuilder getHeader() {
         return header;
+    }
+    
+    public StringBuilder getHttpMethod() {
+        return httpMethod;
     }
 
     public StringBuilder getContentType() {
@@ -96,6 +102,10 @@ public final class LoggingMessage {
         if (encoding.length() > 0) {
             buffer.append("\nEncoding: ");
             buffer.append(encoding);
+        }
+        if (httpMethod.length() > 0) {
+            buffer.append("\nHttp-Method: ");
+            buffer.append(httpMethod);
         }
         buffer.append("\nContent-Type: ");
         buffer.append(contentType);
