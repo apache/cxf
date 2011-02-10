@@ -152,13 +152,13 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
-    public void testSetTwoCookieWebClient() throws Exception {
-        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/settwocookies");
+    public void testSetManyCookiesWebClient() throws Exception {
+        WebClient client = WebClient.create("http://localhost:" + PORT + "/bookstore/setmanycookies");
         Response r = client.type("*/*").get();
         assertEquals(200, r.getStatus());
         List<Object> cookies = r.getMetadata().get("Set-Cookie");
         assertNotNull(cookies);
-        assertEquals(2, cookies.size());
+        assertEquals(3, cookies.size());
     }
 
     

@@ -147,10 +147,12 @@ public class BookStore {
     
 
     @GET
-    @Path("settwocookies")
+    @Path("setmanycookies")
     public Response setTwoCookies() {
         return Response.ok().header("Set-Cookie", "JSESSIONID=0475F7F30A26E5B0C15D69; Path=/")
-            .header("Set-Cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/").build();
+            .header("Set-Cookie", "COOKIETWO=dummy; Expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .header("Set-Cookie", "COOKIETWO=dummy2; expires=Sat, 20-Nov-2010 19:11:32 GMT; Path=/")
+            .build();
     }
     
     @GET
