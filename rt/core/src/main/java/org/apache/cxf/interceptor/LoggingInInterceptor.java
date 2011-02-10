@@ -43,8 +43,9 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
     public LoggingInInterceptor(String phase) {
         super(phase);
     }
+
     public LoggingInInterceptor(String id, String phase) {
-        super(id, id);
+        super(id, phase);
     }
 
     public LoggingInInterceptor(int lim) {
