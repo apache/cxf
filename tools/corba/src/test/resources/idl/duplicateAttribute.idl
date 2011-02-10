@@ -1,0 +1,17 @@
+
+module testDuplicateAttribute {
+
+    interface Filter {
+        readonly attribute string filter_string;
+
+        void store_filter(in string myfilter);
+        string retrieve_filter(in long id);
+    };
+    
+    interface MapFilter {
+        readonly attribute string filter_string;
+        
+        void store_map_filter(in string myfilter);
+        string retrieve_map_filter(in long  id);
+    };
+};

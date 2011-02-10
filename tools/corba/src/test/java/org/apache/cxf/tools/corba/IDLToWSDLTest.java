@@ -360,5 +360,22 @@ public class IDLToWSDLTest extends ToolTestBase {
         assertEquals("IDLToWSDL Failed", noError, exc);
         doTestGeneratedWsdl(expected, actual);
     }
-    
+
+    public void testDuplicateTypeGeneration() throws Exception {
+        File input = new File(getClass().getResource("/idl/duplicateAttribute.idl").toURI());
+        File expected =
+            new File(getClass().getResource("/idl/expected_duplicateAttribute.wsdl").toURI());
+
+        String[] args = new String[] {"-ow", "duplicateAttribute.wsdl",
+                                      "-o", output.toString(),
+                                      "-verbose",
+                                      input.toString()
+        };
+        int exc = execute(args);
+        File actual = new File(output, "duplicateAttribute.wsdl");
+
+        assertEquals("IDLToWSDL Failed", noError, exc);
+        doTestGeneratedWsdl(expected, actual);
+    }
+
 }
