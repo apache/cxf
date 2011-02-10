@@ -94,6 +94,10 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         if (encoding != null) {
             buffer.getEncoding().append(encoding);
         }
+        String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
+        if (httpMethod != null) {
+            buffer.getHttpMethod().append(httpMethod);
+        }
         String ct = (String)message.get(Message.CONTENT_TYPE);
         if (ct != null) {
             buffer.getContentType().append(ct);

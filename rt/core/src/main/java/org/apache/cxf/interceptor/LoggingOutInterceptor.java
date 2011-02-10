@@ -106,7 +106,10 @@ public class LoggingOutInterceptor extends AbstractLoggingInterceptor {
             if (encoding != null) {
                 buffer.getEncoding().append(encoding);
             }            
-            
+            String httpMethod = (String)message.get(Message.HTTP_REQUEST_METHOD);
+            if (httpMethod != null) {
+                buffer.getHttpMethod().append(httpMethod);
+            }
             String address = (String)message.get(Message.ENDPOINT_ADDRESS);
             if (address != null) {
                 buffer.getAddress().append(address);
