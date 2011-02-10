@@ -272,6 +272,7 @@
                             <exclude>**/*$*</exclude>
                         </excludes>
                         <!--disableXmlReport>true</disableXmlReport-->
+                        <runOrder>alphabetical</runOrder>
                         <reportFormat>${cxf.surefire.format}</reportFormat>
                         <useFile>${cxf.surefire.usefile}</useFile>
                         <forkMode>${cxf.surefire.fork.mode}</forkMode>
