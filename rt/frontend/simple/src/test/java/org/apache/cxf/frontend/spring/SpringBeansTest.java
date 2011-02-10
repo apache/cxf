@@ -19,7 +19,6 @@
 package org.apache.cxf.frontend.spring;
 
 import java.util.List;
-import junit.framework.Assert;
 
 import org.apache.cxf.binding.BindingConfiguration;
 import org.apache.cxf.binding.soap.Soap12;
@@ -44,11 +43,11 @@ import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 
-public class SpringBeansTest extends Assert {
+public class SpringBeansTest extends AbstractSimpleFrontendSpringTest {
 
     @Test
     public void testServers() throws Exception {
-        ClassPathXmlApplicationContext ctx =
+        ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/frontend/spring/servers.xml"});
 
         ServerFactoryBean bean = (ServerFactoryBean) ctx.getBean("simple");
@@ -86,7 +85,7 @@ public class SpringBeansTest extends Assert {
     @Test
     public void testClients() throws Exception {
         AbstractFactoryBeanDefinitionParser.setFactoriesAreAbstract(false);
-        ClassPathXmlApplicationContext ctx =
+        ctx =
             new ClassPathXmlApplicationContext(new String[] {"/org/apache/cxf/frontend/spring/clients.xml"});
 
         Object bean = ctx.getBean("client1.proxyFactory");
