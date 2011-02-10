@@ -1,0 +1,256 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns:corba="http://cxf.apache.org/bindings/corba" xmlns:tns="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <corba:typeMapping targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute/typemap"/>
+  <wsdl:types>
+    <xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns="http://cxf.apache.org/bindings/corba/idl/duplicateAttribute" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+      <xs:element name="_get_filter_string">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="_get_filter_stringResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="store_filter">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="myfilter" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="store_filterResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="retrieve_filter">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="id" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="retrieve_filterResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDuplicateAttribute.MapFilter._get_filter_string">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="testDuplicateAttribute.MapFilter._get_filter_stringResult">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="store_map_filter">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="myfilter" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="store_map_filterResponse">
+        <xs:complexType>
+          <xs:sequence>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="retrieve_map_filter">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="id" type="xs:int">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="retrieve_map_filterResponse">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:element name="return" type="xs:string">
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
+    </xs:schema>
+  </wsdl:types>
+  <wsdl:message name="store_map_filterResponse">
+    <wsdl:part name="outparameter" element="tns:store_map_filterResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDuplicateAttribute.MapFilter._get_filter_stringResponse">
+    <wsdl:part name="parameters" element="tns:testDuplicateAttribute.MapFilter._get_filter_stringResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="store_filter">
+    <wsdl:part name="inparameter" element="tns:store_filter">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_filter_string">
+    <wsdl:part name="parameters" element="tns:_get_filter_string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="testDuplicateAttribute.MapFilter._get_filter_string">
+    <wsdl:part name="parameters" element="tns:testDuplicateAttribute.MapFilter._get_filter_string">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieve_map_filter">
+    <wsdl:part name="inparameter" element="tns:retrieve_map_filter">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieve_filter">
+    <wsdl:part name="inparameter" element="tns:retrieve_filter">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="_get_filter_stringResponse">
+    <wsdl:part name="parameters" element="tns:_get_filter_stringResult">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="store_map_filter">
+    <wsdl:part name="inparameter" element="tns:store_map_filter">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieve_map_filterResponse">
+    <wsdl:part name="outparameter" element="tns:retrieve_map_filterResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="retrieve_filterResponse">
+    <wsdl:part name="outparameter" element="tns:retrieve_filterResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="store_filterResponse">
+    <wsdl:part name="outparameter" element="tns:store_filterResponse">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="testDuplicateAttribute.Filter">
+    <wsdl:operation name="_get_filter_string">
+      <wsdl:input name="_get_filter_string" message="tns:_get_filter_string">
+    </wsdl:input>
+      <wsdl:output name="_get_filter_stringResponse" message="tns:_get_filter_stringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="store_filter">
+      <wsdl:input name="store_filterRequest" message="tns:store_filter">
+    </wsdl:input>
+      <wsdl:output name="store_filterResponse" message="tns:store_filterResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieve_filter">
+      <wsdl:input name="retrieve_filterRequest" message="tns:retrieve_filter">
+    </wsdl:input>
+      <wsdl:output name="retrieve_filterResponse" message="tns:retrieve_filterResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:portType name="testDuplicateAttribute.MapFilter">
+    <wsdl:operation name="_get_filter_string">
+      <wsdl:input name="testDuplicateAttribute.MapFilter._get_filter_string" message="tns:testDuplicateAttribute.MapFilter._get_filter_string">
+    </wsdl:input>
+      <wsdl:output name="testDuplicateAttribute.MapFilter._get_filter_stringResponse" message="tns:testDuplicateAttribute.MapFilter._get_filter_stringResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="store_map_filter">
+      <wsdl:input name="store_map_filterRequest" message="tns:store_map_filter">
+    </wsdl:input>
+      <wsdl:output name="store_map_filterResponse" message="tns:store_map_filterResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieve_map_filter">
+      <wsdl:input name="retrieve_map_filterRequest" message="tns:retrieve_map_filter">
+    </wsdl:input>
+      <wsdl:output name="retrieve_map_filterResponse" message="tns:retrieve_map_filterResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="testDuplicateAttribute.MapFilterCORBABinding" type="tns:testDuplicateAttribute.MapFilter">
+    <corba:binding repositoryID="IDL:testDuplicateAttribute/MapFilter:1.0"/>
+    <wsdl:operation name="_get_filter_string">
+      <corba:operation name="_get_filter_string">
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="testDuplicateAttribute.MapFilter._get_filter_string">
+      </wsdl:input>
+      <wsdl:output name="testDuplicateAttribute.MapFilter._get_filter_stringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="store_map_filter">
+      <corba:operation name="store_map_filter">
+        <corba:param mode="in" name="myfilter" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="store_map_filterRequest">
+      </wsdl:input>
+      <wsdl:output name="store_map_filterResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieve_map_filter">
+      <corba:operation name="retrieve_map_filter">
+        <corba:param mode="in" name="id" idltype="corba:long"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="retrieve_map_filterRequest">
+      </wsdl:input>
+      <wsdl:output name="retrieve_map_filterResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:binding name="testDuplicateAttribute.FilterCORBABinding" type="tns:testDuplicateAttribute.Filter">
+    <corba:binding repositoryID="IDL:testDuplicateAttribute/Filter:1.0"/>
+    <wsdl:operation name="_get_filter_string">
+      <corba:operation name="_get_filter_string">
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="_get_filter_string">
+      </wsdl:input>
+      <wsdl:output name="_get_filter_stringResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="store_filter">
+      <corba:operation name="store_filter">
+        <corba:param mode="in" name="myfilter" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="store_filterRequest">
+      </wsdl:input>
+      <wsdl:output name="store_filterResponse">
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="retrieve_filter">
+      <corba:operation name="retrieve_filter">
+        <corba:param mode="in" name="id" idltype="corba:long"/>
+        <corba:return name="return" idltype="corba:string"/>
+      </corba:operation>
+      <wsdl:input name="retrieve_filterRequest">
+      </wsdl:input>
+      <wsdl:output name="retrieve_filterResponse">
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="testDuplicateAttribute.MapFilterCORBAService">
+    <wsdl:port name="testDuplicateAttribute.MapFilterCORBAPort" binding="tns:testDuplicateAttribute.MapFilterCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+  <wsdl:service name="testDuplicateAttribute.FilterCORBAService">
+    <wsdl:port name="testDuplicateAttribute.FilterCORBAPort" binding="tns:testDuplicateAttribute.FilterCORBABinding">
+      <corba:address location="IOR:"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

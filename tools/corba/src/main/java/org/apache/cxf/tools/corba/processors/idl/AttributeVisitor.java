@@ -19,6 +19,8 @@
 
 package org.apache.cxf.tools.corba.processors.idl;
 
+import java.util.HashMap;
+import java.util.Map;
 import javax.wsdl.Binding;
 import javax.wsdl.BindingInput;
 import javax.wsdl.BindingOperation;
@@ -49,8 +51,12 @@ import org.apache.ws.commons.schema.XmlSchemaElement;
 import org.apache.ws.commons.schema.XmlSchemaSequence;
 import org.apache.ws.commons.schema.XmlSchemaType;
 
+
+
+
 public class AttributeVisitor extends VisitorBase {
 
+    private static Map<String, String> duplicateTypeTrackerMap = new HashMap<String, String>();
     private static final String GETTER_PREFIX     = "_get_";
     private static final String SETTER_PREFIX     = "_set_";
     private static final String RESULT_POSTFIX    = "Result";
@@ -58,10 +64,13 @@ public class AttributeVisitor extends VisitorBase {
     private static final String PART_NAME         = "parameters";
     private static final String PARAM_NAME        = "_arg";
     private static final String RETURN_PARAM_NAME = "return";
+
     
     private ExtensionRegistry   extReg;
     private PortType            portType;
     private Binding             binding;
+
+
     
     public AttributeVisitor(Scope scope,
                             Definition defn,
@@ -239,14 +248,22 @@ public class AttributeVisitor extends VisitorBase {
         
         XmlSchemaComplexType complex = new XmlSchemaComplexType(schema);
         complex.setParticle(sequence);
-        
+
+        QName qName = new QName(definition.getTargetNamespace(), name);
+
         XmlSchemaElement result = new XmlSchemaElement();
-        result.setName(name);
-        result.setQName(new QName(definition.getTargetNamespace(), name));
         result.setSchemaType(complex);
 
-        
+        if (duplicateTypeTrackerMap.containsKey(qName.toString())) {
+            result.setName(getScope().toString() + "." + name);
+            result.setQName(new QName(definition.getTargetNamespace(), getScope().toString() + "." + name));
+        }  else {
+            result.setName(name);
+            result.setQName(qName);
+        }
+
         schema.getItems().add(result);
+        duplicateTypeTrackerMap.put(result.getQName().toString(), name);
         
         return result;
     }
@@ -255,9 +272,16 @@ public class AttributeVisitor extends VisitorBase {
         Part part = definition.createPart();
         part.setName(PART_NAME);
         part.setElementName(element.getQName());
-        
+
         Message result = definition.createMessage();
-        result.setQName(new QName(definition.getTargetNamespace(), name));
+
+        QName qName = new QName(definition.getTargetNamespace(), name);
+        if (definition.getMessage(qName) != null) {
+            String newName = getScope().toString() + "." + name;
+            qName = new QName(definition.getTargetNamespace(), newName);
+        }
+
+        result.setQName(qName);
         result.addPart(part);
         result.setUndefined(false);
         
