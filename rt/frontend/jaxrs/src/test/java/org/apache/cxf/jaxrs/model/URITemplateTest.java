@@ -260,7 +260,45 @@ public class URITemplateTest extends Assert {
         assertFalse(uriTemplate.match("/books/a", values));
         assertFalse(uriTemplate.match("/books/ac", values));
     }
+    
+    @Test
+    public void testValueWithLiteralPlus() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/books/ab+");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
 
+        assertTrue(uriTemplate.match("/books/ab+", values));
+        assertFalse(uriTemplate.match("/books/abb", values));
+        assertFalse(uriTemplate.match("/books/ab", values));
+        assertFalse(uriTemplate.match("/books/a", values));
+    }
+    
+    @Test
+    public void testValueWithManyLiteralPluses() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/books/ab+++++");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/books/ab+++++", values));
+        assertFalse(uriTemplate.match("/books/ab++++++", values));
+        assertFalse(uriTemplate.match("/books/ab++++", values));
+        assertFalse(uriTemplate.match("/books/ab+++", values));
+        assertFalse(uriTemplate.match("/books/ab++", values));
+        assertFalse(uriTemplate.match("/books/ab+", values));
+        assertFalse(uriTemplate.match("/books/ab", values));
+        assertFalse(uriTemplate.match("/books/a", values));
+    }
+
+    @Test
+    public void testValueWithRegExPlus() throws Exception {
+        URITemplate uriTemplate = new URITemplate("/books/{regex:ab+\\+}");
+        MultivaluedMap<String, String> values = new MetadataMap<String, String>();
+
+        assertTrue(uriTemplate.match("/books/ab+", values));
+        assertFalse(uriTemplate.match("/books/abb", values));
+        assertFalse(uriTemplate.match("/books/abb", values));
+        assertFalse(uriTemplate.match("/books/abc", values));
+        assertFalse(uriTemplate.match("/books/a", values));
+    }
+    
     @Test
     public void testEncodedSpace() throws Exception {
         URITemplate uriTemplate = new URITemplate("/1 2/%203");

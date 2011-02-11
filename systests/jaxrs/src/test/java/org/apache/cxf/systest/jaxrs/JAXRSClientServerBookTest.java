@@ -67,6 +67,18 @@ public class JAXRSClientServerBookTest extends AbstractBusClientServerTestBase {
     }
     
     @Test
+    public void testGetBookWithNameInQuery() throws Exception {
+        
+        String endpointAddress =
+            "http://localhost:" + PORT + "/bookstore/name-in-query"; 
+        WebClient wc = WebClient.create(endpointAddress);
+        String name = "Many        spaces";
+        wc.query("name", name);
+        Book b = wc.get(Book.class);
+        assertEquals(name, b.getName());
+    }
+    
+    @Test
     public void testPostAnd401WithText() throws Exception {
         
         String endpointAddress =

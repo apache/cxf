@@ -162,6 +162,13 @@ public class BookStore {
     }
     
     @GET
+    @Path("name-in-query")
+    @Produces("application/xml")
+    public Book getBookFromQuery(@QueryParam("name") String name) {
+        return new Book(name, 321L);
+    }
+    
+    @GET
     @Path("propagate-exception2")
     public Book propogateException2() throws BookNotFoundFault {
         PhaseInterceptorChain.getCurrentMessage().put("org.apache.cxf.propagate.exception", Boolean.FALSE);
