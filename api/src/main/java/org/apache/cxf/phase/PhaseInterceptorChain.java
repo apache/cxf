@@ -197,7 +197,7 @@ public class PhaseInterceptorChain implements InterceptorChain {
         Integer phase = nameMap.get(phaseName);
         
         if (phase == null) {
-            LOG.fine("Skipping interceptor " + i.getClass().getName() 
+            LOG.warning("Skipping interceptor " + i.getClass().getName() 
                 + ((phaseName == null) ? ": Phase declaration is missing." 
                 : ": Phase " + phaseName + " specified does not exist."));
         } else {            
