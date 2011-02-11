@@ -21,10 +21,12 @@ package org.apache.cxf.interceptor.security;
 import java.security.Principal;
 import java.security.acl.Group;
 import java.util.Enumeration;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.LoginSecurityContext;
 
 /**
  * SecurityContext which implements isUserInRole using the
@@ -33,7 +35,7 @@ import org.apache.cxf.security.SecurityContext;
  * 
  * TODO : consider moving this class into a rt-core-security module
  */
-public class DefaultSecurityContext implements SecurityContext {
+public class DefaultSecurityContext implements LoginSecurityContext {
 
     private Principal p;
     private Subject subject; 
@@ -88,5 +90,23 @@ public class DefaultSecurityContext implements SecurityContext {
             }
         }
         return false;    
+    }
+
+    @Override
+    public Subject getSubject() {
+        return subject;
+    }
+
+    @Override
+    public Set<Principal> getUserRoles() {
+        Set<Principal> roles = new HashSet<Principal>();
+        if (subject != null) {
+            for (Principal principal : subject.getPrincipals()) {
+                if (principal != p) { 
+                    roles.add(principal);
+                }
+            }
+        }
+        return roles;
     }
 }

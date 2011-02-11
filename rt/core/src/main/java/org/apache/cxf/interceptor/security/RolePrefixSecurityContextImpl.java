@@ -20,20 +20,23 @@
 package org.apache.cxf.interceptor.security;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 import javax.security.auth.Subject;
 
-import org.apache.cxf.security.SecurityContext;
+import org.apache.cxf.security.LoginSecurityContext;
 
-public class RolePrefixSecurityContextImpl implements SecurityContext {
+public class RolePrefixSecurityContextImpl implements LoginSecurityContext {
     private Principal p;
-    private Set<String> roles; 
+    private Set<Principal> roles; 
+    private Subject theSubject;
     
     public RolePrefixSecurityContextImpl(Subject subject, String rolePrefix) {
         this.p = findPrincipal(subject, rolePrefix);
         this.roles = findRoles(subject, rolePrefix);
+        this.theSubject = subject;
     }
     
     public Principal getUserPrincipal() {
@@ -41,7 +44,14 @@ public class RolePrefixSecurityContextImpl implements SecurityContext {
     }
 
     public boolean isUserInRole(String role) {
-        return roles.contains(role);
+        // there is no guarantee the Principal instances retrieved
+        // from the Subject properly implement equalTo
+        for (Principal principal : roles) {
+            if (principal.getName().equals(role)) {
+                return true;
+            }
+        }
+        return false;
     }
     
     private static Principal findPrincipal(Subject subject, String rolePrefix) {
@@ -53,13 +63,21 @@ public class RolePrefixSecurityContextImpl implements SecurityContext {
         return null;
     }
     
-    private static Set<String> findRoles(Subject subject, String rolePrefix) {
-        Set<String> set = new HashSet<String>();
+    private static Set<Principal> findRoles(Subject subject, String rolePrefix) {
+        Set<Principal> set = new HashSet<Principal>();
         for (Principal p : subject.getPrincipals()) {
             if (p.getName().startsWith(rolePrefix)) {
-                set.add(p.getName());
+                set.add(p);
             }
         }
-        return set;
+        return Collections.unmodifiableSet(set);
+    }
+
+    public Subject getSubject() {
+        return theSubject;
+    }
+
+    public Set<Principal> getUserRoles() {
+        return roles;
     }
 }
