@@ -53,7 +53,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         limit = lim;
     }
     public LoggingInInterceptor(String id, int lim) {
-        this(Phase.RECEIVE, id);
+        this(id, Phase.RECEIVE);
         limit = lim;
     }
 
@@ -62,7 +62,7 @@ public class LoggingInInterceptor extends AbstractLoggingInterceptor {
         this.writer = w;
     }
     public LoggingInInterceptor(String id, PrintWriter w) {
-        this(Phase.RECEIVE, id);
+        this(id, Phase.RECEIVE);
         this.writer = w;
     }
     
