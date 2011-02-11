@@ -26,11 +26,11 @@ import javax.ws.rs.core.Application;
 
 import org.apache.cxf.jaxrs.provider.AtomEntryProvider;
 import org.apache.cxf.jaxrs.provider.AtomFeedProvider;
-import org.apache.cxf.management.web.logging.atom.AtomPullServer;
 
 import org.apache.cxf.management.web.browser.bootstrapping.BootstrapStorage;
 import org.apache.cxf.management.web.browser.bootstrapping.SimpleAuthenticationFilter;
 import org.apache.cxf.management.web.browser.bootstrapping.SimpleXMLSettingsStorage;
+import org.apache.cxf.management.web.logging.atom.AtomPullServer;
 
 public class App extends Application {
 
